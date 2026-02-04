@@ -1,0 +1,10 @@
+---
+description: "Handoffs and artifact persistence"
+globs: ["**/*"]
+---
+
+- Every role writes handoffs to files; nothing important stays in chat only.
+- Update sprint `summary.md` and `progress.md` after task completion.
+- Use `handoffs/*.md` for role-to-role transfers.
+- Keep `docs/engineering/state.md` current and concise.
+

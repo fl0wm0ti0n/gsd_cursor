@@ -1,0 +1,17 @@
+# Local metadata
+.specstory/
+
+# Temp build artifacts
+temp/
+gsd-backups/
+
+# Hook telemetry/state
+.cursor/hooks/*.jsonl
+.cursor/hooks/gsd-hook-state.json
+
+# Test/bench artifacts
+tests/.tmp-install/
+tests/report.md
+benchmarks/.tmp/
+benchmarks/bench-report.md
+benchmarks/live/live-bench-report.md

@@ -1,0 +1,11 @@
+---
+description: "GSD core workflow and context pack rules"
+globs: ["**/*"]
+---
+
+- Use the GSD phase flow: intake -> discovery -> architecture -> sprint plan ->
+  execute -> QA -> release -> refresh context.
+- Persist decisions and state in files; do not keep critical info only in chat.
+- Pause/resume is first-class. Update `handoffs/resume_brief.md` on pause.
+- Context pack must stay compact: summarize, do not dump raw logs.
+

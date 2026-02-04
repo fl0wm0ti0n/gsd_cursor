@@ -1,0 +1,30 @@
+[meta]
+id=S1
+name=Intake to sprint plan
+steps=7
+
+[require]
+docs/product/vision.md
+docs/product/backlog.md
+docs/product/acceptance.md
+docs/engineering/architecture.md
+docs/engineering/decisions.md
+docs/engineering/state.md
+sprints/S0001/sprint.md
+sprints/S0001/tasks.md
+sprints/S0001/progress.md
+handoffs/po_to_tl.md
+handoffs/tl_to_dev.md
+
+[sections]
+docs/product/vision.md|# Vision;## Problem;## Audience
+docs/product/backlog.md|# Backlog
+docs/product/acceptance.md|# Acceptance
+docs/engineering/architecture.md|# Architecture;## Overview
+docs/engineering/decisions.md|# Decisions
+docs/engineering/state.md|# Engineering State;## Current phase
+sprints/S0001/sprint.md|# Sprint S0001;## Goal
+sprints/S0001/tasks.md|# Tasks
+sprints/S0001/progress.md|# Progress
+handoffs/po_to_tl.md|# PO -> TL Handoff
+handoffs/tl_to_dev.md|# TL -> Dev Handoff

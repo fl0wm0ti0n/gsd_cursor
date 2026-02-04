@@ -1,0 +1,22 @@
+[meta]
+id=S2
+name=Execute to release
+steps=6
+
+[require]
+sprints/S0001/summary.md
+sprints/S0001/qa-findings.md
+handoffs/dev_to_qa.md
+handoffs/qa_to_dev.md
+handoffs/release_notes.md
+docs/engineering/runbook.md
+docs/engineering/state.md
+
+[sections]
+sprints/S0001/summary.md|# Sprint Summary;## Completed;## Open items
+sprints/S0001/qa-findings.md|# QA Findings;## Summary
+handoffs/dev_to_qa.md|# Dev -> QA Handoff
+handoffs/qa_to_dev.md|# QA -> Dev Handoff
+handoffs/release_notes.md|# Release Notes;## Changes
+docs/engineering/runbook.md|# Runbook;## Commands
+docs/engineering/state.md|# Engineering State

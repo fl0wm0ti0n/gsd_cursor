@@ -1,0 +1,10 @@
+---
+description: "Quality gates and small-step execution"
+globs: ["**/*"]
+---
+
+- Prefer small, atomic changes tied to a single task.
+- Run tests, lint, and typecheck when commands are configured.
+- Update `docs/engineering/state.md` after meaningful changes.
+- If tests fail and commands are set, fix or document before proceeding.
+

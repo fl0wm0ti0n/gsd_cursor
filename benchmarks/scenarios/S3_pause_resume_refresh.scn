@@ -1,0 +1,16 @@
+[meta]
+id=S3
+name=Pause, resume, refresh context
+steps=4
+
+[require]
+handoffs/resume_brief.md
+docs/engineering/state.md
+docs/engineering/decisions.md
+sprints/S0001/summary.md
+
+[sections]
+handoffs/resume_brief.md|# Resume Brief;## Current status;## Next actions
+docs/engineering/state.md|# Engineering State
+docs/engineering/decisions.md|# Decisions
+sprints/S0001/summary.md|# Sprint Summary
