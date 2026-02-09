@@ -95,7 +95,7 @@ New-Item -ItemType Directory -Path $tempRoot | Out-Null
 
 $installer = Join-Path $root "gsd-installer.ps1"
 if (Test-Path $installer -PathType Leaf) {
-  & $installer --target $tempRoot --mode missing --create | Out-Null
+  & $installer -Target $tempRoot -Mode missing -Create | Out-Null
   $installed = Test-Path (Join-Path $tempRoot ".cursor\commands\gsd-intake.md")
   Assert-True "Installer (ps1) installs commands" $installed
 } else {
@@ -106,7 +106,7 @@ if (Test-Path $installer -PathType Leaf) {
 if (Test-Path $installer -PathType Leaf) {
   $readmePath = Join-Path $tempRoot "README.md"
   Set-Content -Path $readmePath -Value "override"
-  & $installer --target $tempRoot --mode overwrite --backup | Out-Null
+  & $installer -Target $tempRoot -Mode overwrite -Backup | Out-Null
   $backupDir = Get-ChildItem -Path (Join-Path $tempRoot "gsd-backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
   $backupOk = $false
   if ($backupDir) {

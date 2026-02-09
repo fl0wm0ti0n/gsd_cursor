@@ -1,0 +1,65 @@
+[meta]
+id=S4
+name=Webview frontend + backend API
+steps=10
+
+[commands]
+/gsd-intake
+/gsd-discovery
+/gsd-architecture
+/gsd-sprint-plan
+/gsd-execute
+/gsd-qa
+/gsd-release
+/gsd-pause
+/gsd-resume
+/gsd-refresh-context
+
+[require]
+docs/product/vision.md
+docs/product/backlog.md
+docs/product/acceptance.md
+docs/engineering/architecture.md
+docs/engineering/decisions.md
+docs/engineering/state.md
+docs/engineering/runbook.md
+sprints/S0001/sprint.md
+sprints/S0001/tasks.md
+sprints/S0001/progress.md
+sprints/S0001/summary.md
+sprints/S0001/qa-findings.md
+handoffs/po_to_tl.md
+handoffs/tl_to_dev.md
+handoffs/dev_to_qa.md
+handoffs/qa_to_dev.md
+handoffs/release_notes.md
+handoffs/resume_brief.md
+examples/webview-app/README.md
+examples/webview-app/frontend/index.html
+examples/webview-app/frontend/app.js
+examples/webview-app/frontend/style.css
+examples/webview-app/backend/server.js
+examples/webview-app/backend/routes.js
+examples/webview-app/backend/validators.js
+examples/webview-app/shared/schema.json
+
+[sections]
+docs/product/vision.md|# Vision
+docs/product/backlog.md|# Backlog
+docs/product/acceptance.md|# Acceptance
+docs/engineering/architecture.md|# Architecture
+docs/engineering/decisions.md|# Decisions
+docs/engineering/state.md|# Engineering State
+docs/engineering/runbook.md|# Runbook
+sprints/S0001/sprint.md|# Sprint S0001
+sprints/S0001/tasks.md|# Tasks
+sprints/S0001/progress.md|# Progress
+sprints/S0001/summary.md|# Sprint Summary
+sprints/S0001/qa-findings.md|# QA Findings
+handoffs/release_notes.md|# Release Notes
+examples/webview-app/README.md|# Webview App
+examples/webview-app/frontend/index.html|WEBVIEW_UI
+examples/webview-app/frontend/app.js|API_CLIENT
+examples/webview-app/backend/server.js|API_SERVER
+examples/webview-app/backend/routes.js|ROUTES
+examples/webview-app/backend/validators.js|VALIDATION

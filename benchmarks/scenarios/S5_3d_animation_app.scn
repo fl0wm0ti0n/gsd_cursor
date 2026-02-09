@@ -1,0 +1,60 @@
+[meta]
+id=S5
+name=3D animation app
+steps=10
+
+[commands]
+/gsd-intake
+/gsd-discovery
+/gsd-architecture
+/gsd-sprint-plan
+/gsd-execute
+/gsd-qa
+/gsd-release
+/gsd-pause
+/gsd-resume
+/gsd-refresh-context
+
+[require]
+docs/product/vision.md
+docs/product/backlog.md
+docs/product/acceptance.md
+docs/engineering/architecture.md
+docs/engineering/decisions.md
+docs/engineering/state.md
+docs/engineering/runbook.md
+sprints/S0001/sprint.md
+sprints/S0001/tasks.md
+sprints/S0001/progress.md
+sprints/S0001/summary.md
+sprints/S0001/qa-findings.md
+handoffs/po_to_tl.md
+handoffs/tl_to_dev.md
+handoffs/dev_to_qa.md
+handoffs/qa_to_dev.md
+handoffs/release_notes.md
+handoffs/resume_brief.md
+examples/3d-animation/README.md
+examples/3d-animation/index.html
+examples/3d-animation/main.js
+examples/3d-animation/scene.js
+examples/3d-animation/animations.js
+
+[sections]
+docs/product/vision.md|# Vision
+docs/product/backlog.md|# Backlog
+docs/product/acceptance.md|# Acceptance
+docs/engineering/architecture.md|# Architecture
+docs/engineering/decisions.md|# Decisions
+docs/engineering/state.md|# Engineering State
+docs/engineering/runbook.md|# Runbook
+sprints/S0001/sprint.md|# Sprint S0001
+sprints/S0001/tasks.md|# Tasks
+sprints/S0001/progress.md|# Progress
+sprints/S0001/summary.md|# Sprint Summary
+sprints/S0001/qa-findings.md|# QA Findings
+handoffs/release_notes.md|# Release Notes
+examples/3d-animation/README.md|# 3D Animation App
+examples/3d-animation/main.js|RENDER_LOOP
+examples/3d-animation/scene.js|SCENE_SETUP
+examples/3d-animation/animations.js|ANIMATION_TRACKS

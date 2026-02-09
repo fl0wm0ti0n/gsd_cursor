@@ -1,0 +1,9 @@
+{
+  "milestone": "M0001",
+  "phases": [
+    {
+      "name": "intake",
+      "status": "pending"
+    }
+  ]
+}

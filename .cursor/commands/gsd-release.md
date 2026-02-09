@@ -24,4 +24,6 @@ description: "GSD release: prepare release notes and runbook updates."
 1. Write release notes and versioning notes.
 2. Update runbook commands if needed.
 3. Update state and readiness.
+4. If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generate
+   `handoffs/release_notes.md` via the release notes script.
 

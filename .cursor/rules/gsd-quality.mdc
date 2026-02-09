@@ -5,6 +5,11 @@ globs: ["**/*"]
 
 - Prefer small, atomic changes tied to a single task.
 - Run tests, lint, and typecheck when commands are configured.
+- If `AUTO_INSTALL_DEPS=1` in `.cursor/scratchpad.md`, install required
+  runtimes/libs without asking (package manager only).
+- If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generate release notes
+  automatically (scripted).
+- If `PERMISSION_MODE=auto`, do not ask for routine permission prompts.
 - Update `docs/engineering/state.md` after meaningful changes.
 - If tests fail and commands are set, fix or document before proceeding.
 

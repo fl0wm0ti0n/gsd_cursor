@@ -77,7 +77,7 @@ foreach ($scn in $scenarios) {
 
   $installer = Join-Path $root "gsd-installer.ps1"
   if (Test-Path $installer -PathType Leaf) {
-    & $installer --target $scenarioRoot --mode missing --create | Out-Null
+    & $installer -Target $scenarioRoot -Mode missing -Create | Out-Null
   }
 
   $missingFiles = @()

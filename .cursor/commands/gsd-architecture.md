@@ -10,6 +10,7 @@ description: "GSD architecture: define approach, risks, and decisions."
 ## Inputs
 - Product vision and acceptance
 - Constraints and risks
+- `docs/engineering/research.md`
 
 ## Outputs (artifacts)
 - `docs/engineering/architecture.md`

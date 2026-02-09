@@ -3,9 +3,16 @@ description: "GSD core workflow and context pack rules"
 globs: ["**/*"]
 ---
 
-- Use the GSD phase flow: intake -> discovery -> architecture -> sprint plan ->
-  execute -> QA -> release -> refresh context.
+- Use the GSD phase flow: intake -> discovery -> research -> architecture ->
+  sprint plan -> plan verify -> execute -> QA -> verify work -> release ->
+  refresh context.
+- `AUTO_FLOW_MODE` controls whether phases run automatically or stop at
+  decision gates (`auto_until_decision` recommended).
+- `PHASE_MODE=interactive` means ask questions; `PHASE_MODE=auto` minimizes
+  prompts unless decisions are required.
 - Persist decisions and state in files; do not keep critical info only in chat.
 - Pause/resume is first-class. Update `handoffs/resume_brief.md` on pause.
 - Context pack must stay compact: summarize, do not dump raw logs.
+- If `REMOTE_EXECUTION=1` and `.cursor/remote.json` is configured, the agent
+  may use the configured remote/docker servers for builds/tests.
 

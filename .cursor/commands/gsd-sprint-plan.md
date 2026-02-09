@@ -16,6 +16,7 @@ description: "GSD sprint plan: create sprint and atomic tasks."
 - `sprints/S0001/tasks.md`
 - `sprints/S0001/progress.md`
 - `handoffs/tl_to_dev.md`
+ - `sprints/S0001/plan-verify.json` (after /gsd-plan-verify)
 
 ## Stop conditions
 - Missing acceptance criteria
@@ -25,4 +26,5 @@ description: "GSD sprint plan: create sprint and atomic tasks."
 1. Create a sprint scope and goals.
 2. Break work into atomic tasks.
 3. Write TL -> Dev handoff.
+4. Run `/gsd-plan-verify` to check coverage.
 
