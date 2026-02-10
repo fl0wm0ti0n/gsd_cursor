@@ -1,0 +1,29 @@
+{
+  "name": "its-magic",
+  "version": "0.1.0",
+  "description": "Cursor-native GSD workflow toolkit with commands, rules, agents, and benchmarks.",
+  "license": "MIT",
+  "bin": {
+    "gsd-kit": "bin/gsd-kit.js"
+  },
+  "files": [
+    ".cursor/",
+    ".github/",
+    "decisions/",
+    "docs/",
+    "handoffs/",
+    "milestones/",
+    "scripts/",
+    "sprints/",
+    "gsd-installer.ps1",
+    "gsd-installer.sh",
+    "gsd-installer.py",
+    "README.md",
+    "bin/gsd-kit.js"
+  ],
+  "scripts": {
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
+  }
+}

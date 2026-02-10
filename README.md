@@ -93,6 +93,41 @@ Examples:
 - `sh gsd-installer.sh --target "/path/to/repo" --mode missing`
 - `sh gsd-installer.sh --target "/path/to/repo" --mode overwrite --backup`
 
+### NPX installer (npm publish)
+
+After publishing this repo to npm as `gsd-cursor-kit`, install with:
+
+- `npx gsd-cursor-kit --target "<path>" --mode missing`
+
+Examples:
+
+- `npx gsd-cursor-kit --target "C:\path\to\repo" --mode missing`
+- `npx gsd-cursor-kit --target "C:\path\to\repo" --mode overwrite --backup`
+
+### NPX release automation
+
+1. `npm login`
+2. `npm publish`
+
+Or use:
+
+- `npm run release:patch`
+- `npm run release:minor`
+- `npm run release:major`
+
+## Release package contents
+
+The npm package intentionally excludes **dev/testing/benchmark** content. The
+published package includes only the kit runtime (commands, rules, agents,
+docs, installers).
+
+Excluded from npm release:
+- `benchmarks/`
+- `tests/`
+- `Plan.md`
+
+If you want those, use the development repo directly.
+
 ## Benchmarks
 
 Use the benchmark harness to compare kit changes over time.
