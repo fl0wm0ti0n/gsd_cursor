@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
     <id>its-magic</id>
@@ -14,7 +14,6 @@
     <summary>AI dev team</summary>
     <tags>cursor ide workflow ai dev-team its-magic</tags>
     <dependencies>
-      <dependency id="nodejs" version="18.0.0" />
     </dependencies>
   </metadata>
   <files>

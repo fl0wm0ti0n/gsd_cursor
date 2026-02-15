@@ -1,4 +1,4 @@
-Param(
+﻿Param(
   [string]$Target,
   [ValidateSet("missing","overwrite","interactive")]
   [string]$Mode,
@@ -167,6 +167,23 @@ foreach ($rel in $files) {
   }
 }
 
-Write-Host "Install completed."
+function Show-ItsMagicBanner {
+    $prev = [Console]::OutputEncoding
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    Write-Host ""
+    Write-Host "  ██╗████████╗███████╗      ███╗   ███╗ █████╗  ██████╗ ██╗ ██████╗" -ForegroundColor Magenta
+    Write-Host "  ██║╚══██╔══╝██╔════╝      ████╗ ████║██╔══██╗██╔════╝ ██║██╔════╝" -ForegroundColor Magenta
+    Write-Host "  ██║   ██║   ███████╗█████╗██╔████╔██║███████║██║  ███╗██║██║     " -ForegroundColor Magenta
+    Write-Host "  ██║   ██║   ╚════██║╚════╝██║╚██╔╝██║██╔══██║██║   ██║██║██║     " -ForegroundColor Cyan
+    Write-Host "  ██║   ██║   ███████║      ██║ ╚═╝ ██║██║  ██║╚██████╔╝██║╚██████╗" -ForegroundColor Cyan
+    Write-Host "  ╚═╝   ╚═╝   ╚══════╝      ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝ ╚═════╝" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "                         AI dev team" -ForegroundColor Yellow
+    Write-Host "                    Installation complete!" -ForegroundColor Green
+    Write-Host ""
+    [Console]::OutputEncoding = $prev
+}
+
+Show-ItsMagicBanner
 exit 0
 

@@ -7,17 +7,36 @@ class ItsMagicBeta < Formula
   version "0.1.2-5"
   license "MIT"
 
-  depends_on "node"
-
   conflicts_with "its-magic", because: "beta and stable share the same binary"
 
   def install
     libexec.install Dir["*"]
-    bin.install_symlink libexec/"bin/its-magic.js" => "its-magic"
+    (bin/"its-magic").write <<~SH
+      #!/bin/bash
+      exec sh "#{libexec}/gsd-installer.sh" "$@"
+    SH
+    chmod 0755, bin/"its-magic"
+  end
+
+  def caveats
+    <<~EOS
+
+        ██╗████████╗███████╗      ███╗   ███╗ █████╗  ██████╗ ██╗ ██████╗
+        ██║╚══██╔══╝██╔════╝      ████╗ ████║██╔══██╗██╔════╝ ██║██╔════╝
+        ██║   ██║   ███████╗█████╗██╔████╔██║███████║██║  ███╗██║██║
+        ██║   ██║   ╚════██║╚════╝██║╚██╔╝██║██╔══██║██║   ██║██║██║
+        ██║   ██║   ███████║      ██║ ╚═╝ ██║██║  ██║╚██████╔╝██║╚██████╗
+        ╚═╝   ╚═╝   ╚══════╝      ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝ ╚═════╝
+
+                           AI dev team
+                   Installation complete! (beta)
+
+      Run: its-magic --help
+    EOS
   end
 
   test do
-    system "#{bin}/its-magic", "--help"
+    system "#{bin}/its-magic", "--target", testpath, "--mode", "missing"
   end
 end
 

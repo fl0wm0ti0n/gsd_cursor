@@ -6,15 +6,35 @@ class ItsMagic < Formula
   sha256 "0c728dc21b0eb4a2e62bd8a4ad40298d618f3ce2b70d0eaef567c8f701e3cd2e"
   license "MIT"
 
-  depends_on "node"
-
   def install
     libexec.install Dir["*"]
-    bin.install_symlink libexec/"bin/its-magic.js" => "its-magic"
+    # Create a shell wrapper that calls gsd-installer.sh directly (no Node.js needed)
+    (bin/"its-magic").write <<~SH
+      #!/bin/bash
+      exec sh "#{libexec}/gsd-installer.sh" "$@"
+    SH
+    chmod 0755, bin/"its-magic"
+  end
+
+  def caveats
+    <<~EOS
+
+        ██╗████████╗███████╗      ███╗   ███╗ █████╗  ██████╗ ██╗ ██████╗
+        ██║╚══██╔══╝██╔════╝      ████╗ ████║██╔══██╗██╔════╝ ██║██╔════╝
+        ██║   ██║   ███████╗█████╗██╔████╔██║███████║██║  ███╗██║██║
+        ██║   ██║   ╚════██║╚════╝██║╚██╔╝██║██╔══██║██║   ██║██║██║
+        ██║   ██║   ███████║      ██║ ╚═╝ ██║██║  ██║╚██████╔╝██║╚██████╗
+        ╚═╝   ╚═╝   ╚══════╝      ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝ ╚═════╝
+
+                           AI dev team
+                      Installation complete!
+
+      Run: its-magic --help
+    EOS
   end
 
   test do
-    system "#{bin}/its-magic", "--help"
+    system "#{bin}/its-magic", "--target", testpath, "--mode", "missing"
   end
 end
 

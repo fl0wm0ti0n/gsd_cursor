@@ -1,4 +1,4 @@
-# Cursor-GSD-Team Kit
+# its-magic — AI dev team
 
 Drop-in template repo that implements a structured GSD workflow in Cursor:
 intake -> discovery -> architecture -> sprint plan -> execute -> QA -> release,
@@ -18,7 +18,7 @@ with pause/resume, decision gates, and persistent artifacts.
 ### GSD tooling (engine)
 - `.cursor/` — commands, rules, agents, hooks, skills, scratchpad config.
 - `.github/workflows/` — CI/CD templates driven by `docs/engineering/runbook.md`.
-- `gsd-installer.*` — installers for adding this kit to other repos.
+- `gsd-installer.*` — installers for adding its-magic to other repos.
 - `scripts/` — helper scripts (release notes generator, unified release script).
 - `packaging/` — Homebrew formula + Chocolatey nuspec for multi-platform distribution.
 
@@ -33,11 +33,11 @@ with pause/resume, decision gates, and persistent artifacts.
 - `examples/` — reference apps created by benchmarks or demos.
 
 ### Testing and benchmarks
-- `tests/` — test harness for kit verification.
+- `tests/` — test harness for its-magic verification.
 - `benchmarks/` — scenario, live, prompted, and headless benchmark runners.
 
 ### Misc
-- `Plan.md` — original master plan for the kit.
+- `Plan.md` — original master plan for its-magic.
 - `.gitignore` — ignores generated reports, temp folders, and telemetry.
 
 ## Voice input (multilingual)
@@ -69,7 +69,7 @@ Supported keys:
 
 ## Installer / updater
 
-Use one of the installers below to add this kit to an existing repo or
+Use one of the installers below to add its-magic to an existing repo or
 bootstrap an empty one:
 
 - Windows: `gsd-installer.ps1`
@@ -277,7 +277,7 @@ flowchart LR
 ## Release package contents
 
 The npm package intentionally excludes **dev/testing/benchmark** content. The
-published package includes only the kit runtime (commands, rules, agents,
+published package includes only the its-magic runtime (commands, rules, agents,
 docs, installers).
 
 Excluded from npm release:
@@ -290,7 +290,7 @@ If you want those, use the development repo directly.
 
 ## Benchmarks
 
-Use the benchmark harness to compare kit changes over time.
+Use the benchmark harness to compare its-magic changes over time.
 
 - Windows: `powershell -ExecutionPolicy Bypass -File benchmarks/run-bench.ps1`
 - macOS/Linux: `sh benchmarks/run-bench.sh`
@@ -302,7 +302,7 @@ Reports are written to `benchmarks/bench-report.md`.
 ```mermaid
 flowchart TD
   StartBench[Start benchmark] --> SelectScenario[Load scenarios]
-  SelectScenario --> InstallKit[Install kit into temp workspace]
+  SelectScenario --> InstallKit[Install its-magic into temp workspace]
   InstallKit --> RunChecks[Validate required files/sections]
   RunChecks --> BenchReport[Write benchmarks/bench-report.md]
 ```
@@ -356,7 +356,7 @@ Per-run artifacts:
 flowchart TD
   StartHeadless[Start headless run] --> LoadPrompt[Load prompt blocks]
   LoadPrompt --> TempWorkspace[Create temp workspace]
-  TempWorkspace --> InstallHeadless[Install kit]
+  TempWorkspace --> InstallHeadless[Install its-magic]
   InstallHeadless --> RunAgent[agent -p --force for each step]
   RunAgent --> ValidateOutputs[Validate files/sections/smoke checks]
   ValidateOutputs --> WriteProtocol[Write protocol.md]
