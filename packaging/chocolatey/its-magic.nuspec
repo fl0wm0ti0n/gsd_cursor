@@ -5,10 +5,10 @@
     <!-- UPDATE version before each release -->
     <version>0.1.1-beta4</version>
     <title>its-magic</title>
-    <authors>YOUR_NAME</authors>
-    <owners>YOUR_NAME</owners>
-    <projectUrl>https://github.com/USER/its-magic</projectUrl>
-    <licenseUrl>https://github.com/USER/its-magic/blob/main/LICENSE</licenseUrl>
+    <authors>omniflow</authors>
+    <owners>omniflow</owners>
+    <projectUrl>https://github.com/fl0wm0ti0n/gsd_cursor</projectUrl>
+    <licenseUrl>https://github.com/fl0wm0ti0n/gsd_cursor/blob/main/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>its-magic brings an AI dev team workflow into Cursor projects with commands, rules, skills, hooks, and agents.</description>
     <summary>AI dev team</summary>
