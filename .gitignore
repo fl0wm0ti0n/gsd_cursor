@@ -20,3 +20,6 @@ benchmarks/headless/.tmp/
 benchmarks/headless/headless-report.md
 benchmarks/headless/protocol.md
 benchmarks/runs/
+
+# Homebrew tap clone (used during release)
+homebrew-tap/

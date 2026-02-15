@@ -1,10 +1,10 @@
 {
   "name": "its-magic",
-  "version": "0.1.0",
-  "description": "Cursor-native GSD workflow toolkit with commands, rules, agents, and benchmarks.",
+  "version": "0.1.2-5",
+  "description": "its-magic - AI dev team workflow for Cursor.",
   "license": "MIT",
   "bin": {
-    "gsd-kit": "bin/gsd-kit.js"
+    "its-magic": "bin/its-magic.js"
   },
   "files": [
     ".cursor/",
@@ -19,11 +19,20 @@
     "gsd-installer.sh",
     "gsd-installer.py",
     "README.md",
-    "bin/gsd-kit.js"
+    "bin/its-magic.js"
   ],
   "scripts": {
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish"
+    "release:major": "npm version major && npm publish",
+    "release:all": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1",
+    "release:all:patch": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -Bump patch",
+    "release:all:minor": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -Bump minor",
+    "release:all:major": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -Bump major",
+    "release:all:beta": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -Bump prerelease -NpmTag beta",
+    "release:all:dry": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -DryRun",
+    "release:npm-only": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -SkipChoco -SkipBrew",
+    "release:choco-only": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -SkipNpm -SkipBrew",
+    "release:brew-only": "powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1 -SkipNpm -SkipChoco"
   }
 }

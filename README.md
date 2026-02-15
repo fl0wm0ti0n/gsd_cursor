@@ -19,7 +19,8 @@ with pause/resume, decision gates, and persistent artifacts.
 - `.cursor/` — commands, rules, agents, hooks, skills, scratchpad config.
 - `.github/workflows/` — CI/CD templates driven by `docs/engineering/runbook.md`.
 - `gsd-installer.*` — installers for adding this kit to other repos.
-- `scripts/` — helper scripts (e.g., release notes generator).
+- `scripts/` — helper scripts (release notes generator, unified release script).
+- `packaging/` — Homebrew formula + Chocolatey nuspec for multi-platform distribution.
 
 ### GSD artifacts (project memory)
 - `docs/` — product + engineering docs (vision, architecture, decisions, state).
@@ -95,14 +96,14 @@ Examples:
 
 ### NPX installer (npm publish)
 
-After publishing this repo to npm as `gsd-cursor-kit`, install with:
+After publishing this repo to npm as `its-magic`, install with:
 
-- `npx gsd-cursor-kit --target "<path>" --mode missing`
+- `npx its-magic --target "<path>" --mode missing`
 
 Examples:
 
-- `npx gsd-cursor-kit --target "C:\path\to\repo" --mode missing`
-- `npx gsd-cursor-kit --target "C:\path\to\repo" --mode overwrite --backup`
+- `npx its-magic --target "C:\path\to\repo" --mode missing`
+- `npx its-magic --target "C:\path\to\repo" --mode overwrite --backup`
 
 ### NPX release automation
 
@@ -115,6 +116,164 @@ Or use:
 - `npm run release:minor`
 - `npm run release:major`
 
+### Unified release (npm + Chocolatey + Homebrew)
+
+Release to all three package managers with a single command:
+
+- Windows: `powershell -ExecutionPolicy Bypass -File scripts/release-all.ps1`
+- macOS/Linux: `sh scripts/release-all.sh`
+
+Or via npm scripts:
+
+**All three at once:**
+
+- `npm run release:all` — patch release to all three
+- `npm run release:all:patch` — explicit patch to all three
+- `npm run release:all:minor` — minor release to all three
+- `npm run release:all:major` — major release to all three
+- `npm run release:all:beta` — beta prerelease to all three
+- `npm run release:all:dry` — dry run (print actions, change nothing)
+
+**Single target only:**
+
+- `npm run release:npm-only` — publish only to npm
+- `npm run release:choco-only` — publish only to Chocolatey
+- `npm run release:brew-only` — publish only to Homebrew
+
+**Mix and match (PowerShell):**
+
+```powershell
+# All three, minor bump
+scripts/release-all.ps1 -Bump minor
+
+# Only npm + Homebrew (skip Chocolatey)
+scripts/release-all.ps1 -SkipChoco
+
+# Only npm + Chocolatey (skip Homebrew)
+scripts/release-all.ps1 -SkipBrew
+
+# Only npm
+scripts/release-all.ps1 -SkipChoco -SkipBrew
+
+# Only Chocolatey
+scripts/release-all.ps1 -SkipNpm -SkipBrew
+
+# Only Homebrew
+scripts/release-all.ps1 -SkipNpm -SkipChoco
+
+# Homebrew + automatic tap publish
+scripts/release-all.ps1 -SkipNpm -SkipChoco -BrewTapRepo USER/homebrew-tap
+
+# Homebrew update only (no tap push)
+scripts/release-all.ps1 -SkipNpm -SkipChoco -SkipBrewPush
+
+# Beta prerelease, only npm
+scripts/release-all.ps1 -Bump prerelease -NpmTag beta -SkipChoco -SkipBrew
+
+# Explicit version
+scripts/release-all.ps1 -Bump 1.2.3
+
+# Preview without changing anything
+scripts/release-all.ps1 -DryRun
+```
+
+**Mix and match (Bash):**
+
+```bash
+# All three, minor bump
+sh scripts/release-all.sh --bump minor
+
+# Only npm + Homebrew (skip Chocolatey)
+sh scripts/release-all.sh --skip-choco
+
+# Only npm
+sh scripts/release-all.sh --skip-choco --skip-brew
+
+# Only Chocolatey
+sh scripts/release-all.sh --skip-npm --skip-brew
+
+# Only Homebrew
+sh scripts/release-all.sh --skip-npm --skip-choco
+
+# Beta prerelease, only npm
+sh scripts/release-all.sh --bump prerelease --npm-tag beta --skip-choco --skip-brew
+
+# Preview without changing anything
+sh scripts/release-all.sh --dry-run
+```
+
+What the script does:
+1. Bumps version in `package.json`
+2. Publishes to npm (with optional dist-tag)
+3. Creates a GitHub release via `gh` CLI (marked as prerelease when version contains `-`)
+4. Updates Chocolatey `.nuspec`, computes checksum, runs `choco push`
+5. Updates Homebrew formula URL + sha256 (auto-selects `its-magic-beta.rb` for pre-releases)
+6. PowerShell script: pushes Homebrew formulas to your tap repo (`homebrew-tap`) unless `-SkipBrewPush` is used
+
+Prerequisites:
+- `npm login` (for npm)
+- `gh auth login` (for GitHub releases, optional but recommended)
+- `choco` installed + API key set (for Chocolatey, optional)
+- Homebrew tap repo for distributing the formula (`USER/homebrew-tap`)
+- `git` available locally (for tap push)
+
+### Installing via each package manager
+
+| Manager    | Stable                                    | Beta / Pre-release                          |
+|------------|-------------------------------------------|---------------------------------------------|
+| npm/npx    | `npx its-magic --target . --mode missing` | `npx its-magic@beta --target . --mode missing` |
+| Chocolatey | `choco install its-magic`                 | `choco install its-magic --pre`             |
+| Homebrew   | `brew install USER/tap/its-magic`         | `brew install USER/tap/its-magic-beta`      |
+
+### Homebrew tap setup
+
+To distribute via Homebrew you need a "tap" repo:
+
+1. Create a GitHub repo named `homebrew-tap` (e.g. `USER/homebrew-tap`)
+2. Copy both formulas into that repo:
+   - `packaging/homebrew/its-magic.rb` (stable)
+   - `packaging/homebrew/its-magic-beta.rb` (pre-releases)
+3. Users install with:
+   - Stable: `brew tap USER/tap && brew install its-magic`
+   - Beta: `brew tap USER/tap && brew install its-magic-beta`
+
+The PowerShell release script auto-detects whether the version is a pre-release
+(contains `-`, e.g. `0.2.0-beta.1`) and updates the correct formula, then
+commits + pushes to your tap repo.
+
+Tap push options (PowerShell):
+- `-BrewTapRepo USER/homebrew-tap` - explicit tap target
+- `-BrewTapBranch main` - target branch
+- `-BrewTapDir <path>` - local checkout path for tap
+- `-CreateBrewTapIfMissing $true|$false` - auto-create tap repo on GitHub (default: `$true`, requires `gh auth login`)
+- `-SkipBrewPush` - update formula locally but do not push tap
+
+### Chocolatey setup
+
+1. Create an account at https://community.chocolatey.org
+2. Get an API key from your account page
+3. Run `choco apikey --key <your-key> --source https://push.chocolatey.org/`
+4. The release script handles `choco pack` + `choco push` automatically
+
+```mermaid
+flowchart LR
+  ReleaseAll[scripts/release-all.*] --> VerCheck{version has -?}
+  VerCheck -->|stable| NPM["npm publish --tag latest"]
+  VerCheck -->|prerelease| NPMBeta["npm publish --tag beta"]
+  ReleaseAll --> GH["gh release create"]
+  VerCheck -->|prerelease| GHPre["--prerelease flag"]
+  GH --> Choco[choco pack + push]
+  GH --> BrewCheck{prerelease?}
+  BrewCheck -->|no| BrewStable[its-magic.rb]
+  BrewCheck -->|yes| BrewBeta[its-magic-beta.rb]
+  NPM --> U1["npx its-magic"]
+  NPMBeta --> U1b["npx its-magic@beta"]
+  Choco --> U2["choco install its-magic"]
+  Choco --> U2b["choco install its-magic --pre"]
+  BrewStable --> U3["brew install its-magic"]
+  BrewBeta --> U3b["brew install its-magic-beta"]
+```
+
 ## Release package contents
 
 The npm package intentionally excludes **dev/testing/benchmark** content. The
@@ -124,6 +283,7 @@ docs, installers).
 Excluded from npm release:
 - `benchmarks/`
 - `tests/`
+- `packaging/`
 - `Plan.md`
 
 If you want those, use the development repo directly.
@@ -262,6 +422,10 @@ Configure in `.cursor/scratchpad.md`:
 
 ## Recent changes (latest additions)
 
+- **Unified multi-platform release** (npm + Chocolatey + Homebrew) via `scripts/release-all.*`.
+- Homebrew formula template in `packaging/homebrew/`.
+- Chocolatey package spec in `packaging/chocolatey/`.
+- npm `release:all` scripts for one-command publishing to all three.
 - Headless CLI benchmark runner with protocol output.
 - Headless run validation: required files, sections, and smoke checks.
 - Prompted scenario files for code benchmarks.
@@ -281,6 +445,10 @@ flowchart TD
   BenchPrompts[benchmarks/prompts/*.txt] --> HeadlessRunner[benchmarks/headless/run-headless.*]
   HeadlessRunner --> Protocol[benchmarks/headless/protocol.md]
   HeadlessRunner --> Report[benchmarks/headless/headless-report.md]
+  ReleaseAll[scripts/release-all.*] --> NPMPub[npm publish]
+  ReleaseAll --> GHRelease[GitHub release]
+  GHRelease --> ChocoUpdate[Chocolatey pack+push]
+  GHRelease --> BrewUpdate[Homebrew formula update]
 ```
 
 ## How-to examples

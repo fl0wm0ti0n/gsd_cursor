@@ -32,10 +32,10 @@ function parseArgs(argv) {
 }
 
 function printHelp() {
-  console.log(`gsd-kit
+  console.log(`its-magic
 
 Usage:
-  npx gsd-cursor-kit --target <path> --mode missing [--backup] [--create]
+  npx its-magic --target <path> --mode missing [--backup] [--create]
 
 Options:
   --target   Target repository path (default: current directory)
