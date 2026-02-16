@@ -2,7 +2,7 @@
 
 ## Commands
 
-TEST_COMMAND: powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1
+TEST_COMMAND: sh tests/run-tests.sh
 LINT_COMMAND:
 TYPECHECK_COMMAND:
 DEPLOY_STAGING_COMMAND:
