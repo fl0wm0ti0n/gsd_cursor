@@ -28,7 +28,7 @@ assert_true() {
   name="$1"
   condition="$2"
   detail="$3"
-  if sh -c "$condition"; then
+  if eval "$condition"; then
     add_result "$name" "PASS" "$detail"
   else
     add_result "$name" "FAIL" "$detail"
@@ -43,7 +43,7 @@ file_contains() {
 
 assert_true "Commands folder exists" "[ -d \"$ROOT/.cursor/commands\" ]"
 assert_true "Rules folder exists" "[ -d \"$ROOT/.cursor/rules\" ]"
-assert_true "Skills folder exists" "[ -d \"$ROOT/.cursor/skills/team/templates\" ]"
+assert_true "Skills folder exists" "[ -d \"$ROOT/.cursor/skills/its-magic/templates\" ]"
 assert_true "Agents folder exists" "[ -d \"$ROOT/.cursor/agents\" ]"
 assert_true "Hooks config exists" "[ -f \"$ROOT/.cursor/hooks.json\" ]"
 assert_true "Docs folder exists" "[ -d \"$ROOT/docs\" ]"
@@ -55,7 +55,7 @@ assert_true "Workflows folder exists" "[ -d \"$ROOT/.github/workflows\" ]"
 cmd_count=$(ls "$ROOT/.cursor/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 rule_count=$(ls "$ROOT/.cursor/rules"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
 agent_count=$(ls "$ROOT/.cursor/agents"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
-assert_true "10 commands exist" "[ $cmd_count -eq 10 ]"
+assert_true "19 commands exist" "[ $cmd_count -eq 19 ]"
 assert_true "4 rules exist" "[ $rule_count -eq 4 ]"
 assert_true "6 agents exist" "[ $agent_count -eq 6 ]"
 

@@ -38,7 +38,7 @@ $root = Resolve-RepoRoot
 # 1) Base structure checks
 Assert-True "Commands folder exists" (Test-Path (Join-Path $root ".cursor\commands"))
 Assert-True "Rules folder exists" (Test-Path (Join-Path $root ".cursor\rules"))
-Assert-True "Skills folder exists" (Test-Path (Join-Path $root ".cursor\skills\team\templates"))
+Assert-True "Skills folder exists" (Test-Path (Join-Path $root ".cursor\skills\its-magic\templates"))
 Assert-True "Agents folder exists" (Test-Path (Join-Path $root ".cursor\agents"))
 Assert-True "Hooks config exists" (Test-Path (Join-Path $root ".cursor\hooks.json"))
 Assert-True "Docs folder exists" (Test-Path (Join-Path $root "docs"))
@@ -48,7 +48,7 @@ Assert-True "Decisions folder exists" (Test-Path (Join-Path $root "decisions"))
 Assert-True "Workflows folder exists" (Test-Path (Join-Path $root ".github\workflows"))
 
 # 2) Command/rule counts
-Assert-True "10 commands exist" ((Count-Files (Join-Path $root ".cursor\commands") "*.md") -eq 10)
+Assert-True "19 commands exist" ((Count-Files (Join-Path $root ".cursor\commands") "*.md") -eq 19)
 Assert-True "4 rules exist" ((Count-Files (Join-Path $root ".cursor\rules") "*.mdc") -eq 4)
 Assert-True "6 agents exist" ((Count-Files (Join-Path $root ".cursor\agents") "*.mdc") -eq 6)
 
