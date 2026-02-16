@@ -18,11 +18,13 @@ jobs:
           import pathlib
           import re
 
-          text = pathlib.Path("docs/engineering/runbook.md").read_text()
+          text = pathlib.Path("docs/engineering/runbook.md").read_text(encoding="utf-8")
 
           def get(key):
-              m = re.search(rf"^{key}:\s*(.*)$", text, re.M)
-              val = (m.group(1) or "").strip() if m else ""
+              m = re.search(rf"^{key}:\s*(.+)$", text, re.M)
+              if not m:
+                  return ""
+              val = m.group(1).strip()
               if val in ("", "...", "<...>", "TODO"):
                   return ""
               return val
@@ -30,18 +32,20 @@ jobs:
           keys = ["TEST_COMMAND", "LINT_COMMAND", "TYPECHECK_COMMAND"]
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               for key in keys:
-                  f.write(f"{key}={get(key)}\n")
+                  val = get(key)
+                  f.write(f"{key}={val}\n")
+                  print(f"  {key} = '{val}'")
           PY
       - name: Test
-        if: steps.runbook.outputs.TEST_COMMAND != ''
+        if: ${{ steps.runbook.outputs.TEST_COMMAND != '' }}
         run: ${{ steps.runbook.outputs.TEST_COMMAND }}
       - name: Lint
-        if: steps.runbook.outputs.LINT_COMMAND != ''
+        if: ${{ steps.runbook.outputs.LINT_COMMAND != '' }}
         run: ${{ steps.runbook.outputs.LINT_COMMAND }}
       - name: Typecheck
-        if: steps.runbook.outputs.TYPECHECK_COMMAND != ''
+        if: ${{ steps.runbook.outputs.TYPECHECK_COMMAND != '' }}
         run: ${{ steps.runbook.outputs.TYPECHECK_COMMAND }}
       - name: No commands set
-        if: steps.runbook.outputs.TEST_COMMAND == '' && steps.runbook.outputs.LINT_COMMAND == '' && steps.runbook.outputs.TYPECHECK_COMMAND == ''
+        if: ${{ steps.runbook.outputs.TEST_COMMAND == '' && steps.runbook.outputs.LINT_COMMAND == '' && steps.runbook.outputs.TYPECHECK_COMMAND == '' }}
         run: echo "No runbook commands set."
 
