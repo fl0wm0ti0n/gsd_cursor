@@ -13,13 +13,9 @@ jobs:
       - id: runbook
         name: Read runbook commands
         run: |
-          python - <<'PY'
-          import os
-          import pathlib
-          import re
-
+          python3 - <<'PY'
+          import os, pathlib, re
           text = pathlib.Path("docs/engineering/runbook.md").read_text(encoding="utf-8")
-
           def get(key):
               m = re.search(rf"^{key}:\s*(.+)$", text, re.M)
               if not m:
@@ -28,13 +24,15 @@ jobs:
               if val in ("", "...", "<...>", "TODO"):
                   return ""
               return val
-
           keys = ["TEST_COMMAND", "LINT_COMMAND", "TYPECHECK_COMMAND"]
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               for key in keys:
                   val = get(key)
-                  f.write(f"{key}={val}\n")
-                  print(f"  {key} = '{val}'")
+                  if val:
+                      f.write(f"{key}={val}\n")
+                      print(f"  {key} = '{val}'")
+                  else:
+                      print(f"  {key} = (skipped, empty)")
           PY
       - name: Test
         if: ${{ steps.runbook.outputs.TEST_COMMAND != '' }}
