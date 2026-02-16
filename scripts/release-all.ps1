@@ -147,7 +147,7 @@ if (-not $SkipChoco) {
         # Compute checksum if we have the zip
         if ($zipUrl -and -not $DryRun) {
             Log "Downloading zip for checksum ..."
-            $tmpZip = Join-Path $env:TEMP "gsd-$tagName.zip"
+            $tmpZip = Join-Path $env:TEMP "its-magic-$tagName.zip"
             try {
                 Invoke-WebRequest -Uri $zipUrl -OutFile $tmpZip -UseBasicParsing
                 $sha = (Get-FileHash -Path $tmpZip -Algorithm SHA256).Hash.ToLower()
@@ -234,7 +234,7 @@ if (-not $SkipBrew) {
 
             # Compute tar.gz sha256 if possible
             if ($tarUrl) {
-                $tmpTar = Join-Path $env:TEMP "gsd-$tagName.tar.gz"
+                $tmpTar = Join-Path $env:TEMP "its-magic-$tagName.tar.gz"
                 try {
                     Invoke-WebRequest -Uri $tarUrl -OutFile $tmpTar -UseBasicParsing
                     $sha = (Get-FileHash -Path $tmpTar -Algorithm SHA256).Hash.ToLower()

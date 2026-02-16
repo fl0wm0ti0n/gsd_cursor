@@ -1,8 +1,8 @@
 ---
-description: "GSD quick: execute a small task without full planning."
+description: "its-magic quick: execute a small task without full planning."
 ---
 
-# /gsd-quick
+# /quick
 
 ## Subagents
 - dev

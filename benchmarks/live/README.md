@@ -10,7 +10,7 @@ Live benchmarks measure actual agent runs in Cursor using hook telemetry.
 3. End the run and clear `GSD_BENCH_SESSION`.
 4. Generate a report from the log file.
 
-The log file is stored at `.cursor/hooks/gsd-bench-log.jsonl`.
+The log file is stored at `.cursor/hooks/bench-log.jsonl`.
 
 ## Prompted runs
 

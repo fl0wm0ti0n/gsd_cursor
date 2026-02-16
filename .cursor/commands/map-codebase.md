@@ -1,8 +1,8 @@
 ---
-description: "GSD map codebase: analyze existing project before changes."
+description: "its-magic map codebase: analyze existing project before changes."
 ---
 
-# /gsd-map-codebase
+# /map-codebase
 
 ## Subagents
 - tech-lead

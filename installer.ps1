@@ -1,4 +1,4 @@
-﻿Param(
+Param(
   [string]$Target,
   [ValidateSet("missing","overwrite","interactive")]
   [string]$Mode,
@@ -37,7 +37,7 @@ function List-SourceFiles($SourceRoot, $IncludePaths) {
 
 function Backup-Files($TargetRoot, $RelPaths) {
   $timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmmssZ")
-  $backupRoot = Join-Path $TargetRoot ("gsd-backups\" + $timestamp)
+  $backupRoot = Join-Path $TargetRoot ("backups\" + $timestamp)
   foreach ($rel in $RelPaths) {
     $src = Join-Path $TargetRoot $rel
     if (Test-Path $src -PathType Leaf) {
@@ -104,9 +104,9 @@ $includePaths = @(
   "decisions",
   ".github/workflows",
   "README.md",
-  "gsd-installer.py",
-  "gsd-installer.ps1",
-  "gsd-installer.sh"
+  "installer.py",
+  "installer.ps1",
+  "installer.sh"
 )
 
 $files = List-SourceFiles $sourceRoot $includePaths

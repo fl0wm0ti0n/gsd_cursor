@@ -4,16 +4,16 @@ name=Webview frontend + backend API
 steps=10
 
 [commands]
-/gsd-intake
-/gsd-discovery
-/gsd-architecture
-/gsd-sprint-plan
-/gsd-execute
-/gsd-qa
-/gsd-release
-/gsd-pause
-/gsd-resume
-/gsd-refresh-context
+/intake
+/discovery
+/architecture
+/sprint-plan
+/execute
+/qa
+/release
+/pause
+/resume
+/refresh-context
 
 [require]
 docs/product/vision.md

@@ -1,6 +1,6 @@
 {
   "name": "its-magic",
-  "version": "0.1.2-5",
+  "version": "0.1.2-9",
   "description": "its-magic - AI dev team workflow for Cursor.",
   "license": "MIT",
   "bin": {
@@ -15,9 +15,9 @@
     "milestones/",
     "scripts/",
     "sprints/",
-    "gsd-installer.ps1",
-    "gsd-installer.sh",
-    "gsd-installer.py",
+    "installer.ps1",
+    "installer.sh",
+    "installer.py",
     "README.md",
     "bin/its-magic.js"
   ],

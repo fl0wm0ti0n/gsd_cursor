@@ -1,8 +1,8 @@
 ---
-description: "GSD resume: load context pack and continue work."
+description: "its-magic resume: load context pack and continue work."
 ---
 
-# /gsd-resume
+# /resume
 
 ## Subagents
 - curator

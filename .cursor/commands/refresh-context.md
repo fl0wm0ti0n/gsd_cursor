@@ -1,8 +1,8 @@
 ---
-description: "GSD refresh context: compact state and decisions."
+description: "its-magic refresh context: compact state and decisions."
 ---
 
-# /gsd-refresh-context
+# /refresh-context
 
 ## Subagents
 - curator

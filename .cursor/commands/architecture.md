@@ -1,8 +1,8 @@
 ---
-description: "GSD architecture: define approach, risks, and decisions."
+description: "its-magic architecture: define approach, risks, and decisions."
 ---
 
-# /gsd-architecture
+# /architecture
 
 ## Subagents
 - tech-lead

@@ -1,8 +1,8 @@
 ---
-description: "GSD execute: implement tasks with artifacts and state updates."
+description: "its-magic execute: implement tasks with artifacts and state updates."
 ---
 
-# /gsd-execute
+# /execute
 
 ## Subagents
 - dev

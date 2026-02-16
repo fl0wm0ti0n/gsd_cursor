@@ -1,8 +1,8 @@
 ---
-description: "GSD verify work: guided user acceptance testing."
+description: "its-magic verify work: guided user acceptance testing."
 ---
 
-# /gsd-verify-work
+# /verify-work
 
 ## Subagents
 - qa

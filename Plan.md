@@ -1,6 +1,6 @@
-# Cursor-GSD-Team Kit – Masterplan (Template + Setup + Workflow + Voice + CI/CD)
+# Cursor-its-magic-Team Kit – Masterplan (Template + Setup + Workflow + Voice + CI/CD)
 
-> Zweck dieses Dokuments: Du (eine andere AI) sollst daraus ein **drop-in “Cursor-GSD-Team Kit”** bauen, das die **GSD-Herangehensweise** (Intake → Rückfragen → Specs → Plan → Execute → Verify) mit einem **AI-Dev-Team** (PO, Tech Lead, Dev, QA, Release, Curator) kombiniert – **Cursor-native** mit **Commands, Rules, Skills, Subagents und Hooks**.  
+> Zweck dieses Dokuments: Du (eine andere AI) sollst daraus ein **drop-in “Cursor-its-magic-Team Kit”** bauen, das die **its-magic-Herangehensweise** (Intake → Rückfragen → Specs → Plan → Execute → Verify) mit einem **AI-Dev-Team** (PO, Tech Lead, Dev, QA, Release, Curator) kombiniert – **Cursor-native** mit **Commands, Rules, Skills, Subagents und Hooks**.  
 > Zusatzanforderungen:  
 > 1) **Sprachsteuerung** für möglichst viele Sprachen (multilingual STT)  
 > 2) **Automatisierte Tests + CI/CD** (lokal über Hooks + remote über GitHub Actions Templates)  
@@ -13,7 +13,7 @@
 
 ### Ziele
 - User muss **nur die Idee schildern** (optional per Sprache).
-- Danach kommen **gezielte Rückfragen** (wie bei GSD), bis die erste **User Story** + **Acceptance Criteria** stehen.
+- Danach kommen **gezielte Rückfragen** (wie bei its-magic), bis die erste **User Story** + **Acceptance Criteria** stehen.
 - Architektur/Design/Beispiele (Website-Inspiration, Grafik/UX) werden **systematisch erfasst** und als Artefakte gespeichert.
 - Danach läuft der Prozess weitgehend automatisch:
   - Plan → Tasks → Umsetzung → Tests → Fixes → Release-Vorbereitung
@@ -83,23 +83,23 @@
 .
 ├─ .cursor/
 │ ├─ commands/
-│ │ ├─ gsd-intake.md
-│ │ ├─ gsd-discovery.md
-│ │ ├─ gsd-architecture.md
-│ │ ├─ gsd-sprint-plan.md
-│ │ ├─ gsd-execute.md
-│ │ ├─ gsd-qa.md
-│ │ ├─ gsd-release.md
-│ │ ├─ gsd-pause.md
-│ │ ├─ gsd-resume.md
-│ │ └─ gsd-refresh-context.md
+│ │ ├─ intake.md
+│ │ ├─ discovery.md
+│ │ ├─ architecture.md
+│ │ ├─ sprint-plan.md
+│ │ ├─ execute.md
+│ │ ├─ qa.md
+│ │ ├─ release.md
+│ │ ├─ pause.md
+│ │ ├─ resume.md
+│ │ └─ refresh-context.md
 │ ├─ rules/
-│ │ ├─ gsd-core.mdc
-│ │ ├─ gsd-quality.mdc
-│ │ ├─ gsd-handoffs.mdc
-│ │ └─ gsd-escalation.mdc
+│ │ ├─ core.mdc
+│ │ ├─ quality.mdc
+│ │ ├─ handoffs.mdc
+│ │ └─ escalation.mdc
 │ ├─ skills/
-│ │ └─ gsd-team/
+│ │ └─ its-magic/
 │ │ ├─ SKILL.md
 │ │ └─ templates/
 │ │ ├─ story.md
@@ -118,7 +118,7 @@
 │ ├─ hooks.json
 │ ├─ scratchpad.md
 │ └─ hooks/
-│ ├─ gsd-hook.py
+│ ├─ hook.py
 │ └─ README.md
 ├─ docs/
 │ ├─ product/
@@ -255,7 +255,7 @@ Regeln:
 
 ### Phase 6: Release + Context Refresh
 - Release: `release_notes.md`, Runbook updaten
-- Curator: `/gsd-refresh-context`
+- Curator: `/refresh-context`
 
 ### Pause/Resume jederzeit
 - Pause: state/progress/resume_brief aktualisieren
@@ -286,16 +286,16 @@ Vorgehen:
 
 ### A) Commands (`.cursor/commands/*`)
 Erstelle 10 Slash-Commands:
-- `gsd-intake`
-- `gsd-discovery`
-- `gsd-architecture`
-- `gsd-sprint-plan`
-- `gsd-execute`
-- `gsd-qa`
-- `gsd-release`
-- `gsd-pause`
-- `gsd-resume`
-- `gsd-refresh-context`
+- `intake`
+- `discovery`
+- `architecture`
+- `sprint-plan`
+- `execute`
+- `qa`
+- `release`
+- `pause`
+- `resume`
+- `refresh-context`
 
 Jeder Command:
 - sagt, welche Subagents genutzt werden
@@ -303,12 +303,12 @@ Jeder Command:
 - welche Stop-Conditions gelten (Decision Gate / Missing Handoff)
 
 ### B) Rules (`.cursor/rules/*.mdc`)
-- `gsd-core.mdc` – Phasenworkflow + Context Pack Pflicht
-- `gsd-quality.mdc` – kleine Schritte + Tests/Checks
-- `gsd-handoffs.mdc` – Handoffs/State Pflicht, kein hidden context
-- `gsd-escalation.mdc` – Decision Gate
+- `core.mdc` – Phasenworkflow + Context Pack Pflicht
+- `quality.mdc` – kleine Schritte + Tests/Checks
+- `handoffs.mdc` – Handoffs/State Pflicht, kein hidden context
+- `escalation.mdc` – Decision Gate
 
-### C) Skills (`.cursor/skills/gsd-team/`)
+### C) Skills (`.cursor/skills/its-magic/`)
 - `SKILL.md` beschreibt Workflow + Artefakte
 - Templates (story, acceptance, architecture, decision, sprint, handoff)
 
@@ -329,7 +329,7 @@ Minimalziele:
    - optional: “loop until tests green” (wenn TEST_COMMAND gesetzt)
 
 Konfiguration über `.cursor/scratchpad.md`:
-- `GSD_CONTEXT_STRICT=1`
+- `its-magic_CONTEXT_STRICT=1`
 - `LOOP_UNTIL_GREEN=0/1`
 - `RUN_TESTS_ON_EDIT=0/1` (optional, kann teuer sein)
 - `DONE` beendet Loops
@@ -339,11 +339,11 @@ Konfiguration über `.cursor/scratchpad.md`:
 ## 11) Voice Input (multilingual) – Anforderungen & Integration
 
 ### Ziel
-User kann in beliebiger Sprache sprechen. Das Ergebnis ist **Text in Cursor**, der den normalen `/gsd-*` Workflow startet.
+User kann in beliebiger Sprache sprechen. Das Ergebnis ist **Text in Cursor**, der den normalen `/*` Workflow startet.
 
 ### Architektur-Prinzip
 Voice ist ein **Input-Layer**, kein Workflow-Layer:
-- STT → Text → Cursor Agent Chat/Composer → `/gsd-intake` etc.
+- STT → Text → Cursor Agent Chat/Composer → `/intake` etc.
 
 ### Unterstützte Strategien (dokumentieren im README)
 **Option A: OS-Diktat**
@@ -357,8 +357,8 @@ Voice ist ein **Input-Layer**, kein Workflow-Layer:
 - Hotkey → Transkription → Text ins aktive Feld / Clipboard → Paste in Cursor
 
 ### “Slash-Command Reliability” Pattern (empfohlen)
-Damit STT nicht “/gsd-intake” kaputt erkennt:
-- Nutze einen Text-Expander/Hotkey, der `/gsd-intake ` einfügt
+Damit STT nicht “/intake” kaputt erkennt:
+- Nutze einen Text-Expander/Hotkey, der `/intake ` einfügt
 - User diktiert nur den Inhalt (in beliebiger Sprache)
 
 Dokumentiere das Pattern, ohne zwingend ein Tool vorzuschreiben.
@@ -388,7 +388,7 @@ Dokumentiere das Pattern, ohne zwingend ein Tool vorzuschreiben.
 ## 13) Akzeptanzkriterien (Definition of Done für das Kit)
 
 Das Kit ist “fertig”, wenn:
-- User kann `/gsd-intake` starten (auch via Voice-Text) und bekommt Rückfragen
+- User kann `/intake` starten (auch via Voice-Text) und bekommt Rückfragen
 - Story + Acceptance wird in Docs geschrieben
 - Sprint Plan erzeugt `sprints/Sxxxx/*` + Handoffs
 - Execute/QA/Release funktionieren über Artefakte
@@ -409,7 +409,7 @@ Das Kit ist “fertig”, wenn:
 5) 6 Subagents definieren (IO-klar, artefaktpflichtig)
 6) Hooks:
    - `.cursor/hooks.json`
-   - `.cursor/hooks/gsd-hook.py` Dispatcher
+   - `.cursor/hooks/hook.py` Dispatcher
    - `.cursor/scratchpad.md` Flags
 7) Docs-Templates in `docs/*` + Sprint Starter anlegen
 8) CI/CD:
@@ -425,4 +425,4 @@ Das Kit ist “fertig”, wenn:
 
 ## 15) Ende
 
-> Implementiere nun das komplette “Cursor-GSD-Team Kit” als Template-Repo gemäß diesem Plan (inkl. Voice-Dokumentation und CI/CD Templates).
+> Implementiere nun das komplette “Cursor-its-magic-Team Kit” als Template-Repo gemäß diesem Plan (inkl. Voice-Dokumentation und CI/CD Templates).

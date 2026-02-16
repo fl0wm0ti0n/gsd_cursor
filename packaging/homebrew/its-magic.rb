@@ -8,10 +8,10 @@ class ItsMagic < Formula
 
   def install
     libexec.install Dir["*"]
-    # Create a shell wrapper that calls gsd-installer.sh directly (no Node.js needed)
+    # Create a shell wrapper that calls installer.sh directly (no Node.js needed)
     (bin/"its-magic").write <<~SH
       #!/bin/bash
-      exec sh "#{libexec}/gsd-installer.sh" "$@"
+      exec sh "#{libexec}/installer.sh" "$@"
     SH
     chmod 0755, bin/"its-magic"
   end

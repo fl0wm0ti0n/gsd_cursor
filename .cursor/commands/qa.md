@@ -1,8 +1,8 @@
 ---
-description: "GSD QA: test plan, findings, verify fixes."
+description: "its-magic QA: test plan, findings, verify fixes."
 ---
 
-# /gsd-qa
+# /qa
 
 ## Subagents
 - qa
@@ -24,5 +24,5 @@ description: "GSD QA: test plan, findings, verify fixes."
 1. Define a test plan and run verification.
 2. Record findings and severity.
 3. Update state and handoff to dev if needed.
-4. Follow with `/gsd-verify-work` for user acceptance.
+4. Follow with `/verify-work` for user acceptance.
 

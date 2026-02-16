@@ -43,7 +43,7 @@ file_contains() {
 
 assert_true "Commands folder exists" "[ -d \"$ROOT/.cursor/commands\" ]"
 assert_true "Rules folder exists" "[ -d \"$ROOT/.cursor/rules\" ]"
-assert_true "Skills folder exists" "[ -d \"$ROOT/.cursor/skills/gsd-team/templates\" ]"
+assert_true "Skills folder exists" "[ -d \"$ROOT/.cursor/skills/team/templates\" ]"
 assert_true "Agents folder exists" "[ -d \"$ROOT/.cursor/agents\" ]"
 assert_true "Hooks config exists" "[ -f \"$ROOT/.cursor/hooks.json\" ]"
 assert_true "Docs folder exists" "[ -d \"$ROOT/docs\" ]"
@@ -90,16 +90,16 @@ assert_true "Deploy workflow references DEPLOY_PROD_COMMAND" "file_contains \"$d
 
 rm -rf "$TMP"
 mkdir -p "$TMP"
-if [ -f "$ROOT/gsd-installer.sh" ]; then
-  sh "$ROOT/gsd-installer.sh" --target "$TMP" --mode missing --create >/dev/null
-  assert_true "Installer (sh) installs commands" "[ -f \"$TMP/.cursor/commands/gsd-intake.md\" ]"
+if [ -f "$ROOT/installer.sh" ]; then
+  sh "$ROOT/installer.sh" --target "$TMP" --mode missing --create >/dev/null
+  assert_true "Installer (sh) installs commands" "[ -f \"$TMP/.cursor/commands/intake.md\" ]"
 else
   assert_true "Installer (sh) exists" "false"
 fi
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
-  echo "# GSD Kit Test Report"
+  echo "# its-magic Test Report"
   echo ""
   echo "Timestamp: $timestamp"
   echo "Pass: $pass"

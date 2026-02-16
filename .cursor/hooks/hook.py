@@ -6,8 +6,8 @@ from datetime import datetime
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SCRATCHPAD = os.path.join(ROOT, ".cursor", "scratchpad.md")
-STATE_FILE = os.path.join(ROOT, ".cursor", "hooks", "gsd-hook-state.json")
-BENCH_LOG = os.path.join(ROOT, ".cursor", "hooks", "gsd-bench-log.jsonl")
+STATE_FILE = os.path.join(ROOT, ".cursor", "hooks", "hook-state.json")
+BENCH_LOG = os.path.join(ROOT, ".cursor", "hooks", "bench-log.jsonl")
 
 
 def read_scratchpad():
@@ -47,7 +47,7 @@ def save_state(state):
 
 
 def bench_session(flags):
-    session = flags.get("GSD_BENCH_SESSION", "").strip()
+    session = flags.get("MAGIC_BENCH_SESSION", "").strip()
     return session if session else None
 
 
@@ -179,7 +179,7 @@ def main():
 
     if event == "stop":
         log_bench_event(session, event, payload)
-        strict = flags.get("GSD_CONTEXT_STRICT", "0") == "1"
+        strict = flags.get("MAGIC_CONTEXT_STRICT", "0") == "1"
         done = flags.get("DONE", "0") == "1"
         if strict and state.get("code_changed") and not state.get("context_refreshed"):
             if not done:

@@ -1,4 +1,4 @@
-# GSD hooks
+# its-magic hooks
 
 This folder contains a minimal hook dispatcher for Cursor.
 

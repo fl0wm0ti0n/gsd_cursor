@@ -1,25 +1,25 @@
-/gsd-intake
+/intake
 Idea: Build a web app with a webview-style UI that shows live data from a backend API.
 Goal: user can filter, sort, and drill into records. Keep scope small but realistic.
 
 ---
 
-/gsd-discovery
+/discovery
 Add 2-3 UX references and describe the intended interaction flow for filters and details.
 
 ---
 
-/gsd-architecture
+/architecture
 Define a frontend + backend split. Include an API schema and validation strategy.
 
 ---
 
-/gsd-sprint-plan
+/sprint-plan
 Create tasks that cover UI, API, validation, and shared schema.
 
 ---
 
-/gsd-execute
+/execute
 Implement in examples/webview-app:
 - frontend/index.html, app.js, style.css
 - backend/server.js, routes.js, validators.js
@@ -33,25 +33,25 @@ WEBVIEW_UI in index.html
 
 ---
 
-/gsd-qa
+/qa
 Verify the webview UI calls the backend and handles invalid input.
 
 ---
 
-/gsd-release
+/release
 Write release notes and ensure runbook notes mention how to run the demo.
 
 ---
 
-/gsd-pause
+/pause
 Checkpoint the current state.
 
 ---
 
-/gsd-resume
+/resume
 Load state and confirm next steps.
 
 ---
 
-/gsd-refresh-context
+/refresh-context
 Compact decisions and state.

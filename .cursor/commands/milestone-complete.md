@@ -1,8 +1,8 @@
 ---
-description: "GSD milestone complete: finalize milestone summary."
+description: "its-magic milestone complete: finalize milestone summary."
 ---
 
-# /gsd-milestone-complete
+# /milestone-complete
 
 ## Subagents
 - release

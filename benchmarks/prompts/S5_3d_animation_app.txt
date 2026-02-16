@@ -1,25 +1,25 @@
-/gsd-intake
+/intake
 Idea: Build a small 3D animation demo in the browser with a controllable camera.
 Goal: create a simple scene and animate multiple objects with different timelines.
 
 ---
 
-/gsd-discovery
+/discovery
 Add 2-3 references for 3D style and animation timing.
 
 ---
 
-/gsd-architecture
+/architecture
 Define a basic rendering loop, scene setup, and animation tracks.
 
 ---
 
-/gsd-sprint-plan
+/sprint-plan
 Create tasks covering scene creation, animation logic, and UI controls.
 
 ---
 
-/gsd-execute
+/execute
 Implement in examples/3d-animation:
 - index.html, main.js, scene.js, animations.js
 Include markers in code:
@@ -29,25 +29,25 @@ ANIMATION_TRACKS in animations.js
 
 ---
 
-/gsd-qa
+/qa
 Verify animations run smoothly and controls behave as expected.
 
 ---
 
-/gsd-release
+/release
 Write release notes and add run steps in runbook.
 
 ---
 
-/gsd-pause
+/pause
 Checkpoint the current state.
 
 ---
 
-/gsd-resume
+/resume
 Load state and confirm next steps.
 
 ---
 
-/gsd-refresh-context
+/refresh-context
 Compact decisions and state.

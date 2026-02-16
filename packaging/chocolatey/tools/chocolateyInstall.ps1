@@ -1,10 +1,10 @@
-ï»¿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 
 # --- Config ---
 $packageName = 'its-magic'
 # UPDATE: url and checksum before each release
-$url         = 'https://github.com/fl0wm0ti0n/gsd_cursor/archive/refs/tags/v0.1.1-4.zip'
-$checksum    = '8374b8f988e7ef17ef9adfa5cf6a16616a4c0cd23bedbea8356b381a001de51b'
+$url         = 'https://github.com/fl0wm0ti0n/gsd_cursor/archive/refs/tags/v0.1.2-9.zip'
+$checksum    = '8fa73c891e07df8b9ca215f5793412dfdf98f748684f83ff4116cd19ca1fe4b5'
 $checksumType= 'sha256'
 
 # --- Download & extract ---
@@ -17,11 +17,11 @@ Install-ChocolateyZipPackage -PackageName $packageName `
     -ChecksumType $checksumType
 
 # --- Find the extracted installer script (no Node.js needed) ---
-$installerPath = Get-ChildItem -Path $toolsDir -Recurse -File -Filter "gsd-installer.ps1" |
+$installerPath = Get-ChildItem -Path $toolsDir -Recurse -File -Filter "installer.ps1" |
     Select-Object -First 1 -ExpandProperty FullName
 
 if (-not $installerPath) {
-    throw "gsd-installer.ps1 not found in extracted archive. Installation failed."
+    throw "installer.ps1 not found in extracted archive. Installation failed."
 }
 
 $extractedRoot = Split-Path -Parent $installerPath
@@ -57,12 +57,12 @@ Install-BinFile -Name 'its-magic' -Path $wrapperCmd
 $prev = [Console]::OutputEncoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 Write-Host ""
-Write-Host "  â–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—      â–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—" -ForegroundColor Magenta
-Write-Host "  â–ˆâ–ˆâ•‘â•šâ•â•â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•”â•â•â•â•â•      â–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â•â•â•" -ForegroundColor Magenta
-Write-Host "  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•”â–ˆâ–ˆâ–ˆâ–ˆâ•”â–ˆâ–ˆâ•‘â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ–ˆâ•—â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     " -ForegroundColor Magenta
-Write-Host "  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â•šâ•â•â•â•â–ˆâ–ˆâ•‘â•šâ•â•â•â•â•â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘     " -ForegroundColor Cyan
-Write-Host "  â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘      â–ˆâ–ˆâ•‘ â•šâ•â• â–ˆâ–ˆâ•‘â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•â–ˆâ–ˆâ•‘â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—" -ForegroundColor Cyan
-Write-Host "  â•šâ•â•   â•šâ•â•   â•šâ•â•â•â•â•â•â•      â•šâ•â•     â•šâ•â•â•šâ•â•  â•šâ•â• â•šâ•â•â•â•â•â• â•šâ•â• â•šâ•â•â•â•â•â•" -ForegroundColor Cyan
+Write-Host "  ¦¦+¦¦¦¦¦¦¦¦+¦¦¦¦¦¦¦+      ¦¦¦+   ¦¦¦+ ¦¦¦¦¦+  ¦¦¦¦¦¦+ ¦¦+ ¦¦¦¦¦¦+" -ForegroundColor Magenta
+Write-Host "  ¦¦¦+--¦¦+--+¦¦+----+      ¦¦¦¦+ ¦¦¦¦¦¦¦+--¦¦+¦¦+----+ ¦¦¦¦¦+----+" -ForegroundColor Magenta
+Write-Host "  ¦¦¦   ¦¦¦   ¦¦¦¦¦¦¦+¦¦¦¦¦+¦¦+¦¦¦¦+¦¦¦¦¦¦¦¦¦¦¦¦¦¦  ¦¦¦+¦¦¦¦¦¦     " -ForegroundColor Magenta
+Write-Host "  ¦¦¦   ¦¦¦   +----¦¦¦+----+¦¦¦+¦¦++¦¦¦¦¦+--¦¦¦¦¦¦   ¦¦¦¦¦¦¦¦¦     " -ForegroundColor Cyan
+Write-Host "  ¦¦¦   ¦¦¦   ¦¦¦¦¦¦¦¦      ¦¦¦ +-+ ¦¦¦¦¦¦  ¦¦¦+¦¦¦¦¦¦++¦¦¦+¦¦¦¦¦¦+" -ForegroundColor Cyan
+Write-Host "  +-+   +-+   +------+      +-+     +-++-+  +-+ +-----+ +-+ +-----+" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "                         AI dev team" -ForegroundColor Yellow
 Write-Host "                    Installation complete!" -ForegroundColor Green
@@ -70,3 +70,7 @@ Write-Host ""
 Write-Host "  Run: its-magic --help" -ForegroundColor White
 Write-Host ""
 [Console]::OutputEncoding = $prev
+
+
+
+

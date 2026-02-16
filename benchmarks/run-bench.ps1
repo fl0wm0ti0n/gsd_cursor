@@ -75,7 +75,7 @@ foreach ($scn in $scenarios) {
   $scenarioRoot = Join-Path $tmpRoot ("{0}-{1}" -f $id, (Get-Date).ToUniversalTime().ToString("yyyyMMdd-HHmmssZ"))
   New-Item -ItemType Directory -Path $scenarioRoot -Force | Out-Null
 
-  $installer = Join-Path $root "gsd-installer.ps1"
+  $installer = Join-Path $root "installer.ps1"
   if (Test-Path $installer -PathType Leaf) {
     & $installer -Target $scenarioRoot -Mode missing -Create | Out-Null
   }
@@ -129,7 +129,7 @@ $failCount = ($results | Where-Object { $_.Status -eq "FAIL" }).Count
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
 @"
-# GSD Kit Benchmark Report
+# its-magic Benchmark Report
 
 Timestamp: $timestamp
 Scenarios: $($results.Count)

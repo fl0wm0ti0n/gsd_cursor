@@ -38,7 +38,7 @@ $root = Resolve-RepoRoot
 # 1) Base structure checks
 Assert-True "Commands folder exists" (Test-Path (Join-Path $root ".cursor\commands"))
 Assert-True "Rules folder exists" (Test-Path (Join-Path $root ".cursor\rules"))
-Assert-True "Skills folder exists" (Test-Path (Join-Path $root ".cursor\skills\gsd-team\templates"))
+Assert-True "Skills folder exists" (Test-Path (Join-Path $root ".cursor\skills\team\templates"))
 Assert-True "Agents folder exists" (Test-Path (Join-Path $root ".cursor\agents"))
 Assert-True "Hooks config exists" (Test-Path (Join-Path $root ".cursor\hooks.json"))
 Assert-True "Docs folder exists" (Test-Path (Join-Path $root "docs"))
@@ -93,10 +93,10 @@ $tempRoot = Join-Path $root "tests\.tmp-install"
 if (Test-Path $tempRoot) { Remove-Item -Recurse -Force $tempRoot }
 New-Item -ItemType Directory -Path $tempRoot | Out-Null
 
-$installer = Join-Path $root "gsd-installer.ps1"
+$installer = Join-Path $root "installer.ps1"
 if (Test-Path $installer -PathType Leaf) {
   & $installer -Target $tempRoot -Mode missing -Create | Out-Null
-  $installed = Test-Path (Join-Path $tempRoot ".cursor\commands\gsd-intake.md")
+  $installed = Test-Path (Join-Path $tempRoot ".cursor\commands\intake.md")
   Assert-True "Installer (ps1) installs commands" $installed
 } else {
   Assert-True "Installer (ps1) exists" $false
@@ -107,7 +107,7 @@ if (Test-Path $installer -PathType Leaf) {
   $readmePath = Join-Path $tempRoot "README.md"
   Set-Content -Path $readmePath -Value "override"
   & $installer -Target $tempRoot -Mode overwrite -Backup | Out-Null
-  $backupDir = Get-ChildItem -Path (Join-Path $tempRoot "gsd-backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
+  $backupDir = Get-ChildItem -Path (Join-Path $tempRoot "backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
   $backupOk = $false
   if ($backupDir) {
     $backupOk = Test-Path (Join-Path $backupDir.FullName "README.md")
@@ -122,7 +122,7 @@ $passCount = ($Results | Where-Object { $_.Status -eq "PASS" }).Count
 $failCount = ($Results | Where-Object { $_.Status -eq "FAIL" }).Count
 
 @"
-# GSD Kit Test Report
+# its-magic Test Report
 
 Timestamp: $timestamp
 Pass: $passCount

@@ -1,6 +1,6 @@
 ---
-name: cursor-gsd-team-kit
-overview: Plan the build of the Cursor-native “GSD Team Kit” template repo described in `Plan.md`, covering commands, rules, skills, agents, hooks, docs, and CI/CD templates.
+name: cursor-its-magic-kit
+overview: Plan the build of the Cursor-native “its-magic Team Kit” template repo described in `Plan.md`, covering commands, rules, skills, agents, hooks, docs, and CI/CD templates.
 todos:
   - id: scaffold-structure
     content: Scaffold directory structure and starter artifacts
@@ -9,7 +9,7 @@ todos:
     content: Add 10 commands and 4 rules with IO/stop gates
     status: pending
   - id: skills-agents
-    content: Create gsd-team skill, templates, and 6 agents
+    content: Create its-magic skill, templates, and 6 agents
     status: pending
   - id: hooks-cicd-docs
     content: Implement hooks, CI/CD workflows, and README updates
@@ -17,20 +17,20 @@ todos:
 isProject: false
 ---
 
-# Cursor-GSD-Team Kit Plan
+# Cursor its-magic Kit Plan
 
 ## Scope Summary
 
-Build a drop-in template repo that implements the full GSD workflow (intake → discovery → architecture → sprint plan → execute → QA → release → pause/resume) using Cursor-native artifacts: commands, rules, skills, subagents, hooks, docs, and GitHub Actions. Voice input is documented as an input layer only. CI/CD is template-based and driven by runbook keys.
+Build a drop-in template repo that implements the full its-magic workflow (intake → discovery → architecture → sprint plan → execute → QA → release → pause/resume) using Cursor-native artifacts: commands, rules, skills, subagents, hooks, docs, and GitHub Actions. Voice input is documented as an input layer only. CI/CD is template-based and driven by runbook keys.
 
 ## Key Files and Structures
 
 - Template structure per spec: [.cursor/](.cursor/), [docs/](docs/), [sprints/](sprints/), [handoffs/](handoffs/), [decisions/](decisions/), [.github/workflows/](.github/workflows/)
-- Commands: `.cursor/commands/gsd-*.md` (10 commands)
-- Rules: `.cursor/rules/gsd-*.mdc` (4 rules)
-- Skills: `.cursor/skills/gsd-team/SKILL.md` + `templates/*.md`
+- Commands: `.cursor/commands/*.md` (10 commands)
+- Rules: `.cursor/rules/*.mdc` (4 rules)
+- Skills: `.cursor/skills/its-magic/SKILL.md` + `templates/*.md`
 - Agents: `.cursor/agents/*.mdc` (PO, tech-lead, dev, QA, release, curator)
-- Hooks: `.cursor/hooks.json`, `.cursor/hooks/gsd-hook.py`, `.cursor/scratchpad.md`
+- Hooks: `.cursor/hooks.json`, `.cursor/hooks/hook.py`, `.cursor/scratchpad.md`
 - Docs templates: `docs/product/*.md`, `docs/engineering/*.md`, `sprints/S0001/*`, `handoffs/*.md`, `decisions/DEC-0001.md`
 - CI/CD: `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`
 - README updates: voice options + runbook usage
@@ -40,7 +40,7 @@ Build a drop-in template repo that implements the full GSD workflow (intake → 
 1. **Scaffold repo layout** per section 4 and add starter artifacts in `docs/`, `sprints/`, `handoffs/`, `decisions/`.
 2. **Write 10 commands** in `.cursor/commands/` with explicit inputs/outputs, stop-conditions, and role usage.
 3. **Define rules** in `.cursor/rules/` for phase flow, quality gates, handoffs/state persistence, and escalation.
-4. **Create the skill** in `.cursor/skills/gsd-team/` and template files for story/acceptance/architecture/decision/sprint/handoff.
+4. **Create the skill** in `.cursor/skills/its-magic/` and template files for story/acceptance/architecture/decision/sprint/handoff.
 5. **Define 6 subagents** with required IO and artifact persistence requirements.
 6. **Implement hooks** (`hooks.json` + dispatcher script) with fail-open logic, context-refresh checks, and safe-command blocking.
 7. **Add CI/CD workflows** that read `docs/engineering/runbook.md` keys and conditionally execute commands.

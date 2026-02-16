@@ -60,8 +60,8 @@ run_root="$ROOT/benchmarks/runs/$run_id"
 workspace="$run_root/workspace"
 mkdir -p "$workspace"
 
-if [ -f "$ROOT/gsd-installer.sh" ]; then
-  sh "$ROOT/gsd-installer.sh" --target "$workspace" --mode missing --create >/dev/null
+if [ -f "$ROOT/installer.sh" ]; then
+  sh "$ROOT/installer.sh" --target "$workspace" --mode missing --create >/dev/null
 fi
 
 cd "$workspace"
@@ -173,7 +173,7 @@ fi
 
 mkdir -p "$(dirname "$REPORT_PATH")"
 {
-  echo "# GSD Kit Headless Benchmark Report"
+  echo "# its-magic Headless Benchmark Report"
   echo ""
   echo "Timestamp: $timestamp"
   echo "PromptFile: $PROMPT_FILE"
@@ -199,7 +199,7 @@ mkdir -p "$(dirname "$REPORT_PATH")"
 
 mkdir -p "$(dirname "$PROTOCOL_PATH")"
 {
-  echo "# GSD Kit Headless Protocol"
+  echo "# its-magic Headless Protocol"
   echo ""
   echo "Timestamp: $timestamp"
   echo "PromptFile: $PROMPT_FILE"

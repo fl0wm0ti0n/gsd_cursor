@@ -61,7 +61,7 @@ function Parse-Jsonl($Path, $Session) {
 
 $root = Resolve-RepoRoot
 $scratchpad = Join-Path $root ".cursor\scratchpad.md"
-$logPath = Join-Path $root ".cursor\hooks\gsd-bench-log.jsonl"
+$logPath = Join-Path $root ".cursor\hooks\bench-log.jsonl"
 $reportPath = Join-Path $root "benchmarks\live\live-bench-report.md"
 
 if (-not $SessionId) {
@@ -106,7 +106,7 @@ Ensure-Parent $reportPath
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 
 @"
-# GSD Kit Live Benchmark Report
+# its-magic Live Benchmark Report
 
 Timestamp: $timestamp
 Session: $SessionId

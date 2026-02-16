@@ -90,7 +90,7 @@ $runRoot = Join-Path $root ("benchmarks\runs\" + $runId)
 $workspace = Join-Path $runRoot "workspace"
 New-Item -ItemType Directory -Path $workspace -Force | Out-Null
 
-$installer = Join-Path $root "gsd-installer.ps1"
+$installer = Join-Path $root "installer.ps1"
 if (Test-Path $installer -PathType Leaf) {
   & $installer -Target $workspace -Mode missing -Create | Out-Null
 }
@@ -204,7 +204,7 @@ Ensure-Parent $runReportPath
 Ensure-Parent $runProtocolPath
 
 @"
-# GSD Kit Headless Benchmark Report
+# its-magic Headless Benchmark Report
 
 Timestamp: $timestamp
 PromptFile: $PromptFile
@@ -243,7 +243,7 @@ if ($smokeChecks.Count -gt 0) {
 }
 
 @"
-# GSD Kit Headless Protocol
+# its-magic Headless Protocol
 
 Timestamp: $timestamp
 PromptFile: $PromptFile

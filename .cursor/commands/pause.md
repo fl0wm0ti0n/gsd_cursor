@@ -1,8 +1,8 @@
 ---
-description: "GSD pause: write checkpoint and resume brief."
+description: "its-magic pause: write checkpoint and resume brief."
 ---
 
-# /gsd-pause
+# /pause
 
 ## Subagents
 - curator

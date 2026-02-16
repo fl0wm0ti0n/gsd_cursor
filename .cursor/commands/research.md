@@ -1,8 +1,8 @@
 ---
-description: "GSD research: gather references and risks before architecture."
+description: "its-magic research: gather references and risks before architecture."
 ---
 
-# /gsd-research
+# /research
 
 ## Subagents
 - tech-lead

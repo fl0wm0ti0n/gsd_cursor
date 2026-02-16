@@ -32,7 +32,7 @@ def ensure_parent(path):
 
 def backup_files(target_root, rel_paths):
     timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%SZ")
-    backup_root = os.path.join(target_root, "gsd-backups", timestamp)
+    backup_root = os.path.join(target_root, "backups", timestamp)
     for rel in rel_paths:
         src = os.path.join(target_root, rel)
         if os.path.isfile(src):
@@ -64,7 +64,7 @@ def prompt_yes_no(label, default=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Install GSD toolkit into a repo")
+    parser = argparse.ArgumentParser(description="Install its-magic into a repo")
     parser.add_argument("--target", help="Target repository path")
     parser.add_argument(
         "--mode",
@@ -115,7 +115,7 @@ def main():
         "decisions",
         ".github/workflows",
         "README.md",
-        "gsd-installer.py",
+        "installer.py",
     ]
 
     files = list_source_files(source_root, include_paths)

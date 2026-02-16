@@ -24,7 +24,7 @@ backup_files() {
   target_root="$1"
   shift
   timestamp=$(date -u +"%Y%m%d-%H%M%SZ")
-  backup_root="$target_root/gsd-backups/$timestamp"
+  backup_root="$target_root/backups/$timestamp"
   for rel in "$@"; do
     src="$target_root/$rel"
     if [ -f "$src" ]; then
@@ -122,9 +122,9 @@ handoffs
 decisions
 .github/workflows
 README.md
-gsd-installer.py
-gsd-installer.ps1
-gsd-installer.sh
+installer.py
+installer.ps1
+installer.sh
 "
 
 FILES=$(list_source_files "$SOURCE_ROOT" $INCLUDE_PATHS)

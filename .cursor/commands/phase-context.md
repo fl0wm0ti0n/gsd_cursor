@@ -1,8 +1,8 @@
 ---
-description: "GSD phase context: capture phase preferences and constraints."
+description: "its-magic phase context: capture phase preferences and constraints."
 ---
 
-# /gsd-phase-context
+# /phase-context
 
 ## Subagents
 - po

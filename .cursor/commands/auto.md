@@ -1,8 +1,8 @@
 ---
-description: "GSD auto: run phases sequentially until decision gate."
+description: "its-magic auto: run phases sequentially until decision gate."
 ---
 
-# /gsd-auto
+# /auto
 
 ## Subagents
 - curator

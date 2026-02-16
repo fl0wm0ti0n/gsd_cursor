@@ -1,8 +1,8 @@
 ---
-description: "GSD intake: clarify idea and capture story + acceptance."
+description: "its-magic intake: clarify idea and capture story + acceptance."
 ---
 
-# /gsd-intake
+# /intake
 
 ## Subagents
 - po

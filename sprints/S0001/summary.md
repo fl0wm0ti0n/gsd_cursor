@@ -6,7 +6,7 @@ Deliver a working vertical slice: filtered item list with detail panel, powered 
 
 ## Completed
 
-- GSD Workflow Kit: all slash commands, agent roles, rules, templates, and CI/CD workflows
+- its-magic: all slash commands, agent roles, rules, templates, and CI/CD workflows
 - Installers (PowerShell, Bash, Python) for kit distribution
 - Benchmark harness (scenario, live, headless, prompted modes)
 - Reference app (`examples/webview-app/`):

@@ -72,8 +72,8 @@ for scn in "$SCENARIOS"/*.scn; do
   scenario_root="$TMP/${id}-$(date -u +"%Y%m%d-%H%M%SZ")"
   mkdir -p "$scenario_root"
 
-  if [ -f "$ROOT/gsd-installer.sh" ]; then
-    sh "$ROOT/gsd-installer.sh" --target "$scenario_root" --mode missing --create >/dev/null
+  if [ -f "$ROOT/installer.sh" ]; then
+    sh "$ROOT/installer.sh" --target "$scenario_root" --mode missing --create >/dev/null
   fi
 
   missing=0
@@ -116,7 +116,7 @@ TOTAL_DURATION=$((TOTAL_END - TOTAL_START))
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 {
-  echo "# GSD Kit Benchmark Report"
+  echo "# its-magic Benchmark Report"
   echo ""
   echo "Timestamp: $timestamp"
   echo "Pass: $pass"

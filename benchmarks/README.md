@@ -1,6 +1,6 @@
 # Benchmarks
 
-This harness provides automated, repeatable benchmarks for the GSD kit.
+This harness provides automated, repeatable benchmarks for the its-magic.
 
 It simulates scenario runs, validates artifact completeness, and produces a
 report with timing, coverage, and errors.
@@ -25,7 +25,7 @@ Scenarios live in `benchmarks/scenarios/*.scn` and use a simple format:
 - `[require]` list of required files
 - `[sections]` file path + required headings
 
-Code scenarios can add a `[commands]` section listing the `/gsd-*` commands
+Code scenarios can add a `[commands]` section listing the `/*` commands
 that must be used. They can also require specific marker strings in code
 files (for example `API_SERVER` or `RENDER_LOOP`) so the validator can check
 that key pieces were implemented.

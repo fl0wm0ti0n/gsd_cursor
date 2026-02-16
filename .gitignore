@@ -3,11 +3,11 @@
 
 # Temp build artifacts
 temp/
-gsd-backups/
+backups/
 
 # Hook telemetry/state
 .cursor/hooks/*.jsonl
-.cursor/hooks/gsd-hook-state.json
+.cursor/hooks/hook-state.json
 .cursor/remote.json
 
 # Test/bench artifacts

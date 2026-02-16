@@ -55,7 +55,7 @@ const root = path.resolve(__dirname, "..");
 const isWin = process.platform === "win32";
 
 if (isWin) {
-  const installer = path.join(root, "gsd-installer.ps1");
+  const installer = path.join(root, "installer.ps1");
   const psArgs = [
     "-ExecutionPolicy",
     "Bypass",
@@ -71,7 +71,7 @@ if (isWin) {
   const res = spawnSync("powershell", psArgs, { stdio: "inherit" });
   process.exit(res.status || 0);
 } else {
-  const installer = path.join(root, "gsd-installer.sh");
+  const installer = path.join(root, "installer.sh");
   const shArgs = [
     installer,
     "--target",

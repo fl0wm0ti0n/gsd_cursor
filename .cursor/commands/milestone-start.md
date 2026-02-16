@@ -1,8 +1,8 @@
 ---
-description: "GSD milestone start: create milestone tracking files."
+description: "its-magic milestone start: create milestone tracking files."
 ---
 
-# /gsd-milestone-start
+# /milestone-start
 
 ## Subagents
 - tech-lead

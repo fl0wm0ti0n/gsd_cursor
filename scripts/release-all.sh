@@ -128,7 +128,7 @@ if ! $SKIP_CHOCO; then
 
       # Compute checksum
       if [[ -n "$ZIP_URL" ]]; then
-        TMP_ZIP="/tmp/gsd-$TAG_NAME.zip"
+        TMP_ZIP="/tmp/its-magic-$TAG_NAME.zip"
         if curl -fsSL "$ZIP_URL" -o "$TMP_ZIP" 2>/dev/null; then
           SHA=$(shasum -a 256 "$TMP_ZIP" | awk '{print $1}')
           sed -i.bak "s|^\\$checksum[[:space:]]*=.*$|\\$checksum    = '$SHA'|" "$CHOCO_INSTALL"
@@ -192,7 +192,7 @@ if ! $SKIP_BREW; then
 
       # Compute sha256
       if [[ -n "$TAR_URL" ]]; then
-        TMP_TAR="/tmp/gsd-$TAG_NAME.tar.gz"
+        TMP_TAR="/tmp/its-magic-$TAG_NAME.tar.gz"
         if curl -fsSL "$TAR_URL" -o "$TMP_TAR" 2>/dev/null; then
           SHA=$(shasum -a 256 "$TMP_TAR" | awk '{print $1}')
           # Replace both PLACEHOLDER and any previous sha256 value

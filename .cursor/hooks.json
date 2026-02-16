@@ -3,22 +3,22 @@
   "hooks": {
     "beforeShellExecution": [
       {
-        "command": "python .cursor/hooks/gsd-hook.py beforeShellExecution"
+        "command": "python .cursor/hooks/hook.py beforeShellExecution"
       }
     ],
     "beforeReadFile": [
       {
-        "command": "python .cursor/hooks/gsd-hook.py beforeReadFile"
+        "command": "python .cursor/hooks/hook.py beforeReadFile"
       }
     ],
     "afterFileEdit": [
       {
-        "command": "python .cursor/hooks/gsd-hook.py afterFileEdit"
+        "command": "python .cursor/hooks/hook.py afterFileEdit"
       }
     ],
     "stop": [
       {
-        "command": "python .cursor/hooks/gsd-hook.py stop"
+        "command": "python .cursor/hooks/hook.py stop"
       }
     ]
   }

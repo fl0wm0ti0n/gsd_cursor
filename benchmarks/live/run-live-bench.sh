@@ -3,7 +3,7 @@ set -e
 
 ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 SCRATCHPAD="$ROOT/.cursor/scratchpad.md"
-LOG="$ROOT/.cursor/hooks/gsd-bench-log.jsonl"
+LOG="$ROOT/.cursor/hooks/bench-log.jsonl"
 REPORT="$ROOT/benchmarks/live/live-bench-report.md"
 
 session="$1"
@@ -61,7 +61,7 @@ stopCount=$(count_event "stop")
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 mkdir -p "$(dirname "$REPORT")"
 {
-  echo "# GSD Kit Live Benchmark Report"
+  echo "# its-magic Live Benchmark Report"
   echo ""
   echo "Timestamp: $timestamp"
   echo "Session: $session"

@@ -1,6 +1,6 @@
-# GSD Team Skill
+# its-magic Skill
 
-This skill guides the AI dev team through the GSD workflow. It enforces
+This skill guides the AI dev team through the its-magic workflow. It enforces
 artifact persistence, clear handoffs, and compact context packs.
 
 ## Workflow

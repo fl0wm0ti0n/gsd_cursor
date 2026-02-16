@@ -1,9 +1,9 @@
 ---
-description: "GSD core workflow and context pack rules"
+description: "Core workflow and context pack rules"
 globs: ["**/*"]
 ---
 
-- Use the GSD phase flow: intake -> discovery -> research -> architecture ->
+- Use the phase flow: intake -> discovery -> research -> architecture ->
   sprint plan -> plan verify -> execute -> QA -> verify work -> release ->
   refresh context.
 - `AUTO_FLOW_MODE` controls whether phases run automatically or stop at

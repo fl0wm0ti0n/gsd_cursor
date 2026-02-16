@@ -1,8 +1,8 @@
 ---
-description: "GSD discovery: collect design/UX inspiration and scope updates."
+description: "its-magic discovery: collect design/UX inspiration and scope updates."
 ---
 
-# /gsd-discovery
+# /discovery
 
 ## Subagents
 - po

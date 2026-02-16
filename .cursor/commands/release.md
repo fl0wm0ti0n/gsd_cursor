@@ -1,8 +1,8 @@
 ---
-description: "GSD release: prepare release notes and runbook updates."
+description: "its-magic release: prepare release notes and runbook updates."
 ---
 
-# /gsd-release
+# /release
 
 ## Subagents
 - release

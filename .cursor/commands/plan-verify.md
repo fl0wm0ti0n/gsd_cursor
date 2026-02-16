@@ -1,8 +1,8 @@
 ---
-description: "GSD plan verify: verify sprint tasks against acceptance."
+description: "its-magic plan verify: verify sprint tasks against acceptance."
 ---
 
-# /gsd-plan-verify
+# /plan-verify
 
 ## Subagents
 - tech-lead

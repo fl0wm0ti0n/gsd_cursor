@@ -1,18 +1,18 @@
-# GSD scratchpad
+# its-magic scratchpad
 #
 # Core behavior
-# - GSD_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
+# - MAGIC_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
 # - LOOP_UNTIL_GREEN: 0|1 (optional test loop)
 # - RUN_TESTS_ON_EDIT: 0|1 (run tests after edits)
 # - DONE: 0|1 (stop hook loops)
-GSD_CONTEXT_STRICT=1
+MAGIC_CONTEXT_STRICT=1
 LOOP_UNTIL_GREEN=0
 RUN_TESTS_ON_EDIT=0
 DONE=0
 #
 # Benchmarking
-# - GSD_BENCH_SESSION: free-form id for live benchmark logging
-GSD_BENCH_SESSION=
+# - MAGIC_BENCH_SESSION: free-form id for live benchmark logging
+MAGIC_BENCH_SESSION=
 #
 # Automation
 # - AUTO_FLOW_MODE: manual|auto_until_decision
