@@ -53,16 +53,17 @@ Set-Content -Path $wrapperCmd -Value $wrapperContent -Encoding ASCII
 # --- Register the shim ---
 Install-BinFile -Name 'its-magic' -Path $wrapperCmd
 
-# --- Banner ---
+# --- Banner (Base64-encoded to avoid encoding issues) ---
 $prev = [Console]::OutputEncoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$b64 = 'ICDilojilojilZfilojilojilojilojilojilojilojilojilZfilojilojilojilojilojilojilojilZcgICAgICDilojilojilojilZcgICDilojilojilojilZcg4paI4paI4paI4paI4paI4pWXICDilojilojilojilojilojilojilZcg4paI4paI4pWXIOKWiOKWiOKWiOKWiOKWiOKWiOKVlwogIOKWiOKWiOKVkeKVmuKVkOKVkOKWiOKWiOKVlOKVkOKVkOKVneKWiOKWiOKVlOKVkOKVkOKVkOKVkOKVnSAgICAgIOKWiOKWiOKWiOKWiOKVlyDilojilojilojilojilZHilojilojilZTilZDilZDilojilojilZfilojilojilZTilZDilZDilZDilZDilZ0g4paI4paI4pWR4paI4paI4pWU4pWQ4pWQ4pWQ4pWQ4pWdCiAg4paI4paI4pWRICAg4paI4paI4pWRICAg4paI4paI4paI4paI4paI4paI4paI4pWX4paI4paI4paI4paI4paI4pWX4paI4paI4pWU4paI4paI4paI4paI4pWU4paI4paI4pWR4paI4paI4paI4paI4paI4paI4paI4pWR4paI4paI4pWRICDilojilojilojilZfilojilojilZHilojilojilZEgICAgIAogIOKWiOKWiOKVkSAgIOKWiOKWiOKVkSAgIOKVmuKVkOKVkOKVkOKVkOKWiOKWiOKVkeKVmuKVkOKVkOKVkOKVkOKVneKWiOKWiOKVkeKVmuKWiOKWiOKVlOKVneKWiOKWiOKVkeKWiOKWiOKVlOKVkOKVkOKWiOKWiOKVkeKWiOKWiOKVkSAgIOKWiOKWiOKVkeKWiOKWiOKVkeKWiOKWiOKVkSAgICAgCiAg4paI4paI4pWRICAg4paI4paI4pWRICAg4paI4paI4paI4paI4paI4paI4paI4pWRICAgICAg4paI4paI4pWRIOKVmuKVkOKVnSDilojilojilZHilojilojilZEgIOKWiOKWiOKVkeKVmuKWiOKWiOKWiOKWiOKWiOKWiOKVlOKVneKWiOKWiOKVkeKVmuKWiOKWiOKWiOKWiOKWiOKWiOKVlwogIOKVmuKVkOKVnSAgIOKVmuKVkOKVnSAgIOKVmuKVkOKVkOKVkOKVkOKVkOKVkOKVnSAgICAgIOKVmuKVkOKVnSAgICAg4pWa4pWQ4pWd4pWa4pWQ4pWdICDilZrilZDilZ0g4pWa4pWQ4pWQ4pWQ4pWQ4pWQ4pWdIOKVmuKVkOKVnSDilZrilZDilZDilZDilZDilZDilZ0='
+$art = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($b64))
+$lines = $art -split "`n"
+$colors = @('Magenta','Magenta','Magenta','Cyan','Cyan','Cyan')
 Write-Host ""
-Write-Host "  ¦¦+¦¦¦¦¦¦¦¦+¦¦¦¦¦¦¦+      ¦¦¦+   ¦¦¦+ ¦¦¦¦¦+  ¦¦¦¦¦¦+ ¦¦+ ¦¦¦¦¦¦+" -ForegroundColor Magenta
-Write-Host "  ¦¦¦+--¦¦+--+¦¦+----+      ¦¦¦¦+ ¦¦¦¦¦¦¦+--¦¦+¦¦+----+ ¦¦¦¦¦+----+" -ForegroundColor Magenta
-Write-Host "  ¦¦¦   ¦¦¦   ¦¦¦¦¦¦¦+¦¦¦¦¦+¦¦+¦¦¦¦+¦¦¦¦¦¦¦¦¦¦¦¦¦¦  ¦¦¦+¦¦¦¦¦¦     " -ForegroundColor Magenta
-Write-Host "  ¦¦¦   ¦¦¦   +----¦¦¦+----+¦¦¦+¦¦++¦¦¦¦¦+--¦¦¦¦¦¦   ¦¦¦¦¦¦¦¦¦     " -ForegroundColor Cyan
-Write-Host "  ¦¦¦   ¦¦¦   ¦¦¦¦¦¦¦¦      ¦¦¦ +-+ ¦¦¦¦¦¦  ¦¦¦+¦¦¦¦¦¦++¦¦¦+¦¦¦¦¦¦+" -ForegroundColor Cyan
-Write-Host "  +-+   +-+   +------+      +-+     +-++-+  +-+ +-----+ +-+ +-----+" -ForegroundColor Cyan
+for ($i = 0; $i -lt $lines.Count; $i++) {
+    Write-Host $lines[$i] -ForegroundColor $colors[$i]
+}
 Write-Host ""
 Write-Host "                         AI dev team" -ForegroundColor Yellow
 Write-Host "                    Installation complete!" -ForegroundColor Green
@@ -70,11 +71,3 @@ Write-Host ""
 Write-Host "  Run: its-magic --help" -ForegroundColor White
 Write-Host ""
 [Console]::OutputEncoding = $prev
-
-
-
-
-
-
-
-

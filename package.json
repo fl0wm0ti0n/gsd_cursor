@@ -23,9 +23,11 @@
     "installer.sh",
     "installer.py",
     "README.md",
-    "bin/its-magic.js"
+    "bin/its-magic.js",
+    "bin/postinstall.js"
   ],
   "scripts": {
+    "postinstall": "node bin/postinstall.js",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",

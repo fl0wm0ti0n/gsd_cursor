@@ -45,7 +45,10 @@ Get-ChildItem -Path $repoRoot -Filter "its-magic-*.tgz" | Remove-Item -Force
 
 # --- Pack ---
 Log "Running npm pack ..."
+$prevEAP = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
 $packOutput = npm pack 2>&1 | Out-String
+$ErrorActionPreference = $prevEAP
 $tgzFile = Get-ChildItem -Path $repoRoot -Filter "its-magic-*.tgz" | Sort-Object LastWriteTime -Descending | Select-Object -First 1
 if (-not $tgzFile) {
     Fail "npm pack did not create a .tgz file"
@@ -56,11 +59,15 @@ Pass "Package created: $($tgzFile.Name)"
 
 # --- Uninstall previous global install (if any) ---
 Log "Removing previous global its-magic (if any) ..."
-npm uninstall -g its-magic 2>$null | Out-Null
+$ErrorActionPreference = 'Continue'
+npm uninstall -g its-magic 2>&1 | Out-Null
+$ErrorActionPreference = $prevEAP
 
 # --- Install globally from local tarball ---
 Log "Installing globally from local tarball ..."
-npm install -g $tgzFile.FullName
+$ErrorActionPreference = 'Continue'
+npm install -g $tgzFile.FullName 2>&1 | Out-Null
+$ErrorActionPreference = $prevEAP
 if ($LASTEXITCODE -ne 0) {
     Fail "npm install -g failed"
     Pop-Location; exit 1
@@ -119,7 +126,9 @@ if ($tgzFile -and (Test-Path $tgzFile.FullName)) { Remove-Item $tgzFile.FullName
 # --- Uninstall ---
 if (-not $SkipUninstall) {
     Log "Uninstalling ..."
-    npm uninstall -g its-magic
+    $ErrorActionPreference = 'Continue'
+    npm uninstall -g its-magic 2>&1 | Out-Null
+    $ErrorActionPreference = $prevEAP
     if ($LASTEXITCODE -ne 0) { Fail "npm uninstall -g failed" }
     else { Pass "Uninstall succeeded" }
 } else {
