@@ -102,11 +102,7 @@ $includePaths = @(
   "sprints",
   "handoffs",
   "decisions",
-  ".github/workflows",
-  "README.md",
-  "installer.py",
-  "installer.ps1",
-  "installer.sh"
+  ".github/workflows"
 )
 
 $files = List-SourceFiles $sourceRoot $includePaths

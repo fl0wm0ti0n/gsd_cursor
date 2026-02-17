@@ -121,10 +121,6 @@ sprints
 handoffs
 decisions
 .github/workflows
-README.md
-installer.py
-installer.ps1
-installer.sh
 "
 
 FILES=$(list_source_files "$SOURCE_ROOT" $INCLUDE_PATHS)

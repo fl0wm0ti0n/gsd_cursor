@@ -1,19 +1,23 @@
 {
   "name": "its-magic",
-  "version": "0.1.2-9",
+  "version": "0.1.2-11",
   "description": "its-magic - AI dev team workflow for Cursor.",
   "license": "MIT",
   "bin": {
     "its-magic": "bin/its-magic.js"
   },
   "files": [
-    ".cursor/",
-    ".github/",
+    ".cursor/commands/",
+    ".cursor/rules/",
+    ".cursor/skills/",
+    ".cursor/agents/",
+    ".cursor/hooks/",
+    ".cursor/hooks.json",
+    ".cursor/scratchpad.md",
+    ".github/workflows/",
     "decisions/",
     "docs/",
     "handoffs/",
-    "milestones/",
-    "scripts/",
     "sprints/",
     "installer.ps1",
     "installer.sh",

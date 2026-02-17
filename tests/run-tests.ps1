@@ -104,13 +104,13 @@ if (Test-Path $installer -PathType Leaf) {
 
 # 7) Backup test (overwrite mode + backup)
 if (Test-Path $installer -PathType Leaf) {
-  $readmePath = Join-Path $tempRoot "README.md"
-  Set-Content -Path $readmePath -Value "override"
+  $testFile = Join-Path $tempRoot ".cursor\commands\intake.md"
+  Set-Content -Path $testFile -Value "override"
   & $installer -Target $tempRoot -Mode overwrite -Backup | Out-Null
   $backupDir = Get-ChildItem -Path (Join-Path $tempRoot "backups") -Directory -ErrorAction SilentlyContinue | Select-Object -First 1
   $backupOk = $false
   if ($backupDir) {
-    $backupOk = Test-Path (Join-Path $backupDir.FullName "README.md")
+    $backupOk = Test-Path (Join-Path $backupDir.FullName ".cursor\commands\intake.md")
   }
   Assert-True "Installer backup created" $backupOk
 }

@@ -114,8 +114,6 @@ def main():
         "handoffs",
         "decisions",
         ".github/workflows",
-        "README.md",
-        "installer.py",
     ]
 
     files = list_source_files(source_root, include_paths)
