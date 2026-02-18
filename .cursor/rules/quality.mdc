@@ -10,6 +10,9 @@ globs: ["**/*"]
 - If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generate release notes
   automatically (scripted).
 - If `PERMISSION_MODE=auto`, do not ask for routine permission prompts.
+- If `RUN_TESTS_ON_EDIT=1`, run configured tests after meaningful edits.
+- If `LOOP_UNTIL_GREEN=1`, iterate fix/test until green, bounded by
+  `AUTO_LOOP_MAX_CYCLES` when set.
 - Update `docs/engineering/state.md` after meaningful changes.
 - If tests fail and commands are set, fix or document before proceeding.
 

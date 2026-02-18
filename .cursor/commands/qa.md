@@ -24,5 +24,8 @@ description: "its-magic QA: test plan, findings, verify fixes."
 1. Define a test plan and run verification.
 2. Record findings and severity.
 3. Update state and handoff to dev if needed.
-4. Follow with `/verify-work` for user acceptance.
+4. If `AUTO_IMPLEMENTATION_LOOP=1` and blocking issues exist, handoff to dev and
+   return to `/execute` automatically (bounded by `AUTO_LOOP_MAX_CYCLES`).
+5. Follow with `/verify-work` for user acceptance when blocking issues are closed.
+6. If `AUTO_PAUSE_REQUEST=1` at safe boundary, run `/pause` before next phase.
 

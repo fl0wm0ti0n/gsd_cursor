@@ -23,3 +23,5 @@ description: "its-magic verify work: guided user acceptance testing."
 1. Convert acceptance criteria into testable UAT steps.
 2. Record results and failures.
 3. Update state with pass/fail summary.
+4. If `AUTO_IMPLEMENTATION_LOOP=1` and UAT fails, write a handoff to dev/QA and
+   continue the fix loop within `AUTO_LOOP_MAX_CYCLES`.

@@ -3,8 +3,8 @@ $ErrorActionPreference = 'Stop'
 # --- Config ---
 $packageName = 'its-magic'
 # UPDATE: url and checksum before each release
-$url         = 'https://github.com/fl0wm0ti0n/gsd_cursor/archive/refs/tags/v0.1.2-12.zip'
-$checksum    = 'a6d54a099ac2bbfa9bacda479a1c59b11141133c943b89c5cf16af63a83ce78f'
+$url         = 'https://github.com/fl0wm0ti0n/its-magic/archive/refs/tags/v0.1.2-15.zip'
+$checksum    = '783ece33a6d023364850dd9c07fc62ee6b9691230e527036527aafba705c0972'
 $checksumType= 'sha256'
 
 # --- Download & extract ---
@@ -24,29 +24,11 @@ if (-not $installerPath) {
     throw "installer.ps1 not found in extracted archive. Installation failed."
 }
 
-$extractedRoot = Split-Path -Parent $installerPath
-
 # --- Create a .cmd wrapper so 'its-magic' works from any shell ---
 $wrapperCmd = Join-Path $toolsDir "its-magic.cmd"
 $wrapperContent = @"
 @echo off
-if "%~1"=="--help" goto :help
-if "%~1"=="-h" goto :help
-if "%~1"=="/?" goto :help
 powershell -ExecutionPolicy Bypass -File "$installerPath" %*
-goto :eof
-:help
-echo its-magic - AI dev team
-echo.
-echo Usage:
-echo   its-magic --target ^<path^> --mode missing [--backup] [--create]
-echo.
-echo Options:
-echo   --target   Target repository path (required)
-echo   --mode     missing ^| overwrite ^| interactive (default: missing)
-echo   --backup   Backup files before overwrite
-echo   --create   Create target directory if missing
-echo   --help     Show this help
 "@
 Set-Content -Path $wrapperCmd -Value $wrapperContent -Encoding ASCII
 
@@ -71,5 +53,11 @@ Write-Host ""
 Write-Host "  Run: its-magic --help" -ForegroundColor White
 Write-Host ""
 [Console]::OutputEncoding = $prev
+
+
+
+
+
+
 
 

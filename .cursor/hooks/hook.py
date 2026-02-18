@@ -6,14 +6,15 @@ from datetime import datetime
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 SCRATCHPAD = os.path.join(ROOT, ".cursor", "scratchpad.md")
+SCRATCHPAD_LOCAL = os.path.join(ROOT, ".cursor", "scratchpad.local.md")
 STATE_FILE = os.path.join(ROOT, ".cursor", "hooks", "hook-state.json")
 BENCH_LOG = os.path.join(ROOT, ".cursor", "hooks", "bench-log.jsonl")
 
 
-def read_scratchpad():
+def read_kv_file(path):
     flags = {}
     try:
-        with open(SCRATCHPAD, "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
                 if not line or line.startswith("#"):
@@ -23,6 +24,14 @@ def read_scratchpad():
                     flags[key.strip()] = val.strip()
     except OSError:
         pass
+    return flags
+
+
+def read_scratchpad():
+    flags = read_kv_file(SCRATCHPAD)
+    # Local overrides are optional and intentionally gitignored.
+    local = read_kv_file(SCRATCHPAD_LOCAL)
+    flags.update(local)
     return flags
 
 

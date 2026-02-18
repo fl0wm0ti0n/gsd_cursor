@@ -9,5 +9,6 @@ Events handled:
 - afterFileEdit: tracks code edits vs context refresh
 - stop: optional reminder to refresh context
 
-Behavior is controlled via `.cursor/scratchpad.md`.
+Behavior is controlled via `.cursor/scratchpad.md` with optional local overrides
+from `.cursor/scratchpad.local.md`.
 

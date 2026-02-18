@@ -10,6 +10,11 @@ globs: ["**/*"]
   decision gates (`auto_until_decision` recommended).
 - `PHASE_MODE=interactive` means ask questions; `PHASE_MODE=auto` minimizes
   prompts unless decisions are required.
+- `AUTO_IMPLEMENTATION_LOOP=1` enables an automatic fix loop:
+  execute -> QA -> execute (and verify-work) until quality gates are green or
+  `AUTO_LOOP_MAX_CYCLES` is reached.
+- `AUTO_PAUSE_REQUEST=1` requests a graceful stop at the next safe boundary
+  defined by `AUTO_PAUSE_POLICY` (`after_task` or `after_phase`).
 - Persist decisions and state in files; do not keep critical info only in chat.
 - Pause/resume is first-class. Update `handoffs/resume_brief.md` on pause.
 - Context pack must stay compact: summarize, do not dump raw logs.

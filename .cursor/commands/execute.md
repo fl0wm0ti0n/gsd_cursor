@@ -10,6 +10,7 @@ description: "its-magic execute: implement tasks with artifacts and state update
 ## Inputs
 - `sprints/S0001/tasks.md`
 - `handoffs/tl_to_dev.md`
+- Optional: `handoffs/qa_to_dev.md` when fixing QA findings
 
 ## Outputs (artifacts)
 - Code changes
@@ -29,4 +30,8 @@ description: "its-magic execute: implement tasks with artifacts and state update
    via the appropriate package manager without prompting.
 5. If `REMOTE_EXECUTION=1` and `.cursor/remote.json` is configured, use
    remote/docker servers for heavy builds or tests when needed.
+6. If `RUN_TESTS_ON_EDIT=1`, run configured tests after meaningful edits.
+7. If `LOOP_UNTIL_GREEN=1`, fix failing tests in small iterations until green,
+   or stop and document blockers in `docs/engineering/state.md`.
+8. If `AUTO_PAUSE_REQUEST=1` and boundary rules permit, checkpoint via `/pause`.
 

@@ -1,13 +1,25 @@
 # its-magic scratchpad
 #
+# Shared team defaults live here.
+# Personal developer overrides belong in `.cursor/scratchpad.local.md`
+# (copy from `.cursor/scratchpad.local.example.md`).
+#
 # Core behavior
 # - MAGIC_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
 # - LOOP_UNTIL_GREEN: 0|1 (optional test loop)
 # - RUN_TESTS_ON_EDIT: 0|1 (run tests after edits)
+# - AUTO_IMPLEMENTATION_LOOP: 0|1 (auto cycle execute->qa->execute)
+# - AUTO_LOOP_MAX_CYCLES: integer >= 1 (safety guard)
+# - AUTO_PAUSE_REQUEST: 0|1 (request graceful stop at next safe boundary)
+# - AUTO_PAUSE_POLICY: after_task|after_phase (safe stop boundary)
 # - DONE: 0|1 (stop hook loops)
 MAGIC_CONTEXT_STRICT=1
 LOOP_UNTIL_GREEN=0
 RUN_TESTS_ON_EDIT=0
+AUTO_IMPLEMENTATION_LOOP=0
+AUTO_LOOP_MAX_CYCLES=5
+AUTO_PAUSE_REQUEST=0
+AUTO_PAUSE_POLICY=after_phase
 DONE=0
 #
 # Benchmarking

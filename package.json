@@ -1,6 +1,6 @@
 {
   "name": "its-magic",
-  "version": "0.1.2-12",
+  "version": "0.1.2-15",
   "description": "its-magic - AI dev team workflow for Cursor.",
   "license": "MIT",
   "bin": {
@@ -14,6 +14,7 @@
     ".cursor/hooks/",
     ".cursor/hooks.json",
     ".cursor/scratchpad.md",
+    ".cursor/scratchpad.local.example.md",
     ".github/workflows/",
     "decisions/",
     "docs/",
