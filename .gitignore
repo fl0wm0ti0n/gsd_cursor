@@ -5,11 +5,15 @@
 temp/
 backups/
 
-# Hook telemetry/state
+# Dev workspace (installed its-magic for dogfooding)
 .cursor/hooks/*.jsonl
 .cursor/hooks/hook-state.json
 .cursor/remote.json
 .cursor/scratchpad.local.md
+
+# Template hook state (not shipped)
+template/.cursor/hooks/*.jsonl
+template/.cursor/hooks/hook-state.json
 
 # Test/bench artifacts
 tests/.tmp-install/

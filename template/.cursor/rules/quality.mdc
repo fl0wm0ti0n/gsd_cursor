@@ -4,7 +4,8 @@ globs: ["**/*"]
 ---
 
 - Prefer small, atomic changes tied to a single task.
-- Run tests, lint, and typecheck when commands are configured.
+- Run tests, lint, and typecheck when commands are configured in
+  `docs/engineering/runbook.md` (`TEST_COMMAND`, `LINT_COMMAND`, `TYPECHECK_COMMAND`).
 - If `AUTO_INSTALL_DEPS=1` in `.cursor/scratchpad.md`, install required
   runtimes/libs without asking (package manager only).
 - If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generate release notes
@@ -15,4 +16,11 @@ globs: ["**/*"]
   `AUTO_LOOP_MAX_CYCLES` when set.
 - Update `docs/engineering/state.md` after meaningful changes.
 - If tests fail and commands are set, fix or document before proceeding.
+- Quality chain: Cursor AI loop (in-editor) → `scripts/validate-and-push`
+  (local pre-push) → CI auto-fix (GitHub Actions). Each layer catches issues
+  the previous layer missed.
+- Before pushing, recommend running `scripts/validate-and-push.ps1` (Windows)
+  or `scripts/validate-and-push.sh` (Linux/Mac) to catch failures locally.
+- `LINT_FIX_COMMAND` and `FORMAT_COMMAND` in the runbook enable automatic
+  formatting/lint fixes both locally and in CI.
 

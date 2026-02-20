@@ -1,9 +1,14 @@
 #!/usr/bin/env sh
 set -e
 
-SOURCE_ROOT=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+if [ -d "$SCRIPT_DIR/template" ]; then
+  SOURCE_ROOT="$SCRIPT_DIR/template"
+else
+  SOURCE_ROOT="$SCRIPT_DIR"
+fi
 REPO_URL="https://github.com/fl0wm0ti0n/its-magic"
-APP_VERSION=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$SOURCE_ROOT/package.json" | head -n 1)
+APP_VERSION=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$SCRIPT_DIR/package.json" 2>/dev/null | head -n 1)
 [ -z "$APP_VERSION" ] && APP_VERSION="unknown"
 
 show_banner() {
@@ -228,6 +233,8 @@ docs
 sprints
 handoffs
 decisions
+scripts/validate-and-push.ps1
+scripts/validate-and-push.sh
 .github/workflows
 README.md
 "

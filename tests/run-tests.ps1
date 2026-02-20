@@ -34,26 +34,28 @@ function Count-Files($Path, $Filter) {
 
 $Results = @()
 $root = Resolve-RepoRoot
+$tpl = Join-Path $root "template"
 
 # 1) Base structure checks
-Assert-True "Commands folder exists" (Test-Path (Join-Path $root ".cursor\commands"))
-Assert-True "Rules folder exists" (Test-Path (Join-Path $root ".cursor\rules"))
-Assert-True "Skills folder exists" (Test-Path (Join-Path $root ".cursor\skills\its-magic\templates"))
-Assert-True "Agents folder exists" (Test-Path (Join-Path $root ".cursor\agents"))
-Assert-True "Hooks config exists" (Test-Path (Join-Path $root ".cursor\hooks.json"))
-Assert-True "Docs folder exists" (Test-Path (Join-Path $root "docs"))
-Assert-True "Sprints folder exists" (Test-Path (Join-Path $root "sprints"))
-Assert-True "Handoffs folder exists" (Test-Path (Join-Path $root "handoffs"))
-Assert-True "Decisions folder exists" (Test-Path (Join-Path $root "decisions"))
-Assert-True "Workflows folder exists" (Test-Path (Join-Path $root ".github\workflows"))
+Assert-True "template/ folder exists" (Test-Path $tpl -PathType Container)
+Assert-True "Commands folder exists" (Test-Path (Join-Path $tpl ".cursor\commands"))
+Assert-True "Rules folder exists" (Test-Path (Join-Path $tpl ".cursor\rules"))
+Assert-True "Skills folder exists" (Test-Path (Join-Path $tpl ".cursor\skills\its-magic\templates"))
+Assert-True "Agents folder exists" (Test-Path (Join-Path $tpl ".cursor\agents"))
+Assert-True "Hooks config exists" (Test-Path (Join-Path $tpl ".cursor\hooks.json"))
+Assert-True "Docs folder exists" (Test-Path (Join-Path $tpl "docs"))
+Assert-True "Sprints folder exists" (Test-Path (Join-Path $tpl "sprints"))
+Assert-True "Handoffs folder exists" (Test-Path (Join-Path $tpl "handoffs"))
+Assert-True "Decisions folder exists" (Test-Path (Join-Path $tpl "decisions"))
+Assert-True "Workflows folder exists" (Test-Path (Join-Path $tpl ".github\workflows"))
 
 # 2) Command/rule counts
-Assert-True "19 commands exist" ((Count-Files (Join-Path $root ".cursor\commands") "*.md") -eq 19)
-Assert-True "4 rules exist" ((Count-Files (Join-Path $root ".cursor\rules") "*.mdc") -eq 4)
-Assert-True "6 agents exist" ((Count-Files (Join-Path $root ".cursor\agents") "*.mdc") -eq 6)
+Assert-True "19 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 19)
+Assert-True "5 rules exist" ((Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 5)
+Assert-True "6 agents exist" ((Count-Files (Join-Path $tpl ".cursor\agents") "*.mdc") -eq 6)
 
 # 3) Command content sections
-$commandFiles = Get-ChildItem -Path (Join-Path $root ".cursor\commands") -Filter "*.md" -File
+$commandFiles = Get-ChildItem -Path (Join-Path $tpl ".cursor\commands") -Filter "*.md" -File
 foreach ($file in $commandFiles) {
   $content = Get-Content -Path $file.FullName -Raw
   $hasSections = $content -match "## Subagents" -and
@@ -64,15 +66,15 @@ foreach ($file in $commandFiles) {
 }
 
 # 4) Runbook keys and workflows
-$runbook = Join-Path $root "docs\engineering\runbook.md"
+$runbook = Join-Path $tpl "docs\engineering\runbook.md"
 Assert-True "Runbook contains TEST_COMMAND" (File-Contains $runbook "TEST_COMMAND")
 Assert-True "Runbook contains LINT_COMMAND" (File-Contains $runbook "LINT_COMMAND")
 Assert-True "Runbook contains TYPECHECK_COMMAND" (File-Contains $runbook "TYPECHECK_COMMAND")
 Assert-True "Runbook contains DEPLOY_STAGING_COMMAND" (File-Contains $runbook "DEPLOY_STAGING_COMMAND")
 Assert-True "Runbook contains DEPLOY_PROD_COMMAND" (File-Contains $runbook "DEPLOY_PROD_COMMAND")
 
-$ci = Join-Path $root ".github\workflows\ci.yml"
-$deploy = Join-Path $root ".github\workflows\deploy.yml"
+$ci = Join-Path $tpl ".github\workflows\ci.yml"
+$deploy = Join-Path $tpl ".github\workflows\deploy.yml"
 Assert-True "CI workflow references TEST_COMMAND" (File-Contains $ci "TEST_COMMAND")
 Assert-True "CI workflow references LINT_COMMAND" (File-Contains $ci "LINT_COMMAND")
 Assert-True "CI workflow references TYPECHECK_COMMAND" (File-Contains $ci "TYPECHECK_COMMAND")
@@ -81,8 +83,8 @@ Assert-True "Deploy workflow references DEPLOY_PROD_COMMAND" (File-Contains $dep
 
 # 5) Hooks config schema
 try {
-  $hooksJson = Get-Content -Path (Join-Path $root ".cursor\hooks.json") -Raw | ConvertFrom-Json
-  $schemaOk = ($hooksJson.version -is [int]) -and ($hooksJson.hooks -is [hashtable])
+  $hooksJson = Get-Content -Path (Join-Path $tpl ".cursor\hooks.json") -Raw | ConvertFrom-Json
+  $schemaOk = ($hooksJson.version -is [int]) -and ($null -ne $hooksJson.hooks)
   Assert-True "Hooks schema valid" $schemaOk
 } catch {
   Assert-True "Hooks schema valid" $false $_.Exception.Message
@@ -141,4 +143,3 @@ Write-Host "Report written to: $reportPath"
 
 if ($failCount -gt 0) { exit 1 }
 exit 0
-

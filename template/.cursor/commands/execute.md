@@ -34,4 +34,6 @@ description: "its-magic execute: implement tasks with artifacts and state update
 7. If `LOOP_UNTIL_GREEN=1`, fix failing tests in small iterations until green,
    or stop and document blockers in `docs/engineering/state.md`.
 8. If `AUTO_PAUSE_REQUEST=1` and boundary rules permit, checkpoint via `/pause`.
+9. When ready to push, suggest `scripts/validate-and-push` to run the full
+   quality chain locally before CI.
 

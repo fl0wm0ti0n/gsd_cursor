@@ -160,8 +160,10 @@ def clean_repo(target_root):
 
 
 def main():
-    source_root = normalize(os.path.dirname(__file__))
-    version = read_version(source_root)
+    script_dir = normalize(os.path.dirname(__file__))
+    template_dir = os.path.join(script_dir, "template")
+    source_root = template_dir if os.path.isdir(template_dir) else script_dir
+    version = read_version(script_dir)
 
     parser = argparse.ArgumentParser(
         description="Install its-magic into a repo",
@@ -227,6 +229,8 @@ def main():
         "sprints",
         "handoffs",
         "decisions",
+        "scripts/validate-and-push.ps1",
+        "scripts/validate-and-push.sh",
         ".github/workflows",
         "README.md",
     ]

@@ -147,9 +147,13 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host ""
 }
 
-$sourceRoot = Normalize-PathSafe (Split-Path -Parent $MyInvocation.MyCommand.Path)
+$scriptDir = Normalize-PathSafe (Split-Path -Parent $MyInvocation.MyCommand.Path)
+$sourceRoot = Join-Path $scriptDir "template"
+if (-not (Test-Path $sourceRoot -PathType Container)) {
+  $sourceRoot = $scriptDir
+}
 $repoUrl = "https://github.com/fl0wm0ti0n/its-magic"
-$appVersion = Get-AppVersion $sourceRoot
+$appVersion = Get-AppVersion $scriptDir
 $noArgs = $PSBoundParameters.Count -eq 0
 
 if ($Version) {
@@ -228,6 +232,8 @@ $includePaths = @(
   "sprints",
   "handoffs",
   "decisions",
+  "scripts/validate-and-push.ps1",
+  "scripts/validate-and-push.sh",
   ".github/workflows",
   "README.md"
 )
