@@ -299,28 +299,36 @@ if (-not $SkipBrew) {
                     $prevEAP = $ErrorActionPreference
                     $ErrorActionPreference = 'Continue'
 
-                    # ── Step A: Ensure we have a local clone ──
-                    $tapGitDir = Join-Path $BrewTapDir ".git"
+                    # ── Helper: check if a directory is a valid git repo ──
+                    function Test-GitRepo($dir) {
+                        if (-not (Test-Path $dir)) { return $false }
+                        git -C $dir rev-parse --git-dir 2>&1 | Out-Null
+                        return ($LASTEXITCODE -eq 0)
+                    }
 
-                    # Clean up non-git directory leftovers
-                    if ((Test-Path $BrewTapDir) -and -not (Test-Path $tapGitDir)) {
-                        Warn "Tap directory exists but is not a git repo. Removing: $BrewTapDir"
+                    # ── Step A: Ensure we have a local clone ──
+                    if ((Test-Path $BrewTapDir) -and -not (Test-GitRepo $BrewTapDir)) {
+                        Warn "Tap directory exists but is not a valid git repo. Removing: $BrewTapDir"
                         Remove-Item -Recurse -Force $BrewTapDir
                     }
 
-                    if (Test-Path $tapGitDir) {
-                        # Already cloned - fetch latest
+                    if (Test-GitRepo $BrewTapDir) {
+                        Log "Using existing tap clone at $BrewTapDir"
                         git -C $BrewTapDir fetch origin 2>&1 | Out-Null
                     } else {
-                        # Clone (try gh first, then git)
                         $cloneOk = $false
+                        if (Test-Path $BrewTapDir) { Remove-Item -Recurse -Force $BrewTapDir }
+
                         if ($ghAvailableForTap) {
+                            Log "Cloning tap via gh: $BrewTapRepo ..."
                             & gh repo clone $BrewTapRepo $BrewTapDir 2>&1 | Out-Null
-                            if ($LASTEXITCODE -eq 0) { $cloneOk = $true }
+                            if (Test-GitRepo $BrewTapDir) { $cloneOk = $true }
                         }
                         if (-not $cloneOk) {
+                            if (Test-Path $BrewTapDir) { Remove-Item -Recurse -Force $BrewTapDir }
+                            Log "Cloning tap via git: https://github.com/$BrewTapRepo.git ..."
                             git clone "https://github.com/$BrewTapRepo.git" $BrewTapDir 2>&1 | Out-Null
-                            if ($LASTEXITCODE -eq 0) { $cloneOk = $true }
+                            if (Test-GitRepo $BrewTapDir) { $cloneOk = $true }
                         }
                         if (-not $cloneOk -and $CreateBrewTapIfMissing -and $ghAvailableForTap) {
                             Warn "Tap repo not found. Creating $BrewTapRepo on GitHub ..."
@@ -328,33 +336,37 @@ if (-not $SkipBrew) {
                             if ($LASTEXITCODE -eq 0) {
                                 Log "Tap repo created: https://github.com/$BrewTapRepo"
                                 if (Test-Path $BrewTapDir) { Remove-Item -Recurse -Force $BrewTapDir }
-                                & gh repo clone $BrewTapRepo $BrewTapDir 2>&1 | Out-Null
-                                if ($LASTEXITCODE -eq 0) { $cloneOk = $true }
+                                git clone "https://github.com/$BrewTapRepo.git" $BrewTapDir 2>&1 | Out-Null
+                                if (Test-GitRepo $BrewTapDir) { $cloneOk = $true }
                             }
                         }
                         if (-not $cloneOk) {
                             $tapReady = $false; $brewTapFailed = $true
                             Warn "Failed to clone/create tap repo $BrewTapRepo"
+                            if (Test-Path $BrewTapDir) { Remove-Item -Recurse -Force $BrewTapDir }
                         }
                     }
 
                     # ── Step B: Ensure branch exists ──
                     if ($tapReady) {
-                        # Check if repo has any commits at all
                         $hasCommits = $false
-                        git -C $BrewTapDir log --oneline -1 2>&1 | Out-Null
+                        $logOutput = git -C $BrewTapDir log --oneline -1 2>&1
                         if ($LASTEXITCODE -eq 0) { $hasCommits = $true }
 
                         if ($hasCommits) {
+                            Log "Tap repo has commits - checking out $BrewTapBranch"
                             git -C $BrewTapDir checkout $BrewTapBranch 2>&1 | Out-Null
                             if ($LASTEXITCODE -ne 0) {
                                 git -C $BrewTapDir checkout -b $BrewTapBranch 2>&1 | Out-Null
                             }
-                            # Try to pull if remote branch exists
                             git -C $BrewTapDir pull origin $BrewTapBranch 2>&1 | Out-Null
                         } else {
-                            Log "Empty tap repo detected - creating initial branch $BrewTapBranch"
+                            Log "Empty tap repo - creating initial branch $BrewTapBranch"
                             git -C $BrewTapDir checkout --orphan $BrewTapBranch 2>&1 | Out-Null
+                            if ($LASTEXITCODE -ne 0) {
+                                $tapReady = $false; $brewTapFailed = $true
+                                Warn "Failed to create orphan branch in tap repo"
+                            }
                         }
                     }
 
