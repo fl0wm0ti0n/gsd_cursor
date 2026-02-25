@@ -42,6 +42,8 @@ show_help() {
   printf "                      overwrite    Replace every file, even if it already exists.\n"
   printf "                                   Combine with --backup to keep a snapshot first.\n"
   printf "                      interactive  Ask per file whether to overwrite or skip.\n"
+  printf "                      upgrade      Update framework files while preserving user data.\n"
+  printf "                                   Use after updating its-magic to a newer version.\n"
   printf "  --backup          Before overwriting, save existing files to backups/<timestamp>/.\n"
   printf "                    Ignored when mode is 'missing' (nothing gets replaced).\n"
   printf "  --create          Create the target directory if it does not exist.\n\n"
@@ -55,9 +57,10 @@ show_help() {
   printf "  --help, -h        Show this help and exit.\n"
   printf "  --version, -v     Print the installed version and exit.\n\n"
   printf "Examples:\n"
-  printf "  its-magic --target . --mode missing            Safe first-time setup\n"
-  printf "  its-magic --target . --mode overwrite --backup   Update all files, keep backup\n"
-  printf "  its-magic --clean-repo --target . --yes        Remove workflow artifacts silently\n\n"
+  printf "  its-magic --target . --mode missing              Safe first-time setup\n"
+  printf "  its-magic --target . --mode upgrade               Update framework, keep user data\n"
+  printf "  its-magic --target . --mode overwrite --backup    Replace all files, keep backup\n"
+  printf "  its-magic --clean-repo --target . --yes           Remove workflow artifacts silently\n\n"
 }
 
 ensure_parent() {
@@ -99,13 +102,42 @@ choose_mode() {
   printf "%s\n" "1) missing-only (copy only files that do not exist)"
   printf "%s\n" "2) overwrite-all (replace existing files)"
   printf "%s\n" "3) interactive (prompt per file)"
-  printf "%s" "Enter 1, 2, or 3: "
+  printf "%s\n" "4) upgrade (update framework files, preserve user data)"
+  printf "%s" "Enter 1, 2, 3, or 4: "
   read -r choice
   case "$choice" in
     1) echo "missing" ;;
     2) echo "overwrite" ;;
+    4) echo "upgrade" ;;
     *) echo "interactive" ;;
   esac
+}
+
+classify_file() {
+  rel="$1"
+  case "$rel" in
+    .cursor/scratchpad.md|README.md) echo "mixed" ;;
+    .cursor/commands/*|.cursor/rules/*|.cursor/agents/*|.cursor/skills/*) echo "framework" ;;
+    .cursor/hooks/*|.cursor/hooks.json|.cursor/scratchpad.local.example.md) echo "framework" ;;
+    .github/workflows/*|scripts/validate-and-push*|docs/engineering/context/*) echo "framework" ;;
+    .its-magic-version) echo "framework" ;;
+    docs/product/*|docs/engineering/*) echo "user-data" ;;
+    sprints/*|handoffs/*|decisions/*) echo "user-data" ;;
+    *) echo "framework" ;;
+  esac
+}
+
+read_installed_version() {
+  vf="$1/.its-magic-version"
+  if [ -f "$vf" ]; then
+    cat "$vf" | tr -d '\n'
+  else
+    printf "unknown"
+  fi
+}
+
+write_installed_version() {
+  printf "%s" "$2" > "$1/.its-magic-version"
 }
 
 prompt_yes_no() {
@@ -237,6 +269,7 @@ scripts/validate-and-push.ps1
 scripts/validate-and-push.sh
 .github/workflows
 README.md
+.its-magic-version
 "
 
 FILES=$(list_source_files "$SOURCE_ROOT" $INCLUDE_PATHS)
@@ -254,6 +287,91 @@ if [ "$BACKUP" = "true" ] && [ "$MODE" = "overwrite" ]; then
     backup_root=$(backup_files "$TARGET_ROOT" $overwrite_candidates)
     printf "%s\n" "Backup created at: $backup_root"
   fi
+fi
+
+if [ "$MODE" = "upgrade" ]; then
+  OLD_VER=$(read_installed_version "$TARGET_ROOT")
+  printf "\n\033[1;36mUpgrading from v%s to v%s\033[0m\n\n" "$OLD_VER" "$APP_VERSION"
+
+  if [ "$BACKUP" = "true" ]; then
+    backup_candidates=""
+    for rel in $FILES; do
+      cat=$(classify_file "$rel")
+      [ "$cat" = "framework" ] && [ -f "$TARGET_ROOT/$rel" ] && backup_candidates="$backup_candidates $rel"
+    done
+    if [ -n "$backup_candidates" ]; then
+      backup_root=$(backup_files "$TARGET_ROOT" $backup_candidates)
+      printf "%s\n" "Backup created at: $backup_root"
+    fi
+  fi
+
+  count_added=0; list_added=""
+  count_updated=0; list_updated=""
+  count_unchanged=0
+  count_preserved=0
+  count_review=0; list_review=""
+
+  for rel in $FILES; do
+    src="$SOURCE_ROOT/$rel"
+    dst="$TARGET_ROOT/$rel"
+    cat=$(classify_file "$rel")
+
+    if [ ! -f "$dst" ]; then
+      ensure_parent "$dst"
+      cp -p "$src" "$dst"
+      count_added=$((count_added + 1))
+      list_added="$list_added $rel"
+      continue
+    fi
+
+    if [ "$cat" = "framework" ]; then
+      if cmp -s "$src" "$dst"; then
+        count_unchanged=$((count_unchanged + 1))
+      else
+        ensure_parent "$dst"
+        cp -p "$src" "$dst"
+        count_updated=$((count_updated + 1))
+        list_updated="$list_updated $rel"
+      fi
+      continue
+    fi
+
+    if [ "$cat" = "user-data" ]; then
+      count_preserved=$((count_preserved + 1))
+      continue
+    fi
+
+    if [ "$cat" = "mixed" ]; then
+      count_preserved=$((count_preserved + 1))
+      if ! cmp -s "$src" "$dst"; then
+        count_review=$((count_review + 1))
+        list_review="$list_review $rel"
+      fi
+      continue
+    fi
+  done
+
+  write_installed_version "$TARGET_ROOT" "$APP_VERSION"
+
+  show_banner
+  printf "\033[1;32mUpgrade complete: v%s -> v%s\033[0m\n\n" "$OLD_VER" "$APP_VERSION"
+  if [ "$count_added" -gt 0 ]; then
+    printf "  \033[1;32mAdded (new):         %s files\033[0m\n" "$count_added"
+    for f in $list_added; do printf "    %s\n" "$f"; done
+  fi
+  if [ "$count_updated" -gt 0 ]; then
+    printf "  \033[1;33mUpdated (framework): %s files\033[0m\n" "$count_updated"
+    for f in $list_updated; do printf "    %s\n" "$f"; done
+  fi
+  printf "  Unchanged:           %s files\n" "$count_unchanged"
+  printf "  Preserved (user):    %s files\n" "$count_preserved"
+  if [ "$count_review" -gt 0 ]; then
+    printf "\n  \033[1;35mReview recommended:  %s files\033[0m\n" "$count_review"
+    for f in $list_review; do printf "    %s\n" "$f"; done
+    printf "    Check .cursor/scratchpad.local.example.md for new flags.\n"
+  fi
+  printf "\nRepository: %s\n\n" "$REPO_URL"
+  exit 0
 fi
 
 for rel in $FILES; do
@@ -293,6 +411,8 @@ for rel in $FILES; do
     fi
   fi
 done
+
+write_installed_version "$TARGET_ROOT" "$APP_VERSION"
 
 show_banner
 printf "its-magic v%s\n" "$APP_VERSION"

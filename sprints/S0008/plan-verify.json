@@ -1,0 +1,51 @@
+{
+  "sprint": "S0008",
+  "stories": ["US-0036"],
+  "total_tasks": 10,
+  "coverage": {
+    "US-0036": {
+      "AC-1": { "task": "T-001+T-002", "status": "covered" },
+      "AC-2": { "task": "T-003", "status": "covered" },
+      "AC-3": { "task": "T-001+T-007", "status": "covered" },
+      "AC-4": { "task": "T-004+T-005+T-008+T-009", "status": "covered" },
+      "AC-5": { "task": "T-005+T-008+T-009", "status": "covered" },
+      "AC-6": { "task": "T-004+T-008+T-009", "status": "covered" },
+      "AC-7": { "task": "T-006+T-009", "status": "covered" },
+      "AC-8": { "task": "T-007+T-008+T-009", "status": "covered" },
+      "AC-9": { "task": "T-002+T-009+T-010", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "Canonical active and template remote config artifacts (.cursor/remote.json parity)",
+      "Schema/contract guidance and deterministic validation rules",
+      "Mode-aware behavior: fail-fast only when REMOTE_EXECUTION=1",
+      "Actionable remote config error message contract",
+      "Security constraints for secrets handling in remote config",
+      "README and runbook updates for setup and validation expectations",
+      "Positive and negative QA coverage planning for remote config failure modes",
+      "Traceability/state/handoff updates for US-0036 planning"
+    ],
+    "out_of_scope": [
+      "Remote transport backend implementation",
+      "External secret manager infrastructure",
+      "Non-US-0036 feature work"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 10,
+    "split_required": false,
+    "split_reason": "10 tasks < 12 threshold. Single sprint."
+  },
+  "gaps": [],
+  "risks": [
+    "Active/template drift for remote contract artifacts and docs",
+    "Validation rules accidentally running in REMOTE_EXECUTION=0 mode",
+    "Insufficiently actionable errors causing slow remediation",
+    "Secret-like values being copied into committed config examples",
+    "Negative-path coverage missing one or more fail-fast scenarios"
+  ],
+  "result": "PASS"
+}

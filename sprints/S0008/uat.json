@@ -1,0 +1,39 @@
+{
+  "sprint": "S0008",
+  "steps": [
+    {
+      "description": "AC-1/AC-9: Verify canonical `.cursor/remote.json` exists in active and template copies with aligned shape and placeholders.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-2: Verify schema guidance defines required fields, optional fields, data types, and allowed enums.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-3: Verify at least two safe target examples are documented (local docker-like and remote VM/SSH-like).",
+      "result": "pass"
+    },
+    {
+      "description": "AC-4/AC-6: Verify mode-aware validation is fail-fast only when `REMOTE_EXECUTION=1` and skipped when `REMOTE_EXECUTION=0`.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-5: Verify actionable remote validation error format includes path, expected rule, actual value/type, and fix hint.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-7: Verify security guidance prohibits committed secrets and requires env-var references for sensitive values.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-8: Verify README and runbook both document remote setup, mode behavior, and troubleshooting.",
+      "result": "pass"
+    },
+    {
+      "description": "Negative-path coverage: missing config, malformed JSON, invalid field/enum/value, and secret-like inline value guidance is present and test-checked.",
+      "result": "pass"
+    }
+  ],
+  "passed": 8,
+  "failed": 0
+}

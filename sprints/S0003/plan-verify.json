@@ -1,0 +1,21 @@
+{
+  "sprint": "S0003",
+  "stories": ["US-0023"],
+  "total_tasks": 6,
+  "coverage": {
+    "US-0023": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-004", "status": "covered" },
+      "AC-4": { "task": "T-003+T-005", "status": "covered" },
+      "AC-5": { "task": "T-003", "status": "covered" },
+      "AC-6": { "task": "T-006", "status": "covered" }
+    }
+  },
+  "gaps": [],
+  "risks": [
+    "Future command additions could miss execution-model sections unless validated in review",
+    "Behavior enforcement remains artifact/rule-based, not externally runtime-enforced"
+  ],
+  "result": "PASS"
+}

@@ -1,0 +1,39 @@
+{
+  "sprint": "S0002",
+  "stories": ["US-0020", "US-0021", "US-0022"],
+  "total_tasks": 8,
+  "total_ac": 19,
+  "coverage": {
+    "US-0020": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-001", "status": "covered" },
+      "AC-3": { "task": "T-001", "status": "covered" },
+      "AC-4": { "task": "T-001", "status": "covered" },
+      "AC-5": { "task": "T-002", "status": "covered" }
+    },
+    "US-0021": {
+      "AC-1": { "task": "T-003", "status": "covered" },
+      "AC-2": { "task": "T-003", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-005", "status": "covered" },
+      "AC-5": { "task": "T-006", "status": "covered" },
+      "AC-6": { "task": "T-003+T-004", "status": "covered" },
+      "AC-7": { "task": "T-003+T-005", "status": "covered" }
+    },
+    "US-0022": {
+      "AC-1": { "task": "T-004", "status": "covered" },
+      "AC-2": { "task": "T-007", "status": "covered" },
+      "AC-3": { "task": "T-008", "status": "covered" },
+      "AC-4": { "task": "T-007", "status": "covered" },
+      "AC-5": { "task": "T-007", "status": "covered" },
+      "AC-6": { "task": "all", "status": "covered" },
+      "AC-7": { "task": "T-008", "status": "covered" }
+    }
+  },
+  "gaps": [],
+  "risks": [
+    "US-0021 AC-7 is behavioral — can only be verified by testing /intake with a weak idea",
+    "US-0022 AC-4 (new idea routing) is advisory text in the command, not enforced programmatically"
+  ],
+  "result": "PASS — all 19 AC mapped to tasks, no gaps"
+}

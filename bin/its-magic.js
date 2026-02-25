@@ -108,6 +108,10 @@ Install options:
                       overwrite    Replace every file, even if it already exists.
                                    Combine with --backup to keep a snapshot first.
                       interactive  Ask per file whether to overwrite or skip.
+                      upgrade      Update framework files (commands, rules, agents,
+                                   hooks, skills, CI, scripts) while preserving user
+                                   data (docs, sprints, handoffs, decisions, runbook).
+                                   Use after updating its-magic to a newer version.
   --backup          Before overwriting, save existing files to backups/<timestamp>/.
                     Ignored when mode is "missing" (nothing gets replaced).
   --create          Create the target directory if it does not exist.
@@ -124,9 +128,11 @@ Info:
   --version, -v     Print the installed version and exit.
 
 Examples:
-  its-magic --target . --mode missing          Safe first-time setup
-  its-magic --target . --mode overwrite --backup  Update all files, keep backup
-  its-magic --clean-repo --target . --yes      Remove workflow artifacts silently
+  its-magic --target . --mode missing            Safe first-time setup
+  its-magic --target . --mode upgrade             Update framework, keep user data
+  its-magic --target . --mode upgrade --backup    Upgrade with backup of old files
+  its-magic --target . --mode overwrite --backup  Replace all files, keep backup
+  its-magic --clean-repo --target . --yes         Remove workflow artifacts silently
 `);
 }
 

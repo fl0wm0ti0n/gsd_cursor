@@ -1,0 +1,50 @@
+{
+  "sprint": "S0012",
+  "steps": [
+    {
+      "description": "AC-1: Confirm `/release` writes sprint-scoped notes only to canonical path `handoffs/releases/Sxxxx-release-notes.md` and does not overwrite other sprint notes.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-2: Confirm canonical queue artifact `handoffs/release_queue.md` exists with required fields (`sprint_id`, `status`, `last_updated`, `release_notes_ref`).",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-3: Confirm deterministic queue update semantics for target sprint (`ready -> unreleased -> released`) with target-row-only mutation.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-4: Confirm unresolved sprint identity fails closed (`RELEASE_SPRINT_UNRESOLVED`) and does not overwrite notes or mutate unrelated queue rows.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-5: Confirm one-time legacy migration/backfill preserves `handoffs/release_notes.md`, supports resolvable migration, and remains idempotent.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-6: Confirm backward compatibility for workflows reading legacy `handoffs/release_notes.md` pointer/latest summary behavior.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-7: Confirm release readiness/reporting surfaces unreleased queue entries before finalization.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-8: Confirm release command/rules/docs define ownership and phase touchpoints for queue transitions and note generation.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-9: Confirm active/template parity for release guidance and artifacts (`release` command, rules, runbook, README, queue, sprint notes template).",
+      "result": "PASS"
+    }
+  ],
+  "passed": 9,
+  "failed": 0,
+  "planned_cases": [
+    { "id": "S0012-UAT-001", "scenario": "Unresolved sprint identity in release flow", "expected_reason_code": "RELEASE_SPRINT_UNRESOLVED" },
+    { "id": "S0012-UAT-002", "scenario": "Legacy migration without resolvable sprint context", "expected_reason_code": "LEGACY_NOTES_SPRINT_UNRESOLVED" },
+    { "id": "S0012-UAT-003", "scenario": "Queue entry missing for target sprint", "expected_reason_code": "QUEUE_ENTRY_MISSING" },
+    { "id": "S0012-UAT-004", "scenario": "Queue row missing notes reference", "expected_reason_code": "NOTES_REF_MISSING" },
+    { "id": "S0012-UAT-005", "scenario": "Invalid queue status transition", "expected_reason_code": "STATUS_TRANSITION_INVALID" }
+  ]
+}

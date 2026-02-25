@@ -1,0 +1,60 @@
+{
+  "sprint": "S0005",
+  "stories": ["US-0025", "US-0027", "US-0026"],
+  "total_tasks": 9,
+  "coverage": {
+    "US-0025": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-001", "status": "covered" },
+      "AC-3": { "task": "T-001+T-003", "status": "covered" },
+      "AC-4": { "task": "T-002", "status": "covered" },
+      "AC-5": { "task": "T-003", "status": "covered" },
+      "AC-6": { "task": "scope-boundary", "status": "covered" }
+    },
+    "US-0027": {
+      "AC-1": { "task": "T-004+T-005", "status": "covered" },
+      "AC-2": { "task": "T-004+T-005+T-006", "status": "covered" },
+      "AC-3": { "task": "T-005", "status": "covered" },
+      "AC-4": { "task": "T-005+T-006", "status": "covered" },
+      "AC-5": { "task": "T-004+T-005", "status": "covered" },
+      "AC-6": { "task": "scope-boundary", "status": "covered" }
+    },
+    "US-0026": {
+      "AC-1": { "task": "T-007", "status": "covered" },
+      "AC-2": { "task": "T-007+T-009", "status": "covered" },
+      "AC-3": { "task": "T-007+T-008", "status": "covered" },
+      "AC-4": { "task": "T-007", "status": "covered" },
+      "AC-5": { "task": "T-008", "status": "covered" },
+      "AC-6": { "task": "scope-boundary", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "US-0025 traceability index and command guidance",
+      "US-0027 UAT lifecycle ownership and minimum content rules",
+      "US-0026 milestone lifecycle states and exit criteria"
+    ],
+    "out_of_scope": [
+      "US-0017 template drift guard automation",
+      "US-0024 memory drift audit (S0004)",
+      "US-0022/US-0023 sprint sizing and automation"
+    ],
+    "note": "All three stories are guidance/documentation changes referencing DEC-0009 and DEC-0010. No new tooling or enforcement logic."
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 9,
+    "split_required": true,
+    "split_reason": "S0004 (6 tasks) + new stories (9 tasks) = 15 > 12. New sprint S0005 created."
+  },
+  "gaps": [],
+  "risks": [
+    "Overlapping file modifications (sprint-plan.md touched by T-002, T-004, T-009) require incremental application",
+    "Overlapping file modifications (verify-work.md touched by T-003, T-005) require incremental application",
+    "Template parity risk if active/template updates are not performed in the same task",
+    "Traceability backfill (T-001) accuracy depends on correct interpretation of historical sprint artifacts",
+    "All changes are guidance-only; effectiveness depends on AI following updated command steps"
+  ],
+  "result": "PASS"
+}

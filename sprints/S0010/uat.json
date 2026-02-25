@@ -1,0 +1,60 @@
+{
+  "sprint": "S0010",
+  "steps": [
+    {
+      "description": "AC-1: Confirm canonical sync policy modes (`disabled|manual|by_phase|by_milestone|custom_phase_list`) are documented with default non-auto behavior (`SYNC_POLICY_MODE=manual`).",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-2: Confirm sync eligibility evaluation executes only at phase-completion boundaries.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-3: Confirm mandatory `TEST_COMMAND` pre-push gate blocks push on missing command, failure, or timeout.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-4: Confirm optional checks (`LINT_COMMAND`, `TYPECHECK_COMMAND`, formatter/lint-fix) are honored only when configured and reported deterministically.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-5: Confirm feature auto-push before QA completion is forbidden; only manual sync is allowed before QA pass.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-6: Confirm unresolved blocking QA findings prevent auto-push and provide actionable remediation guidance.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-7: Confirm branch safety constraints enforce deny-by-default behavior unless explicit allowlist opt-in exists.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-8: Confirm deterministic sync evidence includes policy mode, phase boundary, checks run, push decision, reason code, and evidence references.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-9: Confirm `scripts/validate-and-push.ps1` and `.sh` remain behaviorally aligned for mandatory test gating and optional-check semantics.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-10: Confirm disabled/manual default modes preserve near-zero overhead and existing manual push workflow.",
+      "result": "PASS"
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "planned_cases": [
+    { "id": "S0010-UAT-001", "scenario": "Mode disabled at phase boundary", "expected_reason_code": "SYNC_DISABLED" },
+    { "id": "S0010-UAT-002", "scenario": "Mode manual at phase boundary", "expected_reason_code": "MANUAL_MODE_NO_AUTO" },
+    { "id": "S0010-UAT-003", "scenario": "Auto-push not enabled", "expected_reason_code": "AUTO_PUSH_NOT_ENABLED" },
+    { "id": "S0010-UAT-004", "scenario": "Feature work before QA completion", "expected_reason_code": "PRE_QA_AUTOPUSH_FORBIDDEN" },
+    { "id": "S0010-UAT-005", "scenario": "Unresolved blocking QA findings", "expected_reason_code": "BLOCKING_QA_FINDINGS" },
+    { "id": "S0010-UAT-006", "scenario": "Branch not allowlisted", "expected_reason_code": "BRANCH_NOT_ALLOWLISTED" },
+    { "id": "S0010-UAT-007", "scenario": "Missing TEST_COMMAND", "expected_reason_code": "TEST_COMMAND_MISSING" },
+    { "id": "S0010-UAT-008", "scenario": "TEST_COMMAND failure", "expected_reason_code": "TEST_FAILED" },
+    { "id": "S0010-UAT-009", "scenario": "TEST_COMMAND timeout", "expected_reason_code": "TEST_TIMEOUT" },
+    { "id": "S0010-UAT-010", "scenario": "Optional check failure when configured", "expected_reason_code": "OPTIONAL_CHECK_FAILED" },
+    { "id": "S0010-UAT-011", "scenario": "Eligible boundary with passing checks", "expected_reason_code": "SYNC_PUSHED" }
+  ]
+}

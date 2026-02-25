@@ -1,0 +1,119 @@
+{
+  "runtime": [
+    {
+      "name": "node",
+      "version": ">=20",
+      "purpose": "CLI wrapper (bin/its-magic.js) — only uses built-in modules (path, child_process)",
+      "required_for": "npm distribution path"
+    },
+    {
+      "name": "powershell",
+      "version": ">=5.1",
+      "purpose": "Windows installer (installer.ps1)",
+      "required_for": "Windows/Chocolatey distribution path"
+    },
+    {
+      "name": "bash",
+      "version": ">=4",
+      "purpose": "Unix installer (installer.sh)",
+      "required_for": "macOS/Linux/Homebrew distribution path"
+    },
+    {
+      "name": "python",
+      "version": ">=3.6",
+      "purpose": "Fallback installer (installer.py) — stdlib only",
+      "required_for": "cross-platform fallback"
+    }
+  ],
+  "libraries": [],
+  "tooling": [
+    {
+      "name": "npm",
+      "version": ">=9",
+      "purpose": "Package publishing and global CLI install",
+      "category": "distribution"
+    },
+    {
+      "name": "gh",
+      "version": ">=2",
+      "purpose": "GitHub CLI for release creation",
+      "category": "release"
+    },
+    {
+      "name": "choco",
+      "version": ">=2",
+      "purpose": "Chocolatey package manager for Windows distribution",
+      "category": "distribution"
+    },
+    {
+      "name": "brew",
+      "version": ">=4",
+      "purpose": "Homebrew package manager for macOS/Linux distribution",
+      "category": "distribution"
+    },
+    {
+      "name": "git",
+      "version": ">=2",
+      "purpose": "Version control, release tagging",
+      "category": "vcs"
+    }
+  ],
+  "npm_dependencies": {
+    "dependencies": {},
+    "devDependencies": {},
+    "peerDependencies": {}
+  },
+  "packaging": {
+    "npm": {
+      "name": "its-magic",
+      "version": "0.1.2-17",
+      "bin": "bin/its-magic.js",
+      "published_files": [
+        "template/",
+        "installer.ps1",
+        "installer.sh",
+        "installer.py",
+        "bin/its-magic.js",
+        "bin/postinstall.js"
+      ]
+    },
+    "chocolatey": {
+      "nuspec": "packaging/chocolatey/its-magic.nuspec",
+      "version": "0.1.2-beta17",
+      "install_script": "packaging/chocolatey/tools/chocolateyInstall.ps1"
+    },
+    "homebrew": {
+      "stable_formula": "packaging/homebrew/its-magic.rb",
+      "beta_formula": "packaging/homebrew/its-magic-beta.rb",
+      "stable_version": "0.1.1"
+    }
+  },
+  "ci": {
+    "platform": "GitHub Actions",
+    "node_version": "20",
+    "workflows": [
+      {
+        "name": "ci.yml",
+        "triggers": ["push to main", "pull_request", "workflow_dispatch"],
+        "jobs": ["checks", "auto-fix", "npm-test", "brew-test", "choco-test"]
+      },
+      {
+        "name": "deploy.yml",
+        "triggers": ["workflow_dispatch"],
+        "jobs": ["deploy (staging or prod)"]
+      }
+    ]
+  },
+  "test_framework": {
+    "type": "custom shell scripts",
+    "runners": [
+      "tests/run-tests.ps1",
+      "tests/run-tests.sh"
+    ],
+    "runbook_command": "sh tests/run-tests.sh"
+  },
+  "linting": {
+    "configured": false,
+    "notes": "No linter/formatter configured — project is mostly Markdown/YAML/JSON with minimal JS glue"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "sprint": "S0009",
+  "steps": [
+    {
+      "description": "AC-1: Confirm `/auto` defines explicit `start-from=<phase>` using canonical phase IDs.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-2: Confirm deterministic resume resolution order is `argument > handoffs/resume_brief.md > docs/engineering/state.md > fail-fast`.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-3: Confirm missing/stale/conflicting/unparseable resume sources fail safely with actionable `[AUTO_RESUME_ERROR]` guidance.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-4: Confirm one `/auto` invocation continues remaining phases from the resolved mid-process start point.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-5: Confirm continuation preserves existing stop conditions (decision gate, missing critical input, pause request, loop max cycles).",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-6: Confirm deterministic breadcrumb fields are written for requested/resolved start phase, source, stop reason, stop phase, and timestamp.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-7: Confirm default-safe behavior remains unchanged for manual/interactive workflows unless continuation mode is explicitly used.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-8: Confirm `/pause`, `/resume`, and `/auto` guidance is semantically aligned for shared continuation semantics.",
+      "result": "PASS"
+    },
+    {
+      "description": "AC-9: Confirm active and template continuation guidance files remain aligned for the US-0037 contract.",
+      "result": "PASS"
+    }
+  ],
+  "passed": 9,
+  "failed": 0
+}

@@ -1,0 +1,57 @@
+{
+  "sprint": "S0001",
+  "coverage": [
+    {
+      "criterion": "AC-1: Version tracking (.its-magic-version)",
+      "tasks": ["T-001", "T-002"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-2: File classification (framework vs. user-data)",
+      "tasks": ["T-003"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-3: --mode upgrade updates framework, preserves user data, warns mixed",
+      "tasks": ["T-004", "T-006"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-4: Upgrade summary output",
+      "tasks": ["T-005"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-5: New-file delivery regardless of category",
+      "tasks": ["T-004"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-6: Migration notes for breaking changes",
+      "tasks": [],
+      "status": "deferred",
+      "notes": "Architecture defers to future enhancement. Upgrade summary + scratchpad.local.example.md provide guidance for now."
+    },
+    {
+      "criterion": "AC-7: Triple installer parity (PS1, Bash, Python)",
+      "tasks": ["T-007", "T-008", "T-009", "T-010"],
+      "status": "covered"
+    },
+    {
+      "criterion": "AC-8: README documents upgrade workflow",
+      "tasks": ["T-011"],
+      "status": "covered"
+    },
+    {
+      "criterion": "US-0015: Document empty runbook commands as intentional",
+      "tasks": ["T-011"],
+      "status": "covered"
+    }
+  ],
+  "gaps": [
+    {
+      "criterion": "AC-6: Migration notes",
+      "resolution": "Deferred by architecture decision. Upgrade summary provides sufficient guidance for v1. MIGRATION.md can be added when breaking changes occur."
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "sprint": "S0007",
+  "steps": [
+    {
+      "description": "AC-1: Verify `.cursor/agents/security.mdc` exists and defines persona, inputs, outputs, and artifact responsibilities.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-2: Verify `.cursor/commands/security-review.md` defines both design and code review steps.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-3: Verify `SECURITY_REVIEW` and `COMPLIANCE_PROFILES` flags exist and control activation behavior.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-4: Verify zero-overhead path when `SECURITY_REVIEW=0` (security steps are skipped).",
+      "result": "pass"
+    },
+    {
+      "description": "AC-5: Verify design review scope checks architecture decisions, data flow, auth patterns, and selected profiles.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-6: Verify code review scope checks secrets, injection, auth/authz, and profile-specific requirements.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-7: Verify findings are written to `docs/engineering/security-review.md` with severity, affected component, and remediation.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-8: Verify workflow integration invokes security review at architecture/execute checkpoints when enabled.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-9: Verify critical findings trigger decision records and block progression until resolved.",
+      "result": "pass"
+    },
+    {
+      "description": "AC-10: Verify template parity includes security agent, command, and security review artifact updates.",
+      "result": "pass"
+    }
+  ],
+  "passed": 10,
+  "failed": 0
+}

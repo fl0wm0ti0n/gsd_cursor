@@ -1,0 +1,55 @@
+{
+  "sprint": "S0007",
+  "stories": ["US-0028"],
+  "total_tasks": 10,
+  "coverage": {
+    "US-0028": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-003+T-005+T-008", "status": "covered" },
+      "AC-5": { "task": "T-002+T-004", "status": "covered" },
+      "AC-6": { "task": "T-002", "status": "covered" },
+      "AC-7": { "task": "T-006", "status": "covered" },
+      "AC-8": { "task": "T-005+T-008", "status": "covered" },
+      "AC-9": { "task": "T-001+T-007", "status": "covered" },
+      "AC-10": { "task": "T-009", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "US-0028 security reviewer agent definition (security.mdc) per DEC-0012",
+      "/security-review command with design review and code review modes",
+      "SECURITY_REVIEW and COMPLIANCE_PROFILES scratchpad flags",
+      "GDPR compliance profile with concrete checklist items",
+      "Workflow integration in /auto (conditional spawn) and /qa (critical check)",
+      "security-review.md report placeholder with finding format",
+      "Critical findings → DEC-xxxx decision record escalation",
+      "core.mdc conditional phase flow update",
+      "Template parity for 6 template files (3 new + 3 modified)"
+    ],
+    "out_of_scope": [
+      "Automated SAST/DAST tooling integration",
+      "Compliance certification or audit-grade output",
+      "External security scanning tools",
+      "Detailed checklists for SOC2, HIPAA, PCI-DSS, ISO27001 (high-level only; GDPR is reference)"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 10,
+    "split_required": false,
+    "split_reason": "10 tasks < 12 threshold. Single sprint."
+  },
+  "gaps": [],
+  "risks": [
+    "Security agent scope creep — constrained to architectural/pattern-level review by agent definition rules",
+    "False sense of security from compliance profiles — output explicitly disclaims certification, recommends human review",
+    "Critical findings blocking workflow unnecessarily — user can accept risk with documented rationale via decision gate",
+    "Zero-overhead guarantee — all integration points conditional on SECURITY_REVIEW=1, default is 0",
+    "Template parity across 6 files — single task (T-009) after all active changes complete",
+    "Compliance profiles are prompt-embedded, not validated — quality improves over time as prompts are refined"
+  ],
+  "result": "PASS"
+}

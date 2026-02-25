@@ -1,4 +1,5 @@
 import argparse
+import filecmp
 import json
 import os
 import shutil
@@ -59,12 +60,60 @@ def choose_mode():
     print("1) missing-only (copy only files that do not exist)")
     print("2) overwrite-all (replace existing files)")
     print("3) interactive (prompt per file)")
-    choice = input("Enter 1, 2, or 3: ").strip()
+    print("4) upgrade (update framework files, preserve user data)")
+    choice = input("Enter 1, 2, 3, or 4: ").strip()
     if choice == "1":
         return "missing"
     if choice == "2":
         return "overwrite"
+    if choice == "4":
+        return "upgrade"
     return "interactive"
+
+
+FRAMEWORK_PREFIXES = (
+    ".cursor/commands/", ".cursor/rules/", ".cursor/agents/",
+    ".cursor/skills/", ".cursor/hooks/", ".github/workflows/",
+    "scripts/validate-and-push", "docs/engineering/context/",
+)
+FRAMEWORK_EXACT = {
+    ".cursor/hooks.json", ".cursor/scratchpad.local.example.md",
+    ".its-magic-version",
+}
+USER_DATA_PREFIXES = (
+    "docs/product/", "docs/engineering/",
+    "sprints/", "handoffs/", "decisions/",
+)
+MIXED_FILES = {".cursor/scratchpad.md", "README.md"}
+
+
+def classify_file(rel_path):
+    normalized = rel_path.replace(os.sep, "/")
+    if normalized in MIXED_FILES:
+        return "mixed"
+    for p in FRAMEWORK_PREFIXES:
+        if normalized.startswith(p):
+            return "framework"
+    if normalized in FRAMEWORK_EXACT:
+        return "framework"
+    for p in USER_DATA_PREFIXES:
+        if normalized.startswith(p):
+            return "user-data"
+    return "framework"
+
+
+def read_installed_version(target_root):
+    vf = os.path.join(target_root, ".its-magic-version")
+    if os.path.isfile(vf):
+        with open(vf, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    return "unknown"
+
+
+def write_installed_version(target_root, ver):
+    vf = os.path.join(target_root, ".its-magic-version")
+    with open(vf, "w", encoding="utf-8") as f:
+        f.write(ver)
 
 
 def prompt_yes_no(label, default=False):
@@ -120,6 +169,8 @@ def show_help(version):
     print("                      overwrite    Replace every file, even if it already exists.")
     print("                                   Combine with --backup to keep a snapshot first.")
     print("                      interactive  Ask per file whether to overwrite or skip.")
+    print("                      upgrade      Update framework files while preserving user data.")
+    print("                                   Use after updating its-magic to a newer version.")
     print("  --backup          Before overwriting, save existing files to backups/<timestamp>/.")
     print("                    Ignored when mode is 'missing' (nothing gets replaced).")
     print("  --create          Create the target directory if it does not exist.")
@@ -136,9 +187,10 @@ def show_help(version):
     print("  --version, -v     Print the installed version and exit.")
     print()
     print("Examples:")
-    print("  its-magic --target . --mode missing            Safe first-time setup")
-    print("  its-magic --target . --mode overwrite --backup   Update all files, keep backup")
-    print("  its-magic --clean-repo --target . --yes        Remove workflow artifacts silently")
+    print("  its-magic --target . --mode missing              Safe first-time setup")
+    print("  its-magic --target . --mode upgrade               Update framework, keep user data")
+    print("  its-magic --target . --mode overwrite --backup    Replace all files, keep backup")
+    print("  its-magic --clean-repo --target . --yes           Remove workflow artifacts silently")
     print()
 
 
@@ -170,7 +222,7 @@ def main():
         add_help=False,
     )
     parser.add_argument("--target", help="Target repository path")
-    parser.add_argument("--mode", choices=["missing", "overwrite", "interactive"], help="Install mode")
+    parser.add_argument("--mode", choices=["missing", "overwrite", "interactive", "upgrade"], help="Install mode")
     parser.add_argument("--backup", action="store_true", help="Backup files before overwriting")
     parser.add_argument("--create", action="store_true", help="Create target directory if missing")
     parser.add_argument("--clean-repo", action="store_true", help="Remove installed workflow artifacts")
@@ -233,6 +285,7 @@ def main():
         "scripts/validate-and-push.sh",
         ".github/workflows",
         "README.md",
+        ".its-magic-version",
     ]
 
     files = list_source_files(source_root, include_paths)
@@ -246,8 +299,79 @@ def main():
             if os.path.isfile(os.path.join(target_root, rel)):
                 overwrite_candidates.append(rel)
         if overwrite_candidates:
-            backup_root = backup_files(target_root, overwrite_candidates)
-            print(f"Backup created at: {backup_root}")
+            broot = backup_files(target_root, overwrite_candidates)
+            print(f"Backup created at: {broot}")
+
+    if mode == "upgrade":
+        old_ver = read_installed_version(target_root)
+        print(f"\n\033[1;36mUpgrading from v{old_ver} to v{version}\033[0m\n")
+
+        if backup_enabled:
+            bc = [r for r in files if classify_file(r) == "framework" and os.path.isfile(os.path.join(target_root, r))]
+            if bc:
+                broot = backup_files(target_root, bc)
+                print(f"Backup created at: {broot}")
+
+        added, updated, review = [], [], []
+        unchanged = preserved = 0
+
+        for rel in files:
+            src = os.path.join(source_root, rel)
+            dst = os.path.join(target_root, rel)
+            exists = os.path.isfile(dst)
+            cat = classify_file(rel)
+
+            if not exists:
+                ensure_parent(dst)
+                shutil.copy2(src, dst)
+                added.append(rel)
+                continue
+
+            if cat == "framework":
+                if filecmp.cmp(src, dst, shallow=False):
+                    unchanged += 1
+                else:
+                    ensure_parent(dst)
+                    shutil.copy2(src, dst)
+                    updated.append(rel)
+                continue
+
+            if cat == "user-data":
+                preserved += 1
+                continue
+
+            if cat == "mixed":
+                preserved += 1
+                if not filecmp.cmp(src, dst, shallow=False):
+                    review.append(rel)
+                continue
+
+        write_installed_version(target_root, version)
+
+        show_banner()
+        g = "\033[1;32m"
+        y = "\033[1;33m"
+        p = "\033[1;35m"
+        d = "\033[0;90m"
+        r = "\033[0m"
+        print(f"{g}Upgrade complete: v{old_ver} -> v{version}{r}\n")
+        if added:
+            print(f"  {g}Added (new):         {len(added)} files{r}")
+            for f in added:
+                print(f"    {f}")
+        if updated:
+            print(f"  {y}Updated (framework): {len(updated)} files{r}")
+            for f in updated:
+                print(f"    {f}")
+        print(f"  Unchanged:           {unchanged} files")
+        print(f"  Preserved (user):    {preserved} files")
+        if review:
+            print(f"\n  {p}Review recommended:  {len(review)} files{r}")
+            for f in review:
+                print(f"    {f}")
+            print(f"    {d}Check .cursor/scratchpad.local.example.md for new flags.{r}")
+        print(f"\nRepository: {REPO_URL}\n")
+        return 0
 
     for rel in files:
         src = os.path.join(source_root, rel)
@@ -277,10 +401,12 @@ def main():
                 return 1
             if answer == "o":
                 if backup_enabled:
-                    backup_root = backup_files(target_root, [rel])
-                    print(f"Backed up: {rel} -> {backup_root}")
+                    broot = backup_files(target_root, [rel])
+                    print(f"Backed up: {rel} -> {broot}")
                 ensure_parent(dst)
                 shutil.copy2(src, dst)
+
+    write_installed_version(target_root, version)
 
     show_banner(include_install_message=True)
     print(f"its-magic v{version}")

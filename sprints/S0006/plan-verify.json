@@ -1,0 +1,50 @@
+{
+  "sprint": "S0006",
+  "stories": ["US-0029"],
+  "total_tasks": 10,
+  "coverage": {
+    "US-0029": {
+      "AC-1": { "task": "T-003+T-004", "status": "covered" },
+      "AC-2": { "task": "T-005+T-006", "status": "covered" },
+      "AC-3": { "task": "T-001+T-002", "status": "covered" },
+      "AC-4": { "task": "T-001", "status": "covered" },
+      "AC-5": { "task": "T-004+T-006", "status": "covered" },
+      "AC-6": { "task": "T-010", "status": "covered" },
+      "AC-7": { "task": "T-007", "status": "covered" },
+      "AC-8": { "task": "T-008", "status": "covered" },
+      "AC-9": { "task": "T-001", "status": "covered" },
+      "AC-10": { "task": "T-009", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "US-0029 structured research entries with R-xxxx IDs (DEC-0011)",
+      "Early web research integration in PO and TL agents",
+      "/research command restructured for R-xxxx output",
+      "Curator knowledge base maintenance expansion",
+      "EARLY_RESEARCH scratchpad flag",
+      "Template parity for 8 template files"
+    ],
+    "out_of_scope": [
+      "US-0028 Security & Compliance Review Agent (separate sprint after S0006)",
+      "Automated research quality validation",
+      "External search API integration"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 10,
+    "split_required": false,
+    "split_reason": "10 tasks < 12 threshold. Single sprint."
+  },
+  "gaps": [],
+  "risks": [
+    "US-0029 modifies 3 existing agents (PO, TL, curator) — must preserve existing behavior when EARLY_RESEARCH=0",
+    "R-xxxx ID collisions if multiple agents write concurrently — mitigated by sequential access and auto-increment from highest existing ID",
+    "Template parity across 8 files — single task (T-009) after all active changes complete",
+    "Existing research.md content must be migrated to R-0001 without data loss",
+    "Scratchpad flag additions require scratchpad.local.example.md update for visibility"
+  ],
+  "result": "PASS"
+}

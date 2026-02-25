@@ -64,6 +64,30 @@ Existing repo (overwrite + backup):
 its-magic --target . --mode overwrite --backup
 ```
 
+### Upgrading an existing repo
+
+When you update its-magic to a newer version (`npm update -g its-magic`), run
+upgrade mode to update framework files while preserving your project data:
+
+```bash
+its-magic --target . --mode upgrade
+```
+
+What upgrade does:
+
+- **Framework files** (commands, rules, agents, hooks, skills, CI, scripts) are
+  updated to the latest version.
+- **User data** (docs, sprints, handoffs, decisions, runbook) is never touched.
+- **Mixed files** (`.cursor/scratchpad.md`, `README.md`) are preserved. If the
+  template version has new content, a review notice is printed.
+- A `.its-magic-version` file tracks the installed version in your repo.
+
+Upgrade with backup (backs up framework files before updating):
+
+```bash
+its-magic --target . --mode upgrade --backup
+```
+
 ### 3) Open in Cursor
 
 1. Open the project folder
@@ -96,6 +120,7 @@ its-magic --clean-repo --target .
 | `--mode missing` | **Default.** Only copy files that do not exist yet. Safe for repos that already have some workflow files. |
 | `--mode overwrite` | Replace every file, even if it already exists. Combine with `--backup` to keep a snapshot first. |
 | `--mode interactive` | Ask per file whether to overwrite or skip. Useful when you want to cherry-pick updates. |
+| `--mode upgrade` | Update framework files (commands, rules, agents, hooks, skills, CI, scripts) while preserving user data (docs, sprints, handoffs, decisions). Use after updating its-magic to a newer version. |
 | `--backup` | Before overwriting, save existing files to `backups/<timestamp>/`. Ignored in `missing` mode (nothing gets replaced). |
 | `--create` | Create the target directory if it does not exist. |
 
@@ -158,6 +183,7 @@ Setup:
 
 ### Core commands
 
+- `/ask`: ask questions using project context (read-only, no artifacts created).
 - `/intake`: capture idea, backlog, acceptance.
 - `/discovery`: collect UX/product references.
 - `/research`: risks, patterns, dependencies.
@@ -168,8 +194,78 @@ Setup:
 - `/qa`: test and report findings.
 - `/verify-work`: UAT.
 - `/release`: release notes + runbook updates.
+- `/memory-audit`: read-only memory drift check with advisory report.
 - `/pause`, `/resume`, `/refresh-context`.
-- `/auto`: sequential automation until decision/boundary.
+- `/auto`: orchestration mode that spawns a fresh subagent per phase.
+
+### Release notes model (US-0040)
+
+Release history is sprint-scoped and queue-backed:
+
+- Canonical sprint notes: `handoffs/releases/Sxxxx-release-notes.md`
+- Canonical queue tracker: `handoffs/release_queue.md`
+- Legacy compatibility pointer: `handoffs/release_notes.md`
+
+Deterministic release semantics:
+- Only target sprint artifacts/queue row may be mutated during one `/release` run.
+- Entering release flow sets target row to `unreleased`.
+- Successful finalization transitions same row to `released`.
+- Unresolved sprint identity or queue/notes mismatch fails closed with reason
+  codes and remediation guidance; no destructive reconciliation by default.
+
+### Agent isolation model
+
+- Every phase command runs in a fresh agent/subagent context.
+- Handoff files are the only cross-phase memory (`handoffs/*.md` + artifact
+  files).
+- Never rely on "ignore prior chat"; use a new context boundary instead.
+- `/auto` is orchestration only: it calls phase subagents and transfers context
+  through artifacts.
+
+### Lightweight interaction
+
+Use `/ask` when you want to query the project without triggering the workflow:
+
+- "What's the current sprint status?"
+- "Which stories are still open?"
+- "How does the upgrade mode work?"
+- "What decision was made about X?"
+
+`/ask` reads the project artifacts (state, backlog, architecture, decisions, sprint
+progress) and answers from them. It never creates or modifies files. If your question
+reveals a bug or feature idea, it will suggest running `/intake`.
+
+### Memory drift auditing
+
+Use `/memory-audit` to check whether project memory artifacts still match
+repository reality. This is a read-only, non-blocking command that produces an
+advisory report at `docs/engineering/memory-drift-report.md`.
+
+**When to run:**
+
+- **Pre-handoff**: before writing any role handoff artifact.
+- **Pre-QA**: before `/qa` or `/verify-work`.
+- **Pre-release**: before `/release`.
+- **Ad-hoc**: after external code changes, long pauses, or whenever artifacts
+  feel stale.
+
+**How to interpret output:**
+
+The report contains a severity summary (`high` / `medium` / `low`) and a
+findings table with concrete evidence for each inconsistency. High-severity
+findings should be resolved before the next handoff or release. Medium and low
+findings can be addressed during `/refresh-context` or the next sprint.
+
+The report also includes a reference-only "Template drift" section. Template
+drift remediation belongs to US-0017 — `/memory-audit` only flags it for
+awareness.
+
+**Follow-up commands:**
+
+- `/refresh-context` — update stale artifacts.
+- `/sprint-plan` — if new work is discovered.
+- `/verify-work` — if acceptance status needs re-validation.
+- `/intake` — if findings reveal a new story or bug.
 
 ### Workflow diagrams
 
@@ -235,7 +331,7 @@ Configure in `.cursor/scratchpad.md`:
 
 - `AUTO_FLOW_MODE=manual|auto_until_decision`  
   - `manual`: you trigger each phase/command yourself.  
-  - `auto_until_decision`: `/auto` continues phases until a decision gate, blocker, or pause boundary.
+  - `auto_until_decision`: `/auto` continues by spawning fresh phase subagents until a decision gate, blocker, or pause boundary.
 - `PHASE_MODE=interactive|auto`  
   - `interactive`: agent asks clarifying questions more often.  
   - `auto`: agent minimizes prompts and proceeds with best effort.
@@ -249,7 +345,7 @@ Configure in `.cursor/scratchpad.md`:
   - `1`: keep iterating fix -> test until green (bounded).  
   - `0`: run one pass and report failures.
 - `AUTO_IMPLEMENTATION_LOOP=0|1`  
-  - `1`: enables execute -> QA -> execute loop automatically.
+  - `1`: enables execute -> QA -> execute loop automatically with new Dev/QA subagent instances on each cycle.
 - `AUTO_LOOP_MAX_CYCLES=<n>`  
   - safety cap for auto loops (recommended `3-7`, default `5`).
 - `AUTO_PAUSE_REQUEST=0|1`  
@@ -257,6 +353,37 @@ Configure in `.cursor/scratchpad.md`:
 - `AUTO_PAUSE_POLICY=after_task|after_phase`  
   - `after_task`: faster stop, more frequent boundaries.  
   - `after_phase`: cleaner checkpoints, fewer interruptions.
+
+### Sync policy (US-0038)
+
+Phase-triggered sync is policy-controlled and safe by default.
+
+Scratchpad controls:
+
+- `SYNC_POLICY_MODE=disabled|manual|by_phase|by_milestone|custom_phase_list`
+- `SYNC_CUSTOM_PHASES=<comma-separated canonical phases>`
+- `ALLOW_AUTO_PUSH=0|1`
+- `AUTO_PUSH_BRANCH_ALLOWLIST=<comma-separated branches/patterns>`
+
+Default-safe behavior:
+
+- Default mode is `manual` with `ALLOW_AUTO_PUSH=0` (no automatic push).
+- `disabled` and `manual` add near-zero overhead and preserve manual workflows.
+- Sync policy is evaluated only at completed phase boundaries.
+
+Guarded auto-push conditions (all must pass):
+
+1. Boundary matches configured mode.
+2. Auto-push is explicitly enabled (`ALLOW_AUTO_PUSH=1`).
+3. QA-first safety holds (feature work cannot auto-push pre-QA).
+4. No unresolved blocking QA findings/critical issues.
+5. Branch safety holds (protected/default branches denied unless allowlisted).
+6. Check chain passes (`TEST_COMMAND` required; optional lint/typecheck only if configured).
+
+Deterministic reason codes include:
+`SYNC_DISABLED`, `MANUAL_MODE_NO_AUTO`, `PRE_QA_AUTOPUSH_FORBIDDEN`,
+`BLOCKING_QA_FINDINGS`, `BRANCH_NOT_ALLOWLISTED`, `TEST_COMMAND_MISSING`,
+`TEST_FAILED`, `TEST_TIMEOUT`, `OPTIONAL_CHECK_FAILED`, `SYNC_PUSHED`.
 
 ### Full scratchpad reference (detailed)
 
@@ -274,6 +401,63 @@ Configure in `.cursor/scratchpad.md`:
   - `1`: allow remote/docker execution if configured.
 - `REMOTE_CONFIG=.cursor/remote.json`  
   - path to remote execution server config.
+
+### Remote execution config (`.cursor/remote.json`)
+
+Remote config is optional and mode-aware:
+
+- `REMOTE_EXECUTION=0` (default): skip remote config checks entirely.
+- `REMOTE_EXECUTION=1`: validate `.cursor/remote.json` first and fail fast on
+  missing/malformed/invalid or insecure config.
+
+Canonical contract (DEC-0016):
+
+- Required root fields:
+  - `version` (integer)
+  - `defaultTarget` (string)
+  - `targets` (array)
+- Required target fields:
+  - `id` (string)
+  - `type` (`docker|ssh|vm`)
+  - `enabled` (boolean)
+  - `host` (string)
+  - `port` (integer `1..65535`)
+  - `workspaceRoot` (string)
+- Optional:
+  - `auth.mode` (`none|env`)
+  - If `auth.mode=env`, use env-var references only (`tokenEnv`,
+    `passwordEnv`, `privateKeyPathEnv`, ...).
+
+Two safe target examples are shipped in:
+
+- `.cursor/remote.json` (active repo)
+- `template/.cursor/remote.json` (template parity copy)
+
+The examples include:
+
+- `local-docker`: local network/docker-like endpoint.
+- `remote-vm-ssh`: remote VM/SSH-like endpoint.
+
+No secrets policy:
+
+- Never commit inline tokens/passwords/private keys in `remote.json`.
+- Commit env-var reference names only.
+
+Fail-fast error format:
+
+- `[REMOTE_CONFIG_ERROR] <path>: expected <rule>, got <actual>. Fix: <hint>.`
+
+Troubleshooting quick guide:
+
+- Missing file in remote mode:
+  - Create `.cursor/remote.json` from the template copy, or set
+    `REMOTE_EXECUTION=0`.
+- Invalid enum/type/range:
+  - Update the failing field to match allowed values/ranges.
+- Malformed JSON:
+  - Fix JSON syntax and retry.
+- Secret-like inline value detected:
+  - Replace literal secret with an env-var reference field.
 
 Team/local (recommended in `.cursor/scratchpad.local.md`):
 
@@ -453,6 +637,27 @@ workflow stops and points you to `scripts/validate-and-push` for local fixing.
 2. Close work
 3. `/resume` next session
 
+### Deterministic `/auto` continuation
+
+When resuming mid-process, `/auto` resolves start phase deterministically:
+
+1. explicit `/auto start-from=<phase>`
+2. `handoffs/resume_brief.md`
+3. conservative `docs/engineering/state.md` fallback
+4. fail-fast (no guessing)
+
+Canonical phases:
+`intake`, `discovery`, `research`, `architecture`, `sprint-plan`,
+`plan-verify`, `execute`, `qa`, `verify-work`, `release`, `refresh-context`.
+
+Fail-fast message format:
+`[AUTO_RESUME_ERROR] <code>: <summary>. Source=<source>. Fix: <action>.`
+
+Compatibility and safety:
+- Manual/interactive workflow stays unchanged unless `/auto` continuation is used.
+- Existing stop conditions remain enforced (decision gate, missing input,
+  pause request, loop max).
+
 ### Example 4: Existing project onboarding
 
 1. `/map-codebase`
@@ -495,7 +700,9 @@ Workflows read keys from `docs/engineering/runbook.md`:
 - `DEPLOY_STAGING_COMMAND`
 - `DEPLOY_PROD_COMMAND`
 
-Unset keys are skipped.
+Unset keys are skipped. The template ships with empty values for `LINT_COMMAND`,
+`FORMAT_COMMAND`, and `TYPECHECK_COMMAND` -- this is intentional. its-magic is a
+template/installer project; fill in your project-specific commands after setup.
 
 ### Installer internals
 
@@ -503,7 +710,7 @@ Unset keys are skipped.
 - `installer.sh` (macOS/Linux)
 - `installer.py` (fallback)
 
-Modes: `missing`, `overwrite`, `interactive` (+ optional backup).
+Modes: `missing`, `overwrite`, `interactive`, `upgrade` (+ optional backup).
 
 ### Release automation
 

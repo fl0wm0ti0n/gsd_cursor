@@ -1,6 +1,6 @@
 Param(
   [string]$Target,
-  [ValidateSet("missing","overwrite","interactive")]
+  [ValidateSet("missing","overwrite","interactive","upgrade")]
   [string]$Mode,
   [switch]$Backup,
   [switch]$Create,
@@ -58,12 +58,73 @@ function Choose-Mode {
   Write-Host "1) missing-only (copy only files that do not exist)"
   Write-Host "2) overwrite-all (replace existing files)"
   Write-Host "3) interactive (prompt per file)"
-  $choice = Read-Host "Enter 1, 2, or 3"
+  Write-Host "4) upgrade (update framework files, preserve user data)"
+  $choice = Read-Host "Enter 1, 2, 3, or 4"
   switch ($choice) {
     "1" { return "missing" }
     "2" { return "overwrite" }
+    "4" { return "upgrade" }
     Default { return "interactive" }
   }
+}
+
+function Classify-File($RelPath) {
+  $normalized = $RelPath -replace '\\','/'
+
+  $mixedFiles = @('.cursor/scratchpad.md', 'README.md')
+  if ($mixedFiles -contains $normalized) { return 'mixed' }
+
+  $frameworkPrefixes = @(
+    '.cursor/commands/',
+    '.cursor/rules/',
+    '.cursor/agents/',
+    '.cursor/skills/',
+    '.cursor/hooks/',
+    '.github/workflows/',
+    'scripts/validate-and-push',
+    'docs/engineering/context/'
+  )
+  $frameworkExact = @(
+    '.cursor/hooks.json',
+    '.cursor/scratchpad.local.example.md',
+    '.its-magic-version'
+  )
+  foreach ($p in $frameworkPrefixes) {
+    if ($normalized.StartsWith($p)) { return 'framework' }
+  }
+  if ($frameworkExact -contains $normalized) { return 'framework' }
+
+  $userDataPrefixes = @(
+    'docs/product/',
+    'docs/engineering/',
+    'sprints/',
+    'handoffs/',
+    'decisions/'
+  )
+  foreach ($p in $userDataPrefixes) {
+    if ($normalized.StartsWith($p)) { return 'user-data' }
+  }
+
+  return 'framework'
+}
+
+function Read-InstalledVersion($TargetRoot) {
+  $vf = Join-Path $TargetRoot ".its-magic-version"
+  if (Test-Path $vf -PathType Leaf) {
+    return (Get-Content -Path $vf -Raw).Trim()
+  }
+  return "unknown"
+}
+
+function Write-InstalledVersion($TargetRoot, $Ver) {
+  $vf = Join-Path $TargetRoot ".its-magic-version"
+  Set-Content -Path $vf -Value $Ver -NoNewline
+}
+
+function Files-ContentEqual($PathA, $PathB) {
+  $a = Get-Content -Path $PathA -Raw -ErrorAction SilentlyContinue
+  $b = Get-Content -Path $PathB -Raw -ErrorAction SilentlyContinue
+  return $a -eq $b
 }
 
 function Prompt-YesNo($Label, $Default = $false) {
@@ -125,6 +186,8 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host "                      overwrite    Replace every file, even if it already exists."
   Write-Host "                                   Combine with --backup to keep a snapshot first."
   Write-Host "                      interactive  Ask per file whether to overwrite or skip."
+  Write-Host "                      upgrade      Update framework files while preserving user data."
+  Write-Host "                                   Use after updating its-magic to a newer version."
   Write-Host "  --backup          Before overwriting, save existing files to backups/<timestamp>/."
   Write-Host "                    Ignored when mode is 'missing' (nothing gets replaced)."
   Write-Host "  --create          Create the target directory if it does not exist."
@@ -141,9 +204,10 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host "  --version         Print the installed version and exit."
   Write-Host ""
   Write-Host "Examples:"
-  Write-Host "  its-magic --target . --mode missing            Safe first-time setup"
-  Write-Host "  its-magic --target . --mode overwrite --backup   Update all files, keep backup"
-  Write-Host "  its-magic --clean-repo --target . --yes        Remove workflow artifacts silently"
+  Write-Host "  its-magic --target . --mode missing              Safe first-time setup"
+  Write-Host "  its-magic --target . --mode upgrade               Update framework, keep user data"
+  Write-Host "  its-magic --target . --mode overwrite --backup    Replace all files, keep backup"
+  Write-Host "  its-magic --clean-repo --target . --yes           Remove workflow artifacts silently"
   Write-Host ""
 }
 
@@ -235,7 +299,8 @@ $includePaths = @(
   "scripts/validate-and-push.ps1",
   "scripts/validate-and-push.sh",
   ".github/workflows",
-  "README.md"
+  "README.md",
+  ".its-magic-version"
 )
 
 $files = List-SourceFiles $sourceRoot $includePaths
@@ -254,6 +319,100 @@ if ($backupEnabled -and $mode -eq "overwrite") {
     $backupRoot = Backup-Files $targetRoot $overwriteCandidates
     Write-Host "Backup created at: $backupRoot"
   }
+}
+
+if ($mode -eq "upgrade") {
+  $oldVersion = Read-InstalledVersion $targetRoot
+  Write-Host ""
+  Write-Host "Upgrading from v$oldVersion to v$appVersion" -ForegroundColor Cyan
+  Write-Host ""
+
+  if ($backupEnabled) {
+    $backupCandidates = @()
+    foreach ($rel in $files) {
+      $dst = Join-Path $targetRoot $rel
+      $cat = Classify-File $rel
+      if ($cat -eq 'framework' -and (Test-Path $dst -PathType Leaf)) {
+        $backupCandidates += $rel
+      }
+    }
+    if ($backupCandidates.Count -gt 0) {
+      $backupRoot = Backup-Files $targetRoot $backupCandidates
+      Write-Host "Backup created at: $backupRoot"
+    }
+  }
+
+  $added = New-Object System.Collections.Generic.List[string]
+  $updated = New-Object System.Collections.Generic.List[string]
+  $unchanged = 0
+  $preserved = 0
+  $review = New-Object System.Collections.Generic.List[string]
+
+  foreach ($rel in $files) {
+    $src = Join-Path $sourceRoot $rel
+    $dst = Join-Path $targetRoot $rel
+    $exists = Test-Path $dst -PathType Leaf
+    $cat = Classify-File $rel
+
+    if (-not $exists) {
+      Ensure-Parent $dst
+      Copy-Item -Path $src -Destination $dst -Force
+      $added.Add($rel)
+      continue
+    }
+
+    if ($cat -eq 'framework') {
+      if (Files-ContentEqual $src $dst) {
+        $unchanged++
+      } else {
+        Ensure-Parent $dst
+        Copy-Item -Path $src -Destination $dst -Force
+        $updated.Add($rel)
+      }
+      continue
+    }
+
+    if ($cat -eq 'user-data') {
+      $preserved++
+      continue
+    }
+
+    if ($cat -eq 'mixed') {
+      $preserved++
+      if (-not (Files-ContentEqual $src $dst)) {
+        $review.Add($rel)
+      }
+      continue
+    }
+  }
+
+  Write-InstalledVersion $targetRoot $appVersion
+
+  Show-ItsMagicBanner
+  Write-Host "Upgrade complete: v$oldVersion -> v$appVersion" -ForegroundColor Green
+  Write-Host ""
+  if ($added.Count -gt 0) {
+    Write-Host "  Added (new):         $($added.Count) files" -ForegroundColor Green
+    foreach ($f in $added) { Write-Host "    $f" }
+  }
+  if ($updated.Count -gt 0) {
+    Write-Host "  Updated (framework): $($updated.Count) files" -ForegroundColor Yellow
+    foreach ($f in $updated) { Write-Host "    $f" }
+  }
+  Write-Host "  Unchanged:           $unchanged files"
+  Write-Host "  Preserved (user):    $preserved files"
+  if ($review.Count -gt 0) {
+    Write-Host ""
+    Write-Host "  Review recommended:  $($review.Count) files" -ForegroundColor Magenta
+    foreach ($f in $review) {
+      Write-Host "    $f"
+    }
+    Write-Host "    Check .cursor/scratchpad.local.example.md for new flags." -ForegroundColor DarkGray
+  }
+  Write-Host ""
+  Write-Host "Repository: $repoUrl"
+  Write-Host ""
+  exit 0
 }
 
 foreach ($rel in $files) {
@@ -295,6 +454,8 @@ foreach ($rel in $files) {
     }
   }
 }
+
+Write-InstalledVersion $targetRoot $appVersion
 
 Show-ItsMagicBanner -IncludeInstallMessage
 Write-Host "its-magic v$appVersion"

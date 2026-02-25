@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "defaultTarget": "local-docker",
+  "targets": [
+    {
+      "id": "local-docker",
+      "type": "docker",
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 2375,
+      "workspaceRoot": "/workspace",
+      "auth": {
+        "mode": "env",
+        "tokenEnv": "REMOTE_DOCKER_TOKEN"
+      }
+    },
+    {
+      "id": "remote-vm-ssh",
+      "type": "ssh",
+      "enabled": false,
+      "host": "vm.example.internal",
+      "port": 22,
+      "workspaceRoot": "/home/dev/workspace",
+      "auth": {
+        "mode": "env",
+        "usernameEnv": "REMOTE_SSH_USER",
+        "privateKeyPathEnv": "REMOTE_SSH_KEY_PATH"
+      }
+    }
+  ]
+}

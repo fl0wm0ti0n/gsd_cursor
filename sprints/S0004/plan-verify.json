@@ -1,0 +1,33 @@
+{
+  "sprint": "S0004",
+  "stories": ["US-0024"],
+  "total_tasks": 6,
+  "coverage": {
+    "US-0024": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-004+T-006", "status": "covered" },
+      "AC-5": { "task": "T-001+T-002+T-005", "status": "covered" },
+      "AC-6": { "task": "T-005+T-006", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": ["US-0024 memory drift audit command and report flow"],
+    "out_of_scope": ["US-0017 template drift guard automation"],
+    "note": "Template drift is reference-only in this sprint and must route to US-0017."
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 6,
+    "split_required": false
+  },
+  "gaps": [],
+  "risks": [
+    "Heuristic drift checks may generate false positives without clear evidence requirements",
+    "US-0017 boundary can blur if command/docs do not keep explicit taxonomy split",
+    "Template parity risk if active/template updates are not performed in the same task"
+  ],
+  "result": "PASS"
+}

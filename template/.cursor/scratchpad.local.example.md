@@ -27,6 +27,12 @@ AUTO_IMPLEMENTATION_LOOP=0
 AUTO_LOOP_MAX_CYCLES=5
 AUTO_PAUSE_POLICY=after_phase
 #
+# Sprint planning (override team defaults)
+# - SPRINT_MAX_TASKS: integer >= 1 (max atomic tasks per sprint)
+# - SPRINT_AUTO_SPLIT: 0|1 (propose splitting when over threshold)
+SPRINT_MAX_TASKS=12
+SPRINT_AUTO_SPLIT=1
+#
 # Personal environment preferences
 # - AUTO_INSTALL_DEPS: 0|1
 # - REMOTE_EXECUTION: 0|1

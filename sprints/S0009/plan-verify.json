@@ -1,0 +1,52 @@
+{
+  "sprint": "S0009",
+  "stories": ["US-0037"],
+  "total_tasks": 9,
+  "coverage": {
+    "US-0037": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-004", "status": "covered" },
+      "AC-5": { "task": "T-005", "status": "covered" },
+      "AC-6": { "task": "T-006", "status": "covered" },
+      "AC-7": { "task": "T-007", "status": "covered" },
+      "AC-8": { "task": "T-008", "status": "covered" },
+      "AC-9": { "task": "T-009", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "Explicit /auto start-from contract with canonical phase IDs",
+      "Deterministic precedence resolver for argument, resume brief, and state fallback",
+      "Conflict, staleness, unparseable handling with fail-fast error contract",
+      "One-command continuation through remaining phases",
+      "Stop condition and decision-gate preservation",
+      "Deterministic breadcrumb logging in state and resume artifacts",
+      "Backward-compatible safe defaults for manual workflows",
+      "Alignment across /pause, /resume, /auto plus user-facing docs updates",
+      "Active/template parity for all continuation-related command/doc/rule references"
+    ],
+    "out_of_scope": [
+      "Bypassing decision gates or missing-input blockers",
+      "Changing phase deliverables",
+      "Runtime feature behavior unrelated to workflow control"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 9,
+    "split_required": false,
+    "split_reason": "9 tasks < 12 threshold. Single sprint."
+  },
+  "gaps": [],
+  "risks": [
+    "Resume-source ambiguity causing wrong phase selection",
+    "Conflicting resume artifacts leading to non-deterministic behavior",
+    "Insufficient fail-fast code specificity for operator remediation",
+    "Continuation changes unintentionally weakening existing stop conditions",
+    "Active/template semantics drift over time"
+  ],
+  "result": "PASS"
+}
