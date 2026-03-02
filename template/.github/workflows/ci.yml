@@ -38,12 +38,15 @@ jobs:
           python3 - <<'PY'
           import os, pathlib, re
           text = pathlib.Path("docs/engineering/runbook.md").read_text(encoding="utf-8")
+          command_section = text.split("## Notes", 1)[0]
           def get(key):
-              m = re.search(rf"^{key}:\s*(.+)$", text, re.M)
+              m = re.search(rf"^{re.escape(key)}:[ \t]*(.*)$", command_section, re.M)
               if not m:
                   return ""
               val = m.group(1).strip()
-              if val in ("", "...", "<...>", "TODO"):
+              if val in ("", "...", "<...>", "TODO", key, f"{key}:"):
+                  return ""
+              if val.startswith(f"{key}:"):
                   return ""
               return val
           keys = ["TEST_COMMAND", "LINT_COMMAND", "TYPECHECK_COMMAND", "CI_AUTO_FIX"]
@@ -126,12 +129,15 @@ jobs:
           python3 - <<'PY'
           import os, pathlib, re
           text = pathlib.Path("docs/engineering/runbook.md").read_text(encoding="utf-8")
+          command_section = text.split("## Notes", 1)[0]
           def get(key):
-              m = re.search(rf"^{key}:\s*(.+)$", text, re.M)
+              m = re.search(rf"^{re.escape(key)}:[ \t]*(.*)$", command_section, re.M)
               if not m:
                   return ""
               val = m.group(1).strip()
-              if val in ("", "...", "<...>", "TODO"):
+              if val in ("", "...", "<...>", "TODO", key, f"{key}:"):
+                  return ""
+              if val.startswith(f"{key}:"):
                   return ""
               return val
           keys = ["LINT_FIX_COMMAND", "FORMAT_COMMAND"]

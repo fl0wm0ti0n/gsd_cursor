@@ -25,11 +25,14 @@ jobs:
           import re
 
           text = pathlib.Path("docs/engineering/runbook.md").read_text()
+          command_section = text.split("## Notes", 1)[0]
 
           def get(key):
-              m = re.search(rf"^{key}:\s*(.*)$", text, re.M)
+              m = re.search(rf"^{re.escape(key)}:[ \t]*(.*)$", command_section, re.M)
               val = (m.group(1) or "").strip() if m else ""
-              if val in ("", "...", "<...>", "TODO"):
+              if val in ("", "...", "<...>", "TODO", key, f"{key}:"):
+                  return ""
+              if val.startswith(f"{key}:"):
                   return ""
               return val
 
