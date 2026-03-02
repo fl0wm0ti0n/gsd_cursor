@@ -95,21 +95,7 @@ Optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) are not mandatory re
 
 Default: no bypass. Override only via explicit decision gate with documented rationale and evidence (see Override evidence contract below).
 
-## Check-in test evidence validity contract (US-0039)
-
-Canonical evidence source: `tests/report.md` (or runbook-configured test output). Validity rules:
-
-- **Present**: Evidence file exists and contains parseable result (e.g. Pass/Fail counts, timestamp).
-- **Fresh**: Timestamp (if present) is from a run after the last substantive change to scope; absence of timestamp is treated as unknown freshness — release may require re-run of `TEST_COMMAND` to satisfy gate.
-- **Passing**: Result indicates zero failures for the mandatory test suite.
-
-Deterministic fail reasons when check-in test gate blocks release:
-
-- **Missing**: No evidence file or unparseable — `RELEASE_TEST_EVIDENCE_MISSING`; remediation: run `TEST_COMMAND`, ensure report is written, rerun `/release`.
-- **Stale**: Evidence exists but fails freshness policy (e.g. older than last code/artifact change) — `RELEASE_TEST_STALE`; remediation: re-run `TEST_COMMAND`, then rerun `/release`.
-- **Failing**: Evidence shows one or more test failures — `RELEASE_TEST_FAILED`; remediation: fix failures, re-run tests, then rerun `/release`.
-
-Do not infer pass from missing or stale evidence; block and emit the appropriate reason code.
+Check-in test evidence: canonical source `tests/report.md`; valid = present + fresh + passing. Fail reasons: `RELEASE_TEST_EVIDENCE_MISSING`, `RELEASE_TEST_STALE`, `RELEASE_TEST_FAILED`. QA gate: no unresolved blocking findings; `RELEASE_QA_BLOCKERS_OPEN`, `RELEASE_QA_EVIDENCE_MISSING`. UAT gate: no placeholder/incomplete/unresolved-fail; `RELEASE_UAT_INCOMPLETE`, `RELEASE_UAT_FAILED`. Override evidence: decision record, rationale, approver, risk acceptance; `RELEASE_GATE_OVERRIDE_APPROVED`.
 
 ## QA completion evidence gate (US-0039)
 
@@ -131,21 +117,6 @@ Release may not proceed until UAT artifacts are in verified state (no placeholde
   - **Unresolved fail**: One or more steps recorded as failed and not resolved — `RELEASE_UAT_FAILED`; resolve failures or document acceptance, then rerun `/release`.
 
 Do not infer pass from missing or placeholder UAT; block and emit the appropriate reason code.
-
-## No-bypass default (US-0039)
-
-In default configuration, no release path may bypass the mandatory gates (check-in test, QA completion, UAT completion). There is no implicit or silent bypass. Any override path (if allowed by policy) requires an explicit decision gate with documented rationale and evidence — see Override evidence contract below.
-
-## Decision-gate override evidence contract (US-0039)
-
-When an override path is used (e.g. release despite a failed gate), the following evidence is required and must be recorded:
-
-- **Decision record**: Reference to `decisions/DEC-xxxx.md` (or equivalent) that authorizes the override.
-- **Rationale**: Documented reason for override (e.g. accepted risk, one-time waiver, remediation planned).
-- **Approver**: Who approved the override (role or identifier).
-- **Risk acceptance**: Explicit statement of risk accepted and any follow-up conditions.
-
-Record override evidence in `sprints/Sxxxx/release-findings.md` and in the queue row `gate_snapshot`; when override is used, set reason code `RELEASE_GATE_OVERRIDE_APPROVED` and include pointer to the decision record. Release notes and state checkpoint should reference the same for audit.
 
 ## Backlog reconciliation contract (US-0043 / DEC-0021)
 
@@ -318,8 +289,6 @@ Guardrails:
 
 Required deterministic reason codes:
 - `RELEASE_SPRINT_UNRESOLVED`
-- `RELEASE_TEST_EVIDENCE_MISSING`
-- `RELEASE_TEST_STALE`
 - `RELEASE_TEST_FAILED`
 - `RELEASE_QA_BLOCKERS_OPEN`
 - `RELEASE_QA_EVIDENCE_MISSING`

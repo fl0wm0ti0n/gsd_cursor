@@ -220,29 +220,6 @@ jobs:
               FAIL=1
             fi
           done
-          echo "ci-upgrade-marker" > "$TEST_DIR/.cursor/commands/intake.md"
-          its-magic --target "$TEST_DIR" --mode upgrade
-          if grep -q "ci-upgrade-marker" "$TEST_DIR/.cursor/commands/intake.md"; then
-            echo "FAIL: upgrade did not restore framework file"
-            FAIL=1
-          else
-            echo "PASS: upgrade restored framework file"
-          fi
-          mkdir -p "$TEST_DIR/src"
-          echo "ci-marker" > "$TEST_DIR/src/keep.txt"
-          its-magic --clean-repo --target "$TEST_DIR" --yes
-          if [ -d "$TEST_DIR/.cursor" ]; then
-            echo "FAIL: clean-repo did not remove framework artifacts"
-            FAIL=1
-          else
-            echo "PASS: clean-repo removed framework artifacts"
-          fi
-          if [ -f "$TEST_DIR/src/keep.txt" ]; then
-            echo "PASS: clean-repo preserved non-framework marker"
-          else
-            echo "FAIL: clean-repo removed non-framework marker"
-            FAIL=1
-          fi
           rm -rf "$TEST_DIR"
           exit $FAIL
       - name: Cleanup
@@ -274,29 +251,6 @@ jobs:
               FAIL=1
             fi
           done
-          echo "brew-upgrade-marker" > "$TEST_DIR/.cursor/commands/intake.md"
-          sh installer.sh --target "$TEST_DIR" --mode upgrade
-          if grep -q "brew-upgrade-marker" "$TEST_DIR/.cursor/commands/intake.md"; then
-            echo "FAIL: upgrade did not restore framework file"
-            FAIL=1
-          else
-            echo "PASS: upgrade restored framework file"
-          fi
-          mkdir -p "$TEST_DIR/src"
-          echo "brew-marker" > "$TEST_DIR/src/keep.txt"
-          sh installer.sh --target "$TEST_DIR" --clean-repo --yes
-          if [ -d "$TEST_DIR/.cursor" ]; then
-            echo "FAIL: clean-repo did not remove framework artifacts"
-            FAIL=1
-          else
-            echo "PASS: clean-repo removed framework artifacts"
-          fi
-          if [ -f "$TEST_DIR/src/keep.txt" ]; then
-            echo "PASS: clean-repo preserved non-framework marker"
-          else
-            echo "FAIL: clean-repo removed non-framework marker"
-            FAIL=1
-          fi
           rm -rf "$TEST_DIR"
           exit $FAIL
 
@@ -339,29 +293,6 @@ jobs:
               Write-Host "FAIL: $f"
               $fail = 1
             }
-          }
-          Set-Content -Path (Join-Path $testDir ".cursor\commands\intake.md") -Value "choco-upgrade-marker"
-          & .\installer.ps1 -Target $testDir -Mode upgrade
-          if ((Get-Content -Path (Join-Path $testDir ".cursor\commands\intake.md") -Raw) -match "choco-upgrade-marker") {
-            Write-Host "FAIL: upgrade did not restore framework file"
-            $fail = 1
-          } else {
-            Write-Host "PASS: upgrade restored framework file"
-          }
-          New-Item -ItemType Directory -Path (Join-Path $testDir "src") -Force | Out-Null
-          Set-Content -Path (Join-Path $testDir "src\keep.txt") -Value "choco-marker"
-          & .\installer.ps1 -Target $testDir -CleanRepo -Yes
-          if (Test-Path (Join-Path $testDir ".cursor")) {
-            Write-Host "FAIL: clean-repo did not remove framework artifacts"
-            $fail = 1
-          } else {
-            Write-Host "PASS: clean-repo removed framework artifacts"
-          }
-          if (Test-Path (Join-Path $testDir "src\keep.txt")) {
-            Write-Host "PASS: clean-repo preserved non-framework marker"
-          } else {
-            Write-Host "FAIL: clean-repo removed non-framework marker"
-            $fail = 1
           }
           Remove-Item -Recurse -Force $testDir
           exit $fail

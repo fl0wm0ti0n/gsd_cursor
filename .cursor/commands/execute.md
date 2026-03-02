@@ -46,6 +46,8 @@ as stale isolation evidence).
 - Decision gate triggered
 - Missing task definition or unclear scope
 
+Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and no-bypass/override contract are enforced at `/release`; see `.cursor/commands/release.md` and `.cursor/commands/qa.md`.
+
 ## Canonical status contract (US-0045)
 
 - Story status authority is `docs/product/backlog.md`.
