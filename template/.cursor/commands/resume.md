@@ -11,6 +11,17 @@ description: "its-magic resume: deterministic continuation context loader."
 - Run `/resume` in a fresh Curator subagent context.
 - When continuing to another phase, start that phase in a new subagent/chat.
 
+## Isolation evidence write requirement (US-0048 / DEC-0029)
+
+At the end of `/resume`, append an isolation evidence entry to
+`docs/engineering/state.md`:
+
+- `phase_id=resume`
+- `role=curator`
+- `fresh_context_marker=<new marker for this subagent>`
+- `timestamp=<ISO UTC>`
+- `evidence_ref=docs/engineering/state.md` (resume resolution summary and next-phase recommendation)
+
 ## Inputs
 - `docs/engineering/state.md`
 - `docs/engineering/decisions.md`
@@ -30,6 +41,11 @@ description: "its-magic resume: deterministic continuation context loader."
 2. Parse intended resume phase from `handoffs/resume_brief.md`.
 3. Validate that `resume_brief` phase is canonical and consistent with latest
    `docs/engineering/state.md` checkpoint.
+3a. Validate isolation provenance (US-0048 / DEC-0029):
+   - If `resume_brief.md` includes `isolation_provenance_ref`, confirm it points
+     to the latest relevant isolation evidence entry in `docs/engineering/state.md`.
+   - If `resume_requires_fresh_context=1`, ensure the next phase is executed in a
+     fresh subagent context and writes a new `fresh_context_marker` (no reuse).
 4. If `resume_brief.md` is stale/unparseable/conflicting, fail fast with the
    `/auto` resolver contract format:
    `[AUTO_RESUME_ERROR] <code>: <summary>. Source=<source>. Fix: <action>.`

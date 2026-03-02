@@ -1,0 +1,18 @@
+{
+  "sprint_id": "S0021",
+  "story_id": "US-0045",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    { "id": "UAT-1", "ac": "AC-1", "result": "PASS", "evidence": ".cursor/commands/release.md, docs/engineering/runbook.md" },
+    { "id": "UAT-2", "ac": "AC-2", "result": "PASS", "evidence": ".cursor/commands/release.md deterministic precedence and scope clauses" },
+    { "id": "UAT-3", "ac": "AC-3", "result": "PASS", "evidence": "docs/engineering/status-normalization-report.md baseline" },
+    { "id": "UAT-4", "ac": "AC-4", "result": "PASS", "evidence": "status-normalization-report includes prior/resolved/evidence rows" },
+    { "id": "UAT-5", "ac": "AC-5", "result": "PASS", "evidence": "CANONICAL_STATUS_CONFLICT reason code in release command" },
+    { "id": "UAT-6", "ac": "AC-6", "result": "PASS", "evidence": "target-scoped mutation guard text in release/runbook" },
+    { "id": "UAT-7", "ac": "AC-7", "result": "PASS", "evidence": "canonical-status guard text in auto/execute commands" },
+    { "id": "UAT-8", "ac": "AC-8", "result": "PASS", "evidence": "planning source clarification in sprint-plan command" },
+    { "id": "UAT-9", "ac": "AC-9", "result": "PASS", "evidence": "tests/run-tests.ps1 and tests/run-tests.sh US-0045 assertions" },
+    { "id": "UAT-10", "ac": "AC-10", "result": "PASS", "evidence": "active/template parity updates for command/docs/report artifacts" }
+  ]
+}

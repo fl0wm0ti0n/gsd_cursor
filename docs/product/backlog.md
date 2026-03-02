@@ -102,25 +102,34 @@
 - Title: Configure remaining runbook commands
 - Summary: Only TEST_COMMAND is set. LINT_COMMAND, FORMAT_COMMAND, TYPECHECK_COMMAND are empty. This is acceptable for a template/installer project (mostly Markdown/YAML/JSON), but should be documented as intentional.
 - Priority: P3
-- Status: OPEN
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: Runbook explicitly documents that optional command keys may remain intentionally blank for this project type.
+  - [x] AC-2: README explicitly documents that empty optional runbook command keys are intentional defaults, not missing configuration errors.
+  - [x] AC-3: Active and `template/` runbook/README guidance remains behaviorally aligned for this intent.
+  - [x] AC-4: Regression checks verify the intent statement remains present in docs artifacts.
 
 ## US-0016 — Homebrew Version Sync
 - Title: Sync Homebrew stable formula version with npm
 - Summary: Homebrew stable formula is at 0.1.1, npm is at 0.1.2-17. Next release should align versions across all three channels.
 - Priority: P2
-- Status: OPEN
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: Homebrew stable formula URL tag version is aligned with `package.json` version.
+  - [x] AC-2: Homebrew stable formula `version` field is aligned with `package.json` version.
+  - [x] AC-3: Regression checks validate version alignment to prevent drift.
 
 ## US-0017 — Template Drift Guard
 - Title: Prevent drift between active workflow files and template/ copies
 - Summary: The repo uses its own workflow (self-dogfooding), so active .cursor/, docs/, sprints/ files may diverge from template/ copies. Consider a sync-check test or convention to keep them aligned.
 - Priority: P2
-- Status: OPEN
+- Status: DONE
 
 ## US-0018 — Smart Upgrade Mode
 - Title: Safe, version-aware upgrade for repos already using its-magic
 - Summary: When a user updates its-magic (e.g. `npm update -g its-magic`) and re-runs the installer on a repo that already has it, the current modes don't handle this well. `missing` skips changed files, `overwrite` destroys user data, `interactive` gives no context about what actually changed. A proper upgrade needs to distinguish between framework files (commands, rules, agents, hooks, skills, CI workflows, scripts) that should be updated and user data files (docs, sprints, handoffs, decisions, runbook, scratchpad) that should be preserved.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: Version tracking — installer writes a `.its-magic-version` file (or similar) in the target repo recording the installed version.
   - [ ] AC-2: File classification — files are categorized as "framework" (safe to update) or "user-data" (preserve on upgrade).
@@ -202,7 +211,7 @@
 - Title: Enforce explicit mapping between backlog stories and sprint execution artifacts
 - Summary: Define and enforce a lightweight traceability contract so every OPEN/DONE story can be traced to sprint tasks and completion evidence. This closes the gap where backlog status and sprint artifacts drift without a single cross-reference index.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: A canonical traceability index format is defined and documented (for example story ID -> sprint ID -> task IDs -> status/evidence links).
   - [ ] AC-2: At least one maintained artifact provides a project-wide cross-reference index spanning all active/completed sprints.
@@ -215,7 +224,7 @@
 - Title: Define milestone lifecycle states, required fields, and command expectations
 - Summary: Formalize milestone lifecycle behavior so milestones are intentionally created, populated, progressed, and completed instead of remaining placeholder-like. Clarify exactly when `milestones/*` artifacts must be updated in the workflow.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: Milestone lifecycle states are defined with entry/exit criteria (at minimum: created, active, in-review/ready-to-complete, completed/cancelled).
   - [ ] AC-2: Required milestone artifact fields are defined by phase (for example `name`, `goal`, `scope`, phase list, progress expectations) and cannot stay empty past intake.
@@ -228,7 +237,7 @@
 - Title: Define when UAT artifacts are placeholders, who populates them, and how they gate completion
 - Summary: Remove confusion around `sprints/Sxxxx/uat.json` and `uat.md` by formalizing their lifecycle, ownership, and minimum content expectations across planning, QA, and verify-work phases.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: UAT lifecycle is defined by phase, explicitly separating placeholder creation from execution-time population.
   - [ ] AC-2: Ownership is explicit for each UAT update step (who writes steps, records results, and marks pass/fail).
@@ -241,7 +250,7 @@
 - Title: Optional security/compliance review step with configurable compliance profiles
 - Summary: Add an optional security review agent and `/security-review` command activated via scratchpad flags. Runs at two workflow points: (1) post-architecture for design review, (2) post-execute for code review. Supports compliance profiles (GDPR, SOC2, HIPAA, PCI-DSS, ISO27001). Zero overhead when disabled. Findings to `docs/engineering/security-review.md`.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: New agent definition `security.mdc` with inputs, outputs, persona, and artifact responsibilities.
   - [ ] AC-2: New `/security-review` command with design review and code review steps.
@@ -258,7 +267,7 @@
 - Title: Structured knowledge curation with early web research during intake and architecture
 - Summary: Integrate web research into early workflow phases so PO and Tech Lead agents have external references when making decisions. Enhance `/research` for structured, referenceable output. Persist knowledge in `docs/engineering/research.md` with entry IDs, timestamps, sources, and story linkage. Curator maintains the knowledge base. Subsumes Q0002 (research persistence).
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: PO agent searches the web for relevant context during `/intake` and persists findings as a research entry.
   - [ ] AC-2: Tech Lead agent searches the web for technical references during `/architecture` and persists findings.
@@ -287,7 +296,7 @@
 - Title: Block release when command/flag behavior changed without README/runbook updates
 - Summary: Add a release readiness gate that compares command/flag changes against documentation updates and blocks `/release` when `README.md` and `docs/engineering/runbook.md` are stale or inconsistent for changed CLI/options/workflow flags.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: Release guidance defines a mandatory "doc delta check" step before release notes are finalized.
   - [ ] AC-2: If commands/flags changed in scope, and neither `README.md` nor `docs/engineering/runbook.md` reflects the change, release is blocked with explicit remediation guidance.
@@ -305,16 +314,16 @@
 - Title: Add optional spec-pack generation/check flow controlled by configuration
 - Summary: Introduce an optional workflow path that creates and validates a documentation pack containing Design Concept, CRS, and Technical Specification artifacts when enabled; zero overhead when disabled.
 - Priority: P2
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: A single enable flag/config exists to control spec-pack behavior, defaulting to disabled.
-  - [ ] AC-2: When disabled, no extra required steps are added to intake/architecture/release flow.
-  - [ ] AC-3: When enabled, workflow creates/updates three artifacts with canonical names/locations: Design Concept, CRS, Technical Specification.
-  - [ ] AC-4: Each artifact has minimum required sections/fields defined so completeness is testable.
-  - [ ] AC-5: Validation checks report per-artifact completeness and block progression only when enabled and required sections are missing.
-  - [ ] AC-6: Traceability is defined from backlog story IDs to the generated spec-pack artifacts.
-  - [ ] AC-7: Guidance clarifies ownership (which role/phase maintains each document).
-  - [ ] AC-8: Template parity: active and `template/` command/rules/docs references for spec-pack mode remain aligned.
+  - [x] AC-1: A single enable flag/config exists to control spec-pack behavior, defaulting to disabled.
+  - [x] AC-2: When disabled, no extra required steps are added to intake/architecture/release flow.
+  - [x] AC-3: When enabled, workflow creates/updates three artifacts with canonical names/locations: Design Concept, CRS, Technical Specification.
+  - [x] AC-4: Each artifact has minimum required sections/fields defined so completeness is testable.
+  - [x] AC-5: Validation checks report per-artifact completeness and block progression only when enabled and required sections are missing.
+  - [x] AC-6: Traceability is defined from backlog story IDs to the generated spec-pack artifacts.
+  - [x] AC-7: Guidance clarifies ownership (which role/phase maintains each document).
+  - [x] AC-8: Template parity: active and `template/` command/rules/docs references for spec-pack mode remain aligned.
 - Boundaries:
   - In scope: optional documentation-process capability and quality checks.
   - Out of scope: prescribing domain-specific content models beyond minimal required structure.
@@ -323,35 +332,40 @@
 - Title: Generate user-friendly instructions for each feature behind an explicit flag
 - Summary: Add an optional workflow capability that produces and maintains end-user-facing instructions for each feature/story (what it does, how to use it, examples, limitations, troubleshooting) with deterministic structure and validation, while imposing zero overhead when disabled.
 - Priority: P2
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: A dedicated config flag exists to enable/disable feature user guide generation, defaulting to disabled.
-  - [ ] AC-2: When the flag is disabled, intake/architecture/sprint/execute/qa/release flows add no required guide-generation steps and no new blocking checks.
-  - [ ] AC-3: When enabled, each accepted feature story gets a linked user guide artifact in a canonical location and naming format.
-  - [ ] AC-4: A minimum required guide schema is defined and testable (at least: feature purpose, prerequisites, usage steps, example, limitations, troubleshooting).
-  - [ ] AC-5: Validation reports completeness per guide and fails only when enabled and required sections are missing.
-  - [ ] AC-6: Guide traceability is explicit from story ID to user guide artifact, and referenced in handoff/release context.
-  - [ ] AC-7: Boundaries are enforced between user guides and technical spec-pack docs (`US-0031`) so duplicate ownership/content is avoided.
-  - [ ] AC-8: Template parity is maintained for active and `template/` docs/commands/rules references related to this optional mode.
+  - [x] AC-1: A dedicated config flag exists to enable/disable feature user guide generation, defaulting to disabled.
+  - [x] AC-2: When the flag is disabled, intake/architecture/sprint/execute/qa/release flows add no required guide-generation steps and no new blocking checks.
+  - [x] AC-3: When enabled, each accepted feature story gets a linked user guide artifact in a canonical location and naming format.
+  - [x] AC-4: A minimum required guide schema is defined and testable (at least: feature purpose, prerequisites, usage steps, example, limitations, troubleshooting).
+  - [x] AC-5: Validation reports completeness per guide and fails only when enabled and required sections are missing.
+  - [x] AC-6: Guide traceability is explicit from story ID to user guide artifact, and referenced in handoff/release context.
+  - [x] AC-7: Boundaries are enforced between user guides and technical spec-pack docs (`US-0031`) so duplicate ownership/content is avoided.
+  - [x] AC-8: Template parity is maintained for active and `template/` docs/commands/rules references related to this optional mode.
 - Boundaries:
   - In scope: optional user-facing documentation process, artifact structure, validation, and traceability.
   - Out of scope: replacing technical design docs (Design Concept/CRS/Technical Spec), and writing domain-specific product manuals beyond per-feature usage guidance.
+ - Discovery notes:
+   - Per-feature user guides should follow a consistent, testable schema (purpose, prerequisites, usage steps, example, limitations, troubleshooting) aligned with docs-as-code patterns.
+   - Guides must live in a canonical, story-linked location and be updated alongside code so feature behavior and user instructions change atomically.
+   - User-guide mode remains optional and flag-controlled, with zero additional required steps or gates when disabled.
+   - User guides complement but do not replace spec-pack artifacts from US-0031; each serves a distinct audience and ownership model.
 
 ## US-0033 — Configurable Guided Intake Behavior
 - Title: Let PO ask clarifying questions with options and research by default, with an off switch
 - Summary: Formalize a guided intake mode where PO asks reasonable follow-up questions when scope is unclear, suggests options instead of prematurely deciding implementation, and performs intake-time web research. Add a single switch to disable this proactive behavior for teams that want low-touch intake.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: `/intake` guided mode asks targeted follow-up questions only when ambiguity blocks concrete acceptance criteria.
-  - [ ] AC-2: In guided mode, PO presents at least one viable option/alternative before proposing a recommendation.
-  - [ ] AC-3: Guided mode explicitly preserves user decision authority (PO recommends; user decides).
-  - [ ] AC-4: Guided mode includes PO web research step with persisted evidence in `docs/engineering/research.md` and linked story context.
-  - [ ] AC-5: A single scratchpad switch controls guided intake behavior (default: enabled).
-  - [ ] AC-6: When the switch is disabled, `/intake` adds zero proactive follow-up/options/research overhead and proceeds in low-touch mode unless user requests depth.
-  - [ ] AC-7: Low-touch mode still preserves baseline safety: duplicate/overlap check against backlog remains active.
-  - [ ] AC-8: `/intake` command and `po.mdc` clearly document both modes and mode-specific expectations.
-  - [ ] AC-9: Active and `template/` copies remain behaviorally aligned for the new switch.
+  - [x] AC-1: `/intake` guided mode asks targeted follow-up questions only when ambiguity blocks concrete acceptance criteria.
+  - [x] AC-2: In guided mode, PO presents at least one viable option/alternative before proposing a recommendation.
+  - [x] AC-3: Guided mode explicitly preserves user decision authority (PO recommends; user decides).
+  - [x] AC-4: Guided mode includes PO web research step with persisted evidence in `docs/engineering/research.md` and linked story context.
+  - [x] AC-5: A single scratchpad switch controls guided intake behavior (default: enabled).
+  - [x] AC-6: When the switch is disabled, `/intake` adds zero proactive follow-up/options/research overhead and proceeds in low-touch mode unless user requests depth.
+  - [x] AC-7: Low-touch mode still preserves baseline safety: duplicate/overlap check against backlog remains active.
+  - [x] AC-8: `/intake` command and `po.mdc` clearly document both modes and mode-specific expectations.
+  - [x] AC-9: Active and `template/` copies remain behaviorally aligned for the new switch.
 - Boundaries:
   - In scope: intake interaction behavior, explicit user choice, and mode toggling.
   - Out of scope: changing downstream architecture/sprint execution semantics.
@@ -360,16 +374,16 @@
 - Title: Track module/API compatibility across repos and components
 - Summary: Add an optional workflow capability that watches relevant modules, docs, and API contracts across one or more repositories, then reports compatibility risk and contract drift to engineering artifacts. This is process observability and validation, not runtime feature logic.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: A dedicated config toggle exists (for example `CROSS_REPO_OBSERVABILITY`), defaulting to disabled.
-  - [ ] AC-2: When disabled (default), `/intake`, `/architecture`, `/execute`, and `/qa` add no required extra steps or blocking checks.
-  - [ ] AC-3: When enabled, configuration supports an explicit source list of monitored repositories/modules/artifacts (at least repo path/URL, module ID, and contract/doc location).
-  - [ ] AC-4: Compatibility checks include at minimum: API signature compatibility, declared version/contract mismatch detection, and documentation/API description drift signals.
-  - [ ] AC-5: Findings are persisted in a canonical artifact (for example `docs/engineering/compatibility-report.md`) with severity, affected module(s), evidence, and recommended next action.
-  - [ ] AC-6: If enabled and critical compatibility breakage is detected, workflow raises a decision gate before release progression.
-  - [ ] AC-7: Reports are traceable to backlog story IDs and sprint/task context so QA/release can verify coverage.
-  - [ ] AC-8: Active and `template/` copies of commands/rules/docs remain aligned for this optional mode.
+  - [x] AC-1: A dedicated config toggle exists (for example `CROSS_REPO_OBSERVABILITY`), defaulting to disabled.
+  - [x] AC-2: When disabled (default), `/intake`, `/architecture`, `/execute`, and `/qa` add no required extra steps or blocking checks.
+  - [x] AC-3: When enabled, configuration supports an explicit source list of monitored repositories/modules/artifacts (at least repo path/URL, module ID, and contract/doc location).
+  - [x] AC-4: Compatibility checks include at minimum: API signature compatibility, declared version/contract mismatch detection, and documentation/API description drift signals.
+  - [x] AC-5: Findings are persisted in a canonical artifact (for example `docs/engineering/compatibility-report.md`) with severity, affected module(s), evidence, and recommended next action.
+  - [x] AC-6: If enabled and critical compatibility breakage is detected, workflow raises a decision gate before release progression.
+  - [x] AC-7: Reports are traceable to backlog story IDs and sprint/task context so QA/release can verify coverage.
+  - [x] AC-8: Active and `template/` copies of commands/rules/docs remain aligned for this optional mode.
 - Boundaries:
   - In scope: workflow-level compatibility visibility, artifact persistence, and gate policy.
   - Out of scope: implementing cross-repo CI orchestration engines or runtime service mesh behavior.
@@ -378,16 +392,16 @@
 - Title: Execute workflow on selected component(s) without destabilizing others
 - Summary: Add a component-scoped mode so teams can target one component in a multi-component repo while protecting unaffected components through scope-aware planning and verification rules. Defaults stay lightweight when mode is off.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: A dedicated scope control exists (for example `COMPONENT_SCOPE_MODE` plus `TARGET_COMPONENTS`), with mode default disabled.
-  - [ ] AC-2: When disabled (default), workflow behavior is unchanged and introduces zero required overhead.
-  - [ ] AC-3: When enabled, `/intake` and `/architecture` require explicit in-scope and out-of-scope component declaration in artifacts.
-  - [ ] AC-4: `/sprint-plan` and task artifacts require each task to declare target component(s) and expected impacted interfaces.
-  - [ ] AC-5: `/execute` guidance enforces scope-first execution (no intentional edits outside declared target components unless escalated and approved).
-  - [ ] AC-6: `/qa` includes unaffected-component protection checks (for example smoke/regression checks for declared non-target components) before completion.
-  - [ ] AC-7: If enabled and out-of-scope component impact is detected without prior approval, workflow triggers a decision gate.
-  - [ ] AC-8: Active and `template/` command/rule/docs guidance stays behaviorally aligned for component-scoped mode.
+  - [x] AC-1: A dedicated scope control exists (for example `COMPONENT_SCOPE_MODE` plus `TARGET_COMPONENTS`), with mode default disabled.
+  - [x] AC-2: When disabled (default), workflow behavior is unchanged and introduces zero required overhead.
+  - [x] AC-3: When enabled, `/intake` and `/architecture` require explicit in-scope and out-of-scope component declaration in artifacts.
+  - [x] AC-4: `/sprint-plan` and task artifacts require each task to declare target component(s) and expected impacted interfaces.
+  - [x] AC-5: `/execute` guidance enforces scope-first execution (no intentional edits outside declared target components unless escalated and approved).
+  - [x] AC-6: `/qa` includes unaffected-component protection checks (for example smoke/regression checks for declared non-target components) before completion.
+  - [x] AC-7: If enabled and out-of-scope component impact is detected without prior approval, workflow triggers a decision gate.
+  - [x] AC-8: Active and `template/` command/rule/docs guidance stays behaviorally aligned for component-scoped mode.
 - Boundaries:
   - In scope: workflow scoping, artifact contracts, guardrails, and validation guidance.
   - Out of scope: monorepo build-system redesign or automatic dependency graph generation beyond declared scope metadata.
@@ -396,7 +410,7 @@
 - Title: Ship canonical `.cursor/remote.json` template with schema guidance and safe validation
 - Summary: Add an official remote execution configuration artifact and supporting documentation so teams can use `REMOTE_EXECUTION=1` safely. Provide clear schema/field expectations, example targets, and validation behavior that fails fast on invalid config while keeping zero overhead when `REMOTE_EXECUTION=0`.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: Canonical `.cursor/remote.json` template exists in both active repo and `template/` with aligned defaults and comments/examples where appropriate.
   - [ ] AC-2: Remote config schema is documented (required vs optional fields, data types, allowed values, path/host conventions).
@@ -415,7 +429,7 @@
 - Title: Continue full workflow from an explicit or resolved phase without manual phase triggers
 - Summary: Users can pause mid-workflow, then run one command to continue full automation from the right phase through the remaining pipeline. Add explicit `start-from` support to `/auto`, deterministic resume-source resolution (`handoffs/resume_brief.md` first, `docs/engineering/state.md` fallback), and clear stop/log behavior while preserving safe defaults.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: `/auto` supports an explicit `start-from` phase input (canonical phase IDs) to begin orchestration mid-process.
   - [ ] AC-2: When `start-from` is omitted, resume phase is resolved deterministically in this order: `handoffs/resume_brief.md` -> `docs/engineering/state.md` fallback.
@@ -434,7 +448,7 @@
 - Title: Configurable sync cadence after completed phases with QA-first safety defaults
 - Summary: Add a configurable phase-triggered sync policy that controls when local check-in sync/push is attempted (`disabled`, `manual`, `by_phase`, `by_milestone`, custom phase list). Keep behavior safe-by-default: no automatic push before QA pass for feature work, and always run check-in tests before any push attempt.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
   - [ ] AC-1: A canonical sync policy configuration exists and is documented (at minimum: `disabled`, `manual`, `by_phase`, `by_milestone`, `custom_phase_list`), with default set to a non-auto mode.
   - [ ] AC-2: Policy evaluation runs only at phase-completion boundaries and determines whether a sync attempt is eligible at that boundary.
@@ -454,37 +468,246 @@
 - Title: Allow release only after mandatory check-in tests and QA/UAT readiness
 - Summary: Tighten release readiness so `/release` proceeds only when check-in tests have passed and QA/UAT completion criteria are met. This complements phase sync policy by enforcing a hard final gate before release artifacts are finalized.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: `/release` includes an explicit mandatory gate that verifies latest check-in test result is passing (`TEST_COMMAND` baseline).
-  - [ ] AC-2: If check-in test evidence is missing, stale, or failing, release is blocked with deterministic fail reason and remediation steps.
-  - [ ] AC-3: `/release` requires QA completion evidence (no unresolved blocking findings in current sprint context) before proceeding.
-  - [ ] AC-4: Existing UAT completeness gate remains mandatory; release fails when UAT artifacts are placeholder, incomplete, or unresolved-fail state.
-  - [ ] AC-5: Gate ordering is deterministic: check-in test gate first, then QA gate, then UAT gate, then release-note/runbook updates.
-  - [ ] AC-6: Release output records per-gate pass/fail status and evidence pointers in handoff/state artifacts so QA and TL can audit decisions.
-  - [ ] AC-7: No release path may bypass these gates in default configuration; any override path (if allowed) requires explicit decision gate + documented rationale.
-  - [ ] AC-8: Active and `template/` release/qa/execute guidance remains behaviorally aligned for gate semantics (template parity AC).
-  - [ ] AC-9: Regression coverage includes positive and negative cases for each gate and for stale-evidence scenarios.
-  - [ ] AC-10: Safe default behavior is preserved for teams without optional lint/typecheck commands: release still requires test + QA/UAT evidence and does not falsely fail on blank optional runbook keys.
+  - [x] AC-1: `/release` includes an explicit mandatory gate that verifies latest check-in test result is passing (`TEST_COMMAND` baseline).
+  - [x] AC-2: If check-in test evidence is missing, stale, or failing, release is blocked with deterministic fail reason and remediation steps.
+  - [x] AC-3: `/release` requires QA completion evidence (no unresolved blocking findings in current sprint context) before proceeding.
+  - [x] AC-4: Existing UAT completeness gate remains mandatory; release fails when UAT artifacts are placeholder, incomplete, or unresolved-fail state.
+  - [x] AC-5: Gate ordering is deterministic: check-in test gate first, then QA gate, then UAT gate, then release-note/runbook updates.
+  - [x] AC-6: Release output records per-gate pass/fail status and evidence pointers in handoff/state artifacts so QA and TL can audit decisions.
+  - [x] AC-7: No release path may bypass these gates in default configuration; any override path (if allowed) requires explicit decision gate + documented rationale.
+  - [x] AC-8: Active and `template/` release/qa/execute guidance remains behaviorally aligned for gate semantics (template parity AC).
+  - [x] AC-9: Regression coverage includes positive and negative cases for each gate and for stale-evidence scenarios.
+  - [x] AC-10: Safe default behavior is preserved for teams without optional lint/typecheck commands: release still requires test + QA/UAT evidence and does not falsely fail on blank optional runbook keys.
 - Boundaries:
   - In scope: release readiness policy, gate order, evidence contract, and blocking behavior.
   - Out of scope: redefining sprint lifecycle, changing acceptance ownership, or replacing existing QA/UAT artifact formats.
+- Discovery notes:
+  - Mandatory gates: check-in test (TEST_COMMAND), QA completion (no unresolved blocking findings), UAT completeness (no placeholder/incomplete/fail state).
+  - Deterministic order: test → QA → UAT → release-note/runbook; enforced and documented for auditability.
+  - Evidence contract: per-gate pass/fail and evidence pointers recorded in handoff/state so decisions are auditable.
+  - Bypass: none in default path; any override requires explicit decision gate + documented rationale.
+  - Template parity: active and template release/qa/execute guidance aligned for gate semantics.
 
 ## US-0040 — Per-Sprint Release Notes and Release Queue Tracker
 - Title: Prevent release-note overwrite and track unreleased vs released sprints
 - Summary: Replace single-file release note behavior with per-sprint release note artifacts and add a canonical release queue tracker that records each sprint's release status (`unreleased`/`released`) with deterministic state updates.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Acceptance:
-  - [ ] AC-1: `/release` writes sprint-scoped notes to a canonical path (for example `handoffs/releases/Sxxxx-release-notes.md`) and must not overwrite notes from other sprints.
-  - [ ] AC-2: A canonical release queue artifact exists (for example `handoffs/release_queue.md` or `release_queue.json`) with at least sprint ID, status (`unreleased|released`), last-updated timestamp, and release-notes reference.
-  - [ ] AC-3: Queue update semantics are deterministic: entering release flow for a sprint creates/updates an `unreleased` entry; successful release finalization transitions only that sprint to `released`.
-  - [ ] AC-4: Default-safe behavior: if sprint identity cannot be resolved, release must not overwrite any existing release notes and must fail safely with remediation guidance.
-  - [ ] AC-5: Backfill/migration behavior is defined for existing `handoffs/release_notes.md`: preserve legacy file, attempt one-time migration to sprint-scoped file when sprint context is resolvable, otherwise record manual-migration guidance.
-  - [ ] AC-6: Existing workflows that read `handoffs/release_notes.md` remain backward-compatible (for example via pointer/latest summary behavior) without destructive data loss.
-  - [ ] AC-7: Release readiness/reporting surfaces unreleased sprint queue entries so pending releases are visible before finalization.
-  - [ ] AC-8: Release command/rules/docs define clear ownership and phase touchpoints for queue state transitions and note generation.
-  - [ ] AC-9: Template parity is maintained: active and `template/` copies of release guidance/artifacts are behaviorally aligned for per-sprint notes and queue tracking.
+  - [x] AC-1: `/release` writes sprint-scoped notes to a canonical path (for example `handoffs/releases/Sxxxx-release-notes.md`) and must not overwrite notes from other sprints.
+  - [x] AC-2: A canonical release queue artifact exists (for example `handoffs/release_queue.md` or `release_queue.json`) with at least sprint ID, status (`unreleased|released`), last-updated timestamp, and release-notes reference.
+  - [x] AC-3: Queue update semantics are deterministic: entering release flow for a sprint creates/updates an `unreleased` entry; successful release finalization transitions only that sprint to `released`.
+  - [x] AC-4: Default-safe behavior: if sprint identity cannot be resolved, release must not overwrite any existing release notes and must fail safely with remediation guidance.
+  - [x] AC-5: Backfill/migration behavior is defined for existing `handoffs/release_notes.md`: preserve legacy file, attempt one-time migration to sprint-scoped file when sprint context is resolvable, otherwise record manual-migration guidance.
+  - [x] AC-6: Existing workflows that read `handoffs/release_notes.md` remain backward-compatible (for example via pointer/latest summary behavior) without destructive data loss.
+  - [x] AC-7: Release readiness/reporting surfaces unreleased sprint queue entries so pending releases are visible before finalization.
+  - [x] AC-8: Release command/rules/docs define clear ownership and phase touchpoints for queue state transitions and note generation.
+  - [x] AC-9: Template parity is maintained: active and `template/` copies of release guidance/artifacts are behaviorally aligned for per-sprint notes and queue tracking.
 - Boundaries:
   - In scope: release artifact conventions, migration/backfill contract, queue status lifecycle, and workflow documentation/rules updates.
   - Out of scope: changing deployment runtime behavior, introducing external release-management services, or redefining QA/UAT evidence formats.
+
+## US-0041 — End-to-End Lifecycle QA for `its-magic` Install/Upgrade/Clean
+- Title: Add live lifecycle tests for install, update, backup, and cleanup safety
+- Summary: Extend QA beyond static/template checks to run full end-to-end lifecycle validation of the actual `its-magic` command and platform installers. Cover fresh install, overwrite with backup, upgrade behavior, and clean-repo safety so regressions in real user flows are detected before release.
+- Priority: P1
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: Add deterministic E2E tests for fresh install (`missing` mode) validating required files and `.its-magic-version` creation.
+  - [x] AC-2: Add E2E tests for overwrite + backup (`overwrite --backup`) validating backup structure, timestamped snapshot creation, and recoverability guidance.
+  - [x] AC-3: Add E2E tests for upgrade flow (`upgrade`) validating framework-file refresh, user-data preservation, and new-file delivery.
+  - [x] AC-4: Add E2E tests for cleanup flow (`--clean-repo`) validating only framework artifacts are removed while non-its-magic project files remain untouched.
+  - [x] AC-5: Add negative-path tests (invalid mode/args, malformed target state, missing permissions) with fail-fast and actionable error output checks.
+  - [x] AC-6: Cover CLI entrypoint path (`its-magic ...`) and direct installer path (`installer.ps1`/`installer.sh`) with behavior parity assertions.
+  - [x] AC-7: Ensure OS/platform parity for lifecycle checks (PowerShell + shell paths locally, and CI jobs for npm/choco/brew smoke + lifecycle subset).
+  - [x] AC-8: Ensure tests are isolated/idempotent (temp dirs only, cleanup on failure, no mutation of repo working files).
+  - [x] AC-9: Document lifecycle QA matrix and expected pass/fail evidence in `README.md` and `docs/engineering/runbook.md`.
+- Boundaries:
+  - In scope: QA coverage expansion for installer/CLI lifecycle behavior and release confidence.
+  - Out of scope: redesigning installer feature semantics or adding new install modes not already planned.
+
+## US-0042 — Release Findings Artifact and Post-QA Issue Workflow
+- Title: Standardize how release-step issues are documented, triaged, and handed back
+- Summary: Define an official workflow for issues discovered after QA (for example during `/release` gates), including a dedicated findings artifact similar to QA findings, deterministic reason-code mapping, and clear handoff/ownership semantics.
+- Priority: P1
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: Canonical release-step findings artifact is defined (for example `sprints/Sxxxx/release-findings.md`) with required sections: gate status, blocking/non-blocking findings, reason codes, evidence refs, remediation.
+  - [x] AC-2: `/release` guidance writes/updates release findings when a gate blocks and references deterministic reason codes.
+  - [x] AC-3: Release-blocked scenarios produce a standard handoff path back to implementation (`handoffs/release_to_dev.md` or equivalent documented contract).
+  - [x] AC-4: `docs/engineering/state.md` and queue artifacts remain synchronized with release findings status (`unreleased|blocked|released`) without contradictory records.
+  - [x] AC-5: Decision-gate override path explicitly requires release findings evidence and rationale linkage (`DEC-xxxx` reference).
+  - [x] AC-6: QA and release boundaries are clear: QA findings stay in `qa-findings.md`; post-QA release issues are recorded in release findings artifact.
+  - [x] AC-7: Regression coverage includes at least one blocked release scenario verifying artifact creation/update and handoff behavior.
+  - [x] AC-8: Active/template parity is maintained for command/docs/rules references of the release findings workflow.
+- Boundaries:
+  - In scope: process/workflow documentation, artifact contracts, handoff semantics, and deterministic evidence flow for post-QA release issues.
+  - Out of scope: changing runtime deployment behavior or replacing existing QA/UAT artifact models.
+
+## US-0043 — Backlog Reconciliation Gate for Released Sprints
+- Title: Prevent drift between released sprint evidence and backlog story status
+- Summary: Add a deterministic reconciliation contract so once a sprint reaches `released`, linked story status and acceptance checkmarks in `docs/product/backlog.md` are synchronized from canonical sprint/release evidence. Block or fail safely when contradictory states are detected.
+- Priority: P1
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: Define canonical evidence precedence for story completion reconciliation (at minimum: release queue status, sprint release notes, QA findings, UAT status, and release findings when present).
+  - [x] AC-2: `/release` (or deterministic post-release boundary step) updates linked backlog story status to `DONE` when all mandatory evidence gates are PASS.
+  - [x] AC-3: `/release` (or post-release step) reconciles acceptance checkbox state for the linked story based on completion evidence, not manual memory.
+  - [x] AC-4: If sprint is `released` but backlog story is still `OPEN` or acceptance checkboxes are contradictory, workflow fails safely with explicit reason code and remediation guidance.
+  - [x] AC-5: Reason code vocabulary includes a dedicated drift code (for example `BACKLOG_STATUS_DRIFT`) with deterministic evidence references.
+  - [x] AC-6: Reconciliation mutates only the target story/story IDs linked to the target sprint and must not modify unrelated backlog entries.
+  - [x] AC-7: Regression coverage includes at least one negative case (`released` sprint + stale backlog) and one positive case (automatic reconciliation to consistent state).
+  - [x] AC-8: Active and `template/` command/rule/docs guidance remains behaviorally aligned for reconciliation semantics.
+  - [x] AC-9: Readme/runbook documents the reconciliation invariant and where to inspect evidence when drift is detected.
+  - [x] AC-10: Default-safe behavior is preserved for non-released stories/sprints (no premature `DONE` transitions before release gates pass).
+- Boundaries:
+  - In scope: backlog/sprint/release artifact consistency rules, fail-safe detection, reconciliation behavior, and regression tests.
+  - Out of scope: redefining story acceptance ownership, replacing sprint lifecycle phases, or changing runtime feature behavior.
+
+## US-0044 — Continuous `/auto` Backlog-Drain Mode with Fine-Tune Switches
+- Title: Let `/auto` continue across planned stories until completion (bounded and safe)
+- Summary: Extend `/auto` from single-story continuation to optional backlog-drain orchestration mode. When enabled, `/auto` should deterministically select next eligible OPEN story and continue through full workflow repeatedly until backlog target is reached, while preserving decision gates, stop conditions, and explicit operator controls.
+- Priority: P1
+- Status: DONE
+- Acceptance:
+  - [x] AC-1: A dedicated scratchpad switch enables/disables multi-story backlog-drain mode (default off, preserving current behavior).
+  - [x] AC-2: Deterministic story selection policy is defined and documented (for example by priority, then backlog order), including tie behavior.
+  - [x] AC-3: `/auto` can iterate story-by-story through full lifecycle (`discovery -> ... -> release -> refresh-context`) without manual re-invocation while mode is enabled.
+  - [x] AC-4: Fine-tune switches exist for bounded execution (at minimum max stories per run and stop-on-blocking-story policy).
+  - [x] AC-5: Decision gates remain mandatory and pause backlog-drain progression until user decision is recorded.
+  - [x] AC-6: If one story blocks, deterministic behavior is configurable (`stop_immediately` vs `skip_and_continue`) and always recorded with reason codes.
+  - [x] AC-7: Breadcrumb/state artifacts record per-story start/stop outcomes, selected policy settings, and final backlog-drain summary for auditability.
+  - [x] AC-8: Existing execute↔qa auto loop controls continue to work within each story cycle and do not regress.
+  - [x] AC-9: Active and `template/` command/rule/docs guidance remains behaviorally aligned for backlog-drain semantics.
+  - [x] AC-10: Default-safe backward compatibility is preserved: with mode disabled, `/auto` behavior remains current checkpointed continuation.
+- Boundaries:
+  - In scope: process/workflow orchestration semantics, configuration switches, deterministic selection/stop behavior, and artifact evidence.
+  - Out of scope: bypassing decision approvals, redefining story acceptance content, or runtime product feature logic changes.
+
+## US-0045 — Canonical Story Status Source + Global Drift Guard
+- Title: Make backlog the canonical status source and prevent cross-artifact story drift
+- Summary: Define a deterministic workflow contract where `docs/product/backlog.md` is the canonical source for story `OPEN|DONE` status, and `docs/product/acceptance.md` plus `docs/engineering/state.md` are reconciled from canonical evidence. Include one-time normalization for already-drifted stories and fail-safe guardrails that block contradictory release progression.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - Canonical state owner: `docs/product/backlog.md` for story status.
+  - Secondary/derived views: `docs/product/acceptance.md` checklist state and `docs/engineering/state.md` trace checkpoints.
+  - Expected operator UX: deterministic mismatch report (story id, previous values, resolved values, evidence refs, remediation).
+  - Safety boundary: normalization and reconciliation remain target-scoped and non-destructive for unrelated stories.
+- Acceptance:
+  - [x] AC-1: Define and document canonical ownership: backlog story status is authoritative; acceptance/state are derived or reconciled views.
+  - [x] AC-2: Add deterministic reconciliation rules for `backlog.md` <-> `acceptance.md` <-> `state.md` with explicit precedence and mutation scope.
+  - [x] AC-3: Add a one-time normalization procedure that repairs existing mismatches for historically completed stories (for example OPEN in backlog but DONE/PASS evidence exists).
+  - [x] AC-4: Ensure normalization emits an auditable report of changed stories, prior values, new values, and evidence references.
+  - [x] AC-5: Add fail-safe reason code(s) for contradictory status states detected at release/reconciliation boundaries, with actionable remediation guidance.
+  - [x] AC-6: Guardrails must be target-scoped and non-destructive to unrelated stories/sprints; no broad blind rewrites.
+  - [x] AC-7: `/auto` and `/execute` documentation explicitly states they do not infer implementation readiness from non-canonical status artifacts.
+  - [x] AC-8: `/sprint-plan` guidance clarifies planning source and expected behavior for multiple OPEN backlog items versus sprint sizing limits.
+  - [x] AC-9: Add regression coverage for (a) existing-drift normalization pass and (b) post-normalization drift prevention on subsequent workflow runs.
+  - [x] AC-10: Maintain active/template parity for all command/docs/rules updates tied to this contract.
+- Boundaries:
+  - In scope: workflow-state contracts, normalization/reconciliation behavior, drift detection, command guidance, and regression tests.
+  - Out of scope: changing runtime product features, bypassing decision gates, or removing sprint sizing policies.
+
+## US-0046 — Explicit `/sprint-plan --bulk` Mode
+- Title: Plan multiple OPEN backlog stories into bounded sprint sets in one run
+- Summary: Add an explicit bulk planning mode for `/sprint-plan` so teams can intentionally generate multiple sprint plans from eligible OPEN backlog stories in one invocation. Keep deterministic grouping/splitting rules, bounded limits, and default-safe single-scope behavior when bulk mode is not enabled.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - Explicit operator intent is required for bulk planning activation; default path remains current single-scope planning behavior.
+  - Selection/grouping model should be deterministic and inspectable (priority + backlog order, then documented split/group rule).
+  - Planning completeness must remain identical to non-bulk output quality for every generated sprint artifact set.
+  - Bulk planning should optimize throughput without relaxing `SPRINT_MAX_TASKS` and `SPRINT_AUTO_SPLIT` safety rules.
+- Acceptance:
+  - [x] AC-1: `/sprint-plan` defines an explicit bulk mode trigger (flag/argument or equivalent), defaulting to current non-bulk behavior.
+  - [x] AC-2: Bulk mode uses deterministic story selection policy (at minimum priority + backlog order) and documents tie handling.
+  - [x] AC-3: Bulk mode applies bounded limits (for example max stories and/or max generated sprints per run) with explicit stop reason output.
+  - [x] AC-4: Sprint sizing constraints (`SPRINT_MAX_TASKS`, `SPRINT_AUTO_SPLIT`) remain enforced per generated sprint and never bypassed.
+  - [x] AC-5: Grouping/splitting contract is documented (single-story sprint vs multi-story sprint) with deterministic decision criteria.
+  - [x] AC-6: Generated planning artifacts remain complete for each sprint (`sprint.md`, `tasks.md`, `progress.md`, UAT placeholders, `plan-verify` readiness).
+  - [x] AC-7: Traceability index/state updates remain deterministic and non-duplicative when bulk mode creates multiple sprint entries.
+  - [x] AC-8: Decision gates and missing-input stops are preserved; bulk planning must fail safe on ambiguous or incomplete acceptance criteria.
+  - [x] AC-9: Regression coverage includes positive and negative bulk-planning cases, including boundary-limit behavior.
+  - [x] AC-10: Active and `template/` command/rule/docs guidance stays behaviorally aligned for bulk planning semantics.
+- Boundaries:
+  - In scope: planning orchestration semantics, deterministic selection/grouping/splitting, bounded controls, and artifact completeness.
+  - Out of scope: auto-implementation execution of planned sprints, runtime feature behavior changes, or bypassing sprint sizing policies.
+
+## US-0047 — Explicit Bulk Execute Orchestration Mode
+- Title: Execute planned sprints/stories continuously with fresh agent contexts and bounded safety controls
+- Summary: Add an explicit bulk execution mode that runs planned work sprint-by-sprint (or story-by-story) with mandatory fresh subagent contexts at fine granularity, execute↔QA loop behavior, and deterministic stop/skip controls so users can avoid manual command chaining.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - Bulk execution should be explicit-mode only; existing non-bulk behavior remains default-safe.
+  - Isolation contract remains strict in bulk mode: fresh context per phase and per execute↔QA loop cycle.
+  - Team mode requires member-scoped execution (`TEAM_MEMBER` + `ACTIVE_TASK_IDS`) so out-of-scope tasks are never executed.
+  - Bounded controls and reason codes are required for explainability (max items, block/skip policy, stop reason, resume point).
+- Acceptance:
+  - [x] AC-1: An explicit bulk execute mode is defined (new command or explicit mode argument), defaulting to current non-bulk behavior when disabled.
+  - [x] AC-2: Bulk execution uses deterministic work-item selection policy and records selection source/evidence in state breadcrumbs, including team-context inputs (`TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`) when enabled.
+  - [x] AC-3: Fresh subagent isolation is mandatory per phase and per execute↔QA cycle for each sprint/story handled in bulk mode.
+  - [x] AC-4: Execute↔QA loop controls remain bounded (`AUTO_IMPLEMENTATION_LOOP`, max cycle controls) and are enforced per sprint/story iteration.
+  - [x] AC-5: Bounded run controls exist (for example max sprints/stories per run, stop-vs-skip on blocked item) with explicit reason-code output.
+  - [x] AC-6: Decision gates remain mandatory and pause bulk execution progression until user decision is recorded.
+  - [x] AC-7: Resume semantics are deterministic for interrupted bulk runs (checkpoint source, next item, stop reason) and are documented.
+  - [x] AC-8: In team mode, bulk execution must not run tasks outside the current member context (`TEAM_MEMBER` + `ACTIVE_TASK_IDS`); out-of-scope tasks are deterministically skipped/blocked with explicit reason codes and no writes.
+  - [x] AC-9: Regression coverage includes positive progression, blocked-item policy behavior, and fresh-context isolation expectations.
+  - [x] AC-10: Active and `template/` command/rule/docs guidance stays behaviorally aligned for bulk execution semantics.
+- Boundaries:
+  - In scope: execution orchestration semantics, isolation guarantees, bounded controls, and deterministic auditability.
+  - Out of scope: changing runtime product feature logic, bypassing release/decision gates, or replacing artifact-first handoff model.
+
+## US-0048 — Enforced Per-Phase Subagent Isolation with Audit Gate
+- Title: Enforce fresh subagent isolation for every workflow phase with fail-closed auditability
+- Summary: Close the execution-compliance gap by making phase isolation a hard-enforced contract (not guidance), requiring auditable per-phase isolation evidence and blocking progression/release when isolation proof is missing or violated.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - Current policy text already mandates phase isolation, but operator execution can still drift without deterministic enforcement.
+  - The guard must fail closed on missing or contradictory isolation evidence.
+  - Enforcement should preserve default workflow behavior while making violations explicit and traceable.
+  - Operator expectation: on isolation failure, operators get explicit diagnostics (reason code, phase, evidence ref, remediation) — no silent block or continuation.
+  - Research scope: isolation evidence schema, canonical evidence artifact locations, verify/release gate integration, reason-code taxonomy, and resume provenance; out of scope: runtime product features, external orchestration platform migration.
+- Acceptance:
+  - [x] AC-1: `/auto` enforces orchestrator-only behavior and must fail if phase work is executed without spawning a fresh subagent context.
+  - [x] AC-2: Each phase transition writes mandatory isolation evidence (phase id, role, fresh-context marker, timestamp, evidence ref) to canonical artifacts.
+  - [x] AC-3: `/execute` and `/qa` loop runs enforce fresh-context-per-cycle semantics with deterministic evidence fields.
+  - [x] AC-4: Missing/invalid isolation evidence triggers deterministic fail-safe reason code(s) and stops progression.
+  - [x] AC-5: `/verify-work` and `/release` include an isolation-compliance gate that blocks finalization on unresolved isolation violations.
+  - [x] AC-6: Isolation evidence schema is documented in runbook and reflected in command contracts (`/auto`, `/execute`, `/qa`, `/release`).
+  - [x] AC-7: Reason-code taxonomy includes explicit isolation violations/remediation guidance (for example `PHASE_CONTEXT_ISOLATION_MISSING`, `PHASE_CONTEXT_ISOLATION_VIOLATION`).
+  - [x] AC-8: Regression coverage includes positive and negative isolation cases (missing evidence, reused context, invalid role/phase mapping).
+  - [x] AC-9: Resume behavior remains deterministic; isolation evidence must survive pause/resume boundaries without ambiguity.
+  - [x] AC-10: Active and `template/` command/rule/docs guidance remains behaviorally aligned for isolation enforcement semantics.
+- Boundaries:
+  - In scope: workflow contract enforcement, evidence schema, gates, reason codes, and regression coverage.
+  - Out of scope: runtime product feature behavior changes or external orchestration platform migration.
+
+## US-0049 — Legacy DONE-Story Acceptance/Traceability Backfill Guard
+- Title: Guard and one-time backfill for backlog DONE vs acceptance/traceability drift
+- Summary: Add deterministic detection and bounded repair for legacy stories where canonical backlog shows DONE but acceptance checkmarks or traceability/release artifacts disagree. Include optional one-time backfill mode, ongoing guard at reconciliation/release boundaries, explicit audit report entries and reason codes, and template parity plus regression coverage expectations.
+- Priority: P1
+- Status: DONE
+- Notes: Context: US-0017 and US-0030 were DONE in backlog but unchecked in acceptance and not clearly represented in traceability/release artifacts. Per R-0023. Released S0028 2026-03-02.
+- Discovery notes:
+  - Detection rule: legacy drift = backlog status DONE and (acceptance item unchecked OR traceability index/state lacks entry OR release artifacts lack clear representation for that story).
+  - One-time backfill: explicit trigger runs detection and repair once; emits audit report; idempotent when no drift. Ongoing guard: at release/reconciliation (or dedicated check) detects drift and either blocks with reason code or performs target-scoped repair with audit append.
+  - Audit report: canonical artifact (e.g. docs/engineering/legacy-drift-audit.md) with story ID, prior acceptance/traceability state, resolved state(s), reason code, evidence ref.
+  - Reason codes: BACKLOG_DONE_ACCEPTANCE_UNCHECKED, BACKLOG_DONE_TRACEABILITY_MISSING, BACKLOG_DONE_RELEASE_ARTIFACT_MISSING (or equivalent) with remediation per code.
+  - Boundaries: target-scoped repair only; no change to canonical status ownership (US-0045) or broad reconciliation semantics (US-0043). Template parity and regression coverage required.
+- Acceptance:
+  - [x] AC-1: Define and document detection rule: story is "legacy drift" when backlog status is DONE and (acceptance checklist item for that story is unchecked OR traceability index/state lacks entry OR release artifacts lack clear representation for that story).
+  - [x] AC-2: Bounded target-scoped repair: normalization mutates only stories that match the legacy-drift rule; no broad destructive rewrite of unrelated backlog/acceptance/state/release artifacts.
+  - [x] AC-3: Audit report format is defined with required fields: story ID, prior acceptance state, prior traceability state, resolved state(s), reason code, evidence reference; report written to a canonical artifact (e.g. `docs/engineering/legacy-drift-audit.md` or equivalent).
+  - [x] AC-4: Reason-code vocabulary includes at least: `BACKLOG_DONE_ACCEPTANCE_UNCHECKED`, `BACKLOG_DONE_TRACEABILITY_MISSING`, `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING` (or equivalent), with remediation guidance per code.
+  - [x] AC-5: Optional one-time backfill mode: explicit trigger (e.g. command or flag) runs detection and repair once for all current legacy-drift stories and emits the audit report; idempotent and safe when no drift exists.
+  - [x] AC-6: Ongoing guard: at release or reconciliation boundaries (or dedicated check), workflow detects legacy drift and either blocks with reason code and remediation or performs target-scoped repair with audit append; behavior is documented and deterministic.
+  - [x] AC-7: Template parity: active and `template/` command/rule/docs guidance for backfill guard, audit report location, and reason codes remain behaviorally aligned.
+  - [x] AC-8: Regression coverage includes at least: (a) one-time backfill run with no drift (no changes, report empty or "no drift"), (b) one-time backfill run with one legacy-drift story (repair applied, audit entry created), (c) ongoing guard blocks or repairs when drift is present and reports reason code.
+- Boundaries:
+  - In scope: detection rule, target-scoped repair, audit report schema, reason codes, one-time backfill and ongoing guard behavior, template parity, regression tests.
+  - Out of scope: changing canonical status ownership (US-0045), broad reconciliation semantics (US-0043), or runtime product feature behavior.

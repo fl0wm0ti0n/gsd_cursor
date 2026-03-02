@@ -1,0 +1,19 @@
+{
+  "sprint_id": "S0028",
+  "story_id": "US-0049",
+  "passed": 8,
+  "failed": 0,
+  "verified_state": "verify_work_complete",
+  "verified_at": "2026-03-02T22:00:00Z",
+  "verify_work_verified_at": "2026-03-02T22:00:00Z",
+  "steps": [
+    { "step": 1, "ac": "AC-1", "description": "Detection rule documented", "result": "PASS", "evidence": "runbook.md Legacy DONE-story drift (US-0049)" },
+    { "step": 2, "ac": "AC-2", "description": "Bounded target-scoped repair documented", "result": "PASS", "evidence": "runbook + release 3e" },
+    { "step": 3, "ac": "AC-3", "description": "Audit report format and canonical path", "result": "PASS", "evidence": "legacy-drift-audit.md" },
+    { "step": 4, "ac": "AC-4", "description": "Reason codes with remediation", "result": "PASS", "evidence": "runbook + release.md" },
+    { "step": 5, "ac": "AC-5", "description": "One-time backfill mode", "result": "PASS", "evidence": "runbook" },
+    { "step": 6, "ac": "AC-6", "description": "Ongoing guard at release/reconciliation", "result": "PASS", "evidence": "release step 3e" },
+    { "step": 7, "ac": "AC-7", "description": "Template parity", "result": "PASS", "evidence": "template runbook, release, legacy-drift-audit" },
+    { "step": 8, "ac": "AC-8", "description": "Regression coverage", "result": "PASS", "evidence": "run-tests.ps1 #27, report.md 397/0" }
+  ]
+}

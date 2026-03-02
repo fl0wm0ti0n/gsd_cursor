@@ -1,0 +1,23 @@
+{
+  "sprint": "S0015",
+  "stories": ["US-0043"],
+  "steps": [
+    {
+      "id": "UAT-001",
+      "description": "Verify released sprint story in backlog auto-reconciles to DONE with checked ACs after release finalization.",
+      "result": "pass"
+    },
+    {
+      "id": "UAT-002",
+      "description": "Verify stale released/backlog mismatch emits BACKLOG_STATUS_DRIFT and remediation evidence.",
+      "result": "pass"
+    },
+    {
+      "id": "UAT-003",
+      "description": "Verify unrelated backlog stories are not mutated by reconciliation.",
+      "result": "pass"
+    }
+  ],
+  "passed": 3,
+  "failed": 0
+}

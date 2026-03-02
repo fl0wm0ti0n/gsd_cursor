@@ -1,0 +1,18 @@
+{
+  "sprint_id": "S0027",
+  "story_id": "US-0032",
+  "passed": 8,
+  "failed": 0,
+  "verified_state": "populated",
+  "verified_at": "2026-03-02T19:50:27Z",
+  "steps": [
+    { "id": "UAT-1", "ac": "AC-1", "description": "USER_GUIDE_MODE flag exists in scratchpad (active + template), default 0.", "result": "passed", "evidence": ".cursor/scratchpad.md, template/.cursor/scratchpad.md" },
+    { "id": "UAT-2", "ac": "AC-2", "description": "When USER_GUIDE_MODE=0, no required guide steps or blocking checks in any phase.", "result": "passed", "evidence": "intake, architecture, sprint-plan, execute, qa, release commands (active + template)" },
+    { "id": "UAT-3", "ac": "AC-3", "description": "When enabled, canonical path docs/user-guides/US-xxxx.md per feature story.", "result": "passed", "evidence": "docs/engineering/runbook.md, docs/user-guides/README.md" },
+    { "id": "UAT-4", "ac": "AC-4", "description": "Minimum guide schema (Purpose, Prerequisites, Usage steps, Example, Limitations, Troubleshooting) defined and testable.", "result": "passed", "evidence": "runbook Optional user-guide section, docs/user-guides/README.md" },
+    { "id": "UAT-5", "ac": "AC-5", "description": "Validation reports completeness; blocks with USER_GUIDE_INCOMPLETE only when enabled and sections missing.", "result": "passed", "evidence": ".cursor/commands/release.md step 3d, reason code USER_GUIDE_INCOMPLETE" },
+    { "id": "UAT-6", "ac": "AC-6", "description": "Traceability story ID → user guide artifact; referenced in handoff/release context.", "result": "passed", "evidence": "handoffs.mdc, runbook Traceability, release gate 3d" },
+    { "id": "UAT-7", "ac": "AC-7", "description": "Boundaries with US-0031 enforced; user guides end-user only; no duplicate spec-pack content.", "result": "passed", "evidence": "runbook Boundary with spec-pack (US-0031), docs/user-guides/README.md" },
+    { "id": "UAT-8", "ac": "AC-8", "description": "Active and template docs/commands/rules aligned for user-guide mode.", "result": "passed", "evidence": "template commands, runbook, README, docs/user-guides/README.md, handoffs.mdc; tests/run-tests.ps1 and run-tests.sh" }
+  ]
+}

@@ -20,6 +20,8 @@ Rules:
 - Use only artifact files and handoffs as context, not prior chat history.
 - After writing `handoffs/po_to_tl.md`, stop and require the next phase in a
   new subagent/chat.
+- Read `INTAKE_GUIDED_MODE` from `.cursor/scratchpad.md` and apply behavior
+  mode rules below.
 
 Evaluation (before creating a new story):
 - Check `docs/product/backlog.md` for duplicates or overlapping stories. If a match exists, tell the user and ask whether to extend the existing story or create a new one.
@@ -28,11 +30,18 @@ Evaluation (before creating a new story):
 - Suggest `/quick` for small tasks that don't need full sprint ceremony.
 - Challenge assumptions constructively: present your analysis and recommendation, but the user always has the final say. If the user says "do it anyway," proceed.
 
-Early research (when EARLY_RESEARCH=1 in scratchpad.md):
-- Before evaluating the idea, search the web for relevant external context
-  (competitor approaches, library docs, API references, prior art).
-- Persist findings as an R-xxxx entry in `docs/engineering/research.md`
-  (auto-increment ID from highest existing entry, per DEC-0011).
-- Reference the entry ID in the handoff (`handoffs/po_to_tl.md`).
-- If EARLY_RESEARCH=0, skip this step. `/research` is always available manually.
+Guided intake mode (`INTAKE_GUIDED_MODE=1`, default):
+- Ask targeted follow-up questions only when ambiguity blocks concrete
+  acceptance criteria.
+- Present at least one viable option/alternative before recommendation.
+- Preserve explicit user authority: PO recommends, user decides.
+- Perform intake-time web research and persist findings as an R-xxxx entry in
+  `docs/engineering/research.md` (auto-increment ID from highest existing entry,
+  per DEC-0011).
+- Reference research entry IDs in `handoffs/po_to_tl.md`.
+
+Low-touch mode (`INTAKE_GUIDED_MODE=0`):
+- Do not add proactive follow-up/options/research overhead unless user requests
+  deeper guidance.
+- Keep duplicate/overlap backlog check active as baseline safety.
 

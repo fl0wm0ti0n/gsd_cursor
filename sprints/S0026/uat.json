@@ -1,0 +1,64 @@
+{
+  "sprint_id": "S0026",
+  "story_id": "US-0031",
+  "passed": 8,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Single enable flag SPEC_PACK_MODE=0|1 in scratchpad (active and template), default 0.",
+      "result": "pass",
+      "evidence": ".cursor/scratchpad.md, template/.cursor/scratchpad.md"
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "When SPEC_PACK_MODE=0, intake, architecture, release, execute, qa add no extra required spec-pack steps (zero overhead).",
+      "result": "pass",
+      "evidence": "Command files and runbook reference"
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "When enabled, three artifacts at canonical paths: design-concept, crs, technical-specification; spec-pack README in active and template.",
+      "result": "pass",
+      "evidence": "docs/engineering/runbook.md, docs/engineering/spec-pack/README.md (active + template)"
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Minimum required sections defined in runbook and spec-pack README; completeness testable (Design Concept, CRS, Technical Spec sections).",
+      "result": "pass",
+      "evidence": "Runbook + spec-pack README"
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Release step 3c validates spec-pack when enabled; blocks with SPEC_PACK_INCOMPLETE only when enabled and required sections missing.",
+      "result": "pass",
+      "evidence": ".cursor/commands/release.md (active + template)"
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "Traceability story ID to three spec-pack artifact paths documented in runbook and spec-pack README.",
+      "result": "pass",
+      "evidence": "Runbook + spec-pack README"
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "Ownership (Design Concept: Tech Lead/architecture; CRS: PO/intake; Technical Spec: TL create, Dev update) in runbook.",
+      "result": "pass",
+      "evidence": "docs/engineering/runbook.md"
+    },
+    {
+      "id": "UAT-8",
+      "ac": "AC-8",
+      "description": "Active and template commands, runbook, README aligned for spec-pack mode; US-0031 regression checks in run-tests.",
+      "result": "pass",
+      "evidence": "tests/run-tests.ps1, tests/run-tests.sh, template copies"
+    }
+  ]
+}

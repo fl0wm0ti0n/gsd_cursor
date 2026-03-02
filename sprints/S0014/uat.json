@@ -1,0 +1,13 @@
+{
+  "sprint": "S0014",
+  "steps": [
+    { "description": "AC-1..AC-3 release findings + reason-code workflow", "result": "PASS" },
+    { "description": "AC-4 sync between queue/state/findings", "result": "PASS" },
+    { "description": "AC-5 decision-gate evidence linkage contract", "result": "PASS" },
+    { "description": "AC-6 QA vs release findings boundary", "result": "PASS" },
+    { "description": "AC-7 regression check coverage", "result": "PASS" },
+    { "description": "AC-8 active/template parity", "result": "PASS" }
+  ],
+  "passed": 6,
+  "failed": 0
+}

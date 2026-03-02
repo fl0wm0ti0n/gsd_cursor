@@ -1,0 +1,20 @@
+{
+  "sprint_id": "S0023",
+  "story_id": "US-0034",
+  "result": "PASS",
+  "coverage": {
+    "AC-1": "covered",
+    "AC-2": "covered",
+    "AC-3": "covered",
+    "AC-4": "covered",
+    "AC-5": "covered",
+    "AC-6": "covered",
+    "AC-7": "covered",
+    "AC-8": "covered"
+  },
+  "notes": [
+    "Default-off zero-overhead behavior is documented for relevant phases.",
+    "Canonical compatibility artifacts and release critical-gate policy are included.",
+    "Active/template parity and regression checks are included."
+  ]
+}

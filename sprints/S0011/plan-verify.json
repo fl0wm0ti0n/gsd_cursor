@@ -1,48 +1,34 @@
 {
-  "sprint": "S0011",
-  "stories": ["US-0039"],
-  "total_tasks": 11,
+  "sprint_id": "S0011",
+  "story_id": "US-0039",
+  "result": "PASS",
   "coverage": {
-    "US-0039": {
-      "AC-1": { "task": "T-001", "status": "covered" },
-      "AC-2": { "task": "T-002", "status": "covered" },
-      "AC-3": { "task": "T-003", "status": "covered" },
-      "AC-4": { "task": "T-004", "status": "covered" },
-      "AC-5": { "task": "T-001", "status": "covered" },
-      "AC-6": { "task": "T-005", "status": "covered" },
-      "AC-7": { "task": "T-006", "status": "covered" },
-      "AC-8": { "task": "T-010", "status": "covered" },
-      "AC-9": { "task": "T-008", "status": "covered" },
-      "AC-10": { "task": "T-009", "status": "covered" }
-    }
-  },
-  "scope_boundaries": {
-    "in_scope": [
-      "Ordered release gates for test, QA, and UAT readiness",
-      "Deterministic stale/missing/failing evidence handling",
-      "Per-gate status and evidence logging contract",
-      "No-bypass default with explicit decision-gate override evidence",
-      "Active/template parity and regression coverage"
-    ],
-    "out_of_scope": [
-      "Changing sprint lifecycle ownership model",
-      "Replacing existing QA/UAT artifact formats",
-      "Making optional lint/typecheck mandatory for release gating"
-    ]
-  },
-  "sizing_check": {
-    "sprint_max_tasks": 12,
-    "sprint_auto_split": 1,
-    "planned_tasks": 11,
-    "split_required": false,
-    "split_reason": "Single-story scope remains atomic at 11 tasks."
+    "AC-1": { "tasks": ["T-001", "T-002"], "status": "covered" },
+    "AC-2": { "tasks": ["T-002", "T-008"], "status": "covered" },
+    "AC-3": { "tasks": ["T-003", "T-008"], "status": "covered" },
+    "AC-4": { "tasks": ["T-004", "T-008"], "status": "covered" },
+    "AC-5": { "tasks": ["T-001", "T-008"], "status": "covered" },
+    "AC-6": { "tasks": ["T-005", "T-011"], "status": "covered" },
+    "AC-7": { "tasks": ["T-006", "T-007", "T-008"], "status": "covered" },
+    "AC-8": { "tasks": ["T-010", "T-011"], "status": "covered" },
+    "AC-9": { "tasks": ["T-008", "T-011"], "status": "covered" },
+    "AC-10": { "tasks": ["T-009"], "status": "covered" }
   },
   "gaps": [],
-  "risks": [
-    "Gate ordering could drift across command/doc copies",
-    "Stale-evidence criteria could remain ambiguous without explicit reason codes",
-    "Override path could bypass governance if decision evidence is underspecified",
-    "Optional-key behavior might cause false gate failures"
+  "notes": [
+    "All US-0039 AC-1..AC-10 covered by tasks T-001..T-011; no missing ACs.",
+    "Gate order (T-001): check-in test → QA → UAT → release-note/runbook.",
+    "Check-in evidence contract (T-002), QA gate (T-003), UAT gate (T-004), audit schema (T-005), no-bypass (T-006), override contract (T-007), regression matrix (T-008), optional-key safety (T-009), template parity (T-010), traceability (T-011)."
   ],
-  "result": "PASS"
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "planned_tasks": 11,
+    "split_required": false
+  },
+  "regression_matrix_planned": {
+    "positive": ["all_gates_pass"],
+    "negative": ["missing_test_evidence", "stale_test_evidence", "failing_tests", "unresolved_qa_blockers", "missing_qa_evidence", "placeholder_uat", "unresolved_uat_fail"],
+    "no_bypass": ["no_silent_skip"],
+    "override": ["override_with_decision_evidence"]
+  }
 }

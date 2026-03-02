@@ -1,0 +1,48 @@
+{
+  "sprint": "S0019",
+  "stories": ["US-0046"],
+  "total_tasks": 10,
+  "coverage": {
+    "US-0046": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-004", "status": "covered" },
+      "AC-5": { "task": "T-005", "status": "covered" },
+      "AC-6": { "task": "T-006", "status": "covered" },
+      "AC-7": { "task": "T-007", "status": "covered" },
+      "AC-8": { "task": "T-008", "status": "covered" },
+      "AC-9": { "task": "T-009", "status": "covered" },
+      "AC-10": { "task": "T-010", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "Explicit `/sprint-plan --bulk` trigger semantics with default-safe fallback",
+      "Deterministic bulk selection and grouping/splitting policy",
+      "Bounded controls and explicit stop-reason behavior",
+      "Sizing-safe per-sprint planning and complete artifact generation",
+      "Traceability/state update consistency and active/template parity"
+    ],
+    "out_of_scope": [
+      "Bulk execution orchestration behavior (`US-0047`)",
+      "Runtime product feature changes",
+      "Bypassing sprint sizing safety constraints"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 10,
+    "split_required": false,
+    "split_reason": "Single-story scope remains atomic at 10 tasks."
+  },
+  "gaps": [],
+  "risks": [
+    "Ambiguous operator intent if trigger contract is unclear",
+    "Overplanning risk without strict bounded controls",
+    "Deterministic grouping/splitting drift across active/template docs",
+    "Traceability duplication when generating multiple sprint entries"
+  ],
+  "result": "PASS"
+}

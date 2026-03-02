@@ -22,6 +22,11 @@ Rules:
 - Use only artifact files and handoffs as context, not prior chat history.
 - After writing the requested artifact updates, stop.
 
+Isolation evidence (US-0048 / DEC-0029):
+- When running `/pause` or `/resume`, append isolation evidence entries to
+  `docs/engineering/state.md` (`phase_id=pause|resume`, `role=curator`,
+  `fresh_context_marker`, `timestamp`, `evidence_ref`).
+
 Research knowledge base maintenance:
 - During `/refresh-context`, review `docs/engineering/research.md` for freshness.
 - Mark entries as "outdated" if sources are stale or context has changed.

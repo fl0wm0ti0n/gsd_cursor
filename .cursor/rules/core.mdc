@@ -65,6 +65,7 @@ globs: ["**/*"]
   - `defaultTarget` must reference an existing enabled target id.
   - No committed secrets in config; sensitive values must be env-var references.
   - If valid, agents may use configured remote/docker servers for builds/tests.
+- Release gate no-bypass (US-0039 / DEC-0019): Default workflow does not allow bypassing mandatory release gates (check-in test, QA completion, UAT completion). Override only via explicit decision gate with rationale and evidence; no silent or implicit bypass.
 - Release queue and per-sprint notes contract (DEC-0020):
   - `/verify-work` declares sprint readiness in state context (`ready` intent).
   - `/release` owns target-sprint-only queue transitions and sprint-scoped note

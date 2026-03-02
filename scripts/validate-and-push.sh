@@ -5,7 +5,8 @@
 # Part of the its-magic quality chain:
 #   Cursor AI loop  →  validate-and-push  →  CI auto-fix (GitHub)
 #
-# Reads TEST_COMMAND (and optionally LINT_FIX_COMMAND / FORMAT_COMMAND)
+# Reads TEST_COMMAND (and optionally LINT_COMMAND / TYPECHECK_COMMAND /
+# LINT_FIX_COMMAND / FORMAT_COMMAND)
 # from docs/engineering/runbook.md, runs them in a loop, and pushes
 # only when everything passes.
 # -------------------------------------------------------------------
@@ -15,7 +16,6 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MAX_ATTEMPTS="${1:-5}"
 BRANCH="${2:-}"
 AUTO_COMMIT="${3:-true}"
-TIMEOUT_SEC=120
 
 pass_color="\033[1;32m"
 fail_color="\033[1;31m"
@@ -27,16 +27,6 @@ log_info()  { printf "${info_color}[info]${reset}  %s\n" "$*"; }
 log_pass()  { printf "${pass_color}[pass]${reset}  %s\n" "$*"; }
 log_fail()  { printf "${fail_color}[fail]${reset}  %s\n" "$*"; }
 log_warn()  { printf "${warn_color}[warn]${reset}  %s\n" "$*"; }
-
-run_with_timeout() {
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$TIMEOUT_SEC" "$@"
-  elif command -v gtimeout >/dev/null 2>&1; then
-    gtimeout "$TIMEOUT_SEC" "$@"
-  else
-    "$@"
-  fi
-}
 
 # --- Read commands from runbook ------------------------------------------
 
@@ -57,15 +47,10 @@ LINT_CMD=$(read_runbook_key "LINT_COMMAND")
 TYPECHECK_CMD=$(read_runbook_key "TYPECHECK_COMMAND")
 LINT_FIX_CMD=$(read_runbook_key "LINT_FIX_COMMAND")
 FORMAT_CMD=$(read_runbook_key "FORMAT_COMMAND")
-TIMEOUT_FROM_RUNBOOK=$(read_runbook_key "TEST_TIMEOUT_SECONDS")
-if [ -n "$TIMEOUT_FROM_RUNBOOK" ]; then
-  TIMEOUT_SEC="$TIMEOUT_FROM_RUNBOOK"
-fi
 
 if [ -z "$TEST_CMD" ]; then
-  log_fail "TEST_COMMAND is required by sync policy and cannot be blank."
-  log_warn "Reason code: TEST_COMMAND_MISSING"
-  log_warn "Set TEST_COMMAND in docs/engineering/runbook.md and re-run."
+  log_fail "TEST_COMMAND is required by sync policy."
+  log_warn "Set TEST_COMMAND in docs/engineering/runbook.md, then re-run."
   exit 1
 fi
 
@@ -77,19 +62,10 @@ log_info "validate-and-push loop"
 log_info "Branch: $BRANCH  |  Max attempts: $MAX_ATTEMPTS"
 [ -n "$TEST_CMD" ]     && log_info "TEST_COMMAND:     $TEST_CMD"
 [ -n "$LINT_CMD" ]     && log_info "LINT_COMMAND:     $LINT_CMD"
-[ -n "$TYPECHECK_CMD" ] && log_info "TYPECHECK_COMMAND: $TYPECHECK_CMD"
+[ -n "$TYPECHECK_CMD" ]&& log_info "TYPECHECK_COMMAND: $TYPECHECK_CMD"
 [ -n "$LINT_FIX_CMD" ] && log_info "LINT_FIX_COMMAND: $LINT_FIX_CMD"
 [ -n "$FORMAT_CMD" ]   && log_info "FORMAT_COMMAND:   $FORMAT_CMD"
-log_info "TEST_TIMEOUT_SECONDS: $TIMEOUT_SEC"
 printf "\n"
-
-run_cmd() {
-  cmd="$1"
-  if run_with_timeout sh -c "$cmd"; then
-    return 0
-  fi
-  return 1
-}
 
 attempt=0
 while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
@@ -115,42 +91,37 @@ while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
     eval "$LINT_FIX_CMD" || true
   fi
 
-  # 2. Mandatory test baseline
-  log_info "Running mandatory TEST_COMMAND..."
-  if run_cmd "$TEST_CMD"; then
-    log_pass "TEST_COMMAND passed"
-  else
-    log_fail "TEST_COMMAND failed or timed out"
-    log_warn "Reason code: TEST_FAILED or TEST_TIMEOUT"
-    all_ok=false
-  fi
-
-  # 3. Optional lint check
+  # 3. Run lint check
   if [ -n "$LINT_CMD" ]; then
-    log_info "Running optional LINT_COMMAND..."
-    if run_cmd "$LINT_CMD"; then
+    log_info "Running lint check..."
+    if eval "$LINT_CMD"; then
       log_pass "Lint OK"
     else
       log_fail "Lint failed"
-      log_warn "Reason code: OPTIONAL_CHECK_FAILED"
       all_ok=false
     fi
-  else
-    log_info "LINT_COMMAND not configured -> skipped"
   fi
 
-  # 4. Optional typecheck check
+  # 4. Run tests (mandatory baseline)
+  if [ -n "$TEST_CMD" ]; then
+    log_info "Running tests..."
+    if eval "$TEST_CMD"; then
+      log_pass "Tests OK"
+    else
+      log_fail "Tests failed"
+      all_ok=false
+    fi
+  fi
+
+  # 5. Run typecheck (optional)
   if [ -n "$TYPECHECK_CMD" ]; then
-    log_info "Running optional TYPECHECK_COMMAND..."
-    if run_cmd "$TYPECHECK_CMD"; then
+    log_info "Running typecheck..."
+    if eval "$TYPECHECK_CMD"; then
       log_pass "Typecheck OK"
     else
       log_fail "Typecheck failed"
-      log_warn "Reason code: OPTIONAL_CHECK_FAILED"
       all_ok=false
     fi
-  else
-    log_info "TYPECHECK_COMMAND not configured -> skipped"
   fi
 
   if [ "$all_ok" = "true" ]; then

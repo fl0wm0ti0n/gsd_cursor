@@ -1,0 +1,68 @@
+{
+  "sprint": "S0020",
+  "stories": ["US-0047"],
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md"
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md, docs/engineering/state.md"
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md, .cursor/commands/execute.md"
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md, .cursor/scratchpad.md"
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "result": "PASS",
+      "evidence": ".cursor/scratchpad.md, .cursor/commands/auto.md"
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md, .cursor/rules/core.mdc"
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "result": "PASS",
+      "evidence": "handoffs/resume_brief.md, docs/engineering/state.md"
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "result": "PASS",
+      "evidence": ".cursor/commands/execute.md, .cursor/commands/auto.md"
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "result": "PASS",
+      "evidence": "tests/run-tests.ps1, tests/run-tests.sh"
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "result": "PASS",
+      "evidence": "active/template parity across touched files"
+    }
+  ],
+  "passed": 10,
+  "failed": 0
+}

@@ -32,17 +32,41 @@ MAGIC_BENCH_SESSION=
 # - PERMISSION_MODE: interactive|auto
 # - AUTO_INSTALL_DEPS: 0|1
 # - AUTO_RELEASE_NOTES: 0|1
+# - AUTO_BACKLOG_DRAIN: 0|1 (continue across multiple stories when enabled)
+# - AUTO_BACKLOG_MAX_STORIES: integer >= 1 (max stories per auto run when drain enabled)
+# - AUTO_BACKLOG_ON_BLOCK: stop|skip (behavior when a story blocks)
+# - AUTO_STORY_SELECTION: priority_then_backlog_order
+# - AUTO_EXECUTE_BULK: 0|1 (explicit bulk execute orchestration mode)
+# - AUTO_EXECUTE_MAX_ITEMS: integer >= 1 (max planned items per bulk execute run)
+# - AUTO_EXECUTE_ON_BLOCK: stop|skip (behavior when a planned item blocks)
+# - AUTO_EXECUTE_SELECTION: planned_then_priority
+# - AUTO_TEAM_SCOPE_ENFORCE: 0|1 (when TEAM_MODE=1, enforce TEAM_MEMBER + ACTIVE_TASK_IDS)
 AUTO_FLOW_MODE=manual
 PHASE_MODE=interactive
 PERMISSION_MODE=interactive
 AUTO_INSTALL_DEPS=0
 AUTO_RELEASE_NOTES=0
+AUTO_BACKLOG_DRAIN=0
+AUTO_BACKLOG_MAX_STORIES=1
+AUTO_BACKLOG_ON_BLOCK=stop
+AUTO_STORY_SELECTION=priority_then_backlog_order
+AUTO_EXECUTE_BULK=0
+AUTO_EXECUTE_MAX_ITEMS=1
+AUTO_EXECUTE_ON_BLOCK=stop
+AUTO_EXECUTE_SELECTION=planned_then_priority
+AUTO_TEAM_SCOPE_ENFORCE=1
 #
 # Sprint planning
 # - SPRINT_MAX_TASKS: integer >= 1 (max atomic tasks per sprint, default 12)
 # - SPRINT_AUTO_SPLIT: 0|1 (propose splitting when over threshold)
+# - SPRINT_BULK_MAX_STORIES: integer >= 1 (candidate stories when /sprint-plan --bulk)
+# - SPRINT_BULK_MAX_SPRINTS: integer >= 1 (generated sprints per /sprint-plan --bulk run)
+# - SPRINT_BULK_SELECTION: priority_then_backlog_order
 SPRINT_MAX_TASKS=12
 SPRINT_AUTO_SPLIT=1
+SPRINT_BULK_MAX_STORIES=5
+SPRINT_BULK_MAX_SPRINTS=3
+SPRINT_BULK_SELECTION=priority_then_backlog_order
 #
 # Remote execution
 # - REMOTE_EXECUTION: 0|1
@@ -64,7 +88,9 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #
 # Knowledge curation
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
+# - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
 EARLY_RESEARCH=1
+INTAKE_GUIDED_MODE=1
 
 #
 # Security review
@@ -74,4 +100,30 @@ EARLY_RESEARCH=1
 #   When SECURITY_REVIEW=0, the workflow adds zero security-review overhead.
 SECURITY_REVIEW=0
 COMPLIANCE_PROFILES=GDPR
+
+# Cross-repo compatibility observability
+# - CROSS_REPO_OBSERVABILITY: 0|1 (enable compatibility visibility and checks)
+# - COMPATIBILITY_GATE_ON_CRITICAL: 0|1 (when enabled, critical unresolved
+#   compatibility findings trigger decision gate before release)
+# - COMPATIBILITY_SOURCES: semicolon-separated sources
+#   (repo=<path|url>,module=<id>,contract=<path|url>,docs=<path|url>)
+CROSS_REPO_OBSERVABILITY=0
+COMPATIBILITY_GATE_ON_CRITICAL=1
+COMPATIBILITY_SOURCES=
+
+# Component-scoped execution mode
+# - COMPONENT_SCOPE_MODE: 0|1 (enable scoped planning/execution guardrails)
+# - TARGET_COMPONENTS: comma-separated component IDs intended in scope
+COMPONENT_SCOPE_MODE=0
+TARGET_COMPONENTS=
+
+# Optional spec-pack documentation (US-0031)
+# - SPEC_PACK_MODE: 0|1 (enable Design Concept, CRS, Technical Spec generation/validation; default 0)
+#   When 0, intake/architecture/release add no required spec-pack steps.
+SPEC_PACK_MODE=0
+
+# Optional user-guide documentation (US-0032)
+# - USER_GUIDE_MODE: 0|1 (enable per-feature user guides at docs/user-guides/US-xxxx.md; default 0)
+#   When 0, intake/architecture/sprint-plan/execute/qa/release add no required user-guide steps or blocking checks.
+USER_GUIDE_MODE=0
 

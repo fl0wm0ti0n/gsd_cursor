@@ -1,3 +1,583 @@
+# TL -> Dev Handoff — Sprint S0028 (US-0049 Legacy DONE-Story Acceptance/Traceability Backfill Guard)
+
+## Planning summary
+
+- **Sprint**: S0028 (new)
+- **Story**: US-0049 — Legacy DONE-Story Acceptance/Traceability Backfill Guard
+- **Task count**: 8 (within SPRINT_MAX_TASKS=12)
+- **AC coverage**: AC-1..AC-8 explicit in `sprints/S0028/plan-verify.json`; run `/plan-verify` to confirm.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0049 AC-1..AC-8)
+- Architecture: `docs/engineering/architecture.md` (US-0049 section)
+- Decision: `decisions/DEC-0031.md`
+- Research: `docs/engineering/research.md` (R-0023)
+- PO→TL handoff: `handoffs/po_to_tl.md` (US-0049 discovery addendum)
+- Sprint artifacts: `sprints/S0028/*`
+
+## Focus
+
+1. **Detection rule (T-001)**: Legacy drift = backlog DONE and (acceptance unchecked OR traceability/state lacks entry OR release artifacts lack representation).
+2. **Target-scoped repair (T-002)**: Mutate only stories matching the rule; no broad rewrite.
+3. **Audit report (T-003)**: Canonical path `docs/engineering/legacy-drift-audit.md`; required fields: story ID, prior acceptance/traceability state, resolved state, reason code, evidence ref.
+4. **Reason codes (T-004)**: `BACKLOG_DONE_ACCEPTANCE_UNCHECKED`, `BACKLOG_DONE_TRACEABILITY_MISSING`, `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING` with remediation.
+5. **One-time backfill (T-005)**: Explicit trigger; idempotent when no drift; emit audit report.
+6. **Ongoing guard (T-006)**: At release/reconciliation or dedicated check; block or repair with audit append; documented, deterministic.
+7. **Template parity (T-007)**: Active and `template/` command/rule/docs for backfill and guard aligned.
+8. **Regression (T-008)**: No-drift run, single-drift repair, guard block/repair with reason code.
+
+## Execution order
+
+Execute tasks `T-001`..`T-008` in sequence (see `sprints/S0028/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 8 tasks in `sprints/S0028/tasks.md` are marked done.
+- No uncovered US-0049 acceptance criteria; `sprints/S0028/plan-verify.json` satisfied (run `/plan-verify` to confirm).
+- `sprints/S0028/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0049 advanced from PLANNED with evidence references.
+
+## Execution guardrails
+
+- Process/workflow/docs only; no runtime product feature changes.
+- Maintain active/template parity for backfill guard, audit report location, reason codes.
+- Regression: no-drift, single-drift repair, guard block/repair with reason code.
+
+## Next phase
+
+Run **`/plan-verify`** for S0028; then proceed to execute and `/qa` when ready.
+
+---
+
+# TL -> Sprint-Plan Handoff — US-0049 (Legacy DONE-Story Acceptance/Traceability Backfill Guard) [COMPLETED]
+
+## Architecture summary
+
+- **Story**: US-0049 — Legacy DONE-Story Acceptance/Traceability Backfill Guard (OPEN)
+- **Scope**: Detection rule (backlog DONE and acceptance unchecked or traceability/release missing), target-scoped repair only, canonical audit report, reason-code vocabulary, one-time backfill mode, ongoing guard at release/reconciliation.
+- **Out of scope**: Changing US-0045 canonical status ownership or US-0043 broad reconciliation semantics.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0049 AC-1..AC-8)
+- Architecture: `docs/engineering/architecture.md` (US-0049 section)
+- Decision: `decisions/DEC-0031.md`
+- Research: `docs/engineering/research.md` (R-0023)
+- PO→TL handoff: `handoffs/po_to_tl.md` (US-0049 discovery addendum)
+
+## Focus for `/sprint-plan`
+
+1. **Detection rule**: Document and implement detection for legacy drift (backlog DONE and acceptance unchecked or traceability missing or release artifact missing).
+2. **Audit report**: Canonical path `docs/engineering/legacy-drift-audit.md`; required fields per entry (story ID, prior acceptance/traceability state, resolved state, reason code, evidence ref).
+3. **Reason codes**: `BACKLOG_DONE_ACCEPTANCE_UNCHECKED`, `BACKLOG_DONE_TRACEABILITY_MISSING`, `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING` with remediation guidance.
+4. **One-time backfill**: Explicit trigger; target-scoped repair; idempotent when no drift; append audit report.
+5. **Ongoing guard**: At release or reconciliation (or dedicated check); block with reason code or repair with audit append; deterministic, documented.
+6. **Template parity**: Active and `template/` command/rule/docs for backfill and guard aligned.
+7. **Regression**: No-drift run (no changes), single-drift repair (audit entry), guard block/repair with reason code.
+
+## Next phase
+
+Sprint **S0028** created. Run **`/plan-verify`** for S0028; then `/execute` handoff.
+
+---
+
+# TL -> Dev Handoff — Sprint S0027 (US-0032 Optional Feature User Guide Generation)
+
+## Planning summary
+
+- **Sprint**: S0027 (new)
+- **Story**: US-0032 — Optional Feature User Guide Generation
+- **Task count**: 8 (within SPRINT_MAX_TASKS=12)
+- **AC coverage**: AC-1..AC-8 explicit in `sprints/S0027/plan-verify.json`; no gaps
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0032 AC-1..AC-8)
+- Architecture: `docs/engineering/architecture.md` (US-0032 section)
+- Decision: `decisions/DEC-0030.md`
+- Sprint artifacts: `sprints/S0027/*`
+
+## Focus
+
+1. **USER_GUIDE_MODE** flag (default 0); when disabled, zero required steps or blocking checks in any phase.
+2. Canonical location: `docs/user-guides/US-xxxx.md` per feature story when enabled.
+3. Minimum guide schema: Purpose, Prerequisites, Usage steps, Example, Limitations, Troubleshooting (structural validation only).
+4. Validation reports completeness; release blocks with `USER_GUIDE_INCOMPLETE` only when enabled and required sections missing.
+5. Traceability: story ID → user guide artifact; referenced in handoff/release context.
+6. Boundaries with US-0031: user guides end-user only; no duplicate spec-pack content; document separation.
+7. Template parity: active and `template/` docs/commands/rules aligned for user-guide mode.
+
+## Execution order
+
+Execute tasks `T-001`..`T-008` in sequence (see `sprints/S0027/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 8 tasks in `sprints/S0027/tasks.md` are marked done.
+- No uncovered US-0032 acceptance criteria; `sprints/S0027/plan-verify.json` remains satisfied.
+- `sprints/S0027/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0032 advanced from PLANNED with evidence references.
+
+## Execution guardrails
+
+- Process/workflow/docs only; no runtime product feature changes.
+- Maintain active/template parity for intake, architecture, sprint-plan, execute, qa, release, runbook, README.
+- Regression: positive/negative and USER_GUIDE_MODE=0 zero-overhead coverage in test runners.
+
+## Next phase
+
+After execute: run `/plan-verify` for S0027 if not already run; then `/qa` and `/verify-work` when ready.
+
+---
+
+# TL -> Dev Handoff — Sprint S0011 (US-0039 Release Gate Tightening)
+
+## Planning summary
+
+- **Sprint**: S0011 (reused; plan valid per 2026-03-02 refresh)
+- **Story**: US-0039 — Release Gate Tightening for Check-In Tests and QA/UAT Completion
+- **Task count**: 11 (within SPRINT_MAX_TASKS=12)
+- **AC coverage**: AC-1..AC-10 explicit in `sprints/S0011/plan-verify.json`; no gaps
+
+## Rationale for reusing S0011
+
+- Existing S0011 plan already covers US-0039 AC-1..AC-10 with 11 atomic tasks.
+- Scope and architecture unchanged; backlog/acceptance criteria match.
+- Sizing and gate-order semantics remain correct; no stale/incompatible content.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0039 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0039 section)
+- Decision: `decisions/DEC-0019.md` (gate order, no-bypass, override evidence)
+- Sprint artifacts: `sprints/S0011/*`
+
+## Focus
+
+1. **Gate order**: check-in test → QA → UAT → release finalization (mandatory, deterministic).
+2. **Check-in test gate**: verify latest test result passing; block on missing/stale/failing with reason codes.
+3. **QA gate**: require no unresolved blocking findings before release.
+4. **UAT gate**: block on placeholder, incomplete, or unresolved-fail UAT state.
+5. **Evidence**: per-gate pass/fail and evidence pointers in handoff/state for audit.
+6. **No bypass**: default path has no bypass; override only via decision gate + rationale.
+7. **Template parity**: align `template/` release, qa, execute, runbook for gate semantics.
+8. **Regression**: positive/negative/stale-evidence cases per gate; optional lint/typecheck keys do not false-fail.
+
+## Execution order
+
+Execute tasks `T-001`..`T-011` in sequence (see `sprints/S0011/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 11 tasks in `sprints/S0011/tasks.md` are marked done.
+- No uncovered US-0039 acceptance criteria; `sprints/S0011/plan-verify.json` remains satisfied.
+- `sprints/S0011/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0039 advanced from PLANNED with evidence references.
+
+## Execution guardrails (release gate tightening)
+
+- Process/workflow/docs/tests only; no runtime product feature changes.
+- Maintain active/template parity for release, qa, execute, runbook, README.
+- Regression: positive/negative/stale-evidence and no-bypass coverage in test runners.
+
+## Next phase
+
+After execute/QA/verify-work: run `/plan-verify` for S0011 if not already run; then `/release` when gates pass.
+
+---
+
+# TL -> Dev Handoff — Sprint S0026 (US-0031 Optional Documentation Pack)
+
+## Sprint Overview
+
+Sprint `S0026` is planned for `US-0031`.
+
+- Story count: 1 (`US-0031`)
+- Planned tasks: 8
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Architecture and Decision References
+
+- Story acceptance: `docs/product/backlog.md` (US-0031 AC-1..AC-8)
+- Sprint artifacts: `sprints/S0026/*`
+
+## Focus
+
+1. Add single enable flag/config for spec-pack mode; default disabled.
+2. When disabled: no extra required steps in intake/architecture/release.
+3. When enabled: create/update Design Concept, CRS, Technical Specification at canonical locations.
+4. Define minimum required sections/fields per artifact; validation blocks only when enabled and incomplete.
+5. Define traceability from backlog story IDs to spec-pack artifacts; document ownership (role/phase per document).
+6. Maintain active/template parity for spec-pack mode references.
+
+## Execution order
+
+Execute tasks `T-001`..`T-008` in sequence.
+
+## Done criteria for Dev completion
+
+- All 8 tasks in `sprints/S0026/tasks.md` are marked done.
+- No uncovered US-0031 acceptance criteria in `sprints/S0026/plan-verify.json`.
+- `sprints/S0026/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row advanced from `PLANNED` with evidence references.
+
+---
+
+# TL -> Dev Handoff — Sprint S0025 (US-0048 Per-Phase Subagent Isolation)
+
+## Sprint Overview
+
+Sprint `S0025` is planned for `US-0048`.
+
+- Story count: 1 (`US-0048`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+- Next phase: **`/plan-verify`** for `S0025`
+
+## Architecture and Decision References
+
+- Story acceptance: `docs/product/backlog.md` (US-0048 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0048 section)
+- Research: `docs/engineering/research.md` (`R-0018`, `R-0019`)
+- Decision: `decisions/DEC-0029.md`
+- Sprint artifacts: `sprints/S0025/*`
+
+## Focus
+
+1. Enforce `/auto` orchestrator-only behavior; fail when phase work runs without fresh subagent.
+2. Define and write isolation evidence schema and canonical locations; document in runbook/commands.
+3. Add isolation-compliance gates to `/verify-work` and `/release`; enforce gate order.
+4. Implement reason-code taxonomy and remediation; ensure pause/resume provenance.
+5. Add regression coverage and active/template parity for isolation enforcement.
+
+## Execution order
+
+Execute tasks `T-001`..`T-010` in sequence.
+
+## Critical constraints
+
+- Isolation evidence schema: phase_id, role, fresh_context_marker, timestamp, evidence_ref.
+- Fail-closed on missing/invalid evidence; no silent continuation.
+- Gate order at release: check-in test → QA → UAT → isolation compliance → release finalization.
+- Evidence must survive pause/resume; resume requires fresh context and new evidence.
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0025/tasks.md` are marked done.
+- No uncovered US-0048 acceptance criteria in `sprints/S0025/plan-verify.json`.
+- `sprints/S0025/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row advanced from `PLANNED` with evidence references.
+
+---
+
+# TL -> Dev Handoff — Sprint S0024 (US-0035 Component-Scoped Mode)
+
+## Sprint Overview
+
+Sprint `S0024` is planned for `US-0035`.
+
+- Story count: 1 (`US-0035`)
+- Planned tasks: 8
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Add component scope controls with default-off behavior.
+2. Add explicit scope declaration and scoped task metadata contracts.
+3. Add execute/qa/release guardrails for unapproved out-of-scope impact.
+4. Maintain active/template parity and regression coverage.
+
+## Dev completion note
+
+- Sprint `S0024` implementation is complete.
+- All tasks `T-001..T-008` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0023 (US-0034 Cross-Repo Observability)
+
+## Sprint Overview
+
+Sprint `S0023` is planned for `US-0034`.
+
+- Story count: 1 (`US-0034`)
+- Planned tasks: 8
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Add optional compatibility observability mode controls (default off).
+2. Add source declaration contract and canonical compatibility artifacts.
+3. Add critical compatibility gate behavior for release.
+4. Preserve active/template parity and regression coverage.
+
+## Dev completion note
+
+- Sprint `S0023` implementation is complete.
+- All tasks `T-001..T-008` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0022 (US-0033 Guided Intake Mode)
+
+## Sprint Overview
+
+Sprint `S0022` is planned for `US-0033`.
+
+- Story count: 1 (`US-0033`)
+- Planned tasks: 9
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Add one explicit intake behavior switch (`INTAKE_GUIDED_MODE`).
+2. Define guided mode and low-touch mode behavior contracts.
+3. Keep duplicate-check baseline safety in both modes.
+4. Preserve active/template parity and regression coverage.
+
+## Dev completion note
+
+- Sprint `S0022` implementation is complete.
+- All tasks `T-001..T-009` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0021 (US-0045 Canonical Status Guard)
+
+## Sprint Overview
+
+Sprint `S0021` is planned for `US-0045`.
+
+- Story count: 1 (`US-0045`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Make `docs/product/backlog.md` the canonical story-status source.
+2. Define deterministic reconciliation precedence and target-scoped mutation.
+3. Add one-time normalization baseline report with auditable row details.
+4. Add fail-safe contradiction reason code and active/template parity checks.
+
+## Dev completion note
+
+- Sprint `S0021` implementation is complete.
+- All tasks `T-001..T-010` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0020 (US-0047 Explicit Bulk Execute Orchestration)
+
+## Sprint Overview
+
+Sprint `S0020` is planned for `US-0047`.
+
+- Story count: 1 (`US-0047`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Define explicit bulk execute activation semantics for `/auto`.
+2. Define deterministic selection, bounded controls, and reason-code outcomes.
+3. Enforce team-scoped no-write guardrails (`TEAM_MEMBER` + `ACTIVE_TASK_IDS`).
+4. Maintain strict fresh-context isolation and active/template parity.
+
+## Dev completion note
+
+- Sprint `S0020` implementation is complete.
+- All tasks `T-001..T-010` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0019 (US-0046 Explicit Bulk Sprint Planning)
+
+## Sprint Overview
+
+Sprint `S0019` is planned for `US-0046`.
+
+- Story count: 1 (`US-0046`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Define explicit `/sprint-plan --bulk` trigger semantics with default-safe fallback.
+2. Define deterministic selection/grouping and bounded stop behavior.
+3. Preserve sizing safety and planning artifact completeness for each generated sprint.
+4. Maintain traceability consistency and active/template parity.
+
+## Dev completion note
+
+- Sprint `S0019` implementation is complete.
+- All tasks `T-001..T-010` are done with regression evidence in `tests/report.md`.
+- Sprint is ready for QA/verify/release gates with complete artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0018 (US-0016 Homebrew Sync)
+
+## Sprint Overview
+
+Sprint `S0018` is planned for `US-0016`.
+
+- Story count: 1 (`US-0016`)
+- Planned tasks: 3
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Align stable Homebrew formula tag/version with npm package version.
+2. Add regression checks in both test runners for alignment.
+3. Reconcile product acceptance state and release artifacts.
+
+---
+
+# TL -> Dev Handoff — Sprint S0017 (US-0044 Backlog-Drain Auto Mode)
+
+## Sprint Overview
+
+Sprint `S0017` is planned for `US-0044`.
+
+- Story count: 1 (`US-0044`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Focus
+
+1. Add optional multi-story backlog-drain behavior contract for `/auto`.
+2. Add fine-tune scratchpad switches with default-safe off behavior.
+3. Add deterministic reason codes and per-story breadcrumb contract.
+4. Maintain active/template parity and regression coverage.
+
+---
+
+# TL -> Dev Handoff — Sprint S0016 (US-0015 Runbook Completion)
+
+## Sprint Overview
+
+Sprint `S0016` is planned for `US-0015`.
+
+- Story count: 1 (`US-0015`)
+- Planned tasks: 4
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+
+## Execution order
+
+Execute tasks `T-001..T-004`.
+
+## Focus
+
+1. Document intentional empty optional runbook commands.
+2. Keep active/template parity for runbook + README.
+3. Add regression tests to protect the documentation contract.
+
+---
+
+# TL -> Dev Handoff — Sprint S0015 (US-0043 Backlog Reconciliation Gate)
+
+## Sprint Overview
+
+Sprint `S0015` is planned for `US-0043`: Backlog Reconciliation Gate for
+Released Sprints.
+
+- Story count: 1 (`US-0043`)
+- Planned tasks: 10
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+- Split decision: not required
+- Milestone activation: not applicable
+
+## Architecture and Decision References
+
+- Story acceptance: `docs/product/backlog.md` (US-0043 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0043 section)
+- Research: `docs/engineering/research.md` (`R-0007`)
+- Decision: `decisions/DEC-0021.md`
+- Sprint artifacts: `sprints/S0015/*`
+
+## Execution order
+
+Execute tasks `T-001..T-010` in sequence.
+
+## Priority focus
+
+1. Implement deterministic release-boundary backlog reconciliation for the
+   target sprint story only.
+2. Add fail-safe contradiction handling with `BACKLOG_STATUS_DRIFT`.
+3. Add regression coverage for stale mismatch and positive auto-reconcile.
+4. Maintain active/template parity for command/rule/doc behavior.
+
+## Critical constraints
+
+- No mutation of unrelated backlog stories.
+- No pre-release `DONE` transitions.
+- Keep behavior deterministic and evidence-driven from canonical artifacts.
+- Preserve manual-mode safe defaults and existing decision-gate boundaries.
+
+---
+
+# TL -> Dev Handoff — Sprint S0014 (US-0042 Release Findings Workflow)
+
+## Sprint Overview
+
+Sprint `S0014` is planned for `US-0042` and is implementation-complete.
+
+## Scope delivered
+
+1. Added canonical post-QA release findings artifact contract:
+   `sprints/Sxxxx/release-findings.md`.
+2. Added canonical blocked-release handoff:
+   `handoffs/release_to_dev.md`.
+3. Updated release command and release reason-code contract for blocked post-QA
+   scenarios.
+4. Updated runbook/README boundary guidance for QA findings vs release findings.
+5. Added active/template parity updates and regression checks in both test
+   runners.
+6. Captured real blocked-release evidence for `S0013`.
+
+---
+
+# TL -> Dev Handoff — Sprint S0013 (US-0041 Lifecycle QA Expansion)
+
+## Sprint Overview
+
+Sprint S0013 is planned for US-0041: End-to-End Lifecycle QA for `its-magic`
+Install/Upgrade/Clean.
+
+- Story count: 1 (`US-0041`)
+- Planned tasks: 11
+- Sizing: within limit (`SPRINT_MAX_TASKS=12`)
+- Split decision: not required (single-story sprint)
+- Milestone activation: not applicable
+
+## Execution Order
+
+Execute tasks `T-001` through `T-011` in sequence.
+
+## Priority focus for this sprint
+
+1. Add clean-repo safety lifecycle checks in PowerShell + shell tests.
+2. Add CLI lifecycle tests (`its-magic` path) for `missing`, `overwrite --backup`,
+   `upgrade`, and `--clean-repo`.
+3. Add invalid-mode negative-path checks with deterministic non-zero behavior.
+4. Extend npm local package tests and CI lifecycle subset checks.
+5. Update README/runbook lifecycle QA matrix and maintain template parity.
+
+## Critical constraints
+
+- Use temp directories only for lifecycle tests.
+- Ensure cleanup runs even after failed assertions.
+- Verify non-framework markers survive clean-repo checks.
+- Keep active/template docs aligned for new lifecycle QA references.
+
+---
+
 # TL -> Dev Handoff — Sprint S0012 (US-0040 Release Notes Queue)
 
 ## Sprint Overview

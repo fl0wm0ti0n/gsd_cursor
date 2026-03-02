@@ -138,6 +138,26 @@ its-magic --clean-repo --target .
 | `--help`, `-h` | Show banner, version, repo URL, and full usage reference. |
 | `--version`, `-v` | Print the installed its-magic version and exit. |
 
+### Lifecycle QA matrix (US-0041)
+
+`its-magic` lifecycle behavior is validated in both installer and CLI paths.
+Primary coverage:
+
+| Scenario | Local coverage | CI coverage | Expected evidence |
+|---|---|---|---|
+| Fresh install (`missing`) | `tests/run-tests.ps1`, `tests/run-tests.sh` | npm/brew/choco jobs | Required files + `.its-magic-version` |
+| Overwrite + backup | `tests/run-tests.ps1`, `tests/run-tests.sh` | lifecycle subset in CI jobs | Backup snapshot contains overwritten framework file |
+| Upgrade lifecycle | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local package tests | lifecycle subset in CI jobs | Framework file restored, user-data preserved |
+| Clean-repo safety | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local package tests | lifecycle subset in CI jobs | Framework artifacts removed, non-framework marker preserved |
+| Negative-path invalid mode/args | `tests/run-tests.ps1`, `tests/run-tests.sh` | lifecycle subset in CI jobs | Non-zero fail-fast behavior |
+
+Run locally:
+
+```bash
+sh tests/run-tests.sh
+powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1
+```
+
 ## How-to
 
 ### Command usage pattern
@@ -198,6 +218,96 @@ Setup:
 - `/pause`, `/resume`, `/refresh-context`.
 - `/auto`: orchestration mode that spawns a fresh subagent per phase.
 
+### Guided intake behavior (US-0033)
+
+`/intake` supports two PO interaction modes via `.cursor/scratchpad.md`:
+
+- `INTAKE_GUIDED_MODE=1` (default)
+  - asks targeted follow-up only when needed for concrete acceptance
+  - presents options/alternatives before recommendation
+  - preserves user decision authority
+  - runs intake-time research and persists R-xxxx evidence
+- `INTAKE_GUIDED_MODE=0` (low-touch)
+  - skips proactive follow-up/options/research overhead unless user requests it
+  - still performs duplicate/overlap check against backlog
+
+### Optional cross-repo observability (US-0034)
+
+Use optional compatibility visibility with default-safe off behavior:
+
+- `CROSS_REPO_OBSERVABILITY=0|1` (default `0`)
+- `COMPATIBILITY_GATE_ON_CRITICAL=0|1` (default `1`)
+- `COMPATIBILITY_SOURCES=` monitored `repo/module/contract/docs` declarations
+
+When disabled (`0`), workflow adds zero required compatibility overhead.
+
+When enabled (`1`), compatibility signals/findings are tracked in:
+
+- `docs/engineering/compatibility-signals.md`
+- `docs/engineering/compatibility-report.md`
+- `docs/engineering/manifests/registry.manifest.yaml`
+- `docs/engineering/manifests/repo.manifest.yaml`
+
+If unresolved critical findings remain and
+`COMPATIBILITY_GATE_ON_CRITICAL=1`, release progression must stop for a
+decision gate (`COMPATIBILITY_CRITICAL_OPEN`).
+
+### Optional component-scoped execution (US-0035)
+
+Enable scoped workflow behavior with:
+
+- `COMPONENT_SCOPE_MODE=0|1` (default `0`)
+- `TARGET_COMPONENTS=<comma-separated-component-ids>`
+
+When disabled (`0`), workflow adds zero required scope overhead.
+
+When enabled (`1`):
+
+- Scope declaration is tracked in `docs/engineering/component-scope.md`.
+- Sprint tasks should declare target components and expected impacted interfaces.
+- QA records unaffected-component protection checks in
+  `docs/engineering/component-scope-report.md`.
+- Unapproved out-of-scope impact must block release via decision gate
+  (`COMPONENT_SCOPE_VIOLATION_UNAPPROVED`).
+
+### Optional spec-pack documentation (US-0031)
+
+Optional Design Concept, CRS, and Technical Specification artifacts are
+controlled by:
+
+- `SPEC_PACK_MODE=0|1` (default `0`)
+
+When disabled (`0`), intake/architecture/execute/qa/release add no required
+spec-pack steps (zero overhead).
+
+When enabled (`1`):
+
+- Canonical paths per story: `docs/engineering/spec-pack/<story_id>-design-concept.md`,
+  `docs/engineering/spec-pack/<story_id>-crs.md`,
+  `docs/engineering/spec-pack/<story_id>-technical-specification.md`.
+- Minimum required sections and ownership are in `docs/engineering/runbook.md`.
+- Release gate validates completeness and blocks with `SPEC_PACK_INCOMPLETE` when
+  required sections are missing.
+
+### Optional user-guide documentation (US-0032)
+
+Optional per-feature user guides (end-user how-to docs) are controlled by:
+
+- `USER_GUIDE_MODE=0|1` (default `0`)
+
+When disabled (`0`), intake/architecture/sprint-plan/execute/qa/release add no
+required user-guide steps or blocking checks (zero overhead).
+
+When enabled (`1`):
+
+- Canonical path per feature story: `docs/user-guides/US-xxxx.md`.
+- Minimum required sections: Purpose, Prerequisites, Usage steps, Example,
+  Limitations, Troubleshooting (see `docs/engineering/runbook.md` and
+  `docs/user-guides/README.md`).
+- Release gate validates guide completeness and blocks with `USER_GUIDE_INCOMPLETE`
+  when enabled and required sections are missing.
+- User guides are end-user only; they do not duplicate spec-pack (US-0031) content.
+
 ### Release notes model (US-0040)
 
 Release history is sprint-scoped and queue-backed:
@@ -213,6 +323,45 @@ Deterministic release semantics:
 - Unresolved sprint identity or queue/notes mismatch fails closed with reason
   codes and remediation guidance; no destructive reconciliation by default.
 
+### Post-QA release issue workflow (US-0042)
+
+Release gate chain (US-0039): `/release` enforces mandatory gates in order — check-in test, QA completion, UAT completion — then finalization. Blank optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) do not block release; they are reported as skipped.
+
+If a problem appears **after QA** (during `/release`), record it separately from
+QA findings:
+
+- Release findings artifact: `sprints/Sxxxx/release-findings.md`
+- Release-to-dev handoff: `handoffs/release_to_dev.md`
+
+Boundary:
+- QA-phase issues -> `sprints/Sxxxx/qa-findings.md`
+- Post-QA release-gate issues -> `sprints/Sxxxx/release-findings.md`
+
+Each blocked release finding should include reason code, evidence refs,
+remediation, and rerun criteria.
+
+### Backlog reconciliation invariant (US-0043)
+
+Release completion must not leave stale backlog status for target sprint stories.
+At release finalization:
+
+- reconcile target story status to `DONE` using canonical release evidence;
+- reconcile target story acceptance checkboxes to checked state;
+- mutate only target sprint stories (never unrelated backlog entries);
+- fail safe with `BACKLOG_STATUS_DRIFT` if contradiction remains (e.g. released
+  sprint but backlog still `OPEN`/unchecked).
+
+### Canonical story status + normalization guard (US-0045)
+
+- `docs/product/backlog.md` is canonical for story `OPEN|DONE` status.
+- `docs/product/acceptance.md` and `docs/engineering/state.md` are derived views
+  reconciled from canonical backlog status plus release evidence.
+- One-time normalization baseline is recorded in
+  `docs/engineering/status-normalization-report.md`.
+- Contradictory resolution at release/reconciliation boundaries fails safe with:
+  - `BACKLOG_STATUS_DRIFT`
+  - `CANONICAL_STATUS_CONFLICT`
+
 ### Agent isolation model
 
 - Every phase command runs in a fresh agent/subagent context.
@@ -221,6 +370,17 @@ Deterministic release semantics:
 - Never rely on "ignore prior chat"; use a new context boundary instead.
 - `/auto` is orchestration only: it calls phase subagents and transfers context
   through artifacts.
+
+#### Per-phase isolation evidence (US-0048 / DEC-0029)
+
+Isolation is enforced with auditable evidence written to `docs/engineering/state.md`.
+Each phase run appends:
+
+- `phase_id`, `role`, `fresh_context_marker`, `timestamp`, `evidence_ref`
+
+Missing/invalid/stale evidence fails closed with reason codes:
+`PHASE_CONTEXT_ISOLATION_MISSING`, `PHASE_CONTEXT_ISOLATION_VIOLATION`,
+`ISOLATION_EVIDENCE_STALE`, `ISOLATION_EVIDENCE_INVALID`.
 
 ### Lightweight interaction
 
@@ -658,6 +818,62 @@ Compatibility and safety:
 - Existing stop conditions remain enforced (decision gate, missing input,
   pause request, loop max).
 
+### Optional `/auto` backlog-drain mode (US-0044)
+
+If you want `/auto` to continue across multiple planned stories in one run,
+enable backlog-drain switches in `.cursor/scratchpad.md`:
+
+- `AUTO_BACKLOG_DRAIN=1`
+- `AUTO_BACKLOG_MAX_STORIES=<n>`
+- `AUTO_BACKLOG_ON_BLOCK=stop|skip`
+- `AUTO_STORY_SELECTION=priority_then_backlog_order`
+
+Default-safe behavior remains unchanged with `AUTO_BACKLOG_DRAIN=0`.
+
+### Explicit `/sprint-plan --bulk` mode (US-0046)
+
+By default, `/sprint-plan` plans one scope at a time. For multi-story planning,
+run explicit bulk mode:
+
+- `/sprint-plan --bulk`
+
+Bulk planning remains bounded and deterministic via `.cursor/scratchpad.md`:
+
+- `SPRINT_BULK_MAX_STORIES=<n>`
+- `SPRINT_BULK_MAX_SPRINTS=<n>`
+- `SPRINT_BULK_SELECTION=priority_then_backlog_order`
+
+Bounded stop reason codes:
+`SPRINT_BULK_MAX_STORIES_REACHED`, `SPRINT_BULK_MAX_SPRINTS_REACHED`,
+`SPRINT_BULK_NO_ELIGIBLE_STORIES`, `SPRINT_BULK_MISSING_ACCEPTANCE`.
+
+### Explicit `/auto --execute-bulk` mode (US-0047)
+
+Bulk execution is explicit-mode only. Default `/auto` behavior remains unchanged.
+
+Enable either way:
+
+- one-run explicit argument: `/auto --execute-bulk`
+- scratchpad switch: `AUTO_EXECUTE_BULK=1`
+
+Deterministic controls in `.cursor/scratchpad.md`:
+
+- `AUTO_EXECUTE_MAX_ITEMS=<n>`
+- `AUTO_EXECUTE_ON_BLOCK=stop|skip`
+- `AUTO_EXECUTE_SELECTION=planned_then_priority`
+- `AUTO_TEAM_SCOPE_ENFORCE=0|1`
+
+Deterministic reason codes:
+`EXEC_BULK_MAX_ITEMS_REACHED`, `EXEC_BULK_NO_ELIGIBLE_ITEMS`,
+`EXEC_BULK_ITEM_BLOCKED_STOP`, `EXEC_BULK_ITEM_BLOCKED_SKIPPED`,
+`EXEC_TEAM_SCOPE_BLOCKED`, `EXEC_TEAM_SCOPE_SKIPPED`.
+
+Team-mode safety:
+- In `TEAM_MODE=1`, bulk execute records `TEAM_MODE`, `TEAM_MEMBER`,
+  `ACTIVE_TASK_IDS` in state breadcrumbs.
+- With `AUTO_TEAM_SCOPE_ENFORCE=1`, out-of-scope tasks are blocked/skipped
+  deterministically and never mutated.
+
 ### Example 4: Existing project onboarding
 
 1. `/map-codebase`
@@ -703,6 +919,10 @@ Workflows read keys from `docs/engineering/runbook.md`:
 Unset keys are skipped. The template ships with empty values for `LINT_COMMAND`,
 `FORMAT_COMMAND`, and `TYPECHECK_COMMAND` -- this is intentional. its-magic is a
 template/installer project; fill in your project-specific commands after setup.
+
+US-0015 intent contract:
+- Empty optional runbook keys are valid defaults for this repository type.
+- They must not be treated as missing required configuration.
 
 ### Installer internals
 

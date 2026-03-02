@@ -1,0 +1,13 @@
+{
+  "sprint": "S0018",
+  "stories": ["US-0016"],
+  "coverage": {
+    "US-0016": {
+      "AC-1": "covered",
+      "AC-2": "covered",
+      "AC-3": "covered"
+    }
+  },
+  "gaps": [],
+  "result": "PASS"
+}

@@ -1,6 +1,91 @@
 {
   "sprint": "S0011",
-  "steps": [],
-  "passed": 0,
-  "failed": 0
+  "story_id": "US-0039",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "description": "Verify release starts with check-in test gate and blocks on missing evidence.",
+      "result": "pass",
+      "ac_refs": ["AC-1", "AC-2"],
+      "evidence_refs": [".cursor/commands/release.md", "sprints/S0011/qa-findings.md"]
+    },
+    {
+      "id": "UAT-2",
+      "description": "Verify release blocks on stale test evidence with deterministic reason code (RELEASE_TEST_STALE).",
+      "result": "pass",
+      "ac_refs": ["AC-2"],
+      "evidence_refs": [".cursor/commands/release.md", "docs/engineering/state.md"]
+    },
+    {
+      "id": "UAT-3",
+      "description": "Verify release blocks on failing test evidence with remediation guidance (RELEASE_TEST_FAILED).",
+      "result": "pass",
+      "ac_refs": ["AC-2"],
+      "evidence_refs": [".cursor/commands/release.md", "tests/run-tests.ps1"]
+    },
+    {
+      "id": "UAT-4",
+      "description": "Verify release blocks when QA findings include unresolved blockers (RELEASE_QA_BLOCKERS_OPEN).",
+      "result": "pass",
+      "ac_refs": ["AC-3"],
+      "evidence_refs": [".cursor/commands/release.md", "sprints/S0011/qa-findings.md"]
+    },
+    {
+      "id": "UAT-5",
+      "description": "Verify release blocks when UAT artifacts are placeholder or incomplete (RELEASE_UAT_INCOMPLETE).",
+      "result": "pass",
+      "ac_refs": ["AC-4"],
+      "evidence_refs": [".cursor/commands/release.md", "sprints/S0011/uat.md"]
+    },
+    {
+      "id": "UAT-6",
+      "description": "Verify deterministic gate order is always check-in test → QA → UAT → finalize.",
+      "result": "pass",
+      "ac_refs": ["AC-5"],
+      "evidence_refs": [".cursor/commands/release.md", "docs/engineering/runbook.md"]
+    },
+    {
+      "id": "UAT-7",
+      "description": "Verify no non-decision bypass path exists for failing mandatory gates.",
+      "result": "pass",
+      "ac_refs": ["AC-7"],
+      "evidence_refs": [".cursor/commands/release.md", ".cursor/rules/core.mdc"]
+    },
+    {
+      "id": "UAT-8",
+      "description": "Verify override path requires explicit decision gate and rationale evidence (RELEASE_GATE_OVERRIDE_APPROVED).",
+      "result": "pass",
+      "ac_refs": ["AC-7"],
+      "evidence_refs": ["decisions/DEC-0019.md", ".cursor/commands/release.md"]
+    },
+    {
+      "id": "UAT-9",
+      "description": "Verify per-gate verdict log includes status, reason code, and evidence refs in state/handoff artifacts.",
+      "result": "pass",
+      "ac_refs": ["AC-6"],
+      "evidence_refs": ["docs/engineering/state.md", "docs/engineering/runbook.md"]
+    },
+    {
+      "id": "UAT-10",
+      "description": "Verify blank optional runbook keys (LINT/TYPECHECK) do not trigger false release failure.",
+      "result": "pass",
+      "ac_refs": ["AC-10"],
+      "evidence_refs": ["docs/engineering/runbook.md", "sprints/S0011/qa-findings.md"]
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "total": 10,
+  "verified_state": true,
+  "gate_failure_behavior": {
+    "placeholder": "RELEASE_UAT_INCOMPLETE",
+    "incomplete": "RELEASE_UAT_INCOMPLETE",
+    "unresolved_fail": "RELEASE_UAT_FAILED"
+  },
+  "regression_matrix": {
+    "positive": ["all_gates_pass"],
+    "negative": ["missing_test_evidence", "stale_test_evidence", "failing_tests", "unresolved_qa_blockers", "missing_qa_evidence", "placeholder_uat", "unresolved_uat_fail"],
+    "no_bypass": ["no_silent_skip"],
+    "override": ["override_with_decision_evidence"]
+  }
 }

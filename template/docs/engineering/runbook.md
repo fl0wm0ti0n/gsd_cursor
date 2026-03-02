@@ -24,6 +24,199 @@ TEST_TIMEOUT_SECONDS: 120
   GitHub Actions. When `false` (default), CI reports failures but does not
   attempt auto-fix commits.
 
+## Intentional empty commands (US-0015)
+
+For this template/installer repository, empty optional command keys are
+intentional defaults, not configuration errors:
+
+- `LINT_COMMAND`
+- `FORMAT_COMMAND`
+- `TYPECHECK_COMMAND`
+
+Teams may set these keys when needed for their own project stack.
+
+## Guided intake mode (US-0033)
+
+Intake interaction behavior is controlled by one switch in
+`.cursor/scratchpad.md`:
+
+- `INTAKE_GUIDED_MODE=1` (default): guided PO behavior
+  - targeted follow-up questions only when acceptance is ambiguous
+  - at least one viable option/alternative before recommendation
+  - explicit user decision authority
+  - intake-time research persisted in `docs/engineering/research.md`
+- `INTAKE_GUIDED_MODE=0`: low-touch intake
+  - no proactive follow-up/options/research overhead unless user asks
+  - duplicate/overlap backlog check remains mandatory baseline safety
+
+## Optional cross-repo observability mode (US-0034)
+
+Compatibility visibility is optional and default-off in `.cursor/scratchpad.md`:
+
+- `CROSS_REPO_OBSERVABILITY=0|1` (default `0`)
+- `COMPATIBILITY_GATE_ON_CRITICAL=0|1` (default `1`)
+- `COMPATIBILITY_SOURCES=` monitored source declarations
+
+Default-off behavior:
+- With `CROSS_REPO_OBSERVABILITY=0`, `/intake`, `/architecture`, `/execute`,
+  and `/qa` add zero required compatibility overhead.
+
+Enabled behavior (`CROSS_REPO_OBSERVABILITY=1`):
+- Use canonical artifacts:
+  - `docs/engineering/compatibility-report.md`
+  - `docs/engineering/compatibility-signals.md`
+  - `docs/engineering/manifests/registry.manifest.yaml`
+  - `docs/engineering/manifests/repo.manifest.yaml`
+- Record findings with severity, affected modules, evidence refs, and
+  recommended actions.
+- If unresolved critical findings exist and
+  `COMPATIBILITY_GATE_ON_CRITICAL=1`, trigger decision gate before release
+  progression (`COMPATIBILITY_CRITICAL_OPEN`).
+
+## Optional component-scoped execution mode (US-0035)
+
+Component-scoped execution is optional and default-off:
+
+- `COMPONENT_SCOPE_MODE=0|1` (default `0`)
+- `TARGET_COMPONENTS=` comma-separated scoped component IDs
+
+Default-off behavior:
+- With `COMPONENT_SCOPE_MODE=0`, workflow phases add zero required scope
+  overhead.
+
+Enabled behavior (`COMPONENT_SCOPE_MODE=1`):
+- Declare scope in `docs/engineering/component-scope.md`:
+  - `target_components[]`
+  - `non_target_components[]`
+  - `allowed_interface_touch[]`
+- `/sprint-plan` tasks declare `target_component_ids` and
+  `expected_impacted_interfaces`.
+- `/execute` enforces scope-first behavior.
+- `/qa` verifies unaffected-component checks and records evidence in
+  `docs/engineering/component-scope-report.md`.
+- If unapproved out-of-scope impact remains open, release must stop at decision
+  gate (`COMPONENT_SCOPE_VIOLATION_UNAPPROVED`).
+
+## Optional spec-pack documentation mode (US-0031)
+
+Spec-pack mode is optional and default-off in `.cursor/scratchpad.md`:
+
+- `SPEC_PACK_MODE=0|1` (default `0`)
+
+Default-off behavior:
+- With `SPEC_PACK_MODE=0`, `/intake`, `/architecture`, `/execute`, `/qa`, and
+  `/release` add no required spec-pack steps (zero overhead).
+
+Enabled behavior (`SPEC_PACK_MODE=1`):
+
+**Canonical names and locations** (per story):
+- Design Concept: `docs/engineering/spec-pack/<story_id>-design-concept.md`
+- CRS (Customer/Product Requirements Summary): `docs/engineering/spec-pack/<story_id>-crs.md`
+- Technical Specification: `docs/engineering/spec-pack/<story_id>-technical-specification.md`
+
+**Traceability**: Backlog story ID (e.g. `US-0031`) maps 1:1 to the three
+artifacts above. Handoffs and state should reference these paths when
+spec-pack mode is enabled.
+
+**Minimum required sections** (completeness is testable; validation blocks
+only when enabled and a required section is missing or empty):
+
+- Design Concept: `# Summary`, `# Goals`, `# Non-goals`, `# Key decisions`
+- CRS: `# Purpose`, `# Scope`, `# Acceptance criteria ref`
+- Technical Specification: `# Overview`, `# Components`, `# Interfaces`, `# Non-functional`
+
+**Validation**: When `SPEC_PACK_MODE=1`, release gate checks that for the
+target sprint story, all three artifacts exist and each required section
+above is present and non-empty. If not, release is blocked with reason code
+`SPEC_PACK_INCOMPLETE` and remediation guidance.
+
+**Ownership (role/phase)**:
+- Design Concept: Tech Lead, `/architecture` (create/update).
+- CRS: PO, `/intake` (create/update for new story); Tech Lead may extend in
+  architecture.
+- Technical Specification: Tech Lead, `/architecture` (create); Dev, `/execute`
+  (update when implementation details change).
+
+## Optional user-guide documentation mode (US-0032)
+
+User-guide mode is optional and default-off in `.cursor/scratchpad.md`:
+
+- `USER_GUIDE_MODE=0|1` (default `0`)
+
+Default-off behavior:
+- With `USER_GUIDE_MODE=0`, `/intake`, `/architecture`, `/sprint-plan`, `/execute`,
+  `/qa`, and `/release` add no required user-guide steps or blocking checks (zero overhead).
+
+Enabled behavior (`USER_GUIDE_MODE=1`):
+
+**Canonical location and naming** (per feature story):
+- One guide per feature story: `docs/user-guides/US-xxxx.md` (e.g. `docs/user-guides/US-0032.md`).
+- Story ID `US-xxxx` is the stable identifier; create/update the guide when the story is in scope.
+
+**Minimum required schema** (structural validation only; completeness is testable):
+- `# Purpose`
+- `# Prerequisites`
+- `# Usage steps`
+- `# Example`
+- `# Limitations`
+- `# Troubleshooting`
+
+**Traceability**: Story ID maps 1:1 to the user-guide artifact. Handoffs and release
+context should reference `docs/user-guides/US-xxxx.md` for the target story when
+user-guide mode is enabled.
+
+**Validation**: When `USER_GUIDE_MODE=1`, release gate checks that for the target
+sprint story, the guide file exists at the canonical path and each required section
+above is present and non-empty. If not, release is blocked with reason code
+`USER_GUIDE_INCOMPLETE` and remediation guidance (create or complete the guide).
+
+**Boundary with spec-pack (US-0031)**: User guides are end-user facing how-to
+documentation only. They do not duplicate Design Concept, CRS, or Technical
+Specification content; user guides may reference spec-pack artifacts but must not
+replicate their ownership or technical scope. See runbook/README separation guidance.
+
+## Legacy DONE-story drift detection and guard (US-0049)
+
+Stories that are DONE in backlog but lack aligned acceptance/traceability or
+release representation are in **legacy drift**. US-0049 adds detection, bounded
+repair, and an ongoing guard at release/reconciliation (DEC-0031).
+
+**Detection rule** — A story is in legacy drift when:
+- Backlog status is **DONE**, and
+- At least one of:
+  - Acceptance checklist item for that story is **unchecked**
+  - Traceability index or `docs/engineering/state.md` **lacks an entry** for that story
+  - Release artifacts (e.g. `handoffs/releases/Sxxxx-release-notes.md`, queue row)
+    **lack clear representation** for that story
+
+**Bounded repair**: Only stories matching the rule above may be mutated; no broad
+rewrite of unrelated backlog/acceptance/state/release artifacts.
+
+**Canonical audit artifact**: `docs/engineering/legacy-drift-audit.md`
+- Required fields per entry: story ID, prior acceptance state, prior traceability
+  state, resolved state(s), reason code, evidence reference.
+- Append-only; one-time backfill and ongoing guard append entries when drift is
+  detected and repaired (or when guard blocks and reports).
+
+**Reason-code vocabulary** (with remediation):
+- `BACKLOG_DONE_ACCEPTANCE_UNCHECKED` — Backlog DONE but acceptance item unchecked.
+  Remediation: set acceptance checkbox from canonical release/state evidence or run one-time backfill.
+- `BACKLOG_DONE_TRACEABILITY_MISSING` — Backlog DONE but traceability/state lacks entry.
+  Remediation: add traceability row in `docs/engineering/state.md` from backlog/release evidence or run backfill.
+- `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING` — Backlog DONE but release artifacts lack representation.
+  Remediation: ensure release notes or queue row exists for the story's sprint or run backfill.
+
+**One-time backfill mode**: Explicit trigger (e.g. dedicated check or `/memory-audit`-related path).
+- Run detection once over all DONE stories; for each legacy-drift story, perform
+  target-scoped repair and append an entry to `docs/engineering/legacy-drift-audit.md`.
+- Idempotent when no drift: no mutations; report empty or "no drift".
+- Only stories matching the detection rule are mutated.
+
+**Ongoing guard**: At release or reconciliation boundary (or dedicated check).
+- When legacy drift is detected, either **block** with explicit reason code and
+  remediation, or **repair** target-scoped and append audit entry (policy documented).
+- Behavior is deterministic; operators get explicit diagnostics.
+
 ## Memory drift auditing
 
 Run `/memory-audit` at key workflow checkpoints to verify artifact consistency:
@@ -128,6 +321,128 @@ Stop-condition preservation:
 - continuation does not bypass decision gates, missing-input blockers,
   pause requests, or loop max cycle limits.
 
+## Per-phase subagent isolation evidence (US-0048 / DEC-0029)
+
+Per-phase fresh-context isolation is enforced with auditable, fail-closed
+evidence.
+
+### Canonical evidence store and locations
+
+- Canonical evidence store: `docs/engineering/state.md` (append-only checkpoints).
+- Cross-references are allowed in phase artifacts and handoffs:
+  - `handoffs/dev_to_qa.md`, `handoffs/qa_to_dev.md`
+  - `handoffs/resume_brief.md` (pause/resume provenance)
+  - `sprints/Sxxxx/summary.md`, `sprints/Sxxxx/qa-findings.md`, `sprints/Sxxxx/uat.*`,
+    `sprints/Sxxxx/release-findings.md`
+
+### Required schema (one entry per phase run)
+
+Each phase run must append an isolation evidence entry containing:
+
+- `phase_id`: canonical phase id (`intake|discovery|research|architecture|sprint-plan|plan-verify|execute|qa|verify-work|release|refresh-context|pause|resume`)
+- `role`: subagent role executing the phase (`po|curator|tech-lead|dev|qa|release|security`)
+- `fresh_context_marker`: a marker unique to the fresh subagent context for this phase run
+- `timestamp`: ISO UTC timestamp
+- `evidence_ref`: canonical path to the primary artifact written/validated for the phase run
+
+### Gate behavior (fail closed)
+
+- Missing evidence blocks progression with `PHASE_CONTEXT_ISOLATION_MISSING`.
+- Invalid schema/fields blocks progression with `ISOLATION_EVIDENCE_INVALID`.
+- Stale evidence (reused marker across runs or older than the resumed boundary)
+  blocks progression with `ISOLATION_EVIDENCE_STALE`.
+- Orchestrator executing phase work without spawning a fresh subagent context is
+  a hard violation: `PHASE_CONTEXT_ISOLATION_VIOLATION`.
+
+Remediation (all cases): re-run the affected phase in a fresh subagent context
+and write new isolation evidence before proceeding.
+
+### Reason codes and remediation (US-0048)
+
+- `PHASE_CONTEXT_ISOLATION_MISSING`: no isolation evidence entry found for a
+  required phase run. Fix: rerun the phase in a fresh subagent and append the
+  required evidence fields.
+- `ISOLATION_EVIDENCE_INVALID`: evidence entry present but missing required
+  fields or contains invalid `phase_id`/`role`. Fix: rerun the phase and write a
+  corrected entry.
+- `ISOLATION_EVIDENCE_STALE`: evidence is reused across runs/cycles or predates
+  the latest resume boundary. Fix: rerun the phase and write a new
+  `fresh_context_marker`.
+- `PHASE_CONTEXT_ISOLATION_VIOLATION`: phase work was performed without a fresh
+  subagent context (for example orchestrator performed phase writes). Fix: stop,
+  revert unsafe artifacts if needed, rerun the phase correctly, and ensure
+  orchestration-only behavior.
+
+## Optional backlog-drain auto mode (US-0044)
+
+`/auto` can optionally continue across multiple planned stories when explicitly
+enabled in scratchpad.
+
+Controls:
+- `AUTO_BACKLOG_DRAIN=0|1` (default `0`)
+- `AUTO_BACKLOG_MAX_STORIES=<n>` (default `1`)
+- `AUTO_BACKLOG_ON_BLOCK=stop|skip` (default `stop`)
+- `AUTO_STORY_SELECTION=priority_then_backlog_order` (default)
+
+Semantics:
+- With `AUTO_BACKLOG_DRAIN=0`, keep current single-segment continuation behavior.
+- With `AUTO_BACKLOG_DRAIN=1`, select next eligible OPEN story
+  deterministically and run full lifecycle story-by-story until bounded limit,
+  no eligible stories, or a mandatory stop condition.
+- Decision gates remain mandatory and pause progression until user decision.
+
+## Explicit bulk sprint planning mode (US-0046)
+
+`/sprint-plan` stays single-scope by default. Bulk planning is opt-in via
+explicit argument:
+
+- `/sprint-plan --bulk`
+
+Deterministic controls from `.cursor/scratchpad.md`:
+- `SPRINT_BULK_MAX_STORIES` (candidate OPEN stories per run)
+- `SPRINT_BULK_MAX_SPRINTS` (max generated sprints per run)
+- `SPRINT_BULK_SELECTION=priority_then_backlog_order`
+
+Deterministic behavior:
+- Select eligible OPEN stories by configured selection order.
+- Generate one or more bounded sprint plans while preserving per-sprint sizing
+  guardrails (`SPRINT_MAX_TASKS`, `SPRINT_AUTO_SPLIT`).
+- Stop with explicit reason codes when bounded or blocked:
+  - `SPRINT_BULK_MAX_STORIES_REACHED`
+  - `SPRINT_BULK_MAX_SPRINTS_REACHED`
+  - `SPRINT_BULK_NO_ELIGIBLE_STORIES`
+  - `SPRINT_BULK_MISSING_ACCEPTANCE`
+
+## Explicit bulk execute mode (US-0047)
+
+`/auto` remains non-bulk by default. Bulk execution is explicit and can be
+enabled per run (`/auto --execute-bulk`) or by scratchpad switch.
+
+Deterministic controls:
+- `AUTO_EXECUTE_BULK=0|1` (default `0`)
+- `AUTO_EXECUTE_MAX_ITEMS=<n>` (default `1`)
+- `AUTO_EXECUTE_ON_BLOCK=stop|skip` (default `stop`)
+- `AUTO_EXECUTE_SELECTION=planned_then_priority` (default)
+- `AUTO_TEAM_SCOPE_ENFORCE=0|1` (default `1`)
+
+Execution semantics:
+- Select eligible planned items deterministically.
+- Preserve strict isolation:
+  - fresh subagent per phase
+  - fresh subagent per execute<->QA loop cycle
+- Enforce bounded stop behavior:
+  - `EXEC_BULK_MAX_ITEMS_REACHED`
+  - `EXEC_BULK_NO_ELIGIBLE_ITEMS`
+  - `EXEC_BULK_ITEM_BLOCKED_STOP`
+  - `EXEC_BULK_ITEM_BLOCKED_SKIPPED`
+
+Team mode guardrails (`TEAM_MODE=1`):
+- Capture team context snapshot in breadcrumbs:
+  - `TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`
+- With enforcement enabled, out-of-scope tasks are never mutated and must emit:
+  - `EXEC_TEAM_SCOPE_BLOCKED` (stop policy)
+  - `EXEC_TEAM_SCOPE_SKIPPED` (skip policy)
+
 ## Sync policy and guarded auto-push contract (US-0038 / DEC-0018)
 
 Sync policy controls (from `.cursor/scratchpad.md`):
@@ -192,6 +507,22 @@ Required sync evidence fields:
 - `reason_code`
 - `evidence_refs`
 
+## Release gate chain (US-0039 / DEC-0019)
+
+Deterministic mandatory gate order; no step may be skipped or reordered:
+
+1. **Check-in test gate** — Latest `TEST_COMMAND` evidence must be present and passing.
+2. **QA completion gate** — No unresolved blocking findings in sprint QA context.
+3. **UAT completion gate** — UAT artifacts populated and verified; no placeholder or unresolved-fail state.
+4. **Isolation compliance gate** — Per-phase isolation evidence present and valid (US-0048 / DEC-0029).
+5. **Release finalization** — Notes, queue, backlog/runbook/state updates only after gates 1–4 pass.
+
+Default: no bypass. Override only via explicit decision gate with rationale and evidence (DEC-0019).
+
+**Optional-command compatibility (US-0039 / AC-10)**: Blank optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) must not cause release to fail. Mandatory gates are check-in test + QA + UAT + isolation only.
+
+**Per-gate audit verdict schema (US-0039)**: Record per gate (check-in_test | qa | uat | isolation | finalization): verdict (pass|fail|override), reason_code, remediation, evidence_refs in release-findings and queue gate_snapshot.
+
 ## Release queue and sprint notes contract (US-0040 / DEC-0020)
 
 Canonical release artifacts:
@@ -227,6 +558,80 @@ Mismatch and unresolved-sprint policy:
 - preserve existing notes artifacts by default (non-destructive)
 - do not auto-reconcile by deleting/rebuilding unrelated sprint history
 - include remediation steps in queue/state and rerun `/release` after correction
+
+## Post-QA release issue workflow (US-0042)
+
+When `/release` finds a blocker after QA has passed, document it in a dedicated
+release findings artifact (separate from QA findings):
+
+- Canonical artifact: `sprints/Sxxxx/release-findings.md`
+- Canonical handoff back to implementation: `handoffs/release_to_dev.md`
+
+Required release-findings content:
+- gate status (`PASS|BLOCKED`)
+- blocking and non-blocking findings
+- deterministic reason code(s)
+- evidence refs
+- remediation steps and rerun criteria
+
+Boundary rule:
+- QA-phase defects remain in `sprints/Sxxxx/qa-findings.md`.
+- Post-QA release-gate defects must be recorded in
+  `sprints/Sxxxx/release-findings.md`.
+
+## Backlog reconciliation invariant (US-0043)
+
+At release finalization boundary, target sprint stories must be synchronized in
+`docs/product/backlog.md` using canonical release evidence precedence.
+
+Contract:
+- Scope is target sprint stories only (no global backlog mutation).
+- If release evidence is PASS, set story status to `DONE` and reconcile
+  acceptance checkboxes to checked state.
+- If sprint is `released` but backlog story state remains contradictory
+  (`OPEN`/unchecked), fail safe with reason code `BACKLOG_STATUS_DRIFT`.
+- Record remediation guidance and evidence refs in release artifacts before rerun.
+
+## Canonical status ownership and normalization guard (US-0045)
+
+Canonical owner:
+- `docs/product/backlog.md` is the authority for story status (`OPEN|DONE`).
+- `docs/product/acceptance.md` and `docs/engineering/state.md` are derived views.
+
+Deterministic reconciliation rules:
+1. Read canonical story status from backlog.
+2. Validate target sprint release evidence for status transitions.
+3. Reconcile derived acceptance/state views from canonical backlog status.
+4. Keep mutation scope target-scoped only; never broad-rewrite unrelated stories.
+
+One-time normalization procedure:
+- Run an initial normalization pass for historically drifted stories.
+- Write all changed rows to `docs/engineering/status-normalization-report.md`
+  including prior values, resolved values, evidence references, and timestamp.
+- On future runs, append only delta entries; do not rewrite historical report rows.
+
+Fail-safe reason codes:
+- `BACKLOG_STATUS_DRIFT`: release evidence contradicts backlog/AC state.
+- `CANONICAL_STATUS_CONFLICT`: canonical backlog state conflicts with derived
+  status resolution at reconciliation boundary.
+
+## Lifecycle QA matrix (US-0041)
+
+Use this matrix to validate end-to-end installer/CLI lifecycle behavior:
+
+| Scenario | Primary command path | Coverage location | Required evidence |
+|---|---|---|---|
+| Fresh install (`missing`) | `its-magic --mode missing --create` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Required files exist + `.its-magic-version` exists |
+| Overwrite + backup | `its-magic --mode overwrite --backup` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Backup snapshot contains overwritten framework file |
+| Upgrade lifecycle | `its-magic --mode upgrade` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local tests | Framework file restored, user-data file preserved |
+| Clean-repo safety | `its-magic --clean-repo --yes` and direct installer clean path | `tests/run-tests.ps1`, `tests/run-tests.sh`, CI lifecycle subset | Framework artifacts removed, non-framework marker preserved |
+| Negative path | invalid mode/args | `tests/run-tests.ps1`, `tests/run-tests.sh` | Deterministic non-zero fail-fast behavior |
+| Platform parity subset | npm/brew/choco CI jobs | `.github/workflows/ci.yml` | Lifecycle subset passes on all three runners |
+
+Execution guidance:
+- Local baseline: run `sh tests/run-tests.sh` (or `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1`).
+- Packaging smoke: run npm local tests in `packaging/npm/`.
+- CI evidence: inspect `npm-test`, `brew-test`, and `choco-test` job logs.
 
 ## Project run steps
 

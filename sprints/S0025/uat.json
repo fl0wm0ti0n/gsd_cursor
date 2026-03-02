@@ -1,0 +1,68 @@
+{
+  "sprint_id": "S0025",
+  "story_id": "US-0048",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "result": "PASS",
+      "evidence": ".cursor/commands/auto.md + template/.cursor/commands/auto.md; tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "result": "PASS",
+      "evidence": "docs/engineering/runbook.md evidence schema + canonical locations; README.md; tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "result": "PASS",
+      "evidence": ".cursor/commands/execute.md + qa.md (active+template) loop fresh marker requirements; tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "result": "PASS",
+      "evidence": "runbook reason codes + remediation for missing/invalid/stale evidence; tests/report.md includes isolation reason codes"
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "result": "PASS",
+      "evidence": ".cursor/commands/verify-work.md isolation compliance gate; .cursor/commands/release.md isolation gate after UAT; tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "result": "PASS",
+      "evidence": "runbook documents canonical evidence store/locations; state checkpoints include isolation evidence block"
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "result": "PASS",
+      "evidence": "runbook + commands document PHASE_CONTEXT_ISOLATION_* and ISOLATION_EVIDENCE_* reason codes; tests/report.md checks required codes"
+    },
+    {
+      "id": "UAT-8",
+      "ac": "AC-8",
+      "result": "PASS",
+      "evidence": "tests/run-tests.ps1 and tests/run-tests.sh include US-0048 regression assertions; tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac": "AC-9",
+      "result": "PASS",
+      "evidence": ".cursor/commands/pause.md + resume.md provenance fields and validation (active+template); tests/report.md 2026-03-02T18:38:10Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac": "AC-10",
+      "result": "PASS",
+      "evidence": "active/template parity enforced via test runner assertions across commands/runbook/README/agents; tests/report.md 2026-03-02T18:38:10Z"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "sprint_id": "S0023",
+  "story_id": "US-0034",
+  "passed": 8,
+  "failed": 0,
+  "steps": [
+    { "id": "UAT-1", "ac": "AC-1", "result": "PASS", "evidence": ".cursor/scratchpad.md CROSS_REPO_OBSERVABILITY" },
+    { "id": "UAT-2", "ac": "AC-2", "result": "PASS", "evidence": "intake/architecture/execute/qa disabled-mode zero-overhead clauses" },
+    { "id": "UAT-3", "ac": "AC-3", "result": "PASS", "evidence": "COMPATIBILITY_SOURCES source-list schema documentation" },
+    { "id": "UAT-4", "ac": "AC-4", "result": "PASS", "evidence": "compatibility check taxonomy in runbook/commands" },
+    { "id": "UAT-5", "ac": "AC-5", "result": "PASS", "evidence": "compatibility-report and compatibility-signals artifacts" },
+    { "id": "UAT-6", "ac": "AC-6", "result": "PASS", "evidence": "release gate reason code COMPATIBILITY_CRITICAL_OPEN" },
+    { "id": "UAT-7", "ac": "AC-7", "result": "PASS", "evidence": "signals/findings include story-sprint traceable context" },
+    { "id": "UAT-8", "ac": "AC-8", "result": "PASS", "evidence": "active/template parity and regression assertions in tests" }
+  ]
+}

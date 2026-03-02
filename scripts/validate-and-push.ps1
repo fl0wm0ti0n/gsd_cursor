@@ -4,7 +4,8 @@
 # Part of the its-magic quality chain:
 #   Cursor AI loop  →  validate-and-push  →  CI auto-fix (GitHub)
 #
-# Reads TEST_COMMAND (and optionally LINT_FIX_COMMAND / FORMAT_COMMAND)
+# Reads TEST_COMMAND (and optionally LINT_COMMAND / TYPECHECK_COMMAND /
+# LINT_FIX_COMMAND / FORMAT_COMMAND)
 # from docs/engineering/runbook.md, runs them in a loop, and pushes
 # only when everything passes.
 # -------------------------------------------------------------------
@@ -37,19 +38,15 @@ function Read-RunbookKey {
   return $val
 }
 
-$TestCmd      = Read-RunbookKey "TEST_COMMAND"
-$LintCmd      = Read-RunbookKey "LINT_COMMAND"
+$TestCmd    = Read-RunbookKey "TEST_COMMAND"
+$LintCmd    = Read-RunbookKey "LINT_COMMAND"
 $TypecheckCmd = Read-RunbookKey "TYPECHECK_COMMAND"
-$LintFixCmd   = Read-RunbookKey "LINT_FIX_COMMAND"
-$FormatCmd    = Read-RunbookKey "FORMAT_COMMAND"
-$TimeoutRaw   = Read-RunbookKey "TEST_TIMEOUT_SECONDS"
-$TimeoutSec   = 120
-if ($TimeoutRaw -match '^\d+$') { $TimeoutSec = [int]$TimeoutRaw }
+$LintFixCmd = Read-RunbookKey "LINT_FIX_COMMAND"
+$FormatCmd  = Read-RunbookKey "FORMAT_COMMAND"
 
 if (-not $TestCmd) {
-  Log-Fail "TEST_COMMAND is required by sync policy and cannot be blank."
-  Log-Warn "Reason code: TEST_COMMAND_MISSING"
-  Log-Warn "Set TEST_COMMAND in docs/engineering/runbook.md and re-run."
+  Log-Fail "TEST_COMMAND is required by sync policy."
+  Log-Warn "Set TEST_COMMAND in docs/engineering/runbook.md, then re-run."
   exit 1
 }
 
@@ -65,29 +62,17 @@ if ($LintCmd)    { Log-Info "LINT_COMMAND:     $LintCmd" }
 if ($TypecheckCmd) { Log-Info "TYPECHECK_COMMAND: $TypecheckCmd" }
 if ($LintFixCmd) { Log-Info "LINT_FIX_COMMAND: $LintFixCmd" }
 if ($FormatCmd)  { Log-Info "FORMAT_COMMAND:   $FormatCmd" }
-Log-Info "TEST_TIMEOUT_SECONDS: $TimeoutSec"
 Write-Host ""
 
 function Run-Cmd {
-  param(
-    [string]$Cmd,
-    [int]$TimeoutSeconds
-  )
+  param([string]$Cmd)
   $prev = $ErrorActionPreference
   $ErrorActionPreference = "Continue"
   try {
-    $proc = Start-Process -FilePath "powershell" `
-      -ArgumentList @("-NoProfile", "-NonInteractive", "-Command", $Cmd) `
-      -WorkingDirectory $root `
-      -PassThru `
-      -WindowStyle Hidden
-    if ($proc.WaitForExit($TimeoutSeconds * 1000)) {
-      return @{ Success = ($proc.ExitCode -eq 0); TimedOut = $false }
-    }
-    try { $proc.Kill() } catch {}
-    return @{ Success = $false; TimedOut = $true }
+    Invoke-Expression $Cmd
+    return $LASTEXITCODE -eq 0
   } catch {
-    return @{ Success = $false; TimedOut = $false }
+    return $false
   } finally {
     $ErrorActionPreference = $prev
   }
@@ -100,11 +85,10 @@ for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
   Push-Location $root
   $allOk = $true
 
-  # 1. Optional auto-fix helpers
+  # 1. Run formatter if available
   if ($FormatCmd) {
     Log-Info "Running formatter..."
-    $formatResult = Run-Cmd -Cmd $FormatCmd -TimeoutSeconds $TimeoutSec
-    if ($formatResult.Success) {
+    if (Run-Cmd $FormatCmd) {
       Log-Pass "Format OK"
     } else {
       Log-Warn "Formatter reported issues (non-blocking)"
@@ -114,53 +98,40 @@ for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
   # 2. Try lint fix if available
   if ($LintFixCmd) {
     Log-Info "Running lint auto-fix..."
-    Run-Cmd -Cmd $LintFixCmd -TimeoutSeconds $TimeoutSec | Out-Null
+    Run-Cmd $LintFixCmd | Out-Null
   }
 
-  # 2. Mandatory test baseline
-  Log-Info "Running mandatory TEST_COMMAND..."
-  $testResult = Run-Cmd -Cmd $TestCmd -TimeoutSeconds $TimeoutSec
-  if ($testResult.Success) {
-    Log-Pass "TEST_COMMAND passed"
-  } else {
-    if ($testResult.TimedOut) {
-      Log-Fail "TEST_COMMAND timed out"
-      Log-Warn "Reason code: TEST_TIMEOUT"
-    } else {
-      Log-Fail "TEST_COMMAND failed"
-      Log-Warn "Reason code: TEST_FAILED"
-    }
-    $allOk = $false
-  }
-
-  # 3. Optional lint check
+  # 3. Run lint check
   if ($LintCmd) {
-    Log-Info "Running optional LINT_COMMAND..."
-    $lintResult = Run-Cmd -Cmd $LintCmd -TimeoutSeconds $TimeoutSec
-    if ($lintResult.Success) {
+    Log-Info "Running lint check..."
+    if (Run-Cmd $LintCmd) {
       Log-Pass "Lint OK"
     } else {
       Log-Fail "Lint failed"
-      Log-Warn "Reason code: OPTIONAL_CHECK_FAILED"
       $allOk = $false
     }
-  } else {
-    Log-Info "LINT_COMMAND not configured -> skipped"
   }
 
-  # 4. Optional typecheck check
+  # 4. Run tests (mandatory baseline)
+  if ($TestCmd) {
+    Log-Info "Running tests..."
+    if (Run-Cmd $TestCmd) {
+      Log-Pass "Tests OK"
+    } else {
+      Log-Fail "Tests failed"
+      $allOk = $false
+    }
+  }
+
+  # 5. Run typecheck (optional)
   if ($TypecheckCmd) {
-    Log-Info "Running optional TYPECHECK_COMMAND..."
-    $typecheckResult = Run-Cmd -Cmd $TypecheckCmd -TimeoutSeconds $TimeoutSec
-    if ($typecheckResult.Success) {
+    Log-Info "Running typecheck..."
+    if (Run-Cmd $TypecheckCmd) {
       Log-Pass "Typecheck OK"
     } else {
       Log-Fail "Typecheck failed"
-      Log-Warn "Reason code: OPTIONAL_CHECK_FAILED"
       $allOk = $false
     }
-  } else {
-    Log-Info "TYPECHECK_COMMAND not configured -> skipped"
   }
 
   Pop-Location

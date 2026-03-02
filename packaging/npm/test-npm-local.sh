@@ -96,6 +96,30 @@ do
     fi
 done
 
+# --- Smoke test: upgrade mode in temp directory ---
+echo "npm-cli-upgrade-marker" > "$TEST_DIR/.cursor/commands/intake.md"
+its-magic --target "$TEST_DIR" --mode upgrade 2>/dev/null || true
+if ! grep -q "npm-cli-upgrade-marker" "$TEST_DIR/.cursor/commands/intake.md"; then
+    pass "Upgrade restores framework file in temp repo"
+else
+    fail "Upgrade did not restore framework file in temp repo"
+fi
+
+# --- Smoke test: clean-repo safety in temp directory ---
+mkdir -p "$TEST_DIR/src"
+echo "npm-cli-marker" > "$TEST_DIR/src/keep.txt"
+its-magic --clean-repo --target "$TEST_DIR" --yes 2>/dev/null || true
+if [ ! -d "$TEST_DIR/.cursor" ]; then
+    pass "Clean-repo removed framework artifacts"
+else
+    fail "Clean-repo did not remove framework artifacts"
+fi
+if [ -f "$TEST_DIR/src/keep.txt" ]; then
+    pass "Clean-repo preserved non-framework marker file"
+else
+    fail "Clean-repo removed non-framework marker file"
+fi
+
 # Cleanup temp dir
 rm -rf "$TEST_DIR"
 

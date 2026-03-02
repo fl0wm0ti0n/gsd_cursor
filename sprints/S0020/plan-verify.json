@@ -1,0 +1,48 @@
+{
+  "sprint": "S0020",
+  "stories": ["US-0047"],
+  "total_tasks": 10,
+  "coverage": {
+    "US-0047": {
+      "AC-1": { "task": "T-001", "status": "covered" },
+      "AC-2": { "task": "T-002", "status": "covered" },
+      "AC-3": { "task": "T-003", "status": "covered" },
+      "AC-4": { "task": "T-004", "status": "covered" },
+      "AC-5": { "task": "T-005", "status": "covered" },
+      "AC-6": { "task": "T-006", "status": "covered" },
+      "AC-7": { "task": "T-007", "status": "covered" },
+      "AC-8": { "task": "T-008", "status": "covered" },
+      "AC-9": { "task": "T-009", "status": "covered" },
+      "AC-10": { "task": "T-010", "status": "covered" }
+    }
+  },
+  "scope_boundaries": {
+    "in_scope": [
+      "Explicit bulk execute activation and default-safe fallback",
+      "Deterministic item selection, breadcrumbs, and reason-code output",
+      "Fresh subagent isolation per phase and execute/qa cycle",
+      "Bounded controls and team-scoped no-write guardrails",
+      "Active/template parity and regression checks"
+    ],
+    "out_of_scope": [
+      "Runtime product feature logic changes",
+      "Bypassing release or decision-gate contracts",
+      "Canonical story-status source implementation (US-0045)"
+    ]
+  },
+  "sizing_check": {
+    "sprint_max_tasks": 12,
+    "sprint_auto_split": 1,
+    "planned_tasks": 10,
+    "split_required": false,
+    "split_reason": "Single-story scope remains atomic at 10 tasks."
+  },
+  "gaps": [],
+  "risks": [
+    "Ambiguous activation semantics can cause unintended behavior",
+    "Out-of-scope team task execution can cause collisions",
+    "Long bulk runs require bounded stop behavior and auditability",
+    "Template parity drift can break installer consistency"
+  ],
+  "result": "PASS"
+}

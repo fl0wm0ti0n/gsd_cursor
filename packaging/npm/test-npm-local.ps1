@@ -106,15 +106,42 @@ $requiredFiles = @(
     ".cursor\scratchpad.md",
     "docs\engineering\runbook.md"
 )
-$allFound = $true
 foreach ($f in $requiredFiles) {
     $fp = Join-Path $testDir $f
     if (Test-Path $fp) {
         Pass "File installed: $f"
     } else {
         Fail "File missing: $f"
-        $allFound = $false
     }
+}
+
+# --- Smoke test: upgrade mode in temp directory ---
+$frameworkFile = Join-Path $testDir ".cursor\commands\intake.md"
+Set-Content -Path $frameworkFile -Value "npm-cli-upgrade-marker"
+& its-magic --target $testDir --mode upgrade 2>&1 | Out-Null
+$upgradeRestored = -not ((Get-Content -Path $frameworkFile -Raw) -match "npm-cli-upgrade-marker")
+if ($upgradeRestored) {
+    Pass "Upgrade restores framework file in temp repo"
+} else {
+    Fail "Upgrade did not restore framework file in temp repo"
+}
+
+# --- Smoke test: clean-repo safety in temp directory ---
+$markerDir = Join-Path $testDir "src"
+New-Item -ItemType Directory -Path $markerDir -Force | Out-Null
+$markerFile = Join-Path $markerDir "keep.txt"
+Set-Content -Path $markerFile -Value "npm-cli-marker"
+& its-magic --clean-repo --target $testDir --yes 2>&1 | Out-Null
+
+if (-not (Test-Path (Join-Path $testDir ".cursor") -PathType Container)) {
+    Pass "Clean-repo removed framework artifacts"
+} else {
+    Fail "Clean-repo did not remove framework artifacts"
+}
+if (Test-Path $markerFile -PathType Leaf) {
+    Pass "Clean-repo preserved non-framework marker file"
+} else {
+    Fail "Clean-repo removed non-framework marker file"
 }
 
 # Cleanup temp dir

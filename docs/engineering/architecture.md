@@ -6,6 +6,518 @@ US-0018 adds a fourth installer mode (`--mode upgrade`) that safely updates its-
 
 The existing installer architecture (Node.js CLI wrapper → OS-specific installer script → file copy loop) remains unchanged. Upgrade mode is an additional branch in the existing mode switch, using the same file listing and copy infrastructure.
 
+---
+
+# US-0043: Backlog Reconciliation Gate for Released Sprints
+
+## Overview
+
+US-0043 introduces a deterministic reconciliation gate so backlog story status
+and acceptance checkboxes cannot remain stale after sprint release finalization.
+The architecture uses existing canonical release evidence and adds a scoped
+reconciliation step plus fail-safe drift detection.
+
+## Canonical evidence precedence
+
+For a target sprint, reconciliation uses this precedence:
+
+1. `handoffs/release_queue.md` target row status (`released` required)
+2. `handoffs/releases/Sxxxx-release-notes.md` gate summary
+3. Sprint QA/UAT artifacts (`sprints/Sxxxx/qa-findings.md`, `uat.json`, `uat.md`)
+4. Sprint release findings (`sprints/Sxxxx/release-findings.md`) when present
+5. Mandatory baseline test evidence (`tests/report.md`) if referenced by release
+   gate output
+
+If evidence is contradictory or missing, fail safe and do not silently mutate
+backlog status.
+
+## Reconciliation model
+
+- Trigger point: `/release` finalization boundary (or deterministic equivalent
+  post-release step).
+- Scope: target sprint stories only (no global backlog sweep).
+- Action when evidence is PASS:
+  - set linked story status to `DONE`
+  - reconcile linked story AC checkboxes to checked state
+- Action when evidence contradicts `released` state:
+  - fail-safe reason code `BACKLOG_STATUS_DRIFT`
+  - include remediation guidance and evidence references
+
+## Safety constraints
+
+- No mutation of unrelated backlog stories.
+- No pre-release auto-transition to `DONE`.
+- Reconciliation is deterministic and idempotent for the same target sprint.
+- Active/template command+docs parity is mandatory.
+
+## QA and regression implications
+
+Required coverage:
+- Negative: `released` sprint with stale backlog story status/ACs triggers
+  `BACKLOG_STATUS_DRIFT`.
+- Positive: valid released evidence auto-reconciles target story to consistent
+  `DONE` + checked AC state.
+- Scope guard: unrelated backlog entries remain unchanged.
+
+## Decision linkage
+
+- Research basis: `R-0007`
+- Decision: `DEC-0021`
+
+---
+
+# US-0044: Continuous `/auto` Backlog-Drain Mode
+
+## Overview
+
+US-0044 adds an optional orchestration mode where `/auto` continues across
+multiple planned stories in one run. This extends workflow-level automation
+without changing default-safe behavior.
+
+## Control surface
+
+- `AUTO_BACKLOG_DRAIN=0|1`
+- `AUTO_BACKLOG_MAX_STORIES>=1`
+- `AUTO_BACKLOG_ON_BLOCK=stop|skip`
+- `AUTO_STORY_SELECTION=priority_then_backlog_order`
+
+## Deterministic semantics
+
+- Mode off (`0`): preserve current single-segment continuation behavior.
+- Mode on (`1`): select next eligible OPEN story by deterministic policy, then
+  run full lifecycle story-by-story until bounded stop criteria.
+- Decision gates remain mandatory and pause flow for user decision.
+- Blocked story handling follows policy:
+  - `stop`: emit `BACKLOG_STORY_BLOCKED_STOP` and stop.
+  - `skip`: emit `BACKLOG_STORY_BLOCKED_SKIPPED`, record, continue.
+
+## Bounded run policy
+
+- Stop on max stories limit with reason `BACKLOG_MAX_STORIES_REACHED`.
+- Stop when no eligible stories remain with `BACKLOG_NO_ELIGIBLE_STORIES`.
+- Keep existing global stop conditions and QA/verify/release gates intact.
+
+## Decision linkage
+
+- Research basis: `R-0008`
+- Decision: `DEC-0022`
+
+---
+
+# US-0045: Canonical Story Status Source + Global Drift Guard
+
+## Overview
+
+US-0045 establishes canonical ownership for story status and introduces a
+deterministic drift-prevention contract across product and engineering artifacts.
+The goal is to prevent recurring OPEN/DONE mismatches while preserving
+target-scoped, non-destructive workflow behavior.
+
+## Canonical ownership model
+
+- Canonical status owner: `docs/product/backlog.md` (`OPEN|DONE` only).
+- Derived status views:
+  - `docs/product/acceptance.md` (story completion checklist)
+  - `docs/engineering/state.md` (traceability/checkpoint evidence)
+
+Derived artifacts must never overrule canonical backlog story status.
+
+## Reconciliation and precedence model
+
+At release/reconciliation boundaries, apply deterministic precedence:
+
+1. Canonical story status from `docs/product/backlog.md`
+2. Target sprint release evidence (`release_queue`, sprint release notes,
+   QA/UAT/release findings)
+3. Derived artifact updates (`acceptance.md`, `state.md`)
+
+Mutation scope:
+- Target stories only for the current boundary.
+- No broad rewrite of unrelated stories/sprints.
+
+## One-time normalization baseline
+
+Historical drift is repaired by a one-time normalization pass that:
+- identifies previously completed stories with stale `OPEN`/unchecked status,
+- updates canonical and derived artifacts to consistent state,
+- records a durable audit report at
+  `docs/engineering/status-normalization-report.md`.
+
+Report rows are append-only and include:
+- story id
+- prior values
+- resolved values
+- evidence refs
+- timestamp
+
+## Fail-safe behavior
+
+Contradictory outcomes at reconciliation boundary fail closed with deterministic
+reason codes:
+- `BACKLOG_STATUS_DRIFT`
+- `CANONICAL_STATUS_CONFLICT`
+
+Failures must include actionable remediation guidance and must not trigger
+destructive auto-rewrites.
+
+## Decision linkage
+
+- Research basis: `R-0009`, `R-0014`
+- Decision: `DEC-0025`
+
+---
+
+# US-0049: Legacy DONE-Story Acceptance/Traceability Backfill Guard
+
+## Overview
+
+US-0049 adds deterministic detection and bounded repair for legacy stories where
+`docs/product/backlog.md` shows DONE but acceptance checkmarks or
+traceability/release artifacts disagree. It provides a one-time backfill mode
+and an ongoing guard at reconciliation/release boundaries, with an auditable
+report and explicit reason-code vocabulary. Per R-0023; aligns with US-0045
+(canonical source) and US-0043 (release-boundary reconciliation) without
+duplicating their scope.
+
+## Detection rule
+
+A story is in **legacy drift** when:
+
+- Backlog status is **DONE**, and
+- At least one of:
+  - Acceptance checklist item for that story is **unchecked**
+  - Traceability index or `docs/engineering/state.md` **lacks an entry** for that story
+  - Release artifacts (e.g. `handoffs/releases/Sxxxx-release-notes.md`, queue row)
+    **lack clear representation** for that story
+
+Repair and guard apply only to stories matching this rule; no broad sweep of
+unrelated backlog/acceptance/state/release artifacts.
+
+## Canonical audit artifact
+
+- **Path**: `docs/engineering/legacy-drift-audit.md`
+- **Required fields per entry**: story ID, prior acceptance state, prior
+  traceability state, resolved state(s), reason code, evidence reference
+- **Semantics**: append-only audit log; one-time backfill and ongoing guard
+  append entries when drift is detected and repaired (or when guard blocks and
+  reports)
+
+## Reason-code vocabulary
+
+- `BACKLOG_DONE_ACCEPTANCE_UNCHECKED` — backlog DONE but acceptance item unchecked
+- `BACKLOG_DONE_TRACEABILITY_MISSING` — backlog DONE but traceability/state lacks entry
+- `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING` — backlog DONE but release artifacts lack representation
+
+Each code must have documented remediation guidance (where to fix, what to update).
+
+## One-time backfill mode
+
+- **Trigger**: explicit command or flag (e.g. dedicated check or `/memory-audit`-related path).
+- **Behavior**: run detection once over all DONE stories; for each legacy-drift story,
+  perform target-scoped repair (update acceptance and/or traceability/release refs from
+  canonical evidence) and append audit report entry.
+- **Idempotent**: when no drift exists, run produces no mutations; report is empty or
+  "no drift".
+- **Safe**: only stories matching the detection rule are mutated; no destructive
+  rewrite of unrelated entries.
+
+## Ongoing guard
+
+- **Integration points**: at release boundary or reconciliation boundary (or dedicated
+  check step). When legacy drift is detected, either:
+  - **Block** with explicit reason code and remediation guidance, or
+  - **Repair** target-scoped and append audit entry (policy configurable/documentable).
+- **Deterministic**: behavior and reason codes are documented; operators get explicit
+  diagnostics, not silent block or blind repair.
+
+## Guard placement and release/reconciliation
+
+- Guard may run as part of `/release` pre-finalization checks or as a dedicated
+  verification step before release/reconciliation.
+- If guard blocks: emit reason code, remediation, and evidence refs; do not finalize
+  release until resolved or explicit override (e.g. decision gate) is recorded.
+- Template parity: active and `template/` command/rule/docs for backfill and guard
+  behavior remain aligned.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Backfill touches many entries on large backlogs | Target-scoped repair only; audit report makes impact inspectable |
+| Guard blocks release unexpectedly | Explicit reason codes and remediation; optional repair path with audit append |
+| Overlap with US-0045/US-0043 | Scope limited to legacy-drift detection rule and procedure; canonical ownership and forward reconciliation unchanged |
+
+## Decision linkage
+
+- Research basis: `R-0023`
+- Decision: `DEC-0031`
+- Boundaries: does not change US-0045 canonical status ownership or US-0043
+  broad reconciliation semantics; adds operational guard/backfill procedure and
+  audit contract.
+
+---
+
+# US-0033: Configurable Guided Intake Behavior
+
+## Overview
+
+US-0033 adds configurable intake interaction behavior with a single switch.
+Guided behavior is default-on for higher intake quality; low-touch mode is
+explicitly available for teams that want minimal intake overhead.
+
+## Mode contract
+
+Switch:
+- `INTAKE_GUIDED_MODE=1|0` in `.cursor/scratchpad.md` (default `1`)
+
+Behavior:
+- Guided mode (`1`):
+  - targeted follow-up only when ambiguity prevents concrete acceptance
+  - at least one viable option/alternative before recommendation
+  - explicit user authority (PO recommends; user decides)
+  - intake-time web research persisted as R-xxxx evidence
+- Low-touch mode (`0`):
+  - no proactive follow-up/options/research overhead unless user asks
+  - duplicate/overlap backlog check remains active baseline safety
+
+## Scope boundaries
+
+- In scope: PO intake behavior, command/agent guidance, switch semantics,
+  documentation and regression coverage.
+- Out of scope: downstream architecture/sprint/release behavior changes.
+
+## Decision linkage
+
+- Research basis: `R-0015`
+- Decision: `DEC-0026`
+
+---
+
+# US-0032: Optional Per-Feature User Guide Mode
+
+## Overview
+
+US-0032 adds an optional docs-as-code path for per-feature, end-user-facing guides
+that explain what a feature does and how to use it. The mode is fully
+flag-controlled and must impose zero additional required steps or blocking checks
+when disabled.
+
+## Control surface
+
+- `USER_GUIDE_MODE=0|1` (default `0`) in `.cursor/scratchpad.md`.
+- When `USER_GUIDE_MODE=0`, no phase command is required to read or write
+  user-guide artifacts.
+- When `USER_GUIDE_MODE=1`, each accepted feature story (for example `US-xxxx`)
+  is expected to have a corresponding user guide artifact.
+
+## Canonical location and naming
+
+- Canonical root: `docs/user-guides/`
+- One guide per feature story: `docs/user-guides/US-xxxx.md`
+- Optional frontmatter/metadata (for future use): story id, title, audience,
+  and any relevant feature-flag identifiers.
+
+This pattern keeps guides easy to trace from backlog/acceptance (story IDs are
+already canonical identifiers) while leaving room to introduce area-based
+subfolders later without breaking existing paths.
+
+## Guide schema (minimum required sections)
+
+Each guide is a short, task-focused how-to with the following required sections
+per `R-0021` and `R-0022`:
+
+- **Purpose** — what the feature is and when to use it.
+- **Prerequisites** — environment, permissions, and relevant flags/modes.
+- **Usage steps** — step-by-step instructions.
+- **Example** — at least one concrete usage example.
+- **Limitations** — known caveats or boundaries.
+- **Troubleshooting** — common issues and how to resolve them.
+
+Validation is structural only: automation checks for the presence of required
+headings/sections and basic format, not semantic quality of the text.
+
+## Workflow behavior
+
+### Mode disabled (`USER_GUIDE_MODE=0`)
+
+- `/intake`, `/architecture`, `/sprint-plan`, `/execute`, `/qa`,
+  `/verify-work`, and `/release` add **no required** user-guide steps or gates.
+- Existing stories and sprints proceed exactly as today; any user guides that
+  exist are treated as optional documentation.
+
+### Mode enabled (`USER_GUIDE_MODE=1`)
+
+- `/intake` and `/architecture`:
+  - Ensure backlog/acceptance artifacts record the story ID in a way that can
+    be mapped to `docs/user-guides/US-xxxx.md`.
+  - May note that a user guide is expected for end-user-facing features, but do
+    not block intake/architecture on guide content.
+
+- `/sprint-plan`:
+  - For feature stories that affect end users, include at least one task for
+    creating or updating the corresponding user guide.
+
+- `/execute`:
+  - Dev work for an in-scope feature includes updating
+    `docs/user-guides/US-xxxx.md` in the same change as the code when behavior
+    changes.
+
+- `/qa` and `/verify-work`:
+  - QA may treat user-guide completeness as an advisory, structural check and
+    record findings when required sections are missing or obviously placeholder.
+  - QA/UAT remain responsible for feature correctness; guide checks focus only
+    on schema completeness.
+
+- `/release`:
+  - Adds a **mode-conditioned** gate: for each story in the sprint when
+    `USER_GUIDE_MODE=1`, require the canonical guide file to exist and pass
+    structural validation.
+  - On failure, block release with reason code `USER_GUIDE_INCOMPLETE` and
+    remediation pointing to the missing guide or sections.
+
+## Interaction with spec-pack mode (US-0031)
+
+- User guides are end-user-facing how-to documents and must not duplicate
+  Design Concept, CRS, or Technical Spec content.
+- Spec-pack artifacts remain technical/engineering documents; user guides may
+  link to them for background but are not required to.
+- `SPEC_PACK_MODE` and `USER_GUIDE_MODE` are independent optional modes; either
+  can be enabled without the other.
+
+## Alternatives and tradeoffs
+
+1. **Control surface: single global flag vs per-story toggle**
+   - *Alternative*: encode guide requirements per story using backlog or
+     acceptance metadata only (no global mode flag).
+   - *Decision*: use a single scratchpad flag `USER_GUIDE_MODE` as the primary
+     control and derive per-story expectations from backlog/acceptance context.
+     This matches other optional modes (`SPEC_PACK_MODE`,
+     `CROSS_REPO_OBSERVABILITY`, `COMPONENT_SCOPE_MODE`) and keeps configuration
+     simple, at the cost of less granular per-feature switching.
+
+2. **Location: story-id-only naming vs area/feature folders**
+   - *Alternative*: use `docs/user-guides/<area>/<feature>.md` with the story
+     ID only in frontmatter.
+   - *Decision*: adopt `docs/user-guides/US-xxxx.md` as the initial canonical
+     pattern, with optional frontmatter for area/feature metadata. This is easy
+     to validate and trace from backlog and can evolve to area-based
+     subfolders later without breaking existing guides.
+
+3. **Gate placement: release-only vs earlier QA/verify-work gates**
+   - *Alternative*: enforce guide completeness at `/qa` or `/verify-work`.
+   - *Decision*: place the blocking structural completeness gate in `/release`
+     only, keeping QA checks advisory. This minimizes disruption to existing
+     QA/UAT flows and still guarantees that released features have structurally
+     complete guides when the mode is enabled.
+
+4. **Validation depth: structural vs semantic**
+   - *Alternative*: add semantic validation or content scoring.
+   - *Decision*: limit automation to structural validation and rely on human
+     review for content quality. This keeps checks simple, deterministic, and
+     low-risk.
+
+## Risks and mitigations
+
+- **Risk**: Enabling `USER_GUIDE_MODE` mid-project could block release for
+  older features without guides.
+  - **Mitigation**: Scope the release gate to the sprint/story set in scope;
+    older DONE stories are not retroactively gated unless explicitly brought
+    back into a sprint.
+
+- **Risk**: Drift between feature behavior and guides despite structural checks.
+  - **Mitigation**: Encourage definition-of-done patterns (guide tasks in
+    sprints) and QA advisory checks; structural validation ensures a minimal,
+    consistent shape but not absolute correctness.
+
+- **Risk**: Confusion between user guides and spec-pack artifacts.
+  - **Mitigation**: Keep audiences and locations distinct
+    (`docs/user-guides/*` vs spec-pack locations) and clarify in commands/docs
+    that user guides are for end users while spec-pack artifacts target
+    engineers and stakeholders.
+
+## Decision linkage
+
+- Research basis: `R-0021`, `R-0022`
+- Decision: `DEC-0030`
+
+---
+
+# US-0034: Optional Cross-Repo Compatibility Observability
+
+## Overview
+
+US-0034 introduces optional compatibility observability across repositories and
+components with deterministic artifacts and release gate behavior.
+
+## Control surface
+
+- `CROSS_REPO_OBSERVABILITY=0|1` (default `0`)
+- `COMPATIBILITY_GATE_ON_CRITICAL=0|1` (default `1`)
+- `COMPATIBILITY_SOURCES=` explicit source declarations
+
+## Behavior model
+
+- Disabled mode (`0`): `/intake`, `/architecture`, `/execute`, and `/qa` add zero
+  required compatibility overhead.
+- Enabled mode (`1`):
+  - monitored sources are declared explicitly,
+  - compatibility signals and findings are persisted in canonical artifacts,
+  - findings include severity, affected modules, evidence refs, and actions.
+
+Canonical artifacts:
+- `docs/engineering/compatibility-signals.md`
+- `docs/engineering/compatibility-report.md`
+- `docs/engineering/manifests/registry.manifest.yaml`
+- `docs/engineering/manifests/repo.manifest.yaml`
+
+## Release gate policy
+
+When observability mode is enabled and unresolved critical compatibility
+findings exist while `COMPATIBILITY_GATE_ON_CRITICAL=1`, release progression
+must stop at decision gate with reason code `COMPATIBILITY_CRITICAL_OPEN`.
+
+## Decision linkage
+
+- Research basis: `R-0016`
+- Decision: `DEC-0027`
+
+---
+
+# US-0035: Optional Component-Scoped Execution Mode
+
+## Overview
+
+US-0035 adds optional component-scoped workflow behavior so teams can work on
+selected components without destabilizing non-target components.
+
+## Control surface
+
+- `COMPONENT_SCOPE_MODE=0|1` (default `0`)
+- `TARGET_COMPONENTS=` comma-separated in-scope component IDs
+
+## Behavior model
+
+- Disabled mode (`0`): no required scoped behavior overhead.
+- Enabled mode (`1`):
+  - declare scope in `docs/engineering/component-scope.md`
+  - include `target_components`, `non_target_components`, and
+    `allowed_interface_touch`
+  - require scoped task metadata in sprint planning
+  - enforce scope-first execution in `/execute`
+  - verify unaffected-component checks in `/qa` and record evidence in
+    `docs/engineering/component-scope-report.md`
+
+## Escalation policy
+
+If out-of-scope impact is detected without prior approval, workflow must trigger
+decision gate before release via reason code
+`COMPONENT_SCOPE_VIOLATION_UNAPPROVED`.
+
+## Decision linkage
+
+- Research basis: `R-0017`
+- Decision: `DEC-0028`
+
 ## Components
 
 ### 1. File Classification (path-pattern based)
@@ -1928,7 +2440,9 @@ Implementation should split into:
 
 US-0039 tightens `/release` readiness with deterministic mandatory gates and
 explicit evidence requirements. The objective is to block release when check-in
-tests, QA completion, or UAT completeness are missing/stale/failing.
+tests, QA completion, or UAT completeness are missing/stale/failing. Evidence
+flow is read-from-canonical-artifacts only; no inferred pass from absence of
+evidence (per R-0020).
 
 ## Assumption challenge and alternatives
 
@@ -1962,87 +2476,120 @@ Cons:
 
 ## Minimal architecture
 
-### 1) Deterministic release gate order
+### 1) Release gates and evidence flow
 
-Release gate sequence is fixed:
-1. **Check-in test gate** (`TEST_COMMAND` evidence)
-2. **QA completion gate** (no unresolved blocking findings)
-3. **UAT completion gate** (verified/populated artifacts)
-4. **Release notes + runbook update steps**
+- **Evidence flow**: Gates read from canonical evidence artifacts only. Pass is
+  asserted only when evidence exists and indicates pass; missing or stale
+  evidence never implies pass.
+- **Canonical evidence sources**:
+  - Check-in test: `tests/report.md` (or runbook-defined test output location).
+  - QA completion: `sprints/Sxxxx/qa-findings.md` (no unresolved blocking
+    findings in current sprint context).
+  - UAT completion: `sprints/Sxxxx/uat.json`, `sprints/Sxxxx/uat.md` (no
+    placeholder, incomplete, or unresolved-fail state).
+
+### 2) Deterministic gate order
+
+Release gate sequence is fixed and documented; ordering is enforced so audit
+trails are unambiguous:
+
+1. **Check-in test gate** — `TEST_COMMAND` baseline evidence.
+2. **QA completion gate** — no unresolved blocking findings.
+3. **UAT completion gate** — verified/populated UAT artifacts.
+4. **Release notes + runbook update steps** — only after gates 1–3 pass.
 
 No later gate is evaluated as pass if an earlier mandatory gate fails.
 
-### 2) Mandatory evidence prerequisites
+### 3) Stale and missing evidence behavior
 
-Gate 1: Check-in tests
-- Requires latest relevant check-in test evidence marked pass.
-- Fail when evidence is missing, stale, failing, or unverifiable.
-- Uses deterministic failure reason and remediation guidance.
+- **Missing evidence**: Block release with deterministic reason code and
+  remediation (e.g. run `TEST_COMMAND`, re-run QA, complete verify-work). Do not
+  infer pass.
+- **Stale evidence**: Block release when evidence is absent or does not satisfy
+  validity criteria (e.g. evidence exists and passed; optional timestamp/re-run
+  policy per runbook). Prefer simple rule: "evidence exists and passed" plus
+  optional timestamp check rather than complex TTL.
+- **Reason codes** (aligned with R-0020 and existing release vocabulary):
+  - `RELEASE_SPRINT_UNRESOLVED` — sprint context not resolvable for release.
+  - `RELEASE_TEST_FAILED` — check-in test run failed.
+  - `RELEASE_TEST_STALE` — test evidence missing or stale; re-run required.
+  - `RELEASE_QA_EVIDENCE_MISSING` — QA evidence absent for sprint context.
+  - `RELEASE_QA_BLOCKERS_OPEN` — unresolved blocking findings in QA artifact.
+  - `RELEASE_UAT_INCOMPLETE` — UAT placeholder or incomplete.
+  - `RELEASE_UAT_FAILED` — UAT has unresolved fail state.
+  - `RELEASE_GATE_OVERRIDE_APPROVED` — override with DEC reference (exception path only).
 
-Gate 2: QA completion
-- Requires QA artifacts showing no unresolved blocking findings in current sprint
-  context.
-- Fail when blocking findings are open or QA evidence is absent.
+Each code must have documented remediation (what to fix, which artifact/command, next step).
 
-Gate 3: UAT completion
-- Existing UAT verified-state contract remains mandatory.
-- Fail when artifacts are placeholder/incomplete or unresolved fail states exist.
+### 4) No-bypass default and decision-gate override path
 
-### 3) No-bypass default and explicit override path
+- **Default**: No release path may bypass test/QA/UAT gates. Default
+  configuration has no bypass (per vision Discovery Notes — US-0039).
+- **Override** (exception-only): Allowed only via explicit decision gate: user
+  approval, documented rationale (e.g. `DEC-xxxx`), and audit trail. Release
+  output must record override with `RELEASE_GATE_OVERRIDE_APPROVED` and DEC
+  reference. See DEC-0019.
 
-Default behavior:
-- No bypass for test/QA/UAT gates.
+### 5) Auditable gate evidence
 
-Override behavior (exception-only):
-- Allowed only through explicit decision gate.
-- Must record rationale, approver, scope, and risk acceptance in decision
-  artifacts.
-- Release output must mark override as non-default path.
+- Each gate writes pass/fail and evidence pointers to handoff/state artifacts so
+  QA and TL can verify decisions; no silent or inferred state.
+- Canonical destinations: release handoff, `sprints/Sxxxx/release-findings.md`,
+  `docs/engineering/state.md` (as applicable).
+- Per-gate verdict fields: gate name, status, reason_code, evidence_refs,
+  remediation; for overrides, decision_ref (DEC-xxxx) required.
 
-### 4) Observability and traceable gate verdicts
-
-Canonical release gate evidence destinations:
-- `handoffs/release_notes.md`
-- `docs/engineering/state.md`
-
-Per-gate verdict record fields:
-- `release_gate_id` (`RG-xxxx`)
-- `timestamp`
-- `gate_name` (`checkin_test|qa|uat`)
-- `status` (`pass|fail|override`)
-- `reason_code`
-- `evidence_refs` (artifact paths)
-- `remediation`
-- `decision_ref` (required for overrides)
-
-Reason code examples:
-- `RELEASE_TEST_EVIDENCE_MISSING`
-- `RELEASE_TEST_EVIDENCE_STALE`
-- `RELEASE_TEST_FAILED`
-- `RELEASE_QA_BLOCKERS_OPEN`
-- `RELEASE_QA_EVIDENCE_MISSING`
-- `RELEASE_UAT_INCOMPLETE`
-- `RELEASE_UAT_FAILED`
-- `RELEASE_GATE_OVERRIDE_APPROVED`
-- `RELEASE_READY`
-
-### 5) Compatibility constraints
+### 6) Compatibility constraints
 
 - Keep existing workflow stop conditions and escalation semantics.
-- Preserve teams with blank optional lint/typecheck commands from false failures.
-- Keep release blocked only on mandatory test + QA + UAT evidence.
-- Maintain active/template parity across release/qa/execute guidance.
+- Preserve teams with blank optional lint/typecheck commands from false
+  failures (release still requires test + QA + UAT evidence only).
+- Maintain active/template parity for gate semantics (see Template parity scope below).
+
+## Template parity scope
+
+Active and `template/` release/qa/execute guidance must stay behaviorally
+aligned so installed repos get the same release-safety contract. Drift between
+active and template causes inconsistent gate semantics for new installs.
+
+**Canonical files for gate-semantics parity:**
+
+- `.cursor/commands/release.md`
+- `.cursor/commands/qa.md`
+- `.cursor/commands/execute.md`
+- Runbook sections covering release gates, reason codes, and evidence locations
+- Release-findings and reason-code documentation (e.g. runbook, release command text)
+
+**Mitigation:** (1) List these files in release checklist or parity
+verification steps; (2) Include template-parity verification in release
+checklist or regression tests; (3) Document gate order and reason codes in both
+active and template copies.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Stale-evidence threshold too strict or ambiguous | Prefer "evidence exists and passed" plus optional timestamp check; avoid complex TTL. Document in runbook. |
+| Template parity drift | Canonical file list above; parity check in release checklist or regression; gate order and reason codes documented in both active and template. |
+| Over-strict validation blocks runs if evidence writes are incomplete | Deterministic reason codes and remediation guidance (which command/artifact to fix); fail closed only when gate evidence is required and missing/invalid. |
+| Operator friction on override path | Override remains exception-only; explicit decision gate + DEC reference keeps audit trail and discourages casual bypass. |
+
+## Decision linkage
+
+- Research: R-0020, R-0005
+- Decision: DEC-0019
 
 ## Sprint-plan readiness (decomposition-ready)
 
 Implementation should split into:
 1. Update `/release` gate contract with strict ordered gates.
-2. Define freshness/validity criteria for "latest check-in test" evidence.
+2. Define freshness/validity criteria for "latest check-in test" evidence (simple rule preferred).
 3. Add QA evidence contract checks for unresolved blockers.
 4. Preserve and tighten UAT verified-state gate wording.
-5. Add structured gate verdict logging to release notes/state artifacts.
-6. Define explicit decision-gate override template and constraints.
+5. Add structured gate verdict logging to release notes/state/release-findings artifacts.
+6. Define explicit decision-gate override template and constraints (DEC ref required).
 7. Add QA regression matrix with positive/negative and stale-evidence cases.
+8. Template parity: align and verify release/qa/execute and runbook sections per canonical file list.
 
 ---
 
@@ -2212,3 +2759,395 @@ Implementation tasks should split into:
 4. Add backward-compatible pointer behavior in legacy release notes file.
 5. Add QA matrix for unresolved sprint, overwrite prevention, queue-note mismatch,
    migration success/failure, and active/template parity.
+
+---
+
+# US-0046: Explicit `/sprint-plan --bulk` Mode
+
+## Overview
+
+US-0046 adds an explicit bulk planning mode for `/sprint-plan` so multiple OPEN
+stories can be planned in one bounded run. The architecture keeps current
+single-scope behavior as default and adds deterministic selection/grouping rules
+only when bulk mode is explicitly enabled.
+
+## Assumption challenge and alternatives
+
+### Option A: Keep current `/sprint-plan` behavior only
+
+Pros:
+- No command contract changes.
+- Lowest implementation complexity.
+
+Cons:
+- Does not satisfy the requirement for explicit multi-story planning throughput.
+- Forces repetitive manual planning runs for large backlogs.
+
+### Option B: Implicitly auto-bulk whenever many OPEN stories exist
+
+Pros:
+- Minimal user input.
+- High throughput potential.
+
+Cons:
+- Ambiguous operator intent.
+- High risk of surprising large planning mutations.
+- Harder to audit and bound safely.
+
+### Option C: Explicit bulk planning trigger with bounded deterministic policy (chosen)
+
+Pros:
+- Clear operator intent and safer defaults.
+- Deterministic selection/grouping output.
+- Predictable bounded behavior with explicit stop reasons.
+
+Cons:
+- Adds policy controls and additional regression surface.
+
+## Minimal architecture
+
+### 1) Explicit mode trigger and defaults
+
+- Add an explicit trigger for bulk planning in `/sprint-plan` (flag/argument).
+- Default behavior without trigger remains current non-bulk planning.
+- Invalid or ambiguous bulk arguments fail safe with actionable guidance.
+
+### 2) Deterministic story selection policy
+
+Selection order:
+1. Story priority (highest first)
+2. Backlog order (stable tie-breaker)
+
+Policy requirements:
+- Stable ordering for reproducibility.
+- No hidden randomness.
+- Story selection evidence logged in planning breadcrumbs.
+
+### 3) Bounded planning controls
+
+Required controls:
+- max stories per bulk run
+- max generated sprints per run
+
+Stop outcomes must be deterministic and recorded:
+- reached max stories
+- reached max generated sprints
+- no eligible OPEN stories
+- blocked by missing/ambiguous acceptance
+
+### 4) Grouping and splitting contract
+
+Bulk planning uses deterministic grouping:
+- prefer single-story sprints by default,
+- allow multi-story grouping only when estimated task count remains within
+  `SPRINT_MAX_TASKS`,
+- if estimated size exceeds threshold and `SPRINT_AUTO_SPLIT=1`, split and
+  continue within run bounds.
+
+No grouping rule may bypass sizing safety controls.
+
+### 5) Artifact completeness and traceability
+
+For each generated sprint, planning output must be complete:
+- `sprint.md`
+- `tasks.md`
+- `progress.md`
+- UAT placeholders
+- `plan-verify` readiness contract
+
+Traceability updates in `state.md` must remain deterministic and non-duplicative.
+
+### 6) Risk model
+
+| Risk | Mitigation |
+|------|------------|
+| Bulk run plans too much at once | bounded max stories/sprints controls + explicit stop reasons |
+| Story starvation in repeated bulk runs | deterministic priority ordering with stable backlog tie-break and periodic fairness review |
+| Incomplete generated artifacts | enforce per-sprint completeness checklist before moving to next item |
+| Confusing behavior change for current users | explicit mode trigger; default non-bulk behavior unchanged |
+
+## Decision linkage
+
+- Research basis: `R-0010`, `R-0011`, `R-0013`
+- Decision: `DEC-0023`
+
+---
+
+# US-0047: Explicit Bulk Execute Orchestration Mode
+
+## Overview
+
+US-0047 introduces explicit bulk execution orchestration that processes planned
+sprints/stories continuously while preserving strict fresh-context isolation,
+execute↔QA loop controls, and deterministic stop/skip behavior. In team mode,
+execution must be scoped to member-owned tasks only.
+
+## Assumption challenge and alternatives
+
+### Option A: Rely only on existing `/auto` flag combinations
+
+Pros:
+- Reuses current functionality.
+- No new command-level contract.
+
+Cons:
+- Operator intent remains implicit and easier to misconfigure.
+- Team-member task scoping is not explicit in execution contract.
+- Harder to communicate/verify bounded behavior per run.
+
+### Option B: Global bulk execute without team-scope enforcement
+
+Pros:
+- Maximum throughput in single-user scenarios.
+
+Cons:
+- Unsafe for concurrent team members.
+- High duplicate-work and task-collision risk.
+
+### Option C: Explicit bulk execute mode with team-scoped guardrails (chosen)
+
+Pros:
+- Clear activation semantics and safer defaults.
+- Enforces member/task scope in team mode.
+- Keeps bounded and auditable behavior.
+
+Cons:
+- Requires additional scope-check logic and reason-code coverage.
+
+## Minimal architecture
+
+### 1) Explicit mode trigger and defaults
+
+- Define explicit bulk execute mode (new command or explicit mode argument).
+- Without explicit trigger, keep current non-bulk execution behavior.
+- Invalid/ambiguous trigger input fails safe with remediation.
+
+### 2) Work-item selection and breadcrumbs
+
+Selection policy must be deterministic and logged:
+- selected sprint/story id
+- selection policy source
+- team-context snapshot (when enabled):
+  `TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`
+
+### 3) Isolation and loop contract
+
+- Fresh subagent context is mandatory per phase for each item.
+- Fresh subagent context is mandatory for each execute↔QA loop cycle.
+- Loop bounds (`AUTO_IMPLEMENTATION_LOOP`, max cycles) apply per item.
+
+### 4) Team-scope enforcement model
+
+When `TEAM_MODE=1`:
+- only tasks in `ACTIVE_TASK_IDS` for the current `TEAM_MEMBER` are executable,
+- pre-mutation scope validation is mandatory before task execution writes,
+- out-of-scope tasks must be handled deterministically:
+  - `skip` with reason code, or
+  - `block` with reason code based on configured policy,
+- no writes are allowed for out-of-scope tasks.
+
+### 5) Bounded controls and stop policy
+
+Required bounded controls:
+- max items per run
+- block handling policy (`stop` or `skip`)
+
+Deterministic stop/skip outcomes:
+- max items reached
+- blocked item stop
+- blocked item skipped
+- no eligible scoped items
+- decision gate pause
+
+### 6) Resume semantics
+
+Interrupted bulk runs require deterministic checkpoint fields:
+- last completed item
+- next candidate item
+- stop reason
+- stop phase
+- team-context snapshot (if team mode)
+
+Resume must continue safely from recorded checkpoint state.
+
+### 7) Risk model
+
+| Risk | Mitigation |
+|------|------------|
+| Duplicate or conflicting team execution | member-scope filter + no-write rule for out-of-scope tasks |
+| Long unattended runs hide failures | bounded controls + deterministic reason-code breadcrumbs |
+| Context bleed between items | fresh subagent per phase and per execute↔QA cycle |
+| Ambiguous resume after interruption | explicit checkpoint schema with next-item and stop metadata |
+
+## Decision linkage
+
+- Research basis: `R-0010`, `R-0012`, `R-0013`
+- Decision: `DEC-0024`
+
+---
+
+# US-0048: Enforced Per-Phase Subagent Isolation with Audit Gate
+
+## Overview
+
+US-0048 makes per-phase subagent isolation a hard-enforced workflow contract with
+auditable evidence and fail-closed gates. Policy text already mandates isolation
+(DEC-0007, US-0023); this story adds mandatory evidence writing, deterministic
+reason codes, and blocking behavior at progression and release when evidence is
+missing or violated.
+
+Scope: workflow contract enforcement, evidence schema, gates, reason codes,
+regression coverage. Out of scope: runtime product feature changes, external
+orchestration platform migration.
+
+## Assumption challenge and alternatives
+
+### Option A: Advisory-only (logging deviation, no gates)
+
+- **Pros**: Low effort; no blocking.
+- **Cons**: Does not close recurrence risk; user reported breach was execution
+  in one context instead of fresh subagent per phase. Rejected as insufficient.
+
+### Option B: Hard enforcement + auditable evidence + fail-closed gates (chosen)
+
+- **Pros**: Closes compliance gap; deterministic detection and blocking;
+  operator gets explicit diagnostics (reason code, phase, evidence ref,
+  remediation). Aligns with PO recommendation and vision discovery notes.
+- **Cons**: Higher effort; evidence write discipline required; possible friction
+  if evidence writes are inconsistent. Mitigated by clear schema, remediation
+  guidance, and bounded migration for legacy artifacts.
+
+## Minimal architecture
+
+### 1) Components and data flow for isolation evidence
+
+- **Orchestrator** (`/auto`): Must not execute phase work in-process; must
+  spawn/trigger fresh subagent context per phase and per execute↔QA cycle.
+  Reads handoffs and state; writes phase-boundary breadcrumbs and delegates
+  phase execution to a new context.
+- **Phase executors** (each phase command run in its role): On phase start/completion,
+  write **isolation evidence** to canonical locations (see below). Evidence is
+  the only cross-phase proof of fresh-context execution.
+- **Gate evaluators** (`/verify-work`, `/release`): Before allowing progression
+  or release finalization, read canonical isolation evidence for the current
+  sprint/phase span; if required evidence is missing or invalid, block with
+  deterministic reason code and remediation.
+- **Canonical evidence store**: Single authoritative place where isolation
+  evidence is written and read for gates. Recommended: a dedicated section in
+  `docs/engineering/state.md` and/or phase-scoped footers in handoffs, plus
+  optional append-only `docs/engineering/isolation-evidence.log` or equivalent
+  for machine-checkable audit. Schema below.
+
+Data flow:
+
+1. Phase N starts in a **new** subagent context → executor writes isolation
+   evidence (phase_id, role, fresh_context_marker, timestamp, evidence_ref).
+2. Phase N completes → handoff written; evidence may be appended/updated for
+   phase N completion.
+3. Before phase N+1 or before verify-work/release, gate evaluator reads
+   evidence for completed phases in scope; if any required row is missing or
+   invalid → fail closed, emit reason code and remediation.
+4. Pause/resume: resume checkpoint carries isolation provenance (last phase
+   with valid evidence, evidence_ref) so continuation does not silently reuse
+   context.
+
+### 2) Isolation evidence schema (minimal)
+
+Required fields (per phase boundary):
+
+- `phase_id`: canonical phase identifier (e.g. intake, discovery, architecture,
+  sprint-plan, execute, qa, verify-work, release, refresh-context).
+- `role`: agent role that executed the phase (po, tech-lead, dev, qa, release,
+  curator).
+- `fresh_context_marker`: value attesting new context (e.g. session id or
+  explicit "fresh" token; format defined in runbook).
+- `timestamp`: ISO 8601.
+- `evidence_ref`: pointer to this evidence record (e.g. state.md section id or
+  log line id).
+
+Optional for resume provenance:
+
+- `session_id`, `parent_phase` (for chained continuation).
+
+Canonical locations:
+
+- Primary: `docs/engineering/state.md` — dedicated "Isolation evidence" section
+  with one block per phase transition (sprint/phase scoped).
+- Alternative/append: handoff footers or `docs/engineering/isolation-evidence.log`
+  (append-only) for gate scripts to parse. Runbook documents where gates read
+  from.
+
+### 3) Reason-code taxonomy (isolation violations)
+
+Deterministic codes for gate output and remediation:
+
+| Code | Meaning | Remediation |
+|------|---------|-------------|
+| `PHASE_CONTEXT_ISOLATION_MISSING` | Required isolation evidence for one or more phases is absent | Run the missing phase(s) in a fresh subagent context and ensure evidence is written; re-run gate. |
+| `PHASE_CONTEXT_ISOLATION_VIOLATION` | Evidence indicates reused context (e.g. same session across phases) or invalid role/phase mapping | Re-run affected phase(s) in a fresh context; correct role/phase mapping in commands. |
+| `ISOLATION_EVIDENCE_STALE` | Evidence timestamp or scope does not match current sprint/phase span | Re-run phase(s) or refresh evidence; ensure state/handoffs are current. |
+| `ISOLATION_EVIDENCE_INVALID` | Schema violation (missing required field, malformed) | Fix evidence schema in artifact or in writer (command/agent); re-run phase. |
+
+Remediation guidance must be explicit in gate output (reason code, phase id,
+evidence ref, suggested next action).
+
+### 4) Verify-work and release gate placement and precedence
+
+- **Verify-work**: Before marking verify-work as PASS, run an **isolation-compliance
+  gate**: for the current sprint, all phases that should have been executed
+  (from sprint start through execute and QA) must have valid isolation evidence.
+  If not, verify-work outcome is BLOCKED; output includes reason code and
+  remediation. Order: other verify-work checks (e.g. UAT) may run first or in
+  parallel; isolation gate must pass before verify-work is considered complete.
+- **Release**: Before release finalization, run the same **isolation-compliance
+  gate** for the sprint being released. If isolation evidence is missing or
+  invalid, release is blocked; release command output includes reason code,
+  phase(s) affected, evidence ref, remediation. Gate order: check-in test →
+  QA → UAT → **isolation compliance** → release notes/queue update. Isolation
+  gate does not replace other gates; it is an additional mandatory gate.
+
+Precedence: Isolation gate is mandatory and fail-closed. No bypass in default
+configuration; any override requires explicit decision gate and documented
+rationale (same pattern as US-0039 release overrides).
+
+### 5) Pause/resume provenance behavior
+
+- On **pause**: Persist current phase, last completed phase, and evidence_ref
+  (or equivalent) for the last phase with valid isolation evidence in
+  `handoffs/resume_brief.md` and/or `docs/engineering/state.md`.
+- On **resume**: Resolver uses resume checkpoint; continuation must not assume
+  the same context is still valid. Next phase must run in a **new** subagent
+  context and write new isolation evidence. Breadcrumbs must record
+  `resolved_start_phase`, `isolation_evidence_ref_at_resume`, and
+  `continuation_fresh_context_required=true` so that gate evaluators can require
+  evidence for the resumed phase and subsequent phases.
+- Isolation evidence must **survive** pause/resume: evidence written before
+  pause remains valid for gate checks after resume; no ambiguity that "resumed"
+  implies reuse of pre-pause context for new work.
+
+### 6) Active/template parity requirements
+
+- Command contracts (`/auto`, `/execute`, `/qa`, `/verify-work`, `/release`)
+  that define isolation semantics, evidence-writing steps, and gate behavior
+  must be updated in both active repo and `template/` so that new installs
+  get the same enforcement.
+- Runbook and README must document: isolation evidence schema, canonical
+  locations, reason-code list, and remediation guidance. Parity required for
+  active and template copies.
+- Regression coverage (positive: valid evidence allows progression; negative:
+  missing evidence, reused context, invalid role/phase) must be reflected in
+  test/QA guidance in both active and template where applicable.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Over-strict validation blocks runs when evidence writes are incomplete | Clear schema and runbook steps; remediation guidance; optional bounded migration or legacy handling for repos without prior evidence. |
+| Backward compatibility: existing artifacts lack new evidence fields | Gates apply to "required evidence for phases in scope"; legacy runs can define grace period or one-time migration that backfills or waives for pre-US-0048 sprints (documented). |
+| Operator friction on first failure | Deterministic reason codes and explicit remediation (phase, evidence ref, next action) so operators can fix without guesswork. |
+| Resume ambiguity | Provenance in resume checkpoint (evidence ref at resume, continuation requires fresh context) and documentation that resumed phase writes new evidence. |
+
+## Decision linkage
+
+- Research basis: `R-0018`, `R-0019`
+- Decision: `DEC-0029`

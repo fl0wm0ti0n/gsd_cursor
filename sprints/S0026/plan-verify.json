@@ -1,0 +1,20 @@
+{
+  "sprint_id": "S0026",
+  "story_id": "US-0031",
+  "result": "PASS",
+  "coverage": {
+    "AC-1": "covered",
+    "AC-2": "covered",
+    "AC-3": "covered",
+    "AC-4": "covered",
+    "AC-5": "covered",
+    "AC-6": "covered",
+    "AC-7": "covered",
+    "AC-8": "covered"
+  },
+  "gaps": [],
+  "notes": [
+    "All US-0031 AC-1..AC-8 mapped to tasks T-001..T-008 with no coverage gaps.",
+    "Enable flag (T-001), disabled-path documentation (T-002), canonical artifact names/locations (T-003), minimum sections/fields (T-004), validation and blocking (T-005), story-to-spec-pack traceability (T-006), ownership guidance (T-007), and active/template parity (T-008) are planned."
+  ]
+}

@@ -1,5 +1,10 @@
 {
-  "task": "",
-  "acceptance": [],
-  "status": "open"
+  "task": "Audit status mismatches across backlog, acceptance, and engineering state with focus on DONE stories.",
+  "acceptance": [
+    "List stories marked DONE in backlog but not DONE in acceptance.",
+    "List stories marked DONE in backlog but not DONE/PASS in state traceability.",
+    "List stories still OPEN in backlog while state traceability already shows DONE/PASS.",
+    "Persist findings in quick summary artifact and engineering state checkpoint."
+  ],
+  "status": "done"
 }

@@ -1,0 +1,23 @@
+{
+  "sprint": "S0017",
+  "stories": ["US-0044"],
+  "steps": [
+    {
+      "id": "UAT-001",
+      "description": "Verify `/auto` docs define backlog-drain switches with default-safe off behavior.",
+      "result": "pass"
+    },
+    {
+      "id": "UAT-002",
+      "description": "Verify runbook/README describe multi-story mode and bounded controls.",
+      "result": "pass"
+    },
+    {
+      "id": "UAT-003",
+      "description": "Verify tests assert backlog-drain contract presence in active/template artifacts.",
+      "result": "pass"
+    }
+  ],
+  "passed": 3,
+  "failed": 0
+}

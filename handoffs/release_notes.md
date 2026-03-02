@@ -13,32 +13,60 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0012`
-- **Latest canonical notes:** `handoffs/releases/S0012-release-notes.md`
-- **Latest release date:** 2026-02-26
-- **Latest release story:** US-0040
+- **Latest released sprint:** `S0028`
+- **Latest canonical notes:** `handoffs/releases/S0028-release-notes.md`
+- **Latest release date:** 2026-03-02
+- **Latest release story:** US-0049
 
 ## Unreleased queue visibility
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-## Release readiness note (S0012)
+## Release readiness note (S0028)
 
-- Sprint: `S0012`
-- Story: `US-0040`
+- Sprint: `S0028`
+- Story: `US-0049`
 - Verify-work: PASS
-- UAT status: PASS (`9/9`, `0` failed)
-- QA findings: PASS with no blockers (`sprints/S0012/qa-findings.md`)
+- UAT status: PASS (`8/8`, `0` failed)
+- QA findings: PASS with no blockers (`sprints/S0028/qa-findings.md`)
 - Release readiness: Finalized as `released` in `handoffs/release_queue.md`
   with canonical sprint-scoped notes.
 
 ## Historical references
 
+- `S0011`: `handoffs/releases/S0011-release-notes.md`
+- `S0025`: `handoffs/releases/S0025-release-notes.md`
+- `S0026`: `handoffs/releases/S0026-release-notes.md`
+- `S0027`: `handoffs/releases/S0027-release-notes.md`
+- `S0028`: `handoffs/releases/S0028-release-notes.md`
+- `S0024`: `handoffs/releases/S0024-release-notes.md`
+- `S0023`: `handoffs/releases/S0023-release-notes.md`
+- `S0022`: `handoffs/releases/S0022-release-notes.md`
+- `S0021`: `handoffs/releases/S0021-release-notes.md`
+- `S0020`: `handoffs/releases/S0020-release-notes.md`
+- `S0019`: `handoffs/releases/S0019-release-notes.md`
+- `S0018`: `handoffs/releases/S0018-release-notes.md`
+- `S0017`: `handoffs/releases/S0017-release-notes.md`
+- `S0016`: `handoffs/releases/S0016-release-notes.md`
+- `S0015`: `handoffs/releases/S0015-release-notes.md`
+- `S0013`: `handoffs/releases/S0013-release-notes.md`
 - `S0012`: `handoffs/releases/S0012-release-notes.md`
 - `S0010`: `handoffs/releases/S0010-release-notes.md`
 
 ---
+
+## Per-gate audit verdict (US-0039)
+
+When `/release` runs, each gate (check-in test, QA, UAT, finalization) is recorded with:
+- **verdict**: pass | fail | override
+- **reason_code**: e.g. RELEASE_TEST_FAILED, RELEASE_QA_BLOCKERS_OPEN, RELEASE_UAT_INCOMPLETE, RELEASE_GATE_OVERRIDE_APPROVED
+- **remediation**: short steps when not pass
+- **evidence_refs**: paths to tests/report.md, qa-findings.md, uat.json, release-findings.md, DEC-xxxx
+
+Canonical per-run gate snapshot lives in `sprints/Sxxxx/release-findings.md` and queue row `gate_snapshot`; TL/QA audit from those artifacts and `docs/engineering/state.md` checkpoints.
+
+**Override path (US-0039)**: When a gate is overridden, record decision record ref (DEC-xxxx), rationale, approver, and risk acceptance in release-findings and gate_snapshot; use reason code `RELEASE_GATE_OVERRIDE_APPROVED`.
 
 ## Compatibility behavior contract
 
