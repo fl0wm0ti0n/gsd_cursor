@@ -243,8 +243,8 @@ assert_true "runbook lists negative path: security violation" "file_contains \"$
 assert_true "auto includes explicit start-from contract (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"start-from=<phase>\""
 assert_true "auto includes explicit start-from contract (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"start-from=<phase>\""
 
-assert_true "auto precedence includes argument > resume > state (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"explicit \`/auto start-from=<phase>\`\""
-assert_true "auto precedence includes argument > resume > state (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"explicit \`/auto start-from=<phase>\`\""
+assert_true "auto precedence includes argument > resume > state (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"Resolve start phase in strict order:\""
+assert_true "auto precedence includes argument > resume > state (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"Resolve start phase in strict order:\""
 
 assert_true "auto requires fail-fast on stale resume brief (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"present but stale or unparseable, fail fast\""
 assert_true "auto requires fail-fast on stale resume brief (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"present but stale or unparseable, fail fast\""
