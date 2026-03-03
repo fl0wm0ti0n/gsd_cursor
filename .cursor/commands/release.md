@@ -93,6 +93,8 @@ Mandatory gate order (strict, deterministic). No step may be skipped or reordere
 
 Optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) are not mandatory release gates. When blank, they must not cause release to fail; report as `skipped`. Mandatory gates remain check-in test + QA + UAT + isolation only (US-0039 AC-10, US-0048).
 
+## No-bypass default (US-0039)
+
 Default: no bypass. Override only via explicit decision gate with documented rationale and evidence (see Override evidence contract below).
 
 Check-in test evidence: canonical source `tests/report.md`; valid = present + fresh + passing. Fail reasons: `RELEASE_TEST_EVIDENCE_MISSING`, `RELEASE_TEST_STALE`, `RELEASE_TEST_FAILED`. QA gate: no unresolved blocking findings; `RELEASE_QA_BLOCKERS_OPEN`, `RELEASE_QA_EVIDENCE_MISSING`. UAT gate: no placeholder/incomplete/unresolved-fail; `RELEASE_UAT_INCOMPLETE`, `RELEASE_UAT_FAILED`. Override evidence: decision record, rationale, approver, risk acceptance; `RELEASE_GATE_OVERRIDE_APPROVED`.
