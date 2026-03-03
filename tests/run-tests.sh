@@ -40,7 +40,7 @@ assert_true() {
   name="$1"
   condition="$2"
   detail="$3"
-  if sh -c "$condition" >/dev/null 2>&1; then
+  if eval "$condition" >/dev/null 2>&1; then
     add_result "$name" "PASS" "$detail"
   else
     add_result "$name" "FAIL" "$detail"
