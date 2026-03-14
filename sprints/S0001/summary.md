@@ -32,14 +32,14 @@ All 11 tasks completed. `--mode upgrade` is implemented across all three install
 
 ## Context refresh pack (2026-03-14)
 
-- Latest finalized sprint: `S0037` for `US-0058` (released).
+- Latest finalized sprint: `S0038` for `US-0059` (released).
 - Release evidence:
-  - `sprints/S0037/release-findings.md`
-  - `handoffs/releases/S0037-release-notes.md`
-  - `handoffs/release_queue.md` (`S0037` status `released`)
+  - `sprints/S0038/release-findings.md`
+  - `handoffs/releases/S0038-release-notes.md`
+  - `handoffs/release_queue.md` (`S0038` status `released`)
 - Product reconciliation:
-  - `docs/product/backlog.md` -> `US-0058` is `DONE` with AC-1..AC-10 checked
-  - `docs/product/acceptance.md` -> `US-0058` is checked
+  - `docs/product/backlog.md` -> `US-0059` is `DONE` with AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0059` is checked
 - Next prioritized OPEN story: none in active intake queue.
-- Auto progression status: US-0058 completed/released; awaiting next intake.
+- Auto progression status: US-0059 completed/released; awaiting next intake.
 - Recommended next phase: `/intake`.

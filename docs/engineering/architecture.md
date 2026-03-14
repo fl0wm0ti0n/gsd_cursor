@@ -3761,3 +3761,69 @@ oscillate insertion direction or reorder unrelated entries.
 
 - Research basis: `R-0033`
 - Decision: `DEC-0040`
+
+---
+
+# US-0059: Deterministic Intake Runtime Capability Guard and Single-Writer Drift Safety
+
+## Overview
+
+US-0059 hardens `/intake` runtime behavior so missing role-capability and
+concurrent-writer scenarios are handled deterministically and fail safe.
+
+## Architecture goals
+
+- Fail fast when required role-specific intake subagent capability is missing.
+- Prevent silent fallback in default policy.
+- Distinguish self-write updates from external concurrent artifact drift.
+- Preserve deterministic ordering and canonical ownership guarantees.
+- Keep active/template contracts and regression checks aligned.
+
+## Minimal architecture
+
+1. **Capability preflight contract**
+   - `/intake` performs capability preflight for role-specific `po` subagent
+     before artifact mutation.
+   - Missing capability fails fast with deterministic reason code
+     `SUBAGENT_CAPABILITY_UNAVAILABLE`.
+   - Default policy denies fallback (`INTAKE_SUBAGENT_FALLBACK=deny`);
+     fallback requires explicit opt-in (`allow`).
+
+2. **Single-writer intake scope**
+   - Each intake run binds deterministic writer identity metadata:
+     - `writer_id`
+     - `intake_run_id`
+   - Mutation scope is constrained to target intake artifacts:
+     `vision`, `backlog`, `acceptance`, and `po_to_tl`.
+
+3. **Self-write-aware drift detection**
+   - Drift checks must accept self-generated writes for the same
+     `(writer_id, intake_run_id)` as valid continuation.
+   - Conflicting external concurrent mutation fails safe with reason code
+     `INTAKE_CONCURRENT_WRITER_DETECTED` and no partial overwrite.
+
+4. **Ordering/ownership compatibility**
+   - Existing canonical ownership (`backlog` authority) remains unchanged.
+   - Sorted-canonical intake placement and monotonic timestamp constraints remain
+     mandatory and non-bypass.
+
+5. **Verification and parity**
+   - Add regression coverage for:
+     - capability-missing fail-fast path,
+     - self-write non-false-positive path,
+     - external concurrent writer fail-safe path.
+   - Keep active/template command/runbook/README parity.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Strict preflight blocks valid fallback workflows | explicit opt-in fallback policy via `INTAKE_SUBAGENT_FALLBACK=allow` |
+| Incomplete writer identity causes residual false positives | deterministic run-scoped writer IDs and target-scoped mutation checks |
+| Broad drift handling accidentally suppresses real conflicts | fail-safe only for same writer/run identity; external conflicting writes remain blocking |
+
+## Decision linkage
+
+- Research basis: `R-0035`
+- Decision: `DEC-0041`
+- Boundaries: workflow runtime guard behavior only; no product runtime feature changes.

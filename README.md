@@ -210,6 +210,17 @@ Deterministic ordering behavior (US-0058):
   remain sorted-canonical by story ID.
 - Commands fail closed on ambiguous placement anchors using
   `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`.
+- Commands fail closed on non-monotonic state checkpoint timestamps using
+  `STATE_TIMESTAMP_NON_MONOTONIC`.
+
+Intake runtime safety behavior (US-0059):
+- `/intake` requires role-specific `po` capability by default and fails fast with
+  `SUBAGENT_CAPABILITY_UNAVAILABLE` when unavailable.
+- Silent in-band fallback is disabled by default and only allowed with explicit
+  `INTAKE_SUBAGENT_FALLBACK=allow`.
+- Drift detection distinguishes self-write updates from external concurrent
+  writers; true conflicting external writes fail safe with
+  `INTAKE_CONCURRENT_WRITER_DETECTED`.
 
 ## Workflow
 

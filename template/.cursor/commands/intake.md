@@ -28,6 +28,26 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
 - Missing acceptance criteria or unclear scope
 - Decision gate triggered (see escalation rule)
 
+## Runtime capability and writer-safety guard (US-0059 / DEC-0041)
+
+- `/intake` requires the role-specific `po` subagent capability by default.
+- Before any artifact mutation, run capability preflight:
+  - if `po` capability is unavailable, fail fast with
+    `SUBAGENT_CAPABILITY_UNAVAILABLE`,
+  - emit deterministic remediation guidance (for example: enable role-capable
+    runtime or explicitly opt in to fallback policy).
+- Silent in-band fallback is forbidden unless explicit policy opt-in is
+  configured (`INTAKE_SUBAGENT_FALLBACK=allow`).
+- For artifact mutations, enforce deterministic single-writer scope:
+  - establish writer identity (`writer_id`) and run identity (`intake_run_id`),
+  - bind writes to target artifacts (`backlog`, `acceptance`, `vision`,
+    `po_to_tl`) for this run.
+- Drift guard semantics:
+  - self-write changes from the same `(writer_id, intake_run_id)` are valid and
+    must not trigger concurrent-writer blockers,
+  - external conflicting mutation during active run must fail safe with
+    `INTAKE_CONCURRENT_WRITER_DETECTED` and no partial overwrite.
+
 ## Steps
 1. Determine intake mode from `.cursor/scratchpad.md`:
    - guided mode: `INTAKE_GUIDED_MODE=1` (default)
@@ -129,4 +149,7 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
   - `handoffs/po_to_tl.md` may prepend the latest handoff section only.
 - If the insertion anchor for any target section is missing/ambiguous, fail with
   `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` and avoid partial writes.
+- If intake appends a `docs/engineering/state.md` checkpoint, enforce UTC
+  monotonic timestamp guard (`new >= last`); on violation fail with
+  `STATE_TIMESTAMP_NON_MONOTONIC` and avoid partial writes.
 

@@ -41,11 +41,11 @@ MAGIC_BENCH_SESSION=
 # - AUTO_EXECUTE_ON_BLOCK: stop|skip (behavior when a planned item blocks)
 # - AUTO_EXECUTE_SELECTION: planned_then_priority
 # - AUTO_TEAM_SCOPE_ENFORCE: 0|1 (when TEAM_MODE=1, enforce TEAM_MEMBER + ACTIVE_TASK_IDS)
-AUTO_FLOW_MODE=manual
+AUTO_FLOW_MODE=auto_until_decision
 PHASE_MODE=interactive
 PERMISSION_MODE=interactive
 AUTO_INSTALL_DEPS=0
-AUTO_RELEASE_NOTES=0
+AUTO_RELEASE_NOTES=1
 AUTO_BACKLOG_DRAIN=0
 AUTO_BACKLOG_MAX_STORIES=1
 AUTO_BACKLOG_ON_BLOCK=stop
@@ -55,6 +55,14 @@ AUTO_EXECUTE_MAX_ITEMS=1
 AUTO_EXECUTE_ON_BLOCK=stop
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
+#
+# Team mode
+# - TEAM_MODE: 0|1 (enable task/member scoped team workflow)
+# - TEAM_MEMBER: short id for current developer
+# - ACTIVE_TASK_IDS: comma-separated task ids (for example T-12,T-13)
+TEAM_MODE=0
+TEAM_MEMBER=
+ACTIVE_TASK_IDS=
 #
 # Sprint planning
 # - SPRINT_MAX_TASKS: integer >= 1 (max atomic tasks per sprint, default 12)
@@ -86,9 +94,11 @@ SYNC_CUSTOM_PHASES=
 ALLOW_AUTO_PUSH=0
 AUTO_PUSH_BRANCH_ALLOWLIST=
 #
-# Knowledge curation
+# Knowledge curation / intake
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
 # - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
+# - INTAKE_SUBAGENT_FALLBACK: deny|allow (deny by default; when deny, missing
+#   role-specific intake subagent capability fails fast)
 # - ID_NAMESPACE_BOOTSTRAP: 0|1 (optional fresh-project ID bootstrap mode; when 1, allow first IDs to start at 0001 only if deterministic freshness checks pass)
 # - TOKEN_PROFILE: lean|balanced|full (tiered token-cost profile defaults)
 #   - lean: lowest-token default profile; reduce non-critical automation/research intensity
@@ -98,10 +108,11 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
+INTAKE_SUBAGENT_FALLBACK=deny
 ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 
-# Publish targets (US-0054)
+# Publish targets
 # - RELEASE_PUBLISH_MODE: disabled|confirm|auto
 #   - disabled: skip post-release publish target execution
 #   - confirm: require explicit operator confirmation before publish (default)
@@ -121,7 +132,7 @@ RELEASE_TARGETS_DEFAULT=
 SECURITY_REVIEW=0
 COMPLIANCE_PROFILES=GDPR
 
-# Cross-repo compatibility observability
+# Compatibility observability
 # - CROSS_REPO_OBSERVABILITY: 0|1 (enable compatibility visibility and checks)
 # - COMPATIBILITY_GATE_ON_CRITICAL: 0|1 (when enabled, critical unresolved
 #   compatibility findings trigger decision gate before release)
@@ -131,19 +142,15 @@ CROSS_REPO_OBSERVABILITY=0
 COMPATIBILITY_GATE_ON_CRITICAL=1
 COMPATIBILITY_SOURCES=
 
-# Component-scoped execution mode
+# Component scope
 # - COMPONENT_SCOPE_MODE: 0|1 (enable scoped planning/execution guardrails)
 # - TARGET_COMPONENTS: comma-separated component IDs intended in scope
 COMPONENT_SCOPE_MODE=0
 TARGET_COMPONENTS=
 
-# Optional spec-pack documentation (US-0031)
+# Optional docs packs
 # - SPEC_PACK_MODE: 0|1 (enable Design Concept, CRS, Technical Spec generation/validation; default 0)
 #   When 0, intake/architecture/release add no required spec-pack steps.
 SPEC_PACK_MODE=0
-
-# Optional user-guide documentation (US-0032)
-# - USER_GUIDE_MODE: 0|1 (enable per-feature user guides at docs/user-guides/US-xxxx.md; default 0)
-#   When 0, intake/architecture/sprint-plan/execute/qa/release add no required user-guide steps or blocking checks.
 USER_GUIDE_MODE=0
 

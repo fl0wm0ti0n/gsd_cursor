@@ -946,3 +946,31 @@
 - Boundaries:
   - In scope: workflow artifact ordering contracts, command mutation behavior, and parity/testing/docs updates.
   - Out of scope: changing product runtime features or redefining story semantics.
+
+## US-0059 — Deterministic Intake Runtime Capability Guard and Single-Writer Drift Safety
+- Title: Fail fast on missing role-specific subagent capability and prevent self-write drift false positives in intake
+- Summary: Harden intake runtime behavior so `/intake` does not silently degrade when required role-specific subagent capability is unavailable, and does not misclassify its own deterministic writes as external concurrent drift. Add deterministic diagnostics and bounded single-writer safeguards.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User observed an intake run reporting that `po` subagent could not run in the environment and fallback execution continued in-band.
+  - Same run reported mid-run backlog drift after writing artifacts, likely conflating self-writes with external concurrent edits.
+  - Existing contracts enforce fresh-context role isolation and fail-safe drift behavior, but capability negotiation and writer-identity semantics are not explicit enough for this runtime path.
+  - Decomposition evaluator outcome: single-story recommended because capability fail-fast, writer-lock semantics, and drift diagnostics are tightly coupled and should be validated together.
+  - User authority evidence: user explicitly requested bug intake.
+  - Intake research reference: `R-0035`.
+  - Decision update: `DEC-0041` accepted (intake capability fail-fast + single-writer drift safety contract).
+- Acceptance:
+  - [x] AC-1: `/intake` validates required role-specific subagent capability (`po`) before work starts and fails fast when unavailable.
+  - [x] AC-2: Add deterministic fail code for capability mismatch (for example `SUBAGENT_CAPABILITY_UNAVAILABLE`) with actionable remediation guidance.
+  - [x] AC-3: Intake runtime must not silently degrade to in-band execution when role-specific subagent is required unless explicit policy opt-in is configured.
+  - [x] AC-4: Add deterministic single-writer guard semantics for intake artifact mutation (writer identity/run-id scope) to distinguish self-write vs external concurrent writes.
+  - [x] AC-5: Drift detection distinguishes self-write changes from true external mutation and avoids false concurrent-writer blocking.
+  - [x] AC-6: On true concurrent writer detection, intake fails safe with deterministic reason code and no partial conflicting overwrite.
+  - [x] AC-7: Intake ordering and canonical ownership contracts remain preserved (`backlog` canonical, sorted-canonical placement, target-scoped writes).
+  - [x] AC-8: Active/template parity is maintained for command/rule/docs contracts related to capability checks and drift safety behavior.
+  - [x] AC-9: Regression tests cover capability-missing fail-fast path, self-write non-false-positive path, and real concurrent-writer fail-safe path.
+  - [x] AC-10: README/runbook operator guidance documents capability prerequisites, deterministic diagnostics, and recovery flow.
+- Boundaries:
+  - In scope: workflow runtime guards, intake execution policy, drift-detection semantics, deterministic diagnostics, and parity/testing/docs updates.
+  - Out of scope: runtime product feature behavior, external orchestrator platform migration, or weakening existing fail-closed safety gates.

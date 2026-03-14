@@ -779,6 +779,22 @@ Assert-True "runbook documents deterministic artifact ordering mode (active)" (F
 Assert-True "runbook documents deterministic artifact ordering mode (template)" (File-Contains $runbookTemplate "Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)")
 Assert-True "README documents deterministic ordering behavior (active)" (File-Contains $readmeActive "Deterministic ordering behavior (US-0058):")
 Assert-True "README documents deterministic ordering behavior (template)" (File-Contains $readmeTemplate "Deterministic ordering behavior (US-0058):")
+Assert-True "artifact ordering policy includes non-monotonic state timestamp reason code (active)" (File-Contains $artifactOrderingPolicyActive "STATE_TIMESTAMP_NON_MONOTONIC")
+Assert-True "artifact ordering policy includes non-monotonic state timestamp reason code (template)" (File-Contains $artifactOrderingPolicyTemplate "STATE_TIMESTAMP_NON_MONOTONIC")
+
+# 21i) Intake runtime capability and writer-safety checks (US-0059)
+Assert-True "scratchpad includes INTAKE_SUBAGENT_FALLBACK (active)" (File-Contains $scratchpadActive "INTAKE_SUBAGENT_FALLBACK=deny")
+Assert-True "scratchpad includes INTAKE_SUBAGENT_FALLBACK (template)" (File-Contains $scratchpadTemplate "INTAKE_SUBAGENT_FALLBACK=deny")
+Assert-True "scratchpad local example includes INTAKE_SUBAGENT_FALLBACK (active)" (File-Contains $scratchpadLocalExampleActive "INTAKE_SUBAGENT_FALLBACK=deny")
+Assert-True "scratchpad local example includes INTAKE_SUBAGENT_FALLBACK (template)" (File-Contains $scratchpadLocalExampleTemplate "INTAKE_SUBAGENT_FALLBACK=deny")
+Assert-True "intake command documents capability fail-fast code (active)" (File-Contains $intakeActive "SUBAGENT_CAPABILITY_UNAVAILABLE")
+Assert-True "intake command documents capability fail-fast code (template)" (File-Contains $intakeTemplate "SUBAGENT_CAPABILITY_UNAVAILABLE")
+Assert-True "intake command documents concurrent writer fail-safe code (active)" (File-Contains $intakeActive "INTAKE_CONCURRENT_WRITER_DETECTED")
+Assert-True "intake command documents concurrent writer fail-safe code (template)" (File-Contains $intakeTemplate "INTAKE_CONCURRENT_WRITER_DETECTED")
+Assert-True "runbook documents intake runtime capability and writer safety mode (active)" (File-Contains $runbookActive "Intake runtime capability and single-writer safety (US-0059 / DEC-0041)")
+Assert-True "runbook documents intake runtime capability and writer safety mode (template)" (File-Contains $runbookTemplate "Intake runtime capability and single-writer safety (US-0059 / DEC-0041)")
+Assert-True "README documents intake runtime safety behavior (active)" (File-Contains $readmeActive "Intake runtime safety behavior (US-0059):")
+Assert-True "README documents intake runtime safety behavior (template)" (File-Contains $readmeTemplate "Intake runtime safety behavior (US-0059):")
 
 # 22) Optional cross-repo observability checks (US-0034)
 $qaCommandActive = Join-Path $root ".cursor\commands\qa.md"

@@ -20,10 +20,18 @@ anchors are missing or ambiguous.
 - Re-running a command without semantic changes must not reorder rows/blocks.
 - No oscillation between top and bottom insertion paths.
 - No broad rewrites of unrelated story/sprint entries.
+- For `docs/engineering/state.md`, each newly appended checkpoint timestamp must
+  be monotonic (`new_timestamp >= last_checkpoint_timestamp`) in UTC.
 
 ## Fail-safe behavior
 
 If required placement anchors are missing or ambiguous:
 - stop with reason code `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`,
 - emit remediation guidance with expected anchor and file path,
+- perform no partial mutation.
+
+If a new `state.md` checkpoint timestamp is older than the current last
+checkpoint timestamp:
+- stop with reason code `STATE_TIMESTAMP_NON_MONOTONIC`,
+- emit remediation guidance with the expected minimum timestamp,
 - perform no partial mutation.

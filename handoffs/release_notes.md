@@ -13,28 +13,29 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0037`
-- **Latest canonical notes:** `handoffs/releases/S0037-release-notes.md`
+- **Latest released sprint:** `S0038`
+- **Latest canonical notes:** `handoffs/releases/S0038-release-notes.md`
 - **Latest release date:** 2026-03-14
-- **Latest release story:** US-0058
+- **Latest release story:** US-0059
 
 ## Unreleased queue visibility
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-## Release readiness note (S0037)
+## Release readiness note (S0038)
 
-- Sprint: `S0037`
-- Story: `US-0058`
+- Sprint: `S0038`
+- Story: `US-0059`
 - Verify-work: PASS
 - UAT status: PASS (`10/10`, `0` failed)
-- QA findings: PASS with no blockers (`sprints/S0037/qa-findings.md`)
+- QA findings: PASS with no blockers (`sprints/S0038/qa-findings.md`)
 - Release readiness: Finalized as `released` in `handoffs/release_queue.md`
   with canonical sprint-scoped notes.
 
 ## Historical references
 
+- `S0038`: `handoffs/releases/S0038-release-notes.md`
 - `S0037`: `handoffs/releases/S0037-release-notes.md`
 - `S0036`: `handoffs/releases/S0036-release-notes.md`
 - `S0035`: `handoffs/releases/S0035-release-notes.md`

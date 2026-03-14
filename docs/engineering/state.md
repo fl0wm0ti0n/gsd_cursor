@@ -4088,3 +4088,149 @@ Per DEC-0010, this table maps every story to its sprint, tasks, status, and evid
   - fresh_context_marker=curator-status-reconcile-20260314T203000Z-fresh
   - timestamp=2026-03-14T20:30:00Z
   - evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,handoffs/resume_brief.md,docs/engineering/status-normalization-report.md
+
+## Intake checkpoint (2026-03-14) — US-0059
+
+- Intake result: accepted and persisted as `US-0059` (OPEN).
+- Scope: deterministic intake runtime capability guard + single-writer drift
+  safety for self-write false-positive prevention.
+- Decomposition decision: single-story recommended (capability preflight + drift
+  semantics are tightly coupled).
+- Research reference: `R-0035`.
+- Next recommended phase:
+  - `/discovery` for `US-0059`.
+- Isolation evidence:
+  - phase_id=intake
+  - role=po
+  - fresh_context_marker=po-US0059-intake-20260314T203500Z-fresh
+  - timestamp=2026-03-14T20:35:00Z
+  - evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,docs/product/vision.md,handoffs/po_to_tl.md,docs/engineering/research.md
+
+## Discovery checkpoint (2026-03-14) — US-0059
+
+- Discovery result: PASS.
+- Key outcomes:
+  - capability preflight must fail fast when role-specific `po` capability is
+    unavailable,
+  - drift guard must treat self-write updates as valid within same writer/run
+    scope,
+  - external conflicting writers must remain fail-safe.
+- Isolation evidence:
+  - phase_id=discovery
+  - role=po
+  - fresh_context_marker=po-US0059-discovery-20260314T204000Z-fresh
+  - timestamp=2026-03-14T20:40:00Z
+  - evidence_ref=docs/product/vision.md,handoffs/po_to_tl.md
+
+## Research checkpoint (2026-03-14) — US-0059
+
+- Research result: PASS.
+- Research reference: `R-0035` (intake runtime capability mismatch and
+  self-write drift false-positive controls).
+- Isolation evidence:
+  - phase_id=research
+  - role=po
+  - fresh_context_marker=po-US0059-research-20260314T204500Z-fresh
+  - timestamp=2026-03-14T20:45:00Z
+  - evidence_ref=docs/engineering/research.md
+
+## Architecture checkpoint (2026-03-14) — US-0059
+
+- Architecture result: PASS.
+- Decision: `DEC-0041` accepted.
+- Scope: capability fail-fast (`SUBAGENT_CAPABILITY_UNAVAILABLE`), explicit
+  fallback policy, and single-writer/self-write-aware drift safety with
+  fail-safe external conflict reason
+  (`INTAKE_CONCURRENT_WRITER_DETECTED`).
+- Isolation evidence:
+  - phase_id=architecture
+  - role=tech-lead
+  - fresh_context_marker=tl-US0059-architecture-20260314T205000Z-fresh
+  - timestamp=2026-03-14T20:50:00Z
+  - evidence_ref=docs/engineering/architecture.md,decisions/DEC-0041.md,docs/engineering/decisions.md
+
+## Sprint-plan checkpoint (2026-03-14) — S0038 / US-0059
+
+- Sprint-plan result: PASS.
+- Sprint: `S0038` created with 10 tasks.
+- Isolation evidence:
+  - phase_id=sprint-plan
+  - role=tech-lead
+  - fresh_context_marker=tl-US0059-sprint-plan-20260314T205500Z-fresh
+  - timestamp=2026-03-14T20:55:00Z
+  - evidence_ref=sprints/S0038/sprint.md,sprints/S0038/tasks.md,handoffs/tl_to_dev.md
+
+## Plan-verify checkpoint (2026-03-14) — S0038 / US-0059
+
+- Plan-verify result: PASS.
+- Coverage: AC-1..AC-10 covered; no gaps.
+- Isolation evidence:
+  - phase_id=plan-verify
+  - role=tech-lead
+  - fresh_context_marker=tl-US0059-plan-verify-20260314T210000Z-fresh
+  - timestamp=2026-03-14T21:00:00Z
+  - evidence_ref=sprints/S0038/plan-verify.json
+
+## Execute checkpoint (2026-03-14) — S0038 / US-0059
+
+- Execute result: PASS.
+- Implementation highlights:
+  - intake capability preflight + fail-fast reason code contract added,
+  - explicit fallback policy switch (`INTAKE_SUBAGENT_FALLBACK`) added,
+  - self-write-aware drift safety + concurrent writer fail-safe contract added,
+  - active/template parity updates completed.
+- Isolation evidence:
+  - phase_id=execute
+  - role=dev
+  - fresh_context_marker=dev-US0059-execute-20260314T210500Z-fresh
+  - timestamp=2026-03-14T21:05:00Z
+  - evidence_ref=.cursor/commands/intake.md,template/.cursor/commands/intake.md,.cursor/scratchpad.md,template/.cursor/scratchpad.md,docs/engineering/runbook.md,README.md,tests/run-tests.ps1,tests/run-tests.sh
+
+## QA checkpoint (2026-03-14) — S0038 / US-0059
+
+- QA result: PASS.
+- Evidence: US-0059-targeted assertions PASS; full suite retains known unrelated
+  failures (see `tests/report.md` and `sprints/S0038/qa-findings.md`).
+- Isolation evidence:
+  - phase_id=qa
+  - role=qa
+  - fresh_context_marker=qa-US0059-qa-20260314T211000Z-fresh
+  - timestamp=2026-03-14T21:10:00Z
+  - evidence_ref=sprints/S0038/qa-findings.md,tests/report.md
+
+## Verify-work checkpoint (2026-03-14) — S0038 / US-0059
+
+- UAT result: 10 passed, 0 failed.
+- Isolation evidence:
+  - phase_id=verify-work
+  - role=qa
+  - fresh_context_marker=qa-US0059-verify-work-20260314T211500Z-fresh
+  - timestamp=2026-03-14T21:15:00Z
+  - evidence_ref=sprints/S0038/uat.json,sprints/S0038/uat.md
+
+## Release checkpoint (2026-03-14) — S0038 / US-0059
+
+- Release outcome: PASS and finalized.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0059` set `DONE`; AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0059` checked
+- Isolation evidence:
+  - phase_id=release
+  - role=release
+  - fresh_context_marker=release-US0059-release-20260314T212000Z-fresh
+  - timestamp=2026-03-14T21:20:00Z
+  - evidence_ref=sprints/S0038/release-findings.md,handoffs/releases/S0038-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-14) — post S0038 / US-0059
+
+- Latest completed story: `US-0059` (`S0038`, PASS, released).
+- Backlog posture:
+  - no OPEN story in active intake queue.
+- Next recommended phase:
+  - `/intake`.
+- Isolation evidence:
+  - phase_id=refresh-context
+  - role=curator
+  - fresh_context_marker=curator-refresh-context-post-S0038-no-open-intake-20260314T212500Z-fresh
+  - timestamp=2026-03-14T21:25:00Z
+  - evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,handoffs/resume_brief.md

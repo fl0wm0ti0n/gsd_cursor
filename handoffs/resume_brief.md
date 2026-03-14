@@ -2,19 +2,17 @@
 
 ## Current status
 
-- Post S0037 release: `US-0058` (`S0037`) is finalized (PASS, released).
-- Release gates passed; backlog/acceptance reconciled for US-0058.
-- Status-reconcile pass applied normalization for legacy DONE/unchecked drift
-  (`STATUS_RECONCILE_APPLIED`).
+- Post S0038 release: `US-0059` (`S0038`) is finalized (PASS, released).
+- Release gates passed; backlog/acceptance reconciled for `US-0059`.
 - Current OPEN backlog stories:
   - (none in active intake queue)
 - Latest intake accepted:
-  - `/intake` for `US-0056` (completed),
-  - `/intake` for `US-0057` (completed),
+  - `/intake` for `US-0059` (completed),
   - `/intake` for `US-0058` (completed),
-  - `/discovery` progressed for `US-0056`.
+  - `/intake` for `US-0057` (completed),
+  - `/intake` for `US-0056` (completed).
 - Decision status update:
-  - `DEC-0038` accepted and implemented in S0035 release.
+  - `DEC-0041` accepted and implemented in S0038 release.
 
 ## Next actions
 
@@ -28,7 +26,7 @@
 
 ## Isolation provenance (US-0048 / DEC-0029)
 
-- isolation_provenance_ref=docs/engineering/state.md (refresh-context checkpoint post S0037 / no-open-intake)
+- isolation_provenance_ref=docs/engineering/state.md (refresh-context checkpoint post S0038 / no-open-intake)
 - resume_requires_fresh_context=1
 
 ## Auto continuation breadcrumb contract (US-0037)
@@ -53,4 +51,4 @@ Fail-fast resolver errors must use:
 - resolution_status=resolved
 - stop_reason=completed
 - stop_phase=refresh-context
-- timestamp=2026-03-14T20:10:00Z
+- timestamp=2026-03-14T21:25:00Z

@@ -1,3 +1,49 @@
+# TL -> Dev Handoff — Sprint S0038 (US-0059 Intake Capability Guard + Drift Safety)
+
+## Planning summary
+
+- **Sprint**: S0038 (new)
+- **Story**: US-0059 — Deterministic intake runtime capability guard and
+  single-writer drift safety
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0038/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0059 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0059 section)
+- Decision: `decisions/DEC-0041.md`
+- Research: `docs/engineering/research.md` (`R-0035`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0059 section/addendum)
+- Sprint artifacts: `sprints/S0038/*`
+
+## Focus
+
+1. **Capability fail-fast (T-001..T-003)**: deterministic preflight and explicit
+   fallback policy.
+2. **Single-writer drift safety (T-004..T-006)**: self-write-aware drift
+   semantics and fail-safe external conflict behavior.
+3. **Parity + validation (T-007..T-010)**: active/template parity, tests, docs,
+   and release traceability.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0038/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0038/tasks.md` marked done.
+- `sprints/S0038/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0038/progress.md`, `sprints/S0038/uat.json`, and
+  `sprints/S0038/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0059`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0038` (`US-0059`).
+
+---
+
 # TL -> Dev Handoff — Sprint S0037 (US-0058 Deterministic Artifact Ordering)
 
 ## Planning summary

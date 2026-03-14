@@ -834,6 +834,8 @@ Required write discipline:
 Fail-safe contract:
 - Missing/ambiguous placement anchors fail closed with
   `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`.
+- Non-monotonic `state.md` checkpoint timestamps fail closed with
+  `STATE_TIMESTAMP_NON_MONOTONIC`.
 - No partial mutation on fail-safe path.
 - Re-run without semantic changes must be ordering-idempotent.
 
@@ -841,6 +843,28 @@ Execution guidance:
 - Local baseline: run `sh tests/run-tests.sh` (or `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1`).
 - Packaging smoke: run npm local tests in `packaging/npm/`.
 - CI evidence: inspect `npm-test`, `brew-test`, and `choco-test` job logs.
+
+## Intake runtime capability and single-writer safety (US-0059 / DEC-0041)
+
+`/intake` enforces deterministic runtime preflight and drift safety before
+artifact mutation.
+
+Capability preflight:
+- Required role capability: `po` subagent.
+- Default policy: fail fast when unavailable with
+  `SUBAGENT_CAPABILITY_UNAVAILABLE`.
+- Fallback policy is explicit only:
+  - `INTAKE_SUBAGENT_FALLBACK=deny` (default): no silent fallback.
+  - `INTAKE_SUBAGENT_FALLBACK=allow`: explicit operator opt-in for fallback path.
+
+Single-writer drift safety:
+- Intake run binds a deterministic writer/run identity (`writer_id`,
+  `intake_run_id`) to target artifacts.
+- Self-write updates for the active writer/run are valid and must not trigger
+  concurrent drift blockers.
+- External concurrent conflicting writes fail safe with
+  `INTAKE_CONCURRENT_WRITER_DETECTED`.
+- Fail-safe path performs no partial overwrite.
 
 ## Project run steps
 

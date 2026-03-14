@@ -96,6 +96,8 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 # Knowledge curation / intake
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
 # - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
+# - INTAKE_SUBAGENT_FALLBACK: deny|allow (deny by default; when deny, missing
+#   role-specific intake subagent capability fails fast)
 # - ID_NAMESPACE_BOOTSTRAP: 0|1 (optional fresh-project ID bootstrap mode; when 1, allow first IDs to start at 0001 only if deterministic freshness checks pass)
 # - TOKEN_PROFILE: lean|balanced|full (tiered token-cost profile defaults)
 #   - lean: lowest-token default profile; reduce non-critical automation/research intensity
@@ -105,6 +107,7 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
+INTAKE_SUBAGENT_FALLBACK=deny
 ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 #

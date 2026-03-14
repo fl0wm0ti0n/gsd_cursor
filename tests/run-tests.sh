@@ -584,6 +584,22 @@ assert_true "runbook documents deterministic artifact ordering mode (active)" "f
 assert_true "runbook documents deterministic artifact ordering mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)\""
 assert_true "README documents deterministic ordering behavior (active)" "file_contains \"$ROOT/README.md\" \"Deterministic ordering behavior (US-0058):\""
 assert_true "README documents deterministic ordering behavior (template)" "file_contains \"$TPL/README.md\" \"Deterministic ordering behavior (US-0058):\""
+assert_true "artifact ordering policy includes non-monotonic state timestamp reason code (active)" "file_contains \"$ROOT/docs/engineering/artifact-ordering-policy.md\" \"STATE_TIMESTAMP_NON_MONOTONIC\""
+assert_true "artifact ordering policy includes non-monotonic state timestamp reason code (template)" "file_contains \"$TPL/docs/engineering/artifact-ordering-policy.md\" \"STATE_TIMESTAMP_NON_MONOTONIC\""
+
+# 21i) Intake runtime capability and writer-safety checks (US-0059)
+assert_true "scratchpad includes INTAKE_SUBAGENT_FALLBACK (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"INTAKE_SUBAGENT_FALLBACK=deny\""
+assert_true "scratchpad includes INTAKE_SUBAGENT_FALLBACK (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"INTAKE_SUBAGENT_FALLBACK=deny\""
+assert_true "scratchpad local example includes INTAKE_SUBAGENT_FALLBACK (active)" "file_contains \"$ROOT/.cursor/scratchpad.local.example.md\" \"INTAKE_SUBAGENT_FALLBACK=deny\""
+assert_true "scratchpad local example includes INTAKE_SUBAGENT_FALLBACK (template)" "file_contains \"$TPL/.cursor/scratchpad.local.example.md\" \"INTAKE_SUBAGENT_FALLBACK=deny\""
+assert_true "intake command documents capability fail-fast code (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"SUBAGENT_CAPABILITY_UNAVAILABLE\""
+assert_true "intake command documents capability fail-fast code (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"SUBAGENT_CAPABILITY_UNAVAILABLE\""
+assert_true "intake command documents concurrent writer fail-safe code (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"INTAKE_CONCURRENT_WRITER_DETECTED\""
+assert_true "intake command documents concurrent writer fail-safe code (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"INTAKE_CONCURRENT_WRITER_DETECTED\""
+assert_true "runbook documents intake runtime capability and writer safety mode (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Intake runtime capability and single-writer safety (US-0059 / DEC-0041)\""
+assert_true "runbook documents intake runtime capability and writer safety mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Intake runtime capability and single-writer safety (US-0059 / DEC-0041)\""
+assert_true "README documents intake runtime safety behavior (active)" "file_contains \"$ROOT/README.md\" \"Intake runtime safety behavior (US-0059):\""
+assert_true "README documents intake runtime safety behavior (template)" "file_contains \"$TPL/README.md\" \"Intake runtime safety behavior (US-0059):\""
 
 # 22) Optional cross-repo observability checks (US-0034)
 assert_true "scratchpad includes CROSS_REPO_OBSERVABILITY (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"CROSS_REPO_OBSERVABILITY\""

@@ -1053,3 +1053,40 @@ a decision or recommendation.
 - **Linked**: US-0056
 - **Confidence**: medium
 - **Status**: current
+
+## R-0035
+
+- **Date**: 2026-03-11
+- **Topic**: Intake runtime capability mismatch and self-write drift false-positive controls
+- **Query**: What deterministic intake runtime pattern prevents silent
+  role-subagent degradation and avoids misclassifying self-writes as external
+  concurrent artifact drift.
+- **Sources**:
+  - Internal command contract:
+    - `.cursor/commands/intake.md`
+  - Internal runtime artifacts:
+    - `docs/product/backlog.md`
+    - `docs/product/acceptance.md`
+    - `docs/engineering/state.md`
+  - Reported runtime transcript evidence from first intake in fresh repo.
+- **Findings**:
+  - Required role-subagent capability should be validated before mutation begins;
+    when unavailable, deterministic fail-fast diagnostics are safer than implicit
+    in-band fallback.
+  - Drift detection must include writer identity/run correlation so known
+    self-generated writes are not treated as external concurrent mutation.
+  - Single-writer safety is strongest with bounded lock scope across targeted
+    intake artifacts plus explicit release/timeout semantics.
+  - True external concurrent-writer detection should remain fail-safe and produce
+    deterministic reason code + remediation guidance.
+  - Ordering/ownership contracts remain compatible when guards are target-scoped
+    and avoid broad rewrites.
+- **Risks**:
+  - Locking semantics that are too broad can create avoidable operator friction.
+  - Optional fallback modes without explicit policy can reintroduce silent
+    behavioral drift.
+  - Incomplete template parity can cause inconsistent behavior across fresh
+    repositories.
+- **Linked**: US-0059
+- **Confidence**: medium
+- **Status**: current

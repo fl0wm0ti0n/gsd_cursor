@@ -1,3 +1,97 @@
+# PO -> TL Discovery Addendum — US-0059 (Intake Capability Guard + Drift Safety)
+
+## Discovery context
+
+- Discovery confirms intake reliability gap at runtime boundary:
+  - missing role-specific `po` capability handling,
+  - self-write vs external-writer drift discrimination.
+- Contract must preserve existing ordering and canonical ownership guarantees.
+
+## Discovery outcomes
+
+- Recommend capability preflight before mutation with deterministic fail-fast
+  reason code `SUBAGENT_CAPABILITY_UNAVAILABLE`.
+- Recommend explicit fallback policy switch only
+  (`INTAKE_SUBAGENT_FALLBACK=deny|allow`) with default deny.
+- Recommend deterministic writer/run identity model for intake mutations
+  (`writer_id`, `intake_run_id`) and self-write allow semantics.
+- Recommend fail-safe conflict handling with deterministic reason code
+  `INTAKE_CONCURRENT_WRITER_DETECTED` and no partial overwrite.
+
+## Recommendation
+
+- Proceed to **`/architecture`** for `US-0059` with focus on command contract,
+  reason-code matrix, and parity/test coverage.
+
+---
+
+# PO -> TL Handoff — US-0059 (Intake Runtime Capability Guard + Drift Safety)
+
+## Intake context
+
+User reports a first-intake run in a fresh repo where the runtime claimed:
+- `po` subagent cannot run in current environment (capability mismatch),
+- intake proceeded directly,
+- then blocked because `docs/product/backlog.md` "changed mid-run" from empty to
+  populated.
+
+User explicitly requested this be formalized as a bug intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0048` (fresh per-phase subagent isolation evidence),
+  - `US-0056` (strict runtime proof for phase isolation),
+  - `US-0058` (deterministic artifact ordering).
+- Assessment: not a duplicate.
+  - Existing stories define isolation/order contracts.
+  - This new story targets intake-time capability negotiation and self-write vs
+    external-writer drift discrimination.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - capability preflight, writer identity/run scoping, and deterministic drift
+    diagnostics are tightly coupled,
+  - safest to implement and validate as one bounded intake runtime contract.
+- User authority evidence: user explicitly requested bug intake.
+
+## Scope for TL
+
+- In scope:
+  - intake preflight for required `po` subagent capability,
+  - deterministic fail-fast reason code + remediation output for capability
+    mismatch,
+  - deterministic single-writer guard semantics and self-write-aware drift
+    detection,
+  - fail-safe behavior on true concurrent writer detection,
+  - active/template parity, tests, and operator docs.
+- Out of scope:
+  - removing existing release/isolation fail-closed gates,
+  - changing non-intake workflow feature behavior.
+
+## Risks
+
+- Overly strict capability checks could block valid fallback usage if policy is
+  not explicit.
+- Weak writer identity semantics can still produce false-positive drift blocks.
+- Broad file rewrites during guard implementation could violate ordering
+  idempotence.
+
+## Research reference
+
+- `R-0035`: capability mismatch handling and single-writer drift guard patterns.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0059`, focusing on:
+  - capability contract shape and policy defaults,
+  - run-id/writer-identity model for intake writes,
+  - deterministic reason-code matrix for fail-fast vs fail-safe paths.
+
+---
+
 # PO -> TL Discovery Addendum — US-0056 (Strict Runtime Proof)
 
 ## Discovery context

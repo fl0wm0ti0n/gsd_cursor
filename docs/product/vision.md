@@ -234,3 +234,22 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   artifact and fail closed on ambiguous placement anchors.
 - Re-run idempotence is mandatory: no reorder churn when there is no semantic
   change.
+
+## Intake Notes — US-0059
+
+- User reports intake runtime showing a role-capability mismatch (`po` subagent
+  unavailable) followed by fallback execution in the same context.
+- Same run reported backlog "changed mid-run" after intake persistence, implying
+  possible self-write drift false positive behavior.
+- Expected outcome: deterministic fail-fast on missing required subagent
+  capability, plus single-writer drift semantics that distinguish self-writes
+  from true concurrent external writers.
+
+## Discovery Notes — US-0059
+
+- Intake runtime must validate required role capability before mutation starts;
+  default behavior is fail-fast, not silent in-band fallback.
+- Drift guard needs deterministic writer/run identity so self-generated writes
+  are not treated as external concurrent mutation.
+- External conflicting writer activity must remain fail-safe with deterministic
+  reason code and no partial overwrite behavior.

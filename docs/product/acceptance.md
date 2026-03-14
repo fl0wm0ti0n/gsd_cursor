@@ -83,3 +83,4 @@
 - [x] US-0056: Strict runtime proof for per-phase subagent isolation with fail-closed auto gates
 - [x] US-0057: Upgrade-safe scratchpad local example refresh and installer parity
 - [x] US-0058: Deterministic artifact ordering and write discipline
+- [x] US-0059: Deterministic intake runtime capability guard and single-writer drift safety

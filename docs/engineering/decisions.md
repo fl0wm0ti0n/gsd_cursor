@@ -3,6 +3,7 @@
 ## Current context pack (2026-03-14)
 
 - Latest completed/released stories:
+  - `US-0059` (`S0038`), governed by `DEC-0041`.
   - `US-0058` (`S0037`), governed by `DEC-0040`.
   - `US-0057` (`S0036`), governed by `DEC-0039`.
   - `US-0056` (`S0035`), governed by `DEC-0038`.
@@ -10,14 +11,19 @@
   - `US-0054` (`S0033`), governed by `DEC-0036`.
   - `US-0052` (`S0031`), governed by `DEC-0034`.
   - `US-0053` (`S0032`), governed by `DEC-0035`.
-- Latest architecture decision: `DEC-0040` for `US-0058` (deterministic
-  artifact ordering matrix and fail-safe write contract).
+- Latest architecture decision: `DEC-0041` for `US-0059` (intake capability
+  fail-fast plus single-writer drift safety contract).
 - Next prioritized open story: none in current active intake queue.
 - Active intake/research target: none (awaiting next intake).
 - No open decision gate at workflow boundary.
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0041`: deterministic intake capability preflight with fail-fast
+  `SUBAGENT_CAPABILITY_UNAVAILABLE`, explicit fallback policy, and
+  single-writer self-write-aware drift safety
+  (`INTAKE_CONCURRENT_WRITER_DETECTED` for external conflicts); linked story
+  `US-0059`.
 - `DEC-0040`: canonical artifact ordering matrix (`append-bottom`,
   `prepend-top`, `sorted-canonical`) plus fail-safe anchor handling and
   idempotent rerun contract; linked story `US-0058`.
@@ -51,4 +57,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0040.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0041.md`.
