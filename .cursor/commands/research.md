@@ -32,6 +32,14 @@ description: "its-magic research: gather references and risks before architectur
 1. Identify research topics from product vision, backlog, and acceptance criteria.
 2. Search the web for relevant patterns, libraries, APIs, and risks.
 3. Persist each finding as an R-xxxx entry in `docs/engineering/research.md`.
-   Auto-increment the ID from the highest existing entry. Follow the entry schema
-   defined in the research.md header (per DEC-0011).
+   Use deterministic ID policy:
+   - if `ID_NAMESPACE_BOOTSTRAP=1` and freshness checks pass
+     (`docs/product/backlog.md` has no `US-`, `docs/engineering/decisions.md` has
+     no `DEC-`, and `docs/engineering/research.md` has no `R-`), start at
+     `R-0001`;
+   - otherwise auto-increment from the highest existing entry.
+   Never rewrite historical IDs. If bootstrap is requested but freshness fails,
+   emit `ID_BOOTSTRAP_NOT_FRESH` diagnostic and continue with highest-existing
+   continuation. Follow the entry schema defined in the research.md header
+   (per DEC-0011 / DEC-0034).
 4. Record any decisions triggered by research and update state.

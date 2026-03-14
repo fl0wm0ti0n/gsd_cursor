@@ -128,7 +128,7 @@ its-magic --clean-repo --target .
 
 | Flag | Description |
 |------|-------------|
-| `--clean-repo` | Remove all its-magic workflow artifacts from the target repo (`.cursor`, `docs/product`, `docs/engineering`, `sprints`, `handoffs`, `decisions`). Your own source code is never touched. |
+| `--clean-repo` | Remove installer-owned its-magic workflow artifacts from the target repo (manifest-owned paths including `.cursor`, `docs/product`, `docs/engineering`, `docs/user-guides`, `sprints`, `handoffs`, `decisions`, workflow scripts, CI files, `.its-magic-version`). Your own source code is never touched. |
 | `--yes` | Skip the confirmation prompt when cleaning. |
 
 **Info**
@@ -199,6 +199,18 @@ Setup:
 2. Set personal values there (`TEAM_MEMBER`, `ACTIVE_TASK_IDS`, automation style)
 3. Hook merges shared + local (local wins)
 
+Upgrade behavior (US-0057):
+- `.cursor/scratchpad.local.example.md` is framework-owned and refreshed on `--mode upgrade`.
+- `.cursor/scratchpad.local.md` is user-owned and preserved on `--mode upgrade`.
+- Installer output includes scratchpad example refresh status and local-preserved signal.
+
+Deterministic ordering behavior (US-0058):
+- Mutable artifacts follow `docs/engineering/artifact-ordering-policy.md`.
+- `state.md` checkpoints are append-bottom; `backlog.md` and `acceptance.md`
+  remain sorted-canonical by story ID.
+- Commands fail closed on ambiguous placement anchors using
+  `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`.
+
 ## Workflow
 
 ### Core commands
@@ -230,6 +242,113 @@ Setup:
 - `INTAKE_GUIDED_MODE=0` (low-touch)
   - skips proactive follow-up/options/research overhead unless user requests it
   - still performs duplicate/overlap check against backlog
+
+### Intake decomposition + risk-aware questioning (US-0051)
+
+When guided mode is enabled, `/intake` now supports bounded decomposition for
+broad/high-risk requests:
+
+- runs deterministic breadth/risk heuristics (feature/workflow count,
+  cross-cutting impact, acceptance breadth, unknown dependencies)
+- proposes bounded multi-story decomposition when heuristics indicate broad
+  scope; keeps single-story default for narrow scope
+- enforces vertical-slice/workflow-step split quality (independently valuable,
+  testable stories; avoid technical-layer-only splits by default)
+- preserves user control before persistence: accept, merge, or adjust split
+- asks additional targeted questions on high-risk/high-impact intake (not
+  ambiguity-only), but keeps rounds bounded and concise
+- keeps low-touch compatibility: no forced decomposition when
+  `INTAKE_GUIDED_MODE=0` unless explicitly requested
+- records decomposition/questioning evidence in intake artifacts
+  (`docs/product/backlog.md`, `docs/product/acceptance.md`,
+  `handoffs/po_to_tl.md`)
+
+### Optional ID namespace bootstrap (US-0052)
+
+Fresh-project ID bootstrap behavior is explicit and default-off:
+
+- `ID_NAMESPACE_BOOTSTRAP=0|1` in `.cursor/scratchpad.md` (default `0`)
+
+When enabled (`1`), workflows use deterministic freshness checks before first ID
+creation:
+
+- no `US-` IDs in `docs/product/backlog.md`
+- no `DEC-` IDs in `docs/engineering/decisions.md` / `decisions/DEC-*.md`
+- no `R-` IDs in `docs/engineering/research.md`
+
+If eligible, first IDs start at `US-0001`, `DEC-0001`, and `R-0001`. If not
+eligible (or mode is off), generation continues from highest existing IDs.
+Historical IDs are never rewritten or renumbered. Ineligible bootstrap requests
+emit deterministic diagnostic `ID_BOOTSTRAP_NOT_FRESH`.
+
+### Context compaction + tiered token profile (US-0053)
+
+Token-cost behavior is controlled by `.cursor/scratchpad.md`:
+
+- `TOKEN_PROFILE=lean|balanced|full` (default `balanced`)
+
+Profile behavior:
+
+- `lean`: reduce non-critical overhead defaults (automation/research/context
+  breadth) while keeping mandatory quality gates intact.
+- `balanced`: preserve current capabilities with moderate overhead.
+- `full`: maximize context breadth/autonomy for high-uncertainty work.
+
+Manual override precedence:
+
+- Explicit scratchpad flag values override profile defaults for that flag.
+- Profile mode never disables mandatory `/qa` -> `/verify-work` -> `/release`
+  gate semantics.
+
+Compaction behavior:
+
+- `docs/engineering/state.md` is the active hot surface.
+- Historical checkpoints move to append-only packs under
+  `docs/engineering/state-archive/`.
+- `docs/engineering/decisions.md` stays a compact index with bounded summaries
+  and canonical links to `decisions/DEC-xxxx.md`.
+
+`/ask` policy (read-only):
+
+- question-scoped retrieval first
+- targeted sections before broad file reads
+- bounded expansion only when unresolved
+- explicit "not found in artifacts" when still unresolved
+
+### Configurable multi-target publish + confirmation gate (US-0054)
+
+Post-release publish behavior is configurable per repository:
+
+- `RELEASE_PUBLISH_MODE=disabled|confirm|auto` (default `confirm`)
+- `RELEASE_TARGETS_FILE=docs/engineering/release-targets.json`
+- `RELEASE_TARGETS_DEFAULT=` optional comma-separated default targets
+
+Supported target types include:
+
+- `npm`, `choco`, `brew`, `git`, `docker`, `cloud`
+- `custom` (generic command target)
+- `ssh` (generic server deployment over SSH)
+
+Safety defaults:
+
+- Mandatory `/release` gates are unchanged and must pass first.
+- `confirm` mode enforces explicit operator approval before publish execution.
+- Sensitive values are env-referenced (for example `tokenEnv`, `authEnv`), not
+  inline literals.
+
+### Deterministic status reconciliation command (US-0055)
+
+Use `/status-reconcile` to normalize status drift between canonical and derived
+workflow artifacts before continuation:
+
+- canonical source: `docs/product/backlog.md` story status
+- derived targets: `docs/product/acceptance.md`, `docs/engineering/state.md`,
+  `handoffs/resume_brief.md`
+- deterministic outcomes: apply/no-op/fail-safe reason codes with audit evidence
+  in `docs/engineering/status-normalization-report.md`
+
+This command is the bounded repair counterpart to `/memory-audit`
+(read-only detection).
 
 ### Optional cross-repo observability (US-0034)
 
@@ -381,6 +500,21 @@ Each phase run appends:
 Missing/invalid/stale evidence fails closed with reason codes:
 `PHASE_CONTEXT_ISOLATION_MISSING`, `PHASE_CONTEXT_ISOLATION_VIOLATION`,
 `ISOLATION_EVIDENCE_STALE`, `ISOLATION_EVIDENCE_INVALID`.
+
+#### Strict runtime proof (US-0056 / DEC-0038)
+
+Per-phase isolation also requires strict runtime attestation tuples at
+boundaries (not artifact fields alone):
+
+- `orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`
+- `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`
+
+Fail-closed reason codes:
+`RUNTIME_PROOF_MISSING`, `RUNTIME_PROOF_INVALID`, `RUNTIME_PROOF_REUSED`,
+`RUNTIME_PROOF_STALE`, `RUNTIME_PROOF_AMBIGUOUS_LINK`.
+
+`/auto`, `/verify-work`, and `/release` must validate these tuples before
+continuation/finalization.
 
 ### Lightweight interaction
 

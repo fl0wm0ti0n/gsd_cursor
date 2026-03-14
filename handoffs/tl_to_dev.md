@@ -1,3 +1,465 @@
+# TL -> Dev Handoff — Sprint S0037 (US-0058 Deterministic Artifact Ordering)
+
+## Planning summary
+
+- **Sprint**: S0037 (new)
+- **Story**: US-0058 — Deterministic artifact ordering and write discipline
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0037/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0058 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0058 section)
+- Decision: `decisions/DEC-0040.md`
+- Research: `docs/engineering/research.md` (`R-0033`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0058 section)
+- Sprint artifacts: `sprints/S0037/*`
+
+## Focus
+
+1. **Ordering matrix + fail-safe (T-001..T-005)**: define canonical policy and
+   command-level fail-safe anchor behavior.
+2. **Idempotence + guarantees (T-006..T-008)**: preserve canonical ownership
+   contracts while enforcing deterministic ordering.
+3. **Validation + docs (T-009..T-010)**: regression coverage and operator docs.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0037/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0037/tasks.md` marked done.
+- `sprints/S0037/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0037/progress.md`, `sprints/S0037/uat.json`, and
+  `sprints/S0037/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0058`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0037` (`US-0058`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0036 (US-0057 Upgrade-Safe Scratchpad Example Refresh)
+
+## Planning summary
+
+- **Sprint**: S0036 (new)
+- **Story**: US-0057 — Upgrade-safe scratchpad local example refresh and parity
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0036/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0057 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0057 section)
+- Decision: `decisions/DEC-0039.md`
+- Research: `docs/engineering/research.md` (`R-0032`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0057 section)
+- Sprint artifacts: `sprints/S0036/*`
+
+## Focus
+
+1. **Ownership + refresh semantics (T-001..T-004)**: enforce framework-owned
+   example refresh with deterministic diagnostics while preserving user-local
+   scratchpad values.
+2. **Parity + drift prevention (T-005..T-008)**: keep active/template and
+   installer parity so new flags appear in refreshed example surfaces.
+3. **Validation + docs (T-009..T-010)**: regression coverage and operator-facing
+   README/runbook guidance.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0036/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0036/tasks.md` marked done.
+- `sprints/S0036/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0036/progress.md`, `sprints/S0036/uat.json`, and
+  `sprints/S0036/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` traceability/checkpoints updated for `US-0057`.
+
+## Execution guardrails
+
+- Preserve user ownership for `.cursor/scratchpad.local.md`.
+- Keep framework refresh deterministic for `.cursor/scratchpad.local.example.md`.
+- Maintain parity across installer scripts and template docs/files.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0036` (`US-0057`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0035 (US-0056 Strict Runtime Proof for Per-Phase Isolation)
+
+## Planning summary
+
+- **Sprint**: S0035 (new)
+- **Story**: US-0056 — Strict Runtime Proof for Per-Phase Subagent Isolation
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0035/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0056 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0056 section)
+- Decision: `decisions/DEC-0038.md`
+- Research: `docs/engineering/research.md` (`R-0034`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0056 section/addendum)
+- Sprint artifacts: `sprints/S0035/*`
+
+## Focus
+
+1. **Strict tuple contract (T-001..T-004)**: require deterministic runtime
+   attestation fields and fail-closed reason-code taxonomy.
+2. **Boundary integration (T-005..T-006)**: enforce strict-proof checks in
+   `/auto`, `/verify-work`, and `/release` contracts.
+3. **Operator + compatibility guidance (T-007..T-010)**: bounded legacy handling,
+   diagnostics, tests, and active/template parity.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0035/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0035/tasks.md` marked done.
+- `sprints/S0035/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0035/progress.md`, `sprints/S0035/uat.json`, and
+  `sprints/S0035/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` traceability/checkpoints updated for `US-0056`.
+
+## Execution guardrails
+
+- Keep `/auto` orchestration-only semantics.
+- Preserve existing mandatory release gate chain order.
+- Maintain active/template parity for all strict-proof contracts.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0035` (`US-0056`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0034 (US-0055 Deterministic Status Reconciliation Command)
+
+## Planning summary
+
+- **Sprint**: S0034 (new)
+- **Story**: US-0055 — Deterministic Status Reconciliation Command
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0034/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0055 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0055 section)
+- Decision: `decisions/DEC-0037.md`
+- Research: `docs/engineering/research.md` (`R-0031`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0055 section)
+- Sprint artifacts: `sprints/S0034/*`
+
+## Focus
+
+1. **Reconciliation command contract (T-001..T-003)**: define deterministic
+   read/repair behavior with canonical precedence and conflict handling.
+2. **Normalization behavior (T-004..T-007)**: reconcile DONE+unchecked and
+   acceptance/resume drift with bounded target scope and auditable evidence.
+3. **Deterministic diagnostics + parity (T-008..T-010)**: reason codes,
+   regression coverage, and active/template alignment.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0034/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0034/tasks.md` marked done.
+- `sprints/S0034/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0034/progress.md`, `sprints/S0034/uat.json`, and
+  `sprints/S0034/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` traceability row for US-0055 advances from
+  `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Preserve canonical status ownership (`docs/product/backlog.md`).
+- Reconciliation writes must be target-scoped and non-destructive.
+- Keep mandatory release gate chain behavior unchanged.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0034` (`US-0055`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0033 (US-0054 Configurable Multi-Target Release Publish with Confirmation Gate)
+
+## Planning summary
+
+- **Sprint**: S0033 (new)
+- **Story**: US-0054 — Configurable Multi-Target Release Publish with Confirmation Gate
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0033/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0054 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0054 section)
+- Decision: `decisions/DEC-0036.md`
+- Research: `docs/engineering/research.md` (`R-0029`, `R-0030`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0054 section)
+- Sprint artifacts: `sprints/S0033/*`
+
+## Focus
+
+1. **Target schema + taxonomy (T-001..T-003)**: implement deterministic
+   configurable target schema with built-in target classes and first-class
+   `custom` + `ssh` support.
+2. **Safety contract (T-004, T-006, T-007)**: enforce confirmation default,
+   fail-fast validation, and env-reference-only secret handling.
+3. **Run semantics (T-005)**: deterministic target ordering, selection, and
+   skip behavior for disabled targets.
+4. **Parity + guardrails (T-008..T-010)**: align active/template contract and
+   preserve mandatory release gate invariants.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0033/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0033/tasks.md` marked done.
+- `sprints/S0033/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0033/progress.md`, `sprints/S0033/uat.json`, and
+  `sprints/S0033/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` traceability row for US-0054 advances from
+  `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Mandatory release quality gates remain unchanged (`/qa`, `/verify-work`, `/release`).
+- No inline credentials in committed target configuration.
+- Keep active/template parity for all publish-target contracts.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0033` (`US-0054`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0032 (US-0053 Context Compaction and Tiered Token-Cost Optimization Mode)
+
+## Planning summary
+
+- **Sprint**: S0032 (new)
+- **Story**: US-0053 — Context Compaction and Tiered Token-Cost Optimization Mode
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0032/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0053 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0053 section)
+- Decision: `decisions/DEC-0035.md`
+- Research: `docs/engineering/research.md` (`R-0027`, `R-0028`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0053 section)
+- Sprint artifacts: `sprints/S0032/*`
+
+## Focus
+
+1. **Profile policy (T-001..T-003)**: implement deterministic
+   `TOKEN_PROFILE=lean|balanced|full` behavior, mapping table, and explicit
+   override precedence.
+2. **Context compaction (T-004, T-005)**: implement bounded active-context
+   contracts for `state.md` and compact decisions index policy with archive/link
+   safety.
+3. **Retrieval strategy (T-006)**: enforce narrow-read `/ask` policy
+   (targeted-first, bounded expansion, explicit not-found behavior).
+4. **Parity and guardrails (T-007..T-009)**: keep active/template contracts
+   aligned and lock mandatory QA/UAT/release invariants in regression checks.
+5. **Operator guidance + integrity (T-010)**: document profile tradeoffs and
+   verify no destructive impact to ID/release-history semantics.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0032/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0032/tasks.md` marked done.
+- `sprints/S0032/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0032/progress.md`, `sprints/S0032/uat.json`, and
+  `sprints/S0032/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` traceability row for US-0053 advances from
+  `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Mandatory safety gates remain intact (`/qa`, `/verify-work`, `/release`).
+- No destructive rewrite of historical release or ID artifacts.
+- Keep active/template parity for all token-profile and compaction contracts.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0032` (`US-0053`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0031 (US-0052 Optional Fresh-Project ID Namespace Bootstrap)
+
+## Planning summary
+
+- **Sprint**: S0031 (new)
+- **Story**: US-0052 — Optional Fresh-Project ID Namespace Bootstrap
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-8 verified PASS in `sprints/S0031/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0052 AC-1..AC-8)
+- Architecture: `docs/engineering/architecture.md` (US-0052 section)
+- Decisions: `decisions/DEC-0034.md`
+- Research: `docs/engineering/research.md` (`R-0024`, `R-0025`)
+- PO->TL handoff: `handoffs/po_to_tl.md` (Install Hygiene + Smart Intake + Bootstrap IDs section)
+- Sprint artifacts: `sprints/S0031/*`
+
+## Focus
+
+1. **Bootstrap control contract (T-001)**: define explicit optional bootstrap control with default-off behavior and clear operator interface.
+2. **Deterministic freshness eligibility (T-002, T-005)**: detect fresh vs non-fresh repo state using canonical ID surfaces and emit actionable diagnostics when bootstrap request is ineligible.
+3. **ID generation behavior (T-003, T-004, T-006)**: start at `0001` only for eligible bootstrap; otherwise continue from highest existing IDs without rewriting historical artifacts and with collision safety.
+4. **Operator guidance (T-007)**: document bootstrap constraints, compatibility behavior, and migration caveats in runbook/README/help paths.
+5. **Regression and parity (T-008..T-010)**: cover fresh/non-fresh/mixed-edge cases and keep active/template contracts aligned.
+
+## Execution order
+
+Execute tasks `T-001`..`T-010` in sequence (see `sprints/S0031/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0031/tasks.md` are marked done.
+- No uncovered US-0052 acceptance criteria after `sprints/S0031/plan-verify.json` is PASS.
+- `sprints/S0031/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0052 advanced from `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Preserve backward compatibility for non-fresh repositories (highest-ID continuation).
+- Never renumber or rewrite historical IDs.
+- Keep optional behavior explicit and default-off; no hidden bootstrap side effects.
+- Maintain active/template parity for command, docs, and test contracts.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0031` (`US-0052`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0030 (US-0051 Intelligent Intake Decomposition and Risk-Aware PO Questioning)
+
+## Planning summary
+
+- **Sprint**: S0030 (new)
+- **Story**: US-0051 — Intelligent Intake Decomposition and Risk-Aware PO Questioning
+- **Task count**: 11 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0030/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0051 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0051 section)
+- Decisions: `decisions/DEC-0033.md`
+- Research: `docs/engineering/research.md` (`R-0024`, `R-0025`)
+- PO->TL handoff: `handoffs/po_to_tl.md` (Install Hygiene + Smart Intake + Bootstrap IDs section)
+- Sprint artifacts: `sprints/S0030/*`
+
+## Focus
+
+1. **Decomposition trigger model (T-001, T-005)**: add deterministic breadth/risk heuristics with safe single-story default for narrow intake.
+2. **Split quality and persistence (T-002, T-003)**: generate vertical-slice/workflow-step split proposals and persist explicit split rationale/boundaries.
+3. **User authority controls (T-004)**: require accept/merge/adjust confirmation before decomposed persistence.
+4. **Risk-aware questioning (T-006, T-007)**: escalate follow-ups for broad/high-risk intake while keeping bounded rounds.
+5. **Low-touch compatibility (T-008)**: preserve `INTAKE_GUIDED_MODE=0` minimal-overhead behavior with duplicate safety intact.
+6. **Traceability + parity + regression (T-009..T-011)**: ensure artifact evidence, active/template alignment, and tests for split/no-split/questioning paths.
+
+## Execution order
+
+Execute tasks `T-001`..`T-011` in sequence (see `sprints/S0030/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 11 tasks in `sprints/S0030/tasks.md` are marked done.
+- No uncovered US-0051 acceptance criteria after `sprints/S0030/plan-verify.json` is PASS.
+- `sprints/S0030/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0051 advanced from `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Process/workflow/docs/tests only; no runtime product feature behavior changes.
+- Decomposition must remain bounded and user-controlled (no forced uncontrolled splitting).
+- Preserve low-touch compatibility and active/template parity for intake semantics.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0030` (`US-0051`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0029 (US-0050 Clean Install Hygiene and Complete Clean-Repo Coverage)
+
+## Planning summary
+
+- **Sprint**: S0029 (new)
+- **Story**: US-0050 — Clean Install Hygiene and Complete Clean-Repo Coverage
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-9 verified PASS in `sprints/S0029/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0050 AC-1..AC-9)
+- Architecture: `docs/engineering/architecture.md` (US-0050 section)
+- Decisions: `decisions/DEC-0032.md`
+- Research: `docs/engineering/research.md` (`R-0024`, `R-0025`)
+- PO->TL handoff: `handoffs/po_to_tl.md` (Install Hygiene + Smart Intake + Bootstrap IDs section)
+- Sprint artifacts: `sprints/S0029/*`
+
+## Focus
+
+1. **Ownership source of truth (T-001)**: define canonical installer-owned path contract used by all installers.
+2. **Cross-installer parity (T-002..T-004)**: ensure `installer.ps1`, `installer.sh`, `installer.py` consume same ownership rules for install/clean.
+3. **Cleanup safety (T-005)**: enforce explicit non-destructive boundaries for non-framework files.
+4. **Template neutrality (T-006, T-007)**: remove seeded operational history and neutralize hardcoded runtime ID refs unless intentionally baseline-backed.
+5. **Lifecycle regression (T-008, T-009)**: prove fresh install -> clean-repo -> reinstall behavior and full cleanup coverage.
+6. **Compatibility/parity hardening (T-010)**: preserve US-0018 upgrade behavior and active/template alignment.
+
+## Execution order
+
+Execute tasks `T-001`..`T-010` in sequence (see `sprints/S0029/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0029/tasks.md` are marked done.
+- No uncovered US-0050 acceptance criteria; `sprints/S0029/plan-verify.json` PASS after `/plan-verify`.
+- `sprints/S0029/progress.md`, `uat.json`, and `uat.md` updated with execution evidence.
+- `docs/engineering/state.md` traceability row for US-0050 advanced from `PLANNED` with evidence references.
+
+## Execution guardrails
+
+- Process/workflow/docs/tests only; no runtime product feature behavior changes.
+- Keep cleanup operations ownership-scoped and non-destructive.
+- Maintain active/template parity for installer and starter-artifact contract behavior.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0029` (`US-0050`).
+
+---
+
 # TL -> Dev Handoff — Sprint S0028 (US-0049 Legacy DONE-Story Acceptance/Traceability Backfill Guard)
 
 ## Planning summary

@@ -23,6 +23,46 @@ function Ensure-Parent($Path) {
   }
 }
 
+function Get-ManifestSection($ManifestPath, $SectionName) {
+  $lines = Get-Content -Path $ManifestPath
+  $inSection = $false
+  $items = New-Object System.Collections.Generic.List[string]
+  foreach ($raw in $lines) {
+    $line = $raw.Trim()
+    if ([string]::IsNullOrWhiteSpace($line)) { continue }
+    if ($line.StartsWith("#")) { continue }
+    if ($line.StartsWith("[") -and $line.EndsWith("]")) {
+      $inSection = ($line -eq "[$SectionName]")
+      continue
+    }
+    if ($inSection) { $items.Add($line) }
+  }
+  return $items
+}
+
+function Load-InstallerOwnershipManifest($SourceRoot, $ScriptRoot) {
+  $candidates = @(
+    (Join-Path $SourceRoot "docs/engineering/context/installer-owned-paths.manifest"),
+    (Join-Path $ScriptRoot "docs/engineering/context/installer-owned-paths.manifest")
+  ) | Select-Object -Unique
+
+  foreach ($candidate in $candidates) {
+    if (-not (Test-Path $candidate -PathType Leaf)) { continue }
+    $installPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "install_include_paths"
+    $cleanPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "clean_paths"
+    if ($installPaths.Count -eq 0 -or $cleanPaths.Count -eq 0) {
+      throw "[INSTALL_MANIFEST_ERROR] $candidate is missing required sections or entries."
+    }
+    return [PSCustomObject]@{
+      install_include_paths = @($installPaths)
+      clean_paths = @($cleanPaths)
+      manifest_path = $candidate
+    }
+  }
+
+  throw "[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic to restore template assets."
+}
+
 function List-SourceFiles($SourceRoot, $IncludePaths) {
   $files = New-Object System.Collections.Generic.List[string]
   foreach ($rel in $IncludePaths) {
@@ -97,6 +137,7 @@ function Classify-File($RelPath) {
   $userDataPrefixes = @(
     'docs/product/',
     'docs/engineering/',
+    'docs/user-guides/',
     'sprints/',
     'handoffs/',
     'decisions/'
@@ -194,8 +235,10 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host ""
   Write-Host "Clean options:"
   Write-Host "  --clean-repo      Remove all its-magic workflow artifacts from the target repo"
-  Write-Host "                    (.cursor, docs/product, docs/engineering, sprints, handoffs,"
-  Write-Host "                    decisions). Your own source code is never touched."
+  Write-Host "                    (owned paths from installer manifest, including .cursor,"
+  Write-Host "                    docs/product, docs/engineering, docs/user-guides, sprints,"
+  Write-Host "                    handoffs, decisions, workflow scripts, CI files, and"
+  Write-Host "                    .its-magic-version). Your own source code is never touched."
   Write-Host "  --target <path>   Repo to clean (default: current directory)."
   Write-Host "  --yes             Skip the confirmation prompt."
   Write-Host ""
@@ -213,9 +256,6 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
 
 $scriptDir = Normalize-PathSafe (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $sourceRoot = Join-Path $scriptDir "template"
-if (-not (Test-Path $sourceRoot -PathType Container)) {
-  $sourceRoot = $scriptDir
-}
 $repoUrl = "https://github.com/fl0wm0ti0n/its-magic"
 $appVersion = Get-AppVersion $scriptDir
 $noArgs = $PSBoundParameters.Count -eq 0
@@ -229,6 +269,15 @@ if ($Help -or $noArgs) {
   Show-ItsMagicHelp -VersionString $appVersion -RepoUrl $repoUrl
   exit 0
 }
+
+if (-not (Test-Path $sourceRoot -PathType Container)) {
+  Write-Host "[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package."
+  exit 1
+}
+
+$ownershipManifest = Load-InstallerOwnershipManifest -SourceRoot $sourceRoot -ScriptRoot $scriptDir
+$includePaths = @($ownershipManifest.install_include_paths)
+$cleanPaths = @($ownershipManifest.clean_paths)
 
 if ($CleanRepo) {
   if (-not $Target) { $Target = "." }
@@ -244,18 +293,14 @@ if ($CleanRepo) {
       exit 1
     }
   }
-  $cleanPaths = @(
-    ".cursor",
-    "docs\product",
-    "docs\engineering",
-    "sprints",
-    "handoffs",
-    "decisions"
-  )
   foreach ($rel in $cleanPaths) {
     $fullPath = Join-Path $targetRoot $rel
     if (Test-Path $fullPath) {
-      Remove-Item -Path $fullPath -Recurse -Force
+      if (Test-Path $fullPath -PathType Container) {
+        Remove-Item -Path $fullPath -Recurse -Force
+      } else {
+        Remove-Item -Path $fullPath -Force
+      }
       Write-Host "Removed: $rel"
     }
   }
@@ -282,26 +327,6 @@ $backupEnabled = $Backup.IsPresent
 if (($mode -eq "overwrite" -or $mode -eq "interactive") -and -not $backupEnabled) {
   $backupEnabled = Prompt-YesNo "Backup existing files before overwrite?" $false
 }
-
-$includePaths = @(
-  ".cursor/commands",
-  ".cursor/rules",
-  ".cursor/skills",
-  ".cursor/agents",
-  ".cursor/hooks",
-  ".cursor/hooks.json",
-  ".cursor/scratchpad.md",
-  ".cursor/scratchpad.local.example.md",
-  "docs",
-  "sprints",
-  "handoffs",
-  "decisions",
-  "scripts/validate-and-push.ps1",
-  "scripts/validate-and-push.sh",
-  ".github/workflows",
-  "README.md",
-  ".its-magic-version"
-)
 
 $files = List-SourceFiles $sourceRoot $includePaths
 if ($files.Count -eq 0) {
@@ -347,6 +372,8 @@ if ($mode -eq "upgrade") {
   $unchanged = 0
   $preserved = 0
   $review = New-Object System.Collections.Generic.List[string]
+  $scratchpadExampleRel = '.cursor/scratchpad.local.example.md'
+  $scratchpadExampleStatus = 'not-seen'
 
   foreach ($rel in $files) {
     $src = Join-Path $sourceRoot $rel
@@ -358,16 +385,19 @@ if ($mode -eq "upgrade") {
       Ensure-Parent $dst
       Copy-Item -Path $src -Destination $dst -Force
       $added.Add($rel)
+      if ($rel -eq $scratchpadExampleRel) { $scratchpadExampleStatus = 'added' }
       continue
     }
 
     if ($cat -eq 'framework') {
       if (Files-ContentEqual $src $dst) {
         $unchanged++
+        if ($rel -eq $scratchpadExampleRel) { $scratchpadExampleStatus = 'unchanged' }
       } else {
         Ensure-Parent $dst
         Copy-Item -Path $src -Destination $dst -Force
         $updated.Add($rel)
+        if ($rel -eq $scratchpadExampleRel) { $scratchpadExampleStatus = 'updated' }
       }
       continue
     }
@@ -401,6 +431,11 @@ if ($mode -eq "upgrade") {
   }
   Write-Host "  Unchanged:           $unchanged files"
   Write-Host "  Preserved (user):    $preserved files"
+  if ($scratchpadExampleStatus -eq 'not-seen') { $scratchpadExampleStatus = 'not-in-manifest' }
+  Write-Host "  Scratchpad example:  $scratchpadExampleStatus (.cursor/scratchpad.local.example.md)"
+  if (Test-Path (Join-Path $targetRoot '.cursor/scratchpad.local.md') -PathType Leaf) {
+    Write-Host "  User local file:     preserved (.cursor/scratchpad.local.md)"
+  }
   if ($review.Count -gt 0) {
     Write-Host ""
     Write-Host "  Review recommended:  $($review.Count) files" -ForegroundColor Magenta

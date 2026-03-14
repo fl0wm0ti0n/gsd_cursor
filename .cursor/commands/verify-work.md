@@ -66,6 +66,22 @@ Remediation: re-run the missing/invalid phase(s) in fresh subagent contexts and
 write new isolation evidence, then rerun `/verify-work` before proceeding to
 `/release`.
 
+## Strict runtime proof gate (US-0056 / DEC-0038)
+
+Before handing off to `/release`, verify strict runtime proof tuples are present
+and valid for the target lifecycle phases (`execute`, `qa`, `verify-work`).
+
+Fail-closed behavior (no continuation):
+
+- Missing runtime proof tuple: `RUNTIME_PROOF_MISSING`
+- Invalid tuple shape/hash/linkage: `RUNTIME_PROOF_INVALID`
+- Reused `runtime_proof_id`: `RUNTIME_PROOF_REUSED`
+- Expired proof TTL/stale proof: `RUNTIME_PROOF_STALE`
+- Ambiguous proof-to-checkpoint mapping: `RUNTIME_PROOF_AMBIGUOUS_LINK`
+
+Remediation: rerun affected phase(s) in fresh subagent contexts and write new
+strict-proof tuples linked to checkpoint evidence.
+
 ## Steps
 1. Convert acceptance criteria into testable UAT steps. Derive steps directly from the story's acceptance criteria in `docs/product/acceptance.md`. Each AC should map to at least one UAT step.
 2. Populate UAT artifacts: write derived steps into `uat.json` (with description and result per step, accurate pass/fail counts) and `uat.md` (step list with results, summary section). Ensure UAT artifacts are in **populated** state per DEC-0009 — not placeholder.

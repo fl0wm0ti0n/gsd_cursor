@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0035",
+  "story_ids": [
+    "US-0056"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Strict runtime attestation tuple contract is documented with required fields."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "/auto contract requires strict-proof evidence and fail-closed boundary behavior."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Runtime proofs are linked deterministically to state checkpoint evidence."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Reason-code taxonomy includes missing/invalid/reused/stale/ambiguous strict-proof failures."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Pause/resume provenance contract references strict-proof continuity."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Verify/release gates consume strict runtime-proof evidence in addition to isolation evidence."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Legacy-run handling guidance is bounded and non-destructive."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Operator diagnostics and remediation guidance are documented."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression assertions for strict-proof contract and parity checks are present."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "Active/template command/runbook/README contracts are aligned for US-0056."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

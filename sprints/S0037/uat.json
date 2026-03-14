@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0037",
+  "story_ids": [
+    "US-0058"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Canonical ordering matrix exists and defines per-artifact policy."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "State checkpoint policy documented as append-bottom."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Backlog ordering contract documented as sorted-canonical."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Acceptance ordering contract aligned to canonical backlog ordering."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Mutating command contracts reference ordering matrix and fail-safe anchors."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Idempotent rerun ordering behavior documented."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Canonical ownership/reconciliation guarantees remain intact."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Active/template parity maintained for ordering contracts."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression checks include ordering matrix and fail-safe reason code assertions."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "README and runbook include ordering troubleshooting guidance."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

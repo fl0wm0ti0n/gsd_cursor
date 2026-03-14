@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 
 REPO_URL = "https://github.com/fl0wm0ti0n/its-magic"
+MANIFEST_RELATIVE_PATH = os.path.join("docs", "engineering", "context", "installer-owned-paths.manifest")
 
 
 def normalize(path):
@@ -35,6 +36,38 @@ def list_source_files(source_root, include_paths):
                     rel_path = os.path.relpath(full, source_root)
                     files.append(rel_path)
     return sorted(set(files))
+
+
+def read_manifest_paths(manifest_path, section_name):
+    items = []
+    in_section = False
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or line.startswith("#"):
+                continue
+            if line.startswith("[") and line.endswith("]"):
+                in_section = line == f"[{section_name}]"
+                continue
+            if in_section:
+                items.append(line)
+    return items
+
+
+def load_ownership_manifest(source_root, script_dir):
+    candidates = [
+        os.path.join(source_root, MANIFEST_RELATIVE_PATH),
+        os.path.join(script_dir, MANIFEST_RELATIVE_PATH),
+    ]
+    for path in candidates:
+        if not os.path.isfile(path):
+            continue
+        install_paths = read_manifest_paths(path, "install_include_paths")
+        clean_paths = read_manifest_paths(path, "clean_paths")
+        if not install_paths or not clean_paths:
+            raise RuntimeError(f"[INSTALL_MANIFEST_ERROR] {path} is missing required sections or entries.")
+        return install_paths, clean_paths
+    raise RuntimeError("[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic package.")
 
 
 def ensure_parent(path):
@@ -81,7 +114,7 @@ FRAMEWORK_EXACT = {
     ".its-magic-version",
 }
 USER_DATA_PREFIXES = (
-    "docs/product/", "docs/engineering/",
+    "docs/product/", "docs/engineering/", "docs/user-guides/",
     "sprints/", "handoffs/", "decisions/",
 )
 MIXED_FILES = {".cursor/scratchpad.md", "README.md"}
@@ -177,8 +210,10 @@ def show_help(version):
     print()
     print("Clean options:")
     print("  --clean-repo      Remove all its-magic workflow artifacts from the target repo")
-    print("                    (.cursor, docs/product, docs/engineering, sprints, handoffs,")
-    print("                    decisions). Your own source code is never touched.")
+    print("                    (owned paths from installer manifest, including .cursor,")
+    print("                    docs/product, docs/engineering, docs/user-guides, sprints,")
+    print("                    handoffs, decisions, workflow scripts, CI files, and")
+    print("                    .its-magic-version). Your own source code is never touched.")
     print("  --target <path>   Repo to clean (default: current directory).")
     print("  --yes             Skip the confirmation prompt.")
     print()
@@ -194,19 +229,14 @@ def show_help(version):
     print()
 
 
-def clean_repo(target_root):
-    clean_paths = [
-        ".cursor",
-        os.path.join("docs", "product"),
-        os.path.join("docs", "engineering"),
-        "sprints",
-        "handoffs",
-        "decisions",
-    ]
+def clean_repo(target_root, clean_paths):
     for rel in clean_paths:
         full = os.path.join(target_root, rel)
         if os.path.exists(full):
-            shutil.rmtree(full)
+            if os.path.isdir(full):
+                shutil.rmtree(full)
+            else:
+                os.remove(full)
             print(f"Removed: {rel}")
     print("Clean completed.")
 
@@ -214,7 +244,7 @@ def clean_repo(target_root):
 def main():
     script_dir = normalize(os.path.dirname(__file__))
     template_dir = os.path.join(script_dir, "template")
-    source_root = template_dir if os.path.isdir(template_dir) else script_dir
+    source_root = template_dir
     version = read_version(script_dir)
 
     parser = argparse.ArgumentParser(
@@ -239,6 +269,15 @@ def main():
         print(f"its-magic v{version}")
         return 0
 
+    if not os.path.isdir(source_root):
+        print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
+        return 1
+    try:
+        include_paths, clean_paths = load_ownership_manifest(source_root, script_dir)
+    except RuntimeError as exc:
+        print(str(exc))
+        return 1
+
     target_root = normalize(args.target) if args.target else None
 
     if args.clean_repo:
@@ -250,7 +289,7 @@ def main():
         if not args.yes and not prompt_yes_no(f"Clean its-magic workflow artifacts in {target_root}?", default=False):
             print("Aborted.")
             return 1
-        clean_repo(target_root)
+        clean_repo(target_root, clean_paths)
         return 0
 
     if not target_root:
@@ -267,26 +306,6 @@ def main():
     backup_enabled = args.backup
     if mode in ("overwrite", "interactive") and not args.backup:
         backup_enabled = prompt_yes_no("Backup existing files before overwrite?", False)
-
-    include_paths = [
-        ".cursor/commands",
-        ".cursor/rules",
-        ".cursor/skills",
-        ".cursor/agents",
-        ".cursor/hooks",
-        ".cursor/hooks.json",
-        ".cursor/scratchpad.md",
-        ".cursor/scratchpad.local.example.md",
-        "docs",
-        "sprints",
-        "handoffs",
-        "decisions",
-        "scripts/validate-and-push.ps1",
-        "scripts/validate-and-push.sh",
-        ".github/workflows",
-        "README.md",
-        ".its-magic-version",
-    ]
 
     files = list_source_files(source_root, include_paths)
     if not files:
@@ -314,6 +333,8 @@ def main():
 
         added, updated, review = [], [], []
         unchanged = preserved = 0
+        scratchpad_example_rel = ".cursor/scratchpad.local.example.md"
+        scratchpad_example_status = "not-seen"
 
         for rel in files:
             src = os.path.join(source_root, rel)
@@ -325,15 +346,21 @@ def main():
                 ensure_parent(dst)
                 shutil.copy2(src, dst)
                 added.append(rel)
+                if rel == scratchpad_example_rel:
+                    scratchpad_example_status = "added"
                 continue
 
             if cat == "framework":
                 if filecmp.cmp(src, dst, shallow=False):
                     unchanged += 1
+                    if rel == scratchpad_example_rel:
+                        scratchpad_example_status = "unchanged"
                 else:
                     ensure_parent(dst)
                     shutil.copy2(src, dst)
                     updated.append(rel)
+                    if rel == scratchpad_example_rel:
+                        scratchpad_example_status = "updated"
                 continue
 
             if cat == "user-data":
@@ -365,6 +392,11 @@ def main():
                 print(f"    {f}")
         print(f"  Unchanged:           {unchanged} files")
         print(f"  Preserved (user):    {preserved} files")
+        if scratchpad_example_status == "not-seen":
+            scratchpad_example_status = "not-in-manifest"
+        print(f"  Scratchpad example:  {scratchpad_example_status} (.cursor/scratchpad.local.example.md)")
+        if os.path.isfile(os.path.join(target_root, ".cursor", "scratchpad.local.md")):
+            print("  User local file:     preserved (.cursor/scratchpad.local.md)")
         if review:
             print(f"\n  {p}Review recommended:  {len(review)} files{r}")
             for f in review:

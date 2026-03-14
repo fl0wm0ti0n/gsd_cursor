@@ -18,6 +18,18 @@
 | US-0036 | OPEN | unchecked | DONE | checked | `docs/engineering/state.md` traceability=`PASS`; released sprint evidence | 2026-03-01 |
 | US-0037 | OPEN | unchecked | DONE | checked | `docs/engineering/state.md` traceability=`PASS`; released sprint evidence | 2026-03-01 |
 | US-0038 | OPEN | unchecked | DONE | checked | `docs/engineering/state.md` traceability=`PASS`; released sprint evidence | 2026-03-01 |
+| US-0017 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0018 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0024 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0025 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0026 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0027 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0028 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0029 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0030 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0036 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0037 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| US-0038 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
 
 ## Procedure notes
 

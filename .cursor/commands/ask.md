@@ -8,15 +8,20 @@ description: "its-magic ask: answer questions using project context, read-only."
 - (none — uses default agent)
 
 ## Inputs (context pack)
-Read only the files relevant to the question:
-- `docs/engineering/state.md` — current status, progress, known issues
-- `docs/product/backlog.md` — all stories with status
-- `docs/product/acceptance.md` — what's done, what's remaining
-- `docs/engineering/architecture.md` — technical approach and decisions
-- `docs/engineering/decisions.md` — decision index
-- `docs/engineering/runbook.md` — commands and project config
-- `sprints/S*/progress.md` — active sprint progress (latest sprint)
-- `.cursor/scratchpad.md` — automation flags and config
+Apply narrow-read retrieval policy (US-0053):
+- Start with targeted sections only; do not load broad files by default.
+- Expand in bounded steps only when the answer is unresolved.
+- Keep reads question-scoped and avoid unrelated historical sections unless needed.
+
+Preferred read order:
+1. `docs/engineering/state.md` (latest relevant checkpoint/section)
+2. `handoffs/resume_brief.md` (current continuation intent)
+3. `docs/product/backlog.md` (specific story block by `US-xxxx`)
+4. `docs/product/acceptance.md` (specific checklist rows)
+5. `docs/engineering/decisions.md` and `decisions/DEC-xxxx.md` (when decision detail is required)
+6. `docs/engineering/architecture.md` and `docs/engineering/runbook.md` (only if implementation/policy depth is required)
+7. `sprints/S*/progress.md` (only latest relevant sprint)
+8. `.cursor/scratchpad.md` (flags/config only when needed)
 
 ## Outputs (artifacts)
 - (none — this command is strictly read-only)
@@ -32,6 +37,8 @@ Read only the files relevant to the question:
 - If the question reveals a bug or feature idea, suggest running `/intake`.
 
 ## Steps
-1. Read the context files relevant to the user's question.
-2. Answer the question using the project's own artifacts as the source of truth.
-3. If the answer is not in the artifacts, say so.
+1. Read minimal targeted sections first (narrow-read policy).
+2. If unresolved, expand context in bounded steps following preferred read order.
+3. Stop expanding as soon as confidence is sufficient.
+4. Answer using project artifacts as the source of truth.
+5. If the answer is not present in artifacts after bounded expansion, state that explicitly.

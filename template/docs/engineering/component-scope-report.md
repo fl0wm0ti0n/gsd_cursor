@@ -1,14 +1,14 @@
 # Component Scope Report
 
-- Story: US-0035
-- Scope mode: enabled (reference contract)
-- Overall: PASS
+- Story: US-xxxx
+- Scope mode: optional (`COMPONENT_SCOPE_MODE`)
+- Overall: N/A (no checks run yet)
 
 ## Protection checks
 
 | Check ID | Target components | Non-target components | Result | Evidence |
 |---|---|---|---|---|
-| CSR-0001 | api-gateway | web-app, worker | PASS | No unapproved out-of-scope edits detected in workflow artifacts |
+| (none yet) | - | - | - | - |
 
 ## Findings
 

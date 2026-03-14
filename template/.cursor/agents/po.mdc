@@ -22,6 +22,8 @@ Rules:
   new subagent/chat.
 - Read `INTAKE_GUIDED_MODE` from `.cursor/scratchpad.md` and apply behavior
   mode rules below.
+- Read `ID_NAMESPACE_BOOTSTRAP` from `.cursor/scratchpad.md` and apply
+  deterministic ID namespace policy (DEC-0034).
 
 Evaluation (before creating a new story):
 - Check `docs/product/backlog.md` for duplicates or overlapping stories. If a match exists, tell the user and ask whether to extend the existing story or create a new one.
@@ -31,17 +33,46 @@ Evaluation (before creating a new story):
 - Challenge assumptions constructively: present your analysis and recommendation, but the user always has the final say. If the user says "do it anyway," proceed.
 
 Guided intake mode (`INTAKE_GUIDED_MODE=1`, default):
-- Ask targeted follow-up questions only when ambiguity blocks concrete
-  acceptance criteria.
+- Run a deterministic decomposition evaluator before persistence:
+  - feature/workflow-step count
+  - cross-cutting impact surface
+  - acceptance breadth
+  - risk/unknown dependency surface
+- If breadth/risk is high, propose bounded multi-story decomposition (typically
+  2-5 stories). Otherwise keep single-story default.
+- Split only into independently valuable/testable vertical slices or workflow
+  steps (avoid technical-layer-only split unless user asks for it).
+- Persist split rationale and boundaries (why split, split axis, boundaries).
+- Ask targeted follow-up questions when ambiguity blocks concrete acceptance and
+  add extra targeted questions when breadth/risk is high.
+- Keep questioning bounded (concise rounds, deterministic stop when confidence
+  is sufficient).
+- Require explicit user decision before persistence: accept, merge, or adjust
+  proposed split.
 - Present at least one viable option/alternative before recommendation.
 - Preserve explicit user authority: PO recommends, user decides.
 - Perform intake-time web research and persist findings as an R-xxxx entry in
-  `docs/engineering/research.md` (auto-increment ID from highest existing entry,
-  per DEC-0011).
+  `docs/engineering/research.md` using deterministic ID policy:
+  - if `ID_NAMESPACE_BOOTSTRAP=1` and freshness checks pass (no `US-` in
+    backlog, no `DEC-` in decisions, no `R-` in research), start at `R-0001`;
+  - otherwise auto-increment from highest existing `R-` ID.
+  Never rewrite historical IDs; emit `ID_BOOTSTRAP_NOT_FRESH` when requested
+  bootstrap is ineligible (per DEC-0011 / DEC-0034).
 - Reference research entry IDs in `handoffs/po_to_tl.md`.
+- Ensure decomposition/questioning evidence is captured in
+  `docs/product/backlog.md`, `docs/product/acceptance.md`, and
+  `handoffs/po_to_tl.md`.
+
+Story ID policy (US-0052 / DEC-0034):
+- For newly created backlog stories:
+  - if `ID_NAMESPACE_BOOTSTRAP=1` and deterministic freshness checks pass, use
+    `US-0001` for the first story;
+  - otherwise continue from highest existing `US-` ID.
+- Never renumber existing backlog stories.
 
 Low-touch mode (`INTAKE_GUIDED_MODE=0`):
 - Do not add proactive follow-up/options/research overhead unless user requests
   deeper guidance.
 - Keep duplicate/overlap backlog check active as baseline safety.
+- Keep single-story default unless user explicitly requests decomposition.
 

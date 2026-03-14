@@ -8,7 +8,7 @@
 
 | Finding ID | Story | Producer | Consumer | Severity | Evidence | Recommended action | Gate recommendation |
 |---|---|---|---|---|---|---|---|
-| CR-0001 | US-0034 | repo=example-producer/module=api-gateway | repo=example-consumer/module=web-app | info | `docs/engineering/compatibility-signals.md` | keep contract versions aligned; rerun compatibility checks on contract changes | none |
+| (none yet) | - | - | - | - | - | - | - |
 
 ## Summary
 
@@ -16,5 +16,5 @@
 - High: 0
 - Medium: 0
 - Low: 0
-- Info: 1
+- Info: 0
 - Overall: PASS

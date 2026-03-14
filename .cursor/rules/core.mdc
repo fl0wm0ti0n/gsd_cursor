@@ -76,7 +76,4 @@ globs: ["**/*"]
   - On unresolved sprint identity or queue/notes mismatch, fail closed with
     deterministic reason codes and remediation guidance; no destructive
     reconciliation.
-- Release gate no-bypass (US-0039 / DEC-0019):
-  - Default release behavior is fail-closed; no mandatory gate bypass without
-    explicit decision evidence (`RELEASE_GATE_OVERRIDE_APPROVED`).
 

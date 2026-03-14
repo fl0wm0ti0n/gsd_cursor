@@ -1,3 +1,347 @@
+# Dev -> QA Handoff — Sprint S0034 (US-0055)
+
+## Status
+
+S0034 implementation is complete for **US-0055** (Deterministic Status
+Reconciliation Command) and ready for `/qa`.
+
+## Scope completed
+
+1. **Command contract (T-001, T-002 / AC-1, AC-2)**: added new deterministic
+   `/status-reconcile` command with mismatch detection matrix and bounded repair
+   workflow.
+2. **Canonical precedence + normalization (T-003..T-005 / AC-3..AC-5)**:
+   command defines backlog authority, derived-surface reconciliation semantics,
+   and target-scoped mutation boundaries.
+3. **Continuation readiness (T-006 / AC-6)**: command defines deterministic
+   resume update behavior to next OPEN story and intended phase.
+4. **Evidence + diagnostics (T-007, T-008 / AC-7, AC-8)**: normalization report
+   and state-checkpoint evidence contract plus deterministic reason-code set.
+5. **Regression + parity (T-009, T-010 / AC-9, AC-10)**: test runners extended
+   with US-0055 assertions and active/template docs/command parity updated.
+
+## QA verification checklist (S0034)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0055 assertion block.
+2. Confirm active/template parity:
+   - `.cursor/commands/status-reconcile.md`, `template/.cursor/commands/status-reconcile.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+3. Confirm sprint artifacts:
+   - `sprints/S0034/tasks.md` all done
+   - `sprints/S0034/progress.md` implementation complete
+   - `sprints/S0034/summary.md` present and consistent
+
+## Artifacts updated (S0034)
+
+- `.cursor/commands/status-reconcile.md`, `template/.cursor/commands/status-reconcile.md`
+- `docs/engineering/architecture.md`, `docs/engineering/research.md`
+- `decisions/DEC-0037.md`, `docs/engineering/decisions.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0034/tasks.md`, `sprints/S0034/progress.md`, `sprints/S0034/summary.md`
+
+---
+
+# Dev -> QA Handoff — Sprint S0033 (US-0054)
+
+## Status
+
+S0033 implementation is complete for **US-0054** (Configurable Multi-Target
+Release Publish with Confirmation Gate) and ready for `/qa`.
+
+## Scope completed
+
+1. **Publish control surface (T-001, T-004 / AC-1, AC-4)**: added deterministic
+   release publish controls in scratchpad (`RELEASE_PUBLISH_MODE`,
+   `RELEASE_TARGETS_FILE`, `RELEASE_TARGETS_DEFAULT`) with default `confirm`.
+2. **Target taxonomy + generic support (T-002 / AC-2)**: documented built-in
+   target taxonomy (`npm|choco|brew|git|docker|cloud`) and generic `custom`
+   target contract.
+3. **SSH support (T-003 / AC-3)**: added first-class `ssh` target contract in
+   canonical target schema file with env-referenced host/user/auth fields.
+4. **Deterministic run safety (T-005, T-006 / AC-5, AC-6)**: release contract
+   now includes deterministic ordering, selection, and fail-fast invalid-config
+   reason codes.
+5. **Secret handling + parity (T-007, T-008 / AC-7, AC-8)**: env-reference-only
+   secret policy documented and mirrored across active/template artifacts.
+6. **Regression and invariants (T-009, T-010 / AC-9, AC-10)**: test runners now
+   assert US-0054 contracts while preserving mandatory release gate semantics.
+
+## QA verification checklist (S0033)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0054 assertions.
+2. Confirm active/template parity:
+   - `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
+   - `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+   - `docs/engineering/release-targets.json`, `template/docs/engineering/release-targets.json`
+3. Confirm sprint artifacts:
+   - `sprints/S0033/tasks.md` all done
+   - `sprints/S0033/progress.md` implementation complete
+   - `sprints/S0033/summary.md` present and consistent
+
+## Artifacts updated (S0033)
+
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
+- `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `docs/engineering/release-targets.json`, `template/docs/engineering/release-targets.json`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0033/tasks.md`, `sprints/S0033/progress.md`, `sprints/S0033/summary.md`
+
+---
+
+# Dev -> QA Handoff — Sprint S0032 (US-0053)
+
+## Status
+
+S0032 implementation is complete for **US-0053** (Context Compaction and Tiered
+Token-Cost Optimization Mode) and ready for `/qa`.
+
+## Scope completed
+
+1. **Tiered profile contract (T-001..T-003 / AC-1..AC-3)**: introduced
+   `TOKEN_PROFILE=lean|balanced|full` with deterministic semantics and
+   manual-override precedence in active/template scratchpad and docs.
+2. **State compaction policy (T-004 / AC-4)**: defined active hot-surface policy
+   in `docs/engineering/state.md` and added archive contract in
+   `docs/engineering/state-archive/README.md` (active + template).
+3. **Decisions compaction (T-005 / AC-5)**: compacted
+   `docs/engineering/decisions.md` into bounded summaries with canonical
+   `decisions/DEC-xxxx.md` linkouts; aligned template baseline.
+4. **`/ask` narrow-read policy (T-006 / AC-6)**: updated active/template
+   `.cursor/commands/ask.md` to targeted-first, bounded expansion retrieval with
+   explicit unresolved behavior.
+5. **Parity + regression coverage (T-007..T-009 / AC-7, AC-8)**: aligned
+   active/template command/runbook/README/scratchpad/state contracts and added
+   US-0053 assertions in both test runners.
+6. **Operator guidance and invariants (T-010 / AC-9, AC-10)**: updated runbook
+   and README with profile tradeoffs/escalation guidance while preserving
+   mandatory release-gate semantics and ID/history invariants.
+
+## QA verification checklist (S0032)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0053 assertion block:
+   - `TOKEN_PROFILE` contract in active/template scratchpads
+   - `/ask` narrow-read contract (active + template)
+   - runbook/README US-0053 guidance parity
+   - state archive README presence (active + template)
+   - compact decisions-index assertions
+2. Confirm active/template parity for token-profile + compaction contracts:
+   - `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
+   - `.cursor/commands/ask.md`, `template/.cursor/commands/ask.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+   - `docs/engineering/state.md`, `template/docs/engineering/state.md`
+3. Confirm sprint artifacts:
+   - `sprints/S0032/tasks.md` all done
+   - `sprints/S0032/progress.md` implementation complete
+   - `sprints/S0032/summary.md` present and consistent
+
+## Artifacts updated (S0032)
+
+- `.cursor/commands/ask.md`, `template/.cursor/commands/ask.md`
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `docs/engineering/state.md`, `template/docs/engineering/state.md`
+- `docs/engineering/state-archive/README.md`, `template/docs/engineering/state-archive/README.md`
+- `docs/engineering/decisions.md`, `template/docs/engineering/decisions.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0032/tasks.md`, `sprints/S0032/progress.md`, `sprints/S0032/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+# Dev -> QA Handoff — Sprint S0031 (US-0052)
+
+## Status
+
+S0031 implementation is complete for **US-0052** (Optional Fresh-Project ID
+Namespace Bootstrap) and ready for `/qa`.
+
+## Scope completed
+
+1. **Bootstrap control contract (T-001 / AC-1, AC-6)**: added explicit
+   `ID_NAMESPACE_BOOTSTRAP` scratchpad switch (active + template), default-off.
+2. **Freshness eligibility and bootstrap behavior (T-002, T-003 / AC-2, AC-4)**:
+   intake/research/architecture contracts now define deterministic freshness
+   checks and first-ID bootstrap semantics (`US-0001`, `DEC-0001`, `R-0001`)
+   only when eligible.
+3. **Compatibility-safe continuation (T-004, T-006 / AC-3, AC-5)**: contracts
+   require highest-existing-ID continuation for non-fresh repos, collision-safe
+   generation, and no historical renumbering.
+4. **Deterministic diagnostics (T-005 / AC-4, AC-6)**: ineligible bootstrap
+   requests now require `ID_BOOTSTRAP_NOT_FRESH` diagnostic with remediation
+   guidance.
+5. **Operator guidance (T-007 / AC-6)**: runbook/README (active + template)
+   include bootstrap behavior, eligibility criteria, and constraints.
+6. **Regression + parity (T-008..T-010 / AC-7, AC-8)**: both test runners now
+   assert US-0052 contracts across active/template command, agent, runbook, and
+   README surfaces.
+
+## QA verification checklist (S0031)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0052 assertion block:
+   - `ID_NAMESPACE_BOOTSTRAP` scratchpad keys (active + template)
+   - bootstrap policy in intake/research/architecture commands
+   - bootstrap policy in PO and Tech Lead agents
+   - runbook/README US-0052 guidance parity
+2. Confirm active/template parity for updated command contracts:
+   - `.cursor/commands/intake.md` and `template/.cursor/commands/intake.md`
+   - `.cursor/commands/research.md` and `template/.cursor/commands/research.md`
+   - `.cursor/commands/architecture.md` and `template/.cursor/commands/architecture.md`
+3. Confirm active/template parity for updated agent guidance:
+   - `.cursor/agents/po.mdc` and `template/.cursor/agents/po.mdc`
+   - `.cursor/agents/tech-lead.mdc` and `template/.cursor/agents/tech-lead.mdc`
+4. Confirm runbook and README US-0052 guidance parity:
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+5. Confirm baseline report snapshot:
+   - `tests/report.md` timestamp `2026-03-12T19:43:28Z`, `Pass: 440`, `Fail: 0`.
+
+## Artifacts updated (S0031)
+
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
+- `.cursor/commands/intake.md`, `template/.cursor/commands/intake.md`
+- `.cursor/commands/research.md`, `template/.cursor/commands/research.md`
+- `.cursor/commands/architecture.md`, `template/.cursor/commands/architecture.md`
+- `.cursor/agents/po.mdc`, `template/.cursor/agents/po.mdc`
+- `.cursor/agents/tech-lead.mdc`, `template/.cursor/agents/tech-lead.mdc`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0031/tasks.md`, `sprints/S0031/progress.md`, `sprints/S0031/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+# Dev -> QA Handoff — Sprint S0030 (US-0051)
+
+## Status
+
+S0030 implementation is complete for **US-0051** (Intelligent Intake
+Decomposition and Risk-Aware PO Questioning) and ready for `/qa`.
+
+## Scope completed
+
+1. **Decomposition heuristics and trigger contract (T-001, T-005 / AC-1, AC-5)**:
+   active/template `/intake` now include deterministic breadth/risk evaluation,
+   bounded split trigger behavior, and explicit single-story default for narrow
+   intake.
+2. **Vertical-slice decomposition quality (T-002 / AC-1, AC-2)**: intake split
+   guidance enforces independently valuable/testable stories and avoids
+   technical-layer-only decomposition by default.
+3. **Split rationale persistence (T-003 / AC-3, AC-9)**: intake contract now
+   requires explicit rationale, split axis, and story boundary evidence in
+   product and handoff artifacts.
+4. **Explicit user split decision authority (T-004 / AC-4)**: guidance now
+   requires accept/merge/adjust confirmation before final persistence.
+5. **Risk-aware adaptive questioning (T-006, T-007 / AC-6, AC-7)**: PO behavior
+   now expands follow-ups for broad/high-risk intake and keeps rounds bounded.
+6. **Low-touch compatibility preserved (T-008 / AC-8)**:
+   `INTAKE_GUIDED_MODE=0` remains minimal-overhead with mandatory duplicate
+   safety and no forced decomposition.
+7. **Artifact traceability contract (T-009 / AC-9)**: decomposition/questioning
+   evidence requirement added for `backlog.md`, `acceptance.md`, and
+   `handoffs/po_to_tl.md`.
+8. **Parity + regression (T-010, T-011 / AC-10)**: updated active/template
+   intake + PO guidance, runbook/README docs, and both test runners with new
+   US-0051 assertions.
+
+## QA verification checklist (S0030)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0051 assertion block:
+   - deterministic decomposition evaluator
+   - accept/merge/adjust control
+   - bounded questioning contract
+   - no-forced-decomposition low-touch behavior
+   - runbook/README US-0051 documentation parity
+2. Confirm active/template intake command parity in:
+   - `.cursor/commands/intake.md`
+   - `template/.cursor/commands/intake.md`
+3. Confirm active/template PO agent parity in:
+   - `.cursor/agents/po.mdc`
+   - `template/.cursor/agents/po.mdc`
+4. Confirm runbook and README US-0051 guidance parity:
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+5. Confirm baseline report snapshot:
+   - `tests/report.md` timestamp `2026-03-12T17:48:56Z`, `Pass: 422`, `Fail: 0`.
+
+## Artifacts updated (S0030)
+
+- `.cursor/commands/intake.md`, `template/.cursor/commands/intake.md`
+- `.cursor/agents/po.mdc`, `template/.cursor/agents/po.mdc`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0030/tasks.md`, `sprints/S0030/progress.md`, `sprints/S0030/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+# Dev -> QA Handoff — Sprint S0029 (US-0050)
+
+## Status
+
+S0029 implementation is complete for **US-0050** (Clean Install Hygiene and Complete Clean-Repo Coverage) and ready for `/qa`.
+
+## Scope completed
+
+1. **Ownership manifest contract (T-001 / AC-2)**: Added canonical manifest `docs/engineering/context/installer-owned-paths.manifest` and template parity copy.
+2. **Installer refactor to shared contract (T-002..T-004 / AC-1, AC-2)**: `installer.ps1`, `installer.sh`, and `installer.py` all consume manifest sections for install and clean path scope.
+3. **Expanded clean-repo safety coverage (T-005 / AC-3)**: clean removes manifest-owned workflow artifacts (including docs/user-guides, validate scripts, workflow files, `.its-magic-version`) while preserving non-framework markers.
+4. **Template starter neutrality (T-006 / AC-4)**: removed seeded operational rows from template engineering starter artifacts (`status-normalization-report`, `compatibility-*`, `component-scope-*`).
+5. **Hardcoded reference neutralization (T-007 / AC-5)**: removed fixed `DEC-0011` wording from template research entry format header.
+6. **Fresh-install baseline regression (T-008 / AC-6)**: tests verify missing install yields neutral starter artifacts and no hardcoded `DEC-0011` in starter research.
+7. **Lifecycle clean/install regression (T-009 / AC-8)**: tests validate clean-repo completeness for owned paths and non-framework preservation in both installer and CLI paths.
+8. **Upgrade/parity verification (T-010 / AC-7, AC-9)**: upgrade lifecycle assertions remain passing; active/template clean semantics and ownership manifest parity validated.
+9. **QA blocker remediation (execute loop)**: synced stable Homebrew formula (`packaging/homebrew/its-magic.rb`) to package version `0.1.2-20` (URL + version + SHA256), resolving baseline version-sync test failures.
+
+## QA verification checklist (S0029)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and review new S0029 checks in `tests/report.md`.
+2. Confirm installers load shared manifest: `installer.ps1`, `installer.sh`, `installer.py` reference `installer-owned-paths.manifest`.
+3. Confirm clean-repo manifest scope includes docs/user-guides, scripts/validate-and-push.*, `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `.its-magic-version`.
+4. Confirm template starter neutrality in:
+   - `template/docs/engineering/status-normalization-report.md`
+   - `template/docs/engineering/compatibility-report.md`
+   - `template/docs/engineering/compatibility-signals.md`
+   - `template/docs/engineering/component-scope.md`
+   - `template/docs/engineering/component-scope-report.md`
+   - `template/docs/engineering/research.md` (no `DEC-0011` string)
+5. Confirm README/help text alignment for clean-repo semantics:
+   - `README.md`, `template/README.md`, `bin/its-magic.js`, and installer help output.
+6. Confirm Homebrew stable formula version-sync checks pass:
+   - `Homebrew stable formula URL uses npm version tag`
+   - `Homebrew stable formula version matches npm version`
+7. Verify current baseline report is green:
+   - `tests/report.md` timestamp `2026-03-11T22:03:11Z`, `Pass: 404`, `Fail: 0`.
+
+## Artifacts updated (S0029)
+
+- `docs/engineering/context/installer-owned-paths.manifest`
+- `template/docs/engineering/context/installer-owned-paths.manifest`
+- `installer.ps1`, `installer.sh`, `installer.py`, `bin/its-magic.js`
+- `packaging/homebrew/its-magic.rb`
+- `README.md`, `template/README.md`
+- Template engineering starter artifacts listed in scope item #4
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0029/tasks.md`, `sprints/S0029/progress.md`, `sprints/S0029/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
 # Dev -> QA Handoff — Sprint S0028 (US-0049)
 
 ## Status

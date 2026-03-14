@@ -89,11 +89,10 @@ Mandatory gate order (strict, deterministic). No step may be skipped or reordere
 2. **QA completion gate** — Require no unresolved blocking findings in current sprint context before proceeding.
 3. **UAT completion gate** — Require UAT artifacts populated and verified; block on placeholder, incomplete, or unresolved-fail state.
 4. **Isolation compliance gate** — Require valid per-phase isolation evidence (US-0048 / DEC-0029); block on missing/invalid/stale evidence or violation.
+4b. **Strict runtime proof gate** — Require valid strict runtime attestation tuples (US-0056 / DEC-0038); block on missing/invalid/reused/stale/ambiguous proof linkage.
 5. **Release finalization** — Only after gates 1–4 pass: write release notes, update queue, reconcile backlog/runbook/state.
 
 Optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) are not mandatory release gates. When blank, they must not cause release to fail; report as `skipped`. Mandatory gates remain check-in test + QA + UAT + isolation only (US-0039 AC-10, US-0048).
-
-## No-bypass default (US-0039)
 
 Default: no bypass. Override only via explicit decision gate with documented rationale and evidence (see Override evidence contract below).
 
@@ -236,6 +235,17 @@ Guardrails:
       `PHASE_CONTEXT_ISOLATION_VIOLATION`
     - Remediation: re-run the affected phase(s) in fresh subagent contexts,
       write new isolation evidence, then rerun `/release`.
+4b. Strict runtime proof gate (US-0056 / DEC-0038): verify strict runtime-proof
+    tuples are present and valid for target lifecycle phases (`execute`, `qa`,
+    `verify-work`) and deterministically linked to checkpoint evidence.
+    - Missing tuple: block with `RUNTIME_PROOF_MISSING`
+    - Invalid tuple/hash/linkage: block with `RUNTIME_PROOF_INVALID`
+    - Reused `runtime_proof_id`: block with `RUNTIME_PROOF_REUSED`
+    - Expired/stale proof: block with `RUNTIME_PROOF_STALE`
+    - Ambiguous proof-to-checkpoint linkage: block with
+      `RUNTIME_PROOF_AMBIGUOUS_LINK`
+    - Remediation: rerun affected phase(s), write fresh runtime proof tuples,
+      then rerun `/release`.
 5. Ensure target queue row exists; set status to `unreleased` before finalization.
    - Create row if missing.
    - Set `release_notes_ref` to target sprint notes path.
@@ -286,6 +296,30 @@ Guardrails:
       (`PASS`) and references final evidence artifacts.
 15. If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generation logic must
     still target sprint-scoped notes first and update legacy pointer second.
+16. Optional configurable publish targets (US-0054 / DEC-0036):
+    - Read `.cursor/scratchpad.md`:
+      - `RELEASE_PUBLISH_MODE=disabled|confirm|auto`
+      - `RELEASE_TARGETS_FILE`
+      - `RELEASE_TARGETS_DEFAULT`
+    - If `RELEASE_PUBLISH_MODE=disabled`, skip publish target execution with
+      deterministic no-op evidence.
+    - Validate target schema in `RELEASE_TARGETS_FILE` before execution:
+      - stable `id`, `type`, `enabled`, `order`,
+      - supported `type`: `npm|choco|brew|git|docker|cloud|custom|ssh`,
+      - env-reference-only secret fields (`*Env`) for sensitive values.
+      - fail fast on invalid/missing required fields with
+        `PUBLISH_TARGET_CONFIG_INVALID`.
+    - Resolve selected targets (explicit request, else
+      `RELEASE_TARGETS_DEFAULT`), filter `enabled=true`, and execute in
+      deterministic order (`order`, then `id`).
+    - If `RELEASE_PUBLISH_MODE=confirm`, require explicit operator confirmation
+      before execution; if confirmation is denied/absent, stop with
+      `PUBLISH_CONFIRMATION_REQUIRED`.
+    - For `ssh` targets, require `hostEnv`, `userEnv`, `authEnv`, and
+      `remoteCommand`. Missing required fields fail with
+      `PUBLISH_TARGET_CONFIG_INVALID`.
+    - If target execution fails, emit `PUBLISH_TARGET_EXECUTION_FAILED` with
+      target ID and remediation; do not mutate unrelated release artifacts.
 
 ## Fail-safe reason codes and remediation guidance
 
@@ -300,6 +334,11 @@ Required deterministic reason codes:
 - `PHASE_CONTEXT_ISOLATION_VIOLATION`
 - `ISOLATION_EVIDENCE_STALE`
 - `ISOLATION_EVIDENCE_INVALID`
+- `RUNTIME_PROOF_MISSING`
+- `RUNTIME_PROOF_INVALID`
+- `RUNTIME_PROOF_REUSED`
+- `RUNTIME_PROOF_STALE`
+- `RUNTIME_PROOF_AMBIGUOUS_LINK`
 - `RELEASE_GATE_OVERRIDE_APPROVED`
 - `LEGACY_NOTES_SPRINT_UNRESOLVED`
 - `QUEUE_ENTRY_MISSING`
@@ -314,9 +353,27 @@ Required deterministic reason codes:
 - `BACKLOG_DONE_ACCEPTANCE_UNCHECKED`
 - `BACKLOG_DONE_TRACEABILITY_MISSING`
 - `BACKLOG_DONE_RELEASE_ARTIFACT_MISSING`
+- `PUBLISH_TARGET_CONFIG_INVALID`
+- `PUBLISH_CONFIRMATION_REQUIRED`
+- `PUBLISH_TARGET_EXECUTION_FAILED`
 
 When any reason code is emitted:
 - Preserve existing release note artifacts (non-destructive default).
 - Do not auto-reconcile by deleting/rebuilding unrelated sprint history.
 - Provide actionable remediation steps and require rerun after correction.
+
+## Deterministic artifact ordering contract (US-0058 / DEC-0040)
+
+- Mutations in `/release` must comply with
+  `docs/engineering/artifact-ordering-policy.md`.
+- Ordering expectations:
+  - `docs/engineering/state.md`: append-bottom checkpoint entries only.
+  - `docs/product/backlog.md` + `docs/product/acceptance.md`: target story
+    normalization while preserving sorted-canonical order.
+  - `handoffs/release_queue.md`: append one target sprint row/update in-place for
+    that row only.
+  - `handoffs/release_notes.md`: update latest pointer section first; keep
+    historical list stable.
+- Missing/ambiguous placement anchors must fail with
+  `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` and no partial mutation.
 

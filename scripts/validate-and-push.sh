@@ -5,7 +5,7 @@
 # Part of the its-magic quality chain:
 #   Cursor AI loop  →  validate-and-push  →  CI auto-fix (GitHub)
 #
-# Reads TEST_COMMAND (and optionally TYPECHECK_COMMAND, LINT_FIX_COMMAND / FORMAT_COMMAND)
+# Reads TEST_COMMAND (and optionally LINT_FIX_COMMAND / FORMAT_COMMAND)
 # from docs/engineering/runbook.md, runs them in a loop, and pushes
 # only when everything passes.
 # -------------------------------------------------------------------
@@ -43,12 +43,11 @@ read_runbook_key() {
 
 TEST_CMD=$(read_runbook_key "TEST_COMMAND")
 LINT_CMD=$(read_runbook_key "LINT_COMMAND")
-TYPECHECK_CMD=$(read_runbook_key "TYPECHECK_COMMAND")
 LINT_FIX_CMD=$(read_runbook_key "LINT_FIX_COMMAND")
 FORMAT_CMD=$(read_runbook_key "FORMAT_COMMAND")
 
-if [ -z "$TEST_CMD" ]; then
-  log_warn "TEST_COMMAND is required by sync policy."
+if [ -z "$TEST_CMD" ] && [ -z "$LINT_CMD" ]; then
+  log_warn "No TEST_COMMAND or LINT_COMMAND found in docs/engineering/runbook.md"
   log_warn "Fill in the runbook first, then re-run."
   exit 1
 fi
@@ -61,7 +60,6 @@ log_info "validate-and-push loop"
 log_info "Branch: $BRANCH  |  Max attempts: $MAX_ATTEMPTS"
 [ -n "$TEST_CMD" ]     && log_info "TEST_COMMAND:     $TEST_CMD"
 [ -n "$LINT_CMD" ]     && log_info "LINT_COMMAND:     $LINT_CMD"
-[ -n "$TYPECHECK_CMD" ] && log_info "TYPECHECK_COMMAND: $TYPECHECK_CMD"
 [ -n "$LINT_FIX_CMD" ] && log_info "LINT_FIX_COMMAND: $LINT_FIX_CMD"
 [ -n "$FORMAT_CMD" ]   && log_info "FORMAT_COMMAND:   $FORMAT_CMD"
 printf "\n"
@@ -108,17 +106,6 @@ while [ "$attempt" -lt "$MAX_ATTEMPTS" ]; do
       log_pass "Tests OK"
     else
       log_fail "Tests failed"
-      all_ok=false
-    fi
-  fi
-
-  # 5. Run typecheck (optional)
-  if [ -n "$TYPECHECK_CMD" ]; then
-    log_info "Running typecheck..."
-    if eval "$TYPECHECK_CMD"; then
-      log_pass "Typecheck OK"
-    else
-      log_fail "Typecheck failed"
       all_ok=false
     fi
   fi

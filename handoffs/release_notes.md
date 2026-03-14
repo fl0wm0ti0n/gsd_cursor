@@ -13,28 +13,37 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0028`
-- **Latest canonical notes:** `handoffs/releases/S0028-release-notes.md`
-- **Latest release date:** 2026-03-02
-- **Latest release story:** US-0049
+- **Latest released sprint:** `S0037`
+- **Latest canonical notes:** `handoffs/releases/S0037-release-notes.md`
+- **Latest release date:** 2026-03-14
+- **Latest release story:** US-0058
 
 ## Unreleased queue visibility
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-## Release readiness note (S0028)
+## Release readiness note (S0037)
 
-- Sprint: `S0028`
-- Story: `US-0049`
+- Sprint: `S0037`
+- Story: `US-0058`
 - Verify-work: PASS
-- UAT status: PASS (`8/8`, `0` failed)
-- QA findings: PASS with no blockers (`sprints/S0028/qa-findings.md`)
+- UAT status: PASS (`10/10`, `0` failed)
+- QA findings: PASS with no blockers (`sprints/S0037/qa-findings.md`)
 - Release readiness: Finalized as `released` in `handoffs/release_queue.md`
   with canonical sprint-scoped notes.
 
 ## Historical references
 
+- `S0037`: `handoffs/releases/S0037-release-notes.md`
+- `S0036`: `handoffs/releases/S0036-release-notes.md`
+- `S0035`: `handoffs/releases/S0035-release-notes.md`
+- `S0034`: `handoffs/releases/S0034-release-notes.md`
+- `S0033`: `handoffs/releases/S0033-release-notes.md`
+- `S0032`: `handoffs/releases/S0032-release-notes.md`
+- `S0031`: `handoffs/releases/S0031-release-notes.md`
+- `S0030`: `handoffs/releases/S0030-release-notes.md`
+- `S0029`: `handoffs/releases/S0029-release-notes.md`
 - `S0011`: `handoffs/releases/S0011-release-notes.md`
 - `S0025`: `handoffs/releases/S0025-release-notes.md`
 - `S0026`: `handoffs/releases/S0026-release-notes.md`

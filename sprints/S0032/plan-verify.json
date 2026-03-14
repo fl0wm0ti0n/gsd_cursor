@@ -1,0 +1,42 @@
+{
+  "sprint_id": "S0032",
+  "story_id": "US-0053",
+  "result": "PASS",
+  "checked_at": "2026-03-12T21:05:00Z",
+  "coverage": {
+    "AC-1": [
+      "T-001"
+    ],
+    "AC-2": [
+      "T-002"
+    ],
+    "AC-3": [
+      "T-003"
+    ],
+    "AC-4": [
+      "T-004"
+    ],
+    "AC-5": [
+      "T-005"
+    ],
+    "AC-6": [
+      "T-006"
+    ],
+    "AC-7": [
+      "T-007",
+      "T-009"
+    ],
+    "AC-8": [
+      "T-008",
+      "T-009"
+    ],
+    "AC-9": [
+      "T-010"
+    ],
+    "AC-10": [
+      "T-010"
+    ]
+  },
+  "gaps": [],
+  "notes": "All US-0053 acceptance criteria are covered by S0032 tasks; no planning gap detected."
+}

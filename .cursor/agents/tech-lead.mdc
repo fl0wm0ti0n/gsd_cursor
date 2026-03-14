@@ -33,9 +33,21 @@ Early research (when EARLY_RESEARCH=1 in scratchpad.md):
   (framework docs, pattern comparisons, performance benchmarks, security
   considerations).
 - Persist findings as an R-xxxx entry in `docs/engineering/research.md`
-  (auto-increment ID from highest existing entry, per DEC-0011).
+  using deterministic ID policy:
+  - if `ID_NAMESPACE_BOOTSTRAP=1` and freshness checks pass (no `US-` in
+    backlog, no `DEC-` in decisions, no `R-` in research), start at `R-0001`;
+  - otherwise continue from highest existing `R-` ID.
+  Never rewrite historical IDs; emit `ID_BOOTSTRAP_NOT_FRESH` when requested
+  bootstrap is ineligible (per DEC-0011 / DEC-0034).
 - Reference entry IDs in architecture decisions and DEC-xxxx records.
 - If EARLY_RESEARCH=0, skip this step.
+
+Decision ID policy (US-0052 / DEC-0034):
+- For new `DEC-xxxx` records:
+  - if `ID_NAMESPACE_BOOTSTRAP=1` and deterministic freshness checks pass, first
+    decision starts at `DEC-0001`;
+  - otherwise continue from highest existing `DEC-` ID.
+- Never rewrite or renumber historical decisions.
 
 Sprint sizing (during /sprint-plan):
 - Read SPRINT_MAX_TASKS from `.cursor/scratchpad.md` (default: 12).

@@ -2,11 +2,8 @@
 set -e
 
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-if [ -d "$SCRIPT_DIR/template" ]; then
-  SOURCE_ROOT="$SCRIPT_DIR/template"
-else
-  SOURCE_ROOT="$SCRIPT_DIR"
-fi
+SOURCE_ROOT="$SCRIPT_DIR/template"
+MANIFEST_NAME="docs/engineering/context/installer-owned-paths.manifest"
 REPO_URL="https://github.com/fl0wm0ti0n/its-magic"
 APP_VERSION=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$SCRIPT_DIR/package.json" 2>/dev/null | head -n 1)
 [ -z "$APP_VERSION" ] && APP_VERSION="unknown"
@@ -49,8 +46,10 @@ show_help() {
   printf "  --create          Create the target directory if it does not exist.\n\n"
   printf "Clean options:\n"
   printf "  --clean-repo      Remove all its-magic workflow artifacts from the target repo\n"
-  printf "                    (.cursor, docs/product, docs/engineering, sprints, handoffs,\n"
-  printf "                    decisions). Your own source code is never touched.\n"
+  printf "                    (owned paths from installer manifest, including .cursor,\n"
+  printf "                    docs/product, docs/engineering, docs/user-guides, sprints,\n"
+  printf "                    handoffs, decisions, workflow scripts, CI files, and\n"
+  printf "                    .its-magic-version). Your own source code is never touched.\n"
   printf "  --target <path>   Repo to clean (default: current directory).\n"
   printf "  --yes             Skip the confirmation prompt.\n\n"
   printf "Info:\n"
@@ -79,6 +78,20 @@ list_source_files() {
       find "$src" -type f | sed "s|^$source_root/||"
     fi
   done | sort -u
+}
+
+get_manifest_paths() {
+  section="$1"
+  awk -v s="$section" '
+    BEGIN { in_section=0 }
+    /^[[:space:]]*#/ { next }
+    /^[[:space:]]*$/ { next }
+    /^\[/ {
+      in_section = ($0 == "[" s "]")
+      next
+    }
+    { if (in_section) print $0 }
+  ' "$OWNERSHIP_MANIFEST"
 }
 
 backup_files() {
@@ -121,7 +134,7 @@ classify_file() {
     .cursor/hooks/*|.cursor/hooks.json|.cursor/scratchpad.local.example.md) echo "framework" ;;
     .github/workflows/*|scripts/validate-and-push*|docs/engineering/context/*) echo "framework" ;;
     .its-magic-version) echo "framework" ;;
-    docs/product/*|docs/engineering/*) echo "user-data" ;;
+    docs/product/*|docs/engineering/*|docs/user-guides/*) echo "user-data" ;;
     sprints/*|handoffs/*|decisions/*) echo "user-data" ;;
     *) echo "framework" ;;
   esac
@@ -191,6 +204,22 @@ if [ "$SHOW_HELP" = "true" ]; then
   exit 0
 fi
 
+if [ ! -d "$SOURCE_ROOT" ]; then
+  printf "%s\n" "[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package."
+  exit 1
+fi
+
+OWNERSHIP_MANIFEST="$SOURCE_ROOT/$MANIFEST_NAME"
+if [ ! -f "$OWNERSHIP_MANIFEST" ]; then
+  FALLBACK_MANIFEST="$SCRIPT_DIR/$MANIFEST_NAME"
+  if [ -f "$FALLBACK_MANIFEST" ]; then
+    OWNERSHIP_MANIFEST="$FALLBACK_MANIFEST"
+  else
+    printf "%s\n" "[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic package."
+    exit 1
+  fi
+fi
+
 if [ "$CLEAN_REPO" = "true" ]; then
   if [ -z "$TARGET" ]; then
     TARGET="."
@@ -206,14 +235,11 @@ if [ "$CLEAN_REPO" = "true" ]; then
       exit 1
     fi
   fi
-  CLEAN_PATHS="
-.cursor
-docs/product
-docs/engineering
-sprints
-handoffs
-decisions
-"
+  CLEAN_PATHS=$(get_manifest_paths "clean_paths")
+  if [ -z "$CLEAN_PATHS" ]; then
+    printf "%s\n" "[INSTALL_MANIFEST_ERROR] clean_paths section is empty in $OWNERSHIP_MANIFEST"
+    exit 1
+  fi
   for rel in $CLEAN_PATHS; do
     path="$TARGET_ROOT/$rel"
     if [ -e "$path" ]; then
@@ -252,25 +278,11 @@ if [ "$MODE" = "overwrite" ] || [ "$MODE" = "interactive" ]; then
   fi
 fi
 
-INCLUDE_PATHS="
-.cursor/commands
-.cursor/rules
-.cursor/skills
-.cursor/agents
-.cursor/hooks
-.cursor/hooks.json
-.cursor/scratchpad.md
-.cursor/scratchpad.local.example.md
-docs
-sprints
-handoffs
-decisions
-scripts/validate-and-push.ps1
-scripts/validate-and-push.sh
-.github/workflows
-README.md
-.its-magic-version
-"
+INCLUDE_PATHS=$(get_manifest_paths "install_include_paths")
+if [ -z "$INCLUDE_PATHS" ]; then
+  printf "%s\n" "[INSTALL_MANIFEST_ERROR] install_include_paths section is empty in $OWNERSHIP_MANIFEST"
+  exit 1
+fi
 
 FILES=$(list_source_files "$SOURCE_ROOT" $INCLUDE_PATHS)
 if [ -z "$FILES" ]; then
@@ -310,6 +322,8 @@ if [ "$MODE" = "upgrade" ]; then
   count_unchanged=0
   count_preserved=0
   count_review=0; list_review=""
+  scratchpad_example_rel=".cursor/scratchpad.local.example.md"
+  scratchpad_example_status="not-seen"
 
   for rel in $FILES; do
     src="$SOURCE_ROOT/$rel"
@@ -321,17 +335,20 @@ if [ "$MODE" = "upgrade" ]; then
       cp -p "$src" "$dst"
       count_added=$((count_added + 1))
       list_added="$list_added $rel"
+      [ "$rel" = "$scratchpad_example_rel" ] && scratchpad_example_status="added"
       continue
     fi
 
     if [ "$cat" = "framework" ]; then
       if cmp -s "$src" "$dst"; then
         count_unchanged=$((count_unchanged + 1))
+        [ "$rel" = "$scratchpad_example_rel" ] && scratchpad_example_status="unchanged"
       else
         ensure_parent "$dst"
         cp -p "$src" "$dst"
         count_updated=$((count_updated + 1))
         list_updated="$list_updated $rel"
+        [ "$rel" = "$scratchpad_example_rel" ] && scratchpad_example_status="updated"
       fi
       continue
     fi
@@ -365,6 +382,9 @@ if [ "$MODE" = "upgrade" ]; then
   fi
   printf "  Unchanged:           %s files\n" "$count_unchanged"
   printf "  Preserved (user):    %s files\n" "$count_preserved"
+  [ "$scratchpad_example_status" = "not-seen" ] && scratchpad_example_status="not-in-manifest"
+  printf "  Scratchpad example:  %s (.cursor/scratchpad.local.example.md)\n" "$scratchpad_example_status"
+  [ -f "$TARGET_ROOT/.cursor/scratchpad.local.md" ] && printf "  User local file:     preserved (.cursor/scratchpad.local.md)\n"
   if [ "$count_review" -gt 0 ]; then
     printf "\n  \033[1;35mReview recommended:  %s files\033[0m\n" "$count_review"
     for f in $list_review; do printf "    %s\n" "$f"; done

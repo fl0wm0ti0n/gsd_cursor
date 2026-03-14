@@ -118,8 +118,10 @@ Install options:
 
 Clean options:
   --clean-repo      Remove all its-magic workflow artifacts from the target repo
-                    (.cursor, docs/product, docs/engineering, sprints, handoffs,
-                    decisions). Your own source code is never touched.
+                    (owned paths from installer manifest, including .cursor,
+                    docs/product, docs/engineering, docs/user-guides, sprints,
+                    handoffs, decisions, workflow scripts, CI files, and
+                    .its-magic-version). Your own source code is never touched.
   --target <path>   Repo to clean (default: current directory).
   --yes             Skip the confirmation prompt.
 

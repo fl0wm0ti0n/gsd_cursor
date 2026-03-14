@@ -1,20 +1,19 @@
 # Component Scope
 
 - Mode: optional (`COMPONENT_SCOPE_MODE`)
-- Story: US-0035
+- Story: US-xxxx
 
 ## Scope declaration
 
-- scope_mode: on
+- scope_mode: off
 - target_components:
-  - api-gateway
+  - (set when enabled)
 - non_target_components:
-  - web-app
-  - worker
+  - (set when enabled)
 - allowed_interface_touch:
-  - public-api-v1
+  - (set when enabled)
 - out_of_scope_constraints:
   - no intentional edits in non-target components without explicit approval
 - approval_policy:
-  - required: true
+  - required: false
   - source: decision/handoff artifact

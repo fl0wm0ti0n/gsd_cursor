@@ -1,0 +1,67 @@
+{
+  "sprint_id": "S0031",
+  "story_id": "US-0052",
+  "passed": 8,
+  "failed": 0,
+  "verified_state": "verify_work_complete",
+  "verified_at": "2026-03-12T20:12:00Z",
+  "verify_work_verified_at": "2026-03-12T20:12:00Z",
+  "steps": [
+    {
+      "step": 1,
+      "ac": "AC-1",
+      "description": "optional bootstrap control exists in scratchpad and command contracts with explicit default-off behavior",
+      "result": "pass",
+      "evidence": ".cursor/scratchpad.md and .cursor/commands/intake.md plus template parity"
+    },
+    {
+      "step": 2,
+      "ac": "AC-2",
+      "description": "eligible bootstrap path defines first IDs at US-0001, DEC-0001, and R-0001",
+      "result": "pass",
+      "evidence": ".cursor/commands/intake.md, .cursor/commands/research.md, .cursor/commands/architecture.md"
+    },
+    {
+      "step": 3,
+      "ac": "AC-3",
+      "description": "non-fresh path continues from highest existing IDs and forbids historical rewrites",
+      "result": "pass",
+      "evidence": "intake/research/architecture contracts and PO/TL agent guidance"
+    },
+    {
+      "step": 4,
+      "ac": "AC-4",
+      "description": "freshness detection criteria are deterministic and auditable across canonical artifacts with ineligible diagnostic",
+      "result": "pass",
+      "evidence": "freshness criteria and ID_BOOTSTRAP_NOT_FRESH contract in command docs"
+    },
+    {
+      "step": 5,
+      "ac": "AC-5",
+      "description": "collision-safety is preserved through sequential highest-existing continuation when bootstrap is not eligible",
+      "result": "pass",
+      "evidence": "no-renumbering and highest-existing continuation rules across namespaces"
+    },
+    {
+      "step": 6,
+      "ac": "AC-6",
+      "description": "operator guidance documents bootstrap behavior, constraints, and migration caveats",
+      "result": "pass",
+      "evidence": "README.md and docs/engineering/runbook.md (active + template)"
+    },
+    {
+      "step": 7,
+      "ac": "AC-7",
+      "description": "regression coverage includes bootstrap-enabled/disabled fresh paths and non-fresh/mixed edge checks",
+      "result": "pass",
+      "evidence": "tests/run-tests.ps1 and tests/run-tests.sh US-0052 assertion block"
+    },
+    {
+      "step": 8,
+      "ac": "AC-8",
+      "description": "active and template contracts remain aligned for bootstrap semantics",
+      "result": "pass",
+      "evidence": "parity checks for command/agent/runbook/README/scratchpad surfaces"
+    }
+  ]
+}

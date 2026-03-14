@@ -715,3 +715,341 @@ a decision or recommendation.
 - **Linked**: US-0049, US-0045, US-0043
 - **Confidence**: high
 - **Status**: current
+
+## R-0024
+
+- **Date**: 2026-03-11
+- **Topic**: Fresh-install hygiene, intake decomposition, and adaptive intake questioning
+- **Query**: How to prevent seeded-history starter artifacts in template installs, how to split broad intake into multiple user stories, and how to adapt clarifying questions by risk/complexity.
+- **Sources**:
+  - https://blog.nimblepros.com/blogs/create-github-template-repo-for-boilerplate/
+  - https://stackoverflow.com/questions/77198326/clone-template-repo-into-empty-repo-zero-history
+  - https://agileforall.com/story-splitting/
+  - https://nextagile.ai/blogs/agile/vertical-slicing-and-horizontal-slicing/
+  - https://nextgenanalysts.co.uk/7-proven-techniques-for-splitting-user-stories-with-real-examples/
+  - https://www.businessanalyststoolkit.com/requirements-elicitation-questions/
+  - https://www.designgurus.io/answers/detail/proactive-question-asking-to-clarify-ambiguous-requirements
+- **Findings**:
+  - Template/starter repositories should initialize with neutral baseline artifacts and no inherited project history. New-project trust improves when starter files avoid seeded operational rows and use placeholder/default content only.
+  - Cleanup behavior should be deterministic and ownership-complete; maintaining one source of truth for managed paths reduces cleanup drift across installer implementations.
+  - Broad requirements are best decomposed using vertical slices and workflow-step splits so each story is testable and delivers standalone user value.
+  - Decomposition quality improves when split rationale is explicit (feature axis, workflow step, risk boundary) and user-confirmed before persistence.
+  - Clarifying-question strategy should consider risk and scope breadth, not only explicit ambiguity. High-impact or cross-cutting requests benefit from extra targeted questions even when initial acceptance appears concrete.
+  - Questioning should stay bounded and outcome-focused; short targeted probes plus examples/edge cases reduce assumption risk without turning intake into an open-ended interview.
+- **Linked**: US-0050, US-0051, US-0052
+- **Confidence**: medium
+- **Status**: current
+
+## R-0025
+
+- **Date**: 2026-03-11
+- **Topic**: Architecture patterns for deterministic cleanup ownership and adaptive intake depth
+- **Query**: Which technical patterns best support complete installer cleanup coverage, neutral starter templates, bounded story decomposition, and risk-aware intake questioning.
+- **Sources**:
+  - https://argo-cd.readthedocs.io/en/stable/user-guide/multiple_sources/
+  - https://git-scm.com/docs/gitignore.html
+  - https://git-scm.com/docs/git-clean.html
+  - https://agileforall.com/story-splitting/
+  - https://www.businessanalyststoolkit.com/requirements-elicitation-questions/
+  - https://www.pmi.org/learning/library/uncover-gaps-requirements-risk-management-9910
+- **Findings**:
+  - Duplicate path ownership across multiple implementations is fragile; one canonical manifest/source-of-truth for managed artifacts reduces drift and keeps cleanup behavior consistent.
+  - `.gitignore` controls tracking of untracked files but is not a substitute for deterministic uninstall/clean behavior for already-managed artifacts; explicit cleanup contracts are still required.
+  - Safe cleanup requires a strict ownership boundary: remove only installer-owned artifacts, never non-framework project files.
+  - Large requirements are better split into independently testable vertical slices/workflow steps; this supports clearer planning, faster validation, and lower risk than one large cross-cutting story.
+  - Elicitation quality improves when question depth is adjusted by uncertainty/risk surface, not ambiguity alone; targeted bounded follow-ups reduce assumptions while keeping intake concise.
+- **Linked**: US-0050, US-0051, US-0052, DEC-0032, DEC-0033, DEC-0034
+- **Confidence**: medium
+- **Status**: current
+
+## R-0026
+
+- **Date**: 2026-03-12
+- **Topic**: Token-cost optimization patterns for artifact-first AI workflows
+- **Query**: Which practical patterns reduce token usage in multi-phase AI workflows while preserving quality gates, traceability, and operator control.
+- **Sources**:
+  - https://arxiv.org/html/2501.14723v2
+  - https://williamzujkowski.github.io/posts/from-150k-to-2k-tokens-how-progressive-context-loading-revolutionizes-llm-development-workflows/
+  - https://enricopiovano.com/blog/llm-cost-optimization-caching-strategies
+- **Findings**:
+  - Progressive context loading (start narrow, expand only when needed) is a high-impact strategy for reducing token spend without degrading task outcomes on routine questions.
+  - Separating hot operational context from historical archives keeps retrieval bounded: most runs need latest lifecycle state, not full historical logs.
+  - Compact indexes with links to canonical detail files are more token-efficient than repeating full histories in every high-traffic artifact.
+  - Tiered policy profiles (`lean|balanced|full`) are operator-friendly: they reduce overhead by switching defaults while preserving explicit opt-in for deeper checks.
+  - Quality gates should remain invariant under cost optimization; savings should come from retrieval scope, optional-mode defaults, and loop frequency controls, not from removing release/QA/UAT safety checks.
+- **Linked**: US-0053
+- **Confidence**: medium
+- **Status**: current
+
+## R-0027
+
+- **Date**: 2026-03-12
+- **Topic**: Research basis for tiered token profile and compact-context policy
+- **Query**: Which implementation patterns reduce token usage in artifact-first
+  coding workflows while preserving deterministic quality gates and operator
+  control.
+- **Sources**:
+  - https://platform.openai.com/docs/guides/prompt-caching
+  - https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+  - https://arxiv.org/html/2601.16746v1
+  - https://williamzujkowski.github.io/posts/from-150k-to-2k-tokens-how-progressive-context-loading-revolutionizes-llm-development-workflows/
+- **Findings**:
+  - Stable-prefix caching patterns support lower recurring input cost when
+    repeated instructions are kept deterministic and front-loaded, which aligns
+    with keeping policy contracts stable across runs.
+  - Progressive retrieval (targeted read first, expand only when unresolved)
+    is a practical high-impact strategy for reducing context volume versus broad
+    default file loading.
+  - Context pruning/compression must remain task-aware; compacting high-traffic
+    artifacts is effective only when canonical links to full history stay
+    available for escalation and audit.
+  - Tiered operator profiles are preferable to many independent switches for
+    day-to-day use, provided profile-to-flag mapping and override precedence are
+    explicit and deterministic.
+  - Token optimization should not remove mandatory reliability gates; savings
+    should come from retrieval scope, optional-mode defaults, and loop intensity
+    control while preserving QA/UAT/release chain invariants.
+- **Risks**:
+  - Over-compaction can hide required evidence or create stale summaries if
+    archive-link contracts are weak.
+  - Ambiguous profile precedence can produce non-deterministic behavior between
+    profile defaults and manual overrides.
+  - Excessively aggressive lean defaults can reduce analysis depth if temporary
+    escalation guidance is missing.
+- **Linked**: US-0053
+- **Confidence**: medium
+- **Status**: current
+
+## R-0028
+
+- **Date**: 2026-03-12
+- **Topic**: Architecture tradeoffs for profile-based token optimization and compact state surfaces
+- **Query**: Which architecture choices best support deterministic token-saver
+  profiles and compact active-context artifacts without weakening release
+  reliability.
+- **Sources**:
+  - https://martinfowler.com/articles/feature-toggles.html
+  - https://platform.openai.com/docs/guides/prompt-caching
+  - https://platform.claude.com/docs/en/build-with-claude/prompt-caching
+  - https://docs.eventsourcingdb.io/best-practices/snapshots-and-performance/
+- **Findings**:
+  - A profile switch behaves most predictably when treated like a controlled
+    feature-toggle policy: explicit mode, bounded scope, and deterministic
+    precedence over derived defaults.
+  - Caching-oriented token savings are strongest when the stable instruction
+    prefix remains consistent; architecture should avoid unnecessary churn in
+    high-reuse prompt scaffolding.
+  - A snapshot-style active-context model plus archive references can keep
+    operational reads fast, provided canonical links preserve full traceability.
+  - Compaction should be write-safe and non-destructive: archive historical
+    checkpoints, keep an active bounded context for routine reads, and escalate
+    to archive only when question scope requires it.
+- **Risks**:
+  - Profile sprawl if mode semantics are underspecified.
+  - Archive drift if active snapshots are not consistently refreshed.
+  - Hidden regressions if mandatory gate invariants are not explicitly locked in
+    tests.
+- **Linked**: US-0053, DEC-0035
+- **Confidence**: medium
+- **Status**: current
+
+## R-0029
+
+- **Date**: 2026-03-13
+- **Topic**: Configurable multi-target publishing with operator confirmation and SSH support
+- **Query**: Which patterns support safe half-automatic release publishing across heterogeneous targets (registry, git, docker, cloud, custom servers/SSH) with configurable per-project behavior.
+- **Sources**:
+  - https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments
+  - https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment
+  - https://circleci.com/docs/guides/deploy/deploy-over-ssh
+  - https://octopus.com/docs/infrastructure/deployment-targets/linux/ssh-deployments
+- **Findings**:
+  - A safe "half-automatic" publish flow is best modeled as explicit
+    operator confirmation before deployment/publish execution.
+  - Project-specific release destinations vary significantly; target definitions
+    should be data-driven in configuration rather than hardcoded in workflow
+    logic.
+  - SSH remains a common generic deployment transport and should be supported as
+    a first-class configurable target with env-referenced credentials.
+  - Deterministic fail-fast validation and clear per-target diagnostics prevent
+    partial publish side effects on invalid config.
+  - Multi-target execution should be ordered and selectable per run so teams can
+    publish only a subset (for example npm-only, docker-only, or cloud-only).
+- **Risks**:
+  - Ambiguous target schema can cause non-deterministic or unsafe publish runs.
+  - Inline credential handling can create secret leakage risk.
+  - Missing confirmation boundaries can accidentally trigger irreversible publish actions.
+- **Linked**: US-0054
+- **Confidence**: medium
+- **Status**: current
+
+## R-0030
+
+- **Date**: 2026-03-13
+- **Topic**: Deterministic schema and safety contracts for configurable publish targets
+- **Query**: Which implementation contracts provide safe, configurable, and auditable multi-target publish behavior including SSH/custom destinations.
+- **Sources**:
+  - https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments
+  - https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment
+  - https://circleci.com/docs/guides/deploy/deploy-over-ssh
+  - https://octopus.com/docs/infrastructure/deployment-targets/linux/ssh-deployments
+- **Findings**:
+  - Safe publish automation is strongest when release finalization and target
+    publish are separate stages with explicit confirmation between them.
+  - Target definitions should be strongly typed and validated before execution
+    to prevent partial side effects (missing host/auth/command should fail-fast).
+  - SSH target support should use env-referenced credentials and explicit
+    command templates, with no inline secret literals.
+  - Multi-target runs should support deterministic target ordering and explicit
+    per-target enabled/disabled semantics.
+  - Auditability improves when each attempted target writes structured outcome:
+    selected/skipped/blocked/published with reason code and evidence ref.
+- **Risks**:
+  - Ambiguous target schema can create non-deterministic publish runs.
+  - Missing confirmation boundary can allow unintended irreversible publishes.
+  - Weak secret contract can leak credentials in committed config.
+- **Linked**: US-0054
+- **Confidence**: medium
+- **Status**: current
+
+## R-0031
+
+- **Date**: 2026-03-13
+- **Topic**: Deterministic status reconciliation command design
+- **Query**: Which reconciliation contracts best prevent backlog/acceptance/state/resume drift while preserving canonical ownership and safe continuation.
+- **Sources**:
+  - docs/engineering/runbook.md (canonical status ownership + legacy drift guard)
+  - .cursor/commands/release.md (target-scoped reconciliation and fail-safe reason codes)
+  - .cursor/commands/memory-audit.md (read-only drift detection scope and evidence model)
+  - .cursor/commands/auto.md (resume precedence and fail-fast continuation contract)
+- **Findings**:
+  - Reconciliation should preserve canonical ownership: backlog story status is
+    source-of-truth; acceptance/state/resume are derived and should be normalized
+    to canonical status in bounded target scope.
+  - A dedicated repair command should be distinct from `/memory-audit`:
+    `/memory-audit` detects/report-only, while reconciliation applies explicit
+    deterministic writes with audit evidence.
+  - Deterministic mutation boundaries are required to avoid broad historical
+    rewrites: update only mismatched story blocks and linked derived rows.
+  - Resume reliability improves when reconciliation also sets
+    `handoffs/resume_brief.md` to next OPEN story and intended next phase with
+    resolver breadcrumb metadata.
+  - Blocked/conflict paths should fail closed with reason codes and remediation
+    instead of partial silent correction.
+- **Risks**:
+  - Over-broad normalization can rewrite unrelated story history.
+  - Ambiguous precedence can produce non-deterministic repairs.
+  - Reconciliation without evidence logs can hide true release-state conflicts.
+- **Linked**: US-0055
+- **Confidence**: medium
+- **Status**: current
+
+## R-0032
+
+- **Date**: 2026-03-14
+- **Topic**: Upgrade-safe example/local config handling for scratchpad templates
+- **Query**: Which config-management patterns support safe upgrades of example
+  files while preserving user-local overrides and preventing missing/new option
+  drift.
+- **Sources**:
+  - https://compose-spec.github.io/compose-spec/13-merge.html
+  - https://docs.docker.com/compose/how-tos/multiple-compose-files/merge
+  - Internal implementation references:
+    - `installer.ps1`
+    - `installer.sh`
+    - `installer.py`
+- **Findings**:
+  - Base-plus-local-override patterns are most robust when shared defaults are
+    updated independently from user-local override files.
+  - Upgrade flows should treat example/default files as framework-owned and
+    refresh them on upgrade, while preserving user-local files.
+  - Deterministic merge/precedence behavior (base first, local overrides second)
+    reduces drift where new options appear only in one surface.
+  - Operator diagnostics should explicitly report when framework examples were
+    refreshed and when user files intentionally remain unchanged.
+- **Risks**:
+  - If example/default files are not refreshed during upgrade, operators miss new
+    flags and contracts.
+  - If user-local files are overwritten, personal/project overrides can be lost.
+  - Inconsistent installer parity across PS1/sh/py can create platform-specific
+    drift.
+- **Linked**: US-0057
+- **Confidence**: medium
+- **Status**: current
+
+## R-0033
+
+- **Date**: 2026-03-14
+- **Topic**: Deterministic ordering policies for mutable workflow artifacts
+- **Query**: Which ordering strategies best support reliable append/update
+  behavior for mixed artifact types (event logs, canonical lists, derived
+  checklists) without drift and oscillation.
+- **Sources**:
+  - https://grafana.com/blog/2024/01/04/the-concise-guide-to-loki-how-to-work-with-out-of-order-and-older-logs
+  - https://grafana.com/docs/loki/latest/configure/bp-configure
+  - Internal implementation references:
+    - `docs/engineering/state.md`
+    - `docs/product/backlog.md`
+    - `docs/product/acceptance.md`
+- **Findings**:
+  - Event-like artifacts are most reliable with a single append direction and
+    strict monotonic insertion policy.
+  - Canonical enumerations (story backlogs) need deterministic sort keys to
+    avoid ordering drift under multi-command mutation.
+  - Derived checklist artifacts should align ordering with canonical source to
+    preserve quick auditability.
+  - Missing/ambiguous insertion anchors should fail safe instead of writing in
+    fallback random positions.
+  - Idempotent rewrite behavior is required so repeated no-op runs do not
+    reshuffle blocks.
+- **Risks**:
+  - Enforcing ordering without migration guidance can create noisy diffs on first
+    normalization.
+  - Partial command adoption can keep mixed-order behavior alive.
+  - Overly broad auto-sorting can accidentally rewrite unrelated narrative
+    sections.
+- **Linked**: US-0058
+- **Confidence**: medium
+- **Status**: current
+
+## R-0034
+
+- **Date**: 2026-03-14
+- **Topic**: Strict runtime attestation patterns for phase-isolated orchestration
+- **Query**: Which lightweight attestation patterns provide strong per-run
+  uniqueness/freshness guarantees for orchestration boundaries while remaining
+  auditable and fail-closed.
+- **Sources**:
+  - Internal workflow contracts:
+    - `.cursor/commands/auto.md`
+    - `docs/engineering/state.md`
+    - `docs/engineering/decisions.md`
+  - Prior isolation decision:
+    - `decisions/DEC-0029.md`
+- **Findings**:
+  - Artifact-only evidence is necessary but insufficient for strict runtime
+    proof; boundaries need a runtime-bound attestation tuple.
+  - Minimal strict tuple should include:
+    - `runtime_proof_id` (globally unique per phase run),
+    - `orchestrator_run_id` (unique per `/auto` invocation),
+    - `phase_id`,
+    - `role`,
+    - `proof_issued_at` (RFC3339 UTC),
+    - `proof_ttl_seconds`,
+    - `proof_hash` over deterministic fields.
+  - Boundary validation should fail closed when:
+    - tuple missing required fields,
+    - `runtime_proof_id` reused across phase runs,
+    - proof age exceeds TTL/freshness policy,
+    - tuple cannot be deterministically linked to state checkpoint evidence.
+  - Pause/resume needs strict-proof provenance pointer so resumed runs cannot
+    silently continue past unverifiable boundaries.
+  - Legacy runs lacking strict tuple should follow bounded compatibility guidance
+    (explicit remediation path) rather than history rewrite.
+- **Risks**:
+  - Overly strict freshness windows can create false blocks on slower runs.
+  - Weak uniqueness generation can produce accidental proof collisions.
+  - Partial adoption across active/template commands can reintroduce ambiguity.
+- **Linked**: US-0056
+- **Confidence**: medium
+- **Status**: current

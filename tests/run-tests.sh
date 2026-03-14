@@ -68,7 +68,7 @@ assert_true "Workflows folder exists" "[ -d \"$TPL/.github/workflows\" ]"
 cmd_count=$(ls "$TPL/.cursor/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 rule_count=$(ls "$TPL/.cursor/rules"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
 agent_count=$(ls "$TPL/.cursor/agents"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
-assert_true "22 commands exist" "[ $cmd_count -eq 22 ]"
+assert_true "23 commands exist" "[ $cmd_count -eq 23 ]"
 assert_true "5 rules exist" "[ $rule_count -eq 5 ]"
 assert_true "7 agents exist" "[ $agent_count -eq 7 ]"
 
@@ -117,6 +117,10 @@ mkdir -p "$TMP"
 if [ -f "$ROOT/installer.sh" ]; then
   run_with_timeout sh "$ROOT/installer.sh" --target "$TMP" --mode missing --create < /dev/null >/dev/null
   assert_true "Installer (sh) installs commands" "[ -f \"$TMP/.cursor/commands/intake.md\" ]"
+  assert_true "Installer (sh) installs ownership manifest" "[ -f \"$TMP/docs/engineering/context/installer-owned-paths.manifest\" ]"
+  assert_true "Fresh install has neutral status-normalization report" "file_contains \"$TMP/docs/engineering/status-normalization-report.md\" \"(none yet)\""
+  assert_true "Fresh install has no seeded status-normalization row" "! grep -q 'US-0018' \"$TMP/docs/engineering/status-normalization-report.md\""
+  assert_true "Fresh install research has no hardcoded DEC-0011 reference" "! grep -q 'DEC-0011' \"$TMP/docs/engineering/research.md\""
 else
   assert_true "Installer (sh) exists" "false"
 fi
@@ -134,11 +138,15 @@ if [ -f "$ROOT/installer.sh" ]; then
   echo "# My Custom Vision" > "$UPGRADE_TMP/docs/product/vision.md"
 
   echo "modified-framework" > "$UPGRADE_TMP/.cursor/commands/intake.md"
+  echo "modified-local-example-marker" > "$UPGRADE_TMP/.cursor/scratchpad.local.example.md"
+  echo "user-local-marker=keep" > "$UPGRADE_TMP/.cursor/scratchpad.local.md"
 
   run_with_timeout sh "$ROOT/installer.sh" --target "$UPGRADE_TMP" --mode upgrade < /dev/null >/dev/null
 
   assert_true "Upgrade restores framework files" "! grep -q 'modified-framework' \"$UPGRADE_TMP/.cursor/commands/intake.md\""
   assert_true "Upgrade preserves user data" "grep -q 'My Custom Vision' \"$UPGRADE_TMP/docs/product/vision.md\""
+  assert_true "Upgrade refreshes scratchpad local example" "! grep -q 'modified-local-example-marker' \"$UPGRADE_TMP/.cursor/scratchpad.local.example.md\" && grep -q 'RELEASE_PUBLISH_MODE=confirm' \"$UPGRADE_TMP/.cursor/scratchpad.local.example.md\""
+  assert_true "Upgrade preserves user scratchpad local overrides" "grep -q 'user-local-marker=keep' \"$UPGRADE_TMP/.cursor/scratchpad.local.md\""
   assert_true "Version file updated after upgrade" "[ -f \"$UPGRADE_TMP/.its-magic-version\" ]"
 fi
 
@@ -151,7 +159,7 @@ if [ -f "$ROOT/installer.sh" ]; then
   mkdir -p "$CLEAN_TMP/src"
   echo "non-framework marker" > "$CLEAN_TMP/src/keep.txt"
   run_with_timeout sh "$ROOT/installer.sh" --target "$CLEAN_TMP" --clean-repo --yes < /dev/null >/dev/null
-  assert_true "Clean-repo removes framework artifacts (installer)" "[ ! -d \"$CLEAN_TMP/.cursor\" ]"
+  assert_true "Clean-repo removes framework artifacts (installer)" "[ ! -d \"$CLEAN_TMP/.cursor\" ] && [ ! -d \"$CLEAN_TMP/docs/engineering\" ] && [ ! -d \"$CLEAN_TMP/docs/user-guides\" ] && [ ! -f \"$CLEAN_TMP/scripts/validate-and-push.ps1\" ] && [ ! -f \"$CLEAN_TMP/scripts/validate-and-push.sh\" ] && [ ! -f \"$CLEAN_TMP/.github/workflows/ci.yml\" ] && [ ! -f \"$CLEAN_TMP/.github/workflows/deploy.yml\" ] && [ ! -f \"$CLEAN_TMP/.its-magic-version\" ]"
   assert_true "Clean-repo preserves non-framework marker (installer)" "[ -f \"$CLEAN_TMP/src/keep.txt\" ]"
 fi
 
@@ -164,6 +172,9 @@ if [ -f "$CLI_ENTRY" ] && command -v node >/dev/null 2>&1; then
   run_with_timeout node "$CLI_ENTRY" --target "$CLI_TMP" --mode missing --create < /dev/null >/dev/null
   assert_true "CLI missing install writes version file" "[ -f \"$CLI_TMP/.its-magic-version\" ]"
   assert_true "CLI missing install writes command file" "[ -f \"$CLI_TMP/.cursor/commands/intake.md\" ]"
+  assert_true "CLI missing install writes ownership manifest" "[ -f \"$CLI_TMP/docs/engineering/context/installer-owned-paths.manifest\" ]"
+  assert_true "CLI missing install status-normalization report is neutral" "file_contains \"$CLI_TMP/docs/engineering/status-normalization-report.md\" \"(none yet)\""
+  assert_true "CLI missing install research has no DEC-0011 reference" "! grep -q 'DEC-0011' \"$CLI_TMP/docs/engineering/research.md\""
 
   echo "cli-overwrite-marker" > "$CLI_TMP/.cursor/commands/intake.md"
   run_with_timeout node "$CLI_ENTRY" --target "$CLI_TMP" --mode overwrite --backup < /dev/null >/dev/null
@@ -171,14 +182,18 @@ if [ -f "$CLI_ENTRY" ] && command -v node >/dev/null 2>&1; then
 
   echo "# CLI User Data Marker" > "$CLI_TMP/docs/product/vision.md"
   echo "cli-upgrade-framework-marker" > "$CLI_TMP/.cursor/commands/intake.md"
+  echo "cli-modified-local-example-marker" > "$CLI_TMP/.cursor/scratchpad.local.example.md"
+  echo "cli-local-marker=keep" > "$CLI_TMP/.cursor/scratchpad.local.md"
   run_with_timeout node "$CLI_ENTRY" --target "$CLI_TMP" --mode upgrade < /dev/null >/dev/null
   assert_true "CLI upgrade restores framework files" "! grep -q 'cli-upgrade-framework-marker' \"$CLI_TMP/.cursor/commands/intake.md\""
   assert_true "CLI upgrade preserves user data" "grep -q 'CLI User Data Marker' \"$CLI_TMP/docs/product/vision.md\""
+  assert_true "CLI upgrade refreshes scratchpad local example" "! grep -q 'cli-modified-local-example-marker' \"$CLI_TMP/.cursor/scratchpad.local.example.md\" && grep -q 'RELEASE_PUBLISH_MODE=confirm' \"$CLI_TMP/.cursor/scratchpad.local.example.md\""
+  assert_true "CLI upgrade preserves user scratchpad local overrides" "grep -q 'cli-local-marker=keep' \"$CLI_TMP/.cursor/scratchpad.local.md\""
 
   mkdir -p "$CLI_TMP/src"
   echo "cli-marker" > "$CLI_TMP/src/keep.txt"
   run_with_timeout node "$CLI_ENTRY" --clean-repo --target "$CLI_TMP" --yes < /dev/null >/dev/null
-  assert_true "CLI clean-repo removes framework artifacts" "[ ! -d \"$CLI_TMP/.cursor\" ]"
+  assert_true "CLI clean-repo removes framework artifacts" "[ ! -d \"$CLI_TMP/.cursor\" ] && [ ! -d \"$CLI_TMP/docs/engineering\" ] && [ ! -d \"$CLI_TMP/docs/user-guides\" ] && [ ! -f \"$CLI_TMP/scripts/validate-and-push.ps1\" ] && [ ! -f \"$CLI_TMP/scripts/validate-and-push.sh\" ] && [ ! -f \"$CLI_TMP/.github/workflows/ci.yml\" ] && [ ! -f \"$CLI_TMP/.github/workflows/deploy.yml\" ] && [ ! -f \"$CLI_TMP/.its-magic-version\" ]"
   assert_true "CLI clean-repo preserves non-framework marker" "[ -f \"$CLI_TMP/src/keep.txt\" ]"
 
   set +e
@@ -422,7 +437,7 @@ assert_true "README documents canonical story status guard (template)" "file_con
 assert_true "status normalization report exists (active)" "[ -f \"$ROOT/docs/engineering/status-normalization-report.md\" ]"
 assert_true "status normalization report exists (template)" "[ -f \"$TPL/docs/engineering/status-normalization-report.md\" ]"
 assert_true "status normalization report contains baseline row (active)" "file_contains \"$ROOT/docs/engineering/status-normalization-report.md\" \"US-0018\""
-assert_true "status normalization report contains baseline row (template)" "file_contains \"$TPL/docs/engineering/status-normalization-report.md\" \"US-0018\""
+assert_true "status normalization report template is neutral" "file_contains \"$TPL/docs/engineering/status-normalization-report.md\" \"(none yet)\""
 
 # 21) Guided intake mode checks (US-0033)
 assert_true "scratchpad includes INTAKE_GUIDED_MODE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"INTAKE_GUIDED_MODE\""
@@ -441,6 +456,134 @@ assert_true "runbook documents guided intake mode (active)" "file_contains \"$RO
 assert_true "runbook documents guided intake mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Guided intake mode (US-0033)\""
 assert_true "README documents guided intake behavior (active)" "file_contains \"$ROOT/README.md\" \"Guided intake behavior (US-0033)\""
 assert_true "README documents guided intake behavior (template)" "file_contains \"$TPL/README.md\" \"Guided intake behavior (US-0033)\""
+
+# 21b) Intake decomposition + risk-aware questioning checks (US-0051)
+assert_true "intake command documents deterministic decomposition evaluator (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"deterministic decomposition evaluator\""
+assert_true "intake command documents deterministic decomposition evaluator (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"deterministic decomposition evaluator\""
+assert_true "intake command preserves accept/merge/adjust user control (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"accept**, **merge**, or **adjust\""
+assert_true "intake command preserves accept/merge/adjust user control (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"accept**, **merge**, or **adjust\""
+assert_true "intake command documents bounded questioning (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"Keep questioning bounded\""
+assert_true "intake command documents bounded questioning (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"Keep questioning bounded\""
+assert_true "intake low-touch keeps no forced decomposition (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"single-story default (no forced decomposition)\""
+assert_true "intake low-touch keeps no forced decomposition (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"single-story default (no forced decomposition)\""
+
+assert_true "PO agent documents decomposition evaluator (active)" "file_contains \"$ROOT/.cursor/agents/po.mdc\" \"deterministic decomposition evaluator\""
+assert_true "PO agent documents decomposition evaluator (template)" "file_contains \"$TPL/.cursor/agents/po.mdc\" \"deterministic decomposition evaluator\""
+assert_true "PO agent documents risk-triggered questioning (active)" "file_contains \"$ROOT/.cursor/agents/po.mdc\" \"breadth/risk is high\""
+assert_true "PO agent documents risk-triggered questioning (template)" "file_contains \"$TPL/.cursor/agents/po.mdc\" \"breadth/risk is high\""
+assert_true "PO agent keeps low-touch single-story default (active)" "file_contains \"$ROOT/.cursor/agents/po.mdc\" \"single-story default unless user explicitly requests decomposition\""
+assert_true "PO agent keeps low-touch single-story default (template)" "file_contains \"$TPL/.cursor/agents/po.mdc\" \"single-story default unless user explicitly requests decomposition\""
+
+assert_true "runbook documents intake decomposition and risk-aware questioning (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Intake decomposition and risk-aware questioning (US-0051)\""
+assert_true "runbook documents intake decomposition and risk-aware questioning (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Intake decomposition and risk-aware questioning (US-0051)\""
+assert_true "README documents intake decomposition and risk-aware questioning (active)" "file_contains \"$ROOT/README.md\" \"Intake decomposition + risk-aware questioning (US-0051)\""
+assert_true "README documents intake decomposition and risk-aware questioning (template)" "file_contains \"$TPL/README.md\" \"Intake decomposition + risk-aware questioning (US-0051)\""
+
+# 21c) Optional ID namespace bootstrap checks (US-0052)
+assert_true "scratchpad includes ID_NAMESPACE_BOOTSTRAP (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"ID_NAMESPACE_BOOTSTRAP\""
+assert_true "scratchpad includes ID_NAMESPACE_BOOTSTRAP (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"ID_NAMESPACE_BOOTSTRAP\""
+assert_true "intake command documents optional ID bootstrap (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034)\""
+assert_true "intake command documents optional ID bootstrap (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034)\""
+assert_true "intake command includes ineligible bootstrap diagnostic (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"ID_BOOTSTRAP_NOT_FRESH\""
+assert_true "intake command includes ineligible bootstrap diagnostic (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"ID_BOOTSTRAP_NOT_FRESH\""
+assert_true "research command documents bootstrap-aware ID policy (active)" "file_contains \"$ROOT/.cursor/commands/research.md\" \"ID_NAMESPACE_BOOTSTRAP=1\""
+assert_true "research command documents bootstrap-aware ID policy (template)" "file_contains \"$TPL/.cursor/commands/research.md\" \"ID_NAMESPACE_BOOTSTRAP=1\""
+assert_true "architecture command documents DEC bootstrap policy (active)" "file_contains \"$ROOT/.cursor/commands/architecture.md\" \"DEC-0001\""
+assert_true "architecture command documents DEC bootstrap policy (template)" "file_contains \"$TPL/.cursor/commands/architecture.md\" \"DEC-0001\""
+assert_true "PO agent documents story ID bootstrap policy (active)" "file_contains \"$ROOT/.cursor/agents/po.mdc\" \"Story ID policy (US-0052 / DEC-0034)\""
+assert_true "PO agent documents story ID bootstrap policy (template)" "file_contains \"$TPL/.cursor/agents/po.mdc\" \"Story ID policy (US-0052 / DEC-0034)\""
+assert_true "Tech Lead agent documents decision ID bootstrap policy (active)" "file_contains \"$ROOT/.cursor/agents/tech-lead.mdc\" \"Decision ID policy (US-0052 / DEC-0034)\""
+assert_true "Tech Lead agent documents decision ID bootstrap policy (template)" "file_contains \"$TPL/.cursor/agents/tech-lead.mdc\" \"Decision ID policy (US-0052 / DEC-0034)\""
+assert_true "runbook documents optional ID namespace bootstrap (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Optional ID namespace bootstrap (US-0052)\""
+assert_true "runbook documents optional ID namespace bootstrap (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Optional ID namespace bootstrap (US-0052)\""
+assert_true "README documents optional ID namespace bootstrap (active)" "file_contains \"$ROOT/README.md\" \"Optional ID namespace bootstrap (US-0052)\""
+assert_true "README documents optional ID namespace bootstrap (template)" "file_contains \"$TPL/README.md\" \"Optional ID namespace bootstrap (US-0052)\""
+
+# 21d) Context compaction and token profile checks (US-0053)
+assert_true "scratchpad includes TOKEN_PROFILE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"TOKEN_PROFILE=balanced\""
+assert_true "scratchpad includes TOKEN_PROFILE (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"TOKEN_PROFILE=balanced\""
+assert_true "scratchpad documents manual override precedence (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"Manual-override precedence\""
+assert_true "scratchpad documents manual override precedence (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"Manual-override precedence\""
+assert_true "runbook documents context compaction and token profile mode (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Context compaction and token profile mode (US-0053 / DEC-0035)\""
+assert_true "runbook documents context compaction and token profile mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Context compaction and token profile mode (US-0053 / DEC-0035)\""
+assert_true "README documents context compaction and tiered token profile (active)" "file_contains \"$ROOT/README.md\" \"Context compaction + tiered token profile (US-0053)\""
+assert_true "README documents context compaction and tiered token profile (template)" "file_contains \"$TPL/README.md\" \"Context compaction + tiered token profile (US-0053)\""
+assert_true "ask command documents narrow-read policy (active)" "file_contains \"$ROOT/.cursor/commands/ask.md\" \"Apply narrow-read retrieval policy (US-0053)\""
+assert_true "ask command documents narrow-read policy (template)" "file_contains \"$TPL/.cursor/commands/ask.md\" \"Apply narrow-read retrieval policy (US-0053)\""
+assert_true "state documents active context surface policy (active)" "file_contains \"$ROOT/docs/engineering/state.md\" \"Active context surface (US-0053 / DEC-0035)\""
+assert_true "state template documents active context surface policy" "file_contains \"$TPL/docs/engineering/state.md\" \"Active context surface (US-0053 / DEC-0035)\""
+assert_true "state archive README exists (active)" "[ -f \"$ROOT/docs/engineering/state-archive/README.md\" ]"
+assert_true "state archive README exists (template)" "[ -f \"$TPL/docs/engineering/state-archive/README.md\" ]"
+assert_true "decisions index is compacted (active)" "file_contains \"$ROOT/docs/engineering/decisions.md\" \"Compact decision index (bounded summaries)\""
+assert_true "decisions index includes canonical full records pointer (active)" "file_contains \"$ROOT/docs/engineering/decisions.md\" \"Full records live in decisions/DEC-xxxx.md\""
+assert_true "decisions index includes canonical full records pointer (template)" "file_contains \"$TPL/docs/engineering/decisions.md\" \"Full records live in decisions/DEC-xxxx.md\""
+assert_true "release gate chain remains documented (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"Release gate chain (US-0039 / DEC-0019)\""
+assert_true "release gate chain remains documented (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"Release gate chain (US-0039 / DEC-0019)\""
+
+# 21e) Configurable multi-target publish checks (US-0054)
+assert_true "scratchpad includes RELEASE_PUBLISH_MODE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"RELEASE_PUBLISH_MODE=confirm\""
+assert_true "scratchpad includes RELEASE_PUBLISH_MODE (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"RELEASE_PUBLISH_MODE=confirm\""
+assert_true "scratchpad includes RELEASE_TARGETS_FILE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"RELEASE_TARGETS_FILE=docs/engineering/release-targets.json\""
+assert_true "scratchpad includes RELEASE_TARGETS_FILE (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"RELEASE_TARGETS_FILE=docs/engineering/release-targets.json\""
+assert_true "runbook documents configurable multi-target publish mode (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Configurable multi-target publish mode (US-0054 / DEC-0036)\""
+assert_true "runbook documents configurable multi-target publish mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Configurable multi-target publish mode (US-0054 / DEC-0036)\""
+assert_true "README documents configurable multi-target publish mode (active)" "file_contains \"$ROOT/README.md\" \"Configurable multi-target publish + confirmation gate (US-0054)\""
+assert_true "README documents configurable multi-target publish mode (template)" "file_contains \"$TPL/README.md\" \"Configurable multi-target publish + confirmation gate (US-0054)\""
+assert_true "release command includes configurable publish target section (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"Optional configurable publish targets (US-0054 / DEC-0036)\""
+assert_true "release command includes configurable publish target section (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"Optional configurable publish targets (US-0054 / DEC-0036)\""
+assert_true "release command includes publish config invalid reason code (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"PUBLISH_TARGET_CONFIG_INVALID\""
+assert_true "release command includes publish config invalid reason code (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"PUBLISH_TARGET_CONFIG_INVALID\""
+assert_true "release targets schema file exists (active)" "[ -f \"$ROOT/docs/engineering/release-targets.json\" ]"
+assert_true "release targets schema file exists (template)" "[ -f \"$TPL/docs/engineering/release-targets.json\" ]"
+assert_true "release targets schema includes custom target type (active)" "file_contains \"$ROOT/docs/engineering/release-targets.json\" \"\\\"type\\\": \\\"custom\\\"\""
+assert_true "release targets schema includes ssh target type (active)" "file_contains \"$ROOT/docs/engineering/release-targets.json\" \"\\\"type\\\": \\\"ssh\\\"\""
+assert_true "release targets schema includes ssh target type (template)" "file_contains \"$TPL/docs/engineering/release-targets.json\" \"\\\"type\\\": \\\"ssh\\\"\""
+
+# 21f) Deterministic status reconciliation checks (US-0055)
+assert_true "status-reconcile command exists (active)" "[ -f \"$ROOT/.cursor/commands/status-reconcile.md\" ]"
+assert_true "status-reconcile command exists (template)" "[ -f \"$TPL/.cursor/commands/status-reconcile.md\" ]"
+assert_true "status-reconcile command defines canonical precedence (active)" "file_contains \"$ROOT/.cursor/commands/status-reconcile.md\" \"Canonical precedence (US-0045 / DEC-0025)\""
+assert_true "status-reconcile command defines canonical precedence (template)" "file_contains \"$TPL/.cursor/commands/status-reconcile.md\" \"Canonical precedence (US-0045 / DEC-0025)\""
+assert_true "status-reconcile command includes deterministic reason code STATUS_RECONCILE_APPLIED (active)" "file_contains \"$ROOT/.cursor/commands/status-reconcile.md\" \"STATUS_RECONCILE_APPLIED\""
+assert_true "status-reconcile command includes deterministic reason code STATUS_RECONCILE_APPLIED (template)" "file_contains \"$TPL/.cursor/commands/status-reconcile.md\" \"STATUS_RECONCILE_APPLIED\""
+assert_true "runbook documents deterministic status reconciliation mode (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Deterministic status reconciliation mode (US-0055 / DEC-0037)\""
+assert_true "runbook documents deterministic status reconciliation mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Deterministic status reconciliation mode (US-0055 / DEC-0037)\""
+assert_true "README documents deterministic status reconciliation command (active)" "file_contains \"$ROOT/README.md\" \"Deterministic status reconciliation command (US-0055)\""
+assert_true "README documents deterministic status reconciliation command (template)" "file_contains \"$TPL/README.md\" \"Deterministic status reconciliation command (US-0055)\""
+
+# 21g) Upgrade-safe scratchpad example checks (US-0057)
+assert_true "scratchpad local example exists (active)" "[ -f \"$ROOT/.cursor/scratchpad.local.example.md\" ]"
+assert_true "scratchpad local example exists (template)" "[ -f \"$TPL/.cursor/scratchpad.local.example.md\" ]"
+assert_true "scratchpad local example includes token profile override (active)" "file_contains \"$ROOT/.cursor/scratchpad.local.example.md\" \"TOKEN_PROFILE=balanced\""
+assert_true "scratchpad local example includes detailed core behavior descriptions (active)" "file_contains \"$ROOT/.cursor/scratchpad.local.example.md\" \"- MAGIC_CONTEXT_STRICT: 0|1\""
+assert_true "scratchpad local example includes detailed automation descriptions (template)" "file_contains \"$TPL/.cursor/scratchpad.local.example.md\" \"- AUTO_FLOW_MODE: manual|auto_until_decision\""
+assert_true "scratchpad local example includes release publish mode override (active)" "file_contains \"$ROOT/.cursor/scratchpad.local.example.md\" \"RELEASE_PUBLISH_MODE=confirm\""
+assert_true "scratchpad local example includes release publish mode override (template)" "file_contains \"$TPL/.cursor/scratchpad.local.example.md\" \"RELEASE_PUBLISH_MODE=confirm\""
+assert_true "runbook documents scratchpad upgrade contract (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039)\""
+assert_true "runbook documents scratchpad upgrade contract (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039)\""
+assert_true "README documents scratchpad upgrade behavior (active)" "file_contains \"$ROOT/README.md\" \"Upgrade behavior (US-0057):\""
+assert_true "README documents scratchpad upgrade behavior (template)" "file_contains \"$TPL/README.md\" \"Upgrade behavior (US-0057):\""
+
+# 21h) Deterministic artifact ordering checks (US-0058)
+assert_true "artifact ordering policy exists (active)" "[ -f \"$ROOT/docs/engineering/artifact-ordering-policy.md\" ]"
+assert_true "artifact ordering policy exists (template)" "[ -f \"$TPL/docs/engineering/artifact-ordering-policy.md\" ]"
+assert_true "artifact ordering policy defines state append-bottom (active)" "file_contains \"$ROOT/docs/engineering/artifact-ordering-policy.md\" '`docs/engineering/state.md` | `append-bottom`'"
+assert_true "artifact ordering policy defines backlog sorted-canonical (active)" "file_contains \"$ROOT/docs/engineering/artifact-ordering-policy.md\" '`docs/product/backlog.md` | `sorted-canonical`'"
+assert_true "artifact ordering policy includes anchor ambiguous reason code (active)" "file_contains \"$ROOT/docs/engineering/artifact-ordering-policy.md\" \"ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS\""
+assert_true "auto command includes ordering guard (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"Deterministic artifact ordering guard (US-0058 / DEC-0040)\""
+assert_true "auto command includes ordering guard (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"Deterministic artifact ordering guard (US-0058 / DEC-0040)\""
+assert_true "intake command includes ordering contract (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "intake command includes ordering contract (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "release command includes ordering contract (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "release command includes ordering contract (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "refresh-context includes ordering contract (active)" "file_contains \"$ROOT/.cursor/commands/refresh-context.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "refresh-context includes ordering contract (template)" "file_contains \"$TPL/.cursor/commands/refresh-context.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "status-reconcile includes ordering contract (active)" "file_contains \"$ROOT/.cursor/commands/status-reconcile.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "status-reconcile includes ordering contract (template)" "file_contains \"$TPL/.cursor/commands/status-reconcile.md\" \"Deterministic artifact ordering contract (US-0058 / DEC-0040)\""
+assert_true "runbook documents deterministic artifact ordering mode (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)\""
+assert_true "runbook documents deterministic artifact ordering mode (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)\""
+assert_true "README documents deterministic ordering behavior (active)" "file_contains \"$ROOT/README.md\" \"Deterministic ordering behavior (US-0058):\""
+assert_true "README documents deterministic ordering behavior (template)" "file_contains \"$TPL/README.md\" \"Deterministic ordering behavior (US-0058):\""
 
 # 22) Optional cross-repo observability checks (US-0034)
 assert_true "scratchpad includes CROSS_REPO_OBSERVABILITY (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"CROSS_REPO_OBSERVABILITY\""
@@ -588,6 +731,26 @@ assert_true "README documents per-phase isolation evidence (template)" "file_con
 
 assert_true "dev agent documents isolation evidence (active)" "file_contains \"$ROOT/.cursor/agents/dev.mdc\" \"Isolation evidence (US-0048 / DEC-0029)\""
 assert_true "dev agent documents isolation evidence (template)" "file_contains \"$TPL/.cursor/agents/dev.mdc\" \"Isolation evidence (US-0048 / DEC-0029)\""
+
+# 26b) Strict runtime proof checks (US-0056)
+assert_true "auto documents strict runtime proof section (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"Strict runtime proof enforcement (US-0056 / DEC-0038)\""
+assert_true "auto documents strict runtime proof section (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"Strict runtime proof enforcement (US-0056 / DEC-0038)\""
+assert_true "auto includes runtime proof reason RUNTIME_PROOF_REUSED (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"RUNTIME_PROOF_REUSED\""
+assert_true "auto includes runtime proof reason RUNTIME_PROOF_REUSED (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"RUNTIME_PROOF_REUSED\""
+assert_true "auto includes strict-proof boundary step 11b (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"11b. At each phase boundary, verify strict runtime attestation tuple exists\""
+assert_true "auto includes strict-proof boundary step 11b (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"11b. At each phase boundary, verify strict runtime attestation tuple exists\""
+
+assert_true "verify-work documents strict runtime proof gate (active)" "file_contains \"$ROOT/.cursor/commands/verify-work.md\" \"Strict runtime proof gate (US-0056 / DEC-0038)\""
+assert_true "verify-work documents strict runtime proof gate (template)" "file_contains \"$TPL/.cursor/commands/verify-work.md\" \"Strict runtime proof gate (US-0056 / DEC-0038)\""
+assert_true "release includes strict runtime proof gate (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"Strict runtime proof gate (US-0056 / DEC-0038)\""
+assert_true "release includes strict runtime proof gate (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"Strict runtime proof gate (US-0056 / DEC-0038)\""
+assert_true "release includes runtime proof reason code RUNTIME_PROOF_MISSING (active)" "file_contains \"$ROOT/.cursor/commands/release.md\" \"RUNTIME_PROOF_MISSING\""
+assert_true "release includes runtime proof reason code RUNTIME_PROOF_MISSING (template)" "file_contains \"$TPL/.cursor/commands/release.md\" \"RUNTIME_PROOF_MISSING\""
+
+assert_true "runbook documents strict runtime proof contract (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Strict runtime proof contract (US-0056 / DEC-0038)\""
+assert_true "runbook documents strict runtime proof contract (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Strict runtime proof contract (US-0056 / DEC-0038)\""
+assert_true "README documents strict runtime proof section (active)" "file_contains \"$ROOT/README.md\" \"Strict runtime proof (US-0056 / DEC-0038)\""
+assert_true "README documents strict runtime proof section (template)" "file_contains \"$TPL/README.md\" \"Strict runtime proof (US-0056 / DEC-0038)\""
 
 if [ -f "$ROOT/handoffs/release_queue.md" ] && grep -Eq "^\| S0013 \|.*\| released \|" "$ROOT/handoffs/release_queue.md"; then
   us0041_block="$(awk '

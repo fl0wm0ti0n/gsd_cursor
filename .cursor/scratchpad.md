@@ -89,8 +89,28 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 # Knowledge curation
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
 # - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
+# - ID_NAMESPACE_BOOTSTRAP: 0|1 (optional fresh-project ID bootstrap mode; when 1, allow first IDs to start at 0001 only if deterministic freshness checks pass)
+# - TOKEN_PROFILE: lean|balanced|full (tiered token-cost profile defaults)
+#   - lean: lowest-token default profile; reduce non-critical automation/research intensity
+#   - balanced: default profile; preserves current behavior with moderate overhead
+#   - full: highest-context profile; maximize context breadth/autonomy
+# - Manual-override precedence: explicit flag values in this file remain authoritative
+#   for that flag and override profile defaults.
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
+ID_NAMESPACE_BOOTSTRAP=0
+TOKEN_PROFILE=balanced
+
+# Publish targets (US-0054)
+# - RELEASE_PUBLISH_MODE: disabled|confirm|auto
+#   - disabled: skip post-release publish target execution
+#   - confirm: require explicit operator confirmation before publish (default)
+#   - auto: allow publish without confirmation (explicit opt-in)
+# - RELEASE_TARGETS_FILE: canonical target config path
+# - RELEASE_TARGETS_DEFAULT: comma-separated default target IDs (optional)
+RELEASE_PUBLISH_MODE=confirm
+RELEASE_TARGETS_FILE=docs/engineering/release-targets.json
+RELEASE_TARGETS_DEFAULT=
 
 #
 # Security review

@@ -1,0 +1,81 @@
+{
+  "sprint_id": "S0032",
+  "story_id": "US-0053",
+  "passed": 10,
+  "failed": 0,
+  "verified_state": "verify_work_complete",
+  "verified_at": "2026-03-13T09:50:00Z",
+  "verify_work_verified_at": "2026-03-13T09:50:00Z",
+  "steps": [
+    {
+      "step": 1,
+      "ac": "AC-1",
+      "description": "tiered token profile control exists with deterministic default behavior and explicit mode values",
+      "result": "pass",
+      "evidence": ".cursor/scratchpad.md and template/.cursor/scratchpad.md include TOKEN_PROFILE contract"
+    },
+    {
+      "step": 2,
+      "ac": "AC-2",
+      "description": "lean-mode guidance reduces non-critical overhead defaults while mandatory release safety gates remain unchanged",
+      "result": "pass",
+      "evidence": "docs/engineering/runbook.md and README.md US-0053 sections preserve qa->verify-work->release chain"
+    },
+    {
+      "step": 3,
+      "ac": "AC-3",
+      "description": "balanced and full profile behavior plus manual override precedence are documented and deterministic",
+      "result": "pass",
+      "evidence": "scratchpad comments and runbook profile semantics/override precedence"
+    },
+    {
+      "step": 4,
+      "ac": "AC-4",
+      "description": "state hot-surface and archive strategy is defined with non-destructive archive policy",
+      "result": "pass",
+      "evidence": "docs/engineering/state.md active context section and docs/engineering/state-archive/README.md (plus template parity)"
+    },
+    {
+      "step": 5,
+      "ac": "AC-5",
+      "description": "decisions file is compacted to bounded index summaries with canonical full-record linkouts",
+      "result": "pass",
+      "evidence": "docs/engineering/decisions.md compact decision index and canonical full records pointer"
+    },
+    {
+      "step": 6,
+      "ac": "AC-6",
+      "description": "/ask contract enforces narrow-read retrieval (targeted first, bounded expansion, explicit unresolved)",
+      "result": "pass",
+      "evidence": ".cursor/commands/ask.md and template/.cursor/commands/ask.md"
+    },
+    {
+      "step": 7,
+      "ac": "AC-7",
+      "description": "active and template contracts remain aligned for token profile and compaction semantics",
+      "result": "pass",
+      "evidence": "parity across ask/scratchpad/runbook/README/state/decisions/archive docs"
+    },
+    {
+      "step": 8,
+      "ac": "AC-8",
+      "description": "regression suite covers profile mapping, guardrail invariants, and compact-context policy assertions",
+      "result": "pass",
+      "evidence": "tests/run-tests.ps1 and tests/run-tests.sh US-0053 assertion block; tests/report.md pass"
+    },
+    {
+      "step": 9,
+      "ac": "AC-9",
+      "description": "operator guidance documents profile tradeoffs and when to escalate from lean to fuller context",
+      "result": "pass",
+      "evidence": "README.md and docs/engineering/runbook.md US-0053 guidance sections"
+    },
+    {
+      "step": 10,
+      "ac": "AC-10",
+      "description": "ID semantics and release/history integrity remain unchanged by compaction updates",
+      "result": "pass",
+      "evidence": "no changes to ID-generation contracts; release/history artifacts preserved"
+    }
+  ]
+}

@@ -3151,3 +3151,613 @@ rationale (same pattern as US-0039 release overrides).
 
 - Research basis: `R-0018`, `R-0019`
 - Decision: `DEC-0029`
+
+# US-0050: Clean Install Hygiene and Complete Clean-Repo Coverage
+
+## Context and scope
+
+US-0050 addresses installer trust and determinism gaps observed in real installs:
+partial cleanup with `--clean-repo`, seeded historical starter data in template
+artifacts, and starter references that look like cross-repo memory carryover.
+Scope includes installer cleanup contract, template artifact neutrality, and
+install/clean regression coverage. Out of scope: runtime product behavior and
+non-workflow repository content.
+
+## Assumption challenge and alternatives
+
+### Option A: Keep per-installer hardcoded cleanup path lists
+
+- **Pros**: Lowest immediate implementation effort.
+- **Cons**: Path drift risk across PS1/SH/PY; recurring partial cleanup defects.
+  Rejected.
+
+### Option B: Ownership manifest as single source of truth (chosen)
+
+- **Pros**: Deterministic cleanup coverage, simpler parity verification, safer
+  scope control (installer-owned only), easier regression testing.
+- **Cons**: Requires introducing and maintaining one canonical ownership
+  artifact and readers in each installer.
+
+## Minimal architecture
+
+### 1) Ownership contract
+
+- Introduce a canonical installer-managed ownership manifest (for example
+  `template/docs/engineering/context/installer-owned-paths.json`) that defines:
+  - directory ownership entries
+  - file ownership entries
+  - optional exclusions/safety guards
+- All installer entry points (`installer.ps1`, `installer.sh`, `installer.py`)
+  consume this same manifest for:
+  - install include scope
+  - clean-repo deletion scope
+
+### 2) Clean-repo execution model
+
+- `--clean-repo` resolves managed paths from ownership manifest.
+- Delete only installer-owned paths that exist in target repo.
+- Never traverse or delete paths outside manifest ownership boundaries.
+- Emit deterministic cleanup summary (removed paths + skipped missing paths).
+
+### 3) Template neutrality rules
+
+- Starter artifacts in `template/docs/engineering/*` must be neutral placeholders:
+  no seeded operational history rows from this repository.
+- Cross-references to concrete runtime IDs are allowed only when matching baseline
+  records are intentionally shipped and documented; otherwise use neutral wording.
+
+### 4) Regression coverage
+
+- Add install/clean lifecycle assertions:
+  - fresh install => no preloaded story/decision/research operational history rows
+  - clean-repo => full removal of installer-owned artifacts
+  - reinstall after clean => same clean baseline
+  - parity across installer entry points
+- Maintain US-0018 upgrade contract compatibility.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Over-cleaning deletes non-framework project files | Ownership manifest must be explicit allowlist only; no broad wildcard deletes. |
+| Under-cleaning leaves artifacts behind | Regression tests assert full ownership set removal per installer path. |
+| Template hygiene regresses over time | Add template neutrality checks in lifecycle test suite and release checklist. |
+
+## Decision linkage
+
+- Research basis: `R-0024`, `R-0025`
+- Decision: `DEC-0032`
+
+# US-0051: Intelligent Intake Decomposition and Risk-Aware PO Questioning
+
+## Context and scope
+
+US-0051 improves intake quality by splitting broad requests into multiple
+independently valuable stories and by increasing PO follow-up depth when request
+breadth/risk is high (not ambiguity-only). Out of scope: downstream execute/release
+contracts and runtime feature implementation.
+
+## Assumption challenge and alternatives
+
+### Option A: Keep single-story default with larger AC lists
+
+- **Pros**: Simpler logic; minimal behavior change.
+- **Cons**: Oversized stories, weaker sprintability, lower traceability of split
+  intent. Rejected.
+
+### Option B: Deterministic decomposition heuristics + explicit user confirmation (chosen)
+
+- **Pros**: Better backlog quality, bounded behavior, user authority retained,
+  clearer sprint planning input.
+- **Cons**: More intake logic and documentation; requires robust heuristics to
+  avoid over-splitting.
+
+## Minimal architecture
+
+### 1) Decomposition evaluator
+
+- Add intake-time evaluator that scores request breadth using heuristics:
+  - feature count / workflow-step count
+  - cross-cutting impact surface
+  - acceptance set size
+  - risk and unknown dependencies
+- If score exceeds threshold, propose multi-story decomposition.
+
+### 2) Split strategy
+
+- Prefer vertical slices/workflow-step slices with independent value.
+- Avoid technical-layer-only split output (frontend-only/backend-only stories).
+- Persist split rationale in backlog and PO->TL handoff.
+
+### 3) Adaptive questioning policy
+
+- Keep `INTAKE_GUIDED_MODE=1` behavior but add risk-aware escalation:
+  - ambiguity-based questions (existing)
+  - risk/breadth-based questions (new)
+- Keep question loop bounded (max rounds or stop when acceptance confidence is sufficient).
+- Preserve explicit user choice to accept/merge/adjust proposed splits.
+
+### 4) Low-touch compatibility
+
+- `INTAKE_GUIDED_MODE=0` keeps low-touch path and mandatory duplicate check.
+- No forced decomposition in low-touch mode unless user requests decomposition.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Over-splitting into too many tiny stories | Threshold + bounded split count + explicit user confirmation before persist. |
+| Under-splitting broad requests | Include breadth and risk heuristics; emit rationale when staying single-story. |
+| Endless follow-up loop | Bounded question rounds and deterministic stop conditions. |
+
+## Decision linkage
+
+- Research basis: `R-0024`, `R-0025`
+- Decision: `DEC-0033`
+
+# US-0052: Optional Fresh-Project ID Namespace Bootstrap
+
+## Context and scope
+
+US-0052 adds an optional bootstrap path for fresh repos so first IDs can start
+at `US-0001` / `DEC-0001` / `R-0001`, while preserving current highest-existing-ID
+continuation for non-fresh repositories. Out of scope: retroactive renumbering
+or migration of existing histories.
+
+## Assumption challenge and alternatives
+
+### Option A: Always continue from highest discovered ID
+
+- **Pros**: Simpler and backward compatible.
+- **Cons**: Cannot satisfy fresh-project expectation in repos that want explicit
+  namespace bootstrap semantics. Rejected as sole mode.
+
+### Option B: Optional bootstrap mode with deterministic freshness checks (chosen)
+
+- **Pros**: Supports fresh-project UX while maintaining compatibility in existing
+  repos; no historical rewrites.
+- **Cons**: Requires robust eligibility detection and collision safeguards.
+
+## Minimal architecture
+
+### 1) Bootstrap control
+
+- Add explicit bootstrap control (flag or scratchpad/command argument), default off.
+- Bootstrap applies only during eligible first-run/new-project initialization.
+
+### 2) Freshness detection
+
+- Determine eligibility from absence of existing `US-`, `DEC-`, and `R-` IDs in
+  canonical artifacts.
+- Emit deterministic diagnostics when bootstrap requested but repo is not fresh.
+
+### 3) ID generation contract
+
+- If bootstrap eligible and enabled: start at `0001`.
+- Otherwise: continue from highest existing ID (current behavior).
+- Never rewrite historical IDs.
+
+### 4) Test coverage
+
+- Add regression cases for:
+  - fresh + bootstrap enabled
+  - fresh + bootstrap disabled
+  - non-fresh + bootstrap requested
+  - mixed/partial artifact edge cases
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| ID collision in partially initialized repos | Multi-artifact freshness check and fail-fast diagnostics. |
+| Operator confusion about bootstrap behavior | Clear README/runbook/help contract with examples and constraints. |
+| Hidden behavior changes in existing repos | Default-off bootstrap and strict compatibility with highest-ID continuation. |
+
+## Decision linkage
+
+- Research basis: `R-0024`, `R-0025`
+- Decision: `DEC-0034`
+
+---
+
+# US-0053: Context Compaction and Tiered Token-Cost Optimization Mode
+
+## Overview
+
+US-0053 introduces a deterministic token-efficiency control surface that reduces
+recurring context volume while preserving workflow safety guarantees. The design
+adds a tiered policy profile (`lean|balanced|full`), compact active-context
+contracts for high-traffic artifacts, and a narrow-read retrieval strategy for
+`/ask`.
+
+## Challenge and alternatives
+
+### Alternatives considered
+
+1. **Manual per-flag tuning only** (no profile):
+   flexible but error-prone; high operator overhead and inconsistent behavior.
+2. **Single global token-saver on/off switch**:
+   too coarse; insufficient control for teams needing intermediate depth.
+3. **Tiered profile with documented override precedence** (selected):
+   balances operator simplicity with deterministic, testable behavior.
+
+### Simpler-path check
+
+The selected architecture keeps existing features and safety gates, changing only
+default intensity and retrieval scope. It avoids new runtime services or external
+state stores and reuses existing artifact-first contracts.
+
+## Minimal architecture
+
+### 1) Token profile policy layer
+
+- Add `TOKEN_PROFILE=lean|balanced|full` in scratchpad (default `balanced`).
+- Define deterministic profile mapping to existing switches (automation looping,
+  early research, intake depth, and optional overhead modes).
+- Document explicit precedence:
+  - mandatory gate invariants cannot be disabled by profile,
+  - explicit manual flag overrides (when present) take precedence over profile
+    defaults for documented keys.
+
+### 2) Compact active-context contract
+
+- Keep `docs/engineering/state.md` as canonical active evidence store but define
+  a bounded **active context pack** section for routine reads.
+- Archive older checkpoint blocks into versioned archive packs under a dedicated
+  state-archive path; keep canonical references in active state.
+- Compaction is append-safe and non-destructive: no historical deletion, only
+  bounded active window + archive pointers.
+
+### 3) Decisions index compaction
+
+- Keep `docs/engineering/decisions.md` as compact current index:
+  - current context pack,
+  - bounded decision summary list,
+  - canonical pointers to full `decisions/DEC-xxxx.md`.
+- Prevent uncontrolled growth by moving long historical narrative detail to DEC
+  records only.
+
+### 4) `/ask` narrow-read retrieval strategy
+
+- Update `/ask` policy to question-scoped retrieval:
+  1. targeted section reads first (latest relevant checkpoints/story blocks),
+  2. bounded expansion only when unresolved,
+  3. explicit "not found in artifacts" response when evidence is absent.
+- Preserve strict read-only behavior and zero artifact mutation contract.
+
+### 5) Guardrail invariants
+
+- Mandatory workflow gates remain unchanged:
+  - `/qa` completion requirements,
+  - `/verify-work` UAT completeness,
+  - `/release` deterministic gate chain and isolation checks.
+- Token savings are achieved via retrieval scope and default overhead intensity,
+  not by removing safeguards.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Profile ambiguity causes inconsistent behavior | Publish deterministic profile mapping + precedence contract and regression tests. |
+| Over-compaction hides needed evidence | Keep archive links canonical and require escalation path from active to archive reads. |
+| Lean mode under-questions complex work | Document escalation guidance (`lean` -> `balanced`/`full`) and preserve manual override path. |
+| Safety regression under token optimization | Lock mandatory gate invariants in tests and runbook contracts. |
+
+## Decision linkage
+
+- Research basis: `R-0027`, `R-0028`
+- Decision: `DEC-0035`
+
+---
+
+# US-0054: Configurable Multi-Target Release Publish with Confirmation Gate
+
+## Overview
+
+US-0054 adds an optional post-release publish orchestration contract so each
+repository can configure its own publish destinations (for example npm, choco,
+brew, git, docker, cloud, custom servers) while enforcing a default confirmation
+boundary before publish execution.
+
+## Architecture goals
+
+- Keep `/release` gate chain semantics unchanged and mandatory.
+- Add publish-target behavior as a configuration-driven post-release layer.
+- Support built-in target types and generic custom/SSH targets without hardcoded
+  provider coupling.
+- Fail fast on invalid target definitions with deterministic diagnostics.
+- Preserve active/template parity and secret-safety contracts.
+
+## Minimal architecture
+
+1. **Target contract surface**
+   - Canonical configurable target file under engineering docs (example schema).
+   - Each target entry includes stable `id`, `type`, `enabled`, `order`,
+     execution command/template, and optional environment/credential references.
+
+2. **Execution mode control**
+   - Scratchpad-controlled publish mode:
+     - `disabled` (no publish step),
+     - `confirm` (default; operator approval required),
+     - `auto` (explicit opt-in).
+   - Optional default target selection list, overridable per run.
+
+3. **Target taxonomy**
+   - Built-in `type` guidance for common destinations: `npm`, `choco`, `brew`,
+     `git`, `docker`, `cloud`.
+   - Generic `custom` target for arbitrary command workflows.
+   - First-class `ssh` target with host/user/port/auth-reference/remote command.
+
+4. **Safety and validation boundary**
+   - Deterministic pre-execution validation for required fields and type
+     constraints.
+   - Env-reference-only sensitive values (`*Env` style) for tokens/passwords/keys.
+   - Invalid or incomplete config blocks publish execution with explicit reason
+     codes and no partial target side effects.
+
+5. **Deterministic run semantics**
+   - Explicit target selection (single/multi-target) per publish run.
+   - Deterministic order by configured `order` then stable ID tie-break.
+   - Disabled targets are skipped with explicit audit entries.
+
+## Guardrail invariants
+
+- Mandatory release quality gates remain unchanged:
+  check-in tests -> QA -> UAT -> isolation -> release finalization.
+- Publish target execution is additional post-release behavior and cannot bypass
+  release evidence requirements.
+- Existing story/decision/research ID semantics remain unchanged.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Ambiguous target config creates non-deterministic runs | strict schema and deterministic ordering rules |
+| Missing confirmation triggers unintended publish | default `confirm` mode, explicit operator approval gate |
+| Secret leakage in repo config | env-reference-only sensitive fields and fail-fast validation |
+| Provider lock-in | built-in target guidance plus generic `custom` and `ssh` types |
+
+## Decision linkage
+
+- Research basis: `R-0029`, `R-0030`
+- Decision: `DEC-0036`
+- Boundaries: add configurable publish target layer only; do not alter mandatory
+  `/release` gate chain contract.
+
+---
+
+# US-0055: Deterministic Status Reconciliation Command
+
+## Overview
+
+US-0055 adds a dedicated reconciliation command to normalize status drift across
+canonical and derived workflow artifacts so continuation (`/auto`) can safely
+resume from the correct next OPEN story and phase.
+
+## Architecture goals
+
+- Preserve canonical status ownership (`docs/product/backlog.md`).
+- Reconcile derived artifacts deterministically (`acceptance`, `state`, `resume`).
+- Keep mutation scope bounded to mismatched stories and linked derived entries.
+- Emit auditable normalization evidence and deterministic reason codes.
+- Preserve release-gate safety invariants and non-destructive history behavior.
+
+## Minimal architecture
+
+1. **New reconciliation command contract**
+   - Add command (for example `/status-reconcile`) with deterministic detection,
+     repair, and fail-closed blocked/conflict behavior.
+   - Distinguish from `/memory-audit`:
+     - `/memory-audit` remains read-only detection,
+     - `/status-reconcile` performs bounded reconciliation writes.
+
+2. **Canonical precedence model**
+   - Authoritative source: backlog story `Status` (`OPEN|DONE`).
+   - Derived surfaces:
+     - `docs/product/acceptance.md` check rows,
+     - backlog AC checkboxes for DONE stories,
+     - `handoffs/resume_brief.md` next story + intended phase,
+     - state reconciliation checkpoint.
+   - If canonical status conflicts with release evidence, fail closed with reason
+     code and remediation (no silent correction).
+
+3. **Deterministic mutation boundaries**
+   - Update only stories detected as mismatched.
+   - Do not rewrite unrelated story blocks, sprint history, or narrative content.
+   - Normalize DONE stories with unchecked ACs and acceptance drift in target scope.
+
+4. **Auditability contract**
+   - Write normalization evidence rows to canonical report artifact
+     (`docs/engineering/status-normalization-report.md`):
+     story ID, prior values, resolved values, evidence refs, timestamp.
+   - Append reconciliation checkpoint in `docs/engineering/state.md`.
+
+5. **Continuation readiness contract**
+   - Recompute next OPEN story by canonical backlog priority/order.
+   - Update `handoffs/resume_brief.md` deterministically:
+     next actions, intended resume phase, latest breadcrumb metadata.
+
+## Guardrail invariants
+
+- Mandatory `/qa` -> `/verify-work` -> `/release` gate semantics remain unchanged.
+- Reconciliation must not bypass release evidence requirements.
+- No destructive rewrite of unrelated historical artifacts.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Over-broad repair mutates unrelated history | strict target-scoped mutation rules |
+| Ambiguous conflict handling yields inconsistent outcomes | deterministic precedence + fail-safe reason codes |
+| Hidden drift after repair | mandatory normalization report rows + state checkpoint evidence |
+
+## Decision linkage
+
+- Research basis: `R-0031`
+- Decision: `DEC-0037`
+- Boundaries: add reconciliation command and evidence contract only; do not
+  change feature/runtime behavior beyond workflow status normalization.
+
+---
+
+# US-0056: Strict Runtime Proof for Per-Phase Subagent Isolation
+
+## Overview
+
+US-0056 strengthens the existing isolation contract by requiring runtime
+attestation at each phase boundary. Artifact markers remain required, but `/auto`
+must fail closed unless each completed phase provides valid, unique, fresh, and
+linkable runtime proof.
+
+## Architecture goals
+
+- Add strict runtime attestation without weakening current isolation evidence.
+- Enforce deterministic boundary validation and fail-closed continuation.
+- Preserve pause/resume traceability with strict-proof provenance.
+- Keep active/template parity and bounded compatibility handling for legacy runs.
+
+## Minimal architecture
+
+1. **Runtime attestation envelope**
+   - Required fields per completed phase run:
+     - `orchestrator_run_id`
+     - `runtime_proof_id`
+     - `phase_id`
+     - `role`
+     - `proof_issued_at` (UTC/RFC3339)
+     - `proof_ttl_seconds`
+     - `proof_hash` (deterministic hash over canonical tuple fields)
+   - Evidence must be linked to canonical checkpoint in `docs/engineering/state.md`.
+
+2. **Boundary validator in `/auto`**
+   - After each phase, `/auto` validates attestation tuple and linkage before
+     advancing.
+   - Fail-closed reasons are deterministic:
+     - `RUNTIME_PROOF_MISSING`
+     - `RUNTIME_PROOF_INVALID`
+     - `RUNTIME_PROOF_REUSED`
+     - `RUNTIME_PROOF_STALE`
+     - `RUNTIME_PROOF_AMBIGUOUS_LINK`
+
+3. **Strict-proof provenance for pause/resume**
+   - `handoffs/resume_brief.md` stores strict-proof provenance reference for last
+     valid boundary.
+   - Resume resolution fails closed when provenance is stale/unparseable or
+     strict-proof chain cannot be validated.
+
+4. **Gate integration**
+   - Isolation/release verification consumes strict attestation in addition to
+     existing artifact evidence fields from US-0048/DEC-0029.
+   - No gate bypass: missing strict-proof evidence blocks continuation/release.
+
+5. **Legacy compatibility contract**
+   - No historical rewrite.
+   - Legacy runs without strict attestation produce remediation guidance and
+     deterministic blocked outcomes.
+
+## Guardrail invariants
+
+- `/auto` remains orchestration-only; phase work is still isolated by role.
+- Strict runtime proof augments, not replaces, existing evidence requirements.
+- Fail-closed behavior is mandatory on missing/invalid/reused/stale proof.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| False blocks due to tight freshness windows | bounded TTL defaults + clear remediation guidance |
+| Proof-ID collision/reuse ambiguity | deterministic uniqueness constraints + reuse checks |
+| Partial rollout causes parity drift | active/template contract parity + regression coverage |
+
+## Decision linkage
+
+- Research basis: `R-0034`
+- Decision: `DEC-0038` accepted for strict attestation tuple + validator contract
+- Boundaries: workflow orchestration proof contract only; no product runtime behavior changes.
+
+---
+
+# US-0057: Upgrade-Safe Scratchpad Example Refresh and Parity
+
+## Overview
+
+US-0057 tightens installer upgrade behavior so the framework-owned scratchpad
+example is always refreshed while user-owned local overrides remain preserved.
+The solution extends existing upgrade ownership semantics (US-0018/US-0050)
+with explicit scratchpad-surface rules and deterministic operator diagnostics.
+
+## Ownership model
+
+- Framework-owned: `.cursor/scratchpad.local.example.md`
+- User-owned: `.cursor/scratchpad.local.md`
+- Mixed/shared defaults remain unchanged (`.cursor/scratchpad.md`).
+
+## Upgrade behavior contract
+
+In `--mode upgrade`, installers must:
+1. Refresh framework-owned scratchpad example to latest release content.
+2. Preserve user-owned local scratchpad with no overwrite path.
+3. Emit deterministic diagnostics:
+   - scratchpad example status (`added|updated|unchanged`)
+   - user local file preservation signal when present.
+
+## Parity and validation
+
+- The same behavior is required in all installer implementations:
+  - `installer.ps1`
+  - `installer.sh`
+  - `installer.py`
+- Regression coverage validates:
+  - framework refresh for example file,
+  - preservation of user local overrides,
+  - no regression in existing install/upgrade/clean guarantees.
+
+## Decision linkage
+
+- Research basis: `R-0032`
+- Decision: `DEC-0039`
+
+---
+
+# US-0058: Deterministic Artifact Ordering and Write Discipline
+
+## Overview
+
+US-0058 standardizes write ordering across mutable workflow artifacts. The goal
+is deterministic, idempotent artifact mutations so command reruns do not
+oscillate insertion direction or reorder unrelated entries.
+
+## Architecture goals
+
+- Define one canonical ordering matrix for mutable artifact surfaces.
+- Keep `state.md` checkpoint writes append-bottom only.
+- Keep backlog/acceptance story ordering sorted-canonical and aligned.
+- Enforce fail-safe behavior when insertion anchors are missing or ambiguous.
+- Preserve canonical ownership guarantees from US-0045/US-0055.
+
+## Minimal architecture
+
+1. **Ordering matrix artifact**
+   - New canonical policy file:
+     `docs/engineering/artifact-ordering-policy.md`
+   - Defines per-artifact policy: `append-bottom`, `prepend-top`,
+     `sorted-canonical`.
+
+2. **Command contract integration**
+   - Commands that mutate ordering-sensitive artifacts must reference the matrix:
+     `/auto`, `/intake`, `/release`, `/refresh-context`, `/status-reconcile`.
+   - Command behavior must remain target-scoped; no broad rewrites.
+
+3. **Fail-safe anchor handling**
+   - Missing/ambiguous placement anchors trigger deterministic fail-closed code:
+     `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`.
+   - No partial writes on fail-safe path.
+
+4. **Idempotence requirement**
+   - Re-running commands with no semantic changes must keep identical order.
+   - No top/bottom insertion flips across repeated runs.
+
+## Decision linkage
+
+- Research basis: `R-0033`
+- Decision: `DEC-0040`

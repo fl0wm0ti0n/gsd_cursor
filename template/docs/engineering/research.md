@@ -1,6 +1,6 @@
 # Research
 
-## Entry format (per DEC-0011)
+## Entry format
 
 Each research entry uses the R-xxxx ID format with semi-structured fields.
 

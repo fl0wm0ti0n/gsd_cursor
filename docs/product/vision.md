@@ -107,3 +107,130 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Guide schema**: Each feature guide should follow a deterministic structure (purpose, prerequisites, step-by-step usage, example, limitations, troubleshooting) so completeness is testable rather than subjective.
 - **Traceability**: Guides should be named and stored canonically (for example one guide per story/feature ID) and referenced from backlog, acceptance, and release handoffs when the mode is enabled.
 - **Docs-as-code alignment**: User guides live in-repo alongside code, are updated in the same change as the feature, and are validated via simple structural checks instead of manual checklists.
+
+## Discovery Notes — US-0050, US-0051, US-0052
+
+- Fresh-install trust requires two guarantees: starter artifacts are neutral (no historical seeded project rows), and `--clean-repo` removes every installer-owned artifact deterministically.
+- Cleanup ownership should be centrally defined (manifest-style or equivalent single source) and shared across installer implementations to prevent path drift and partial-clean states.
+- Broad intake should not collapse into one oversized story; intake needs decomposition heuristics (vertical slices/workflow-step splits) with explicit user approval of proposed splits.
+- Guided PO behavior should adapt to intake breadth and risk, not ambiguity alone, while keeping low-touch mode available for teams that prefer minimal interaction.
+- Fresh-project teams may need optional namespace bootstrap so first IDs begin at `US-0001`/`DEC-0001`, without rewriting existing-history repos.
+
+## Discovery Notes — US-0053
+
+- **Token-efficiency objective**: Reduce recurring token cost by narrowing default
+  retrieval scope and compaction of high-traffic context artifacts, while
+  keeping mandatory QA/UAT/release safety gates intact.
+- **Tiered profile UX expectation**: operators need one explicit policy switch
+  (`lean|balanced|full`) instead of many ad-hoc toggles; profile behavior and
+  override precedence must be deterministic and documented.
+- **Context architecture expectation**: maintain a compact hot context for
+  frequent reads and an archive path for historical detail, so routine
+  `/ask`/phase runs avoid loading full lifecycle history.
+- **`/ask` interaction expectation**: query resolution should be question-scoped
+  (targeted sections first, progressive expansion only when unresolved) with
+  strict read-only behavior preserved.
+- **Discovery references**:
+  - OpenAI prompt caching docs:
+    `https://platform.openai.com/docs/guides/prompt-caching`
+  - Anthropic prompt caching docs:
+    `https://platform.claude.com/docs/en/build-with-claude/prompt-caching`
+  - Progressive context loading pattern reference:
+    `https://williamzujkowski.github.io/posts/from-150k-to-2k-tokens-how-progressive-context-loading-revolutionizes-llm-development-workflows/`
+
+## Discovery Notes — US-0054
+
+- **Target variability expectation**: release publish destinations differ by
+  repository; publish targets must be configurable rather than hardcoded.
+- **Half-automatic safety expectation**: publish actions should require explicit
+  operator confirmation before execution by default.
+- **Target taxonomy expectation**: support built-in destination types plus a
+  generic custom-command type for non-standard environments.
+- **SSH/generic server expectation**: SSH-based targets must be first-class in
+  configuration (host/user/port/auth reference/remote command) so teams can
+  deploy to custom servers without provider-specific coupling.
+- **Security expectation**: credentials/tokens/keys should be env-reference
+  based; no inline secrets in committed configuration.
+- **Determinism expectation**: target selection/order, disabled-target skip
+  behavior, and invalid-config failures must be deterministic and auditable.
+- **Discovery references**:
+  - GitHub deployment environments and protection rules:
+    `https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments`
+  - GitHub managing deployment environments:
+    `https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/managing-environments-for-deployment`
+  - CircleCI deploy over SSH:
+    `https://circleci.com/docs/guides/deploy/deploy-over-ssh`
+
+## Discovery Notes — US-0055
+
+- **Operator expectation**: teams need a deterministic command to detect and
+  reconcile cross-artifact status drift (backlog/acceptance/state/resume)
+  without ad-hoc manual edits.
+- **Canonical precedence expectation**: backlog story status remains authoritative;
+  derived artifacts must reconcile to backlog unless release evidence reveals
+  canonical conflict requiring fail-closed remediation.
+- **Scope boundary expectation**: reconciliation must be target-scoped and
+  auditable (changed stories + before/after values), avoiding broad historical
+  rewrites.
+- **Continuation expectation**: reconciliation should restore deterministic
+  `resume_brief` intent so `/auto` can continue from the correct next OPEN story
+  and phase.
+- **Diagnostics expectation**: blocked/conflict paths need deterministic reason
+  codes and clear remediation guidance.
+
+## Intake Notes — US-0056
+
+- User requests strict runtime proof that `/auto` truly runs per-phase fresh
+  subagent executions, not only artifact-level isolation markers.
+- Required outcome: fail-closed enforcement when runtime proof is missing,
+  reused, stale, or ambiguous.
+- Expected scope: attestation schema, phase-gate integration, resume/pause
+  provenance, and operator diagnostics for strict-proof failures.
+
+## Discovery Notes — US-0056
+
+- Runtime-isolation confidence must be proven by execution-time attestations, not
+  only artifact text fields written after the fact.
+- Attestation must be uniquely bound to phase execution and validated at each
+  `/auto` boundary before continuation.
+- Failure paths must be fail-closed with deterministic reason codes and
+  remediation guidance so operators can recover safely.
+- Pause/resume and release/isolation gates must consume strict attestation
+  evidence to prevent unverifiable continuation.
+
+## Intake Notes — US-0057
+
+- User requests reliable upgrade handling for `.cursor/scratchpad.local.example.md`.
+- Problem statement: `--mode upgrade` may leave scratchpad example with fewer
+  options or mismatched guidance while some options already exist in user
+  scratchpad surfaces.
+- Expected scope: deterministic framework-vs-user ownership policy for
+  scratchpad files, installer parity across PS1/sh/py, and explicit operator
+  diagnostics/troubleshooting guidance for drift.
+
+## Discovery Notes — US-0057
+
+- `.cursor/scratchpad.local.example.md` must be treated as framework-owned and
+  refreshed on upgrade.
+- `.cursor/scratchpad.local.md` must remain user-owned and preserved.
+- Installer output should provide deterministic, operator-visible diagnostics
+  for example refresh status and local-file preservation.
+
+## Intake Notes — US-0058
+
+- User requests deterministic ordering discipline for artifact updates; current
+  behavior appears mixed (top vs bottom insertion) across key files.
+- Problem surfaces include `docs/engineering/state.md`,
+  `docs/product/backlog.md`, and `docs/product/acceptance.md`.
+- Expected scope: per-file ordering matrix (top-down/bottom-up/sorted),
+  command-level mutation consistency, idempotent ordering behavior, and
+  documentation/test coverage.
+
+## Discovery Notes — US-0058
+
+- A single canonical ordering matrix is required to avoid command-specific
+  insertion drift.
+- Commands that mutate ordering-sensitive artifacts must consume the same policy
+  artifact and fail closed on ambiguous placement anchors.
+- Re-run idempotence is mandatory: no reorder churn when there is no semantic
+  change.

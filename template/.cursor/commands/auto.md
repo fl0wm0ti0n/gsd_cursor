@@ -35,6 +35,32 @@ Reason codes (deterministic):
 - `ISOLATION_EVIDENCE_STALE`
 - `ISOLATION_EVIDENCE_INVALID`
 
+## Strict runtime proof enforcement (US-0056 / DEC-0038)
+
+`/auto` must enforce strict runtime attestation in addition to artifact-level
+isolation evidence:
+
+- Each completed phase must provide a runtime attestation tuple linked to the
+  phase checkpoint evidence:
+  - `orchestrator_run_id`
+  - `runtime_proof_id`
+  - `phase_id`
+  - `role`
+  - `proof_issued_at` (ISO UTC / RFC3339)
+  - `proof_ttl_seconds`
+  - `proof_hash`
+- `runtime_proof_id` must be unique per phase run; reused proof IDs are invalid.
+- Proof freshness must be validated against `proof_issued_at` + TTL policy.
+- Proof linkage must be deterministic and auditable to checkpoint evidence refs.
+- Fail closed on any strict-proof violation; no silent continuation.
+
+Strict-proof reason codes:
+- `RUNTIME_PROOF_MISSING`
+- `RUNTIME_PROOF_INVALID`
+- `RUNTIME_PROOF_REUSED`
+- `RUNTIME_PROOF_STALE`
+- `RUNTIME_PROOF_AMBIGUOUS_LINK`
+
 ## Inputs
 - `AUTO_FLOW_MODE` and `PHASE_MODE` from `.cursor/scratchpad.md`
 - `AUTO_IMPLEMENTATION_LOOP`, `AUTO_LOOP_MAX_CYCLES` from `.cursor/scratchpad.md`
@@ -194,6 +220,11 @@ Reason-code baseline:
 - `EXEC_BULK_NO_ELIGIBLE_ITEMS`
 - `EXEC_TEAM_SCOPE_BLOCKED`
 - `EXEC_TEAM_SCOPE_SKIPPED`
+- `RUNTIME_PROOF_MISSING`
+- `RUNTIME_PROOF_INVALID`
+- `RUNTIME_PROOF_REUSED`
+- `RUNTIME_PROOF_STALE`
+- `RUNTIME_PROOF_AMBIGUOUS_LINK`
 
 ## Canonical `start-from` contract
 
@@ -308,6 +339,17 @@ Required codes:
     missing/invalid/stale, stop with the appropriate reason code and remediation
     guidance (run the phase again in a fresh subagent context and write new
     evidence).
+11b. At each phase boundary, verify strict runtime attestation tuple exists and
+    is valid for the completed phase (`orchestrator_run_id`,
+    `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`,
+    `proof_ttl_seconds`, `proof_hash`).
+    - Missing tuple: `RUNTIME_PROOF_MISSING`
+    - Invalid schema/hash/linkage: `RUNTIME_PROOF_INVALID`
+    - Reused `runtime_proof_id`: `RUNTIME_PROOF_REUSED`
+    - Expired proof TTL / stale proof: `RUNTIME_PROOF_STALE`
+    - Ambiguous proof-to-checkpoint linkage: `RUNTIME_PROOF_AMBIGUOUS_LINK`
+    - Remediation: rerun affected phase in fresh subagent context, write new
+      strict-proof tuple + checkpoint evidence, then continue.
 12. At each phase boundary, evaluate sync policy only when mode requires it and
     record a deterministic sync verdict entry with:
     - `phase_boundary`
@@ -338,3 +380,14 @@ Required codes:
 - `/resume` remains valid for context loading and guided continuation.
 - Deterministic precedence and fail-fast behavior apply when `/auto` continuation
   is invoked.
+
+## Deterministic artifact ordering guard (US-0058 / DEC-0040)
+
+- When `/auto` coordinates phases that write mutable artifacts, each phase must
+  follow `docs/engineering/artifact-ordering-policy.md`.
+- Ordering policies are mandatory:
+  - `state.md`: append-bottom
+  - `backlog.md` / `acceptance.md`: sorted-canonical
+  - release/handoff surfaces: policy-specific (prepend/append) as documented.
+- If a required placement anchor is missing or ambiguous, fail closed with
+  `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` and do not continue.

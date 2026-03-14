@@ -1,3 +1,465 @@
+# PO -> TL Discovery Addendum — US-0056 (Strict Runtime Proof)
+
+## Discovery context
+
+- Discovery confirms a contract gap between artifact-level isolation evidence
+  and strict runtime-attested phase execution guarantees.
+- `/auto` must validate runtime proof at every phase boundary before proceeding;
+  otherwise fail closed.
+
+## Discovery outcomes
+
+- Recommend introducing a strict runtime attestation envelope per phase run with
+  unique proof identity and bounded freshness checks.
+- Recommend deterministic reason-code taxonomy for strict-proof failure classes
+  (missing, invalid shape, reused proof, stale proof, ambiguous linkage).
+- Recommend integrating strict-proof checks into:
+  - phase-boundary continuation in `/auto`,
+  - pause/resume provenance,
+  - isolation/release gate consumption.
+
+## Recommendation
+
+- Proceed to **`/research`** for `US-0056` to gather attestation patterns and
+  define bounded compatibility behavior for legacy runs.
+
+---
+
+# PO -> TL Handoff — US-0058 (Deterministic Artifact Ordering)
+
+## Intake context
+
+User requests deterministic artifact update ordering because current behavior can
+mix top and bottom insertions. Reported affected surfaces include
+`docs/engineering/state.md`, `docs/product/backlog.md`, and
+`docs/product/acceptance.md`.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0045` (canonical status source + drift guard)
+  - `US-0055` (status reconciliation command)
+- Assessment: not a duplicate.
+  - Prior stories focus on status precedence/reconciliation.
+  - `US-0058` is specifically about deterministic insertion/sorting discipline
+    across artifact mutation commands.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one core objective (deterministic ordering contract),
+  - tightly coupled concerns (ordering matrix, mutation anchors, idempotence,
+    parity, tests),
+  - better validated as one cross-command policy package.
+- User authority evidence: user explicitly requested this intake.
+
+## Scope for TL
+
+- In scope:
+  - per-file ordering matrix (`append-bottom`, `prepend-top`, `sorted-canonical`),
+  - command contract updates for deterministic insertion points and fail-safe
+    behavior,
+  - idempotent re-run guarantees (no oscillating order),
+  - active/template parity and regression coverage.
+- Out of scope:
+  - changing runtime product feature behavior.
+
+## Risks
+
+- First normalization could cause large diffs if migration is not bounded.
+- Ambiguous anchors may trigger non-deterministic writes if not fail-safe.
+- Divergent command behavior could persist without parity enforcement.
+
+## Research reference
+
+- `R-0033`: ordering policy patterns + artifact-specific guidance.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0058`, focusing on:
+  - file-by-file ordering matrix and deterministic anchors,
+  - one-time bounded normalization strategy,
+  - command ownership map and regression scope.
+
+---
+
+# PO -> TL Handoff — US-0057 (Upgrade-Safe Scratchpad Example Refresh)
+
+## Intake context
+
+User reports that upgrading via `its-magic --mode upgrade` can leave
+`.cursor/scratchpad.local.example.md` with fewer or missing options, while some
+options already exist in the user's scratchpad surfaces. User requests reliable
+upgrade behavior and parity.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0018` (smart upgrade mode)
+  - `US-0050` (clean install hygiene and install/clean ownership)
+- Assessment: not a duplicate.
+  - Existing stories establish broad upgrade/ownership behavior.
+  - `US-0057` is focused on a specific scratchpad example/user drift path and
+    deterministic installer parity + diagnostics.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one objective (upgrade-safe scratchpad example refresh),
+  - tightly coupled scope across ownership policy, installer parity, diagnostics,
+    and regression checks,
+  - can be validated in one integrated installer/test pass.
+- User authority evidence: user explicitly requested this intake.
+
+## Scope for TL
+
+- In scope:
+  - deterministic scratchpad example ownership/update policy on upgrade,
+  - user scratchpad preservation behavior,
+  - installer parity across PS1/sh/py,
+  - explicit upgrade diagnostics for example refresh/preservation outcomes,
+  - active/template parity and regression coverage.
+- Out of scope:
+  - unrelated runtime workflow feature changes.
+
+## Risks
+
+- Refresh logic might overwrite user-owned scratchpad values.
+- Under-refresh may keep stale example contract and hide new options.
+- Installer parity gaps can cause OS-specific drift behavior.
+
+## Research reference
+
+- `R-0032`: upgrade-safe example/local config patterns + installer references.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for US-0057 with focus on:
+  - ownership matrix and deterministic precedence,
+  - upgrade diagnostics for example vs user surfaces,
+  - parity contract across all installers and tests.
+
+---
+
+# PO -> TL Handoff — US-0056 (Strict Runtime Proof for Per-Phase Isolation)
+
+## Intake context
+
+User wants strict runtime proof that `/auto` phase execution actually uses fresh
+subagent executions per phase, beyond artifact-only isolation evidence rows.
+User observed a single visible chat flow and requested fail-closed proof
+enforcement.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0048` / `DEC-0029` (per-phase isolation evidence contract)
+  - `US-0055` (status reconciliation command)
+- Assessment: not a duplicate.
+  - `US-0048` defines required evidence fields and fail-closed behavior, but
+    lacks strict runtime attestation guarantees.
+  - `US-0056` introduces explicit runtime-proof schema and enforcement so phase
+    isolation cannot be satisfied by artifact markers alone.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one shared objective (strict runtime isolation proof),
+  - tightly coupled scope across attestation schema, `/auto` gate enforcement,
+    resume/pause provenance, and operator diagnostics,
+  - should be validated in one integrated parity/regression pass.
+- User authority evidence: user explicitly requested strict proof via intake.
+
+## Scope for TL
+
+- In scope:
+  - strict runtime attestation schema per phase run,
+  - deterministic `/auto` fail-closed checks for missing/reused/stale proof,
+  - integration with isolation/release gates and resume provenance,
+  - deterministic reason-code taxonomy and remediation guidance,
+  - active/template parity and regression coverage.
+- Out of scope:
+  - product runtime feature behavior changes,
+  - external orchestration platform migration.
+
+## Risks
+
+- False confidence if proof fields are present but not uniquely bound to phase execution.
+- Overly strict gating could block continuation without actionable remediation.
+- Legacy runs without strict attestation may need bounded compatibility handling.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0056`, focusing on:
+  - runtime proof schema and uniqueness constraints,
+  - strict fail-safe reason-code contract,
+  - pause/resume provenance compatibility,
+  - auditable operator-visible diagnostics.
+
+---
+
+# PO -> TL Handoff — US-0055 (Deterministic Status Reconciliation Command)
+
+## Intake context
+
+User reported status drift after refresh/auto boundaries where some historical
+stories remain marked DONE in backlog while related acceptance/checklist surfaces
+still show unchecked entries. User requested a dedicated command to check and
+clean this "chaos" so next `/auto` continuation resumes from the correct OPEN
+story baseline.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0024` (`/memory-audit`, read-only drift detection)
+  - `US-0045` (canonical status ownership)
+  - `US-0049` (legacy DONE-story drift guard at release boundary)
+- Assessment: not a duplicate.
+  - `US-0055` adds an explicit deterministic **repair/reconciliation command**
+    across backlog/acceptance/state/resume surfaces and continuation readiness.
+  - Existing contracts detect/guard in parts, but there is no dedicated operator
+    command that performs bounded reconciliation and resume setup.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one shared operational objective (deterministic status normalization and
+    continuation readiness),
+  - tightly coupled scope across detection rules, repair semantics, audit
+    evidence, and resume baseline update,
+  - can be validated in one integrated parity/regression pass.
+- User authority evidence: user explicitly requested this intake.
+
+## Scope for TL
+
+- In scope:
+  - new reconciliation command contract (for example `/status-reconcile`),
+  - deterministic status mismatch detection across backlog/acceptance/state/resume,
+  - bounded target-scoped repair behavior with audit traceability,
+  - reason-code and remediation contract for blocked/conflict states,
+  - deterministic resume metadata update for next OPEN story/phase,
+  - active/template parity and regression coverage.
+- Out of scope:
+  - changing product feature semantics,
+  - bypassing mandatory QA/UAT/release gates,
+  - destructive rewrite of unrelated historical artifacts.
+
+## Risks
+
+- Over-broad mutation could rewrite unrelated historical entries.
+- Ambiguous source precedence can create non-deterministic reconciliation.
+- Poorly bounded repair may hide true release-evidence conflicts.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0055`, focusing on:
+  - canonical precedence and deterministic mutation boundaries,
+  - blocked/conflict reason-code set and remediation UX,
+  - audit artifact schema for before/after normalization evidence,
+  - resume phase resolution rules after reconciliation.
+
+## Discovery addendum — US-0055
+
+- Discovery completed for US-0055 and validated:
+  - canonical backlog status must remain authoritative,
+  - reconciliation mutation must stay target-scoped and auditable,
+  - deterministic resume update is required for safe `/auto` continuation.
+- Updated recommendation: Proceed to **`/research`** for US-0055.
+
+---
+
+# PO -> TL Handoff — US-0054 (Configurable Multi-Target Release Publish)
+
+## Intake context
+
+User requested intake for configurable publish targets after workflow release
+finalization, including support for:
+
+1. heterogeneous destinations per project (registry/git/docker/cloud/custom),
+2. generic/custom server targets,
+3. SSH-based execution targets,
+4. half-automatic safety where the agent asks for confirmation before publish.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0038` (sync policy and guarded auto-push)
+  - `US-0039` (release gate chain and no-bypass release semantics)
+  - `US-0036` (remote config validation contract)
+- Assessment: not a duplicate.
+  - `US-0054` focuses on **post-release publish target configuration and
+    operator-confirmed execution** across heterogeneous destinations.
+  - Existing stories cover release safety and sync behavior, but not a generic
+    configurable publish-target model including SSH/custom server paths.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one shared operational objective (configurable multi-target publish with
+    confirmation safety),
+  - tightly coupled scope across target schema, confirmation flow, and
+    execution/fail-fast behavior,
+  - can be validated in one integrated parity and regression pass.
+- User authority evidence: user explicitly asked to take this as intake and
+  requested generic/custom + SSH support.
+
+## Scope for TL
+
+- In scope:
+  - configurable publish-target schema and validation,
+  - target-type support for built-in + generic custom command targets,
+  - SSH target support via config,
+  - operator confirmation gate before publish execution,
+  - deterministic selection/order/skip and fail-fast diagnostics,
+  - active/template parity and regression coverage.
+- Out of scope:
+  - replacing provider-specific CLIs,
+  - hardcoding one deployment platform,
+  - storing inline secrets in committed artifacts.
+
+## Risks
+
+- Under-specified target schema may produce non-deterministic execution.
+- Missing confirmation boundaries may allow accidental publish actions.
+- Secret handling can regress if env-reference-only constraints are not explicit.
+
+## Research reference
+
+- `R-0029`: configurable multi-target publish patterns, confirmation gates, and
+  SSH-based deployment references.
+
+## Recommendation
+
+- Proceed to **`/research`** for US-0054 with these targets:
+  - canonical target schema and fail-fast validation rules,
+  - target taxonomy (built-in + `custom` + `ssh`) and deterministic execution order,
+  - confirmation gate semantics (default-on) and operator override boundaries,
+  - env-reference-only credential handling contract for publish targets,
+  - deterministic reason-code set for invalid config/blocked execution,
+  - active/template parity and regression matrix.
+
+## Discovery addendum — US-0054
+
+- Discovery references reviewed:
+  - GitHub deployment environments/protection rules,
+  - GitHub environment management guidance,
+  - SSH deployment patterns for CI/CD.
+- Discovery conclusion:
+  - publish targets must be configuration-driven per repository,
+  - SSH/custom server targets should be first-class target types,
+  - default confirmation gate is required for half-automatic safety,
+  - deterministic validation/reason-code contract is required before architecture.
+
+---
+
+# PO -> TL Handoff — US-0053 (Context Compaction + Tiered Token-Cost Optimization)
+
+## Intake context
+
+User concern: current workflow likely consumes too many tokens due to repeated
+reads/writes of large memory artifacts. User requested:
+
+1. a tiered token-saver mode (lean/balanced/full style) with minimal feature
+   loss,
+2. context compaction strategy for large artifacts (especially
+   `docs/engineering/state.md`),
+3. compact `docs/engineering/decisions.md`,
+4. narrow-read `/ask` policy focused on question-scoped retrieval.
+
+User explicitly asked to treat this as intake and accepted the tiered-profile
+direction.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0024` (memory drift audit, read-only advisory)
+  - `US-0033` (guided intake behavior switch)
+  - `US-0045` (canonical status ownership/reconciliation)
+- Assessment: not a duplicate.
+  - `US-0053` focuses on token-efficiency policy controls and compact active
+    context retrieval behavior while preserving existing quality gates.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - one shared operational objective (token-cost reduction with safety
+    invariants),
+  - tightly coupled scope across profile defaults, context compaction, and ask
+    retrieval policy,
+  - can be validated through one integrated policy + parity regression pass.
+- User authority evidence: user approved this intake direction and asked to
+  proceed as intake.
+
+## Scope for TL
+
+- In scope:
+  - tiered token profile contract and mapping to scratchpad behavior switches,
+  - active-vs-archive compaction policy for `state.md`,
+  - compact index policy for `decisions.md`,
+  - `/ask` narrow-read retrieval rules,
+  - active/template parity and regression coverage.
+- Out of scope:
+  - removing mandatory QA/UAT/release gates,
+  - destructive deletion of historical evidence,
+  - changing canonical status ownership semantics.
+
+## Risks
+
+- Over-aggressive compaction could hide required evidence if archive links or
+  retrieval rules are ambiguous.
+- Profile mapping may create operator confusion if override precedence is not
+  explicit and deterministic.
+- Token-saver defaults must not silently degrade release safety behavior.
+
+## Research reference
+
+- `R-0026`: Token-cost optimization patterns for artifact-first AI workflows.
+
+## Recommendation
+
+- Proceed to **`/research`** for US-0053 with these targets:
+  - exact profile mapping table (`lean|balanced|full`) and deterministic
+    override precedence,
+  - compact/hot vs archive structure contract for `state.md` including archival
+    trigger and retrieval policy,
+  - compact index boundary for `decisions.md` and canonical linking pattern to
+    `decisions/DEC-xxxx.md`,
+  - `/ask` retrieval-order contract (targeted read -> bounded expansion -> fail
+    with explicit "not found in artifacts"),
+  - regression/parity matrix for active + `template/` surfaces and guardrail
+    invariants (mandatory release chain unchanged).
+
+## Discovery addendum — US-0053
+
+- Discovery references reviewed:
+  - OpenAI prompt caching docs (`platform.openai.com/docs/guides/prompt-caching`)
+  - Anthropic prompt caching docs (`platform.claude.com/docs/en/build-with-claude/prompt-caching`)
+  - Progressive context loading pattern reference
+    (`williamzujkowski.github.io/.../from-150k-to-2k-tokens...`)
+- Discovery conclusion:
+  - major savings should come from retrieval scope control and compact active
+    memory surfaces rather than reducing mandatory quality gates,
+  - tiered profile UX is preferred over many independent toggles for daily use,
+  - profile/override behavior must be deterministic and testable.
+
+---
+
 # PO -> TL Handoff — US-0049 (Legacy DONE-Story Acceptance/Traceability Backfill Guard)
 
 ## Discovery context (fresh PO run)
@@ -1026,3 +1488,78 @@ User requests two explicit high-autonomy capabilities:
 - Proceed to `/research` for `US-0046` and `US-0047` with emphasis on
   deterministic explicit-mode contracts, member-scope enforcement, and bounded
   orchestration safety.
+
+---
+
+# PO -> TL Handoff — Intake: Install Hygiene + Smart Intake + Bootstrap IDs
+
+## Intake context (fresh PO run)
+
+User reported real-world first-time install and cleanup trust gaps in external repos:
+
+1. `--clean-repo` leaves framework artifacts behind.
+2. Fresh installs still contain starter references/history that look like copied memory.
+3. Broad intake still collapses into one oversized story with too few PO follow-up questions.
+4. Fresh-project teams want optional ID bootstrap (`US-0001` / `DEC-0001`).
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0018` (upgrade mode), `US-0019` (placeholder cleanup), `US-0041` (installer lifecycle QA), `US-0033` (guided intake behavior), `US-0046`/`US-0047` (bulk planning/execution).
+- Assessment:
+  - No direct duplicate for end-to-end clean-install hygiene + complete clean-repo coverage + starter neutrality policy.
+  - No direct duplicate for intake decomposition heuristics plus risk-aware questioning.
+  - No direct duplicate for explicit fresh-project ID namespace bootstrap.
+- Decision:
+  - Split into three stories (`US-0050`, `US-0051`, `US-0052`) to avoid one oversized mixed-scope intake.
+
+## Accepted stories
+
+### US-0050 — Clean Install Hygiene and Complete Clean-Repo Coverage
+- Priority: P1
+- Status: OPEN
+- Intent: deterministic fresh install without seeded history + deterministic complete cleanup of installer-owned artifacts.
+
+### US-0051 — Intelligent Intake Decomposition and Risk-Aware PO Questioning
+- Priority: P1
+- Status: OPEN
+- Intent: decompose broad intake into multiple focused stories and increase questioning depth based on scope/risk (not ambiguity only).
+
+### US-0052 — Optional Fresh-Project ID Namespace Bootstrap
+- Priority: P2
+- Status: OPEN
+- Intent: allow explicit bootstrap of IDs from 0001 in truly fresh repos while preserving highest-existing continuation for non-fresh repos.
+
+## Research reference
+
+- `R-0024`: starter/template hygiene, deterministic cleanup ownership, vertical-slice story splitting, and adaptive elicitation questioning patterns.
+
+## TL boundaries
+
+- In scope:
+  - installer cleanup ownership contract and parity across PS1/SH/PY.
+  - starter artifact neutralization policy for template docs.
+  - intake decomposition and adaptive PO questioning contracts.
+  - optional ID bootstrap with deterministic eligibility rules.
+  - regression coverage and active/template parity.
+- Out of scope:
+  - runtime product feature behavior changes.
+  - retroactive renumbering of existing project histories.
+  - bypassing existing release/decision-gate safety contracts.
+
+## Risks
+
+- Cleanup scope expansion could accidentally remove non-framework files if ownership rules are unclear.
+- Intake decomposition may over-split without bounded heuristics and explicit user approval.
+- Bootstrap ID mode could collide with existing repos if freshness detection is weak.
+
+## Recommendation
+
+1. Architecture first on `US-0050` (ownership manifest + cleanup safety + starter neutrality).
+2. Then `US-0051` (decomposition heuristics + risk-aware questioning with bounded prompts).
+3. Then `US-0052` (explicit bootstrap mode with deterministic fresh-repo detection).
+4. Ensure parity/regression checks are planned as first-class tasks in the same sprint sequence.
+
+## Next phase
+
+- Proceed to `/research` for `US-0050`, `US-0051`, and `US-0052` (or `/architecture` directly if research depth is considered sufficient via `R-0024`).

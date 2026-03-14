@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0036",
+  "story_ids": [
+    "US-0057"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Ownership contract distinguishes framework example from user local scratchpad."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Upgrade refreshes .cursor/scratchpad.local.example.md content."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "PS1/sh/py installers share parity behavior for scratchpad example handling."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Upgrade diagnostics include scratchpad example status and local-preserved signal."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Expanded example includes newer options including token and publish controls."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "User local overrides remain deterministic and conflict-free."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Lifecycle install/upgrade/clean tests continue to pass."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Active/template files are aligned for scratchpad and documentation contracts."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression tests include installer and CLI upgrade scratchpad drift scenarios."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "README/runbook now describe upgrade outcomes and troubleshooting guidance."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

@@ -1,0 +1,73 @@
+{
+  "sprint_id": "S0033",
+  "story_ids": [
+    "US-0054"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "result": "pass",
+      "notes": "Configurable publish-target contract documented in runbook and release command."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "result": "pass",
+      "notes": "Schema includes built-in target types and generic custom target."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "result": "pass",
+      "notes": "Schema includes SSH target with host/user/auth refs and remote command."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "result": "pass",
+      "notes": "Default publish mode is confirm and requires explicit operator approval."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "result": "pass",
+      "notes": "Release contract documents deterministic selection and ordering semantics."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "result": "pass",
+      "notes": "Fail-fast invalid-config reason codes are documented."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "result": "pass",
+      "notes": "Sensitive fields are env-reference based (tokenEnv/authEnv/hostEnv/userEnv)."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "result": "pass",
+      "notes": "Active/template parity confirmed for scratchpad, release command, runbook, README, and schema."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "result": "pass",
+      "notes": "Regression tests include US-0054 checks and pass in tests/report.md."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "result": "pass",
+      "notes": "Mandatory release gate chain remains unchanged and documented."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

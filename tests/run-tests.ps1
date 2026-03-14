@@ -62,7 +62,7 @@ Assert-True "Decisions folder exists" (Test-Path (Join-Path $tpl "decisions"))
 Assert-True "Workflows folder exists" (Test-Path (Join-Path $tpl ".github\workflows"))
 
 # 2) Command/rule counts
-Assert-True "22 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 22)
+Assert-True "23 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 23)
 Assert-True "5 rules exist" ((Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 5)
 Assert-True "7 agents exist" ((Count-Files (Join-Path $tpl ".cursor\agents") "*.mdc") -eq 7)
 
@@ -126,7 +126,14 @@ if (Test-Path $installer -PathType Leaf) {
   try {
     Invoke-Installer $installer @("-Target", $tempRoot, "-Mode", "missing", "-Create")
     $installed = Test-Path (Join-Path $tempRoot ".cursor\commands\intake.md")
+    $manifestInstalled = Test-Path (Join-Path $tempRoot "docs\engineering\context\installer-owned-paths.manifest")
+    $freshStatusReport = Join-Path $tempRoot "docs\engineering\status-normalization-report.md"
+    $freshResearch = Join-Path $tempRoot "docs\engineering\research.md"
     Assert-True "Installer (ps1) installs commands" $installed
+    Assert-True "Installer (ps1) installs ownership manifest" $manifestInstalled
+    Assert-True "Fresh install has neutral status-normalization report" (File-Contains $freshStatusReport "(none yet)")
+    Assert-True "Fresh install has no seeded status-normalization row" (-not (File-Contains $freshStatusReport "US-0018"))
+    Assert-True "Fresh install research has no hardcoded DEC-0011 reference" (-not (File-Contains $freshResearch "DEC-0011"))
   } catch {
     Assert-True "Installer (ps1) installs commands" $false $_.Exception.Message
   }
@@ -168,6 +175,10 @@ if (Test-Path $installer -PathType Leaf) {
 
     $frameworkFile = Join-Path $upgradeTemp ".cursor\commands\intake.md"
     Set-Content -Path $frameworkFile -Value "modified-framework"
+    $scratchpadExample = Join-Path $upgradeTemp ".cursor\scratchpad.local.example.md"
+    $scratchpadLocal = Join-Path $upgradeTemp ".cursor\scratchpad.local.md"
+    Set-Content -Path $scratchpadExample -Value "modified-local-example-marker"
+    Set-Content -Path $scratchpadLocal -Value "user-local-marker=keep"
 
     Invoke-Installer $installer @("-Target", $upgradeTemp, "-Mode", "upgrade")
 
@@ -176,6 +187,13 @@ if (Test-Path $installer -PathType Leaf) {
 
     $userPreserved = (Get-Content -Path $userFile -Raw) -match "My Custom Vision"
     Assert-True "Upgrade preserves user data" $userPreserved
+
+    $scratchpadExampleRefreshed = -not ((Get-Content -Path $scratchpadExample -Raw) -match "modified-local-example-marker") -and
+      (Get-Content -Path $scratchpadExample -Raw) -match "RELEASE_PUBLISH_MODE=confirm"
+    Assert-True "Upgrade refreshes scratchpad local example" $scratchpadExampleRefreshed
+
+    $scratchpadLocalPreserved = (Get-Content -Path $scratchpadLocal -Raw) -match "user-local-marker=keep"
+    Assert-True "Upgrade preserves user scratchpad local overrides" $scratchpadLocalPreserved
 
     $versionUpdated = (Test-Path $versionFile -PathType Leaf)
     Assert-True "Version file updated after upgrade" $versionUpdated
@@ -202,7 +220,14 @@ if (Test-Path $installer -PathType Leaf) {
 
     Invoke-Installer $installer @("-Target", $cleanTemp, "-CleanRepo", "-Yes")
 
-    $frameworkRemoved = -not (Test-Path (Join-Path $cleanTemp ".cursor") -PathType Container)
+    $frameworkRemoved = -not (Test-Path (Join-Path $cleanTemp ".cursor") -PathType Container) -and
+      -not (Test-Path (Join-Path $cleanTemp "docs\engineering") -PathType Container) -and
+      -not (Test-Path (Join-Path $cleanTemp "docs\user-guides") -PathType Container) -and
+      -not (Test-Path (Join-Path $cleanTemp "scripts\validate-and-push.ps1") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cleanTemp "scripts\validate-and-push.sh") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cleanTemp ".github\workflows\ci.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cleanTemp ".github\workflows\deploy.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cleanTemp ".its-magic-version") -PathType Leaf)
     $markerPreserved = Test-Path $markerFile -PathType Leaf
     Assert-True "Clean-repo removes framework artifacts (installer)" $frameworkRemoved
     Assert-True "Clean-repo preserves non-framework marker (installer)" $markerPreserved
@@ -225,6 +250,9 @@ if ((Test-Path $cli -PathType Leaf) -and $nodeCmd) {
     & node $cli --target $cliTemp --mode missing --create | Out-Null
     Assert-True "CLI missing install writes version file" (Test-Path (Join-Path $cliTemp ".its-magic-version") -PathType Leaf)
     Assert-True "CLI missing install writes command file" (Test-Path (Join-Path $cliTemp ".cursor\commands\intake.md") -PathType Leaf)
+    Assert-True "CLI missing install writes ownership manifest" (Test-Path (Join-Path $cliTemp "docs\engineering\context\installer-owned-paths.manifest") -PathType Leaf)
+    Assert-True "CLI missing install status-normalization report is neutral" (File-Contains (Join-Path $cliTemp "docs\engineering\status-normalization-report.md") "(none yet)")
+    Assert-True "CLI missing install research has no DEC-0011 reference" (-not (File-Contains (Join-Path $cliTemp "docs\engineering\research.md") "DEC-0011"))
 
     $cliFrameworkFile = Join-Path $cliTemp ".cursor\commands\intake.md"
     Set-Content -Path $cliFrameworkFile -Value "cli-overwrite-marker"
@@ -239,18 +267,34 @@ if ((Test-Path $cli -PathType Leaf) -and $nodeCmd) {
     $cliUserFile = Join-Path $cliTemp "docs\product\vision.md"
     Set-Content -Path $cliUserFile -Value "# CLI User Data Marker"
     Set-Content -Path $cliFrameworkFile -Value "cli-upgrade-framework-marker"
+    $cliScratchpadExample = Join-Path $cliTemp ".cursor\scratchpad.local.example.md"
+    $cliScratchpadLocal = Join-Path $cliTemp ".cursor\scratchpad.local.md"
+    Set-Content -Path $cliScratchpadExample -Value "cli-modified-local-example-marker"
+    Set-Content -Path $cliScratchpadLocal -Value "cli-local-marker=keep"
     & node $cli --target $cliTemp --mode upgrade | Out-Null
     $cliFrameworkRestored = -not ((Get-Content -Path $cliFrameworkFile -Raw) -match "cli-upgrade-framework-marker")
     $cliUserPreserved = (Get-Content -Path $cliUserFile -Raw) -match "CLI User Data Marker"
+    $cliScratchpadExampleRefreshed = -not ((Get-Content -Path $cliScratchpadExample -Raw) -match "cli-modified-local-example-marker") -and
+      (Get-Content -Path $cliScratchpadExample -Raw) -match "RELEASE_PUBLISH_MODE=confirm"
+    $cliScratchpadLocalPreserved = (Get-Content -Path $cliScratchpadLocal -Raw) -match "cli-local-marker=keep"
     Assert-True "CLI upgrade restores framework files" $cliFrameworkRestored
     Assert-True "CLI upgrade preserves user data" $cliUserPreserved
+    Assert-True "CLI upgrade refreshes scratchpad local example" $cliScratchpadExampleRefreshed
+    Assert-True "CLI upgrade preserves user scratchpad local overrides" $cliScratchpadLocalPreserved
 
     $markerDir = Join-Path $cliTemp "src"
     New-Item -ItemType Directory -Path $markerDir -Force | Out-Null
     $markerFile = Join-Path $markerDir "keep.txt"
     Set-Content -Path $markerFile -Value "cli-marker"
     & node $cli --clean-repo --target $cliTemp --yes | Out-Null
-    $cliFrameworkRemoved = -not (Test-Path (Join-Path $cliTemp ".cursor") -PathType Container)
+    $cliFrameworkRemoved = -not (Test-Path (Join-Path $cliTemp ".cursor") -PathType Container) -and
+      -not (Test-Path (Join-Path $cliTemp "docs\engineering") -PathType Container) -and
+      -not (Test-Path (Join-Path $cliTemp "docs\user-guides") -PathType Container) -and
+      -not (Test-Path (Join-Path $cliTemp "scripts\validate-and-push.ps1") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cliTemp "scripts\validate-and-push.sh") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cliTemp ".github\workflows\ci.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cliTemp ".github\workflows\deploy.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cliTemp ".its-magic-version") -PathType Leaf)
     $cliMarkerPreserved = Test-Path $markerFile -PathType Leaf
     Assert-True "CLI clean-repo removes framework artifacts" $cliFrameworkRemoved
     Assert-True "CLI clean-repo preserves non-framework marker" $cliMarkerPreserved
@@ -553,7 +597,7 @@ Assert-True "README documents canonical story status guard (template)" (File-Con
 Assert-True "status normalization report exists (active)" (Test-Path $statusReportActive -PathType Leaf)
 Assert-True "status normalization report exists (template)" (Test-Path $statusReportTemplate -PathType Leaf)
 Assert-True "status normalization report contains baseline row (active)" (File-Contains $statusReportActive "US-0018")
-Assert-True "status normalization report contains baseline row (template)" (File-Contains $statusReportTemplate "US-0018")
+Assert-True "status normalization report template is neutral" (File-Contains $statusReportTemplate "(none yet)")
 
 # 21) Guided intake mode checks (US-0033)
 $intakeActive = Join-Path $root ".cursor\commands\intake.md"
@@ -578,9 +622,165 @@ Assert-True "runbook documents guided intake mode (template)" (File-Contains $ru
 Assert-True "README documents guided intake behavior (active)" (File-Contains $readmeActive "Guided intake behavior (US-0033)")
 Assert-True "README documents guided intake behavior (template)" (File-Contains $readmeTemplate "Guided intake behavior (US-0033)")
 
-# 22) Optional cross-repo observability checks (US-0034)
+# 21b) Intake decomposition + risk-aware questioning checks (US-0051)
+Assert-True "intake command documents deterministic decomposition evaluator (active)" (File-Contains $intakeActive "deterministic decomposition evaluator")
+Assert-True "intake command documents deterministic decomposition evaluator (template)" (File-Contains $intakeTemplate "deterministic decomposition evaluator")
+Assert-True "intake command preserves accept/merge/adjust user control (active)" (File-Contains $intakeActive "accept**, **merge**, or **adjust")
+Assert-True "intake command preserves accept/merge/adjust user control (template)" (File-Contains $intakeTemplate "accept**, **merge**, or **adjust")
+Assert-True "intake command documents bounded questioning (active)" (File-Contains $intakeActive "Keep questioning bounded")
+Assert-True "intake command documents bounded questioning (template)" (File-Contains $intakeTemplate "Keep questioning bounded")
+Assert-True "intake low-touch keeps no forced decomposition (active)" (File-Contains $intakeActive "single-story default (no forced decomposition)")
+Assert-True "intake low-touch keeps no forced decomposition (template)" (File-Contains $intakeTemplate "single-story default (no forced decomposition)")
+
+Assert-True "PO agent documents decomposition evaluator (active)" (File-Contains $poAgentActive "deterministic decomposition evaluator")
+Assert-True "PO agent documents decomposition evaluator (template)" (File-Contains $poAgentTemplate "deterministic decomposition evaluator")
+Assert-True "PO agent documents risk-triggered questioning (active)" (File-Contains $poAgentActive "breadth/risk is high")
+Assert-True "PO agent documents risk-triggered questioning (template)" (File-Contains $poAgentTemplate "breadth/risk is high")
+Assert-True "PO agent keeps low-touch single-story default (active)" (File-Contains $poAgentActive "single-story default unless user explicitly requests decomposition")
+Assert-True "PO agent keeps low-touch single-story default (template)" (File-Contains $poAgentTemplate "single-story default unless user explicitly requests decomposition")
+
+Assert-True "runbook documents intake decomposition and risk-aware questioning (active)" (File-Contains $runbookActive "Intake decomposition and risk-aware questioning (US-0051)")
+Assert-True "runbook documents intake decomposition and risk-aware questioning (template)" (File-Contains $runbookTemplate "Intake decomposition and risk-aware questioning (US-0051)")
+Assert-True "README documents intake decomposition and risk-aware questioning (active)" (File-Contains $readmeActive "Intake decomposition + risk-aware questioning (US-0051)")
+Assert-True "README documents intake decomposition and risk-aware questioning (template)" (File-Contains $readmeTemplate "Intake decomposition + risk-aware questioning (US-0051)")
+
+# 21c) Optional ID namespace bootstrap checks (US-0052)
+$researchActive = Join-Path $root ".cursor\commands\research.md"
+$researchTemplate = Join-Path $tpl ".cursor\commands\research.md"
 $architectureCommandActive = Join-Path $root ".cursor\commands\architecture.md"
 $architectureCommandTemplate = Join-Path $tpl ".cursor\commands\architecture.md"
+$tlAgentActive = Join-Path $root ".cursor\agents\tech-lead.mdc"
+$tlAgentTemplate = Join-Path $tpl ".cursor\agents\tech-lead.mdc"
+
+Assert-True "scratchpad includes ID_NAMESPACE_BOOTSTRAP (active)" (File-Contains $scratchpadActive "ID_NAMESPACE_BOOTSTRAP")
+Assert-True "scratchpad includes ID_NAMESPACE_BOOTSTRAP (template)" (File-Contains $scratchpadTemplate "ID_NAMESPACE_BOOTSTRAP")
+Assert-True "intake command documents optional ID bootstrap (active)" (File-Contains $intakeActive "Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034)")
+Assert-True "intake command documents optional ID bootstrap (template)" (File-Contains $intakeTemplate "Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034)")
+Assert-True "intake command includes ineligible bootstrap diagnostic (active)" (File-Contains $intakeActive "ID_BOOTSTRAP_NOT_FRESH")
+Assert-True "intake command includes ineligible bootstrap diagnostic (template)" (File-Contains $intakeTemplate "ID_BOOTSTRAP_NOT_FRESH")
+Assert-True "research command documents bootstrap-aware ID policy (active)" (File-Contains $researchActive "ID_NAMESPACE_BOOTSTRAP=1")
+Assert-True "research command documents bootstrap-aware ID policy (template)" (File-Contains $researchTemplate "ID_NAMESPACE_BOOTSTRAP=1")
+Assert-True "architecture command documents DEC bootstrap policy (active)" (File-Contains $architectureCommandActive "DEC-0001")
+Assert-True "architecture command documents DEC bootstrap policy (template)" (File-Contains $architectureCommandTemplate "DEC-0001")
+Assert-True "PO agent documents story ID bootstrap policy (active)" (File-Contains $poAgentActive "Story ID policy (US-0052 / DEC-0034)")
+Assert-True "PO agent documents story ID bootstrap policy (template)" (File-Contains $poAgentTemplate "Story ID policy (US-0052 / DEC-0034)")
+Assert-True "Tech Lead agent documents decision ID bootstrap policy (active)" (File-Contains $tlAgentActive "Decision ID policy (US-0052 / DEC-0034)")
+Assert-True "Tech Lead agent documents decision ID bootstrap policy (template)" (File-Contains $tlAgentTemplate "Decision ID policy (US-0052 / DEC-0034)")
+Assert-True "runbook documents optional ID namespace bootstrap (active)" (File-Contains $runbookActive "Optional ID namespace bootstrap (US-0052)")
+Assert-True "runbook documents optional ID namespace bootstrap (template)" (File-Contains $runbookTemplate "Optional ID namespace bootstrap (US-0052)")
+Assert-True "README documents optional ID namespace bootstrap (active)" (File-Contains $readmeActive "Optional ID namespace bootstrap (US-0052)")
+Assert-True "README documents optional ID namespace bootstrap (template)" (File-Contains $readmeTemplate "Optional ID namespace bootstrap (US-0052)")
+
+# 21d) Context compaction and token profile checks (US-0053)
+$askCommandActive = Join-Path $root ".cursor\commands\ask.md"
+$askCommandTemplate = Join-Path $tpl ".cursor\commands\ask.md"
+$stateArchiveReadmeActive = Join-Path $root "docs\engineering\state-archive\README.md"
+$stateArchiveReadmeTemplate = Join-Path $tpl "docs\engineering\state-archive\README.md"
+$stateActive = Join-Path $root "docs\engineering\state.md"
+$stateTemplate = Join-Path $tpl "docs\engineering\state.md"
+$decisionsIndexActive = Join-Path $root "docs\engineering\decisions.md"
+$decisionsIndexTemplate = Join-Path $tpl "docs\engineering\decisions.md"
+
+Assert-True "scratchpad includes TOKEN_PROFILE (active)" (File-Contains $scratchpadActive "TOKEN_PROFILE=balanced")
+Assert-True "scratchpad includes TOKEN_PROFILE (template)" (File-Contains $scratchpadTemplate "TOKEN_PROFILE=balanced")
+Assert-True "scratchpad documents manual override precedence (active)" (File-Contains $scratchpadActive "Manual-override precedence")
+Assert-True "scratchpad documents manual override precedence (template)" (File-Contains $scratchpadTemplate "Manual-override precedence")
+Assert-True "runbook documents context compaction and token profile mode (active)" (File-Contains $runbookActive "Context compaction and token profile mode (US-0053 / DEC-0035)")
+Assert-True "runbook documents context compaction and token profile mode (template)" (File-Contains $runbookTemplate "Context compaction and token profile mode (US-0053 / DEC-0035)")
+Assert-True "README documents context compaction and tiered token profile (active)" (File-Contains $readmeActive "Context compaction + tiered token profile (US-0053)")
+Assert-True "README documents context compaction and tiered token profile (template)" (File-Contains $readmeTemplate "Context compaction + tiered token profile (US-0053)")
+Assert-True "ask command documents narrow-read policy (active)" (File-Contains $askCommandActive "Apply narrow-read retrieval policy (US-0053)")
+Assert-True "ask command documents narrow-read policy (template)" (File-Contains $askCommandTemplate "Apply narrow-read retrieval policy (US-0053)")
+Assert-True "state documents active context surface policy (active)" (File-Contains $stateActive "Active context surface (US-0053 / DEC-0035)")
+Assert-True "state template documents active context surface policy" (File-Contains $stateTemplate "Active context surface (US-0053 / DEC-0035)")
+Assert-True "state archive README exists (active)" (Test-Path $stateArchiveReadmeActive -PathType Leaf)
+Assert-True "state archive README exists (template)" (Test-Path $stateArchiveReadmeTemplate -PathType Leaf)
+Assert-True "decisions index is compacted (active)" (File-Contains $decisionsIndexActive "Compact decision index (bounded summaries)")
+Assert-True "decisions index includes canonical full records pointer (active)" (File-Contains $decisionsIndexActive "Full records live in decisions/DEC-xxxx.md")
+Assert-True "decisions index includes canonical full records pointer (template)" (File-Contains $decisionsIndexTemplate "Full records live in decisions/DEC-xxxx.md")
+Assert-True "release gate chain remains documented (active)" (File-Contains $releaseCommandActive "Release gate chain (US-0039 / DEC-0019)")
+Assert-True "release gate chain remains documented (template)" (File-Contains $releaseCommandTemplate "Release gate chain (US-0039 / DEC-0019)")
+
+# 21e) Configurable multi-target publish checks (US-0054)
+$releaseTargetsActive = Join-Path $root "docs\engineering\release-targets.json"
+$releaseTargetsTemplate = Join-Path $tpl "docs\engineering\release-targets.json"
+
+Assert-True "scratchpad includes RELEASE_PUBLISH_MODE (active)" (File-Contains $scratchpadActive "RELEASE_PUBLISH_MODE=confirm")
+Assert-True "scratchpad includes RELEASE_PUBLISH_MODE (template)" (File-Contains $scratchpadTemplate "RELEASE_PUBLISH_MODE=confirm")
+Assert-True "scratchpad includes RELEASE_TARGETS_FILE (active)" (File-Contains $scratchpadActive "RELEASE_TARGETS_FILE=docs/engineering/release-targets.json")
+Assert-True "scratchpad includes RELEASE_TARGETS_FILE (template)" (File-Contains $scratchpadTemplate "RELEASE_TARGETS_FILE=docs/engineering/release-targets.json")
+Assert-True "runbook documents configurable multi-target publish mode (active)" (File-Contains $runbookActive "Configurable multi-target publish mode (US-0054 / DEC-0036)")
+Assert-True "runbook documents configurable multi-target publish mode (template)" (File-Contains $runbookTemplate "Configurable multi-target publish mode (US-0054 / DEC-0036)")
+Assert-True "README documents configurable multi-target publish mode (active)" (File-Contains $readmeActive "Configurable multi-target publish + confirmation gate (US-0054)")
+Assert-True "README documents configurable multi-target publish mode (template)" (File-Contains $readmeTemplate "Configurable multi-target publish + confirmation gate (US-0054)")
+Assert-True "release command includes configurable publish target section (active)" (File-Contains $releaseCommandActive "Optional configurable publish targets (US-0054 / DEC-0036)")
+Assert-True "release command includes configurable publish target section (template)" (File-Contains $releaseCommandTemplate "Optional configurable publish targets (US-0054 / DEC-0036)")
+Assert-True "release command includes publish config invalid reason code (active)" (File-Contains $releaseCommandActive "PUBLISH_TARGET_CONFIG_INVALID")
+Assert-True "release command includes publish config invalid reason code (template)" (File-Contains $releaseCommandTemplate "PUBLISH_TARGET_CONFIG_INVALID")
+Assert-True "release targets schema file exists (active)" (Test-Path $releaseTargetsActive -PathType Leaf)
+Assert-True "release targets schema file exists (template)" (Test-Path $releaseTargetsTemplate -PathType Leaf)
+Assert-True "release targets schema includes custom target type (active)" (File-Contains $releaseTargetsActive '"type": "custom"')
+Assert-True "release targets schema includes ssh target type (active)" (File-Contains $releaseTargetsActive '"type": "ssh"')
+Assert-True "release targets schema includes ssh target type (template)" (File-Contains $releaseTargetsTemplate '"type": "ssh"')
+
+# 21f) Deterministic status reconciliation checks (US-0055)
+$statusReconcileCommandActive = Join-Path $root ".cursor\commands\status-reconcile.md"
+$statusReconcileCommandTemplate = Join-Path $tpl ".cursor\commands\status-reconcile.md"
+
+Assert-True "status-reconcile command exists (active)" (Test-Path $statusReconcileCommandActive -PathType Leaf)
+Assert-True "status-reconcile command exists (template)" (Test-Path $statusReconcileCommandTemplate -PathType Leaf)
+Assert-True "status-reconcile command defines canonical precedence (active)" (File-Contains $statusReconcileCommandActive "Canonical precedence (US-0045 / DEC-0025)")
+Assert-True "status-reconcile command defines canonical precedence (template)" (File-Contains $statusReconcileCommandTemplate "Canonical precedence (US-0045 / DEC-0025)")
+Assert-True "status-reconcile command includes deterministic reason code STATUS_RECONCILE_APPLIED (active)" (File-Contains $statusReconcileCommandActive "STATUS_RECONCILE_APPLIED")
+Assert-True "status-reconcile command includes deterministic reason code STATUS_RECONCILE_APPLIED (template)" (File-Contains $statusReconcileCommandTemplate "STATUS_RECONCILE_APPLIED")
+Assert-True "runbook documents deterministic status reconciliation mode (active)" (File-Contains $runbookActive "Deterministic status reconciliation mode (US-0055 / DEC-0037)")
+Assert-True "runbook documents deterministic status reconciliation mode (template)" (File-Contains $runbookTemplate "Deterministic status reconciliation mode (US-0055 / DEC-0037)")
+Assert-True "README documents deterministic status reconciliation command (active)" (File-Contains $readmeActive "Deterministic status reconciliation command (US-0055)")
+Assert-True "README documents deterministic status reconciliation command (template)" (File-Contains $readmeTemplate "Deterministic status reconciliation command (US-0055)")
+
+# 21g) Upgrade-safe scratchpad example checks (US-0057)
+$scratchpadLocalExampleActive = Join-Path $root ".cursor\scratchpad.local.example.md"
+$scratchpadLocalExampleTemplate = Join-Path $tpl ".cursor\scratchpad.local.example.md"
+
+Assert-True "scratchpad local example exists (active)" (Test-Path $scratchpadLocalExampleActive -PathType Leaf)
+Assert-True "scratchpad local example exists (template)" (Test-Path $scratchpadLocalExampleTemplate -PathType Leaf)
+Assert-True "scratchpad local example includes token profile override (active)" (File-Contains $scratchpadLocalExampleActive "TOKEN_PROFILE=balanced")
+Assert-True "scratchpad local example includes detailed core behavior descriptions (active)" (File-Contains $scratchpadLocalExampleActive "- MAGIC_CONTEXT_STRICT: 0|1")
+Assert-True "scratchpad local example includes detailed automation descriptions (template)" (File-Contains $scratchpadLocalExampleTemplate "- AUTO_FLOW_MODE: manual|auto_until_decision")
+Assert-True "scratchpad local example includes release publish mode override (active)" (File-Contains $scratchpadLocalExampleActive "RELEASE_PUBLISH_MODE=confirm")
+Assert-True "scratchpad local example includes release publish mode override (template)" (File-Contains $scratchpadLocalExampleTemplate "RELEASE_PUBLISH_MODE=confirm")
+Assert-True "runbook documents scratchpad upgrade contract (active)" (File-Contains $runbookActive "Scratchpad example upgrade contract (US-0057 / DEC-0039)")
+Assert-True "runbook documents scratchpad upgrade contract (template)" (File-Contains $runbookTemplate "Scratchpad example upgrade contract (US-0057 / DEC-0039)")
+Assert-True "README documents scratchpad upgrade behavior (active)" (File-Contains $readmeActive "Upgrade behavior (US-0057):")
+Assert-True "README documents scratchpad upgrade behavior (template)" (File-Contains $readmeTemplate "Upgrade behavior (US-0057):")
+
+# 21h) Deterministic artifact ordering checks (US-0058)
+$autoCmdActiveUs0058 = Join-Path $root ".cursor\commands\auto.md"
+$autoCmdTemplateUs0058 = Join-Path $tpl ".cursor\commands\auto.md"
+$artifactOrderingPolicyActive = Join-Path $root "docs\engineering\artifact-ordering-policy.md"
+$artifactOrderingPolicyTemplate = Join-Path $tpl "docs\engineering\artifact-ordering-policy.md"
+
+Assert-True "artifact ordering policy exists (active)" (Test-Path $artifactOrderingPolicyActive -PathType Leaf)
+Assert-True "artifact ordering policy exists (template)" (Test-Path $artifactOrderingPolicyTemplate -PathType Leaf)
+Assert-True "artifact ordering policy defines state append-bottom (active)" (File-Contains $artifactOrderingPolicyActive "docs/engineering/state.md")
+Assert-True "artifact ordering policy defines backlog sorted-canonical (active)" (File-Contains $artifactOrderingPolicyActive "sorted-canonical")
+Assert-True "artifact ordering policy includes anchor ambiguous reason code (active)" (File-Contains $artifactOrderingPolicyActive "ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS")
+Assert-True "auto command includes ordering guard (active)" (File-Contains $autoCmdActiveUs0058 "Deterministic artifact ordering guard (US-0058 / DEC-0040)")
+Assert-True "auto command includes ordering guard (template)" (File-Contains $autoCmdTemplateUs0058 "Deterministic artifact ordering guard (US-0058 / DEC-0040)")
+Assert-True "intake command includes ordering contract (active)" (File-Contains $intakeActive "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "intake command includes ordering contract (template)" (File-Contains $intakeTemplate "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "release command includes ordering contract (active)" (File-Contains $releaseCommandActive "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "release command includes ordering contract (template)" (File-Contains $releaseCommandTemplate "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "refresh-context includes ordering contract (active)" (File-Contains (Join-Path $root ".cursor\commands\refresh-context.md") "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "refresh-context includes ordering contract (template)" (File-Contains (Join-Path $tpl ".cursor\commands\refresh-context.md") "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "status-reconcile includes ordering contract (active)" (File-Contains $statusReconcileCommandActive "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "status-reconcile includes ordering contract (template)" (File-Contains $statusReconcileCommandTemplate "Deterministic artifact ordering contract (US-0058 / DEC-0040)")
+Assert-True "runbook documents deterministic artifact ordering mode (active)" (File-Contains $runbookActive "Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)")
+Assert-True "runbook documents deterministic artifact ordering mode (template)" (File-Contains $runbookTemplate "Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)")
+Assert-True "README documents deterministic ordering behavior (active)" (File-Contains $readmeActive "Deterministic ordering behavior (US-0058):")
+Assert-True "README documents deterministic ordering behavior (template)" (File-Contains $readmeTemplate "Deterministic ordering behavior (US-0058):")
+
+# 22) Optional cross-repo observability checks (US-0034)
 $qaCommandActive = Join-Path $root ".cursor\commands\qa.md"
 $qaCommandTemplate = Join-Path $tpl ".cursor\commands\qa.md"
 $compatReportActive = Join-Path $root "docs\engineering\compatibility-report.md"
@@ -753,6 +953,26 @@ Assert-True "README documents per-phase isolation evidence (template)" (File-Con
 
 Assert-True "dev agent documents isolation evidence (active)" (File-Contains (Join-Path $root ".cursor\agents\dev.mdc") "Isolation evidence (US-0048 / DEC-0029)")
 Assert-True "dev agent documents isolation evidence (template)" (File-Contains (Join-Path $tpl ".cursor\agents\dev.mdc") "Isolation evidence (US-0048 / DEC-0029)")
+
+# 26b) Strict runtime proof checks (US-0056)
+Assert-True "auto documents strict runtime proof section (active)" (File-Contains $autoActive "Strict runtime proof enforcement (US-0056 / DEC-0038)")
+Assert-True "auto documents strict runtime proof section (template)" (File-Contains $autoTemplate "Strict runtime proof enforcement (US-0056 / DEC-0038)")
+Assert-True "auto includes runtime proof reason RUNTIME_PROOF_REUSED (active)" (File-Contains $autoActive "RUNTIME_PROOF_REUSED")
+Assert-True "auto includes runtime proof reason RUNTIME_PROOF_REUSED (template)" (File-Contains $autoTemplate "RUNTIME_PROOF_REUSED")
+Assert-True "auto includes strict-proof boundary step 11b (active)" (File-Contains $autoActive "11b. At each phase boundary, verify strict runtime attestation tuple exists")
+Assert-True "auto includes strict-proof boundary step 11b (template)" (File-Contains $autoTemplate "11b. At each phase boundary, verify strict runtime attestation tuple exists")
+
+Assert-True "verify-work documents strict runtime proof gate (active)" (File-Contains $verifyWorkActive "Strict runtime proof gate (US-0056 / DEC-0038)")
+Assert-True "verify-work documents strict runtime proof gate (template)" (File-Contains $verifyWorkTemplate "Strict runtime proof gate (US-0056 / DEC-0038)")
+Assert-True "release includes strict runtime proof gate (active)" (File-Contains $releaseCommandActive "Strict runtime proof gate (US-0056 / DEC-0038)")
+Assert-True "release includes strict runtime proof gate (template)" (File-Contains $releaseCommandTemplate "Strict runtime proof gate (US-0056 / DEC-0038)")
+Assert-True "release includes runtime proof reason code RUNTIME_PROOF_MISSING (active)" (File-Contains $releaseCommandActive "RUNTIME_PROOF_MISSING")
+Assert-True "release includes runtime proof reason code RUNTIME_PROOF_MISSING (template)" (File-Contains $releaseCommandTemplate "RUNTIME_PROOF_MISSING")
+
+Assert-True "runbook documents strict runtime proof contract (active)" (File-Contains $runbookActive "Strict runtime proof contract (US-0056 / DEC-0038)")
+Assert-True "runbook documents strict runtime proof contract (template)" (File-Contains $runbookTemplate "Strict runtime proof contract (US-0056 / DEC-0038)")
+Assert-True "README documents strict runtime proof section (active)" (File-Contains $readmeActive "Strict runtime proof (US-0056 / DEC-0038)")
+Assert-True "README documents strict runtime proof section (template)" (File-Contains $readmeTemplate "Strict runtime proof (US-0056 / DEC-0038)")
 
 # 27) Legacy DONE-story drift detection and guard (US-0049)
 $legacyAuditActive = Join-Path $root "docs\engineering\legacy-drift-audit.md"

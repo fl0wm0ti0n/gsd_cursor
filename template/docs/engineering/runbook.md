@@ -49,6 +49,155 @@ Intake interaction behavior is controlled by one switch in
   - no proactive follow-up/options/research overhead unless user asks
   - duplicate/overlap backlog check remains mandatory baseline safety
 
+## Intake decomposition and risk-aware questioning (US-0051)
+
+When guided mode is enabled (`INTAKE_GUIDED_MODE=1`), intake adds bounded
+decomposition and adaptive questioning behavior:
+
+- Run deterministic breadth/risk heuristics before persisting a story:
+  - feature/workflow-step count
+  - cross-cutting impact surface
+  - acceptance breadth
+  - risk/unknown dependency surface
+- If heuristics indicate broad/high-risk intake:
+  - propose bounded multi-story decomposition (typically 2-5 stories)
+  - prefer vertical-slice/workflow-step stories with independent user value
+  - avoid technical-layer-only splits unless user explicitly requests
+- Preserve user authority explicitly before persistence:
+  - user can accept, merge, or adjust the proposed split
+- Keep adaptive questioning concise and bounded:
+  - ask ambiguity-driven questions plus risk-triggered questions
+  - stop after bounded rounds or when acceptance confidence is sufficient
+- Low-touch compatibility (`INTAKE_GUIDED_MODE=0`):
+  - no forced decomposition
+  - single-story default unless user explicitly asks for decomposition
+  - duplicate/overlap safety remains mandatory
+- Traceability requirement:
+  - intake output must capture decomposition/questioning evidence in
+    `docs/product/backlog.md`, `docs/product/acceptance.md`, and
+    `handoffs/po_to_tl.md`.
+
+## Optional ID namespace bootstrap (US-0052)
+
+Fresh-project ID bootstrap is optional and default-off in
+`.cursor/scratchpad.md`:
+
+- `ID_NAMESPACE_BOOTSTRAP=0|1` (default `0`)
+
+Deterministic behavior:
+
+- If `ID_NAMESPACE_BOOTSTRAP=1`, evaluate freshness eligibility before creating
+  new IDs:
+  - no `US-` IDs in `docs/product/backlog.md`
+  - no `DEC-` IDs in `docs/engineering/decisions.md` (and no existing
+    `decisions/DEC-*.md`)
+  - no `R-` IDs in `docs/engineering/research.md`
+- If eligible, first created IDs start at:
+  - `US-0001` for intake stories
+  - `DEC-0001` for architecture decisions
+  - `R-0001` for research entries
+- If not eligible (or mode is off), continue from highest existing ID in each
+  namespace.
+- Never rewrite/renumber historical IDs.
+- If bootstrap is requested but ineligible, emit deterministic diagnostic
+  `ID_BOOTSTRAP_NOT_FRESH` and continue with highest-existing continuation.
+
+## Context compaction and token profile mode (US-0053 / DEC-0035)
+
+Tiered token-cost control is explicit and defaulted in `.cursor/scratchpad.md`:
+
+- `TOKEN_PROFILE=lean|balanced|full` (default `balanced`)
+
+Deterministic profile semantics:
+
+- `lean`: reduce non-critical overhead defaults (for example aggressive research,
+  autonomous loops, broad-context retrieval), while preserving mandatory
+  quality/release gates.
+- `balanced`: preserve current capability profile with moderate overhead.
+- `full`: maximize context breadth and autonomy for complex/high-uncertainty work.
+
+Manual override precedence:
+
+- Explicit flag values remain authoritative for that flag.
+- If a flag is explicitly set, it overrides profile defaults.
+- Profile changes must not disable mandatory gate contracts
+  (`/qa`, `/verify-work`, `/release`).
+
+Context compaction policy:
+
+- `docs/engineering/state.md` is a compact hot surface for current execution
+  context and recent checkpoints.
+- Historical state packs belong in `docs/engineering/state-archive/` and are
+  append-only/non-destructive.
+- `docs/engineering/decisions.md` is a compact index with bounded summaries and
+  canonical links to full records in `decisions/DEC-xxxx.md`.
+
+`/ask` retrieval policy:
+
+- Use question-scoped narrow reads first.
+- Expand context in bounded steps only when unresolved.
+- If unresolved after bounded expansion, answer with explicit "not found in
+  current artifacts" rather than broad speculative reads.
+
+## Configurable multi-target publish mode (US-0054 / DEC-0036)
+
+Post-release publish orchestration is configurable and default-safe:
+
+- `RELEASE_PUBLISH_MODE=disabled|confirm|auto` (default `confirm`)
+- `RELEASE_TARGETS_FILE=docs/engineering/release-targets.json`
+- `RELEASE_TARGETS_DEFAULT=` optional comma-separated default target IDs
+
+Target schema contract:
+
+- Canonical target config file: `docs/engineering/release-targets.json`
+- Supported target types:
+  - `npm`, `choco`, `brew`, `git`, `docker`, `cloud`
+  - `custom` (generic command target)
+  - `ssh` (host/user/port/auth reference + remote command)
+- Each target entry must define deterministic fields:
+  - `id` (stable unique target ID)
+  - `type`
+  - `enabled` (`true|false`)
+  - `order` (deterministic execution ordering)
+  - execution details (`command` for non-ssh, `remoteCommand` + host/user/auth refs for `ssh`)
+
+Safety contract:
+
+- Mandatory release gates remain unchanged and must pass before any publish
+  target execution.
+- `confirm` mode requires explicit operator approval before publish execution.
+- Sensitive fields must be env-referenced (`*Env` keys); inline secret literals
+  are not allowed.
+- Invalid target config must fail fast with deterministic diagnostics and no
+  partial side effects.
+
+## Deterministic status reconciliation mode (US-0055 / DEC-0037)
+
+Use the dedicated reconciliation command to normalize status drift across
+canonical and derived artifacts:
+
+- Command: `/status-reconcile`
+- Canonical source: `docs/product/backlog.md` (story `Status`)
+- Derived surfaces: `docs/product/acceptance.md`, `docs/engineering/state.md`,
+  `handoffs/resume_brief.md`
+
+Deterministic behavior:
+
+- Detects mismatches (for example DONE + unchecked ACs, acceptance drift, resume drift).
+- Applies target-scoped reconciliation only to mismatched story blocks/rows.
+- Preserves canonical ownership; derived artifacts reconcile to backlog status.
+- Updates `handoffs/resume_brief.md` to next OPEN story and intended phase.
+- Writes auditable rows to `docs/engineering/status-normalization-report.md`.
+
+Reason-code baseline:
+
+- `STATUS_RECONCILE_APPLIED`
+- `STATUS_RECONCILE_NOOP`
+- `STATUS_RECONCILE_MISSING_INPUT`
+- `STATUS_RECONCILE_CANONICAL_CONFLICT`
+- `STATUS_RECONCILE_PHASE_AMBIGUOUS`
+- `STATUS_RECONCILE_EVIDENCE_MISSING`
+
 ## Optional cross-repo observability mode (US-0034)
 
 Compatibility visibility is optional and default-off in `.cursor/scratchpad.md`:
@@ -373,6 +522,37 @@ and write new isolation evidence before proceeding.
   revert unsafe artifacts if needed, rerun the phase correctly, and ensure
   orchestration-only behavior.
 
+## Strict runtime proof contract (US-0056 / DEC-0038)
+
+Strict runtime proof augments artifact-level isolation evidence. `/auto`,
+`/verify-work`, and `/release` must validate runtime attestation tuples at phase
+boundaries before continuation/finalization.
+
+Required runtime attestation tuple fields:
+
+- `orchestrator_run_id`
+- `runtime_proof_id` (unique per phase run)
+- `phase_id`
+- `role`
+- `proof_issued_at` (ISO UTC / RFC3339)
+- `proof_ttl_seconds`
+- `proof_hash`
+
+Deterministic fail-closed reason codes:
+
+- `RUNTIME_PROOF_MISSING`
+- `RUNTIME_PROOF_INVALID`
+- `RUNTIME_PROOF_REUSED`
+- `RUNTIME_PROOF_STALE`
+- `RUNTIME_PROOF_AMBIGUOUS_LINK`
+
+Boundary behavior:
+
+- Missing/invalid/reused/stale/ambiguous runtime proof blocks progression.
+- Release finalization must consume strict runtime proof in addition to existing
+  isolation evidence checks.
+- Pause/resume provenance must reference latest valid strict-proof boundary.
+
 ## Optional backlog-drain auto mode (US-0044)
 
 `/auto` can optionally continue across multiple planned stories when explicitly
@@ -623,10 +803,39 @@ Use this matrix to validate end-to-end installer/CLI lifecycle behavior:
 |---|---|---|---|
 | Fresh install (`missing`) | `its-magic --mode missing --create` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Required files exist + `.its-magic-version` exists |
 | Overwrite + backup | `its-magic --mode overwrite --backup` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Backup snapshot contains overwritten framework file |
-| Upgrade lifecycle | `its-magic --mode upgrade` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local tests | Framework file restored, user-data file preserved |
+| Upgrade lifecycle | `its-magic --mode upgrade` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local tests | Framework file restored, scratchpad example refreshed, user local scratchpad preserved |
 | Clean-repo safety | `its-magic --clean-repo --yes` and direct installer clean path | `tests/run-tests.ps1`, `tests/run-tests.sh`, CI lifecycle subset | Framework artifacts removed, non-framework marker preserved |
 | Negative path | invalid mode/args | `tests/run-tests.ps1`, `tests/run-tests.sh` | Deterministic non-zero fail-fast behavior |
 | Platform parity subset | npm/brew/choco CI jobs | `.github/workflows/ci.yml` | Lifecycle subset passes on all three runners |
+
+## Scratchpad example upgrade contract (US-0057 / DEC-0039)
+
+`its-magic --mode upgrade` treats `.cursor/scratchpad.local.example.md` as
+framework-owned and `.cursor/scratchpad.local.md` as user-owned.
+
+Expected deterministic outcome:
+- Framework-owned example is refreshed to latest release contract.
+- User local scratchpad remains preserved without overwrite.
+- Installer output reports scratchpad example refresh status
+  (`added|updated|unchanged`) and preservation signal for user local file.
+
+## Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)
+
+Canonical policy source:
+- `docs/engineering/artifact-ordering-policy.md`
+
+Required write discipline:
+- `docs/engineering/state.md`: append-bottom checkpoint writes only.
+- `docs/product/backlog.md`: sorted-canonical story ordering by numeric `US-xxxx`.
+- `docs/product/acceptance.md`: sorted-canonical row ordering aligned to backlog.
+- Handoff surfaces use explicit policy (`prepend-top` or `append-bottom`) per
+  matrix and command contract.
+
+Fail-safe contract:
+- Missing/ambiguous placement anchors fail closed with
+  `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`.
+- No partial mutation on fail-safe path.
+- Re-run without semantic changes must be ordering-idempotent.
 
 Execution guidance:
 - Local baseline: run `sh tests/run-tests.sh` (or `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1`).

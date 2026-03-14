@@ -1,0 +1,35 @@
+# its-magic installer ownership manifest
+# Sections are line-based path lists.
+
+[install_include_paths]
+.cursor/commands
+.cursor/rules
+.cursor/skills
+.cursor/agents
+.cursor/hooks
+.cursor/hooks.json
+.cursor/scratchpad.md
+.cursor/scratchpad.local.example.md
+docs
+sprints
+handoffs
+decisions
+scripts/validate-and-push.ps1
+scripts/validate-and-push.sh
+.github/workflows
+README.md
+.its-magic-version
+
+[clean_paths]
+.cursor
+docs/product
+docs/engineering
+docs/user-guides
+sprints
+handoffs
+decisions
+scripts/validate-and-push.ps1
+scripts/validate-and-push.sh
+.github/workflows/ci.yml
+.github/workflows/deploy.yml
+.its-magic-version

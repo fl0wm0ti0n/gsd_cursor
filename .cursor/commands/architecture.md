@@ -35,12 +35,26 @@ description: "its-magic architecture: define approach, risks, and decisions."
 
 ## Steps
 1. Challenge:
-   a. If `EARLY_RESEARCH=1` in `.cursor/scratchpad.md`, search for technical references (framework docs, pattern comparisons, benchmarks, security considerations) and persist as an R-xxxx entry in `docs/engineering/research.md` (auto-increment ID, per DEC-0011).
+   a. If `EARLY_RESEARCH=1` in `.cursor/scratchpad.md`, search for technical
+      references (framework docs, pattern comparisons, benchmarks, security
+      considerations) and persist as an R-xxxx entry in
+      `docs/engineering/research.md` using deterministic ID policy:
+      - if `ID_NAMESPACE_BOOTSTRAP=1` and freshness checks pass (no `US-` in
+        backlog, no `DEC-` in decisions, no `R-` in research), start at
+        `R-0001`,
+      - otherwise continue from highest existing `R-` ID.
+      Never rewrite historical IDs; emit `ID_BOOTSTRAP_NOT_FRESH` when
+      bootstrap is requested but ineligible (DEC-0011 / DEC-0034).
    b. Question design assumptions ("what's the alternative?").
    c. Check for simpler approaches ("can this be simpler?").
    d. Inventory risks for each architectural choice.
 2. Define the minimal architecture and key components.
 3. Record tradeoffs in decisions log.
+   - For new `DEC-xxxx` records use deterministic ID policy:
+     - if `ID_NAMESPACE_BOOTSTRAP=1` and deterministic freshness checks pass,
+       start at `DEC-0001`,
+     - otherwise continue from highest existing `DEC-` ID.
+   - Never renumber historical decisions.
 4. Update engineering state and readiness.
 5. Optional cross-repo observability architecture (US-0034):
    - If `CROSS_REPO_OBSERVABILITY=0`, skip this step (zero required overhead).

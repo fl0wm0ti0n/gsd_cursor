@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0034",
+  "story_ids": [
+    "US-0055"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "status-reconcile command exists and documents deterministic read/repair flow."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "detection matrix includes backlog/AC/acceptance/resume mismatch surfaces."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "canonical ownership explicitly preserved with backlog as status source."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "DONE+unchecked normalization behavior and audit evidence contract documented."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "acceptance reconciliation is target-scoped and deterministic."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "resume update rules define next OPEN story and intended phase."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "normalization report and state checkpoint evidence contract present."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "reason-code set includes applied/no-op/missing/conflict/ambiguous/evidence-missing."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "tests include US-0055 assertions for command/docs/reason-code coverage."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "active/template parity confirmed across command/runbook/README contracts."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

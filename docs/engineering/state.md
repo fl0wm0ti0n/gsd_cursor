@@ -1,5 +1,1264 @@
 # Engineering State
 
+## Active context surface (US-0053 / DEC-0035)
+
+- This file is the hot context surface for current phase checkpoints and
+  short-horizon traceability.
+- Archive policy: move low-frequency historical checkpoints into
+  `docs/engineering/state-archive/` packs without rewriting evidence.
+- Retrieval policy for `/ask`: prefer latest targeted sections first and expand
+  only when unresolved.
+
+## Refresh-context checkpoint (2026-03-13) — post S0032 / US-0053
+
+- Latest completed story: `US-0053` (`S0032`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0032` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0032-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0053` is `DONE` with AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0053` is checked
+- Backlog posture:
+  - next OPEN story by priority: **`US-0054`** (P1).
+- Next recommended phase: **`/discovery`** for `US-0054`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0032-US0054-open-20260313T101500Z-fresh
+- timestamp=2026-03-13T10:15:00Z
+- evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md
+
+## Auto continuation checkpoint (2026-03-13) — US-0054
+
+- invocation_mode=auto
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- timestamp=2026-03-13T10:20:00Z
+
+## Discovery checkpoint (2026-03-13) — US-0054
+
+- `/discovery` completed for **US-0054** in fresh PO context.
+- Discovery artifacts updated:
+  - `docs/product/vision.md` (US-0054 discovery notes),
+  - `handoffs/po_to_tl.md` (US-0054 discovery addendum and updated recommendation).
+- Discovery findings:
+  - target variability requires config-driven publish targets,
+  - default confirmation gate required for half-automatic safety,
+  - SSH/custom server support required as first-class target types.
+- Next phase recommendation: **`/research`** for `US-0054`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=discovery
+- role=po
+- fresh_context_marker=po-US0054-discovery-20260313T102100Z-fresh
+- timestamp=2026-03-13T10:21:00Z
+- evidence_ref=docs/product/vision.md,handoffs/po_to_tl.md,docs/product/backlog.md
+
+## Research checkpoint (2026-03-13) — US-0054
+
+- `/research` completed for **US-0054** in fresh Tech Lead context.
+- Research evidence added:
+  - `R-0030` in `docs/engineering/research.md` (schema validation, confirmation
+    boundary, SSH/custom target safety patterns).
+- Context pack synchronized:
+  - `docs/engineering/decisions.md` updated with `US-0054` as active
+    intake/research target and latest evidence `R-0030`.
+- No decision gate triggered at research boundary.
+- Next phase recommendation: **`/architecture`** for `US-0054`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=research
+- role=tech-lead
+- fresh_context_marker=tl-US0054-research-20260313T102500Z-fresh
+- timestamp=2026-03-13T10:25:00Z
+- evidence_ref=docs/engineering/research.md,docs/engineering/decisions.md,handoffs/po_to_tl.md,docs/product/backlog.md
+
+## Architecture checkpoint (2026-03-13) — US-0054
+
+- `/architecture` completed for **US-0054** in fresh Tech Lead context.
+- Architecture defined in `docs/engineering/architecture.md`:
+  - configuration-driven publish-target schema with deterministic validation,
+  - target taxonomy including built-in, `custom`, and first-class `ssh`,
+  - default confirmation gate (`confirm`) for half-automatic publish safety,
+  - deterministic target ordering/selection and fail-fast diagnostics,
+  - release-gate invariants preserved (publish is post-release optional layer).
+- Decision recorded: `DEC-0036`.
+- Optional mode checks:
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead),
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead),
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead),
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead).
+- Next phase recommendation: **`/sprint-plan`** for `US-0054`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tl-US0054-architecture-20260313T103500Z-fresh
+- timestamp=2026-03-13T10:35:00Z
+- evidence_ref=docs/engineering/architecture.md,docs/engineering/decisions.md,decisions/DEC-0036.md,docs/engineering/research.md,docs/product/backlog.md,handoffs/po_to_tl.md
+
+## Sprint-plan checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/sprint-plan` completed for **US-0054** in fresh Tech Lead context.
+- Sprint planned: `S0033` with 10 atomic tasks (`T-001..T-010`) mapped to
+  AC-1..AC-10.
+- Sizing validation:
+  - `SPRINT_MAX_TASKS=12`
+  - planned tasks: 10
+  - split required: no
+- Sprint artifacts created:
+  - `sprints/S0033/sprint.md`
+  - `sprints/S0033/tasks.md`
+  - `sprints/S0033/progress.md`
+  - `sprints/S0033/plan-verify.json` (pending)
+  - `sprints/S0033/uat.json` (placeholder)
+  - `sprints/S0033/uat.md` (placeholder)
+- TL -> Dev handoff updated: `handoffs/tl_to_dev.md`.
+- Next phase recommendation: **`/plan-verify`** for `S0033`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-S0033-sprint-plan-20260313T104000Z-fresh
+- timestamp=2026-03-13T10:40:00Z
+- evidence_ref=sprints/S0033/sprint.md,sprints/S0033/tasks.md,sprints/S0033/progress.md,sprints/S0033/uat.json,sprints/S0033/uat.md,handoffs/tl_to_dev.md,docs/product/backlog.md
+
+## Plan-verify checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/plan-verify` completed for **S0033** in fresh Tech Lead context.
+- `sprints/S0033/plan-verify.json` status: **PASS**.
+- Coverage check: AC-1..AC-10 are fully covered by `T-001..T-010` with no gaps.
+- Next phase recommendation: **`/execute`** for `S0033`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=plan-verify
+- role=tech-lead
+- fresh_context_marker=tl-S0033-plan-verify-20260313T104500Z-fresh
+- timestamp=2026-03-13T10:45:00Z
+- evidence_ref=sprints/S0033/plan-verify.json,sprints/S0033/tasks.md,sprints/S0033/progress.md,docs/product/backlog.md
+
+## Execute checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/execute` completed for **S0033** in fresh Dev context; implementation for
+  `US-0054` delivered and handed off to QA.
+- Delivered scope:
+  - release publish controls in scratchpad (`RELEASE_PUBLISH_MODE`,
+    `RELEASE_TARGETS_FILE`, `RELEASE_TARGETS_DEFAULT`) in active + template,
+  - canonical release target schema file with built-in, `custom`, and `ssh`
+    target examples in active + template,
+  - runbook/README guidance for configurable multi-target publish behavior,
+  - release command optional publish-target contract and reason codes (active +
+    template),
+  - regression assertions for US-0054 in both test runners.
+- Sprint artifacts synchronized:
+  - `sprints/S0033/tasks.md` all `done`,
+  - `sprints/S0033/progress.md` -> `IMPLEMENTATION COMPLETE`,
+  - `sprints/S0033/summary.md` created with delivered scope.
+- Dev -> QA handoff prepared: `handoffs/dev_to_qa.md` updated with S0033 section.
+- Next phase recommendation: **`/qa`** for `S0033`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0033-execute-20260313T105500Z-fresh
+- timestamp=2026-03-13T10:55:00Z
+- evidence_ref=.cursor/scratchpad.md,template/.cursor/scratchpad.md,.cursor/commands/release.md,template/.cursor/commands/release.md,docs/engineering/release-targets.json,template/docs/engineering/release-targets.json,docs/engineering/runbook.md,template/docs/engineering/runbook.md,README.md,template/README.md,tests/run-tests.ps1,tests/run-tests.sh,sprints/S0033/tasks.md,sprints/S0033/progress.md,sprints/S0033/summary.md,handoffs/dev_to_qa.md
+
+## QA checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/qa` completed for **S0033** in fresh QA context.
+- QA evidence:
+  - `sprints/S0033/qa-findings.md` outcome: **PASS**,
+  - baseline tests: `tests/report.md` (2026-03-13T17:09:21Z, Pass: 476, Fail: 0),
+  - no blocking findings.
+- Next phase recommendation: **`/verify-work`** for S0033.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0033-qa-20260313T171500Z-fresh
+- timestamp=2026-03-13T17:15:00Z
+- evidence_ref=sprints/S0033/qa-findings.md,tests/report.md,handoffs/qa_to_dev.md,docs/engineering/state.md
+
+## Verify-work checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/verify-work` completed for **S0033** in fresh QA context.
+- UAT verification:
+  - `sprints/S0033/uat.json` and `sprints/S0033/uat.md` populated and verified,
+  - Result: **10/10 PASS**, 0 failed.
+- Traceability status advanced to PASS for release readiness.
+- Next phase recommendation: **`/release`** for S0033.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0033-verify-work-20260313T172000Z-fresh
+- timestamp=2026-03-13T17:20:00Z
+- evidence_ref=sprints/S0033/uat.json,sprints/S0033/uat.md,handoffs/qa_to_dev.md,docs/engineering/state.md
+
+## Release checkpoint (2026-03-13) — S0033 / US-0054
+
+- `/release` completed for **S0033** in fresh Release context.
+- Mandatory gate chain PASS:
+  - check-in test PASS (`tests/report.md`),
+  - QA PASS (`sprints/S0033/qa-findings.md`),
+  - UAT PASS (`sprints/S0033/uat.json`, `sprints/S0033/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` evidence present).
+- Canonical release artifacts updated:
+  - `sprints/S0033/release-findings.md` (PASS),
+  - `handoffs/releases/S0033-release-notes.md`,
+  - `handoffs/release_queue.md` row `S0033` -> `released`,
+  - `handoffs/release_notes.md` latest pointer -> `S0033`.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0054` status DONE with AC-1..AC-10 checked,
+  - `docs/product/acceptance.md` -> `US-0054` checked.
+- Next phase recommendation: **`/refresh-context`**.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0033-release-20260313T172500Z-fresh
+- timestamp=2026-03-13T17:25:00Z
+- evidence_ref=sprints/S0033/release-findings.md,handoffs/releases/S0033-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-13) — post S0033 / US-0054
+
+- Latest completed story: `US-0054` (`S0033`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0033` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0033-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0054` is `DONE` with AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0054` is checked
+- Backlog posture:
+  - no OPEN stories remain.
+- Next recommended phase: **`/intake`**.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0033-20260313T173000Z-fresh
+- timestamp=2026-03-13T17:30:00Z
+- evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Auto completion checkpoint (2026-03-13) — US-0054
+
+- invocation_mode=auto
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=completed
+- stop_phase=refresh-context
+- timestamp=2026-03-13T17:30:00Z
+
+## Intake checkpoint (2026-03-13) — US-0055
+
+- New intake accepted: **US-0055** (Deterministic Status Reconciliation Command).
+- Intake artifacts updated:
+  - `docs/product/backlog.md` (US-0055 added, `Status: OPEN`),
+  - `docs/product/acceptance.md` (US-0055 checklist entry added unchecked),
+  - `handoffs/po_to_tl.md` (US-0055 intake handoff prepended).
+- Intake objective:
+  - add deterministic status reconciliation command to detect/repair
+    backlog/acceptance/state/resume drift and restore safe auto continuation
+    readiness to next OPEN story.
+- Duplicate/overlap check:
+  - related to US-0024/US-0045/US-0049 but not duplicate; scope is explicit
+    reconciliation command with bounded mutation + audit evidence.
+- Next phase recommendation: **`/discovery`** for `US-0055`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=intake
+- role=po
+- fresh_context_marker=po-US0055-intake-20260313T180000Z-fresh
+- timestamp=2026-03-13T18:00:00Z
+- evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,handoffs/po_to_tl.md,docs/engineering/state.md
+
+## Auto continuation checkpoint (2026-03-13) — US-0055
+
+- invocation_mode=auto
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- timestamp=2026-03-13T18:05:00Z
+
+## Discovery checkpoint (2026-03-13) — US-0055
+
+- `/discovery` completed for **US-0055** in fresh PO context.
+- Discovery artifacts updated:
+  - `docs/product/vision.md` (US-0055 discovery notes),
+  - `handoffs/po_to_tl.md` (US-0055 recommendation to proceed).
+- Discovery findings:
+  - need deterministic status reconciliation command with canonical precedence,
+  - bounded target-scoped repair and auditable evidence are required,
+  - resume intent must be recalculated to next OPEN story safely.
+- Next phase recommendation: **`/research`** for `US-0055`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=discovery
+- role=po
+- fresh_context_marker=po-US0055-discovery-20260313T181000Z-fresh
+- timestamp=2026-03-13T18:10:00Z
+- evidence_ref=docs/product/vision.md,handoffs/po_to_tl.md,docs/product/backlog.md
+
+## Research checkpoint (2026-03-13) — US-0055
+
+- `/research` completed for **US-0055** in fresh Tech Lead context.
+- Research evidence added:
+  - `R-0031` in `docs/engineering/research.md` (deterministic reconciliation
+    contracts across backlog/acceptance/state/resume).
+- Context pack synchronized:
+  - `docs/engineering/decisions.md` updated with `US-0055` as active target and
+    latest evidence `R-0031`.
+- No decision gate triggered at research boundary.
+- Next phase recommendation: **`/architecture`** for `US-0055`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=research
+- role=tech-lead
+- fresh_context_marker=tl-US0055-research-20260313T181500Z-fresh
+- timestamp=2026-03-13T18:15:00Z
+- evidence_ref=docs/engineering/research.md,docs/engineering/decisions.md,handoffs/po_to_tl.md,docs/product/backlog.md
+
+## Architecture checkpoint (2026-03-13) — US-0055
+
+- `/architecture` completed for **US-0055** in fresh Tech Lead context.
+- Architecture defined in `docs/engineering/architecture.md`:
+  - new `/status-reconcile` command contract,
+  - canonical precedence and bounded mutation model,
+  - normalization evidence/reporting and fail-safe reason codes,
+  - deterministic resume readiness update behavior.
+- Decision recorded: `DEC-0037`.
+- Optional mode checks:
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead),
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead),
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead),
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead).
+- Next phase recommendation: **`/sprint-plan`** for `US-0055`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tl-US0055-architecture-20260313T182000Z-fresh
+- timestamp=2026-03-13T18:20:00Z
+- evidence_ref=docs/engineering/architecture.md,docs/engineering/decisions.md,decisions/DEC-0037.md,docs/engineering/research.md,docs/product/backlog.md,handoffs/po_to_tl.md
+
+## Sprint-plan checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/sprint-plan` completed for **US-0055** in fresh Tech Lead context.
+- Sprint planned: `S0034` with 10 atomic tasks (`T-001..T-010`) mapped to
+  AC-1..AC-10.
+- Sizing validation:
+  - `SPRINT_MAX_TASKS=12`
+  - planned tasks: 10
+  - split required: no
+- Sprint artifacts created:
+  - `sprints/S0034/sprint.md`
+  - `sprints/S0034/tasks.md`
+  - `sprints/S0034/progress.md`
+  - `sprints/S0034/plan-verify.json`
+  - `sprints/S0034/uat.json` (placeholder)
+  - `sprints/S0034/uat.md` (placeholder)
+- TL -> Dev handoff updated: `handoffs/tl_to_dev.md`.
+- Next phase recommendation: **`/plan-verify`** for `S0034`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-S0034-sprint-plan-20260313T182500Z-fresh
+- timestamp=2026-03-13T18:25:00Z
+- evidence_ref=sprints/S0034/sprint.md,sprints/S0034/tasks.md,sprints/S0034/progress.md,sprints/S0034/plan-verify.json,sprints/S0034/uat.json,sprints/S0034/uat.md,handoffs/tl_to_dev.md,docs/product/backlog.md
+
+## Plan-verify checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/plan-verify` completed for **S0034** in fresh Tech Lead context.
+- `sprints/S0034/plan-verify.json` status: **PASS**.
+- Coverage check: AC-1..AC-10 are fully covered by `T-001..T-010` with no gaps.
+- Next phase recommendation: **`/execute`** for `S0034`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=plan-verify
+- role=tech-lead
+- fresh_context_marker=tl-S0034-plan-verify-20260313T183000Z-fresh
+- timestamp=2026-03-13T18:30:00Z
+- evidence_ref=sprints/S0034/plan-verify.json,sprints/S0034/tasks.md,sprints/S0034/progress.md,docs/product/backlog.md
+
+## Execute checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/execute` completed for **S0034** in fresh Dev context; implementation for
+  `US-0055` delivered and handed off to QA.
+- Delivered scope:
+  - new `.cursor/commands/status-reconcile.md` + template parity command,
+  - runbook/README US-0055 contracts (active + template),
+  - architecture/research/decision artifacts for US-0055 (`R-0031`, `DEC-0037`),
+  - regression assertions for US-0055 in both test runners.
+- Sprint artifacts synchronized:
+  - `sprints/S0034/tasks.md` all `done`,
+  - `sprints/S0034/progress.md` -> `IMPLEMENTATION COMPLETE`,
+  - `sprints/S0034/summary.md` created.
+- Dev -> QA handoff prepared: `handoffs/dev_to_qa.md` updated with S0034 section.
+- Next phase recommendation: **`/qa`** for `S0034`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0034-execute-20260313T184000Z-fresh
+- timestamp=2026-03-13T18:40:00Z
+- evidence_ref=.cursor/commands/status-reconcile.md,template/.cursor/commands/status-reconcile.md,docs/engineering/runbook.md,template/docs/engineering/runbook.md,README.md,template/README.md,tests/run-tests.ps1,tests/run-tests.sh,sprints/S0034/tasks.md,sprints/S0034/progress.md,sprints/S0034/summary.md,handoffs/dev_to_qa.md
+
+## QA checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/qa` completed for **S0034** in fresh QA context.
+- Result: PASS, no blocking findings.
+- Verification evidence:
+  - runbook `TEST_COMMAND` host-limited on this Windows environment
+    (`sh tests/run-tests.sh` unavailable),
+  - baseline fallback passed: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`,
+  - `tests/report.md` current run shows `Fail: 0`,
+  - acceptance verification recorded in `sprints/S0034/qa-findings.md`.
+- Next phase recommendation: **`/verify-work`** for `S0034`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0034-qa-20260313T184500Z-fresh
+- timestamp=2026-03-13T18:45:00Z
+- evidence_ref=sprints/S0034/qa-findings.md,handoffs/qa_to_dev.md,tests/report.md
+
+## Verify-work checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/verify-work` completed for **S0034** in fresh QA context.
+- UAT artifacts transitioned from placeholder to populated/verified-for-phase:
+  - `sprints/S0034/uat.json` (`passed=10`, `failed=0`),
+  - `sprints/S0034/uat.md` (10/10 execution steps with AC-1..AC-10 mapping).
+- Traceability row updated to PASS readiness for release.
+- Next phase recommendation: **`/release`** for `S0034`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0034-verify-work-20260313T185000Z-fresh
+- timestamp=2026-03-13T18:50:00Z
+- evidence_ref=sprints/S0034/uat.json,sprints/S0034/uat.md,handoffs/qa_to_dev.md
+
+## Release checkpoint (2026-03-13) — S0034 / US-0055
+
+- `/release` completed for **S0034** in fresh Release context.
+- Mandatory gate chain PASS:
+  - check-in test PASS (`tests/report.md`),
+  - QA PASS (`sprints/S0034/qa-findings.md`),
+  - UAT PASS (`sprints/S0034/uat.json`, `sprints/S0034/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` evidence present).
+- Canonical release artifacts updated:
+  - `sprints/S0034/release-findings.md` (PASS),
+  - `handoffs/releases/S0034-release-notes.md`,
+  - `handoffs/release_queue.md` row `S0034` -> `released`,
+  - `handoffs/release_notes.md` latest pointer -> `S0034`.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0055` status DONE with AC-1..AC-10 checked,
+  - `docs/product/acceptance.md` -> `US-0055` checked.
+- Next phase recommendation: **`/refresh-context`**.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0034-release-20260313T185500Z-fresh
+- timestamp=2026-03-13T18:55:00Z
+- evidence_ref=sprints/S0034/release-findings.md,handoffs/releases/S0034-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-13) — post S0034 / US-0055
+
+- Latest completed story: `US-0055` (`S0034`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0034` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0034-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0055` is `DONE` with AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0055` is checked
+- Backlog posture:
+  - no OPEN stories remain.
+- Next recommended phase: **`/intake`**.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0034-20260313T190000Z-fresh
+- timestamp=2026-03-13T19:00:00Z
+- evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Auto completion checkpoint (2026-03-13) — US-0055
+
+- invocation_mode=auto
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=completed
+- stop_phase=refresh-context
+- timestamp=2026-03-13T19:00:00Z
+
+## Intake checkpoint (2026-03-14) — US-0056
+
+- New intake accepted: **US-0056** (Strict Runtime Proof for Per-Phase Subagent Isolation).
+- Intake artifacts updated:
+  - `docs/product/backlog.md` (US-0056 added, `Status: OPEN`),
+  - `docs/product/acceptance.md` (US-0056 checklist entry added unchecked),
+  - `docs/product/vision.md` (US-0056 intake notes),
+  - `handoffs/po_to_tl.md` (US-0056 intake handoff prepended).
+- Intake objective:
+  - enforce strict runtime-proof attestation for per-phase fresh subagent
+    execution, with fail-closed `/auto` gating when proof is missing/reused/stale.
+- Duplicate/overlap check:
+  - related to US-0048/DEC-0029 but not duplicate; this story raises proof from
+    artifact-only evidence to strict runtime attestation.
+- Next phase recommendation: **`/discovery`** for `US-0056`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=intake
+- role=po
+- fresh_context_marker=po-US0056-intake-20260314T153000Z-fresh
+- timestamp=2026-03-14T15:30:00Z
+- evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,docs/product/vision.md,handoffs/po_to_tl.md,docs/engineering/state.md
+
+## Execute checkpoint (2026-03-12) — S0032 / US-0053
+
+- `/execute` completed for `S0032` in fresh Dev context; implementation for
+  `US-0053` delivered and handed off to QA.
+- Delivered scope:
+  - tiered token-profile contract in scratchpad (active + template),
+  - `/ask` narrow-read retrieval policy (active + template),
+  - state hot-surface + archive policy with `state-archive/README.md`,
+  - compact decisions index with canonical DEC linkouts,
+  - regression assertions for US-0053 in both test runners.
+- Sprint artifacts synchronized:
+  - `sprints/S0032/tasks.md` all `done`,
+  - `sprints/S0032/progress.md` -> `IMPLEMENTATION COMPLETE`,
+  - `sprints/S0032/summary.md` created.
+- Next phase recommendation: **`/qa`** for `S0032`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0032-execute-US0053-20260312T213500Z-fresh
+- timestamp=2026-03-12T21:35:00Z
+- evidence_ref=handoffs/dev_to_qa.md,sprints/S0032/summary.md
+
+## QA checkpoint (2026-03-13) — S0032 / US-0053
+
+- `/qa` completed for `S0032` in fresh QA context.
+- Result: PASS, no blocking findings.
+- Verification evidence:
+  - runbook `TEST_COMMAND` host-limited on this Windows environment
+    (`sh tests/run-tests.sh` unavailable),
+  - baseline fallback passed: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`,
+  - `tests/report.md` timestamp `2026-03-13T09:46:51Z` (`Pass: 459`, `Fail: 0`),
+  - acceptance verification recorded in `sprints/S0032/qa-findings.md`.
+- Optional mode checks (security/compatibility/component-scope/spec-pack/user-guide)
+  skipped by config (`0`) per zero-overhead contract.
+- Next phase recommendation: **`/verify-work`** for `S0032`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0032-US0053-20260313T094700Z-fresh
+- timestamp=2026-03-13T09:47:00Z
+- evidence_ref=sprints/S0032/qa-findings.md,handoffs/qa_to_dev.md
+
+## Verify-work checkpoint (2026-03-13) — S0032 / US-0053
+
+- `/verify-work` completed for `S0032` in fresh QA context.
+- UAT artifacts transitioned from placeholder to populated/verified-for-phase:
+  - `sprints/S0032/uat.json` (`passed=10`, `failed=0`,
+    `verified_state=verify_work_complete`),
+  - `sprints/S0032/uat.md` (10/10 execution steps with AC-1..AC-10 mapping).
+- Baseline evidence snapshot: `tests/report.md` timestamp
+  `2026-03-13T09:46:51Z` (`Pass: 459`, `Fail: 0`).
+- Isolation compliance gate PASS for target lifecycle evidence:
+  - execute marker: `dev-S0032-execute-US0053-20260312T213500Z-fresh`,
+  - qa marker: `qa-S0032-US0053-20260313T094700Z-fresh`,
+  - verify-work marker recorded below.
+- Traceability index updated: `US-0053` status set to `PASS` with UAT evidence.
+- Pre-handoff traceability check PASS: no OPEN or DONE story in sprint `S0032`
+  lacks a traceability index row.
+- Next phase recommendation: **`/release`** for `S0032`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0032-verify-work-US0053-20260313T095000Z-fresh
+- timestamp=2026-03-13T09:50:00Z
+- evidence_ref=sprints/S0032/uat.json,sprints/S0032/uat.md
+
+## Release checkpoint (2026-03-13) — S0032 / US-0053
+
+- Release gate chain PASS for **S0032** (`US-0053` Context Compaction and
+  Tiered Token-Cost Optimization Mode).
+- Canonical notes finalized: `handoffs/releases/S0032-release-notes.md`.
+- Queue row added and set to released: `handoffs/release_queue.md` (`S0032`
+  status=`released`).
+- Legacy pointer updated: `handoffs/release_notes.md` now points to `S0032` /
+  `US-0053`.
+- Product status synchronized for target story:
+  - `docs/product/backlog.md`: `US-0053` marked DONE and ACs checked.
+  - `docs/product/acceptance.md`: `US-0053` marked complete.
+- Gate evidence:
+  - check-in test PASS (`tests/report.md`, 2026-03-13T09:46:51Z, Pass: 459,
+    Fail: 0),
+  - QA PASS (`sprints/S0032/qa-findings.md`),
+  - UAT PASS (`sprints/S0032/uat.json`, `sprints/S0032/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` entries for S0032).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0032-US0053-20260313T095500Z-fresh
+- timestamp=2026-03-13T09:55:00Z
+- evidence_ref=sprints/S0032/release-findings.md,handoffs/releases/S0032-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Plan-verify checkpoint (2026-03-12) — S0032 / US-0053
+
+- `sprints/S0032/plan-verify.json` result: PASS.
+- Coverage status: all `US-0053` AC-1..AC-10 are covered by `T-001..T-010`.
+- No planning gaps or decision-gate blockers at plan boundary.
+- Next phase recommendation: **`/execute`** for `S0032` (`US-0053`).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=plan-verify
+- role=tech-lead
+- fresh_context_marker=tl-S0032-plan-verify-US0053-20260312T210500Z-fresh
+- timestamp=2026-03-12T21:05:00Z
+- evidence_ref=sprints/S0032/plan-verify.json,sprints/S0032/tasks.md,docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/architecture.md
+
+## Sprint-plan checkpoint (2026-03-12) — S0032 / US-0053
+
+- Sprint-plan completed for `US-0053` in fresh Tech Lead context (non-bulk mode).
+- Sprint created: `S0032`.
+- Planned tasks: `T-001..T-010` (within `SPRINT_MAX_TASKS=12`; split not required).
+- Artifacts created:
+  - `sprints/S0032/sprint.md`
+  - `sprints/S0032/tasks.md`
+  - `sprints/S0032/progress.md`
+  - `sprints/S0032/plan-verify.json` (placeholder)
+  - `sprints/S0032/uat.json` and `sprints/S0032/uat.md` (placeholder lifecycle state)
+  - `handoffs/tl_to_dev.md` (S0032 handoff section)
+- Optional mode checks:
+  - `COMPONENT_SCOPE_MODE=0` -> no required component scope metadata.
+  - `USER_GUIDE_MODE=0` -> no required user-guide planning tasks.
+- Traceability index updated: `US-0053 -> S0032` with `Status=PLANNED` and empty evidence.
+- Next phase recommendation: **`/plan-verify`** for `S0032`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-S0032-sprint-plan-US0053-20260312T205500Z-fresh
+- timestamp=2026-03-12T20:55:00Z
+- evidence_ref=sprints/S0032/sprint.md,sprints/S0032/tasks.md,sprints/S0032/progress.md,sprints/S0032/plan-verify.json,sprints/S0032/uat.json,sprints/S0032/uat.md,handoffs/tl_to_dev.md,docs/engineering/state.md
+
+## Architecture checkpoint (2026-03-12) — US-0053
+
+- `/architecture` completed for **US-0053** in fresh Tech Lead context.
+- Architecture defined in `docs/engineering/architecture.md`:
+  - `TOKEN_PROFILE=lean|balanced|full` policy layer with deterministic
+    profile-to-flag mapping and override precedence,
+  - compact active-context + archive strategy for `docs/engineering/state.md`,
+  - compact decisions-index strategy for `docs/engineering/decisions.md`,
+  - narrow-read `/ask` retrieval order (targeted -> bounded expansion -> explicit
+    not-found),
+  - mandatory guardrail invariants preserved (`/qa`, `/verify-work`, `/release`).
+- Early-research evidence added per architecture contract: `R-0028`.
+- Decision recorded: `DEC-0035`.
+- Optional mode checks:
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead),
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead),
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead),
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead).
+- Next phase recommendation: **`/sprint-plan`** for `US-0053`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tl-US0053-architecture-20260312T204500Z-fresh
+- timestamp=2026-03-12T20:45:00Z
+- evidence_ref=docs/engineering/architecture.md,docs/engineering/decisions.md,decisions/DEC-0035.md,docs/engineering/research.md,docs/product/backlog.md,docs/product/vision.md
+
+## Research checkpoint (2026-03-12) — US-0053
+
+- `/research` completed for **US-0053** (Context Compaction and Tiered
+  Token-Cost Optimization Mode) in fresh Tech Lead context.
+- Research focus validated from backlog AC-1..AC-10:
+  - tiered profile policy (`lean|balanced|full`) and override precedence,
+  - compact hot-vs-archive strategy for `state.md`,
+  - compact index strategy for `decisions.md`,
+  - narrow-read `/ask` retrieval order (targeted first, bounded expansion),
+  - quality-gate invariants preserved (`/qa`, `/verify-work`, `/release`).
+- New research evidence appended: `R-0027` in `docs/engineering/research.md`.
+- Decision-gate status: no new decision gate triggered at research boundary.
+- Next phase recommendation: **`/architecture`** for US-0053.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=research
+- role=tech-lead
+- fresh_context_marker=tl-US0053-research-20260312T203000Z-fresh
+- timestamp=2026-03-12T20:30:00Z
+- evidence_ref=docs/engineering/research.md,docs/engineering/decisions.md,docs/product/backlog.md,docs/product/vision.md
+
+## Refresh-context checkpoint (2026-03-12) — post S0031 / US-0052
+
+- Latest completed story: `US-0052` (`S0031`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0031` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0031-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Backlog posture:
+  - `US-0052` is DONE and reconciled in canonical/derived views,
+  - next OPEN story by priority: **None**. All stories in backlog are DONE.
+- Next recommended target: (none; backlog exhausted).
+- Next recommended phase: **`/intake`** (for new work).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0031-20260312T201800Z-fresh
+- timestamp=2026-03-12T20:18:00Z
+- evidence_ref=docs/engineering/state.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/engineering/research.md,handoffs/release_queue.md
+
+## Release checkpoint (2026-03-12) — S0031 / US-0052
+
+- Release gate chain PASS for **S0031** (US-0052 Optional Fresh-Project ID Namespace Bootstrap).
+- Canonical notes finalized: `handoffs/releases/S0031-release-notes.md`.
+- Queue row added and set to released: `handoffs/release_queue.md` (`S0031` status=`released`).
+- Legacy pointer updated: `handoffs/release_notes.md` now points to `S0031` / US-0052.
+- Product status synchronized for target story:
+  - `docs/product/backlog.md`: `US-0052` marked DONE and ACs checked.
+  - `docs/product/acceptance.md`: `US-0052` marked complete.
+- Gate evidence:
+  - check-in test PASS (`tests/report.md`, 2026-03-12T20:06:45Z, Pass: 440, Fail: 0),
+  - QA PASS (`sprints/S0031/qa-findings.md`),
+  - UAT PASS (`sprints/S0031/uat.json`, `sprints/S0031/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` entries for S0031).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0031-US0052-20260312T201500Z-fresh
+- timestamp=2026-03-12T20:15:00Z
+- evidence_ref=sprints/S0031/release-findings.md,handoffs/releases/S0031-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Verify-work checkpoint (2026-03-12) — S0031 / US-0052
+
+- Sprint **S0031** (`US-0052`) `/verify-work` completed in fresh QA context.
+- UAT status: **PASS** (`passed=8`, `failed=0`, total steps=8).
+- UAT artifacts populated (no placeholders):
+  - `sprints/S0031/uat.json`
+  - `sprints/S0031/uat.md`
+- Acceptance mapping: AC-1..AC-8 each mapped to at least one explicit UAT step.
+- Isolation compliance gate: **PASS** for target lifecycle evidence in
+  `docs/engineering/state.md` (required phases present with valid fields and
+  fresh markers: execute, qa, verify-work).
+- Pre-handoff traceability check: **PASS** (current sprint story `US-0052` has
+  traceability index row and evidence refs).
+- Next phase recommendation: **`/release`** for S0031.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0031-verify-work-US0052-20260312T201200Z-fresh
+- timestamp=2026-03-12T20:12:00Z
+- evidence_ref=sprints/S0031/uat.json,sprints/S0031/uat.md
+
+## QA checkpoint (2026-03-12) — S0031 / US-0052
+
+- Sprint **S0031** (`US-0052`) QA completed in fresh QA context with PASS outcome.
+- Validation evidence:
+  - runbook `TEST_COMMAND` attempt `sh tests/run-tests.sh` was unavailable on
+    this host (`sh` command not found),
+  - fallback baseline `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`
+    -> exit code 0,
+  - `tests/report.md` timestamp `2026-03-12T20:06:45Z` (`Pass: 440`,
+    `Fail: 0`).
+- Findings:
+  - Blocking: none,
+  - Non-blocking: runbook `TEST_COMMAND` is shell-based; PowerShell baseline
+    command used on this Windows host.
+- Optional mode checks:
+  - `SECURITY_REVIEW=0` -> skipped,
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped,
+  - `COMPONENT_SCOPE_MODE=0` -> skipped,
+  - `SPEC_PACK_MODE=0` -> skipped,
+  - `USER_GUIDE_MODE=0` -> skipped.
+- Sync policy guidance:
+  - `PRE_QA_AUTOPUSH_FORBIDDEN` cleared for this sprint,
+  - `BLOCKING_QA_FINDINGS` not applicable,
+  - `SYNC_PUSHED` only when policy and branch safety checks pass.
+- Next phase recommendation: **`/verify-work`** for `S0031`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0031-US0052-20260312T200700Z-fresh
+- timestamp=2026-03-12T20:07:00Z
+- evidence_ref=sprints/S0031/qa-findings.md,handoffs/qa_to_dev.md,tests/report.md
+
+## Execute checkpoint (2026-03-12) — S0031 / US-0052
+
+- Sprint **S0031** (`US-0052` Optional Fresh-Project ID Namespace Bootstrap)
+  implementation completed in fresh Dev context.
+- Delivered:
+  - explicit bootstrap control contract (`ID_NAMESPACE_BOOTSTRAP`) in
+    active/template `.cursor/scratchpad.md`,
+  - bootstrap-aware intake/research/architecture ID policy for
+    `US-`/`DEC-`/`R-` namespaces,
+  - deterministic freshness eligibility checks across canonical artifacts and
+    deterministic ineligible diagnostic (`ID_BOOTSTRAP_NOT_FRESH`),
+  - compatibility-safe highest-existing continuation fallback with strict no
+    historical renumbering contract,
+  - runbook/README operator guidance for bootstrap behavior and constraints,
+  - expanded regression checks in both test runners for US-0052 parity.
+- Validation evidence:
+  - `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit
+    code 0,
+  - `tests/report.md` timestamp `2026-03-12T19:43:28Z` (`Pass: 440`,
+    `Fail: 0`).
+- Optional mode checks:
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead),
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead),
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead),
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead).
+- Next phase recommendation: **`/qa`** for `S0031`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0031-execute-US0052-20260312T194400Z-fresh
+- timestamp=2026-03-12T19:44:00Z
+- evidence_ref=handoffs/dev_to_qa.md,sprints/S0031/summary.md,tests/report.md
+
+## Plan-verify checkpoint (2026-03-12) — S0031 / US-0052
+
+- `sprints/S0031/plan-verify.json` result: PASS.
+- Coverage status: all `US-0052` AC-1..AC-8 are covered by `T-001..T-010`.
+- No planning gaps or decision-gate blockers at plan boundary.
+- Next phase recommendation: **`/execute`** for `S0031` (`US-0052`).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=plan-verify
+- role=tech-lead
+- fresh_context_marker=tl-S0031-plan-verify-US0052-20260312T195500Z-fresh
+- timestamp=2026-03-12T19:55:00Z
+- evidence_ref=sprints/S0031/plan-verify.json,sprints/S0031/tasks.md,docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/architecture.md
+
+## Sprint-plan checkpoint (2026-03-12) — S0031 / US-0052
+
+- Sprint-plan completed for `US-0052` in fresh Tech Lead context (non-bulk mode).
+- Sprint created: `S0031`.
+- Planned tasks: `T-001..T-010` (within `SPRINT_MAX_TASKS=12`; split not required).
+- Artifacts created:
+  - `sprints/S0031/sprint.md`
+  - `sprints/S0031/tasks.md`
+  - `sprints/S0031/progress.md`
+  - `sprints/S0031/plan-verify.json` (placeholder)
+  - `sprints/S0031/uat.json` and `sprints/S0031/uat.md` (placeholder lifecycle state)
+  - `handoffs/tl_to_dev.md` (S0031 handoff section)
+- Optional mode checks:
+  - `COMPONENT_SCOPE_MODE=0` -> no required component scope metadata.
+  - `USER_GUIDE_MODE=0` -> no required user-guide planning tasks.
+- Traceability index updated: `US-0052 -> S0031` with `Status=PLANNED` and empty evidence.
+- Next phase recommendation: **`/plan-verify`** for `S0031`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-S0031-sprint-plan-US0052-20260312T194500Z-fresh
+- timestamp=2026-03-12T19:45:00Z
+- evidence_ref=sprints/S0031/sprint.md,sprints/S0031/tasks.md,sprints/S0031/progress.md,sprints/S0031/plan-verify.json,sprints/S0031/uat.json,sprints/S0031/uat.md,handoffs/tl_to_dev.md,docs/engineering/state.md
+
+## Refresh-context checkpoint (2026-03-12) — post S0030 / US-0051
+
+- Latest completed story: `US-0051` (`S0030`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0030` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0030-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Backlog posture:
+  - `US-0051` is DONE and reconciled in canonical/derived views,
+  - next OPEN story by priority: `US-0052` (P2).
+- Next recommended target: `US-0052`.
+- Next recommended phase: **`/sprint-plan`** (`US-0052` architecture and decision context are already captured).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0030-20260312T193500Z-fresh
+- timestamp=2026-03-12T19:35:00Z
+- evidence_ref=docs/engineering/state.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/engineering/research.md,handoffs/release_queue.md
+
+## Release checkpoint (2026-03-12) — S0030 / US-0051
+
+- Release gate chain PASS for **S0030** (US-0051 Intelligent Intake Decomposition
+  and Risk-Aware PO Questioning).
+- Canonical notes finalized: `handoffs/releases/S0030-release-notes.md`.
+- Queue row added and set to released: `handoffs/release_queue.md` (`S0030`
+  status=`released`).
+- Legacy pointer updated: `handoffs/release_notes.md` now points to `S0030` /
+  US-0051.
+- Product status synchronized for target story:
+  - `docs/product/backlog.md`: `US-0051` marked DONE and ACs checked.
+  - `docs/product/acceptance.md`: `US-0051` marked complete.
+- Gate evidence:
+  - check-in test PASS (`tests/report.md`, 2026-03-12T17:58:01Z, Pass: 422,
+    Fail: 0),
+  - QA PASS (`sprints/S0030/qa-findings.md`),
+  - UAT PASS (`sprints/S0030/uat.json`, `sprints/S0030/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` entries for S0030).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0030-US0051-20260312T192000Z-fresh
+- timestamp=2026-03-12T19:20:00Z
+- evidence_ref=sprints/S0030/release-findings.md,handoffs/releases/S0030-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Verify-work checkpoint (2026-03-12) — S0030 / US-0051
+
+- Sprint **S0030** (`US-0051`) `/verify-work` completed in fresh QA context.
+- UAT status: **PASS** (`passed=10`, `failed=0`, total steps=10).
+- UAT artifacts populated (no placeholders):
+  - `sprints/S0030/uat.json`
+  - `sprints/S0030/uat.md`
+- Acceptance mapping: AC-1..AC-10 each mapped to at least one explicit UAT step.
+- Isolation compliance gate: **PASS** for target lifecycle evidence in
+  `docs/engineering/state.md` (required phases present with valid fields and
+  fresh markers: execute, qa, verify-work).
+- Pre-handoff traceability check: **PASS** (current sprint story `US-0051` has
+  traceability index row and evidence refs).
+- Next phase recommendation: **`/release`** for S0030.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0030-verify-work-US0051-20260312T184950Z-fresh
+- timestamp=2026-03-12T18:49:50Z
+- evidence_ref=sprints/S0030/uat.json,sprints/S0030/uat.md
+
+## QA checkpoint (2026-03-12) — S0030 / US-0051
+
+- Sprint **S0030** (`US-0051`) QA completed in fresh QA context with PASS outcome.
+- Validation evidence:
+  - runbook `TEST_COMMAND` attempt `sh tests/run-tests.sh` was unavailable on
+    this host (`sh` command not found),
+  - fallback baseline `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`
+    -> exit code 0,
+  - `tests/report.md` timestamp `2026-03-12T17:58:01Z` (`Pass: 422`,
+    `Fail: 0`).
+- Findings:
+  - Blocking: none,
+  - Non-blocking: runbook `TEST_COMMAND` is shell-based; PowerShell baseline
+    command used on this Windows host.
+- Optional mode checks:
+  - `SECURITY_REVIEW=0` -> skipped,
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped,
+  - `COMPONENT_SCOPE_MODE=0` -> skipped,
+  - `SPEC_PACK_MODE=0` -> skipped,
+  - `USER_GUIDE_MODE=0` -> skipped.
+- Sync policy guidance:
+  - `PRE_QA_AUTOPUSH_FORBIDDEN` cleared for this sprint,
+  - `BLOCKING_QA_FINDINGS` not applicable,
+  - `SYNC_PUSHED` only when policy and branch safety checks pass.
+- Next phase recommendation: **`/verify-work`** for `S0030`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0030-US0051-20260312T175823Z-fresh
+- timestamp=2026-03-12T17:58:23Z
+- evidence_ref=sprints/S0030/qa-findings.md,handoffs/qa_to_dev.md,tests/report.md
+
+## Execute checkpoint (2026-03-12) — S0030 / US-0051
+
+- Sprint **S0030** (`US-0051` Intelligent Intake Decomposition and Risk-Aware PO
+  Questioning) implementation completed in fresh Dev context.
+- Delivered:
+  - deterministic intake decomposition evaluator and bounded split trigger in
+    active/template `/intake`,
+  - vertical-slice/workflow-step split-quality guidance and split rationale
+    persistence contract,
+  - explicit user accept/merge/adjust control before decomposition persistence,
+  - risk-aware questioning escalation beyond ambiguity-only triggers with
+    bounded rounds,
+  - low-touch compatibility contract (`INTAKE_GUIDED_MODE=0`, no forced split),
+  - active/template parity updates in PO agent guidance and runbook/README docs,
+  - regression expansion in both test runners for US-0051 contract checks.
+- Validation evidence:
+  - `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit
+    code 0,
+  - `tests/report.md` timestamp `2026-03-12T17:48:56Z` (`Pass: 422`,
+    `Fail: 0`).
+- Optional mode checks:
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead),
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead),
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead),
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead).
+- Next phase recommendation: **`/qa`** for `S0030`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0030-execute-US0051-20260312T174916Z-fresh
+- timestamp=2026-03-12T17:49:16Z
+- evidence_ref=handoffs/dev_to_qa.md,sprints/S0030/summary.md,tests/report.md
+
+## Plan-verify checkpoint (2026-03-12) — S0030 / US-0051
+
+- `sprints/S0030/plan-verify.json` result: PASS.
+- Coverage status: all `US-0051` AC-1..AC-10 are covered by `T-001..T-011`.
+- No planning gaps or decision-gate blockers at plan boundary.
+- Next phase recommendation: **`/execute`** for `S0030` (`US-0051`).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=plan-verify
+- role=tech-lead
+- fresh_context_marker=tl-S0030-plan-verify-US0051-20260312T173210Z-fresh
+- timestamp=2026-03-12T17:32:10Z
+- evidence_ref=sprints/S0030/plan-verify.json,sprints/S0030/tasks.md,docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/architecture.md
+
+## Sprint-plan checkpoint (2026-03-11) — S0030 / US-0051
+
+- Sprint-plan completed for `US-0051` in fresh Tech Lead context (non-bulk mode).
+- Sprint created: `S0030`.
+- Planned tasks: `T-001..T-011` (within `SPRINT_MAX_TASKS=12`; split not required).
+- Artifacts created:
+  - `sprints/S0030/sprint.md`
+  - `sprints/S0030/tasks.md`
+  - `sprints/S0030/progress.md`
+  - `sprints/S0030/plan-verify.json` (placeholder)
+  - `sprints/S0030/uat.json` and `sprints/S0030/uat.md` (placeholder lifecycle state)
+  - `handoffs/tl_to_dev.md` (S0030 handoff section)
+- Optional mode checks:
+  - `COMPONENT_SCOPE_MODE=0` -> no required component scope metadata.
+  - `USER_GUIDE_MODE=0` -> no required user-guide planning tasks.
+- Traceability index updated: `US-0051 -> S0030` with `Status=PLANNED` and empty evidence.
+- Next phase recommendation: **`/plan-verify`** for `S0030`.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-S0030-sprint-plan-US0051-20260311T230600Z-fresh
+- timestamp=2026-03-11T23:06:00Z
+- evidence_ref=sprints/S0030/sprint.md,sprints/S0030/tasks.md,sprints/S0030/progress.md,sprints/S0030/plan-verify.json,sprints/S0030/uat.json,sprints/S0030/uat.md,handoffs/tl_to_dev.md,docs/engineering/state.md
+
+## Refresh-context checkpoint (2026-03-11) — post S0029 / US-0050
+
+- Latest completed story: `US-0050` (`S0029`, PASS, released).
+- Workflow boundary is clean; no active release blocker.
+- Canonical release status:
+  - queue row `S0029` is `released` in `handoffs/release_queue.md`,
+  - canonical notes at `handoffs/releases/S0029-release-notes.md`,
+  - legacy pointer updated in `handoffs/release_notes.md`.
+- Backlog posture:
+  - `US-0050` is DONE and reconciled in canonical/derived views,
+  - next OPEN stories by priority: `US-0051` (P1), `US-0052` (P2).
+- Next recommended target: `US-0051`.
+- Next recommended phase: **`/sprint-plan`** (US-0051 context already has discovery/research/architecture artifacts).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-refresh-context-post-S0029-20260311T225146Z-fresh
+- timestamp=2026-03-11T22:51:46Z
+- evidence_ref=docs/engineering/state.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/engineering/research.md,handoffs/release_queue.md
+
+## Release checkpoint (2026-03-11) — S0029 / US-0050
+
+- Release gate chain PASS for **S0029** (US-0050 Clean Install Hygiene and Complete Clean-Repo Coverage).
+- Canonical notes finalized: `handoffs/releases/S0029-release-notes.md`.
+- Queue row added and set to released: `handoffs/release_queue.md` (`S0029` status=`released`).
+- Legacy pointer updated: `handoffs/release_notes.md` now points to `S0029` / US-0050.
+- Product status synchronized for target story:
+  - `docs/product/backlog.md`: `US-0050` marked DONE and ACs checked.
+  - `docs/product/acceptance.md`: `US-0050` marked complete.
+- Gate evidence:
+  - check-in test PASS (`tests/report.md`, 2026-03-11T22:12:04Z, Pass: 404, Fail: 0),
+  - QA PASS (`sprints/S0029/qa-findings.md`),
+  - UAT PASS (`sprints/S0029/uat.json`, `sprints/S0029/uat.md`),
+  - isolation PASS (`execute`, `qa`, `verify-work` entries for S0029).
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0029-US0050-20260311T224628Z-fresh
+- timestamp=2026-03-11T22:46:28Z
+- evidence_ref=sprints/S0029/release-findings.md,handoffs/releases/S0029-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Verify-work checkpoint (2026-03-11) — S0029 / US-0050
+
+- Sprint **S0029** (US-0050) `/verify-work` completed in fresh QA context.
+- UAT status: **PASS** (`passed=9`, `failed=0`, total steps=9).
+- UAT artifacts populated (no placeholders):
+  - `sprints/S0029/uat.json`
+  - `sprints/S0029/uat.md`
+- Acceptance mapping: AC-1..AC-9 each mapped to at least one explicit UAT step.
+- Isolation compliance gate: **PASS** for target lifecycle evidence in `docs/engineering/state.md`
+  (required phases present with valid fields and fresh markers: execute, qa, verify-work).
+- Pre-handoff traceability check: **PASS** (current sprint story `US-0050` has traceability index row and evidence refs).
+- Next phase recommendation: **`/release`** for S0029.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0029-verify-work-US0050-20260311T222720Z-fresh
+- timestamp=2026-03-11T22:27:20Z
+- evidence_ref=sprints/S0029/uat.json,sprints/S0029/uat.md
+
+## QA checkpoint (2026-03-11) — S0029 / US-0050 (rerun)
+
+- Sprint **S0029** (US-0050) QA rerun completed in fresh QA context with PASS outcome.
+- Validation evidence:
+  - `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit code 0,
+  - `tests/report.md` timestamp `2026-03-11T22:12:04Z` (`Pass: 404`, `Fail: 0`),
+  - previously failing Homebrew stable formula version-sync checks now PASS.
+- Findings:
+  - Blocking: none,
+  - Non-blocking: runbook `TEST_COMMAND` is shell-based; PowerShell baseline command used on this Windows host.
+- Sync policy guidance:
+  - `PRE_QA_AUTOPUSH_FORBIDDEN` cleared for this sprint,
+  - `BLOCKING_QA_FINDINGS` not applicable,
+  - `SYNC_PUSHED` only when manual policy is explicitly invoked and branch safety checks pass.
+- Next phase recommendation: **`/verify-work`** for S0029.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0029-rerun-US0050-20260311T221300Z-fresh
+- timestamp=2026-03-11T22:13:00Z
+- evidence_ref=sprints/S0029/qa-findings.md,handoffs/qa_to_dev.md
+
+## Execute checkpoint (2026-03-11) — S0029 / US-0050 (QA blocker remediation)
+
+- Execute re-run completed in fresh Dev context to resolve S0029 QA blockers.
+- Remediation implemented: updated `packaging/homebrew/its-magic.rb` to match package version `0.1.2-20` (URL + version + SHA256).
+- Validation evidence:
+  - `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit code 0,
+  - `tests/report.md` timestamp `2026-03-11T22:03:11Z` (`Pass: 404`, `Fail: 0`),
+  - previously failing Homebrew stable formula sync checks now PASS.
+- Next phase recommendation: **`/qa`** rerun for S0029.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0029-execute2-US0050-20260311T220600Z-fresh
+- timestamp=2026-03-11T22:06:00Z
+- evidence_ref=handoffs/dev_to_qa.md,sprints/S0029/summary.md
+
+## QA checkpoint (2026-03-11) — S0029 / US-0050
+
+- Sprint **S0029** (US-0050) QA completed in fresh QA context.
+- Story implementation contract AC-1..AC-9 verifies as implemented, but QA outcome is **BLOCKED** due unresolved baseline test failures.
+- Test evidence:
+  - runbook TEST_COMMAND attempt `sh tests/run-tests.sh` failed on host (`sh` unavailable),
+  - fallback baseline `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit code 1,
+  - `tests/report.md` timestamp `2026-03-11T21:48:44Z` (`Pass: 402`, `Fail: 2`).
+- Blocking findings (high):
+  - `Homebrew stable formula URL uses npm version tag`
+  - `Homebrew stable formula version matches npm version`
+- Sync policy guidance:
+  - `PRE_QA_AUTOPUSH_FORBIDDEN` (until QA clear),
+  - `BLOCKING_QA_FINDINGS` (currently active),
+  - `SYNC_PUSHED` not eligible.
+- Next phase recommendation: **`/execute`** to resolve blockers or open decision gate for deferred scope.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-S0029-US0050-20260311T215200Z-fresh
+- timestamp=2026-03-11T21:52:00Z
+- evidence_ref=sprints/S0029/qa-findings.md,handoffs/qa_to_dev.md
+
+## Execute checkpoint (2026-03-11) — S0029 / US-0050
+
+- Sprint **S0029** (US-0050 Clean Install Hygiene and Complete Clean-Repo Coverage) implementation completed in fresh Dev context.
+- Delivered:
+  - shared installer ownership manifest and template parity copy,
+  - manifest-driven install/clean behavior in `installer.ps1`, `installer.sh`, `installer.py`,
+  - expanded clean scope for owned workflow artifacts (docs/user-guides, validate scripts, CI workflow files, `.its-magic-version`),
+  - starter template neutrality cleanup for seeded operational rows and fixed ID references,
+  - lifecycle regression expansion for fresh-install neutrality and clean-repo completeness in both PowerShell and shell test runners.
+- Evidence: `sprints/S0029/summary.md`, `sprints/S0029/tasks.md`, `sprints/S0029/progress.md`, `handoffs/dev_to_qa.md`, `tests/report.md`.
+- Test result: `tests/run-tests.ps1` -> Pass 402, Fail 2.
+- Blockers: two pre-existing Homebrew stable formula version-sync test failures (outside US-0050 implementation scope).
+- Next phase recommendation: **`/qa`** for S0029.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-S0029-execute-US0050-20260311T214000Z-fresh
+- timestamp=2026-03-11T21:40:00Z
+- evidence_ref=handoffs/dev_to_qa.md,sprints/S0029/summary.md
+
 ## Release checkpoint (2026-03-02) — S0028 / US-0049
 
 - Release gate chain PASS for **S0028** (US-0049 Legacy DONE-Story Acceptance/Traceability Backfill Guard).
@@ -1644,6 +2903,8 @@ Per DEC-0010, this table maps every story to its sprint, tasks, status, and evid
 
 | Story | Sprint | Tasks | Status | Evidence |
 |-------|--------|-------|--------|----------|
+| US-0055 | S0034 | T-001..T-010 | DONE | sprints/S0034/summary.md, sprints/S0034/qa-findings.md, sprints/S0034/uat.json, sprints/S0034/uat.md, sprints/S0034/release-findings.md, handoffs/releases/S0034-release-notes.md, tests/report.md |
+| US-0054 | S0033 | T-001..T-010 | DONE | sprints/S0033/summary.md, sprints/S0033/qa-findings.md, sprints/S0033/uat.json, sprints/S0033/uat.md, sprints/S0033/release-findings.md, handoffs/releases/S0033-release-notes.md, tests/report.md |
 | US-0018 | S0001 | T-001..T-011 | DONE | S0001/summary.md, S0001/uat.json |
 | US-0015 | S0016 | T-001..T-004 | PASS | S0016/summary.md, S0016/qa-findings.md, S0016/uat.json, S0016/uat.md, tests/report.md |
 | US-0016 | S0018 | T-001..T-003 | PASS | S0018/summary.md, S0018/qa-findings.md, S0018/uat.json, S0018/uat.md, tests/report.md |
@@ -1676,6 +2937,10 @@ Per DEC-0010, this table maps every story to its sprint, tasks, status, and evid
 | US-0031 | S0026 | T-001..T-008 | DONE | S0026/summary.md, S0026/qa-findings.md, S0026/uat.json, S0026/uat.md, tests/report.md, handoffs/releases/S0026-release-notes.md |
 | US-0032 | S0027 | T-001..T-008 | DONE | sprints/S0027/summary.md, sprints/S0027/qa-findings.md, sprints/S0027/uat.json, sprints/S0027/uat.md, sprints/S0027/release-findings.md, handoffs/releases/S0027-release-notes.md, tests/report.md |
 | US-0049 | S0028 | T-001..T-008 | EXECUTE COMPLETE | sprints/S0028/sprint.md, sprints/S0028/tasks.md, sprints/S0028/summary.md, sprints/S0028/progress.md, sprints/S0028/plan-verify.json, handoffs/dev_to_qa.md, docs/engineering/legacy-drift-audit.md, tests/report.md |
+| US-0050 | S0029 | T-001..T-010 | DONE | sprints/S0029/summary.md, sprints/S0029/tasks.md, sprints/S0029/progress.md, sprints/S0029/qa-findings.md, sprints/S0029/uat.json, sprints/S0029/uat.md, sprints/S0029/release-findings.md, handoffs/releases/S0029-release-notes.md, handoffs/release_queue.md, handoffs/dev_to_qa.md, handoffs/qa_to_dev.md, tests/report.md |
+| US-0051 | S0030 | T-001..T-011 | DONE | sprints/S0030/summary.md, sprints/S0030/tasks.md, sprints/S0030/progress.md, sprints/S0030/qa-findings.md, sprints/S0030/uat.json, sprints/S0030/uat.md, sprints/S0030/release-findings.md, handoffs/releases/S0030-release-notes.md, handoffs/release_queue.md, handoffs/dev_to_qa.md, handoffs/qa_to_dev.md, tests/report.md |
+| US-0052 | S0031 | T-001..T-010 | DONE | sprints/S0031/sprint.md, sprints/S0031/tasks.md, sprints/S0031/progress.md, sprints/S0031/summary.md, sprints/S0031/qa-findings.md, sprints/S0031/uat.json, sprints/S0031/uat.md, sprints/S0031/plan-verify.json, sprints/S0031/release-findings.md, handoffs/releases/S0031-release-notes.md, handoffs/release_queue.md, handoffs/dev_to_qa.md, handoffs/qa_to_dev.md, tests/report.md |
+| US-0053 | S0032 | T-001..T-010 | PASS | sprints/S0032/summary.md;handoffs/dev_to_qa.md;sprints/S0032/qa-findings.md;sprints/S0032/uat.json;sprints/S0032/uat.md;sprints/S0032/release-findings.md;handoffs/releases/S0032-release-notes.md;handoffs/release_queue.md;handoffs/qa_to_dev.md;tests/report.md |
 
 ## Known issues
 
@@ -2254,3 +3519,572 @@ Per DEC-0010, this table maps every story to its sprint, tasks, status, and evid
 - stop_reason=completed
 - stop_phase=refresh-context
 - timestamp=2026-03-01
+
+## Architecture checkpoint (2026-03-11) — US-0050 / US-0051 / US-0052
+
+- Architecture completed for:
+  - `US-0050` clean-install hygiene and complete clean-repo coverage
+  - `US-0051` intake decomposition + risk-aware questioning
+  - `US-0052` optional fresh-project ID bootstrap
+- Early architecture research persisted: `R-0025`.
+- Decisions recorded:
+  - `DEC-0032` ownership-manifest cleanup contract and starter neutrality
+  - `DEC-0033` decomposition heuristics + adaptive questioning policy
+  - `DEC-0034` optional ID bootstrap with deterministic freshness checks
+- Optional-mode checks (from scratchpad):
+  - `CROSS_REPO_OBSERVABILITY=0` -> skipped (zero required overhead)
+  - `COMPONENT_SCOPE_MODE=0` -> skipped (zero required overhead)
+  - `SPEC_PACK_MODE=0` -> skipped (zero required overhead)
+  - `USER_GUIDE_MODE=0` -> skipped (zero required overhead)
+- Readiness:
+  - Scope boundaries and risk inventory documented in `docs/engineering/architecture.md`.
+  - Decision index updated in `docs/engineering/decisions.md` and full DEC files created.
+  - Backlog remains OPEN for `US-0050`, `US-0051`, `US-0052`.
+- Next recommended phase:
+  - `/sprint-plan` (recommended sequencing: `US-0050` -> `US-0051` -> `US-0052`).
+
+## Sprint-plan checkpoint (2026-03-11) — S0029 / US-0050
+
+- Non-bulk sprint planning completed for `US-0050` using canonical backlog scope.
+- Sprint created: `S0029`.
+- Planned tasks: `T-001..T-010` (within `SPRINT_MAX_TASKS=12`; split not required).
+- Milestone activation check (DEC-0009): not applicable (no milestone context declared).
+- UAT placeholders created:
+  - `sprints/S0029/uat.json`
+  - `sprints/S0029/uat.md`
+- Optional-mode planning checks:
+  - `COMPONENT_SCOPE_MODE=0` -> no component scope task metadata required.
+  - `USER_GUIDE_MODE=0` -> no user-guide planning tasks required.
+- Traceability index updated with `US-0050 -> S0029` row (`Status=PLANNED`, empty evidence).
+- Next recommended phase:
+  - `/plan-verify` for `S0029`.
+
+## Plan-verify checkpoint (2026-03-11) — S0029 / US-0050
+
+- `sprints/S0029/plan-verify.json` result: PASS.
+- Coverage status: all `US-0050` AC-1..AC-9 are covered by `T-001..T-010`.
+- No planning gaps or decision-gate blockers at plan boundary.
+- Next recommended phase:
+  - `/execute` for `S0029` (`US-0050`).
+
+## Intake checkpoint (2026-03-14) — US-0057
+
+- Intake captured for `US-0057`:
+  - title: Upgrade-safe scratchpad local example refresh and installer parity
+  - status: `OPEN`
+  - acceptance set: AC-1..AC-10 (deterministic ownership, upgrade refresh,
+    parity, diagnostics, regression coverage)
+- Intake artifacts updated:
+  - `docs/product/backlog.md`
+  - `docs/product/acceptance.md`
+  - `docs/product/vision.md`
+  - `handoffs/po_to_tl.md`
+  - `docs/engineering/research.md` (`R-0032`)
+- Canonical priority/order check:
+  - `US-0056` remains next prioritized OPEN story by backlog order.
+  - `US-0057` is queued as additional OPEN P1 intake.
+- Isolation evidence:
+  - phase_id=intake
+  - role=po
+  - fresh_context_marker
+  - timestamp=2026-03-14T15:40:00Z
+  - evidence_ref=docs/product/backlog.md#us-0057
+
+## Intake checkpoint (2026-03-14) — US-0058
+
+- Intake captured for `US-0058`:
+  - title: Deterministic artifact ordering and write discipline
+  - status: `OPEN`
+  - acceptance set: AC-1..AC-10 (ordering matrix, deterministic insertion,
+    idempotence, parity, tests)
+- Intake artifacts updated:
+  - `docs/product/backlog.md`
+  - `docs/product/acceptance.md`
+  - `docs/product/vision.md`
+  - `handoffs/po_to_tl.md`
+  - `docs/engineering/research.md` (`R-0033`)
+- Canonical priority/order check:
+  - `US-0056` remains next prioritized OPEN story by backlog order.
+  - `US-0057` and `US-0058` remain queued OPEN stories.
+- Isolation evidence:
+  - phase_id=intake
+  - role=po
+  - fresh_context_marker
+  - timestamp=2026-03-14T16:00:00Z
+  - evidence_ref=docs/product/backlog.md#us-0058
+
+## Auto continuation checkpoint (2026-03-14) — US-0056
+
+- invocation_mode=auto
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- timestamp=2026-03-14T16:15:00Z
+
+## Discovery checkpoint (2026-03-14) — US-0056
+
+- `/discovery` completed for `US-0056` in fresh PO context.
+- Discovery artifacts updated:
+  - `docs/product/vision.md` (discovery notes)
+  - `handoffs/po_to_tl.md` (discovery addendum)
+- Discovery findings:
+  - strict runtime proof requires execution-bound attestation, not only artifact markers.
+  - `/auto` must validate proof tuple at each phase boundary before continuation.
+  - failure paths require deterministic fail-closed reason codes and remediation guidance.
+- Next phase recommendation: `/research` for `US-0056`.
+- Isolation evidence:
+  - phase_id=discovery
+  - role=po
+  - fresh_context_marker=po-US0056-discovery-20260314T161800Z-fresh
+  - timestamp=2026-03-14T16:18:00Z
+  - evidence_ref=docs/product/vision.md,handoffs/po_to_tl.md,docs/product/backlog.md
+
+## Research checkpoint (2026-03-14) — US-0056
+
+- `/research` completed for `US-0056` in fresh Tech Lead context.
+- Research evidence added:
+  - `R-0034` in `docs/engineering/research.md` (runtime attestation tuple,
+    uniqueness/freshness validation, deterministic failure classes).
+- Context pack synchronized:
+  - `docs/engineering/decisions.md` updated with active architecture target
+    `US-0056` and latest evidence `R-0034`.
+- Next phase recommendation: `/architecture` for `US-0056`.
+- Isolation evidence:
+  - phase_id=research
+  - role=tech-lead
+  - fresh_context_marker=tl-US0056-research-20260314T162300Z-fresh
+  - timestamp=2026-03-14T16:23:00Z
+  - evidence_ref=docs/engineering/research.md,docs/engineering/decisions.md
+
+## Architecture checkpoint (2026-03-14) — US-0056
+
+- `/architecture` completed for `US-0056` in fresh Tech Lead context.
+- Architecture artifacts updated:
+  - `docs/engineering/architecture.md` (strict runtime attestation design)
+  - `decisions/DEC-0038.md` (proposed decision; gate open)
+  - `docs/engineering/decisions.md` (decision index/context pack)
+- Decision-gate status:
+  - open_decision_gate=`DEC-0038`
+  - required_action=user decision on strict attestation envelope + validator contract
+  - stop_reason=decision_gate
+  - stop_phase=architecture
+- Isolation evidence:
+  - phase_id=architecture
+  - role=tech-lead
+  - fresh_context_marker=tl-US0056-architecture-20260314T163000Z-fresh
+  - timestamp=2026-03-14T16:30:00Z
+  - evidence_ref=docs/engineering/architecture.md,decisions/DEC-0038.md,docs/engineering/decisions.md
+
+## Decision checkpoint (2026-03-14) — US-0056 / DEC-0038
+
+- User approved `DEC-0038` (strict runtime attestation contract).
+- Decision status transitioned:
+  - from `Proposed (decision gate open)`
+  - to `Accepted`
+- Continuation readiness:
+  - decision gate cleared
+  - next recommended phase=`/sprint-plan` for `US-0056`
+- Isolation evidence:
+  - phase_id=decision
+  - role=curator
+  - fresh_context_marker=curator-US0056-decision-DEC0038-approved-20260314T164500Z-fresh
+  - timestamp=2026-03-14T16:45:00Z
+  - evidence_ref=decisions/DEC-0038.md,docs/engineering/decisions.md,handoffs/resume_brief.md
+
+## Sprint-plan checkpoint (2026-03-14) — S0035 / US-0056
+
+- Non-bulk sprint planning completed for `US-0056` using canonical backlog scope.
+- Sprint created: `S0035`.
+- Planned tasks: `T-001..T-010` (within `SPRINT_MAX_TASKS=12`; split not required).
+- Plan artifacts created:
+  - `sprints/S0035/sprint.md`
+  - `sprints/S0035/tasks.md`
+  - `sprints/S0035/plan-verify.json`
+- Next recommended phase:
+  - `/plan-verify` for `S0035`.
+- Isolation evidence:
+  - phase_id=sprint-plan
+  - role=tech-lead
+  - fresh_context_marker=tl-US0056-sprint-plan-20260314T171000Z-fresh
+  - timestamp=2026-03-14T17:10:00Z
+  - evidence_ref=sprints/S0035/sprint.md,sprints/S0035/tasks.md,sprints/S0035/plan-verify.json,handoffs/tl_to_dev.md
+
+## Plan-verify checkpoint (2026-03-14) — S0035 / US-0056
+
+- `sprints/S0035/plan-verify.json` result: PASS.
+- Coverage status: all `US-0056` AC-1..AC-10 are covered by `T-001..T-010`.
+- No planning gaps or decision-gate blockers at plan boundary.
+- Next recommended phase:
+  - `/execute` for `S0035` (`US-0056`).
+- Isolation evidence:
+  - phase_id=plan-verify
+  - role=tech-lead
+  - fresh_context_marker=tl-US0056-plan-verify-20260314T171500Z-fresh
+  - timestamp=2026-03-14T17:15:00Z
+  - evidence_ref=sprints/S0035/plan-verify.json
+
+## Execute checkpoint (2026-03-14) — S0035 / US-0056
+
+- Implementation contract updates completed for strict runtime proof:
+  - `.cursor/commands/auto.md` (+ template parity)
+  - `.cursor/commands/verify-work.md` (+ template parity)
+  - `.cursor/commands/release.md` (+ template parity)
+  - `docs/engineering/runbook.md` (+ template parity)
+  - `README.md` (+ template parity)
+  - `tests/run-tests.ps1`, `tests/run-tests.sh`
+- Sprint artifacts updated:
+  - `sprints/S0035/progress.md`
+  - `sprints/S0035/summary.md`
+- Next recommended phase:
+  - `/qa` for `S0035`.
+- Isolation evidence:
+  - phase_id=execute
+  - role=dev
+  - fresh_context_marker=dev-US0056-execute-20260314T173000Z-fresh
+  - timestamp=2026-03-14T17:30:00Z
+  - evidence_ref=.cursor/commands/auto.md,.cursor/commands/verify-work.md,.cursor/commands/release.md,docs/engineering/runbook.md,README.md,tests/run-tests.ps1,tests/run-tests.sh
+
+## QA checkpoint (2026-03-14) — S0035 / US-0056
+
+- QA outcome: PASS, no blockers.
+- QA evidence:
+  - `sprints/S0035/qa-findings.md`
+  - `tests/report.md` (`Fail: 0`)
+- Optional checks:
+  - `LINT_COMMAND`: skipped (empty runbook key)
+  - `TYPECHECK_COMMAND`: skipped (empty runbook key)
+- Next recommended phase:
+  - `/verify-work` for `S0035`.
+- Isolation evidence:
+  - phase_id=qa
+  - role=qa
+  - fresh_context_marker=qa-US0056-qa-20260314T174000Z-fresh
+  - timestamp=2026-03-14T17:40:00Z
+  - evidence_ref=sprints/S0035/qa-findings.md,tests/report.md
+
+## Verify-work checkpoint (2026-03-14) — S0035 / US-0056
+
+- UAT artifacts verified:
+  - `sprints/S0035/uat.json`
+  - `sprints/S0035/uat.md`
+- UAT result: 10 passed, 0 failed.
+- Isolation compliance: PASS (execute/qa/verify-work evidence present).
+- Next recommended phase:
+  - `/release` for `S0035`.
+- Isolation evidence:
+  - phase_id=verify-work
+  - role=qa
+  - fresh_context_marker=qa-US0056-verify-work-20260314T175000Z-fresh
+  - timestamp=2026-03-14T17:50:00Z
+  - evidence_ref=sprints/S0035/uat.json,sprints/S0035/uat.md
+
+## Release checkpoint (2026-03-14) — S0035 / US-0056
+
+- Release outcome: PASS.
+- Release artifacts:
+  - `sprints/S0035/release-findings.md`
+  - `handoffs/releases/S0035-release-notes.md`
+  - `handoffs/release_queue.md` (`S0035` status `released`)
+  - `handoffs/release_notes.md` (latest pointer updated)
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0056` set to `DONE`; AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0056` checked
+- Isolation evidence:
+  - phase_id=release
+  - role=release
+  - fresh_context_marker=release-US0056-release-20260314T180000Z-fresh
+  - timestamp=2026-03-14T18:00:00Z
+  - evidence_ref=sprints/S0035/release-findings.md,handoffs/releases/S0035-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-14) — post S0035 / US-0056
+
+- Latest completed story: `US-0056` (`S0035`, PASS, released).
+- Canonical release status:
+  - queue row `S0035` is `released` in `handoffs/release_queue.md`
+  - canonical notes at `handoffs/releases/S0035-release-notes.md`
+  - legacy pointer updated in `handoffs/release_notes.md`
+- Backlog posture:
+  - next OPEN story by priority/order: `US-0057` (P1)
+  - additional OPEN story: `US-0058` (P1)
+- Next recommended phase:
+  - `/discovery` for `US-0057`.
+- Isolation evidence:
+  - phase_id=refresh-context
+  - role=curator
+  - fresh_context_marker=curator-refresh-context-post-S0035-US0057-open-20260314T181000Z-fresh
+  - timestamp=2026-03-14T18:10:00Z
+  - evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,handoffs/resume_brief.md
+
+## Discovery checkpoint (2026-03-14) — US-0057
+
+- Discovery outcome: confirmed scratchpad example drift risk during upgrade and
+  ownership gap in diagnostics contract.
+- Recommended continuation: `/research`.
+- Isolation evidence:
+  - phase_id=discovery
+  - role=tech-lead
+  - fresh_context_marker=tl-US0057-discovery-20260314T182000Z-fresh
+  - timestamp=2026-03-14T18:20:00Z
+  - evidence_ref=docs/product/backlog.md,handoffs/po_to_tl.md
+
+## Research checkpoint (2026-03-14) — US-0057
+
+- Research baseline reused: `R-0032`.
+- Key finding: treat scratchpad example as framework-owned and user local file
+  as preserved user-owned surface.
+- Recommended continuation: `/architecture`.
+- Isolation evidence:
+  - phase_id=research
+  - role=curator
+  - fresh_context_marker=curator-US0057-research-20260314T183000Z-fresh
+  - timestamp=2026-03-14T18:30:00Z
+  - evidence_ref=docs/engineering/research.md
+
+## Architecture checkpoint (2026-03-14) — US-0057
+
+- Added architecture section for upgrade-safe scratchpad example refresh and
+  installer parity.
+- Decision accepted: `DEC-0039`.
+- Recommended continuation: `/sprint-plan`.
+- Isolation evidence:
+  - phase_id=architecture
+  - role=tech-lead
+  - fresh_context_marker=tl-US0057-architecture-20260314T184000Z-fresh
+  - timestamp=2026-03-14T18:40:00Z
+  - evidence_ref=docs/engineering/architecture.md,decisions/DEC-0039.md
+
+## Sprint-plan checkpoint (2026-03-14) — S0036 / US-0057
+
+- Sprint artifacts created:
+  - `sprints/S0036/sprint.md`
+  - `sprints/S0036/tasks.md`
+  - `sprints/S0036/progress.md`
+  - `sprints/S0036/plan-verify.json`
+  - `sprints/S0036/uat.json`
+  - `sprints/S0036/uat.md`
+- Isolation evidence:
+  - phase_id=sprint-plan
+  - role=tech-lead
+  - fresh_context_marker=tl-US0057-sprint-plan-20260314T185000Z-fresh
+  - timestamp=2026-03-14T18:50:00Z
+  - evidence_ref=sprints/S0036/sprint.md,sprints/S0036/tasks.md,sprints/S0036/plan-verify.json
+
+## Plan-verify checkpoint (2026-03-14) — S0036 / US-0057
+
+- Plan verification result: PASS (AC-1..AC-10 covered, no gaps).
+- Isolation evidence:
+  - phase_id=plan-verify
+  - role=qa
+  - fresh_context_marker=qa-US0057-plan-verify-20260314T185500Z-fresh
+  - timestamp=2026-03-14T18:55:00Z
+  - evidence_ref=sprints/S0036/plan-verify.json
+
+## Execute checkpoint (2026-03-14) — S0036 / US-0057
+
+- Implemented scratchpad example parity + installer diagnostics:
+  - `.cursor/scratchpad.local.example.md` (+ template parity)
+  - `installer.ps1`, `installer.sh`, `installer.py`
+  - `README.md`, `docs/engineering/runbook.md` (+ template parity)
+  - `tests/run-tests.ps1`, `tests/run-tests.sh`
+- Isolation evidence:
+  - phase_id=execute
+  - role=dev
+  - fresh_context_marker=dev-US0057-execute-20260314T190000Z-fresh
+  - timestamp=2026-03-14T19:00:00Z
+  - evidence_ref=installer.ps1,installer.sh,installer.py,.cursor/scratchpad.local.example.md,tests/run-tests.ps1,tests/run-tests.sh
+
+## QA checkpoint (2026-03-14) — S0036 / US-0057
+
+- QA result: PASS.
+- Evidence: tests suite PASS with zero failures.
+- Isolation evidence:
+  - phase_id=qa
+  - role=qa
+  - fresh_context_marker=qa-US0057-qa-20260314T190300Z-fresh
+  - timestamp=2026-03-14T19:03:00Z
+  - evidence_ref=sprints/S0036/qa-findings.md,tests/report.md
+
+## Verify-work checkpoint (2026-03-14) — S0036 / US-0057
+
+- UAT result: 10 passed, 0 failed.
+- Isolation evidence:
+  - phase_id=verify-work
+  - role=qa
+  - fresh_context_marker=qa-US0057-verify-work-20260314T190600Z-fresh
+  - timestamp=2026-03-14T19:06:00Z
+  - evidence_ref=sprints/S0036/uat.json,sprints/S0036/uat.md
+
+## Release checkpoint (2026-03-14) — S0036 / US-0057
+
+- Release outcome: PASS and finalized.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0057` set `DONE`; AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0057` checked
+- Isolation evidence:
+  - phase_id=release
+  - role=release
+  - fresh_context_marker=release-US0057-release-20260314T190800Z-fresh
+  - timestamp=2026-03-14T19:08:00Z
+  - evidence_ref=sprints/S0036/release-findings.md,handoffs/releases/S0036-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-14) — post S0036 / US-0057
+
+- Latest completed story: `US-0057` (`S0036`, PASS, released).
+- Backlog posture:
+  - next OPEN story by priority/order: `US-0058` (P1)
+- Next recommended phase:
+  - `/discovery` for `US-0058`.
+- Isolation evidence:
+  - phase_id=refresh-context
+  - role=curator
+  - fresh_context_marker=curator-refresh-context-post-S0036-US0058-open-20260314T191000Z-fresh
+  - timestamp=2026-03-14T19:10:00Z
+  - evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,handoffs/resume_brief.md
+
+## Discovery checkpoint (2026-03-14) — US-0058
+
+- Discovery outcome: ordering drift confirmed across state/backlog/acceptance
+  and handoff surfaces.
+- Recommended continuation: `/research`.
+- Isolation evidence:
+  - phase_id=discovery
+  - role=tech-lead
+  - fresh_context_marker=tl-US0058-discovery-20260314T192000Z-fresh
+  - timestamp=2026-03-14T19:20:00Z
+  - evidence_ref=docs/product/backlog.md,handoffs/po_to_tl.md
+
+## Research checkpoint (2026-03-14) — US-0058
+
+- Research baseline reused: `R-0033`.
+- Key finding: use one canonical per-artifact ordering matrix plus fail-safe
+  anchor handling.
+- Recommended continuation: `/architecture`.
+- Isolation evidence:
+  - phase_id=research
+  - role=curator
+  - fresh_context_marker=curator-US0058-research-20260314T193000Z-fresh
+  - timestamp=2026-03-14T19:30:00Z
+  - evidence_ref=docs/engineering/research.md
+
+## Architecture checkpoint (2026-03-14) — US-0058
+
+- Added architecture section for deterministic artifact ordering and write
+  discipline.
+- Decision accepted: `DEC-0040`.
+- Recommended continuation: `/sprint-plan`.
+- Isolation evidence:
+  - phase_id=architecture
+  - role=tech-lead
+  - fresh_context_marker=tl-US0058-architecture-20260314T194000Z-fresh
+  - timestamp=2026-03-14T19:40:00Z
+  - evidence_ref=docs/engineering/architecture.md,decisions/DEC-0040.md
+
+## Sprint-plan checkpoint (2026-03-14) — S0037 / US-0058
+
+- Sprint artifacts created:
+  - `sprints/S0037/sprint.md`
+  - `sprints/S0037/tasks.md`
+  - `sprints/S0037/progress.md`
+  - `sprints/S0037/plan-verify.json`
+  - `sprints/S0037/uat.json`
+  - `sprints/S0037/uat.md`
+- Isolation evidence:
+  - phase_id=sprint-plan
+  - role=tech-lead
+  - fresh_context_marker=tl-US0058-sprint-plan-20260314T195000Z-fresh
+  - timestamp=2026-03-14T19:50:00Z
+  - evidence_ref=sprints/S0037/sprint.md,sprints/S0037/tasks.md,sprints/S0037/plan-verify.json
+
+## Plan-verify checkpoint (2026-03-14) — S0037 / US-0058
+
+- Plan verification result: PASS (AC-1..AC-10 covered, no gaps).
+- Isolation evidence:
+  - phase_id=plan-verify
+  - role=qa
+  - fresh_context_marker=qa-US0058-plan-verify-20260314T195500Z-fresh
+  - timestamp=2026-03-14T19:55:00Z
+  - evidence_ref=sprints/S0037/plan-verify.json
+
+## Execute checkpoint (2026-03-14) — S0037 / US-0058
+
+- Implemented deterministic ordering contract artifacts and command updates:
+  - `docs/engineering/artifact-ordering-policy.md` (+ template parity)
+  - command contracts (`auto`, `intake`, `release`, `refresh-context`,
+    `status-reconcile`) + template parity
+  - `README.md`, `docs/engineering/runbook.md` + template parity
+  - `tests/run-tests.ps1`, `tests/run-tests.sh`
+- Isolation evidence:
+  - phase_id=execute
+  - role=dev
+  - fresh_context_marker=dev-US0058-execute-20260314T200000Z-fresh
+  - timestamp=2026-03-14T20:00:00Z
+  - evidence_ref=docs/engineering/artifact-ordering-policy.md,.cursor/commands/auto.md,.cursor/commands/release.md,tests/run-tests.ps1,tests/run-tests.sh
+
+## QA checkpoint (2026-03-14) — S0037 / US-0058
+
+- QA result: PASS.
+- Evidence: tests suite PASS with zero failures.
+- Isolation evidence:
+  - phase_id=qa
+  - role=qa
+  - fresh_context_marker=qa-US0058-qa-20260314T200300Z-fresh
+  - timestamp=2026-03-14T20:03:00Z
+  - evidence_ref=sprints/S0037/qa-findings.md,tests/report.md
+
+## Verify-work checkpoint (2026-03-14) — S0037 / US-0058
+
+- UAT result: 10 passed, 0 failed.
+- Isolation evidence:
+  - phase_id=verify-work
+  - role=qa
+  - fresh_context_marker=qa-US0058-verify-work-20260314T200600Z-fresh
+  - timestamp=2026-03-14T20:06:00Z
+  - evidence_ref=sprints/S0037/uat.json,sprints/S0037/uat.md
+
+## Release checkpoint (2026-03-14) — S0037 / US-0058
+
+- Release outcome: PASS and finalized.
+- Product reconciliation:
+  - `docs/product/backlog.md` -> `US-0058` set `DONE`; AC-1..AC-10 checked
+  - `docs/product/acceptance.md` -> `US-0058` checked
+- Isolation evidence:
+  - phase_id=release
+  - role=release
+  - fresh_context_marker=release-US0058-release-20260314T200800Z-fresh
+  - timestamp=2026-03-14T20:08:00Z
+  - evidence_ref=sprints/S0037/release-findings.md,handoffs/releases/S0037-release-notes.md,handoffs/release_queue.md,docs/product/backlog.md,docs/product/acceptance.md
+
+## Refresh-context checkpoint (2026-03-14) — post S0037 / US-0058
+
+- Latest completed story: `US-0058` (`S0037`, PASS, released).
+- Backlog posture:
+  - no OPEN story in active intake queue.
+- Next recommended phase:
+  - `/intake`.
+- Isolation evidence:
+  - phase_id=refresh-context
+  - role=curator
+  - fresh_context_marker=curator-refresh-context-post-S0037-no-open-intake-20260314T201000Z-fresh
+  - timestamp=2026-03-14T20:10:00Z
+  - evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/release_notes.md,handoffs/release_queue.md,handoffs/resume_brief.md
+
+## Status-reconcile checkpoint (2026-03-14)
+
+- Reconciliation result: `STATUS_RECONCILE_APPLIED`.
+- Applied normalization scope:
+  - backlog AC checkbox normalization for DONE stories: `US-0018`, `US-0025`,
+    `US-0026`, `US-0027`, `US-0028`, `US-0029`, `US-0030`, `US-0036`,
+    `US-0037`, `US-0038`
+  - acceptance row normalization for DONE stories: `US-0017`, `US-0018`,
+    `US-0024`, `US-0025`, `US-0026`, `US-0027`, `US-0028`, `US-0029`,
+    `US-0030`, `US-0036`, `US-0037`, `US-0038`
+- Resume posture after reconcile:
+  - no OPEN story in active intake queue
+  - intended phase remains `/intake`
+- Isolation evidence:
+  - phase_id=status-reconcile
+  - role=curator
+  - fresh_context_marker=curator-status-reconcile-20260314T203000Z-fresh
+  - timestamp=2026-03-14T20:30:00Z
+  - evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,handoffs/resume_brief.md,docs/engineering/status-normalization-report.md

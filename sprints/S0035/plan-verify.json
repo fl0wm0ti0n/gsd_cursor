@@ -1,0 +1,20 @@
+{
+  "sprint_id": "S0035",
+  "story_id": "US-0056",
+  "status": "PASS",
+  "coverage": [
+    {"ac": "AC-1", "tasks": ["T-001"], "status": "covered"},
+    {"ac": "AC-2", "tasks": ["T-002"], "status": "covered"},
+    {"ac": "AC-3", "tasks": ["T-003"], "status": "covered"},
+    {"ac": "AC-4", "tasks": ["T-004"], "status": "covered"},
+    {"ac": "AC-5", "tasks": ["T-005"], "status": "covered"},
+    {"ac": "AC-6", "tasks": ["T-006"], "status": "covered"},
+    {"ac": "AC-7", "tasks": ["T-007"], "status": "covered"},
+    {"ac": "AC-8", "tasks": ["T-008"], "status": "covered"},
+    {"ac": "AC-9", "tasks": ["T-009"], "status": "covered"},
+    {"ac": "AC-10", "tasks": ["T-010"], "status": "covered"}
+  ],
+  "gaps": [],
+  "summary": "PASS - all US-0056 acceptance criteria are fully covered by planned sprint tasks.",
+  "notes": "DEC-0038 accepted; proceed to /execute."
+}

@@ -28,3 +28,14 @@ description: "its-magic refresh context: compact state and decisions."
 2. Update sprint summary with current status.
 3. Ensure handoffs and state are consistent.
 
+## Deterministic artifact ordering contract (US-0058 / DEC-0040)
+
+- Writes must follow `docs/engineering/artifact-ordering-policy.md`.
+- `docs/engineering/state.md` refresh checkpoints are append-bottom only.
+- `docs/engineering/decisions.md` compact index remains newest-first in bounded
+  section while preserving canonical header structure.
+- `sprints/S0001/summary.md` context-pack pointer is prepend-top within its
+  context section; historical details remain intact.
+- Missing/ambiguous anchors fail with `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS`
+  (no partial write).
+

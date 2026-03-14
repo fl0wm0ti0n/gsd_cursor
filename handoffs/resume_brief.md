@@ -2,14 +2,25 @@
 
 ## Current status
 
-- Post S0028 release: `US-0049` (`S0028`) is finalized (PASS, released).
-- Release gates passed; backlog/acceptance reconciled for US-0049.
-- **OPEN stories: none** — backlog currently all DONE; next work via **intake**.
+- Post S0037 release: `US-0058` (`S0037`) is finalized (PASS, released).
+- Release gates passed; backlog/acceptance reconciled for US-0058.
+- Status-reconcile pass applied normalization for legacy DONE/unchecked drift
+  (`STATUS_RECONCILE_APPLIED`).
+- Current OPEN backlog stories:
+  - (none in active intake queue)
+- Latest intake accepted:
+  - `/intake` for `US-0056` (completed),
+  - `/intake` for `US-0057` (completed),
+  - `/intake` for `US-0058` (completed),
+  - `/discovery` progressed for `US-0056`.
+- Decision status update:
+  - `DEC-0038` accepted and implemented in S0035 release.
 
 ## Next actions
 
-1. Next run: start from **intake** for new work (no OPEN story in backlog).
-2. After intake selects/creates a story, run **discovery** → research → architecture → sprint-plan per workflow.
+1. Next run: continue with a new **`/intake`** story request.
+2. Recommended next phase: **`/intake`**.
+3. Then continue lifecycle: discovery -> research -> architecture -> sprint-plan -> plan-verify -> execute -> qa -> verify-work -> release.
 
 ## Intended resume phase
 
@@ -17,7 +28,7 @@
 
 ## Isolation provenance (US-0048 / DEC-0029)
 
-- isolation_provenance_ref=docs/engineering/state.md (refresh-context checkpoint post S0028)
+- isolation_provenance_ref=docs/engineering/state.md (refresh-context checkpoint post S0037 / no-open-intake)
 - resume_requires_fresh_context=1
 
 ## Auto continuation breadcrumb contract (US-0037)
@@ -33,3 +44,13 @@ When `/auto` continuation stops before completion, include:
 
 Fail-fast resolver errors must use:
 `[AUTO_RESUME_ERROR] <code>: <summary>. Source=<source>. Fix: <action>.`
+
+## Latest auto breadcrumb
+
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=completed
+- stop_phase=refresh-context
+- timestamp=2026-03-14T20:10:00Z
