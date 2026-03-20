@@ -57,6 +57,12 @@ verify no unresolved blockers.
    - `TEST_COMMAND` is mandatory baseline evidence for push eligibility.
    - Optional checks run only when configured and should be reported as
      `pass|fail|skipped` deterministically.
+   - **User-visible metadata guard (US-0071 / DEC-0053):** run
+     `python scripts/check-user-visible-metadata.py` (see runbook). On failure,
+     record blocking findings with reason `USER_VISIBLE_INTERNAL_METADATA_DETECTED`,
+     cite `path:line:column` evidence, token class, and remediation per runbook.
+     If the checker entrypoint is missing, fail closed with
+     `METADATA_SANITIZATION_POLICY_MISSING`.
 2. Record findings and severity.
    - Explicitly classify blockers that must prevent auto-push:
      unresolved blocking QA findings and unresolved critical issues.
@@ -98,4 +104,77 @@ verify no unresolved blockers.
    - If `USER_GUIDE_MODE=1`, verify target-story user guide exists at
      `docs/user-guides/US-xxxx.md` and required sections are present; report
      gaps in qa-findings; see runbook for minimum schema.
+12. Optional remote runtime QA/debug contract (US-0064):
+   - When remote runtime metadata exists in
+     `docs/engineering/release-targets.json` for active target context,
+     validate remote endpoint reachability/debug evidence per configured
+     `runtime.mode`.
+   - Include local vs remote QA context and sanitized endpoint details in
+     `sprints/Sxxxx/qa-findings.md`.
+   - If remote connectivity config is incomplete for required remote checks,
+     mark blocking with deterministic reason code
+     `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
+13. Runtime QA autopilot contract (US-0065 / DEC-0047):
+   - Runtime truth path is mandatory for generated-project QA:
+     `startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`.
+   - PASS requires runtime startup and endpoint/process reachability evidence.
+   - Deterministic failure outcomes:
+     - startup command/process fails: `RUNTIME_STARTUP_FAILED`
+     - endpoint/process unreachable after retries:
+       `RUNTIME_ENDPOINT_UNREACHABLE`
+     - critical runtime log signals detected:
+       `RUNTIME_LOG_CRITICAL_DETECTED`
+     - retry budget exhausted without recovery:
+       `RUNTIME_RETRY_BUDGET_EXHAUSTED`
+     - stack profile unresolved for runtime checks:
+       `RUNTIME_STACK_PROFILE_UNRESOLVED`
+   - Runtime profile resolution must be stack-aware for:
+     `node|python|go|java|dotnet` at minimum.
+   - Unknown/ambiguous stacks must fail closed with
+     `RUNTIME_STACK_PROFILE_UNRESOLVED` (no silent generic PASS fallback).
+   - Bounded retry loop requirements:
+     - retry only transient startup/connectivity failures,
+     - enforce configured attempt cap (`attempt <= max`),
+     - write per-attempt ledger evidence (`attempt`, `delay_ms`, `outcome`),
+     - stop retrying on non-transient critical log failures.
+   - Required QA runtime evidence schema fields in `sprints/Sxxxx/qa-findings.md`:
+     - `runtime_startup_command`
+     - `runtime_stack_profile`
+     - `runtime_mode` (`local|remote`)
+     - `runtime_health_target` (process/endpoint)
+     - `runtime_health_result`
+     - `runtime_log_summary` (severity counts + key signals)
+     - `runtime_retry_count`
+     - `runtime_retry_ledger`
+     - `runtime_final_verdict` (`pass|fail`)
+     - `runtime_reason_code`
+     - `runtime_evidence_refs`
+   - Webapp runtime verification path (when applicable):
+     - run browser-surface check for expected app load path,
+     - capture console error summary and failed network request summary,
+     - include results in runtime evidence fields.
+   - Optional debug escalation path:
+     - use only for reproducible runtime failures,
+     - keep instrumentation bounded and reversible,
+     - record debug actions/evidence and cleanup confirmation.
+14. Generated baseline test auto-run contract (US-0066 / DEC-0048):
+   - For generated-project QA scope, run baseline tests automatically using the
+     resolved `TEST_COMMAND`; do not treat baseline tests as optional.
+   - Deterministic generated-test evidence fields in `sprints/Sxxxx/qa-findings.md`:
+     - `generated_test_stack_profile`
+     - `generated_test_command`
+     - `generated_test_result` (`pass|fail`)
+     - `generated_test_output_ref`
+     - `generated_test_paths_ref`
+     - `generated_test_reason_code`
+   - Deterministic scaffold failure outcomes:
+     - unresolved profile: `TEST_SCAFFOLD_STACK_UNRESOLVED`
+     - unsupported profile: `TEST_SCAFFOLD_UNSUPPORTED_STACK`
+     - generation/run failure: `TEST_SCAFFOLD_GENERATION_FAILED`
+   - Non-destructive baseline guardrails:
+     - preserve user-authored tests/config/commands,
+     - validate generated scaffold behavior as fill-missing/idempotent only.
+   - Runtime integration boundary:
+     - generated-test PASS does not override runtime-autopilot failures from
+       `US-0065`; non-starting apps cannot PASS QA.
 

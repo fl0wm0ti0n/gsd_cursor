@@ -115,13 +115,17 @@ Install options:
   --backup          Before overwriting, save existing files to backups/<timestamp>/.
                     Ignored when mode is "missing" (nothing gets replaced).
   --create          Create the target directory if it does not exist.
+  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from
+        OS+stack detection; unresolved TEST_COMMAND fails fast with
+        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.
 
 Clean options:
   --clean-repo      Remove all its-magic workflow artifacts from the target repo
                     (owned paths from installer manifest, including .cursor,
                     docs/product, docs/engineering, docs/user-guides, sprints,
                     handoffs, decisions, workflow scripts, CI files, and
-                    .its-magic-version). Your own source code is never touched.
+                    installer metadata under its_magic/ (legacy .its-magic-version
+                    is also removed when present). Your own source code is never touched.
   --target <path>   Repo to clean (default: current directory).
   --yes             Skip the confirmation prompt.
 

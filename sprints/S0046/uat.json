@@ -1,0 +1,30 @@
+{
+  "sprint_id": "S0046",
+  "story_ids": [
+    "US-0067"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    { "id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Canonical release-notes template defines deterministic Run/Connect/Verify section schema in fixed order with required section headings." },
+    { "id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Operator contract enforces startup command, runtime mode/context, endpoint/port, expected health signal, and known-issues fields." },
+    { "id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Credentials guidance is restricted to environment-reference names only and requires expected value-source location semantics." },
+    { "id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Legacy latest-pointer release notes include concise Run/Connect/Verify summary and deterministic link-back to canonical sprint notes." },
+    { "id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Release command contains fail-closed behavior and deterministic reason codes for missing, ambiguous, or unsafe operator hints." },
+    { "id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Runtime-mode local/remote context is explicit and aligned with runtime-connectivity guidance when that contract is present." },
+    { "id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "QA evidence references validated operator hints against verification artifacts with in-scope AC coverage in qa-findings." },
+    { "id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Active/template parity is maintained across release command, release-note templates, runbook, and core rule guidance." },
+    { "id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression checks include valid operator guidance generation, fail-safe missing-field behavior, and secret-redaction policy assertions." },
+    { "id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "Operator-facing output remains concise and deterministic across reruns in both canonical and legacy release-note surfaces." }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0046/qa-findings.md",
+    "sprints/S0046/summary.md",
+    "sprints/S0046/tasks.md",
+    "sprints/S0046/progress.md",
+    "tests/report.md"
+  ]
+}

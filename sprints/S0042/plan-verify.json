@@ -1,0 +1,22 @@
+{
+  "sprint_id": "S0042",
+  "story_id": "US-0062",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "ownership-boundary",
+      "status": "pass",
+      "note": "Installer-owned metadata is scoped under its_magic/."
+    },
+    {
+      "id": "migration-compatibility",
+      "status": "pass",
+      "note": "Legacy root version marker is read/migrated safely."
+    },
+    {
+      "id": "parity-regression",
+      "status": "pass",
+      "note": "Active/template parity and regression tests updated."
+    }
+  ]
+}

@@ -18,7 +18,7 @@ scripts/validate-and-push.ps1
 scripts/validate-and-push.sh
 .github/workflows
 README.md
-.its-magic-version
+its_magic
 
 [clean_paths]
 .cursor
@@ -32,4 +32,5 @@ scripts/validate-and-push.ps1
 scripts/validate-and-push.sh
 .github/workflows/ci.yml
 .github/workflows/deploy.yml
+its_magic
 .its-magic-version

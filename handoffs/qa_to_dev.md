@@ -1,3 +1,92 @@
+# QA -> Dev Handoff - Sprint S0050 (US-0071)
+
+## Status: PASS - no fixes required
+
+Fresh `/qa` completed for Sprint **S0050** (US-0071 user-visible internal metadata
+sanitization guard). No blocking findings for in-scope acceptance.
+
+## Verification completed
+
+- Metadata guard:
+  `python scripts/check-user-visible-metadata.py` (exit code `0`).
+- Baseline command:
+  `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (exit code `1`).
+- Evidence: `tests/report.md` (`Timestamp: 2026-03-20T21:45:24Z`, `Pass: 683`,
+  `Fail: 4`).
+- US-0071 AC-1..AC-10 and section **26e** regression strings: PASS per
+  `sprints/S0050/qa-findings.md`.
+- Out-of-scope failures: Homebrew formula/npm sync (2), installer/CLI
+  `TEST_COMMAND` bootstrap (2) — documented as non-blocking for this story.
+
+## Findings
+
+- Blocking: none.
+- Non-blocking: baseline suite drift items above (repo-wide, not US-0071 scope).
+
+## Required next step
+
+- Proceed to **`/verify-work`** for S0050.
+
+---
+
+# QA -> Dev Handoff - Sprint S0049 (US-0070)
+
+## Status: PASS - no fixes required
+
+Fresh `/qa` completed for Sprint **S0049** (US-0070 scratchpad-controlled `/auto`
+phase selection policy). No blocking findings for in-scope acceptance.
+
+## Verification completed
+
+- Baseline command:
+  `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (exit code `1`).
+- Evidence: `tests/report.md` (`Timestamp: 2026-03-20T21:19:34Z`, `Pass: 673`,
+  `Fail: 4`).
+- US-0070 AC-1..AC-10 and section **26d** regression strings: PASS per
+  `sprints/S0049/qa-findings.md`.
+- Out-of-scope failures: Homebrew formula/npm sync (2), installer/CLI
+  `TEST_COMMAND` bootstrap (2) — documented as non-blocking for this story.
+
+## Findings
+
+- Blocking: none.
+- Non-blocking: baseline suite drift items above (repo-wide, not US-0070 scope).
+
+## Required next step
+
+- Proceed to **`/verify-work`** for S0049.
+
+---
+
+# QA -> Dev Handoff - Sprint S0048 (US-0069)
+
+## Status: PASS - no fixes required
+
+Fresh `/qa` completed for Sprint **S0048** (US-0069 Strict Phase Role Enforcement
+in `/auto` orchestration). No blocking findings for in-scope acceptance.
+
+## Verification completed
+
+- Baseline command:
+  `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (exit code `1`).
+- Evidence: `tests/report.md` (`Timestamp: 2026-03-20T21:07:46Z`, `Pass: 661`,
+  `Fail: 2`).
+- US-0069 AC-1..AC-10 and section **26c** regression strings: PASS per
+  `sprints/S0048/qa-findings.md`.
+- Out-of-scope failures: Homebrew stable formula URL/version vs npm (documented
+  as non-blocking for this story).
+
+## Findings
+
+- Blocking: none.
+- Non-blocking: Homebrew formula/npm version sync (repo-wide baseline drift).
+
+## Required next step
+
+- Proceed to **`/verify-work`** for S0048.
+
+---
+
 # QA -> Dev Handoff - Sprint S0033 (US-0054) /verify-work
 
 ## Status: PASS - no fixes required
@@ -836,3 +925,61 @@ continuation semantics.
 
 - No dev fix work needed for S0009 QA findings.
 - Proceed to `/verify-work`.
+
+---
+
+# QA -> Dev Handoff - Sprint S0045 (US-0066)
+
+## Status: PASS - blocker closed
+
+Fresh `/qa` rerun completed for Sprint **S0045** (US-0066 Generated Test
+Scaffolding and Auto-Run Contract) after execute remediation.
+
+## Verification completed
+
+- Command: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (exit code `1`).
+- Evidence: `tests/report.md` (`Timestamp: 2026-03-16T22:55:47Z`, `Pass: 622`, `Fail: 2`).
+- In-scope US-0066 assertions remain PASS (generated scaffold contract, QA auto-run contract, verify-work/release prerequisites).
+- Prior blocker is closed:
+  - `sprints/S0045/progress.md` now reports baseline tasks `T-001..T-010` as done.
+  - `sprints/S0045/tasks.md` and `sprints/S0045/summary.md` remain consistent with done/execute-complete state.
+
+## Findings
+
+- Blocking (US-0066 scope): none.
+- Non-blocking: baseline suite still has two out-of-scope Homebrew stable formula sync failures.
+
+## Required next step
+
+- Proceed to **`/verify-work`** for S0045.
+
+---
+
+# QA -> Dev Handoff - Sprint S0045 (US-0066)
+
+## Status: BLOCKED - fixes required
+
+Fresh `/qa` completed for Sprint **S0045** (US-0066 Generated Test Scaffolding
+and Auto-Run Contract).
+
+## Verification completed
+
+- Command: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (exit code `1`).
+- Evidence: `tests/report.md` (`Pass: 622`, `Fail: 2`).
+- In-scope US-0066 contract assertions are PASS (generated scaffold + auto-run +
+  verify-work/release prerequisites across active/template surfaces).
+- Sprint artifact consistency check found a blocking mismatch.
+
+## Blocking findings
+
+1. `sprints/S0045/progress.md` states `Baseline tasks T-001..T-010 are pending`.
+2. `sprints/S0045/tasks.md` marks `T-001..T-010` as `done`.
+3. `sprints/S0045/summary.md` reports `Status: EXECUTE COMPLETE`.
+
+This is an in-scope blocker for QA consistency evidence; QA cannot clear until
+artifact state is internally consistent.
+
+## Required next step
+
+- Update `sprints/S0045/progress.md` to reflect completed task state.
+- Rerun `/qa` for `S0045`.

@@ -1,3 +1,448 @@
+## Dev -> QA Handoff — Sprint S0050 (US-0071)
+
+## Status
+
+S0050 implementation is complete for **US-0071** (user-visible internal metadata
+sanitization guard) and ready for `/qa`.
+
+## Scope completed
+
+1. **T-001 / AC-1** — Forbidden planning-shaped matchers and inclusive scan roots in
+   `scripts/check-user-visible-metadata.py` + runbook.
+2. **T-002 / AC-2** — Internal-only surfaces documented (paths not in inclusive
+   scan list; comments vs emitted strings).
+3. **T-003 / AC-3** — `/execute` step 20 mandates checker before completion.
+4. **T-004 / AC-4** — `/qa` step 1 mandates checker + fail-closed reason codes.
+5. **T-005 / AC-5** — Remediation contract in runbook (evidence ref, token class,
+   neutral operator copy).
+6. **T-006 / AC-6** — Reason codes: `USER_VISIBLE_INTERNAL_METADATA_DETECTED`,
+   `METADATA_SANITIZATION_POLICY_MISSING`, `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`.
+7. **T-007 / AC-7** — Regression: non-scanned `docs/` tree + JS line-comment path.
+8. **T-008 / AC-8** — Active/template parity: runbook, execute, qa, release gate
+   note, `quality.mdc`, README.
+9. **T-009 / AC-9** — Tests **26e** in `tests/run-tests.ps1` and
+   `tests/run-tests.sh`.
+10. **T-010 / AC-10** — Release check-in gate references US-0071 coverage via
+    consolidated test runner.
+
+## QA verification checklist (S0050)
+
+1. Run `python scripts/check-user-visible-metadata.py` (expect exit 0).
+2. Run `TEST_COMMAND` / `tests/run-tests.ps1` or `tests/run-tests.sh` and confirm
+   **26e** metadata guard rows pass.
+3. Spot-check active/template parity for files listed in `sprints/S0050/summary.md`.
+
+## Artifacts updated (S0050)
+
+- `scripts/check-user-visible-metadata.py`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `.cursor/commands/execute.md`, `template/.cursor/commands/execute.md`
+- `.cursor/commands/qa.md`, `template/.cursor/commands/qa.md`
+- `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+- `.cursor/rules/quality.mdc`, `template/.cursor/rules/quality.mdc`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0050/tasks.md`, `sprints/S0050/sprint.md`, `sprints/S0050/progress.md`,
+  `sprints/S0050/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff - Sprint S0049 (US-0070)
+
+## Status
+
+S0049 implementation is complete for **US-0070** (configurable `/auto` phase
+selection policy) and ready for `/qa`.
+
+## Scope completed
+
+1. **Phase-selection contract (AC-1, T-001)** — `AUTO_PHASE_PLAN`, `AUTO_PHASE_EXCLUDE`,
+   `AUTO_PHASE_INCLUDE`, `AUTO_PHASE_PROFILE`, `AUTO_PHASE_HIGH_RISK_ACK`; exactly-one
+   active mode; `PHASE_POLICY_CONFLICT` and related fail-closed codes in `/auto`.
+2. **Plan materialization + breadcrumbs (AC-2, T-002)** — pipeline order, plan
+   breadcrumbs before spawn (`phase_policy_mode`, `resolved_phase_plan`,
+   `skipped_phases`).
+3. **Invalid tokens / profiles (AC-3, T-003)** — `PHASE_PLAN_UNKNOWN_PHASE`,
+   `PHASE_PLAN_EMPTY_INCLUDE`, `PHASE_PLAN_UNKNOWN_PROFILE`,
+   `PHASE_PLAN_INVALID_AUTO_PHASE_PLAN`, `PHASE_PLAN_HIGH_RISK_ACK_REQUIRED`.
+4. **Non-skippable reinstatement (AC-4, T-004)** — safety gates + evidence-chain
+   closure; `non_skippable_gate` recording.
+5. **`start-from` intersection (AC-5, T-005)** — `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`.
+6. **Backlog-drain / bulk / team (AC-6, T-006)** — scratchpad reload + plan recompute
+   at boundaries documented in `/auto` **Steps**.
+7. **Resume parity (AC-7, T-007)** — nominal start + plan intersection; recomputation
+   on every entry documented in `/auto`.
+8. **Parity (AC-8, T-008)** — active + template for `/auto`, scratchpad,
+   `scratchpad.local.example`, runbook, README.
+9. **Regression (AC-9, T-009)** — tests section **26d** (both runners).
+10. **Boundary operator visibility (AC-10, T-010)** — step **11a** phase boundary
+    status contract in `/auto`.
+
+## QA verification checklist (S0049)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (or
+   `tests/run-tests.sh`) and confirm **26d** US-0070 assertions pass.
+2. Confirm active/template parity for:
+   - `.cursor/commands/auto.md`, `template/.cursor/commands/auto.md`
+   - `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`,
+     `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+3. Confirm sprint execute artifacts:
+   - `sprints/S0049/sprint.md`, `sprints/S0049/tasks.md`, `sprints/S0049/progress.md`
+
+## Artifacts updated (S0049)
+
+- `.cursor/commands/auto.md`, `template/.cursor/commands/auto.md`
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`,
+  `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0049/sprint.md`, `sprints/S0049/tasks.md`, `sprints/S0049/progress.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff - Sprint S0048 (US-0069)
+
+## Status
+
+S0048 implementation is complete for **US-0069** (strict `/auto` phase→role
+enforcement) and ready for `/qa`.
+
+## Scope completed
+
+1. **Phase→role matrix + alternates (AC-1, T-001)** — `/auto` documents canonical
+   mapping and `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`,
+   `AUTO_ROLE_REFRESH_CONTEXT` with empty→default and invalid→fail-closed rules.
+2. **Preflight gate (AC-2, T-002)** — admission before spawn; stop with
+   `PHASE_ROLE_CAPABILITY_MISSING` (diagnostics: `phase_id`, expected role,
+   observed capability, remediation); no unrelated-role spawn.
+3. **Checkpoint validation (AC-3, T-003)** — isolation `role` must match
+   preflight-resolved role; else `PHASE_ROLE_MISMATCH`.
+4. **Diagnostics contract (AC-4, T-004)** — encoded in `/auto` + runbook preflight
+   and failure sections.
+5. **Execute default deny (AC-5, T-005)** — `AUTO_EXECUTE_ROLE_OVERRIDE` +
+   `EXECUTE_OVERRIDE_GOVERNANCE_REF` documented; default `dev`.
+6. **Continuation parity (AC-6, T-006)** — resume / `start-from` / state fallback
+   must recompute preflight; documented in `/auto` + runbook.
+7. **Parity (AC-7, T-007)** — active + template for listed surfaces.
+8. **Regression (AC-8, T-008)** — tests section **26c** (both runners).
+9. **Reason codes (AC-9, T-009)** — baseline codes in `/auto`, runbook, release.
+10. **Release readiness (AC-10, T-010)** — `/release` gates **4a**/**4b** cite
+    phase-role and strict-proof alignment with isolation evidence.
+
+## QA verification checklist (S0048)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` (or
+   `tests/run-tests.sh`) and confirm **26c** US-0069 assertions pass.
+2. Confirm active/template parity for:
+   - `.cursor/commands/auto.md`, `template/.cursor/commands/auto.md`
+   - `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+   - `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`,
+     `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+3. Confirm sprint execute artifacts:
+   - `sprints/S0048/sprint.md`, `sprints/S0048/tasks.md`,
+     `sprints/S0048/progress.md`, `sprints/S0048/summary.md`
+
+## Artifacts updated (S0048)
+
+- `.cursor/commands/auto.md`, `template/.cursor/commands/auto.md`
+- `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`,
+  `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0048/sprint.md`, `sprints/S0048/tasks.md`,
+  `sprints/S0048/progress.md`, `sprints/S0048/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff - Sprint S0047 (US-0068)
+
+## Status
+
+S0047 implementation is complete for **US-0068** (Mandatory Intake Question
+Packs) and ready for `/qa`.
+
+## Scope completed
+
+1. **Deterministic question-pack contract (AC-1, AC-2, AC-10)**:
+   `first-intake-pack` and `small-intake-pack` schemas are now explicitly
+   enforced in intake and PO guidance, with deterministic unknown/ambiguous
+   stack fallback to `first-intake-pack`.
+2. **Fail-closed persistence gate (AC-3, AC-7)**: intake contract now requires
+   required-topic coverage (or explicit bounded assumption confirmation) before
+   backlog/acceptance persistence and includes deterministic reason codes:
+   `INTAKE_REQUIRED_TOPIC_MISSING`, `INTAKE_REQUIRED_PACK_INCOMPLETE`,
+   `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`, `INTAKE_PERSISTENCE_BLOCKED`.
+3. **Guided + low-touch compatibility (AC-4, AC-5)**: adaptive follow-ups remain
+   bounded while low-touch mode compatibility is preserved without allowing
+   critical coverage bypass.
+4. **Coverage evidence persistence contract (AC-6)**: intake guidance now
+   requires persisted evidence fields: `asked_topics`, `missing_topics`,
+   `assumptions_confirmed`.
+5. **Active/template parity (AC-8)**: intake command, PO agent guidance,
+   runbook, and README were updated in both active and template trees.
+6. **Regression coverage surfaces (AC-9)**: both test runners now include
+   US-0068 assertions for contract presence and parity.
+
+## QA verification checklist (S0047)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm US-0068 assertions pass.
+2. Confirm active/template parity for:
+   - `.cursor/commands/intake.md`, `template/.cursor/commands/intake.md`
+   - `.cursor/agents/po.mdc`, `template/.cursor/agents/po.mdc`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+3. Confirm sprint execute artifacts:
+   - `sprints/S0047/sprint.md`
+   - `sprints/S0047/tasks.md`
+   - `sprints/S0047/progress.md`
+   - `sprints/S0047/summary.md`
+
+## Artifacts updated (S0047)
+
+- `.cursor/commands/intake.md`, `template/.cursor/commands/intake.md`
+- `.cursor/agents/po.mdc`, `template/.cursor/agents/po.mdc`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0047/sprint.md`, `sprints/S0047/tasks.md`,
+  `sprints/S0047/progress.md`, `sprints/S0047/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff - Sprint S0046 (US-0067)
+
+## Status
+
+S0046 implementation is complete for **US-0067** (Release Operator Hints
+Contract) and ready for `/qa`.
+
+## Scope completed
+
+1. **Mandatory operator hints schema (AC-1, AC-2)**: canonical sprint release
+   notes contract enforces deterministic section order
+   `Run -> Connect -> Verify -> Credentials -> Known Issues` and required
+   fields including start command, runtime mode, URL/port, health endpoint,
+   verification steps, and known issues.
+2. **Credentials sanitization contract (AC-3)**: release operator guidance
+   requires env-reference-only credential source refs and explicit value-source
+   location guidance; inline secrets are forbidden.
+3. **Legacy pointer summary parity (AC-4)**: `handoffs/release_notes.md` and
+   template parity surface deterministic latest operator summary pointers.
+4. **Fail-closed enforcement (AC-5)**: release command contract includes
+   deterministic operator-hints reason codes:
+   `RELEASE_OPERATOR_HINTS_MISSING`,
+   `RELEASE_OPERATOR_HINTS_AMBIGUOUS`,
+   `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`.
+5. **Runtime context alignment (AC-6)**: runbook guidance enforces local/remote
+   context linkage to `docs/engineering/runtime-connectivity.md` when present.
+6. **Evidence linkage and parity (AC-7, AC-8)**: sprint artifacts and handoff
+   include AC evidence refs; active/template parity maintained for release
+   command, release-note templates, runbook, and core rule surfaces.
+7. **Regression coverage (AC-9, AC-10)**: both test runners include US-0067
+   assertions for contract presence, reason codes, and deterministic output
+   behavior.
+
+## QA verification checklist (S0046)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm US-0067 assertions pass.
+2. Confirm active/template parity for:
+   - `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+   - `.cursor/rules/core.mdc`, `template/.cursor/rules/core.mdc`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `handoffs/releases/Sxxxx-release-notes.md`,
+     `template/handoffs/releases/Sxxxx-release-notes.md`
+   - `handoffs/release_notes.md`, `template/handoffs/release_notes.md`
+3. Confirm sprint artifacts reflect execute completion and AC evidence refs:
+   - `sprints/S0046/tasks.md`
+   - `sprints/S0046/progress.md`
+   - `sprints/S0046/summary.md`
+
+## Artifacts updated (S0046)
+
+- `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+- `.cursor/rules/core.mdc`, `template/.cursor/rules/core.mdc`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `handoffs/releases/Sxxxx-release-notes.md`,
+  `template/handoffs/releases/Sxxxx-release-notes.md`
+- `handoffs/release_notes.md`, `template/handoffs/release_notes.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0046/sprint.md`, `sprints/S0046/tasks.md`,
+  `sprints/S0046/progress.md`, `sprints/S0046/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff — Sprint S0045 (US-0066) Execute Loop Remediation
+
+## Status
+
+Execute remediation complete for the QA blocker in `handoffs/qa_to_dev.md`.
+S0045 artifact status is now internally consistent and ready for `/qa` rerun.
+
+## Fix applied
+
+1. Updated `sprints/S0045/progress.md` status line from pending to done for
+   baseline tasks `T-001..T-010`.
+2. Updated `sprints/S0045/summary.md` next-phase section to record the
+   execute-loop consistency remediation and QA rerun readiness.
+3. Kept `sprints/S0045/tasks.md` unchanged (`T-001..T-010` already `done`).
+
+## QA rerun focus
+
+1. Re-run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`.
+2. Re-check sprint artifact consistency:
+   - `sprints/S0045/tasks.md` -> `T-001..T-010` = `done`
+   - `sprints/S0045/progress.md` -> baseline tasks = `done`
+   - `sprints/S0045/summary.md` -> `Status: EXECUTE COMPLETE`
+3. Confirm blocker closure in `handoffs/qa_to_dev.md` for S0045.
+
+---
+
+## Dev -> QA Handoff — Sprint S0045 (US-0066)
+
+## Status
+
+S0045 implementation is complete for **US-0066** (Generated Test Scaffolding +
+Auto-Run Contract) and ready for `/qa`.
+
+## Scope completed
+
+1. **Stack/profile contract (T-001 / AC-1)**: execute guidance now requires
+   deterministic profile resolution for `node|python|go|java|dotnet`.
+2. **Scaffold generation and evidence (T-002 / AC-2)**: execute contract now
+   requires missing-only baseline unit/integration/acceptance scaffold behavior
+   with generated-path inventory evidence.
+3. **Runbook `TEST_COMMAND` baseline wiring (T-003 / AC-3)**: runbook now
+   defines deterministic non-destructive command precedence (preserve existing
+   non-empty command; write baseline only when unset).
+4. **QA automatic baseline test execution (T-004 / AC-4)**: qa contract now
+   requires generated-test auto-run with deterministic evidence fields
+   (`command`, `result`, `output ref`, `paths ref`, reason code).
+5. **Fail-closed diagnostics (T-005 / AC-5)**: execute/qa/release contracts now
+   include `TEST_SCAFFOLD_STACK_UNRESOLVED`,
+   `TEST_SCAFFOLD_UNSUPPORTED_STACK`, and
+   `TEST_SCAFFOLD_GENERATION_FAILED`.
+6. **Non-destructive/idempotent behavior (T-006 / AC-6)**: contracts now
+   explicitly preserve user-authored tests/config/commands and require
+   fill-missing/idempotent reruns only.
+7. **Runtime-autopilot boundary integration (T-007 / AC-7)**: qa/execute
+   guidance now states static generated-test pass does not bypass US-0065
+   runtime verdict; non-starting apps cannot PASS QA.
+8. **Parity updates (T-008 / AC-8)**: active/template parity aligned across
+   execute, qa, verify-work, release, runbook, and README surfaces.
+9. **Regression coverage (T-009 / AC-9)**: added US-0066 assertions in both
+   `tests/run-tests.ps1` and `tests/run-tests.sh`.
+10. **Release/readiness references (T-010 / AC-10)**: added generated-test
+    readiness/release evidence prerequisites in `verify-work` and `release`
+    contracts.
+
+## QA verification checklist (S0045)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0066 assertions.
+2. Confirm active/template parity:
+   - `.cursor/commands/execute.md`, `template/.cursor/commands/execute.md`
+   - `.cursor/commands/qa.md`, `template/.cursor/commands/qa.md`
+   - `.cursor/commands/verify-work.md`, `template/.cursor/commands/verify-work.md`
+   - `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+3. Confirm sprint artifacts:
+   - `sprints/S0045/tasks.md` all done
+   - `sprints/S0045/progress.md` implementation complete
+   - `sprints/S0045/summary.md` present and consistent
+
+## Artifacts updated (S0045)
+
+- `.cursor/commands/execute.md`, `template/.cursor/commands/execute.md`
+- `.cursor/commands/qa.md`, `template/.cursor/commands/qa.md`
+- `.cursor/commands/verify-work.md`, `template/.cursor/commands/verify-work.md`
+- `.cursor/commands/release.md`, `template/.cursor/commands/release.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0045/sprint.md`, `sprints/S0045/tasks.md`,
+  `sprints/S0045/progress.md`, `sprints/S0045/summary.md`,
+  `sprints/S0045/uat.md`, `sprints/S0045/uat.json`
+- `sprints/S0001/summary.md`, `docs/engineering/state.md`,
+  `handoffs/dev_to_qa.md`
+
+---
+
+## Dev -> QA Handoff — Sprint S0044 (US-0065)
+
+## Status
+
+S0044 implementation is complete for **US-0065** (Runtime QA Autopilot for
+Generated Projects) and ready for `/qa`.
+
+## Scope completed
+
+1. **Mandatory runtime truth path (T-001 / AC-1)**: execute/qa contracts now
+   require the canonical stage chain
+   `startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`.
+2. **Deterministic runtime failure outcomes (T-002 / AC-2)**: runtime failures
+   now use deterministic reason codes including `RUNTIME_STARTUP_FAILED`,
+   `RUNTIME_ENDPOINT_UNREACHABLE`, and retry-budget boundaries.
+3. **Bounded retry with attempt evidence (T-003 / AC-3)**: contracts now require
+   transient-only retry behavior with explicit per-attempt ledger fields.
+4. **Runtime evidence schema (T-004 / AC-4)**: QA findings now require startup
+   command, runtime mode/context, health result, log summary, retry count/ledger,
+   and final verdict+reason-code evidence refs.
+5. **Stack-aware profile resolution (T-005 / AC-5)**: Node/Python/Go/Java/.NET
+   profiles are explicitly required with deterministic unresolved fallback
+   (`RUNTIME_STACK_PROFILE_UNRESOLVED`).
+6. **Webapp runtime verification path (T-006 / AC-6)**: qa contract now includes
+   browser-surface checks and console/network signal capture when applicable.
+7. **Debug escalation and remote compatibility (T-007, T-008 / AC-7, AC-8)**:
+   bounded debug escalation/cleanup semantics and sanitized remote runtime
+   reporting requirements are documented.
+8. **Parity and regression coverage (T-009, T-010 / AC-9, AC-10)**:
+   active/template command/rule/runbook/README parity updated and test runners
+   extended with US-0065 runtime-autopilot assertions.
+
+## QA verification checklist (S0044)
+
+1. Run `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` and
+   confirm PASS including US-0065 assertions.
+2. Confirm active/template parity:
+   - `.cursor/commands/execute.md`, `template/.cursor/commands/execute.md`
+   - `.cursor/commands/qa.md`, `template/.cursor/commands/qa.md`
+   - `.cursor/rules/quality.mdc`, `template/.cursor/rules/quality.mdc`
+   - `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+   - `README.md`, `template/README.md`
+3. Confirm sprint artifacts:
+   - `sprints/S0044/tasks.md` all done
+   - `sprints/S0044/progress.md` implementation complete
+   - `sprints/S0044/summary.md` present and consistent
+
+## Artifacts updated (S0044)
+
+- `.cursor/commands/execute.md`, `template/.cursor/commands/execute.md`
+- `.cursor/commands/qa.md`, `template/.cursor/commands/qa.md`
+- `.cursor/rules/quality.mdc`, `template/.cursor/rules/quality.mdc`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0044/sprint.md`, `sprints/S0044/tasks.md`,
+  `sprints/S0044/progress.md`, `sprints/S0044/summary.md`
+- `docs/engineering/state.md`, `handoffs/dev_to_qa.md`
+
+---
+
 # Dev -> QA Handoff — Sprint S0034 (US-0055)
 
 ## Status

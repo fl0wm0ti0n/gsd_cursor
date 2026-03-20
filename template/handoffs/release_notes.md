@@ -23,6 +23,19 @@ Canonical queue state now lives under:
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
+## Latest operator summary (Run/Connect/Verify)
+
+- **Start command:** Refer to `## Run` in
+  `handoffs/releases/Sxxxx-release-notes.md`.
+- **Endpoint + port:** Refer to `## Connect` in
+  `handoffs/releases/Sxxxx-release-notes.md`.
+- **Verification steps + health signal:** Refer to `## Verify` in
+  `handoffs/releases/Sxxxx-release-notes.md`.
+- **Credentials source refs (sanitized):** Refer to `## Credentials` in
+  `handoffs/releases/Sxxxx-release-notes.md` (env-ref only).
+- **Known issues:** Refer to `## Known Issues` in
+  `handoffs/releases/Sxxxx-release-notes.md`.
+
 ## Historical references
 
 - `Sxxxx`: `handoffs/releases/Sxxxx-release-notes.md`

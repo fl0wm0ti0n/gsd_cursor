@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0039",
+  "story_ids": [
+    "US-0060"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Deterministic rollover thresholds are explicitly defined with defaults."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Refresh-context contract enforces rollover into state-archive when thresholds are exceeded."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Archive behavior is documented as non-destructive and chronology-preserving."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Rollover naming/partitioning is documented as deterministic and idempotent."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Fail-safe reason codes for archive boundary and write failures are present."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Retrieval contract remains latest-first hot surface with bounded archive expansion."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Ordering and canonical ownership contracts remain preserved."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Active/template parity maintained for command/policy/scratchpad artifacts."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression assertions include rollover threshold and fail-safe reason-code checks."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "README/runbook include threshold defaults and remediation guidance."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

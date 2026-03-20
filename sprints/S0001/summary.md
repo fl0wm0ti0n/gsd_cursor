@@ -30,16 +30,47 @@ All 11 tasks completed. `--mode upgrade` is implemented across all three install
 ## Deferred
 - AC-6 (upgrade from pre-version repos): deferred per sprint plan
 
-## Context refresh pack (2026-03-14)
+## Context refresh pack (2026-03-22 — post S0050 / US-0071)
 
-- Latest finalized sprint: `S0038` for `US-0059` (released).
-- Release evidence:
-  - `sprints/S0038/release-findings.md`
-  - `handoffs/releases/S0038-release-notes.md`
-  - `handoffs/release_queue.md` (`S0038` status `released`)
-- Product reconciliation:
-  - `docs/product/backlog.md` -> `US-0059` is `DONE` with AC-1..AC-10 checked
-  - `docs/product/acceptance.md` -> `US-0059` is checked
-- Next prioritized OPEN story: none in active intake queue.
-- Auto progression status: US-0059 completed/released; awaiting next intake.
-- Recommended next phase: `/intake`.
+- Latest released sprint: **`S0050`** for **`US-0071`** (`DEC-0053`); state hot-surface
+  rollover: **12** oldest checkpoints → `docs/engineering/state-archive/state-pack-20260322.md`
+  (**39** retained on hot surface; `STATE_HOT_MAX_LINES=1200`).
+- Next OPEN story: **`US-0072`** — resume at **`/discovery`** (see `handoffs/resume_brief.md`).
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack (2026-03-22 — post S0050 / US-0071)**.
+
+## Context refresh pack (2026-03-21 — post S0049 / US-0070)
+
+- Latest released sprint: **`S0049`** for **`US-0070`** (`DEC-0052`); state hot-surface
+  rollover: **11** oldest checkpoints → `docs/engineering/state-archive/state-pack-20260321.md`
+  (41 retained on hot surface; `STATE_HOT_MAX_LINES=1200`).
+- Next OPEN story: **`US-0071`** — resume at **`/discovery`** (see `handoffs/resume_brief.md`).
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack (2026-03-21 — post S0049 / US-0070)**.
+
+## Context refresh pack (2026-03-21)
+
+- Latest released sprint: **`S0048`** for **`US-0069`** (`DEC-0051`); state hot-surface
+  rollover archived to `docs/engineering/state-archive/state-pack-20260320.md`.
+- Next OPEN story: **`US-0070`** — resume at **`/discovery`** (see `handoffs/resume_brief.md`).
+- Compact decision index refreshed in `docs/engineering/decisions.md` (context pack dated 2026-03-21).
+
+## Context refresh pack (2026-03-16)
+
+- Latest finalized sprint: `S0044` for `US-0065` (released).
+- Current in-flight sprint: `S0045` for `US-0066` (`/execute` complete).
+- Execute evidence:
+  - `sprints/S0045/summary.md`
+  - `handoffs/dev_to_qa.md` (S0045 section)
+  - `docs/engineering/state.md` (execute checkpoint + strict runtime proof tuple)
+- Remaining OPEN stories by priority:
+  - `US-0066`, `US-0067`, `US-0068` (all `P1`).
+- Auto progression status: `US-0066` advanced through `/execute`; continuation should proceed to `/qa`.
+- Recommended next phase: `/qa` for `S0045` (`US-0066`).
+
+## Execute loop remediation (2026-03-16)
+
+- Target: `S0045` / `US-0066` QA blocker from `handoffs/qa_to_dev.md`.
+- Fix: reconciled sprint artifact status mismatch by updating
+  `sprints/S0045/progress.md` to `T-001..T-010` done, aligned with
+  `sprints/S0045/tasks.md` and `sprints/S0045/summary.md`.
+- Handoff refreshed: `handoffs/dev_to_qa.md` now includes execute-loop
+  remediation context for QA rerun.

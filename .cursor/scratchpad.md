@@ -56,6 +56,31 @@ AUTO_EXECUTE_ON_BLOCK=stop
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
 #
+# `/auto` phase role policy (US-0069 / DEC-0051)
+# - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
+# - AUTO_ROLE_PLAN_VERIFY: qa|tech-lead (empty -> default qa)
+# - AUTO_ROLE_REFRESH_CONTEXT: curator|po (empty -> default curator)
+# - AUTO_EXECUTE_ROLE_OVERRIDE: empty or allowed_non_dev_execute (execute default is dev)
+# - EXECUTE_OVERRIDE_GOVERNANCE_REF: parseable waiver pointer (DEC-xxxx / state anchor) when override set
+AUTO_ROLE_RESEARCH=
+AUTO_ROLE_PLAN_VERIFY=
+AUTO_ROLE_REFRESH_CONTEXT=
+AUTO_EXECUTE_ROLE_OVERRIDE=
+EXECUTE_OVERRIDE_GOVERNANCE_REF=
+#
+# `/auto` phase selection policy (US-0070 / DEC-0052)
+# Exactly one active mode after merge; conflict -> PHASE_POLICY_CONFLICT (no plan).
+# - AUTO_PHASE_PLAN: unset or full (default full canonical lifecycle)
+# - AUTO_PHASE_EXCLUDE: csv of canonical phase ids (exclude from full)
+# - AUTO_PHASE_INCLUDE: csv of canonical phase ids (re-sorted to canonical order)
+# - AUTO_PHASE_PROFILE: named profile (see /auto + DEC-0052; unknown -> fail closed)
+# - AUTO_PHASE_HIGH_RISK_ACK: required token when a high-risk profile demands it
+AUTO_PHASE_PLAN=
+AUTO_PHASE_EXCLUDE=
+AUTO_PHASE_INCLUDE=
+AUTO_PHASE_PROFILE=
+AUTO_PHASE_HIGH_RISK_ACK=
+#
 # Sprint planning
 # - SPRINT_MAX_TASKS: integer >= 1 (max atomic tasks per sprint, default 12)
 # - SPRINT_AUTO_SPLIT: 0|1 (propose splitting when over threshold)
@@ -96,6 +121,10 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   - lean: lowest-token default profile; reduce non-critical automation/research intensity
 #   - balanced: default profile; preserves current behavior with moderate overhead
 #   - full: highest-context profile; maximize context breadth/autonomy
+# - STATE_HOT_MAX_LINES: integer >= 200 (hot-surface soft cap trigger for
+#   archival rollover checks)
+# - STATE_HOT_MAX_CHECKPOINTS: integer >= 10 (max recent checkpoints to retain
+#   in `state.md` after rollover)
 # - Manual-override precedence: explicit flag values in this file remain authoritative
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
@@ -103,6 +132,8 @@ INTAKE_GUIDED_MODE=1
 INTAKE_SUBAGENT_FALLBACK=deny
 ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
+STATE_HOT_MAX_LINES=1200
+STATE_HOT_MAX_CHECKPOINTS=80
 
 # Publish targets (US-0054)
 # - RELEASE_PUBLISH_MODE: disabled|confirm|auto

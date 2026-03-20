@@ -1090,3 +1090,548 @@ a decision or recommendation.
 - **Linked**: US-0059
 - **Confidence**: medium
 - **Status**: current
+
+## R-0036
+
+- **Date**: 2026-03-11
+- **Topic**: Deterministic state hot-surface rollover and archive trigger patterns
+- **Query**: Which retention/compaction patterns support deterministic bounded
+  hot-surface state files with non-destructive archive rollover and idempotent
+  rerun behavior.
+- **Sources**:
+  - Internal policy/contracts:
+    - `docs/engineering/state.md`
+    - `docs/engineering/state-archive/README.md`
+    - `docs/engineering/runbook.md`
+  - External references:
+    - https://docs.confluent.io/kafka/design/log_compaction.html
+    - https://www.confluent.io/learn/kafka-retention/
+- **Findings**:
+  - Policy-only compaction is insufficient for bounded growth; deterministic
+    rollover triggers (size/checkpoint thresholds) are required for predictable
+    behavior.
+  - Hybrid retention patterns (bounded hot surface + archived history) preserve
+    quick current-context reads while keeping full historical evidence.
+  - Idempotent compaction requires stable partitioning/naming and deterministic
+    cut lines so reruns do not duplicate or reshuffle archived data.
+  - Fail-safe behavior on archive-write failure is critical: block mutation and
+    emit deterministic diagnostics rather than partial writes.
+  - Retrieval policy should remain latest-first on hot surface with bounded
+    archive expansion only when unresolved.
+- **Risks**:
+  - Too-small thresholds can reduce immediate troubleshooting context.
+  - Non-deterministic rollover boundaries can produce archive churn.
+  - Archive I/O failures without fail-safe guards can break traceability.
+- **Linked**: US-0060
+- **Confidence**: medium
+- **Status**: current
+
+## R-0037
+
+- **Date**: 2026-03-15
+- **Topic**: Cross-phase artifact ownership guards and deterministic archive execution controls
+- **Query**: Which contract patterns prevent phase-level accidental deletion of other-phase artifact content while preserving intentional override paths, and which archive controls ensure deterministic bounded hot-surface behavior.
+- **Sources**:
+  - Internal command/policy artifacts:
+    - `.cursor/commands/intake.md`
+    - `.cursor/commands/architecture.md`
+    - `.cursor/commands/refresh-context.md`
+    - `docs/engineering/artifact-ordering-policy.md`
+    - `docs/engineering/runbook.md`
+  - Internal observed behavior:
+    - user-reported architecture history deletion in fresh repo run
+    - user-reported continued `state.md` growth despite rollover policy
+- **Findings**:
+  - Ordering policies alone are insufficient to prevent cross-phase destructive rewrites; a separate phase-ownership matrix is needed (who can mutate which artifact sections).
+  - Safe default is non-destructive mutation: phase-local target updates only; unrelated section deletion/rewrite must fail closed with deterministic diagnostics.
+  - Override-authorized mutation should be explicit, narrow, and auditable (phase identity, artifact scope, reason, evidence reference), not implicit.
+  - `architecture.md` requires explicit history-preservation semantics because it aggregates prior story decisions and can be damaged by broad rewrite templates.
+  - Archive controls must include deterministic execution evidence (partition boundary, items moved, items retained) and idempotent pack naming to avoid silent no-op drift.
+  - Rollover thresholds without verifiable execution path can leave hot-surface growth effectively unbounded in practice.
+- **Risks**:
+  - Over-constrained ownership rules can block legitimate maintenance updates.
+  - Ambiguous override boundaries can become a bypass path for destructive edits.
+  - Archive verification metadata that is too verbose can reduce token savings.
+- **Linked**: US-0061
+- **Confidence**: medium
+- **Status**: current
+
+## R-0038
+
+- **Date**: 2026-03-15
+- **Topic**: Installer-owned metadata boundary via dedicated `its_magic/` folder
+- **Query**: Which deterministic installer ownership patterns keep framework
+  metadata isolated in a dedicated folder while preserving project-owned
+  artifacts and backward-compatible upgrade/clean behavior.
+- **Sources**:
+  - Internal installer/ownership artifacts:
+    - `installer.ps1`
+    - `installer.sh`
+    - `installer.py`
+    - `bin/its-magic.js`
+    - `.cursor/ownership.manifest.json`
+  - Internal docs/tests:
+    - `README.md`
+    - `docs/engineering/runbook.md`
+    - `tests/run-tests.ps1`
+    - `tests/run-tests.sh`
+- **Findings**:
+  - A dedicated framework-owned folder boundary reduces ambiguity between
+    installer metadata and project/business artifacts.
+  - Deterministic migration is required for existing repos that already contain
+    top-level metadata paths; idempotent reruns avoid layout churn.
+  - Ownership manifest must classify `its_magic/` entries explicitly so
+    install/upgrade/clean semantics stay consistent.
+  - Clean behavior should only remove manifest-owned framework files and must
+    not infer ownership for project artifacts outside declared scope.
+  - Operator documentation must clearly distinguish framework-owned metadata
+    from project-owned content (`src`, app docs, runtime files).
+- **Risks**:
+  - Misclassified ownership can cause accidental project-file relocation/deletion.
+  - Partial migration paths can leave hybrid layouts that confuse operators.
+  - Packaging/installer parity gaps can drift behavior across platforms.
+- **Linked**: US-0062
+- **Confidence**: medium
+- **Status**: current
+
+## R-0039
+
+- **Date**: 2026-03-15
+- **Topic**: OS-aware runbook command bootstrap with mandatory quality-gate safety
+- **Query**: Which deterministic onboarding patterns auto-generate valid
+  runbook commands per OS/project stack without weakening mandatory test gates.
+- **Sources**:
+  - Internal gate contracts and docs:
+    - `docs/engineering/runbook.md`
+    - `.cursor/commands/release.md`
+    - `.cursor/commands/qa.md`
+    - `README.md`
+  - Internal installer/bootstrap surfaces:
+    - `installer.ps1`
+    - `installer.sh`
+    - `installer.py`
+    - `bin/its-magic.js`
+  - User-observed mismatch:
+    - Windows operator context while baseline runbook command used `sh`.
+- **Findings**:
+  - Mandatory baseline quality gate should remain `TEST_COMMAND`; onboarding can
+    reduce friction by pre-filling valid defaults rather than relaxing gates.
+  - Bootstrap should be OS-aware and shell-aware (PowerShell on Windows,
+    shell/bash on Unix) for framework baseline test commands.
+  - Stack-signal detection should provide best-effort concrete defaults for test
+    (and optional lint/typecheck when confidently known), with deterministic
+    fallback and clear remediation when unresolved.
+  - Generated command probing/validation avoids committing unusable defaults and
+    prevents silent placeholder drift.
+  - Non-destructive precedence (`user-set > detected > fallback`) preserves
+    existing repo intent while enabling new-repo automation.
+- **Risks**:
+  - Incorrect stack inference can generate noisy/invalid defaults.
+  - Excessively strict validation can over-block uncommon but valid setups.
+  - Platform parity drift across installer variants can fragment behavior.
+- **Linked**: US-0063
+- **Confidence**: medium
+- **Status**: current
+
+## R-0040
+
+- **Date**: 2026-03-15
+- **Topic**: Remote runtime connectivity schema + phase consumption for QA/release/publish
+- **Query**: Which deterministic configuration and workflow patterns allow
+  release targets to carry runtime connectivity metadata (domain/ip/port/ingress
+  and Docker-over-SSH) while enabling safe remote-aware QA/release behavior and
+  operator connection reporting.
+- **Sources**:
+  - Internal target/phase artifacts:
+    - `docs/engineering/release-targets.json`
+    - `.cursor/commands/release.md`
+    - `.cursor/commands/qa.md`
+    - `.cursor/commands/execute.md`
+    - `docs/engineering/runbook.md`
+  - User requirement context:
+    - remote connectivity fields and Traefik/ingress possibilities
+    - Docker via SSH support
+    - operator-friendly connection info + canonical document output
+- **Findings**:
+  - Existing publish target model should be extended with deterministic
+    connectivity metadata fields and type-specific validation constraints.
+  - Docker-over-SSH should be represented as explicit target contract variant
+    (or deterministic subtype) with env-reference-only sensitive fields.
+  - Remote-aware phase behavior must be opt-in/config-driven and keep existing
+    mandatory release/quality gates unchanged.
+  - QA/release outputs should include connection endpoint summaries and local vs
+    remote execution context while redacting secret/auth material.
+  - A canonical runtime-connectivity document improves operator handoff and
+    reproducibility for debug/support workflows.
+- **Risks**:
+  - Over-complex target schema can reduce usability for local-only repos.
+  - Inadequate redaction can expose sensitive infrastructure data.
+  - Remote execution ambiguity can cause accidental no-op or wrong-target checks.
+- **Linked**: US-0064
+- **Confidence**: medium
+- **Status**: current
+
+## R-0041
+
+- **Date**: 2026-03-16
+- **Topic**: Runtime QA autopilot for generated repos, structured test scaffolding,
+  release operator run/connect hints, and mandatory intake question packs
+- **Query**: Which deterministic workflow patterns enforce real runtime
+  validation (startup/connectivity/log/debug), language-aware baseline test
+  generation, operator-ready release run/connect guidance, and intake
+  questionnaire coverage before persistence.
+- **Sources**:
+  - Cursor Browser tools:
+    https://cursor.com/docs/agent/tools/browser
+  - Cursor Debug Mode:
+    https://cursor.com/docs/agent/debug-mode
+  - Internal workflow contracts:
+    - `.cursor/commands/execute.md`
+    - `.cursor/commands/qa.md`
+    - `.cursor/commands/release.md`
+    - `.cursor/commands/intake.md`
+    - `.cursor/agents/dev.mdc`
+    - `.cursor/agents/qa.mdc`
+- **Findings**:
+  - Generated-project quality confidence requires mandatory runtime validation,
+    not only static/test-command checks. Minimal deterministic chain:
+    startup attempt -> health/connectivity check -> log/error scan ->
+    bounded self-debug retries -> explicit verdict.
+  - Browser-level verification is a practical, automatable path for webapp
+    runtime checks (UI path validation + console/network evidence), and should
+    be integrated where project type indicates browser surface.
+  - Debug-mode workflow provides a bounded escalation path for reproducible
+    runtime failures: hypothesis/instrumentation/reproduction/evidence-based fix,
+    followed by cleanup.
+  - Baseline test scaffolding should be stack-aware and non-destructive:
+    generate when missing, preserve explicit user tests/commands, and wire
+    deterministic `TEST_COMMAND` evidence into QA/release gates.
+  - Release artifacts should include a strict operator-facing
+    `Run/Connect/Verify` section so users can immediately start and validate
+    shipped software without guesswork.
+  - Intake reliability improves when required topic coverage is explicit:
+    first-intake comprehensive pack and small-intake minimal pack, with bounded
+    assumptions requiring user confirmation before persistence.
+- **Risks**:
+  - Over-broad runtime retries can mask deeper design issues if bounds/reason
+    codes are weak.
+  - Stack detection errors can generate unusable starter tests if fallback rules
+    are underspecified.
+  - Mandatory intake packs can increase friction if low-touch compatibility is
+    not preserved with deterministic minimum gates.
+- **Linked**: US-0065, US-0066, US-0067, US-0068
+- **Confidence**: high
+- **Status**: current
+
+## R-0042
+
+- **Date**: 2026-03-16
+- **Topic**: US-0065 runtime QA autopilot contract refinements (startup/readiness, bounded retries, runtime log severity evidence)
+- **Query**: Which concrete runtime-validation patterns should be mandated for generated-project QA so PASS requires real startup and reachability proof, bounded retry behavior, and structured error/log evidence.
+- **Sources**:
+  - https://playwright.dev/docs/test-webserver
+  - https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/
+  - https://opentelemetry.io/docs/specs/otel/logs/data-model/
+- **Findings**:
+  - Runtime readiness should be endpoint-driven with explicit startup timeout and accepted health-response semantics; this aligns with deterministic startup -> readiness proof in QA evidence.
+  - Retry policy must be bounded and selective: retry only transient startup/connectivity failures, cap attempts, and use backoff to avoid retry storms; persistent failures must fail closed with explicit reason code.
+  - Runtime log analysis should carry normalized severity evidence and explicit error thresholds (ERROR/FATAL boundaries) so PASS cannot ignore critical runtime signals.
+  - QA evidence for US-0065 should minimally include startup command, readiness endpoint/result, retry ledger (attempts and delays), and log severity summary for reproducibility.
+  - Webapp runtime checks should include browser-surface verification when applicable, but remain under US-0065 scope as runtime truth validation (not release-hint or test-scaffold scope).
+- **Risks**:
+  - Overly strict startup timeouts can create false negatives for slower stacks.
+  - Broad retry scope can hide non-transient defects and extend failing runs.
+  - Log-severity mapping drift across stacks can cause inconsistent PASS/FAIL unless thresholds are explicit.
+- **Linked**: US-0065, R-0041
+- **Confidence**: high
+- **Status**: current
+
+## R-0043
+
+- **Date**: 2026-03-16
+- **Topic**: US-0066 generated baseline test scaffolding contract (stack-aware templates, non-destructive reruns, deterministic auto-run linkage)
+- **Query**: Which concrete cross-stack test-scaffold and execution conventions should drive deterministic baseline generation for new app repos while preserving existing user tests/commands and enforcing automatic QA execution evidence.
+- **Sources**:
+  - https://jestjs.io/docs/next/getting-started
+  - https://docs.pytest.org/en/7.4.x/getting-started.html
+  - https://pkg.go.dev/testing
+  - https://maven.apache.org/surefire/maven-surefire-plugin/examples/inclusion-exclusion.html
+  - https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-xunit
+  - `docs/product/backlog.md` (`US-0066` ACs and boundaries)
+  - `handoffs/po_to_tl.md` (US-0066 discovery addendum)
+- **Findings**:
+  - Baseline scaffold generation should follow ecosystem-native discovery conventions so generated tests are runnable immediately by default (`test_*.py`/`*_test.py` for pytest, `*_test.go` for Go, Surefire include patterns for Java, `dotnet new xunit` + `dotnet test` for .NET, and standard Jest bootstrap for Node).
+  - Deterministic stack profiles should map to one minimal baseline `TEST_COMMAND` per detected stack, with explicit fail-closed diagnostics when no supported profile resolves; unresolved detection must not silently skip scaffold generation.
+  - Non-destructive behavior is mandatory: create only missing baseline artifacts, never overwrite existing user-authored tests/config by default, and use deterministic precedence (`user-authored existing assets` > `generated baseline missing assets`).
+  - Idempotent reruns require stable path conventions and explicit generated-path evidence so repeated `/execute` runs do not create duplicate test files or oscillating command/config rewrites.
+  - `/qa` should treat generated baseline tests as mandatory execution evidence (pass/fail + command + output reference), but story scope remains test scaffolding and auto-run contract only; runtime startup/connectivity verdict remains governed by `US-0065`.
+- **Risks**:
+  - Over-eager detection can generate scaffolds for the wrong stack in polyglot repos unless profile-selection precedence is explicit.
+  - Non-destructive merge rules that are too weak can still clobber existing project test layout or command intent.
+  - Rigid single-command defaults can miss repo-specific test runners unless remediation/fallback diagnostics are actionable.
+- **Linked**: US-0066, R-0041
+- **Confidence**: high
+- **Status**: current
+
+## R-0044
+
+- **Date**: 2026-03-16
+- **Topic**: US-0067 release operator Run/Connect/Verify hints contract hardening
+- **Query**: Which release-artifact schema and validation patterns ensure
+  deterministic operator-ready `Run/Connect/Verify` guidance with fail-closed
+  behavior on missing or ambiguous fields, while preserving `US-0067`-only scope.
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0067` discovery refinements and acceptance)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — `US-0067`)
+  - `docs/engineering/runtime-connectivity.md`
+  - `handoffs/releases/S0045-release-notes.md`
+  - `handoffs/release_notes.md`
+  - `.cursor/commands/release.md`
+- **Findings**:
+  - A deterministic fixed-order operator section (`Run -> Connect -> Verify ->
+    Credentials(env-ref only) -> Known Issues`) is necessary to keep release
+    reruns idempotent and operator-readable.
+  - Required fields should be schema-validated at release finalization with
+    fail-closed behavior; missing or ambiguous values must block completion with
+    deterministic reason code + remediation guidance.
+  - Credentials guidance must remain env-reference-only (variable names and
+    source location), with explicit prohibition of inline secrets in release
+    artifacts.
+  - Runtime context must be explicit (`local|remote`) and, when available,
+    endpoint/connectivity claims should align with
+    `docs/engineering/runtime-connectivity.md`.
+  - Canonical sprint release notes should carry full operator details, while
+    `handoffs/release_notes.md` should remain a concise latest-pointer summary
+    that links to canonical per-sprint notes.
+- **Risks**:
+  - Overly permissive validation can allow nominal "PASS" release output that is
+    not operationally actionable.
+  - Inconsistent active/template guidance may reintroduce drift in required
+    operator sections for fresh installs.
+  - Ambiguous local/remote endpoint reporting can create incorrect operator
+    runbook steps even when release gates pass.
+- **Linked**: US-0067, R-0041
+- **Confidence**: high
+- **Status**: current
+
+## R-0045
+
+- **Date**: 2026-03-17
+- **Topic**: US-0068 mandatory intake question-pack enforcement and coverage evidence contract
+- **Query**: Which deterministic intake questionnaire patterns enforce required coverage for first and small intakes, block persistence on missing critical answers, and preserve low-touch compatibility with auditable evidence.
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0068` discovery refinements and acceptance)
+  - `handoffs/po_to_tl.md` (Discovery Addendum - `US-0068`)
+  - `.cursor/commands/intake.md`
+  - `.cursor/agents/po.mdc`
+  - https://www.atlassian.com/agile/project-management/user-stories
+  - https://www.productplan.com/glossary/user-story/
+- **Findings**:
+  - Intake quality is more reliable when question coverage is explicit and machine-verifiable; topic IDs plus required/optional classification are needed for deterministic checks.
+  - First-intake and small-intake packs should remain distinct to keep high-signal collection without forcing full questionnaires on low-scope follow-up requests.
+  - Persistence gating must fail closed when required coverage is missing, with deterministic reason codes and remediation guidance before any backlog/acceptance write.
+  - Bounded assumptions are a safe compatibility path only when user confirmation is explicit and persisted as structured evidence.
+  - Low-touch mode can remain available if critical safety topics are still mandatory and recorded (`asked_topics`, `missing_topics`, `assumptions_confirmed`).
+- **Risks**:
+  - Overly broad required packs can increase intake friction and encourage low-quality responses.
+  - Weak topic taxonomy can create false "coverage complete" outcomes that miss critical requirements.
+  - Inconsistent active/template command guidance can reintroduce intake-policy drift in fresh installs.
+- **Linked**: US-0068, R-0041
+- **Confidence**: high
+- **Status**: current
+
+## R-0046
+
+- **Date**: 2026-03-17 (extended 2026-03-21)
+- **Topic**: US-0071 user-visible internal metadata sanitization guard
+- **Query**: Which deterministic policy/check patterns prevent internal planning identifiers from leaking into user-visible software surfaces while keeping internal docs/comments usable.
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0071` intake, discovery refinements, AC-1..AC-10)
+  - `docs/product/vision.md` (Discovery Notes — `US-0071`)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — `US-0071`)
+  - `https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html`
+  - `https://owasp.org/www-community/Improper_Error_Handling`
+  - `https://cwe.mitre.org/data/definitions/200.html`
+  - `https://cwe.mitre.org/data/definitions/209.html`
+- **Findings**:
+  - User-facing output should be treated as a sanitized surface; internal implementation and planning identifiers must not be emitted to end users by default.
+  - Deterministic allowlist/denylist policy is needed to avoid ambiguous enforcement: deny planning-token patterns in user-visible surfaces, allow internal docs and code comments.
+  - Enforcement should be automated in execute and qa with fail-closed behavior and evidence refs, not manual review only.
+  - Diagnostics should be specific and actionable (detected token class, evidence path/context, safe-remediation guidance), consistent with secure error-handling principles.
+  - Regression checks should explicitly validate both negative paths (leak detection) and allowlist behavior (no false blocks for docs/comments).
+  - **Post-discovery scope (2026-03-21)**: “User-visible” means operator/end-user **software outputs** (CLI stdout/stderr, UI copy, thrown/propagated error strings, installer-visible text). **Out of scope for the guard**: internal `docs/**`, `.cursor/**`, sprint/handoff/decision artifacts, and **code comments**—these remain valid homes for `US|DEC|R` planning IDs.
+  - **Minimum forbidden patterns (AC-1)**: treat `US-[0-9]{4}`, `DEC-[0-9]{4}`, and `R-[0-9]{4}` as the baseline deny set in disallowed channels; tune matching to planning-shaped tokens to limit accidental hits on unrelated strings.
+  - **Reason-code contract (AC-6)**: document a small deterministic vocabulary (for example `USER_VISIBLE_INTERNAL_METADATA_DETECTED`, `METADATA_SANITIZATION_POLICY_MISSING`) and require the same codes in execute/QA/release evidence for traceability.
+  - **Release/readiness (AC-10)**: readiness artifacts should attest that sanitization checks **ran and passed** (not merely that policy text exists).
+  - **Parity (AC-8)**: policy-bearing command/rule/runbook/README guidance must stay aligned in **active** vs **template** install trees so fresh installs inherit the same guard semantics.
+- **Risks**:
+  - Overbroad pattern matching can cause false positives and developer friction.
+  - Narrow matching can miss nonstandard planning markers and allow leakage.
+  - Inconsistent active/template policy surfaces can reintroduce drift for new installs.
+  - Channel misclassification (treating internal docs as “user-visible” or vice versa) can produce false failures or missed leaks.
+- **Linked**: US-0071
+- **Confidence**: high
+- **Status**: current
+
+## R-0047
+
+- **Date**: 2026-03-17
+- **Topic**: US-0072 deterministic context slimming and archive enforcement across core artifacts
+- **Query**: Which deterministic execution patterns enforce archive rollover for hot artifacts and minimize subagent context load without losing auditable historical evidence.
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0053`, `US-0060`, `US-0061`, `US-0072`)
+  - `docs/engineering/state.md` (current hot-surface growth and latest checkpoints)
+  - `docs/engineering/state-archive/README.md`
+  - `https://fivenines.io/blog/logrotate-the-complete-guide/`
+  - `https://cheatsheetseries.owasp.org/cheatsheets/Error_Handling_Cheat_Sheet.html`
+- **Findings**:
+  - Archive strategy must be enforced as an execution gate, not documentation only; when thresholds are exceeded, rollover or fail-closed should occur in the same boundary.
+  - Deterministic verification evidence (`boundary`, `moved`, `retained`, `pack_ref`) is required to make archive behavior auditable and avoid silent no-op rollover paths.
+  - High-growth artifact strategy should separate hot summaries from historical archive packs to preserve fast, low-noise reads while retaining full evidence.
+  - Subagent quality improves when phase reads are bounded and retrieval expands only when unresolved; this reduces irrelevant-context hallucination risk.
+  - Idempotent archive pack naming/partitioning is essential to prevent duplicate or oscillating archive churn on reruns.
+- **Risks**:
+  - Over-aggressive compaction can hide needed context if archive pointers are weak.
+  - Weak enforcement can leave thresholds breached indefinitely while claiming policy compliance.
+  - Non-deterministic pack boundaries can break traceability and increase operator confusion.
+- **Linked**: US-0072, US-0060, US-0061
+- **Confidence**: medium-high
+- **Status**: current
+
+## R-0048
+
+- **Date**: 2026-03-20
+- **Topic**: US-0069 strict phase role enforcement and preflight capability
+  resolution for `/auto` orchestration
+- **Query**: Which deterministic workflow patterns enforce a single resolved role
+  per phase boundary, fail closed when the required capability is missing, and
+  keep isolation evidence aligned with strict runtime attestation (no silent
+  role substitution).
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0069` acceptance and discovery refinements)
+  - `docs/product/vision.md` (Discovery Notes — `US-0069`)
+  - `.cursor/commands/auto.md` (orchestration model, isolation + strict-proof
+    contracts)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — `US-0069`)
+  - `docs/engineering/research.md` (`R-0001` subagent isolation baseline)
+  - https://open-policy-agent.github.io/gatekeeper/website/docs/failing-closed/
+  - https://dev.to/uu/pre-action-authorization-the-missing-security-layer-for-ai-agents-3l0p
+- **Findings**:
+  - **Preflight over post-hoc**: Admission-style systems treat “cannot evaluate
+    policy” as deny when configured to fail closed; the same principle maps to
+    `/auto` as **resolve required role/capability before spawning phase work**,
+    not only validating artifacts afterward.
+  - **Single-valued role at the boundary**: When a phase allows alternates
+    (`research`, `plan-verify`, `refresh-context`), a documented precedence
+    order (for example scratchpad policy keys) must yield exactly one expected
+    role for that run so diagnostics, isolation `role`, and strict-proof
+    `role` stay aligned.
+  - **Default deny for high-risk phases**: `execute` mapped to `dev` with
+    explicit override-only exceptions matches least-privilege and separation-of-
+    duties patterns; implicit fallback to `tech-lead` (or any unrelated role)
+    undermines review integrity already described in `R-0001`.
+  - **Evidence consistency**: Isolation evidence (`phase_id`, `role`, marker)
+    and strict runtime proof tuples must reference the **same resolved
+    canonical role**; mismatch should fail closed per backlog discovery
+    refinements.
+  - **Resume/start-from parity**: Continuation paths must rerun the same
+    preflight; stale resume artifacts cannot bypass capability checks without
+    creating a silent downgrade of enforcement.
+  - **Operator actionability**: Blockers should emit deterministic reason codes
+    (vocabulary per AC-9), plus `phase_id`, expected vs observed role/capability,
+    and remediation (spawn correct role, fix policy, or document override).
+- **Risks**:
+  - Over-strict policy without escape hatches can block legitimate constrained
+    environments unless override contracts are rare, explicit, and audited.
+  - Alternate-role precedence that is hard to discover increases misconfiguration
+    and false “capability missing” stops.
+  - Documentation-only enforcement still depends on human/tool discipline;
+    regression tests (AC-8) are needed to prevent drift in command templates.
+- **Linked**: US-0069, US-0048, US-0056, DEC-0029, DEC-0038, R-0001
+- **Confidence**: high
+- **Status**: current
+
+## R-0049
+
+- **Date**: 2026-03-21
+- **Topic**: US-0070 scratchpad-controlled `/auto` phase selection policy
+  (precedence, non-skippable gates, profiles, and `US-0069` compatibility)
+- **Query**: How should operators configure a resolved ordered phase subset
+  without silent safety bypass, conflicting policy modes, or role/capability
+  substitution when phases are omitted from the plan?
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0070` discovery refinements and ACs)
+  - `docs/product/vision.md` (Discovery Notes — `US-0070`)
+  - `.cursor/commands/auto.md` (canonical phase order, isolation + strict-proof
+    boundaries, `start-from`, backlog-drain, bulk execute, team scope)
+  - `docs/engineering/research.md` (`R-0004` resume precedence, `R-0048`
+    preflight role enforcement)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — `US-0070`)
+- **Findings**:
+  - **Single active policy mode (fail-closed on conflict)**: At most one of
+    `AUTO_PHASE_PLAN=full` (default), `AUTO_PHASE_EXCLUDE=<csv>`,
+    `AUTO_PHASE_INCLUDE=<csv>`, or `AUTO_PHASE_PROFILE=<name>` may be active;
+    if two or more non-default selectors are set simultaneously, resolve with
+    a deterministic `PHASE_POLICY_CONFLICT` (or equivalent) and **no** plan
+    materialization.
+  - **Precedence matrix (evaluation order when implementing)**:
+    1. Parse scratchpad + `scratchpad.local` merge (template parity on install).
+    2. Detect policy mode; on conflict, stop (above).
+    3. Expand mode to a **candidate** ordered list:
+       - `full`: canonical lifecycle order (`intake` → `refresh-context`, plus
+         documented optional inserts such as `/security-review` when enabled).
+       - `exclude`: `full` minus excluded ids (validate tokens).
+       - `include`: only listed ids, **re-sorted** into canonical order (reject
+         unknown ids; reject empty result).
+       - `profile`: expand named profile to an include/exclude or ordered
+         subset per profile registry (unknown profile → fail closed).
+    4. Apply **non-skippable reinstatement** (default profile): reinsert any
+       phase in the **default non-skippable set** that was removed, with reason
+       `non_skippable_gate` in breadcrumbs (unless operator selected a named
+       **high-risk profile** that documents explicit exceptions and required
+       acknowledgment fields — then reinstatement rules come from the profile
+       spec, not the default set).
+    5. Intersect with `start-from=<phase>`: keep phases from the requested
+       anchor forward **that remain** in the plan; empty intersection → fail
+       closed with diagnostics (`resolved_plan` vs `requested_start`).
+    6. Persist resolved plan + skipped-phase reasons to continuation
+       breadcrumbs **before** first spawn (per backlog discovery).
+  - **Default non-skippable phase set (baseline recommendation)**:
+    - **Safety gates**: `qa`, `verify-work`, `release` — always reinstate in
+      default profile; aligns with AC-4 and existing sync/release contracts.
+    - **Evidence-chain integrity**: any phase whose skip would leave a later
+      phase without a valid prior isolation + strict-proof checkpoint for the
+      same story/run should be treated as non-skippable in default profile
+      (typically the full upstream chain for active implementation loops); exact
+      minimal subgraph can be tightened in architecture but **must not** silently
+      drop required tuples.
+  - **Named profile sketch (`profile_high_risk_dev_fast` — illustrative only)**:
+    - Declared intent: accelerate early phases for trusted sandboxes only.
+    - Documented exceptions: may allow omitting selected upstream phases **only**
+      when paired with explicit operator acknowledgment fields (for example
+      `AUTO_PHASE_HIGH_RISK_ACK=<token>` + profile version ref).
+    - Must still emit deterministic **skipped** reasons and must **not** mark
+      downstream gates as passed without their checkpoints.
+  - **`US-0069` compatibility (no role substitution via skipping)**:
+    - Role resolution applies **per phase that remains in the resolved plan**
+      only; skipping `research` does **not** reassign `architecture` to `po`.
+    - Preflight capability gate runs before each spawn for planned phases; a
+      skipped phase imposes **no** spawn and **no** alternate-role fallback for
+      a different phase.
+    - Resume/backlog-drain/bulk/team paths must reload the same phase-policy
+      inputs and recompute the plan; stale plans cannot revive skipped phases
+      silently.
+  - **Failure taxonomy (operator-actionable)**: reserve deterministic codes for
+    unknown phase token, empty plan after include, policy conflict, invalid
+    profile, `start-from` empty intersection, and reinstatement diagnostics —
+    aligned with backlog “invalid-token fail-fast codes” requirement.
+- **Risks**:
+  - Overly permissive profiles could reintroduce silent gate bypass if
+    acknowledgment and evidence rules are weak.
+  - `include` mode can accidentally construct sparse plans that break evidence
+    chains unless architecture defines minimal mandatory subgraphs explicitly.
+  - Documentation-only policy remains dependent on command implementation and
+    tests (AC-9) to prevent drift across active vs template installs.
+- **Linked**: US-0070, US-0069, DEC-0051, R-0004, R-0048
+- **Confidence**: high
+- **Status**: current

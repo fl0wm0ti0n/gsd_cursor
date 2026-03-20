@@ -85,7 +85,7 @@ Strict mutation semantics:
 
 Mandatory gate order (strict, deterministic). No step may be skipped or reordered:
 
-1. **Check-in test gate** — Verify latest `TEST_COMMAND` result is passing; block on missing, stale, or failing evidence.
+1. **Check-in test gate** — Verify latest `TEST_COMMAND` result is passing; block on missing, stale, or failing evidence. When `TEST_COMMAND` runs the consolidated repo runner (`tests/run-tests.*`), passing results must include **US-0071** user-visible metadata guard coverage (positive, leak detection, idempotence); otherwise treat as incomplete release evidence for this repository (`METADATA_SANITIZATION_POLICY_MISSING` / missing regression row).
 2. **QA completion gate** — Require no unresolved blocking findings in current sprint context before proceeding.
 3. **UAT completion gate** — Require UAT artifacts populated and verified; block on placeholder, incomplete, or unresolved-fail state.
 4. **Isolation compliance gate** — Require valid per-phase isolation evidence (US-0048 / DEC-0029); block on missing/invalid/stale evidence or violation.
@@ -96,6 +96,11 @@ Optional runbook keys (`LINT_COMMAND`, `TYPECHECK_COMMAND`) are not mandatory re
 
 Default: no bypass. Override only via explicit decision gate with documented rationale and evidence (see Override evidence contract below).
 
+## No-bypass default (US-0039)
+
+Release gates are mandatory by default. Bypass is not allowed unless an
+explicit decision gate is approved and evidence is recorded.
+
 Check-in test evidence: canonical source `tests/report.md`; valid = present + fresh + passing. Fail reasons: `RELEASE_TEST_EVIDENCE_MISSING`, `RELEASE_TEST_STALE`, `RELEASE_TEST_FAILED`. QA gate: no unresolved blocking findings; `RELEASE_QA_BLOCKERS_OPEN`, `RELEASE_QA_EVIDENCE_MISSING`. UAT gate: no placeholder/incomplete/unresolved-fail; `RELEASE_UAT_INCOMPLETE`, `RELEASE_UAT_FAILED`. Override evidence: decision record, rationale, approver, risk acceptance; `RELEASE_GATE_OVERRIDE_APPROVED`.
 
 ## QA completion evidence gate (US-0039)
@@ -105,6 +110,23 @@ Release may not proceed until QA completion evidence shows no unresolved blockin
 - **Evidence source**: `sprints/Sxxxx/qa-findings.md` (and optionally `handoffs/qa_to_dev.md` for handoff context).
 - **Pass condition**: No unresolved blocking or critical findings; QA phase has been run and findings recorded.
 - **Fail condition**: Unresolved blocking findings exist, or QA evidence is missing for target sprint — block with `RELEASE_QA_BLOCKERS_OPEN` or `RELEASE_QA_EVIDENCE_MISSING`; remediation: resolve blockers, re-run `/qa`, then rerun `/release`.
+
+## Generated-test evidence prerequisite (US-0066 / DEC-0048)
+
+For generated-project scope, release evidence must include deterministic
+generated-test auto-run references:
+
+- **Execution evidence source**: `sprints/Sxxxx/summary.md` generated baseline
+  test section (stack profile, generated paths, scaffold actions).
+- **QA evidence source**: `sprints/Sxxxx/qa-findings.md` generated-test auto-run
+  fields (`generated_test_command`, `generated_test_result`,
+  `generated_test_output_ref`, `generated_test_paths_ref`,
+  `generated_test_reason_code`).
+- **Pass condition**: generated-test evidence exists, is traceable, and does not
+  contradict QA/runtime verdicts.
+- **Fail condition**: missing/ambiguous generated-test evidence or unresolved
+  scaffold failure reason code; block release with
+  `TEST_SCAFFOLD_GENERATION_FAILED` and rerun `/execute` and/or `/qa`.
 
 ## UAT completion gate (US-0039)
 
@@ -233,6 +255,9 @@ Guardrails:
     - Stale/reused evidence: block with `ISOLATION_EVIDENCE_STALE`
     - Orchestrator/phase executed without fresh subagent: block with
       `PHASE_CONTEXT_ISOLATION_VIOLATION`
+    - **Phase role alignment (US-0069 / DEC-0051)**: each entry's `role` must
+      match the canonical expected role for its `phase_id` (matrix + scratchpad
+      alternates as documented in `/auto`). Mismatch → `PHASE_ROLE_MISMATCH`.
     - Remediation: re-run the affected phase(s) in fresh subagent contexts,
       write new isolation evidence, then rerun `/release`.
 4b. Strict runtime proof gate (US-0056 / DEC-0038): verify strict runtime-proof
@@ -244,6 +269,11 @@ Guardrails:
     - Expired/stale proof: block with `RUNTIME_PROOF_STALE`
     - Ambiguous proof-to-checkpoint linkage: block with
       `RUNTIME_PROOF_AMBIGUOUS_LINK`
+    - **Strict-proof role alignment (US-0069 / DEC-0051)**: tuple `role` must
+      equal the sibling isolation evidence `role` and the expected phase contract
+      role; `proof_hash` must be consistent with sorted-key JSON of the tuple
+      fields per `DEC-0038`. Violation → `RUNTIME_PROOF_INVALID` or
+      `PHASE_ROLE_MISMATCH` as applicable.
     - Remediation: rerun affected phase(s), write fresh runtime proof tuples,
       then rerun `/release`.
 5. Ensure target queue row exists; set status to `unreleased` before finalization.
@@ -320,6 +350,52 @@ Guardrails:
       `PUBLISH_TARGET_CONFIG_INVALID`.
     - If target execution fails, emit `PUBLISH_TARGET_EXECUTION_FAILED` with
       target ID and remediation; do not mutate unrelated release artifacts.
+17. Remote runtime connectivity contract (US-0064 / DEC-0044):
+    - Extend target interpretation with runtime metadata from
+      `RELEASE_TARGETS_FILE`:
+      - `runtime.mode` (`local|remote`),
+      - endpoint fields (`domainEnv|ipEnv|hostEnv`, `port`, `protocol`),
+      - optional ingress metadata (`traefik.enabled`, `router`, `entrypoint`,
+        `tls`),
+      - optional `dockerOverSsh` contract for ssh targets.
+    - Validate remote connectivity fields for remote-mode targets; fail with
+      `REMOTE_CONNECTIVITY_CONFIG_INVALID` on missing/invalid requirements.
+    - Write/update canonical operator doc:
+      `docs/engineering/runtime-connectivity.md` with sanitized endpoint summary
+      and local vs remote execution context.
+    - In release output/handoffs, include operator connection guidance
+      (where hosted, how to connect) without exposing secrets.
+18. Release operator Run/Connect/Verify hints contract (US-0067 / DEC-0049):
+    - `handoffs/releases/Sxxxx-release-notes.md` must include a deterministic
+      operator section order and required fields:
+      1) `## Run`:
+         - `start_command`
+         - `runtime_mode` (`local|remote`)
+         - `runtime_context_ref` (link to `docs/engineering/runtime-connectivity.md`
+           when available)
+      2) `## Connect`:
+         - `service_url`
+         - `service_port`
+         - `health_endpoint`
+      3) `## Verify`:
+         - `verification_steps` (deterministic numbered list)
+         - `expected_health_signal`
+      4) `## Credentials`:
+         - env-reference-only credential source refs (for example `API_TOKEN_ENV`)
+         - expected value source location guidance (for example CI secret store,
+           operator shell profile) with no inline secret values
+      5) `## Known Issues`:
+         - concise deterministic known issues list, or explicit `None`.
+    - `handoffs/release_notes.md` must include a concise latest release operator
+      summary (start command + endpoint + verify pointer) and link to canonical
+      sprint notes.
+    - Fail closed when required operator hints are missing/ambiguous or contain
+      inline secrets:
+      - `RELEASE_OPERATOR_HINTS_MISSING`
+      - `RELEASE_OPERATOR_HINTS_AMBIGUOUS`
+      - `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`
+    - Remediation: populate required fields in canonical sprint notes with
+      sanitized env-ref-only credential guidance, then rerun `/release`.
 
 ## Fail-safe reason codes and remediation guidance
 
@@ -356,6 +432,16 @@ Required deterministic reason codes:
 - `PUBLISH_TARGET_CONFIG_INVALID`
 - `PUBLISH_CONFIRMATION_REQUIRED`
 - `PUBLISH_TARGET_EXECUTION_FAILED`
+- `REMOTE_CONNECTIVITY_CONFIG_INVALID`
+- `RUNTIME_CONNECTIVITY_DOC_WRITE_FAILED`
+- `RELEASE_OPERATOR_HINTS_MISSING`
+- `RELEASE_OPERATOR_HINTS_AMBIGUOUS`
+- `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`
+- `PHASE_OWNERSHIP_VIOLATION`
+- `PHASE_OVERRIDE_EVIDENCE_MISSING`
+- `TEST_SCAFFOLD_STACK_UNRESOLVED`
+- `TEST_SCAFFOLD_UNSUPPORTED_STACK`
+- `TEST_SCAFFOLD_GENERATION_FAILED`
 
 When any reason code is emitted:
 - Preserve existing release note artifacts (non-destructive default).
@@ -376,4 +462,15 @@ When any reason code is emitted:
     historical list stable.
 - Missing/ambiguous placement anchors must fail with
   `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` and no partial mutation.
+
+## Cross-phase ownership guard (US-0061 / DEC-0043)
+
+- `/release` mutations must also satisfy
+  `docs/engineering/artifact-ownership-policy.md`.
+- Release may mutate only release-owned scopes (target sprint queue row, release
+  notes pointer/sprint notes, and target story reconciliation surfaces).
+- Cross-phase non-owned section rewrites/deletions fail closed with
+  `PHASE_OWNERSHIP_VIOLATION`.
+- If an override-authorized mutation path is configured but override evidence is
+  missing, fail closed with `PHASE_OVERRIDE_EVIDENCE_MISSING`.
 

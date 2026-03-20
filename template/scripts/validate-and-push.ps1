@@ -4,7 +4,8 @@
 # Part of the its-magic quality chain:
 #   Cursor AI loop  →  validate-and-push  →  CI auto-fix (GitHub)
 #
-# Reads TEST_COMMAND (and optionally LINT_FIX_COMMAND / FORMAT_COMMAND)
+# Reads TEST_COMMAND (and optionally LINT_COMMAND / TYPECHECK_COMMAND /
+# LINT_FIX_COMMAND / FORMAT_COMMAND)
 # from docs/engineering/runbook.md, runs them in a loop, and pushes
 # only when everything passes.
 # -------------------------------------------------------------------
@@ -39,11 +40,13 @@ function Read-RunbookKey {
 
 $TestCmd    = Read-RunbookKey "TEST_COMMAND"
 $LintCmd    = Read-RunbookKey "LINT_COMMAND"
+$TypecheckCmd = Read-RunbookKey "TYPECHECK_COMMAND"
 $LintFixCmd = Read-RunbookKey "LINT_FIX_COMMAND"
 $FormatCmd  = Read-RunbookKey "FORMAT_COMMAND"
 
 if (-not $TestCmd -and -not $LintCmd) {
   Log-Warn "No TEST_COMMAND or LINT_COMMAND found in docs/engineering/runbook.md"
+  Log-Warn "TEST_COMMAND is required by sync policy for push-eligible paths."
   Log-Warn "Fill in the runbook first, then re-run."
   exit 1
 }
@@ -57,6 +60,7 @@ Log-Info "validate-and-push loop"
 Log-Info "Branch: $Branch  |  Max attempts: $MaxAttempts"
 if ($TestCmd)    { Log-Info "TEST_COMMAND:     $TestCmd" }
 if ($LintCmd)    { Log-Info "LINT_COMMAND:     $LintCmd" }
+if ($TypecheckCmd) { Log-Info "TYPECHECK_COMMAND: $TypecheckCmd" }
 if ($LintFixCmd) { Log-Info "LINT_FIX_COMMAND: $LintFixCmd" }
 if ($FormatCmd)  { Log-Info "FORMAT_COMMAND:   $FormatCmd" }
 Write-Host ""
@@ -109,7 +113,18 @@ for ($attempt = 1; $attempt -le $MaxAttempts; $attempt++) {
     }
   }
 
-  # 4. Run tests
+  # 4. Run typecheck (optional)
+  if ($TypecheckCmd) {
+    Log-Info "Running typecheck..."
+    if (Run-Cmd $TypecheckCmd) {
+      Log-Pass "Typecheck OK"
+    } else {
+      Log-Fail "Typecheck failed"
+      $allOk = $false
+    }
+  }
+
+  # 5. Run tests
   if ($TestCmd) {
     Log-Info "Running tests..."
     if (Run-Cmd $TestCmd) {

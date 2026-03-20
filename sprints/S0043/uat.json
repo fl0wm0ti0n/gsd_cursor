@@ -1,0 +1,19 @@
+{
+  "sprint_id": "S0043",
+  "story_id": "US-0063",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "detectable-stack-bootstrap",
+      "status": "pass"
+    },
+    {
+      "id": "explicit-user-override-preserved",
+      "status": "pass"
+    },
+    {
+      "id": "deterministic-failfast-diagnostics",
+      "status": "pass"
+    }
+  ]
+}

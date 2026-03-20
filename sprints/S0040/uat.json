@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0040",
+  "story_ids": [
+    "US-0061"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Deterministic ownership matrix is defined for mutable workflow artifacts."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Ownership violation fail-safe code is documented and enforced in command/rule contracts."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Override-authorized mutation path requires explicit evidence fields."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Architecture history-preservation contract prevents unrelated section deletion."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Phase command contracts reference ownership policy consistently."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Refresh-context archive controls include deterministic verification behavior."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Archive verification mismatch fail-safe reason code is documented."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Canonical ownership and ordering contracts remain intact."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Active/template parity is maintained for all relevant policy/command/doc surfaces."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "Regression assertions cover ownership and archive verification controls."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

@@ -1,3 +1,474 @@
+## TL -> Dev Handoff — Sprint S0050 (US-0071 User-Visible Internal Metadata Sanitization Guard)
+
+## Planning summary
+
+- **Sprint**: S0050 (new)
+- **Story**: US-0071 — User-visible internal metadata sanitization guard
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0050/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0071 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0071 section)
+- Decision: `decisions/DEC-0053.md`
+- Research: `docs/engineering/research.md` (`R-0046`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0071)
+- Sprint artifacts: `sprints/S0050/*`
+
+## Focus
+
+1. **Policy + allowlist (T-001..T-002)**: forbidden planning-shaped tokens in user-visible outputs only; explicit internal surfaces + comments-not-strings rule.
+2. **Enforcement chain (T-003..T-005)**: `/execute` default guard, `/qa` automated scan with fail-closed diagnostics, structured findings with path evidence and remediation.
+3. **Vocabulary + precision (T-006..T-007)**: shared reason codes; no false blocks on allowlisted docs/comments.
+4. **Parity + evidence (T-008..T-010)**: active/template alignment, regression matrix (positive/negative/allowlist/idempotence), release attestation that checks ran.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0050/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0050/tasks.md` marked done.
+- `sprints/S0050/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0050/progress.md`, `sprints/S0050/uat.json`, and `sprints/S0050/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0071`.
+
+## Next phase
+
+Plan-verify **PASS** for **`S0050`** (`sprints/S0050/plan-verify.json`). Proceed to **`/execute`** for **`S0050`** (`US-0071`).
+
+---
+
+## TL -> Dev Handoff — Sprint S0049 (US-0070 Configurable Auto Phase Selection Policy)
+
+## Planning summary
+
+- **Sprint**: S0049 (new)
+- **Story**: US-0070 — Scratchpad-controlled `/auto` phase selection policy
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0049/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0070 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0070 section)
+- Decision: `decisions/DEC-0052.md`
+- Research: `docs/engineering/research.md` (`R-0049`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0070)
+- Sprint artifacts: `sprints/S0049/*`
+
+## Focus
+
+1. **Policy contract + conflict gate (T-001)**: single active selector (`AUTO_PHASE_PLAN` / `EXCLUDE` / `INCLUDE` / `PROFILE`) and `PHASE_POLICY_CONFLICT` per `DEC-0052`.
+2. **Plan materialization + breadcrumbs (T-002..T-005)**: ordered canonical plan, non-skippable reinstatement, `start-from` intersection, fail-closed invalid tokens.
+3. **Continuation + modes (T-006..T-007)**: backlog-drain, bulk execute, team paths, and resume parity — reload policy, recompute plan, no silent phase revival.
+4. **Parity + regression + operator UX (T-008..T-010)**: active/template docs, test coverage, boundary status with selected/skipped + reason codes.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0049/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0049/tasks.md` marked done.
+- `sprints/S0049/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0049/progress.md`, `sprints/S0049/uat.json`, and `sprints/S0049/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0070`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0049` (`US-0070`). Plan-verify: **PASS** (`sprints/S0049/plan-verify.json`).
+
+---
+
+## TL -> Dev Handoff — Sprint S0048 (US-0069 Strict Phase Role Enforcement in /auto)
+
+## Planning summary
+
+- **Sprint**: S0048 (new)
+- **Story**: US-0069 — Strict phase role enforcement in `/auto` orchestration
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0048/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0069 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0069 section)
+- Decision: `decisions/DEC-0051.md`
+- Research: `docs/engineering/research.md` (`R-0048`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0069)
+- Sprint artifacts: `sprints/S0048/*`
+
+## Focus
+
+1. **Contract + single-valued roles (T-001)**: canonical phase→role matrix and scratchpad alternate resolution per `DEC-0051`.
+2. **Preflight + fail-closed spawn (T-002..T-004)**: `PHASE_ROLE_CAPABILITY_MISSING`, checkpoint `PHASE_ROLE_MISMATCH`, and full diagnostics.
+3. **Execute default deny + resume parity (T-005..T-006)**: override governance ref path; no stale resume bypass.
+4. **Parity + regression + vocabulary + release evidence (T-007..T-010)**: active/template docs, tests, reason-code docs, readiness citations.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0048/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0048/tasks.md` marked done.
+- `sprints/S0048/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS**; recorded 2026-03-20).
+- `sprints/S0048/progress.md`, `sprints/S0048/uat.json`, and `sprints/S0048/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0069`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0048` (`US-0069`).
+
+---
+
+## TL -> Dev Handoff — Sprint S0047 (US-0068 Mandatory Intake Question Packs)
+
+## Planning summary
+
+- **Sprint**: S0047 (new)
+- **Story**: US-0068 — Mandatory intake question packs for first and small intakes
+- **Task count**: 11 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped in `sprints/S0047/tasks.md` (remediation applied for AC-8/AC-9/AC-10)
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0068 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0068 section)
+- Decision: `decisions/DEC-0050.md`
+- Research: `docs/engineering/research.md` (`R-0045`, baseline `R-0041`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0068 discovery addendum)
+- Sprint artifacts: `sprints/S0047/*`
+
+## Focus
+
+1. **Deterministic pack schemas (T-001..T-003)**: define machine-verifiable first/small intake topic coverage with required/optional classification.
+2. **Fail-closed persistence policy (T-004..T-008)**: block writes on missing required coverage, allow explicit bounded assumptions, and emit deterministic reason codes.
+3. **Parity + regression + fallback (T-009..T-011)**: cover active/template parity (AC-8), explicit regression matrix (AC-9), and deterministic unknown-stack fallback (AC-10).
+
+## Execution order
+
+Run tasks `T-001`..`T-011` in sequence (see `sprints/S0047/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 11 tasks in `sprints/S0047/tasks.md` marked done.
+- `sprints/S0047/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0047/progress.md`, `sprints/S0047/uat.json`, and `sprints/S0047/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0068`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0047` (`US-0068`) after `/plan-verify`.
+
+---
+
+## TL -> Dev Handoff — Sprint S0046 (US-0067 Release Operator Run/Connect/Verify Hints Contract)
+
+## Planning summary
+
+- **Sprint**: S0046 (new)
+- **Story**: US-0067 — Release operator Run/Connect/Verify hints contract
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0046/plan-verify.json`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0067 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0067 section)
+- Decision: `decisions/DEC-0049.md`
+- Research: `docs/engineering/research.md` (`R-0044`, baseline `R-0041`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0067 discovery addendum)
+- Sprint artifacts: `sprints/S0046/*`
+
+## Focus
+
+1. **Canonical schema + required fields (T-001..T-003)**: fixed-order `Run -> Connect -> Verify -> Credentials(env-ref only) -> Known Issues` contract with required operator fields and credentials safety boundary.
+2. **Fail-closed release and context alignment (T-004..T-007)**: deterministic latest-pointer parity, missing/ambiguous field blocking, runtime context (`local|remote`) explicitness, and QA/release evidence linkage.
+3. **Parity + deterministic reruns (T-008..T-010)**: active/template parity, regression coverage, and idempotent concise operator-facing release output.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0046/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0046/tasks.md` marked done.
+- `sprints/S0046/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0046/progress.md`, `sprints/S0046/uat.json`, and `sprints/S0046/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0067`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0046` (`US-0067`) after `/plan-verify`.
+
+---
+
+## TL -> Dev Handoff — Sprint S0045 (US-0066 Generated Test Scaffolding + Auto-Run)
+
+## Planning summary
+
+- **Sprint**: S0045 (new)
+- **Story**: US-0066 — Generated test scaffolding + auto-run contract for app projects
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped in `sprints/S0045/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0066 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0066 section)
+- Decision: `decisions/DEC-0048.md`
+- Research: `docs/engineering/research.md` (`R-0043`, baseline `R-0041`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0066 section/addendum)
+- Sprint artifacts: `sprints/S0045/*`
+
+## Focus
+
+1. **Scaffold generation contract (T-001..T-003)**: stack detection, missing-asset generation, and deterministic baseline `TEST_COMMAND` runbook wiring.
+2. **QA and fail-safe behavior (T-004..T-007)**: automatic generated-test execution, unsupported-stack diagnostics, non-destructive merge precedence, and runtime-autopilot integration boundary.
+3. **Parity + evidence (T-008..T-010)**: active/template parity, regression coverage, and deterministic release/readiness evidence references.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0045/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0045/tasks.md` marked done.
+- `sprints/S0045/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0045/progress.md`, `sprints/S0045/uat.json`, and `sprints/S0045/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0066`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0045` (`US-0066`) after `/plan-verify`.
+
+---
+
+## TL -> Dev Handoff — Sprint S0044 (US-0065 Runtime QA Autopilot)
+
+## Planning summary
+
+- **Sprint**: S0044 (new)
+- **Story**: US-0065 — Runtime QA Autopilot for generated projects (startup/connectivity/logs/bounded debug retries)
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped in `sprints/S0044/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0065 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0065 section)
+- Decision: `decisions/DEC-0047.md`
+- Research: `docs/engineering/research.md` (`R-0042`, baseline `R-0041`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0065 section/addendum)
+- Sprint artifacts: `sprints/S0044/*`
+
+## Focus
+
+1. **Mandatory runtime truth path (T-001..T-004)**: startup, connectivity, log scan, bounded retries, and auditable evidence schema.
+2. **Deterministic runtime policy (T-005..T-008)**: stack-profile resolution, webapp/browser checks, debug escalation, and remote-runtime compatibility.
+3. **Parity + verification (T-009..T-010)**: active/template contract parity and deterministic regression paths.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0044/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0044/tasks.md` marked done.
+- `sprints/S0044/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0044/progress.md`, `sprints/S0044/uat.json`, and `sprints/S0044/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0065`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0044` (`US-0065`) after `/plan-verify`.
+
+---
+
+# TL -> Dev Handoff — Sprint S0043 (US-0063 OS-Aware Runbook Bootstrap)
+
+## Planning summary
+
+- **Sprint**: S0043 (new)
+- **Story**: US-0063 — OS-aware runbook command auto-bootstrap with verified
+  quality gates
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0043/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0063 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0063 section)
+- Decision: `decisions/DEC-0046.md`
+- Research: `docs/engineering/research.md` (`R-0039`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0063 section)
+- Sprint artifacts: `sprints/S0043/*`
+
+## Focus
+
+1. **Bootstrap contract + detection (T-001..T-004)**: precedence model, OS/stack
+   detection, and deterministic validation diagnostics.
+2. **Gate and safety behavior (T-005..T-007)**: keep mandatory baseline command
+   policy and preserve user overrides on reruns.
+3. **Parity + verification (T-008..T-010)**: active/template parity with
+   installer/CLI/docs/tests updates.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0043/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0043/tasks.md` marked done.
+- `sprints/S0043/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0043/progress.md`, `sprints/S0043/uat.json`, and
+  `sprints/S0043/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0063`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0043` (`US-0063`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0041 (US-0064 Remote Connectivity Contract)
+
+## Planning summary
+
+- **Sprint**: S0041 (new)
+- **Story**: US-0064 — Remote runtime connectivity contract for QA/release/publish
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0041/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0064 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0064 section)
+- Decision: `decisions/DEC-0044.md`
+- Research: `docs/engineering/research.md` (`R-0040`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0064 section)
+- Sprint artifacts: `sprints/S0041/*`
+
+## Focus
+
+1. **Schema + validation (T-001..T-004)**: connectivity metadata + docker-over-ssh
+   support and deterministic validation diagnostics.
+2. **Phase integration (T-005..T-007)**: remote-aware release/qa/execute behavior
+   and canonical operator connectivity doc.
+3. **Parity + verification (T-008..T-010)**: active/template parity, tests, and docs.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0041/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0041/tasks.md` marked done.
+- `sprints/S0041/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0041/progress.md`, `sprints/S0041/uat.json`, and
+  `sprints/S0041/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0064`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0041` (`US-0064`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0040 (US-0061 Ownership Guard + Archive Control)
+
+## Planning summary
+
+- **Sprint**: S0040 (new)
+- **Story**: US-0061 — Cross-phase artifact ownership guard and deterministic
+  archive control
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0040/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0061 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0061 section)
+- Decision: `decisions/DEC-0043.md`
+- Research: `docs/engineering/research.md` (`R-0037`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0061 section/addendum)
+- Sprint artifacts: `sprints/S0040/*`
+
+## Focus
+
+1. **Ownership matrix + fail-safe (T-001..T-004)**: define phase ownership,
+   non-destructive mutation rules, and override evidence requirements.
+2. **Archive verification control (T-005..T-006)**: deterministic archive
+   verification outputs and fail-safe mismatch behavior.
+3. **Parity + validation (T-007..T-010)**: preserve existing canonical
+   contracts and add regression/test/doc updates.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0040/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0040/tasks.md` marked done.
+- `sprints/S0040/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0040/progress.md`, `sprints/S0040/uat.json`, and
+  `sprints/S0040/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0061`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0040` (`US-0061`).
+
+---
+
+# TL -> Dev Handoff — Sprint S0039 (US-0060 State Rollover Enforcement)
+
+## Planning summary
+
+- **Sprint**: S0039 (new)
+- **Story**: US-0060 — Deterministic state hot-surface rollover and archive enforcement
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage**: AC-1..AC-10 verified PASS in `sprints/S0039/plan-verify.json`.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0060 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0060 section)
+- Decision: `decisions/DEC-0042.md`
+- Research: `docs/engineering/research.md` (`R-0036`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (US-0060 section/addendum)
+- Sprint artifacts: `sprints/S0039/*`
+
+## Focus
+
+1. **Threshold contract (T-001..T-003)**: deterministic rollover triggers and
+   refresh-context enforcement.
+2. **Archive safety (T-004..T-006)**: non-destructive history retention,
+   idempotent partitioning, and fail-safe diagnostics.
+3. **Parity + validation (T-007..T-010)**: ordering compatibility, docs, tests,
+   and release traceability.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0039/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0039/tasks.md` marked done.
+- `sprints/S0039/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps.
+- `sprints/S0039/progress.md`, `sprints/S0039/uat.json`, and
+  `sprints/S0039/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes checkpoint traceability for `US-0060`.
+
+## Next phase
+
+Proceed to **`/execute`** for `S0039` (`US-0060`).
+
+---
+
 # TL -> Dev Handoff — Sprint S0038 (US-0059 Intake Capability Guard + Drift Safety)
 
 ## Planning summary

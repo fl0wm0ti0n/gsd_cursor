@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0041",
+  "story_ids": [
+    "US-0064"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {"id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Release targets include deterministic runtime connectivity fields."},
+    {"id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Docker-over-SSH contract fields are represented in schema examples."},
+    {"id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Release contract includes connectivity validation fail-fast behavior."},
+    {"id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Release contract includes operator connection guidance requirement."},
+    {"id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "QA contract includes optional remote runtime QA/debug behavior."},
+    {"id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Execute contract includes optional remote runtime execution context behavior."},
+    {"id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Canonical runtime connectivity document exists and defines endpoint summary contract."},
+    {"id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Operator context output includes local vs remote and redaction constraints."},
+    {"id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Active/template parity maintained across schema/commands/docs."},
+    {"id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "Regression assertions cover schema fields and phase contract content."}
+  ],
+  "verified_state": "qa-pass-and-uat-pass"
+}

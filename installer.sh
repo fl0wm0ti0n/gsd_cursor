@@ -44,12 +44,16 @@ show_help() {
   printf "  --backup          Before overwriting, save existing files to backups/<timestamp>/.\n"
   printf "                    Ignored when mode is 'missing' (nothing gets replaced).\n"
   printf "  --create          Create the target directory if it does not exist.\n\n"
+  printf "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from\n"
+  printf "        OS+stack detection; unresolved TEST_COMMAND fails fast with\n"
+  printf "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.\n\n"
   printf "Clean options:\n"
   printf "  --clean-repo      Remove all its-magic workflow artifacts from the target repo\n"
   printf "                    (owned paths from installer manifest, including .cursor,\n"
   printf "                    docs/product, docs/engineering, docs/user-guides, sprints,\n"
   printf "                    handoffs, decisions, workflow scripts, CI files, and\n"
-  printf "                    .its-magic-version). Your own source code is never touched.\n"
+  printf "                    installer metadata under its_magic/ (legacy .its-magic-version\n"
+  printf "                    is also removed when present). Your own source code is never touched.\n"
   printf "  --target <path>   Repo to clean (default: current directory).\n"
   printf "  --yes             Skip the confirmation prompt.\n\n"
   printf "Info:\n"
@@ -132,8 +136,8 @@ classify_file() {
     .cursor/scratchpad.md|README.md) echo "mixed" ;;
     .cursor/commands/*|.cursor/rules/*|.cursor/agents/*|.cursor/skills/*) echo "framework" ;;
     .cursor/hooks/*|.cursor/hooks.json|.cursor/scratchpad.local.example.md) echo "framework" ;;
-    .github/workflows/*|scripts/validate-and-push*|docs/engineering/context/*) echo "framework" ;;
-    .its-magic-version) echo "framework" ;;
+    .github/workflows/*|scripts/validate-and-push*|docs/engineering/context/*|its_magic/*) echo "framework" ;;
+    .its-magic-version|its_magic/.its-magic-version|its_magic/README.md) echo "framework" ;;
     docs/product/*|docs/engineering/*|docs/user-guides/*) echo "user-data" ;;
     sprints/*|handoffs/*|decisions/*) echo "user-data" ;;
     *) echo "framework" ;;
@@ -141,16 +145,157 @@ classify_file() {
 }
 
 read_installed_version() {
-  vf="$1/.its-magic-version"
-  if [ -f "$vf" ]; then
-    cat "$vf" | tr -d '\n'
-  else
-    printf "unknown"
+  primary="$1/its_magic/.its-magic-version"
+  legacy="$1/.its-magic-version"
+  if [ -f "$primary" ]; then
+    cat "$primary" | tr -d '\n'
+    return 0
   fi
+  if [ -f "$legacy" ]; then
+    cat "$legacy" | tr -d '\n'
+    return 0
+  fi
+  printf "unknown"
 }
 
 write_installed_version() {
-  printf "%s" "$2" > "$1/.its-magic-version"
+  vf="$1/its_magic/.its-magic-version"
+  ensure_parent "$vf"
+  printf "%s" "$2" > "$vf"
+  legacy="$1/.its-magic-version"
+  [ -f "$legacy" ] && rm -f "$legacy"
+}
+
+sync_root_readme_to_its_magic() {
+  target_root="$1"
+  [ -f "$target_root/README.md" ] || return 1
+  dst="$target_root/its_magic/README.md"
+  ensure_parent "$dst"
+  cp -p "$target_root/README.md" "$dst"
+  return 0
+}
+
+read_runbook_key() {
+  runbook_path="$1"
+  key="$2"
+  [ -f "$runbook_path" ] || { printf ""; return; }
+  awk -F: -v k="$key" '$1==k { sub(/^[[:space:]]*/, "", $2); print $2; exit }' "$runbook_path"
+}
+
+write_runbook_key() {
+  runbook_path="$1"
+  key="$2"
+  value="$3"
+  [ -f "$runbook_path" ] || return 1
+  tmp="$runbook_path.tmp.$$"
+  awk -v k="$key" -v v="$value" '
+    BEGIN { changed=0 }
+    index($0, k":") == 1 && changed==0 { print k": "v; changed=1; next }
+    { print $0 }
+    END { if (changed==0) exit 2 }
+  ' "$runbook_path" > "$tmp" || { rm -f "$tmp"; return 1; }
+  mv "$tmp" "$runbook_path"
+  return 0
+}
+
+package_has_script() {
+  target_root="$1"
+  script_name="$2"
+  pkg="$target_root/package.json"
+  [ -f "$pkg" ] || return 1
+  command -v node >/dev/null 2>&1 || return 1
+  node -e "const fs=require('fs');const p=JSON.parse(fs.readFileSync(process.argv[1],'utf8'));const s=(p.scripts||{})[process.argv[2]];process.exit((typeof s==='string'&&s.trim())?0:1);" "$pkg" "$script_name" >/dev/null 2>&1
+}
+
+detect_runbook_defaults() {
+  target_root="$1"
+  TEST_CANDIDATE=""
+  LINT_CANDIDATE=""
+  TYPECHECK_CANDIDATE=""
+  if [ -f "$target_root/package.json" ] && package_has_script "$target_root" "test"; then
+    TEST_CANDIDATE="npm run test"
+    package_has_script "$target_root" "lint" && LINT_CANDIDATE="npm run lint"
+    package_has_script "$target_root" "typecheck" && TYPECHECK_CANDIDATE="npm run typecheck"
+    return 0
+  fi
+  if [ -f "$target_root/go.mod" ]; then
+    TEST_CANDIDATE="go test ./..."
+    return 0
+  fi
+  if [ -f "$target_root/pyproject.toml" ] || [ -f "$target_root/requirements.txt" ] || [ -f "$target_root/setup.py" ]; then
+    TEST_CANDIDATE="python -m pytest"
+    return 0
+  fi
+  if [ -f "$target_root/tests/run-tests.sh" ]; then
+    TEST_CANDIDATE="sh tests/run-tests.sh"
+    return 0
+  fi
+}
+
+validate_bootstrap_command() {
+  target_root="$1"
+  key="$2"
+  cmd="$3"
+  [ -n "$cmd" ] || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="${key}_UNDETECTED"; return 0; }
+  case "$cmd" in
+    "npm run "*)
+      command -v npm >/dev/null 2>&1 || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="NPM_NOT_FOUND"; return 0; }
+      script_name=$(printf "%s" "$cmd" | sed 's/^npm run[[:space:]]\+//')
+      package_has_script "$target_root" "$script_name" || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="NPM_SCRIPT_MISSING:$script_name"; return 0; }
+      BOOTSTRAP_VALID="true"; BOOTSTRAP_REASON="OK"; return 0
+      ;;
+    "python -m pytest")
+      command -v python >/dev/null 2>&1 || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="PYTHON_NOT_FOUND"; return 0; }
+      BOOTSTRAP_VALID="true"; BOOTSTRAP_REASON="OK"; return 0
+      ;;
+    "go test "*)
+      command -v go >/dev/null 2>&1 || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="GO_NOT_FOUND"; return 0; }
+      [ -f "$target_root/go.mod" ] || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="GO_MOD_MISSING"; return 0; }
+      BOOTSTRAP_VALID="true"; BOOTSTRAP_REASON="OK"; return 0
+      ;;
+    "sh "*)
+      command -v sh >/dev/null 2>&1 || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="SH_NOT_FOUND"; return 0; }
+      [ -f "$target_root/tests/run-tests.sh" ] || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="RUN_TESTS_SH_MISSING"; return 0; }
+      BOOTSTRAP_VALID="true"; BOOTSTRAP_REASON="OK"; return 0
+      ;;
+  esac
+  exe=$(printf "%s" "$cmd" | awk '{print $1}')
+  command -v "$exe" >/dev/null 2>&1 || { BOOTSTRAP_VALID="false"; BOOTSTRAP_REASON="EXECUTABLE_NOT_FOUND:$exe"; return 0; }
+  BOOTSTRAP_VALID="true"; BOOTSTRAP_REASON="OK"
+}
+
+bootstrap_runbook_commands() {
+  target_root="$1"
+  runbook="$target_root/docs/engineering/runbook.md"
+  [ -f "$runbook" ] || { BOOTSTRAP_OK="true"; BOOTSTRAP_NOTES=""; return 0; }
+  BOOTSTRAP_NOTES=""
+  APPLIED=""
+  detect_runbook_defaults "$target_root"
+  for key in TEST_COMMAND LINT_COMMAND TYPECHECK_COMMAND; do
+    current=$(read_runbook_key "$runbook" "$key")
+    [ -n "$current" ] && continue
+    candidate=""
+    [ "$key" = "TEST_COMMAND" ] && candidate="$TEST_CANDIDATE"
+    [ "$key" = "LINT_COMMAND" ] && candidate="$LINT_CANDIDATE"
+    [ "$key" = "TYPECHECK_COMMAND" ] && candidate="$TYPECHECK_CANDIDATE"
+    if [ -z "$candidate" ]; then
+      if [ "$key" = "TEST_COMMAND" ]; then
+        BOOTSTRAP_NOTES="${BOOTSTRAP_NOTES}[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED: could not detect a valid baseline test command. Fix: define TEST_COMMAND in docs/engineering/runbook.md or add detectable stack markers (package.json scripts.test, pyproject.toml, go.mod)."$'\n'
+      fi
+      continue
+    fi
+    validate_bootstrap_command "$target_root" "$key" "$candidate"
+    if [ "$BOOTSTRAP_VALID" = "true" ]; then
+      if write_runbook_key "$runbook" "$key" "$candidate"; then
+        if [ -z "$APPLIED" ]; then APPLIED="$key=$candidate"; else APPLIED="$APPLIED, $key=$candidate"; fi
+      fi
+    elif [ "$key" = "TEST_COMMAND" ]; then
+      BOOTSTRAP_NOTES="${BOOTSTRAP_NOTES}[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_INVALID:$BOOTSTRAP_REASON. Fix: set a valid TEST_COMMAND in docs/engineering/runbook.md."$'\n'
+    fi
+  done
+  [ -n "$APPLIED" ] && BOOTSTRAP_NOTES="${BOOTSTRAP_NOTES}[RUNBOOK_BOOTSTRAP] Applied defaults: $APPLIED"$'\n'
+  final_test=$(read_runbook_key "$runbook" "TEST_COMMAND")
+  if [ -n "$final_test" ]; then BOOTSTRAP_OK="true"; else BOOTSTRAP_OK="false"; fi
 }
 
 prompt_yes_no() {
@@ -369,6 +514,10 @@ if [ "$MODE" = "upgrade" ]; then
   done
 
   write_installed_version "$TARGET_ROOT" "$APP_VERSION"
+  sync_root_readme_to_its_magic "$TARGET_ROOT" || true
+  bootstrap_runbook_commands "$TARGET_ROOT"
+  [ -n "$BOOTSTRAP_NOTES" ] && printf "%s" "$BOOTSTRAP_NOTES"
+  [ "$BOOTSTRAP_OK" = "true" ] || exit 1
 
   show_banner
   printf "\033[1;32mUpgrade complete: v%s -> v%s\033[0m\n\n" "$OLD_VER" "$APP_VERSION"
@@ -433,6 +582,10 @@ for rel in $FILES; do
 done
 
 write_installed_version "$TARGET_ROOT" "$APP_VERSION"
+sync_root_readme_to_its_magic "$TARGET_ROOT" || true
+bootstrap_runbook_commands "$TARGET_ROOT"
+[ -n "$BOOTSTRAP_NOTES" ] && printf "%s" "$BOOTSTRAP_NOTES"
+[ "$BOOTSTRAP_OK" = "true" ] || exit 1
 
 show_banner
 printf "its-magic v%s\n" "$APP_VERSION"

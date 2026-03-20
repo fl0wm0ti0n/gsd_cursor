@@ -47,6 +47,17 @@ $Results = @()
 $script:TimeoutSeconds = $TimeoutSeconds
 $root = Resolve-RepoRoot
 $tpl = Join-Path $root "template"
+$bootstrapPkgJson = @'
+{
+  "name": "bootstrap-fixture",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo ok",
+    "lint": "echo lint",
+    "typecheck": "echo typecheck"
+  }
+}
+'@
 
 # 1) Base structure checks
 Assert-True "template/ folder exists" (Test-Path $tpl -PathType Container)
@@ -82,6 +93,7 @@ $runbook = Join-Path $tpl "docs\engineering\runbook.md"
 Assert-True "Runbook contains TEST_COMMAND" (File-Contains $runbook "TEST_COMMAND")
 Assert-True "Runbook contains LINT_COMMAND" (File-Contains $runbook "LINT_COMMAND")
 Assert-True "Runbook contains TYPECHECK_COMMAND" (File-Contains $runbook "TYPECHECK_COMMAND")
+Assert-True "Runbook documents OS-aware bootstrap contract (template)" (File-Contains $runbook "OS-aware runbook command bootstrap (US-0063 / DEC-0046)")
 Assert-True "Runbook contains DEPLOY_STAGING_COMMAND" (File-Contains $runbook "DEPLOY_STAGING_COMMAND")
 Assert-True "Runbook contains DEPLOY_PROD_COMMAND" (File-Contains $runbook "DEPLOY_PROD_COMMAND")
 Assert-True "Runbook documents US-0015 intentional empty commands (template)" (File-Contains $runbook "Intentional empty commands (US-0015)")
@@ -120,6 +132,7 @@ try {
 $tempRoot = Join-Path $root "tests\.tmp-install"
 if (Test-Path $tempRoot) { Remove-Item -Recurse -Force $tempRoot -ErrorAction SilentlyContinue }
 New-Item -ItemType Directory -Path $tempRoot | Out-Null
+Set-Content -Path (Join-Path $tempRoot "package.json") -Value $bootstrapPkgJson
 
 $installer = Join-Path $root "installer.ps1"
 if (Test-Path $installer -PathType Leaf) {
@@ -127,10 +140,15 @@ if (Test-Path $installer -PathType Leaf) {
     Invoke-Installer $installer @("-Target", $tempRoot, "-Mode", "missing", "-Create")
     $installed = Test-Path (Join-Path $tempRoot ".cursor\commands\intake.md")
     $manifestInstalled = Test-Path (Join-Path $tempRoot "docs\engineering\context\installer-owned-paths.manifest")
+    $manifestPath = Join-Path $tempRoot "docs\engineering\context\installer-owned-paths.manifest"
     $freshStatusReport = Join-Path $tempRoot "docs\engineering\status-normalization-report.md"
     $freshResearch = Join-Path $tempRoot "docs\engineering\research.md"
+    $freshRunbook = Join-Path $tempRoot "docs\engineering\runbook.md"
     Assert-True "Installer (ps1) installs commands" $installed
     Assert-True "Installer (ps1) installs ownership manifest" $manifestInstalled
+    Assert-True "Installer ownership manifest includes its_magic boundary" (File-Contains $manifestPath "its_magic")
+    Assert-True "Installer bootstraps TEST_COMMAND for detectable stack" (File-Contains $freshRunbook "TEST_COMMAND: npm run test")
+    Assert-True "Installer mirrors root README into its_magic README" (File-Contains (Join-Path $tempRoot "its_magic\README.md") "US-0015 intent contract")
     Assert-True "Fresh install has neutral status-normalization report" (File-Contains $freshStatusReport "(none yet)")
     Assert-True "Fresh install has no seeded status-normalization row" (-not (File-Contains $freshStatusReport "US-0018"))
     Assert-True "Fresh install research has no hardcoded DEC-0011 reference" (-not (File-Contains $freshResearch "DEC-0011"))
@@ -163,18 +181,24 @@ if (Test-Path $installer -PathType Leaf) {
   $upgradeTemp = Join-Path $root "tests\.tmp-upgrade"
   if (Test-Path $upgradeTemp) { Remove-Item -Recurse -Force $upgradeTemp -ErrorAction SilentlyContinue }
   New-Item -ItemType Directory -Path $upgradeTemp | Out-Null
+  Set-Content -Path (Join-Path $upgradeTemp "package.json") -Value $bootstrapPkgJson
 
   try {
     Invoke-Installer $installer @("-Target", $upgradeTemp, "-Mode", "missing", "-Create")
 
-    $versionFile = Join-Path $upgradeTemp ".its-magic-version"
-    Assert-True "Version file written on install" (Test-Path $versionFile -PathType Leaf)
+    $versionFile = Join-Path $upgradeTemp "its_magic\.its-magic-version"
+    Assert-True "Version file written on install (its_magic)" (Test-Path $versionFile -PathType Leaf)
+    Assert-True "Metadata README written on install (its_magic)" (Test-Path (Join-Path $upgradeTemp "its_magic\README.md") -PathType Leaf)
 
     $userFile = Join-Path $upgradeTemp "docs\product\vision.md"
     Set-Content -Path $userFile -Value "# My Custom Vision"
 
     $frameworkFile = Join-Path $upgradeTemp ".cursor\commands\intake.md"
     Set-Content -Path $frameworkFile -Value "modified-framework"
+    $upgradeRunbook = Join-Path $upgradeTemp "docs\engineering\runbook.md"
+    $upgradeRunbookRaw = Get-Content -Path $upgradeRunbook -Raw
+    $upgradeRunbookRaw = $upgradeRunbookRaw -replace '(?m)^TEST_COMMAND:\s*.*$', 'TEST_COMMAND: custom test command'
+    Set-Content -Path $upgradeRunbook -Value $upgradeRunbookRaw
     $scratchpadExample = Join-Path $upgradeTemp ".cursor\scratchpad.local.example.md"
     $scratchpadLocal = Join-Path $upgradeTemp ".cursor\scratchpad.local.md"
     Set-Content -Path $scratchpadExample -Value "modified-local-example-marker"
@@ -194,9 +218,11 @@ if (Test-Path $installer -PathType Leaf) {
 
     $scratchpadLocalPreserved = (Get-Content -Path $scratchpadLocal -Raw) -match "user-local-marker=keep"
     Assert-True "Upgrade preserves user scratchpad local overrides" $scratchpadLocalPreserved
+    Assert-True "Upgrade does not overwrite explicit user TEST_COMMAND" (File-Contains $upgradeRunbook "TEST_COMMAND: custom test command")
 
     $versionUpdated = (Test-Path $versionFile -PathType Leaf)
-    Assert-True "Version file updated after upgrade" $versionUpdated
+    Assert-True "Version file updated after upgrade (its_magic)" $versionUpdated
+    Assert-True "Legacy top-level version file migrated away on upgrade" (-not (Test-Path (Join-Path $upgradeTemp ".its-magic-version") -PathType Leaf))
   } catch {
     Assert-True "Upgrade test" $false $_.Exception.Message
   }
@@ -209,6 +235,7 @@ if (Test-Path $installer -PathType Leaf) {
   $cleanTemp = Join-Path $root "tests\.tmp-cleanrepo"
   if (Test-Path $cleanTemp) { Remove-Item -Recurse -Force $cleanTemp -ErrorAction SilentlyContinue }
   New-Item -ItemType Directory -Path $cleanTemp | Out-Null
+  Set-Content -Path (Join-Path $cleanTemp "package.json") -Value $bootstrapPkgJson
 
   try {
     Invoke-Installer $installer @("-Target", $cleanTemp, "-Mode", "missing", "-Create")
@@ -227,6 +254,7 @@ if (Test-Path $installer -PathType Leaf) {
       -not (Test-Path (Join-Path $cleanTemp "scripts\validate-and-push.sh") -PathType Leaf) -and
       -not (Test-Path (Join-Path $cleanTemp ".github\workflows\ci.yml") -PathType Leaf) -and
       -not (Test-Path (Join-Path $cleanTemp ".github\workflows\deploy.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cleanTemp "its_magic") -PathType Container) -and
       -not (Test-Path (Join-Path $cleanTemp ".its-magic-version") -PathType Leaf)
     $markerPreserved = Test-Path $markerFile -PathType Leaf
     Assert-True "Clean-repo removes framework artifacts (installer)" $frameworkRemoved
@@ -245,10 +273,14 @@ if ((Test-Path $cli -PathType Leaf) -and $nodeCmd) {
   $cliTemp = Join-Path $root "tests\.tmp-cli-lifecycle"
   if (Test-Path $cliTemp) { Remove-Item -Recurse -Force $cliTemp -ErrorAction SilentlyContinue }
   New-Item -ItemType Directory -Path $cliTemp | Out-Null
+  Set-Content -Path (Join-Path $cliTemp "package.json") -Value $bootstrapPkgJson
 
   try {
     & node $cli --target $cliTemp --mode missing --create | Out-Null
-    Assert-True "CLI missing install writes version file" (Test-Path (Join-Path $cliTemp ".its-magic-version") -PathType Leaf)
+    Assert-True "CLI missing install writes version file (its_magic)" (Test-Path (Join-Path $cliTemp "its_magic\.its-magic-version") -PathType Leaf)
+    Assert-True "CLI missing install writes metadata README (its_magic)" (Test-Path (Join-Path $cliTemp "its_magic\README.md") -PathType Leaf)
+    Assert-True "CLI missing install bootstraps TEST_COMMAND for detectable stack" (File-Contains (Join-Path $cliTemp "docs\engineering\runbook.md") "TEST_COMMAND: npm run test")
+    Assert-True "CLI missing install mirrors root README into its_magic README" (File-Contains (Join-Path $cliTemp "its_magic\README.md") "US-0015 intent contract")
     Assert-True "CLI missing install writes command file" (Test-Path (Join-Path $cliTemp ".cursor\commands\intake.md") -PathType Leaf)
     Assert-True "CLI missing install writes ownership manifest" (Test-Path (Join-Path $cliTemp "docs\engineering\context\installer-owned-paths.manifest") -PathType Leaf)
     Assert-True "CLI missing install status-normalization report is neutral" (File-Contains (Join-Path $cliTemp "docs\engineering\status-normalization-report.md") "(none yet)")
@@ -294,6 +326,7 @@ if ((Test-Path $cli -PathType Leaf) -and $nodeCmd) {
       -not (Test-Path (Join-Path $cliTemp "scripts\validate-and-push.sh") -PathType Leaf) -and
       -not (Test-Path (Join-Path $cliTemp ".github\workflows\ci.yml") -PathType Leaf) -and
       -not (Test-Path (Join-Path $cliTemp ".github\workflows\deploy.yml") -PathType Leaf) -and
+      -not (Test-Path (Join-Path $cliTemp "its_magic") -PathType Container) -and
       -not (Test-Path (Join-Path $cliTemp ".its-magic-version") -PathType Leaf)
     $cliMarkerPreserved = Test-Path $markerFile -PathType Leaf
     Assert-True "CLI clean-repo removes framework artifacts" $cliFrameworkRemoved
@@ -328,6 +361,7 @@ Assert-True "README mentions memory-audit timing (template)" (File-Contains $rea
 
 $runbookActive = Join-Path $root "docs\engineering\runbook.md"
 Assert-True "Runbook documents US-0015 intentional empty commands (active)" (File-Contains $runbookActive "Intentional empty commands (US-0015)")
+Assert-True "Runbook documents OS-aware bootstrap contract (active)" (File-Contains $runbookActive "OS-aware runbook command bootstrap (US-0063 / DEC-0046)")
 Assert-True "Runbook mentions memory-audit timing" (File-Contains $runbookActive "Pre-handoff")
 
 Assert-True "memory-audit routes template drift to US-0017 (active)" (File-Contains $auditActive "US-0017")
@@ -377,6 +411,46 @@ Assert-True "runbook lists negative path: missing config" (File-Contains $runboo
 Assert-True "runbook lists negative path: malformed JSON" (File-Contains $runbookActive "Malformed JSON")
 Assert-True "runbook lists negative path: invalid value or enum" (File-Contains $runbookActive "Invalid value or enum")
 Assert-True "runbook lists negative path: security violation" (File-Contains $runbookActive "Security violation")
+
+Assert-True "execute command documents runtime autopilot stage chain (active)" (File-Contains $executeActive "startup -> readiness/connectivity -> log scan -> bounded retry -> verdict")
+Assert-True "execute command documents runtime autopilot stage chain (template)" (File-Contains $executeTemplate "startup -> readiness/connectivity -> log scan -> bounded retry -> verdict")
+$qaActive = Join-Path $root ".cursor\commands\qa.md"
+$qaTemplate = Join-Path $tpl ".cursor\commands\qa.md"
+$qualityActive = Join-Path $root ".cursor\rules\quality.mdc"
+$qualityTemplate = Join-Path $tpl ".cursor\rules\quality.mdc"
+Assert-True "qa command defines RUNTIME_STARTUP_FAILED (active)" (File-Contains $qaActive "RUNTIME_STARTUP_FAILED")
+Assert-True "qa command defines RUNTIME_RETRY_BUDGET_EXHAUSTED (active)" (File-Contains $qaActive "RUNTIME_RETRY_BUDGET_EXHAUSTED")
+Assert-True "qa command defines RUNTIME_STACK_PROFILE_UNRESOLVED (template)" (File-Contains $qaTemplate "RUNTIME_STACK_PROFILE_UNRESOLVED")
+Assert-True "runbook documents runtime QA autopilot contract (active)" (File-Contains $runbookActive "Runtime QA autopilot contract (US-0065 / DEC-0047)")
+Assert-True "runbook documents runtime QA autopilot contract (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Runtime QA autopilot contract (US-0065 / DEC-0047)")
+Assert-True "README documents runtime QA autopilot behavior (active)" (File-Contains $readmeActive "Runtime QA autopilot behavior (US-0065)")
+Assert-True "README documents runtime QA autopilot behavior (template)" (File-Contains $readmeTemplate "Runtime QA autopilot behavior (US-0065)")
+Assert-True "quality rule includes runtime deterministic reason codes (active)" (File-Contains $qualityActive "RUNTIME_LOG_CRITICAL_DETECTED")
+Assert-True "quality rule includes runtime deterministic reason codes (template)" (File-Contains $qualityTemplate "RUNTIME_LOG_CRITICAL_DETECTED")
+Assert-True "execute command documents generated scaffold contract (active)" (File-Contains $executeActive "Generated baseline test scaffolding contract (US-0066 / DEC-0048)")
+Assert-True "execute command documents generated scaffold contract (template)" (File-Contains $executeTemplate "Generated baseline test scaffolding contract (US-0066 / DEC-0048)")
+Assert-True "qa command documents generated test auto-run contract (active)" (File-Contains $qaActive "Generated baseline test auto-run contract (US-0066 / DEC-0048)")
+Assert-True "qa command documents generated test auto-run contract (template)" (File-Contains $qaTemplate "Generated baseline test auto-run contract (US-0066 / DEC-0048)")
+Assert-True "runbook documents generated test scaffolding contract (active)" (File-Contains $runbookActive "Generated test scaffolding + auto-run contract (US-0066 / DEC-0048)")
+Assert-True "runbook documents generated test scaffolding contract (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Generated test scaffolding + auto-run contract (US-0066 / DEC-0048)")
+Assert-True "README documents generated test scaffolding behavior (active)" (File-Contains $readmeActive "Generated test scaffolding + auto-run behavior (US-0066)")
+Assert-True "README documents generated test scaffolding behavior (template)" (File-Contains $readmeTemplate "Generated test scaffolding + auto-run behavior (US-0066)")
+Assert-True "verify-work includes generated-test readiness gate (active)" (File-Contains (Join-Path $root ".cursor\commands\verify-work.md") "Generated-test readiness evidence gate (US-0066 / DEC-0048)")
+Assert-True "verify-work includes generated-test readiness gate (template)" (File-Contains (Join-Path $tpl ".cursor\commands\verify-work.md") "Generated-test readiness evidence gate (US-0066 / DEC-0048)")
+Assert-True "release includes generated-test evidence prerequisite (active)" (File-Contains (Join-Path $root ".cursor\commands\release.md") "Generated-test evidence prerequisite (US-0066 / DEC-0048)")
+Assert-True "release includes generated-test evidence prerequisite (template)" (File-Contains (Join-Path $tpl ".cursor\commands\release.md") "Generated-test evidence prerequisite (US-0066 / DEC-0048)")
+Assert-True "release includes scaffold fail code TEST_SCAFFOLD_GENERATION_FAILED (active)" (File-Contains (Join-Path $root ".cursor\commands\release.md") "TEST_SCAFFOLD_GENERATION_FAILED")
+Assert-True "release includes scaffold fail code TEST_SCAFFOLD_GENERATION_FAILED (template)" (File-Contains (Join-Path $tpl ".cursor\commands\release.md") "TEST_SCAFFOLD_GENERATION_FAILED")
+Assert-True "intake command documents mandatory question packs contract (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "Mandatory intake question packs and fail-closed persistence gate (US-0068 / DEC-0050)")
+Assert-True "intake command documents mandatory question packs contract (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "Mandatory intake question packs and fail-closed persistence gate (US-0068 / DEC-0050)")
+Assert-True "po agent includes first-intake-pack guidance (active)" (File-Contains (Join-Path $root ".cursor\agents\po.mdc") "first-intake-pack")
+Assert-True "po agent includes small-intake-pack guidance (template)" (File-Contains (Join-Path $tpl ".cursor\agents\po.mdc") "small-intake-pack")
+Assert-True "runbook documents mandatory intake question packs section (active)" (File-Contains $runbookActive "Mandatory intake question packs and persistence coverage gate (US-0068 / DEC-0050)")
+Assert-True "runbook documents mandatory intake question packs section (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Mandatory intake question packs and persistence coverage gate (US-0068 / DEC-0050)")
+Assert-True "README documents US-0068 intake pack behavior (active)" (File-Contains $readmeActive "Mandatory intake question packs (US-0068)")
+Assert-True "README documents US-0068 intake pack behavior (template)" (File-Contains $readmeTemplate "Mandatory intake question packs (US-0068)")
+Assert-True "intake command includes deterministic fail code INTAKE_PERSISTENCE_BLOCKED (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "INTAKE_PERSISTENCE_BLOCKED")
+Assert-True "intake command includes deterministic evidence field asked_topics (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "asked_topics")
 
 # 13) Auto continuation deterministic contract checks (US-0037)
 $autoActive = Join-Path $root ".cursor\commands\auto.md"
@@ -796,6 +870,26 @@ Assert-True "runbook documents intake runtime capability and writer safety mode 
 Assert-True "README documents intake runtime safety behavior (active)" (File-Contains $readmeActive "Intake runtime safety behavior (US-0059):")
 Assert-True "README documents intake runtime safety behavior (template)" (File-Contains $readmeTemplate "Intake runtime safety behavior (US-0059):")
 
+# 21j) Deterministic state rollover enforcement checks (US-0060)
+$refreshContextActive = Join-Path $root ".cursor\commands\refresh-context.md"
+$refreshContextTemplate = Join-Path $tpl ".cursor\commands\refresh-context.md"
+Assert-True "scratchpad includes STATE_HOT_MAX_LINES (active)" (File-Contains $scratchpadActive "STATE_HOT_MAX_LINES=1200")
+Assert-True "scratchpad includes STATE_HOT_MAX_LINES (template)" (File-Contains $scratchpadTemplate "STATE_HOT_MAX_LINES=1200")
+Assert-True "scratchpad includes STATE_HOT_MAX_CHECKPOINTS (active)" (File-Contains $scratchpadActive "STATE_HOT_MAX_CHECKPOINTS=80")
+Assert-True "scratchpad includes STATE_HOT_MAX_CHECKPOINTS (template)" (File-Contains $scratchpadTemplate "STATE_HOT_MAX_CHECKPOINTS=80")
+Assert-True "scratchpad local example includes STATE_HOT_MAX_LINES (active)" (File-Contains $scratchpadLocalExampleActive "STATE_HOT_MAX_LINES=1200")
+Assert-True "scratchpad local example includes STATE_HOT_MAX_LINES (template)" (File-Contains $scratchpadLocalExampleTemplate "STATE_HOT_MAX_LINES=1200")
+Assert-True "refresh-context command documents rollover thresholds (active)" (File-Contains $refreshContextActive "STATE_HOT_MAX_LINES")
+Assert-True "refresh-context command documents rollover thresholds (template)" (File-Contains $refreshContextTemplate "STATE_HOT_MAX_LINES")
+Assert-True "refresh-context includes archive write fail-safe code (active)" (File-Contains $refreshContextActive "STATE_ARCHIVE_WRITE_FAILED")
+Assert-True "refresh-context includes archive write fail-safe code (template)" (File-Contains $refreshContextTemplate "STATE_ARCHIVE_WRITE_FAILED")
+Assert-True "artifact ordering policy includes archive fail-safe code (active)" (File-Contains $artifactOrderingPolicyActive "STATE_ARCHIVE_BOUNDARY_AMBIGUOUS")
+Assert-True "artifact ordering policy includes archive fail-safe code (template)" (File-Contains $artifactOrderingPolicyTemplate "STATE_ARCHIVE_BOUNDARY_AMBIGUOUS")
+Assert-True "runbook documents enforced rollover thresholds (active)" (File-Contains $runbookActive "Enforced rollover thresholds")
+Assert-True "runbook documents enforced rollover thresholds (template)" (File-Contains $runbookTemplate "Enforced rollover thresholds")
+Assert-True "README documents enforced rollover thresholds (active)" (File-Contains $readmeActive "Enforced rollover thresholds")
+Assert-True "README documents enforced rollover thresholds (template)" (File-Contains $readmeTemplate "Enforced rollover thresholds")
+
 # 22) Optional cross-repo observability checks (US-0034)
 $qaCommandActive = Join-Path $root ".cursor\commands\qa.md"
 $qaCommandTemplate = Join-Path $tpl ".cursor\commands\qa.md"
@@ -990,6 +1084,40 @@ Assert-True "runbook documents strict runtime proof contract (template)" (File-C
 Assert-True "README documents strict runtime proof section (active)" (File-Contains $readmeActive "Strict runtime proof (US-0056 / DEC-0038)")
 Assert-True "README documents strict runtime proof section (template)" (File-Contains $readmeTemplate "Strict runtime proof (US-0056 / DEC-0038)")
 
+# 26c) Strict phase role enforcement checks (US-0069 / DEC-0051)
+Assert-True "auto documents strict phase role enforcement section (active)" (File-Contains $autoActive "Strict phase role enforcement (US-0069 / DEC-0051)")
+Assert-True "auto documents strict phase role enforcement section (template)" (File-Contains $autoTemplate "Strict phase role enforcement (US-0069 / DEC-0051)")
+Assert-True "auto includes PHASE_ROLE_CAPABILITY_MISSING (active)" (File-Contains $autoActive "PHASE_ROLE_CAPABILITY_MISSING")
+Assert-True "auto includes PHASE_ROLE_MISMATCH (active)" (File-Contains $autoActive "PHASE_ROLE_MISMATCH")
+Assert-True "auto includes AUTO_ROLE_RESEARCH scratchpad input (active)" (File-Contains $autoActive "AUTO_ROLE_RESEARCH")
+Assert-True "auto includes EXECUTE_OVERRIDE_GOVERNANCE_REF (template)" (File-Contains $autoTemplate "EXECUTE_OVERRIDE_GOVERNANCE_REF")
+Assert-True "runbook documents phase role enforcement (active)" (File-Contains $runbookActive "PHASE_ROLE_CAPABILITY_MISSING")
+Assert-True "runbook documents phase role enforcement US-0069 header (active)" (File-Contains $runbookActive "US-0069 / DEC-0051")
+Assert-True "runbook documents phase role enforcement (template)" (File-Contains $runbookTemplate "PHASE_ROLE_CAPABILITY_MISSING")
+Assert-True "runbook documents phase role enforcement US-0069 header (template)" (File-Contains $runbookTemplate "US-0069 / DEC-0051")
+Assert-True "README documents phase role enforcement subsection (active)" (File-Contains $readmeActive "phase→role enforcement (US-0069 / DEC-0051)")
+Assert-True "README documents phase role enforcement subsection (template)" (File-Contains $readmeTemplate "phase→role enforcement (US-0069 / DEC-0051)")
+Assert-True "release isolation gate cites phase role alignment (active)" (File-Contains $releaseCommandActive "Phase role alignment (US-0069 / DEC-0051)")
+Assert-True "release strict-proof gate cites role alignment (template)" (File-Contains $releaseCommandTemplate "Strict-proof role alignment (US-0069 / DEC-0051)")
+Assert-True "active scratchpad documents AUTO_ROLE_RESEARCH (US-0069)" (File-Contains (Join-Path $root ".cursor\scratchpad.md") "AUTO_ROLE_RESEARCH")
+Assert-True "template scratchpad documents AUTO_ROLE_RESEARCH (US-0069)" (File-Contains (Join-Path $tpl ".cursor\scratchpad.md") "AUTO_ROLE_RESEARCH")
+
+# 26d) Configurable phase selection policy checks (US-0070 / DEC-0052)
+Assert-True "auto documents US-0070 phase selection section (active)" (File-Contains $autoActive "Configurable phase selection policy (US-0070 / DEC-0052)")
+Assert-True "auto documents US-0070 phase selection section (template)" (File-Contains $autoTemplate "Configurable phase selection policy (US-0070 / DEC-0052)")
+Assert-True "auto includes PHASE_POLICY_CONFLICT (active)" (File-Contains $autoActive "PHASE_POLICY_CONFLICT")
+Assert-True "auto includes START_FROM_PHASE_PLAN_EMPTY_INTERSECTION (template)" (File-Contains $autoTemplate "START_FROM_PHASE_PLAN_EMPTY_INTERSECTION")
+Assert-True "auto steps reference materialize resolved phase plan (active)" (File-Contains $autoActive "materialize the resolved")
+Assert-True "auto inputs list AUTO_PHASE_EXCLUDE (active)" (File-Contains $autoActive "AUTO_PHASE_EXCLUDE")
+Assert-True "runbook documents US-0070 phase plan header (active)" (File-Contains $runbookActive "phase plan (US-0070 / DEC-0052)")
+Assert-True "runbook documents US-0070 phase plan header (template)" (File-Contains $runbookTemplate "phase plan (US-0070 / DEC-0052)")
+Assert-True "README documents US-0070 phase selection subsection (active)" (File-Contains $readmeActive "phase selection policy (US-0070 / DEC-0052)")
+Assert-True "README documents US-0070 phase selection subsection (template)" (File-Contains $readmeTemplate "phase selection policy (US-0070 / DEC-0052)")
+Assert-True "active scratchpad documents AUTO_PHASE_INCLUDE (US-0070)" (File-Contains (Join-Path $root ".cursor\scratchpad.md") "AUTO_PHASE_INCLUDE")
+Assert-True "template scratchpad documents AUTO_PHASE_INCLUDE (US-0070)" (File-Contains (Join-Path $tpl ".cursor\scratchpad.md") "AUTO_PHASE_INCLUDE")
+Assert-True "active scratchpad.local.example documents AUTO_PHASE_PROFILE (US-0070)" (File-Contains (Join-Path $root ".cursor\scratchpad.local.example.md") "AUTO_PHASE_PROFILE")
+Assert-True "template scratchpad.local.example documents AUTO_PHASE_PROFILE (US-0070)" (File-Contains (Join-Path $tpl ".cursor\scratchpad.local.example.md") "AUTO_PHASE_PROFILE")
+
 # 27) Legacy DONE-story drift detection and guard (US-0049)
 $legacyAuditActive = Join-Path $root "docs\engineering\legacy-drift-audit.md"
 $legacyAuditTemplate = Join-Path $tpl "docs\engineering\legacy-drift-audit.md"
@@ -1008,6 +1136,55 @@ Assert-True "release command includes legacy drift guard step (US-0049) (templat
 Assert-True "release command includes legacy-drift reason code BACKLOG_DONE_RELEASE_ARTIFACT_MISSING (active)" (File-Contains $releaseCommandActive "BACKLOG_DONE_RELEASE_ARTIFACT_MISSING")
 Assert-True "release command includes legacy-drift reason code BACKLOG_DONE_RELEASE_ARTIFACT_MISSING (template)" (File-Contains $releaseCommandTemplate "BACKLOG_DONE_RELEASE_ARTIFACT_MISSING")
 
+# 28) Cross-phase ownership guard and archive verification checks (US-0061)
+$ownershipPolicyActive = Join-Path $root "docs\engineering\artifact-ownership-policy.md"
+$ownershipPolicyTemplate = Join-Path $tpl "docs\engineering\artifact-ownership-policy.md"
+Assert-True "artifact ownership policy exists (active)" (Test-Path $ownershipPolicyActive -PathType Leaf)
+Assert-True "artifact ownership policy exists (template)" (Test-Path $ownershipPolicyTemplate -PathType Leaf)
+Assert-True "ownership policy includes phase ownership violation code (active)" (File-Contains $ownershipPolicyActive "PHASE_OWNERSHIP_VIOLATION")
+Assert-True "ownership policy includes architecture history deletion code (template)" (File-Contains $ownershipPolicyTemplate "ARCH_HISTORY_DELETION_DETECTED")
+Assert-True "refresh-context includes archive verification fail-safe code (active)" (File-Contains (Join-Path $root ".cursor\commands\refresh-context.md") "STATE_ARCHIVE_VERIFICATION_FAILED")
+Assert-True "refresh-context includes archive verification fail-safe code (template)" (File-Contains (Join-Path $tpl ".cursor\commands\refresh-context.md") "STATE_ARCHIVE_VERIFICATION_FAILED")
+Assert-True "core rule includes cross-phase ownership guard (active)" (File-Contains (Join-Path $root ".cursor\rules\core.mdc") "Cross-phase artifact ownership guard (US-0061 / DEC-0043)")
+Assert-True "core rule includes cross-phase ownership guard (template)" (File-Contains (Join-Path $tpl ".cursor\rules\core.mdc") "Cross-phase artifact ownership guard (US-0061 / DEC-0043)")
+Assert-True "runbook documents ownership guard mode (active)" (File-Contains $runbookActive "Cross-phase artifact ownership guard (US-0061 / DEC-0043)")
+Assert-True "README documents ownership guard mode (template)" (File-Contains $readmeTemplate "Cross-phase artifact ownership guard (US-0061)")
+
+# 29) Remote runtime connectivity contract checks (US-0064)
+$releaseTargetsActive = Join-Path $root "docs\engineering\release-targets.json"
+$releaseTargetsTemplate = Join-Path $tpl "docs\engineering\release-targets.json"
+$runtimeConnectivityActive = Join-Path $root "docs\engineering\runtime-connectivity.md"
+$runtimeConnectivityTemplate = Join-Path $tpl "docs\engineering\runtime-connectivity.md"
+Assert-True "release-targets includes runtime connectivity doc path (active)" (File-Contains $releaseTargetsActive "runtimeConnectivityDoc")
+Assert-True "release-targets includes runtime mode field (template)" (File-Contains $releaseTargetsTemplate "`"mode`": `"remote`"")
+Assert-True "release-targets includes traefik metadata (active)" (File-Contains $releaseTargetsActive "`"traefik`"")
+Assert-True "release-targets includes docker over ssh metadata (template)" (File-Contains $releaseTargetsTemplate "`"dockerOverSsh`"")
+Assert-True "runtime connectivity doc exists (active)" (Test-Path $runtimeConnectivityActive -PathType Leaf)
+Assert-True "runtime connectivity doc exists (template)" (Test-Path $runtimeConnectivityTemplate -PathType Leaf)
+Assert-True "release command includes remote connectivity invalid reason (active)" (File-Contains $releaseCommandActive "REMOTE_CONNECTIVITY_CONFIG_INVALID")
+Assert-True "qa command includes remote runtime QA contract (active)" (File-Contains $qaCommandActive "Optional remote runtime QA/debug contract (US-0064)")
+Assert-True "execute command includes remote runtime execution context (template)" (File-Contains $executeTemplate "Optional remote runtime execution context (US-0064)")
+Assert-True "runbook documents runtime connectivity metadata (active)" (File-Contains $runbookActive "Connectivity metadata (for operator-safe remote/local context)")
+Assert-True "README references runtime connectivity doc (template)" (File-Contains $readmeTemplate "docs/engineering/runtime-connectivity.md")
+
+# 30) Release operator hints contract checks (US-0067)
+$releaseNotesTemplateActive = Join-Path $root "handoffs\releases\Sxxxx-release-notes.md"
+$releaseNotesTemplateTemplate = Join-Path $tpl "handoffs\releases\Sxxxx-release-notes.md"
+$legacyReleaseNotesTemplate = Join-Path $tpl "handoffs\release_notes.md"
+Assert-True "release notes template includes Run section (active)" (File-Contains $releaseNotesTemplateActive "## Run")
+Assert-True "release notes template includes Connect section (template)" (File-Contains $releaseNotesTemplateTemplate "## Connect")
+Assert-True "release notes template includes Verify section (active)" (File-Contains $releaseNotesTemplateActive "## Verify")
+Assert-True "release notes template includes health endpoint field (template)" (File-Contains $releaseNotesTemplateTemplate "health_endpoint")
+Assert-True "release notes template enforces credentials env-ref guidance (active)" (File-Contains $releaseNotesTemplateActive "env names only")
+Assert-True "release command includes operator hints contract section (active)" (File-Contains $releaseCommandActive "Release operator Run/Connect/Verify hints contract (US-0067 / DEC-0049)")
+Assert-True "release command includes operator hints missing reason code (template)" (File-Contains $releaseCommandTemplate "RELEASE_OPERATOR_HINTS_MISSING")
+Assert-True "release command includes operator hints ambiguous reason code (active)" (File-Contains $releaseCommandActive "RELEASE_OPERATOR_HINTS_AMBIGUOUS")
+Assert-True "release command includes operator hints secret exposure reason code (template)" (File-Contains $releaseCommandTemplate "RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE")
+Assert-True "legacy release notes pointer includes latest operator summary (active)" (File-Contains $releaseNotesActive "Latest operator summary (Run/Connect/Verify)")
+Assert-True "legacy release notes pointer includes latest operator summary (template)" (File-Contains $legacyReleaseNotesTemplate "Latest operator summary (Run/Connect/Verify)")
+Assert-True "runbook documents release operator hints contract (active)" (File-Contains $runbookActive "Release operator hints contract (US-0067 / DEC-0049)")
+Assert-True "core rule documents release operator hints contract (template)" (File-Contains (Join-Path $tpl ".cursor\\rules\\core.mdc") "Release operator hints contract (US-0067 / DEC-0049)")
+
 $releaseQueueContent = if (Test-Path $releaseQueueActive -PathType Leaf) { Get-Content -Path $releaseQueueActive -Raw } else { "" }
 $hasS0013Released = $releaseQueueContent -match "\|\s*S0013\s*\|[^\r\n]*\|\s*released\s*\|"
 $backlogPath = Join-Path $root "docs\product\backlog.md"
@@ -1016,6 +1193,41 @@ $us0041StatusDone = $backlogRaw -match "(?s)## US-0041[\s\S]*?- Status: DONE"
 if ($hasS0013Released) {
   Assert-True "released sprint S0013 has reconciled backlog DONE state for US-0041" $us0041StatusDone
 }
+
+# 26e) User-visible internal metadata guard (US-0071 / DEC-0053)
+$metaScript = Join-Path $root "scripts\check-user-visible-metadata.py"
+Assert-True "metadata guard script exists" (Test-Path $metaScript -PathType Leaf)
+$metaOk = Start-Process python -ArgumentList @($metaScript, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "metadata guard clean repo scan passes" ($metaOk.ExitCode -eq 0)
+$metaOk2 = Start-Process python -ArgumentList @($metaScript, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "metadata guard idempotent rerun passes" ($metaOk2.ExitCode -eq 0)
+$metaLeak = Join-Path $root "tests\.tmp-meta-leak"
+if (Test-Path $metaLeak) { Remove-Item -Recurse -Force $metaLeak -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Path (Join-Path $metaLeak "bin") -Force | Out-Null
+Set-Content -Path (Join-Path $metaLeak "bin\leak-test.js") -Value 'console.log("US-0999");' -Encoding utf8
+$metaBad = Start-Process python -ArgumentList @($metaScript, "--repo", $metaLeak) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "metadata guard detects leak in user-visible bin" ($metaBad.ExitCode -eq 1)
+Remove-Item -Recurse -Force $metaLeak -ErrorAction SilentlyContinue
+$metaAllow = Join-Path $root "tests\.tmp-meta-allow"
+if (Test-Path $metaAllow) { Remove-Item -Recurse -Force $metaAllow -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Path (Join-Path $metaAllow "docs") -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $metaAllow "bin") -Force | Out-Null
+Set-Content -Path (Join-Path $metaAllow "docs\internal.md") -Value "US-0999`n" -Encoding utf8
+Set-Content -Path (Join-Path $metaAllow "bin\ok.js") -Value "console.log('ok');`n" -Encoding utf8
+$metaAllowRun = Start-Process python -ArgumentList @($metaScript, "--repo", $metaAllow) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "metadata guard passes when only non-scanned tree has tokens" ($metaAllowRun.ExitCode -eq 0)
+Remove-Item -Recurse -Force $metaAllow -ErrorAction SilentlyContinue
+$metaJsComment = Join-Path $root "tests\.tmp-meta-jscomment"
+if (Test-Path $metaJsComment) { Remove-Item -Recurse -Force $metaJsComment -ErrorAction SilentlyContinue }
+New-Item -ItemType Directory -Path (Join-Path $metaJsComment "bin") -Force | Out-Null
+Set-Content -Path (Join-Path $metaJsComment "bin\c.js") -Value "// US-0999`nconsole.log('ok');`n" -Encoding utf8
+$metaCommentRun = Start-Process python -ArgumentList @($metaScript, "--repo", $metaJsComment) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "metadata guard allows JS line comment with token shape" ($metaCommentRun.ExitCode -eq 0)
+Remove-Item -Recurse -Force $metaJsComment -ErrorAction SilentlyContinue
+Assert-True "runbook documents user-visible metadata guard (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
+Assert-True "runbook documents user-visible metadata guard (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
+Assert-True "execute command documents metadata guard step (active)" (File-Contains (Join-Path $root ".cursor\commands\execute.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
+Assert-True "execute command documents metadata guard step (template)" (File-Contains (Join-Path $tpl ".cursor\commands\execute.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
 
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {

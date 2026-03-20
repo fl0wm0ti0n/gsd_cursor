@@ -1,24 +1,90 @@
 # Decisions
 
-## Current context pack (2026-03-14)
+## Current context pack (2026-03-22 — post S0050 / US-0071)
 
-- Latest completed/released stories:
-  - `US-0059` (`S0038`), governed by `DEC-0041`.
-  - `US-0058` (`S0037`), governed by `DEC-0040`.
-  - `US-0057` (`S0036`), governed by `DEC-0039`.
-  - `US-0056` (`S0035`), governed by `DEC-0038`.
-  - `US-0055` (`S0034`), governed by `DEC-0037`.
-  - `US-0054` (`S0033`), governed by `DEC-0036`.
-  - `US-0052` (`S0031`), governed by `DEC-0034`.
-  - `US-0053` (`S0032`), governed by `DEC-0035`.
-- Latest architecture decision: `DEC-0041` for `US-0059` (intake capability
-  fail-fast plus single-writer drift safety contract).
-- Next prioritized open story: none in current active intake queue.
-- Active intake/research target: none (awaiting next intake).
-- No open decision gate at workflow boundary.
+- Latest completed/released stories (high-signal):
+  - `US-0071` (`S0050`, released), governed by `DEC-0053` (user-visible internal
+    metadata sanitization guard; execute/QA/release attestation).
+  - `US-0070` (`S0049`, released), governed by `DEC-0052`.
+  - `US-0069` (`S0048`, released), governed by `DEC-0051`.
+  - `US-0068` (`S0047`), governed by `DEC-0050`.
+  - `US-0067` (`S0046`), governed by `DEC-0049`.
+- Hot surface: `docs/engineering/state.md` rolled over; oldest checkpoints archived
+  to `docs/engineering/state-archive/state-pack-20260322.md` (12-checkpoint contiguous
+  prefix; prior packs `state-pack-20260321.md`, `state-pack-20260320.md` remain
+  historical); see refresh-context checkpoint **post S0050 / US-0071** in `state.md`.
+- Next prioritized open story: **`US-0072`** (`P1`) — deterministic context slimming
+  and archive enforcement across core artifacts (`state`, handoffs, architecture).
+- Active workflow target: **`/discovery`** for **`US-0072`** (see `handoffs/resume_brief.md`).
+- No open decision gate at this boundary.
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0053`: user-visible **internal metadata sanitization guard** — forbidden
+  planning-token patterns (`US|DEC|R` + four digits) in operator/end-user
+  software outputs only; explicit allowlist for `docs/**`, `.cursor/**`,
+  sprint/handoff/decision artifacts, and code comments; mandatory execute guard +
+  QA fail-closed scan + release attestation that checks ran; deterministic
+  reason-code vocabulary; active/template parity; linked story `US-0071`.
+- `DEC-0052`: scratchpad-controlled `/auto` **phase plan** resolution (single
+  active policy mode: `full` / `exclude` / `include` / `profile`), deterministic
+  materialization pipeline, default **non-skippable** reinstatement (`qa`,
+  `verify-work`, `release` + evidence-chain integrity), `start-from`
+  intersection fail-closed semantics, named high-risk profile rules with
+  acknowledgment, compatibility with `DEC-0051` (no role substitution via
+  skips), and operator-facing breadcrumb/reason-code contract; linked story
+  `US-0070`.
+- `DEC-0051`: strict `/auto` phase→role mapping with scratchpad-resolved
+  alternates (`AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`,
+  `AUTO_ROLE_REFRESH_CONTEXT`), mandatory preflight capability gate,
+  fail-closed isolation vs contract validation (`PHASE_ROLE_MISMATCH`),
+  `PHASE_ROLE_CAPABILITY_MISSING`, strict-proof `role` alignment with
+  isolation, execute default `dev` with rare `AUTO_EXECUTE_ROLE_OVERRIDE` +
+  `execute_override_governance_ref`, and resume/start-from preflight parity;
+  linked story `US-0069`.
+- `DEC-0050`: mandatory deterministic intake question packs (`first-intake-pack`
+  and `small-intake-pack`) with machine-verifiable topic IDs,
+  required/optional classification, fail-closed persistence gating on missing
+  required coverage, bounded assumptions confirmation path, and mandatory
+  intake coverage evidence fields (`asked_topics`, `missing_topics`,
+  `assumptions_confirmed`); linked story `US-0068`.
+- `DEC-0049`: deterministic release operator hints contract for sprint release
+  artifacts with fixed `Run -> Connect -> Verify -> Credentials(env-ref only) ->
+  Known Issues` ordering, fail-closed required-field validation, explicit
+  `local|remote` runtime context alignment, and concise latest-pointer parity;
+  linked story `US-0067`.
+- `DEC-0048`: deterministic generated-test scaffolding + auto-run contract for
+  generated app projects, including supported stack baseline profiles
+  (Node/Python/Go/Java/.NET), fail-closed unresolved/unsupported diagnostics,
+  non-destructive precedence (`user-authored assets` > `generated missing
+  assets`), rerun idempotence, and mandatory QA evidence linkage; linked story
+  `US-0066`.
+- `DEC-0047`: mandatory runtime QA autopilot contract for generated projects:
+  startup/readiness/log validation chain, bounded selective retries, deterministic
+  runtime reason-code families, stack-aware profile fail-safe, and mandatory
+  runtime evidence schema; linked story `US-0065`.
+- `DEC-0046`: runbook command bootstrap contract with precedence
+  (`user override > detected defaults > fail-fast diagnostics`), stack/OS-aware
+  detection, mandatory baseline validation, and non-destructive reruns; linked
+  story `US-0063`.
+- `DEC-0045`: installer-owned canonical metadata boundary at `its_magic/` with
+  upgrade migration from legacy root marker, clean/install ownership manifest
+  updates, and non-destructive backward compatibility; linked story `US-0062`.
+- `DEC-0043`: cross-phase ownership matrix with non-destructive mutation
+  enforcement (`PHASE_OWNERSHIP_VIOLATION`,
+  `PHASE_OVERRIDE_EVIDENCE_MISSING`, `ARCH_HISTORY_DELETION_DETECTED`) and
+  deterministic archive verification fail-safe
+  (`STATE_ARCHIVE_VERIFICATION_FAILED`); linked story `US-0061`.
+- `DEC-0044`: release-target runtime connectivity contract (`runtime.mode`,
+  endpoint metadata, Traefik fields, docker-over-ssh) with remote-aware
+  release/qa/execute behavior and deterministic diagnostics
+  (`REMOTE_CONNECTIVITY_CONFIG_INVALID`,
+  `RUNTIME_CONNECTIVITY_DOC_WRITE_FAILED`); linked story `US-0064`.
+- `DEC-0042`: deterministic state hot-surface rollover with explicit thresholds
+  (`STATE_HOT_MAX_LINES`, `STATE_HOT_MAX_CHECKPOINTS`), non-destructive archive
+  packs, and fail-safe diagnostics
+  (`STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`, `STATE_ARCHIVE_WRITE_FAILED`); linked
+  story `US-0060`.
 - `DEC-0041`: deterministic intake capability preflight with fail-fast
   `SUBAGENT_CAPABILITY_UNAVAILABLE`, explicit fallback policy, and
   single-writer self-write-aware drift safety
@@ -57,4 +123,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0041.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0053.md`.

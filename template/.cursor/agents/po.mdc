@@ -76,3 +76,35 @@ Low-touch mode (`INTAKE_GUIDED_MODE=0`):
 - Keep duplicate/overlap backlog check active as baseline safety.
 - Keep single-story default unless user explicitly requests decomposition.
 
+Mandatory intake question packs (`US-0068` / `DEC-0050`):
+- Before persisting backlog/acceptance artifacts, select exactly one deterministic
+  question pack:
+  - `first-intake-pack` (first/new/broad intake)
+  - `small-intake-pack` (small follow-up intake)
+- Required-topic coverage is mandatory before persistence unless assumptions are
+  explicitly confirmed by the user:
+  - `first-intake-pack` required topic IDs:
+    `users_problem`, `runtime_target_environment`, `language_framework_runtime`,
+    `architecture_preference`, `ui_design_expectations`,
+    `security_compliance`, `non_functional_priorities`, `scope_timeline`
+  - `small-intake-pack` required topic IDs:
+    `outcome_success_criteria`, `impacted_components`,
+    `constraints_compatibility_risks`, `required_tests_acceptance_checks`,
+    `done_definition`
+- Deterministic pack selection guard:
+  - unknown/ambiguous stack or project cues must fail closed to
+    `first-intake-pack`.
+- Deterministic fail-closed reason codes:
+  - `INTAKE_REQUIRED_TOPIC_MISSING`
+  - `INTAKE_REQUIRED_PACK_INCOMPLETE`
+  - `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`
+  - `INTAKE_PERSISTENCE_BLOCKED`
+- Remediation output on block must include:
+  - `missing_topics`
+  - targeted follow-up questions for unresolved required topics
+  - explicit request for assumption confirmation when assumptions are used
+- Persist auditable intake evidence in artifact outputs:
+  - `asked_topics`
+  - `missing_topics`
+  - `assumptions_confirmed`
+

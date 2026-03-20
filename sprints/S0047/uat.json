@@ -1,0 +1,30 @@
+{
+  "sprint_id": "S0047",
+  "story_ids": [
+    "US-0068"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    { "id": "UAT-001", "ac": "AC-1", "result": "pass", "notes": "Deterministic first-intake-pack schema defines required topic IDs for users/problem, runtime target/environment, stack/runtime, architecture preference, UI/design, security/compliance, NFR priorities, and scope/timeline." },
+    { "id": "UAT-002", "ac": "AC-2", "result": "pass", "notes": "Deterministic small-intake-pack schema defines required topic IDs for outcome/success criteria, impacted components, constraints/compatibility risk, required tests/acceptance checks, and done definition." },
+    { "id": "UAT-003", "ac": "AC-3", "result": "pass", "notes": "Intake persistence is fail-closed until required coverage is complete or bounded assumptions are explicitly confirmed." },
+    { "id": "UAT-004", "ac": "AC-4", "result": "pass", "notes": "Guided mode retains adaptive follow-ups with bounded rounds while enforcing deterministic minimum pack coverage." },
+    { "id": "UAT-005", "ac": "AC-5", "result": "pass", "notes": "Low-touch mode remains available but still enforces critical required coverage when mandatory fields are missing." },
+    { "id": "UAT-006", "ac": "AC-6", "result": "pass", "notes": "Evidence persistence contract includes asked_topics, missing_topics, and assumptions_confirmed for deterministic traceability." },
+    { "id": "UAT-007", "ac": "AC-7", "result": "pass", "notes": "Deterministic blocked reason codes are present for missing required answers and intake persistence block states." },
+    { "id": "UAT-008", "ac": "AC-8", "result": "pass", "notes": "Active/template parity is maintained for intake command, PO agent guidance, runbook, and README touchpoints." },
+    { "id": "UAT-009", "ac": "AC-9", "result": "pass", "notes": "Regression assertions cover first-intake flow, small-intake flow, low-touch compatibility, and blocked-on-missing-answer behavior." },
+    { "id": "UAT-010", "ac": "AC-10", "result": "pass", "notes": "Question-pack selection includes deterministic unknown-stack fallback to first-intake-pack." }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0047/qa-findings.md",
+    "sprints/S0047/summary.md",
+    "sprints/S0047/tasks.md",
+    "sprints/S0047/progress.md",
+    "tests/report.md"
+  ]
+}

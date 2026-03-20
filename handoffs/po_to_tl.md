@@ -1,3 +1,921 @@
+## PO -> TL Handoff — US-0072 (Deterministic Context Slimming + Archive Enforcement)
+
+### Intake context
+
+- User reports persistent operational gap: `docs/engineering/state.md` keeps
+  growing while `docs/engineering/state-archive/` remains effectively empty.
+- User also reports `handoffs` and `docs/engineering/architecture.md` growth is
+  creating noisy context that increases subagent misunderstanding/hallucination
+  risk.
+- User requests deterministic process changes so subagents read only
+  context-necessary files while preserving required traceability.
+
+### Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0053` (context compaction + `/ask` narrow reads),
+  - `US-0060` (state rollover + archive enforcement),
+  - `US-0061` (ownership guard + deterministic archive control).
+- Assessment: not duplicate.
+  - Existing contracts define policy, but current observed behavior indicates an
+    enforcement/integration gap (archive not materializing, hot files still
+    oversized).
+  - This story focuses on fail-closed execution enforcement and bounded
+    per-phase read contracts across multiple large artifacts.
+
+### Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** recommended.
+- Reason:
+  - archive enforcement and context-budget control are tightly coupled in one
+    operational objective (smaller, safer context surfaces with no evidence loss).
+
+### Intake pack evidence (US-0068)
+
+- selected_pack=`small-intake-pack`
+- asked_topics:
+  - `outcome_success_criteria`
+  - `impacted_components`
+  - `constraints_compatibility_risks`
+  - `required_tests_acceptance_checks`
+  - `done_definition`
+- missing_topics=`(none)`
+- assumptions_confirmed=`(none)`
+
+### Scope for TL
+
+- In scope:
+  - deterministic hot/archive thresholds + enforcement for state/handoff/architecture,
+  - fail-closed boundary checks when rollover is required but missing,
+  - archive verification evidence schema and idempotent pack behavior,
+  - strict per-phase minimal-read policy and compact phase-context pointers,
+  - regression coverage for empty-archive and oversize-hot-surface failures.
+- Out of scope:
+  - deleting historical evidence,
+  - weakening lifecycle quality/safety gates.
+
+### Research reference
+
+- `R-0047`: archive/rotation and bounded-context retrieval patterns for
+  deterministic compaction with low hallucination risk.
+
+### Recommendation
+
+- Proceed to **`/discovery`** for `US-0072`.
+- Discovery focus:
+  - deterministic archive execution gates at phase boundaries,
+  - minimal per-phase read allowlists and bounded expansion path,
+  - hot/archive artifact split plan for state, handoffs, architecture with
+    explicit ownership and verification evidence.
+
+---
+
+## PO -> TL Handoff — US-0071 (User-Visible Internal Metadata Sanitization Guard)
+
+### Intake context
+
+- User reports repeated cases where planning identifiers (for example `US-xxxx`)
+  appear in user-visible software outputs (UI strings or other end-user-visible
+  surfaces).
+- User policy requirement is explicit:
+  - allowed: internal docs + code comments,
+  - forbidden: user-visible product surfaces.
+- User expects deterministic automation guardrails, not manual discipline only.
+
+### Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0069` (role enforcement in `/auto`),
+  - `US-0068` (intake question-pack enforcement),
+  - `US-0067` (release operator output schema).
+- Assessment: not duplicate.
+  - Existing stories improve orchestration quality and release clarity but do not
+    define a dedicated cross-phase policy for blocking internal planning IDs in
+    user-visible software.
+
+### Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** recommended.
+- Reason:
+  - one policy boundary (internal metadata visibility) with cohesive
+    execute/qa/release evidence integration.
+- Alternatives considered:
+  - split into "policy definition" + "qa gate" (rejected: tightly coupled and
+    harder to validate independently for this scope size).
+
+### Intake pack evidence (US-0071)
+
+- selected_pack=`small-intake-pack`
+- asked_topics:
+  - `outcome_success_criteria`
+  - `impacted_components`
+  - `constraints_compatibility_risks`
+  - `required_tests_acceptance_checks`
+  - `done_definition`
+- missing_topics=`(none)`
+- assumptions_confirmed=`(none)`
+
+### Scope for TL
+
+- In scope:
+  - deterministic forbidden-token policy for user-visible surfaces,
+  - explicit allowlist for internal-only surfaces (docs/comments),
+  - execute/qa fail-closed checks with deterministic reason codes and evidence,
+  - release/readiness evidence references for sanitization verification,
+  - active/template parity across command/rule/doc guidance.
+- Out of scope:
+  - broad content-style governance unrelated to internal planning metadata,
+  - modifying business feature scope outside this visibility-policy contract.
+
+### Research reference
+
+- `R-0046`: user-visible internal metadata leakage prevention patterns, with
+  security/error-handling references and policy implications.
+
+### Recommendation
+
+- **`/discovery` complete for `US-0071`** (see **Discovery Addendum — US-0071**).
+- Proceed to **`/research`** for **`US-0071`**, extending `R-0046` findings into
+  concrete scan targets, allowlist boundaries, and test matrix notes for
+  execute/QA automation.
+
+---
+
+## Discovery Addendum — US-0071 (User-Visible Internal Metadata Sanitization Guard)
+
+### Discovery context
+
+- Discovery confirms a recurring quality gap: planning identifiers (`US-xxxx`,
+  `DEC-xxxx`, `R-xxxx`) can appear in operator- or user-visible software outputs
+  despite being acceptable in internal markdown and comments.
+- Existing orchestration stories improve roles, phase plans, and release hints but
+  do not define a cross-phase **output sanitization** contract for those tokens.
+
+### Discovery outcomes
+
+- Define **user-visible surfaces** as software-facing channels (CLI stdout/stderr,
+  UI copy, user-facing errors, installer-visible messages) while **excluding**
+  repository documentation trees, `.cursor` policy text, sprint/handoff/decision
+  artifacts, and source comments from mandatory redaction.
+- Keep **minimum forbidden patterns** aligned with backlog AC-1; allow research to
+  propose extensions without shrinking the baseline taxonomy.
+- Require **execute default guard** and **QA automated verification** with
+  fail-closed diagnostics: file/path context, token class, safe replacement
+  guidance, and documented reason codes (`USER_VISIBLE_INTERNAL_METADATA_DETECTED`,
+  `METADATA_SANITIZATION_POLICY_MISSING`, etc.).
+- Plan **regression shape**: positive clean output, negative leak detection,
+  allowlist (docs/comments) non-regression, idempotent reruns — matching AC-9.
+- **Scope wall**: no `US-0069` role-matrix changes, no `US-0070` phase-selection
+  policy edits, no generic marketing copy standards.
+
+### Recommendation
+
+- Proceed to **`/research`** for **`US-0071`** only (deepen `R-0046` into
+  implementation-ready guard + verification design).
+
+---
+
+## PO -> TL Handoff — US-0069 and US-0070 (/auto role enforcement + phase selection policy)
+
+### Intake context
+
+- User confirmed an external generated-repo run where `/auto` moved from intake
+  into implementation behavior under tech-lead context instead of intended
+  phase-role routing.
+- User requested deterministic prevention of this behavior via strict phase role
+  capability enforcement and fail-closed diagnostics.
+- User also requested a scratchpad-controlled way to fine-tune which phases
+  `/auto` runs (for example skipping `research` or `sprint-plan`) without
+  disabling automation entirely.
+
+### Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0048` (per-phase isolation evidence),
+  - `US-0056` (strict runtime proof),
+  - `US-0059` (intake role capability guard),
+  - `US-0047` (bulk execute orchestration controls).
+- Assessment: not duplicate.
+  - `US-0069` introduces strict phase-role capability enforcement and role
+    mismatch rejection across `/auto` lifecycle boundaries.
+  - `US-0070` introduces operator-configurable phase selection policy for
+    `/auto`, which existing mode toggles do not provide.
+
+### Decomposition decision (US-0051 contract)
+
+- Evaluator result: **two-story split** recommended and user-approved.
+- `US-0069` scope: safety contract (role enforcement, fail-fast, evidence role
+  validation).
+- `US-0070` scope: operability contract (phase include/exclude policy with
+  deterministic precedence and diagnostics).
+
+### Scope for TL
+
+- In scope:
+  - deterministic phase->role mapping and capability preflight in `/auto`,
+  - fail-closed reason codes for role-capability missing and role mismatch,
+  - checkpoint role validation against expected phase-role contract,
+  - scratchpad-driven phase selection policy with clear precedence and guardrails,
+  - resume/start-from interaction contract for selected/skipped phases.
+- Out of scope:
+  - bypassing mandatory safety checks without explicit policy contract,
+  - changing application-level implementation logic in generated repositories.
+
+### Recommendation
+
+- **`/discovery` complete for `US-0069`** (see **Discovery Addendum — US-0069**).
+- **`/discovery` complete for `US-0070`** (see **Discovery Addendum — US-0070**).
+- Proceed to **`/research`** for **`US-0070`** next (phase-selection policy contract).
+- Discovery focus for `US-0069` (completed):
+  - deterministic phase-role matrix and allowed override semantics,
+  - reason-code taxonomy and fail-closed behavior for capability/mismatch paths,
+  - evidence validation hooks at phase boundaries.
+- Discovery focus for `US-0070`:
+  - scratchpad schema for phase selection (`include`/`exclude`/profiles),
+  - non-skippable safety boundary policy,
+  - deterministic interaction with `start-from`, resume, backlog-drain, and
+    bulk/team modes.
+
+---
+
+## Discovery Addendum — US-0069 (Strict Phase Role Enforcement in `/auto`)
+
+### Discovery context
+
+- Discovery confirms the reported failure mode: phases that should run under
+  `dev`/`qa`/`release`/`curator` contexts can collapse into a single role
+  (commonly `tech-lead`) when orchestration does not enforce capability routing.
+- Existing isolation and strict-proof contracts record `role`, but without a
+  hard phase→role gate, incorrect roles can still produce forward progress.
+
+### Discovery outcomes
+
+- Recommend **mandatory preflight** before each `/auto` phase transition: resolve
+  required role from the canonical matrix (backlog AC-1), apply documented
+  policy for allowed alternates, then fail closed with deterministic reason
+  codes (`PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`) when
+  unavailable or mismatched.
+- Recommend **checkpoint rejection** when completed-phase isolation evidence
+  `role` does not match the expected contract for that `phase_id` (including
+  policy-resolved alternate), satisfying AC-3.
+- Recommend **default deny** for `execute` outside `dev` unless an explicit
+  override contract is documented (AC-5).
+- Recommend **strict-proof tuple alignment**: `role` in the runtime attestation
+  matches the resolved canonical role and links to the same checkpoint as
+  US-0048 isolation fields (AC-10 traceability).
+- Explicit **non-scope** reminder: operator phase skip/include profiles are
+  `US-0070` only; this story must not subsume phase-selection configuration.
+
+### Recommendation
+
+- Proceed to **`/research`** for **`US-0069` only** (role enforcement contract).
+- Phase-selection configuration is **`US-0070`** (see **Discovery Addendum — US-0070**).
+
+---
+
+## Discovery Addendum — US-0070 (Configurable Auto Phase Selection Policy)
+
+### Discovery context
+
+- Operators want `/auto` to support **scratchpad-driven phase inclusion/exclusion**
+  (for example skip `research` or `sprint-plan`) while keeping deterministic
+  automation, fail-fast diagnostics, and visible breadcrumbs.
+- `US-0069` now governs **which role** must run a phase; `US-0070` governs
+  **whether a phase is scheduled at all** in a given `/auto` invocation — the
+  two contracts must compose without role substitution or silent gate bypass.
+
+### Discovery outcomes
+
+- Recommend a **single active phase-policy mode** per run with explicit
+  precedence (default full lifecycle; optional `AUTO_PHASE_EXCLUDE`,
+  `AUTO_PHASE_INCLUDE`, or `AUTO_PHASE_PROFILE`) and deterministic fail-closed
+  errors for unknown ids, empty plans, or conflicting policy keys.
+- Recommend computing an **`effective_phase_plan`** (ordered canonical subset)
+  after resume/`start-from` resolution and **before** the first phase spawn;
+  record it in continuation breadcrumbs (`docs/engineering/state.md` and
+  operator-visible status fields).
+- Recommend a **non-skippable phase** baseline tied to mandatory evidence and
+  quality gates (for example `qa`, `verify-work`, `release`), with only
+  **explicit, named, documented profiles** allowing narrower plans — never silent
+  omission from empty scratchpad values.
+- Recommend deterministic **`start-from` ∩ effective plan** semantics with
+  empty-intersection fail-fast and diagnostics that echo both inputs.
+- Recommend parity rules for **`AUTO_BACKLOG_DRAIN`**, **`AUTO_EXECUTE_BULK`**,
+  **`TEAM_MODE`**, and **`AUTO_PAUSE_*`**: carry forward the same phase policy
+  metadata across segment boundaries so skipped phases stay skipped until the
+  operator changes policy.
+- Recommend reason-code extensions (to be finalized in research) such as
+  `PHASE_POLICY_CONFLICT`, `PHASE_PLAN_EMPTY`, `PHASE_ID_UNKNOWN`,
+  `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION` for invalid operator config.
+
+### Recommendation
+
+- Proceed to **`/research`** for **`US-0070` only**, producing a precedence matrix,
+  default non-skippable set, named profile sketch, and compatibility notes with
+  `US-0069` role enforcement and existing `/auto` resume precedence.
+
+---
+
+## Discovery Addendum — US-0068 (Mandatory Intake Question Packs)
+
+### Discovery context
+
+- Discovery confirms a deterministic intake-quality gap: adaptive questioning
+  exists, but minimum required topic coverage is not enforced before persistence.
+- User intent requires mandatory questionnaire coverage in both first-intake and
+  small-intake paths, with explicit blocked behavior when critical answers are
+  missing.
+
+### Discovery outcomes
+
+- Recommend two canonical packs with deterministic topic IDs and coverage rules:
+  - `first-intake-pack` (comprehensive): users/problem, runtime environment,
+    stack/framework/runtime, architecture preferences, UI/UX expectations,
+    security/compliance, NFR priorities, scope/timeline.
+  - `small-intake-pack` (compact): desired outcome, impacted components,
+    constraints/compatibility risk, required tests/acceptance checks, done
+    definition.
+- Recommend fail-closed persistence gating:
+  - no backlog/acceptance persistence until required coverage is satisfied, or
+    bounded assumptions are explicitly confirmed and recorded.
+- Recommend deterministic diagnostics and evidence fields in intake outputs:
+  `asked_topics`, `missing_topics`, `assumptions_confirmed`, and reason-coded
+  block metadata for missing required answers.
+- Scope boundary reminder: keep this story limited to intake questionnaire and
+  persistence-gate policy; runtime QA/test scaffolding/release operator hints
+  remain in `US-0065`/`US-0066`/`US-0067`.
+
+### Recommendation
+
+- Proceed to **`/research`** for `US-0068` only, focusing on pack schema,
+  low-touch compatibility boundaries, fail-closed reason-code taxonomy, and
+  canonical evidence-write locations.
+
+---
+
+## Discovery Addendum — US-0067 (Release Operator Hints Contract)
+
+### Discovery context
+
+- Discovery confirms an operator-readiness gap: release artifacts can pass gates
+  while still lacking practical run/connect/verify instructions needed for fast
+  real-world startup validation.
+- Existing release notes are summary-focused; deterministic operator guidance
+  fields are not currently enforced as mandatory contract output.
+
+### Discovery outcomes
+
+- Recommend a required section schema for sprint release notes with fixed order:
+  `Run` -> `Connect` -> `Verify` -> `Credentials (env-ref only)` -> `Known Issues`.
+- Recommend strict required-field validation and fail-closed release finalization
+  when any run/connect/verify field is missing or ambiguous.
+- Recommend explicit runtime context reporting (`local|remote`) aligned with
+  runtime-connectivity documentation when available.
+- Recommend concise pointer parity in `handoffs/release_notes.md` so latest
+  operator run/connect summary links to canonical sprint release notes.
+- Scope boundary reminder: keep this story limited to release operator hint
+  contract; runtime autopilot and generated test scaffolding remain in
+  `US-0065` and `US-0066`.
+
+### Recommendation
+
+- Proceed to **`/research`** for `US-0067` only, focusing on existing release
+  artifact patterns, deterministic schema validation points, reason-code
+  taxonomy for missing/ambiguous fields, and active/template parity surfaces.
+
+---
+
+## Discovery Addendum — US-0066 (Generated Test Scaffolding + Auto-Run)
+
+### Discovery context
+
+- Discovery confirms a generated-project reliability gap: baseline quality gates
+  can run without guaranteeing baseline runnable tests exist for new app repos.
+- Existing runbook/test command contracts are necessary but insufficient when
+  repos start without scaffolded unit/integration/acceptance tests.
+
+### Discovery outcomes
+
+- Recommend deterministic stack/profile-driven baseline test scaffold generation
+  for Node/Python/Go/Java/.NET minimum, with fail-safe behavior for unresolved
+  or unsupported stack contexts.
+- Recommend non-destructive generation precedence: scaffold only missing
+  baseline assets and preserve user-authored tests/commands with explicit merge
+  and precedence rules.
+- Recommend deterministic runbook wiring so generated baseline tests are
+  executable via `TEST_COMMAND` and automatically executed during `/qa`.
+- Recommend idempotent rerun guarantees with auditable evidence (generated
+  paths, skip reasons, preserved existing assets, and pass/fail test output
+  references).
+- Scope boundary reminder: keep runtime startup/connectivity/log autopilot in
+  `US-0065`; keep release operator `Run/Connect/Verify` schema in `US-0067`.
+
+### Recommendation
+
+- Proceed to **`/research`** for `US-0066` only, focusing on scaffold template
+  coverage by stack, deterministic merge precedence, fail-safe diagnostics, and
+  idempotent rerun evidence schema.
+
+---
+
+# PO -> TL Handoff — US-0065..US-0068 (Runtime QA/Dev Autopilot + Test Scaffolding + Release Runbook Hints + Intake Question Packs)
+
+## Intake context
+
+User validated a real external generated-repo gap (not this framework repo's
+self-tests):
+- runtime app was not reliably started/validated,
+- logs/errors were not inspected deeply enough,
+- bounded self-debug retries were not enforced,
+- generated baseline tests were not guaranteed,
+- release output lacked concrete run/connect hints,
+- intake still missed essential clarifying questions in some runs.
+
+User explicitly requested a 4-story decomposition:
+- Story A -> Runtime QA Autopilot (`US-0065`)
+- Story B -> Generated Test Scaffolding + Auto-run (`US-0066`)
+- Story C -> Release Operator Hints Contract (`US-0067`)
+- Story D -> Mandatory Intake Question Packs (`US-0068`)
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0041` (installer/CLI lifecycle QA for this framework repo),
+  - `US-0064` (remote connectivity metadata and remote-aware phase behavior),
+  - `US-0051` / `US-0033` (intake decomposition and guided intake behavior).
+- Assessment: not a duplicate.
+  - Current contracts do not hard-enforce generated-project runtime startup +
+    connectivity/log/debug loop as mandatory QA pass criteria.
+  - Existing guided intake is adaptive but lacks fixed mandatory first/small
+    questionnaire coverage gates.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **multi-story split** recommended and user-approved.
+- Option considered:
+  - single large story (rejected: mixes runtime QA, test generation, release UX,
+    and intake policy into one difficult validation scope).
+- Selected option:
+  - four focused stories with clear acceptance boundaries and independent
+    regression paths.
+- User authority evidence:
+  - user explicitly accepted split A-D in intake request.
+
+## Scope for TL
+
+- In scope:
+  - language/project-aware runtime boot/health/log/debug QA contract,
+  - generated-test scaffolding + automatic QA execution evidence contract,
+  - mandatory release `Run/Connect/Verify` operator hints schema,
+  - mandatory first/small intake question packs with persistence gating.
+- Out of scope:
+  - replacing per-project app architecture decisions,
+  - embedding inline secrets in release/operator artifacts,
+  - bypassing existing release/decision safety gates.
+
+## Research reference
+
+- `R-0041`: runtime verification/autopilot patterns, browser/debug-assisted web
+  validation, and structured intake questionnaire coverage model.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0065` first, then continue in order:
+  `US-0066` -> `US-0067` -> `US-0068`.
+- Discovery focus:
+  - deterministic reason codes and bounded retry policy,
+  - stack-profile command resolution + fallback behavior,
+  - release operator hint schema and fail-safe validation,
+  - intake questionnaire gating and low-touch compatibility.
+
+## Discovery Addendum — US-0065 (Runtime QA Autopilot)
+
+### Discovery context
+
+- Discovery confirms a hard runtime-verification gap for generated projects:
+  current workflow evidence can pass without proving the target app/service
+  actually started, became reachable, or produced a clean runtime signal.
+- Existing lifecycle and release gates remain necessary but are insufficient for
+  generated-project runtime truth without a mandatory startup/connectivity/log
+  contract.
+
+### Discovery outcomes
+
+- Recommend a deterministic runtime QA autopilot envelope with mandatory stages:
+  startup attempt -> health/connectivity probe -> log/error scan -> bounded
+  debug retry loop -> final PASS/FAIL verdict.
+- Recommend explicit reason-code families for each failure boundary
+  (startup-failed, endpoint-unreachable, log-critical-detected,
+  retry-budget-exhausted, stack-profile-unresolved) with remediation guidance.
+- Recommend stack-profile command resolution (Node/Python/Go/Java/.NET minimum)
+  with deterministic fallback and non-silent fail-safe behavior when no runnable
+  runtime profile can be selected.
+- Recommend webapp-aware verification path inclusion (browser-level smoke and
+  console/network error checks) when app context indicates HTTP/UI runtime.
+- Recommend QA evidence schema hardening for reproducibility: startup command,
+  runtime mode (`local|remote`), target endpoint/health result, log summary,
+  retry attempt ledger, and final verdict.
+- Scope boundary reminder: keep `US-0065` limited to runtime verification and
+  QA evidence contract; route generated test scaffolding and release operator
+  hints to `US-0066`/`US-0067`.
+
+### Recommendation
+
+- Proceed to **`/research`** for `US-0065` only, focusing on runtime
+  attestation patterns, bounded retry policy defaults, stack-detection fallback
+  matrix, and deterministic reason-code taxonomy.
+
+### Discovery remediation note (strict-proof rerun)
+
+- Discovery rerun was executed for `US-0065` remediation scope only.
+- Functional discovery conclusions are unchanged; scope remains runtime
+  verification contract/evidence only.
+- Next phase recommendation remains **`/research`** for `US-0065`.
+
+---
+
+# PO -> TL Handoff — US-0064 (Remote Connectivity Contract for QA/Release/Publish)
+
+## Intake context
+
+User requests extending release target configuration to include runtime
+connectivity and remote execution details, including:
+- domain/IP/port metadata,
+- Traefik/ingress possibilities,
+- Docker via SSH execution targets.
+
+User also requests that remote-aware phases consume this contract and provide
+operator-facing connection guidance (where hosted/how to connect), persisted in
+documentation.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0054` (configurable multi-target publish + SSH/custom targets),
+  - `US-0034` (optional cross-repo observability),
+  - `US-0039` (release gates).
+- Assessment: not a duplicate.
+  - Existing story `US-0054` provides publish target taxonomy and confirmation.
+  - This story adds richer runtime/connectivity schema + remote phase
+    consumption + operator connectivity documentation contract.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - target schema extension, release/qa phase consumption, remote execution
+    context handling, and canonical connectivity documentation are tightly
+    coupled.
+- User authority evidence: user explicitly requested intake.
+
+## Scope for TL
+
+- In scope:
+  - schema extension for connectivity metadata and Docker-over-SSH targets,
+  - deterministic validation and fail-fast diagnostics,
+  - remote-aware release/qa (and relevant execution) behavior contract,
+  - canonical operator connectivity documentation artifact + updates.
+- Out of scope:
+  - secret-inline storage in repo files,
+  - weakening existing mandatory release/quality gates.
+
+## Risks
+
+- Overly broad schema can add complexity/noise for local-only repos.
+- Inconsistent remote-context detection can cause wrong phase behavior.
+- Poor redaction policy can leak sensitive connection/auth information.
+
+## Research reference
+
+- `R-0040`: remote connectivity schema and phase-consumption patterns for
+  operator-safe QA/release workflows.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0064`, focusing on:
+  - minimal deterministic schema shape for connectivity metadata,
+  - remote/local phase selection and skip semantics,
+  - operator-facing connectivity output + canonical document lifecycle.
+
+---
+
+# PO -> TL Handoff — US-0063 (OS-Aware Runbook Bootstrap + Verified Gates)
+
+## Intake context
+
+User requests automatic runbook command bootstrap for new repositories so first
+sprint runs do not block on missing command configuration.
+
+User explicitly requires:
+- no quality-gate weakening,
+- no placeholder-only bypass behavior,
+- OS-aware defaults (Windows vs Unix),
+- real command suitability for the detected project stack.
+
+Observed mismatch example:
+- Windows operator context with runbook baseline `TEST_COMMAND: sh tests/run-tests.sh`.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0015` (intentional optional empty command keys),
+  - `US-0038`/`US-0039` (mandatory test gate contracts),
+  - `US-0050`/`US-0018` (installer hygiene and upgrade behavior).
+- Assessment: not a duplicate.
+  - Existing work defines command semantics and installer behavior.
+  - This story adds deterministic OS/stack-aware bootstrap and command
+    verification during onboarding.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - bootstrap precedence, OS/stack detection, command verification, and gate
+    compatibility are tightly coupled,
+  - safer to validate as one onboarding contract.
+- User authority evidence: user explicitly requested intake.
+
+## Scope for TL
+
+- In scope:
+  - deterministic bootstrap precedence and non-destructive overwrite policy,
+  - OS/shell-aware command generation defaults,
+  - stack signal detection for baseline/optional checks,
+  - fail-fast diagnostics for invalid/unresolvable generated commands,
+  - parity/tests/docs updates.
+- Out of scope:
+  - weakening mandatory quality/release gates,
+  - forcing one stack-specific command policy on all repositories.
+
+## Risks
+
+- Over-aggressive auto-detection may generate wrong commands for uncommon setups.
+- Under-specified fallback behavior can recreate onboarding blockers.
+- Incomplete parity can cause platform drift between installer implementations.
+
+## Research reference
+
+- `R-0039`: OS-aware runbook bootstrap patterns with mandatory-gate safety.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0063`, focusing on:
+  - deterministic precedence and override policy,
+  - OS/shell detection contract and supported signal set,
+  - command validation criteria + diagnostics.
+
+---
+
+# PO -> TL Handoff — US-0062 (Installer-Owned `its_magic/` Metadata Boundary)
+
+## Intake context
+
+User requests that installer-owned, non-project artifacts be placed under a
+dedicated `its_magic/` folder rather than mixed into root/project artifact
+space.
+
+User explicitly highlights:
+- framework README surface and version marker as `its_magic/` candidates,
+- clear separation from project-owned artifacts (`src`, project docs, and other
+  implementation/runtime content).
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0050` (clean install hygiene / clean-repo coverage),
+  - `US-0018` (upgrade mode),
+  - `US-0057` (scratchpad example upgrade parity).
+- Assessment: not a duplicate.
+  - Existing work improves hygiene and upgrade safety.
+  - This story adds explicit folder-level installer ownership boundary and
+    deterministic migration/cleanup semantics for framework metadata.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - installer placement, ownership manifest updates, upgrade migration, and
+    clean behavior are tightly coupled,
+  - safer to design/verify as one cohesive ownership-boundary package.
+- User authority evidence: user explicitly requested intake.
+
+## Scope for TL
+
+- In scope:
+  - canonical `its_magic/` ownership boundary for framework metadata,
+  - deterministic placement/migration rules for install and upgrade modes,
+  - clean-repo behavior aligned with updated ownership manifest,
+  - parity updates across installer scripts/templates/docs/tests.
+- Out of scope:
+  - relocating project business artifacts into framework-owned folder,
+  - changing product runtime feature behavior.
+
+## Risks
+
+- Over-broad ownership classification could accidentally move or delete
+  project-owned files.
+- Incomplete migration logic could leave mixed layouts across existing repos.
+- Insufficient docs could confuse users about framework-vs-project ownership.
+
+## Research reference
+
+- `R-0038`: installer ownership boundary patterns for framework metadata
+  placement and non-destructive migration.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0062`, focusing on:
+  - deterministic ownership matrix for `its_magic/`,
+  - migration-safe upgrade path from legacy top-level layout,
+  - clean-repo and regression coverage to prevent project-file impact.
+
+---
+
+# PO -> TL Discovery Addendum — US-0061 (Ownership Guard + Archive Control)
+
+## Discovery context
+
+- Discovery confirms policy gap: ordering rules do not fully prevent phase-level
+  deletion/rewrite of non-owned sections.
+- User-reported architecture history loss indicates need for explicit
+  cross-phase ownership enforcement.
+- State compaction requires deterministic verification outputs to ensure archive
+  execution is real and auditable.
+
+## Discovery outcomes
+
+- Recommend canonical phase/artifact ownership matrix with explicit allowed
+  phases and target scopes.
+- Recommend fail-safe reason codes for prohibited cross-phase mutation and
+  missing override evidence.
+- Recommend explicit architecture history-preservation rule with
+  non-target-section deletion detection.
+- Recommend archive verification fail-safe path
+  (`STATE_ARCHIVE_VERIFICATION_FAILED`) in refresh-context controls.
+
+## Recommendation
+
+- Proceed to **`/architecture`** for `US-0061`, focusing on ownership matrix
+  schema, override evidence contract, and archive verification semantics.
+
+---
+
+# PO -> TL Handoff — US-0061 (Cross-Phase Ownership Guard + Archive Control)
+
+## Intake context
+
+User reports history loss in `docs/engineering/architecture.md` in a new-repo
+run and requests stronger non-destructive guarantees across relevant phases and
+artifacts.
+
+User explicitly requests this intake to include:
+- phase ownership guardrails (no cross-phase deletions),
+- explicit override-authorized phase model for exceptional mutation,
+- stricter deterministic archive execution controls so `state.md` remains
+  bounded.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0058` (deterministic artifact ordering),
+  - `US-0060` (state rollover enforcement),
+  - `US-0045` / `US-0055` (canonical ownership + reconciliation).
+- Assessment: not a duplicate.
+  - Existing work defines ordering, status ownership, and rollover thresholds.
+  - This new story adds cross-phase section ownership enforcement, explicit
+    override-authority semantics, and executable archive verification controls.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - ownership matrix, override authority rules, command-level guardrails, and
+    archive execution controls are tightly coupled,
+  - safest to validate as one deterministic policy package.
+- User authority evidence: user explicitly requested intake.
+
+## Scope for TL
+
+- In scope:
+  - deterministic phase/artifact ownership matrix and guard checks,
+  - fail-safe reason-code path for prohibited cross-phase deletion/rewrite,
+  - explicit override-authorized mutation path with auditable evidence,
+  - architecture history-preservation guard semantics,
+  - deterministic archive execution + verification outputs and idempotence.
+- Out of scope:
+  - deleting historical evidence for size reduction,
+  - changing product runtime behavior.
+
+## Risks
+
+- Ownership rules that are too broad may block valid target-scoped updates.
+- Weak override boundaries can reintroduce destructive rewrites.
+- Archive controls without deterministic verification can still drift under
+  reruns or partial-write failures.
+
+## Research reference
+
+- `R-0037`: cross-phase ownership guard patterns and deterministic archive
+  execution controls.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0061`, focusing on:
+  - ownership matrix shape (artifact + section granularity),
+  - override authority contract and evidence schema,
+  - archive boundary algorithm + verification ledger outputs.
+
+---
+
+# PO -> TL Discovery Addendum — US-0060 (State Rollover Enforcement)
+
+## Discovery context
+
+- Discovery confirms compaction enforcement gap: `state.md` hot surface grows
+  beyond practical bounds because rollover triggers are not mandatory.
+- Existing archive policy exists, but deterministic trigger and fail-safe
+  mechanics require explicit contract hardening.
+
+## Discovery outcomes
+
+- Recommend deterministic threshold contract in scratchpad:
+  `STATE_HOT_MAX_LINES` and `STATE_HOT_MAX_CHECKPOINTS`.
+- Recommend enforced rollover in `/refresh-context` with deterministic archive
+  partitioning/naming and bounded hot-surface retention.
+- Recommend explicit fail-safe diagnostics:
+  - `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`
+  - `STATE_ARCHIVE_WRITE_FAILED`
+- Recommend active/template parity plus regression coverage for threshold,
+  idempotence, and fail-safe paths.
+
+## Recommendation
+
+- Proceed to **`/architecture`** for `US-0060`, focusing on threshold defaults,
+  archive boundary algorithm, and fail-safe mutation guarantees.
+
+---
+
+# PO -> TL Handoff — US-0060 (State Hot-Surface Rollover Enforcement)
+
+## Intake context
+
+User reports unbounded growth of `docs/engineering/state.md` in a fresh repo
+(~1800 lines after two sprints) and requests deterministic minimization behavior
+that is actually enforced, not policy-only.
+
+User explicitly approved taking this as intake.
+
+## Duplicate/overlap evaluation
+
+- Related stories:
+  - `US-0053` (context compaction and token profile),
+  - `US-0058` (deterministic artifact ordering).
+- Assessment: not a duplicate.
+  - `US-0053` introduced hot-surface/archive policy.
+  - `US-0060` focuses on deterministic rollover enforcement thresholds and
+    fail-safe archive mechanics when growth exceeds bounds.
+
+## Decomposition decision (US-0051 contract)
+
+- Evaluator result: **single-story** (no split) recommended.
+- Rationale:
+  - threshold trigger, archive pack mechanics, idempotence, and retrieval
+    compatibility are tightly coupled,
+  - best validated as one bounded compaction-enforcement package.
+- User authority evidence: user explicitly requested intake.
+
+## Scope for TL
+
+- In scope:
+  - deterministic rollover trigger contract (`max_lines` and/or
+    `max_checkpoints`) for `state.md`,
+  - non-destructive archival into canonical `state-pack-*` files,
+  - idempotent rollover behavior and fail-safe archive error handling,
+  - command integration (`/refresh-context`, retrieval behavior) and parity/tests/docs.
+- Out of scope:
+  - deleting historical evidence,
+  - changing delivery workflow phase semantics.
+
+## Risks
+
+- Over-aggressive rollover may hide near-term troubleshooting context if bounds
+  are too low.
+- Non-idempotent archive routines can create duplicate packs or reorder history.
+- Partial writes during rollover failure can corrupt traceability.
+
+## Research reference
+
+- `R-0036`: deterministic event/state compaction and retention-trigger patterns.
+
+## Recommendation
+
+- Proceed to **`/discovery`** for `US-0060`, focusing on:
+  - explicit threshold defaults and override contract,
+  - deterministic archive partitioning/naming and write ordering,
+  - fail-safe error matrix for archive and anchor edge cases.
+
+---
+
 # PO -> TL Discovery Addendum — US-0059 (Intake Capability Guard + Drift Safety)
 
 ## Discovery context

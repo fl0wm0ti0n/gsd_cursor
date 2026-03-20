@@ -13,28 +13,53 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0038`
-- **Latest canonical notes:** `handoffs/releases/S0038-release-notes.md`
-- **Latest release date:** 2026-03-14
-- **Latest release story:** US-0059
+- **Latest released sprint:** `S0050`
+- **Latest canonical notes:** `handoffs/releases/S0050-release-notes.md`
+- **Latest release date:** 2026-03-21
+- **Latest release story:** US-0071
 
 ## Unreleased queue visibility
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-## Release readiness note (S0038)
+## Release readiness note (S0050)
 
-- Sprint: `S0038`
-- Story: `US-0059`
+- Sprint: `S0050`
+- Story: `US-0071`
 - Verify-work: PASS
 - UAT status: PASS (`10/10`, `0` failed)
-- QA findings: PASS with no blockers (`sprints/S0038/qa-findings.md`)
+- QA findings: PASS with no in-scope blockers (`sprints/S0050/qa-findings.md`)
 - Release readiness: Finalized as `released` in `handoffs/release_queue.md`
   with canonical sprint-scoped notes.
 
+## Latest operator summary (Run/Connect/Verify)
+
+- **Start command:** Refer to `## Run` in
+  `handoffs/releases/S0050-release-notes.md`.
+- **Endpoint + port:** Refer to `## Connect` in
+  `handoffs/releases/S0050-release-notes.md`.
+- **Verification steps + health signal:** Refer to `## Verify` in
+  `handoffs/releases/S0050-release-notes.md`.
+- **Credentials source refs (sanitized):** Refer to `## Credentials` in
+  `handoffs/releases/S0050-release-notes.md` (env-ref only).
+- **Known issues:** Refer to `## Known Issues` in
+  `handoffs/releases/S0050-release-notes.md`.
+
 ## Historical references
 
+- `S0050`: `handoffs/releases/S0050-release-notes.md`
+- `S0049`: `handoffs/releases/S0049-release-notes.md`
+- `S0048`: `handoffs/releases/S0048-release-notes.md`
+- `S0047`: `handoffs/releases/S0047-release-notes.md`
+- `S0046`: `handoffs/releases/S0046-release-notes.md`
+- `S0045`: `handoffs/releases/S0045-release-notes.md`
+- `S0044`: `handoffs/releases/S0044-release-notes.md`
+- `S0043`: `handoffs/releases/S0043-release-notes.md`
+- `S0042`: `handoffs/releases/S0042-release-notes.md`
+- `S0041`: `handoffs/releases/S0041-release-notes.md`
+- `S0040`: `handoffs/releases/S0040-release-notes.md`
+- `S0039`: `handoffs/releases/S0039-release-notes.md`
 - `S0038`: `handoffs/releases/S0038-release-notes.md`
 - `S0037`: `handoffs/releases/S0037-release-notes.md`
 - `S0036`: `handoffs/releases/S0036-release-notes.md`

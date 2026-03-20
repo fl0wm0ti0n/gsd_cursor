@@ -974,3 +974,389 @@
 - Boundaries:
   - In scope: workflow runtime guards, intake execution policy, drift-detection semantics, deterministic diagnostics, and parity/testing/docs updates.
   - Out of scope: runtime product feature behavior, external orchestrator platform migration, or weakening existing fail-closed safety gates.
+
+## US-0060 — Deterministic State Hot-Surface Rollover and Archive Enforcement
+- Title: Enforce bounded state hot-surface size with deterministic archive rollover
+- Summary: Prevent `docs/engineering/state.md` from unbounded growth by enforcing deterministic rollover thresholds and automatic archival of older checkpoints into `docs/engineering/state-archive/` packs while preserving traceability and fail-safe behavior.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports very large `state.md` growth in new repositories (for example ~1800 lines after two sprints), indicating compaction policy is not being enforced strongly enough.
+  - Existing `US-0053` compaction contract defines hot-surface + archive strategy, but current behavior appears policy-only and lacks deterministic rollover trigger enforcement.
+  - Decomposition evaluator outcome: single-story recommended because threshold policy, archive mechanics, and command-level mutation behavior are tightly coupled and best validated together.
+  - User authority evidence: user explicitly requested this as intake.
+  - Intake research reference: `R-0036`.
+  - Decision update: `DEC-0042` accepted (deterministic state rollover enforcement contract).
+- Acceptance:
+  - [x] AC-1: Define deterministic rollover trigger for `docs/engineering/state.md` (for example max checkpoints and/or max lines) with explicit default values.
+  - [x] AC-2: When trigger is exceeded, commands archive older checkpoints into canonical `docs/engineering/state-archive/state-pack-*.md` and keep only bounded recent hot-surface checkpoints.
+  - [x] AC-3: Archive operation is non-destructive and preserves evidence references and ordering chronology.
+  - [x] AC-4: Archive pack naming and partitioning are deterministic and idempotent on reruns (no duplicate/oscillating pack creation).
+  - [x] AC-5: Hot-surface and archive writes remain append-safe and fail closed on ambiguous anchors or archive-write errors (no partial corruption).
+  - [x] AC-6: `/ask` and `/refresh-context` retrieval behavior remains accurate with hot+archive split (latest-first on hot surface, bounded expansion to archive when needed).
+  - [x] AC-7: Existing canonical ownership and ordering contracts (US-0045/US-0055/US-0058) remain intact with no regressions.
+  - [x] AC-8: Active/template parity is maintained for command contracts, policy docs, and archive artifacts.
+  - [x] AC-9: Regression tests cover threshold crossing, rollover success path, idempotent re-run path, and archive-write fail-safe path.
+  - [x] AC-10: README/runbook documents rollover thresholds, archive behavior, and operator remediation for fail-safe outcomes.
+- Boundaries:
+  - In scope: state compaction enforcement contract, deterministic archive rollover mechanics, command/policy parity, and regression/docs updates.
+  - Out of scope: changing feature delivery workflow semantics or deleting historical evidence.
+
+## US-0061 — Cross-Phase Artifact Ownership Guard and Deterministic Archive Control
+- Title: Prevent cross-phase artifact deletions and enforce deterministic archive execution boundaries
+- Summary: Introduce a cross-phase artifact ownership contract so phases cannot delete or rewrite content owned by other phases unless an explicit override-authorized phase is defined. Tighten archival behavior with deterministic pack boundaries, execution controls, and verification to stop silent history loss and unbounded growth.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports that in a fresh repository run, prior `architecture.md` story sections were deleted, which violates expected historical continuity.
+  - User requests a generalized rule across relevant artifacts/phases: each phase may update its own owned scope, but must not delete other-phase content unless the phase is explicitly designated as an override authority.
+  - User also requests stricter, more specific archive control because `state.md` can still grow excessively while archive behavior appears policy-only.
+  - Decomposition evaluator outcome: single-story recommended because ownership-guard contracts, override authority matrix, and archive execution controls are tightly coupled and should be validated together.
+  - User authority evidence: user explicitly requested this intake.
+  - Intake research reference: `R-0037`.
+  - Decision update: `DEC-0043` accepted (cross-phase ownership guard + archive verification fail-safe contract).
+- Acceptance:
+  - [x] AC-1: Define a deterministic phase-to-artifact ownership matrix for all mutable workflow artifacts (including explicit owned scope and prohibited mutations per phase).
+  - [x] AC-2: Non-override phases must fail safe when a write would delete or rewrite unrelated phase-owned sections, with deterministic reason code and remediation guidance.
+  - [x] AC-3: Introduce explicit override-authorized phase list per artifact (or per section), and require auditable evidence when override mutation is used.
+  - [x] AC-4: `docs/engineering/architecture.md` must be protected by non-destructive history-preservation semantics (append or target-section update only); unrelated story sections cannot be removed by normal phase runs.
+  - [x] AC-5: Ordering policy and command contracts are extended so ownership guard enforcement is consistent across `/intake`, `/discovery`, `/research`, `/architecture`, `/sprint-plan`, `/execute`, `/qa`, `/verify-work`, `/release`, and `/refresh-context`.
+  - [x] AC-6: State archive control is strengthened with deterministic boundary algorithm and explicit execution behavior (not policy-only), including stable pack naming and idempotent reruns.
+  - [x] AC-7: Archive operations must provide deterministic verification outputs (what moved, what stayed hot, boundary evidence) and fail closed on mismatch/partial-write risk.
+  - [x] AC-8: Existing canonical ownership guarantees (US-0045/US-0055) and deterministic ordering rules (US-0058) remain intact with no precedence regressions.
+  - [x] AC-9: Active/template parity is maintained for ownership matrix, override rules, archive controls, and all affected command/rule docs.
+  - [x] AC-10: Regression tests cover prevention of cross-phase deletion, authorized override path, archive-boundary determinism/idempotence, and fail-safe behavior.
+- Boundaries:
+  - In scope: artifact ownership guardrails, override authority model, deterministic archive execution controls, and parity/testing/docs updates.
+  - Out of scope: changing product runtime features or deleting historical evidence to reduce file size.
+
+## US-0062 — Installer-Owned `its_magic/` Folder for Framework Metadata
+- Title: Separate framework metadata from project content using a dedicated `its_magic/` installation surface
+- Summary: Install framework-owned, non-project artifacts (for example README pointer/docs and version marker) into a dedicated `its_magic/` folder so project content (`src`, `docs`, feature files) remains clearly separated from installer/runtime metadata.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User requests clearer separation: framework/installer files should live in `its_magic/`, while project artifacts stay in project-owned locations.
+  - User explicitly identifies README and version marker as candidate framework-owned metadata for relocation into `its_magic/`.
+  - Existing install/upgrade/clean behavior already has ownership concepts, but top-level placement still mixes framework metadata and project-facing artifacts.
+  - Decomposition evaluator outcome: single-story recommended because installer paths, ownership manifest, upgrade/clean parity, and migration compatibility are tightly coupled.
+  - User authority evidence: user explicitly requested this intake.
+  - Intake research reference: `R-0038`.
+- Acceptance:
+  - [x] AC-1: Define deterministic ownership boundary for installer-managed framework metadata under canonical folder `its_magic/`.
+  - [x] AC-2: Move/emit framework-owned metadata artifacts (including version marker and framework README surface) into `its_magic/` on fresh install.
+  - [x] AC-3: Preserve project-owned artifacts (for example `src/`, project `docs/`, app/runtime files) outside `its_magic/` with no forced relocation.
+  - [x] AC-4: Upgrade mode migrates legacy top-level framework metadata into `its_magic/` deterministically and idempotently.
+  - [x] AC-5: Clean-repo logic removes framework-owned `its_magic/` content while preserving project-owned content outside the ownership set.
+  - [x] AC-6: Ownership manifest/schema is updated to classify `its_magic/` entries correctly for install/upgrade/clean operations.
+  - [x] AC-7: CLI/help and runbook/README guidance document which files are framework-owned in `its_magic/` vs project-owned.
+  - [x] AC-8: Active/template parity is maintained for installer scripts, templates, and ownership policy docs.
+  - [x] AC-9: Regression tests cover fresh install, upgrade migration, missing/overwrite modes, and clean-repo behavior for `its_magic/` boundaries.
+  - [x] AC-10: Migration path is backward-compatible and non-destructive for existing repositories with previous file layout.
+  - Decision update: `DEC-0045` accepted (installer-owned `its_magic/` metadata boundary + legacy migration compatibility).
+- Boundaries:
+  - In scope: installer ownership boundaries, file-placement contracts, migration/clean behavior, and parity/testing/docs updates.
+  - Out of scope: changing project feature runtime behavior or moving project business artifacts into `its_magic/`.
+
+## US-0063 — OS-Aware Runbook Command Auto-Bootstrap with Verified Quality Gates
+- Title: Auto-generate real runbook test/lint/typecheck commands per OS and project stack
+- Summary: Remove first-run blockers by auto-bootstrapping `docs/engineering/runbook.md` commands for new repositories using OS + stack detection, while preserving strict quality gates and avoiding placeholder-only configuration.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports first sprint blocked because runbook commands were not defined for the target environment.
+  - User requires quality checks to remain strict and real (no placeholder bypass), and expects OS-aware defaults.
+  - Example mismatch observed: Windows operator context while `TEST_COMMAND` is `sh tests/run-tests.sh`.
+  - Decomposition evaluator outcome: single-story recommended because installer bootstrap, command verification, and gate compatibility are tightly coupled.
+  - User authority evidence: user explicitly requested intake.
+  - Intake research reference: `R-0039`.
+- Acceptance:
+  - [x] AC-1: Define deterministic runbook bootstrap contract for install/upgrade/new-repo onboarding with explicit precedence (`user override > detected defaults > safe fallback`).
+  - [x] AC-2: Detect operator OS/shell and generate OS-appropriate command defaults (for example PowerShell on Windows, sh/bash on Unix) for framework baseline checks.
+  - [x] AC-3: Detect project stack signals (`package.json`, `pyproject.toml`, `go.mod`, etc.) and emit concrete `TEST_COMMAND` defaults; optional lint/typecheck commands are emitted when confidently detectable.
+  - [x] AC-4: Generated commands must be validated/probed; unresolved or invalid command generation fails with deterministic diagnostics and remediation guidance (no silent placeholder success).
+  - [x] AC-5: Mandatory quality gate semantics remain intact (`TEST_COMMAND` required; release/sync gates still fail on missing/failing baseline evidence).
+  - [x] AC-6: Optional command compatibility remains preserved (`LINT_COMMAND`/`TYPECHECK_COMMAND` may be blank when undetectable and are reported as skipped, not pass).
+  - [x] AC-7: Existing repositories with explicit runbook commands are not destructively overwritten; bootstrap is non-destructive and idempotent.
+  - [x] AC-8: Installer/CLI/help and runbook/README documentation clearly explain OS-aware bootstrap behavior, override flow, and diagnostics.
+  - [x] AC-9: Active/template parity is maintained across installers, template runbook, bootstrap logic, and tests.
+  - [x] AC-10: Regression tests cover Windows and Unix default paths, stack detection outcomes, invalid-command fail-fast behavior, and non-destructive reruns.
+  - Decision update: `DEC-0046` accepted (OS-aware runbook bootstrap + deterministic diagnostics contract).
+- Boundaries:
+  - In scope: runbook command bootstrap logic, OS/stack detection, verification diagnostics, and parity/testing/docs updates.
+  - Out of scope: weakening release/quality gate contracts or replacing project-specific quality policy decisions.
+
+## US-0064 — Remote Runtime Connectivity Contract for QA/Release/Publish
+- Title: Extend release targets with deploy/runtime connectivity metadata and remote phase execution support
+- Summary: Expand `docs/engineering/release-targets.json` to include runtime connectivity details (domain, IP, port, ingress/Traefik, Docker-over-SSH options) and use this contract across release/QA/execute phases for remote contexts. Agents must provide operator-ready connection info and persist a canonical hosting/connectivity document.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User requests extending release/publish target config to cover runtime connection details and remote deployment/validation needs.
+  - User explicitly asks for domain/IP/port/Traefik and Docker via SSH possibilities in target schema.
+  - User expects phases to consume this info when project context is remote, including remote QA/debug paths.
+  - User expects agents to communicate connection details clearly to operators (how to connect, where hosted) and persist this in documentation.
+  - Decomposition evaluator outcome: single-story recommended because target schema, phase integration, operator reporting, and docs/evidence are tightly coupled.
+  - User authority evidence: user explicitly requested intake.
+  - Intake research reference: `R-0040`.
+  - Decision update: `DEC-0044` accepted (remote connectivity schema + phase-consumption contract).
+- Acceptance:
+  - [x] AC-1: Extend `docs/engineering/release-targets.json` schema with deterministic runtime connectivity fields (domain, ip/host, port, protocol, ingress/Traefik metadata, environment labels).
+  - [x] AC-2: Add deterministic schema support for Docker-over-SSH execution targets with required fields for remote host/auth/env references and container context.
+  - [x] AC-3: Release target validation enforces required connectivity fields per target type and fails fast with deterministic diagnostics when invalid/incomplete.
+  - [x] AC-4: `/release` consumes enriched connectivity data and emits operator-ready publish/connect instructions (where hosted, how to connect, target endpoint summary).
+  - [x] AC-5: `/qa` can use connectivity contract to run remote verification/debug checks when target context is remote, with deterministic no-op/skip behavior when not applicable.
+  - [x] AC-6: `/execute` and/or relevant runtime phases honor remote target context for deployment/debug flow when configured, preserving existing safety gates.
+  - [x] AC-7: Add canonical documentation artifact for hosting/connectivity summary (for example `docs/engineering/runtime-connectivity.md`) and keep it updated by release flow.
+  - [x] AC-8: Operator-facing output and handoff artifacts include local vs remote execution context and connection endpoints without leaking secrets.
+  - [x] AC-9: Active/template parity is maintained for schema, commands, docs, and sample target configuration.
+  - [x] AC-10: Regression tests cover schema validation, remote/local phase behavior, operator connectivity output, and documentation updates.
+- Boundaries:
+  - In scope: release-target schema extension, remote phase consumption contract, operator connectivity reporting, and parity/testing/docs updates.
+  - Out of scope: introducing secret-inline storage, replacing existing mandatory release/quality gates, or adding vendor-specific lock-in requirements.
+
+## US-0065 — Runtime QA Autopilot for Generated Projects
+- Title: Enforce runtime startup, connectivity, log inspection, and bounded self-debug in execute/qa phases
+- Summary: For project repositories generated/managed with its-magic, require runtime validation beyond static checks: start the app/service, verify health/connectivity, inspect logs/errors, and run bounded auto-debug retries before reporting PASS.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports real generated-repo failure where workflow did not start app locally, did not inspect logs, and did not perform bounded debug retries.
+  - Existing QA/execute contracts focus on runbook checks and findings but do not hard-require runtime startup/connectivity validation.
+  - Decomposition evaluator outcome: multi-story split accepted because runtime autopilot, generated tests, release operator hints, and intake questioning are related but independently testable.
+  - User authority evidence: user explicitly requested the 4-story split (`A-D`) during intake.
+  - Intake research reference: `R-0041`.
+  - Discovery refinement (US-0065-only): enforce deterministic runtime failure
+    reason-code families and keep scope boundary strict (runtime verification
+    contract/evidence only; no test scaffolding or release-hint schema work in
+    this story).
+- Acceptance:
+  - [x] AC-1: Define a mandatory runtime validation contract for generated project repos: startup attempt, health/connectivity check, log/error scan, and deterministic PASS/FAIL criteria.
+  - [x] AC-2: `/qa` must fail with deterministic reason code when runtime startup fails or endpoint/process remains unreachable after bounded retries.
+  - [x] AC-3: `/execute` and `/qa` support bounded self-debug retries (`attempt <= configured max`) with explicit evidence of each retry outcome.
+  - [x] AC-4: QA evidence must include startup command, environment context (local/remote), health result, log summary, retry count, and final verdict.
+  - [x] AC-5: Runtime checks are stack-aware (Node/Python/Go/Java/.NET at minimum) with deterministic fallback behavior for unknown stacks.
+  - [x] AC-6: If webapp context is detected, runtime QA includes browser-level verification path and console/network error inspection guidance where applicable.
+  - [x] AC-7: Optional debug-mode workflow is integrated as an escalation path for reproducible runtime failures with bounded instrumentation/cleanup semantics.
+  - [x] AC-8: Remote-runtime mode remains supported via `release-targets` connectivity contract and uses sanitized endpoint/auth-reference reporting.
+  - [x] AC-9: Active/template parity is maintained for command/rule/runbook/readme surfaces describing runtime autopilot behavior.
+  - [x] AC-10: Regression coverage includes success path, startup-fail path, unreachable-endpoint path, and bounded-retry exhaustion with deterministic reason codes.
+- Boundaries:
+  - In scope: workflow/process runtime validation behavior for generated repositories and evidence contracts.
+  - Out of scope: implementing app-specific business logic fixes beyond bounded auto-debug attempts.
+
+## US-0066 — Generated Test Scaffolding and Auto-Run Contract
+- Title: Auto-generate baseline tests for app projects and enforce automatic execution in execute/qa
+- Summary: During implementation in generated repos, create baseline unit/integration/acceptance test scaffolding by stack/project type, wire it to `TEST_COMMAND`, and require automatic QA execution with evidence.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User requests generated project repositories to receive real runnable tests automatically, not only framework-repo checks.
+  - Current baseline gates rely on configured runbook commands but do not guarantee initial test scaffolding for new app repos.
+  - Decomposition evaluator outcome: split accepted to keep runtime autopilot and test scaffolding independently verifiable.
+  - User authority evidence: user explicitly requested this as Story B in intake.
+  - Intake research reference: `R-0041`.
+  - Discovery refinement (US-0066-only): deterministic scaffold ownership and rerun idempotence are mandatory so generated tests are created when missing without clobbering user-authored tests/commands.
+  - Story boundary reminder: keep release operator hint schema and mandatory intake questionnaire policy in `US-0067` and `US-0068`.
+- Acceptance:
+  - [x] AC-1: Define deterministic stack/project detection for baseline test scaffold generation (Node/Python/Go/Java/.NET minimum).
+  - [x] AC-2: `/execute` generates baseline unit/integration/acceptance test files for app projects when missing and records generated paths in evidence.
+  - [x] AC-3: Generated test setup deterministically updates `docs/engineering/runbook.md` `TEST_COMMAND` to runnable baseline command for detected stack.
+  - [x] AC-4: `/qa` must execute generated baseline tests automatically and include pass/fail evidence in `qa-findings`.
+  - [x] AC-5: If generation is not possible for a detected stack, workflow fails closed with deterministic diagnostics and remediation guidance.
+  - [x] AC-6: Existing user-authored tests/commands are preserved (non-destructive merge/append behavior) with deterministic precedence rules.
+  - [x] AC-7: Generated tests integrate with runtime autopilot contract so non-starting apps cannot PASS QA even if static tests pass.
+  - [x] AC-8: Active/template parity is maintained for generation rules, command docs, and test guidance.
+  - [x] AC-9: Regression coverage includes fresh project generation, rerun idempotence, existing-tests preservation, and unsupported-stack fail-fast behavior.
+  - [x] AC-10: Release/readiness artifacts reference generated-test evidence in a deterministic and auditable way.
+- Boundaries:
+  - In scope: workflow-level test scaffolding and execution contracts in generated repositories.
+  - Out of scope: full framework-specific advanced test architecture for every ecosystem.
+
+## US-0067 — Release Operator Run/Connect/Verify Hints Contract
+- Title: Require operator-ready startup/connectivity guidance in sprint release artifacts
+- Summary: Make release output operator-actionable by requiring a deterministic `Run/Connect/Verify` section in sprint notes and legacy pointer surfaces, including startup command, endpoint, health check, env-ref credentials source, and known issues.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports release and sprint-end output currently lacks enough practical hints to run and validate shipped features quickly.
+  - Existing release notes primarily summarize shipped changes and gate state; operator run/connect guidance is not mandatory.
+  - Decomposition evaluator outcome: split accepted to keep release-UX contract testable independently from runtime/test contracts.
+  - User authority evidence: user explicitly requested this as Story C in intake.
+  - Intake research reference: `R-0041`.
+  - Research refinement reference (US-0067-only): `R-0044`.
+  - Discovery refinement (US-0067-only): required section schema should be deterministic and order-stable as `Run -> Connect -> Verify -> Credentials(env-ref only) -> Known Issues` to keep reruns idempotent and operator-readable.
+  - Discovery refinement (US-0067-only): release finalization must fail closed when required operator fields are missing/ambiguous, with deterministic reason codes and remediation guidance in release findings.
+  - Discovery refinement (US-0067-only): local vs remote runtime context must be explicit and consistent with `docs/engineering/runtime-connectivity.md` when that contract exists.
+  - Story boundary reminder: keep runtime QA autopilot in `US-0065`, generated test scaffolding in `US-0066`, and intake questionnaire policy in `US-0068`.
+- Acceptance:
+  - [x] AC-1: Define required `Run/Connect/Verify` section schema for `handoffs/releases/Sxxxx-release-notes.md`.
+  - [x] AC-2: Schema includes exact start command(s), runtime mode (`local|remote`), endpoint (`url/ip:port`), expected health signal, and known issues.
+  - [x] AC-3: Credentials/auth guidance must reference env variable names only (no inline secrets) and include where values are expected.
+  - [x] AC-4: Legacy pointer `handoffs/release_notes.md` includes concise latest run/connect summary linking to canonical sprint notes.
+  - [x] AC-5: If required run/connect fields are missing or ambiguous, release finalization fails closed with deterministic reason code and remediation.
+  - [x] AC-6: Local vs remote context is explicitly surfaced and aligned with `runtime-connectivity` documentation when available.
+  - [x] AC-7: QA and release findings include references proving run/connect guidance was validated against actual verification evidence.
+  - [x] AC-8: Active/template parity is maintained for release command docs/templates and runbook guidance.
+  - [x] AC-9: Regression coverage includes valid guidance generation, missing-field fail-safe behavior, and secret-redaction checks.
+  - [x] AC-10: Operator-facing output remains concise and deterministic across repeated release reruns (idempotent formatting/content contract).
+- Boundaries:
+  - In scope: release artifact schema and operator guidance quality.
+  - Out of scope: deployment platform-specific orchestration engines.
+
+## US-0068 — Mandatory Intake Question Packs for First and Small Intakes
+- Title: Enforce structured intake questionnaires with required coverage before persistence
+- Summary: Strengthen intake quality by requiring deterministic question packs: a comprehensive first-intake questionnaire and a compact small-intake questionnaire, with required answer coverage before backlog/acceptance persistence.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports intake still sometimes proceeds without sufficient clarifying questions despite prior requests.
+  - Existing guided intake supports adaptive questions but does not enforce fixed minimum topic coverage sets for first-intake and small-intake modes.
+  - Decomposition evaluator outcome: split accepted so questioning policy can be validated independently from runtime/release contracts.
+  - User authority evidence: user explicitly requested mandatory first-intake and small-intake question sets with examples.
+  - Intake research reference: `R-0041`.
+  - Research refinement reference (US-0068-only): `R-0045`.
+  - Discovery refinement (US-0068-only): enforce deterministic pack schemas with explicit topic IDs and required/optional classification so coverage checks are machine-verifiable.
+  - Discovery refinement (US-0068-only): fail-closed persistence gate must emit deterministic missing-topic reason codes and optional bounded-assumption confirmation path before write.
+  - Discovery refinement (US-0068-only): low-touch mode remains available but cannot bypass critical safety coverage capture.
+  - Discovery refinement (US-0068-only): intake artifacts must persist coverage evidence (`asked_topics`, `missing_topics`, `assumptions_confirmed`) for deterministic downstream trust.
+- Acceptance:
+  - [x] AC-1: Define deterministic first-intake question pack with mandatory coverage for users/problem, runtime target/environment, language/framework/runtime, architecture preference, UI/design expectations, security/compliance, non-functional priorities, and scope/timeline.
+  - [x] AC-2: Define deterministic small-intake question pack with mandatory coverage for outcome/success criteria, impacted components, constraints/compatibility risks, required tests/acceptance checks, and done definition.
+  - [x] AC-3: Intake must not persist story artifacts until required question-pack coverage is satisfied or explicit bounded assumptions are confirmed by user.
+  - [x] AC-4: Guided mode keeps adaptive follow-ups, but now with enforceable minimum pack coverage and bounded rounds.
+  - [x] AC-5: Low-touch mode remains available but still enforces critical minimum safety questions when required fields are missing.
+  - [x] AC-6: Intake output persists questioning evidence (asked topics, unresolved assumptions, confirmations) in backlog/acceptance/handoff artifacts.
+  - [x] AC-7: Deterministic reason codes are emitted when intake is blocked due to missing required answers.
+  - [x] AC-8: Active/template parity is maintained for intake command, PO agent guidance, runbook, and README documentation.
+  - [x] AC-9: Regression coverage includes first-intake flow, small-intake flow, low-touch compatibility, and blocked-on-missing-answer behavior.
+  - [x] AC-10: Question packs remain language/project aware with deterministic fallback for unknown stack context.
+- Boundaries:
+  - In scope: intake workflow policy, required-question coverage, and persistence gating.
+  - Out of scope: replacing user authority with forced architectural decisions by AI.
+
+## US-0069 — Strict Phase Role Enforcement in /auto Orchestration
+- Title: Fail closed when /auto cannot run a phase with its required role capability
+- Summary: Prevent role collapse (for example execute running as tech-lead) by enforcing deterministic phase-to-role mapping in `/auto`, with hard fail-fast behavior when the required role capability is unavailable.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reported a generated repository run where `/auto` performed intake and then coding under tech-lead context instead of routing through intended phase roles.
+  - Existing contracts define per-phase role intent, but capability enforcement is inconsistent across phases and can permit unintended fallback behavior in some repos.
+  - User authority evidence: user explicitly requested intake to close this orchestration gap.
+  - Discovery refinement (US-0069-only): enforce **preflight** role-capability resolution before each phase spawn; post-hoc evidence alone is insufficient.
+  - Discovery refinement (US-0069-only): for phases with allowed role alternates, require **deterministic policy + precedence** so expected role is single-valued at each boundary.
+  - Discovery refinement (US-0069-only): reject checkpoint completion when `role` in isolation evidence conflicts with the phase contract (fail-closed mismatch).
+  - Discovery refinement (US-0069-only): align `proof_hash`/strict-proof `role` with the same resolved canonical role as isolation evidence for auditable linkage.
+  - Discovery refinement (US-0069-only): default-deny non-`dev` execute contexts unless a documented override contract exists.
+  - Research refinement reference (US-0069-only): `R-0048`.
+- Acceptance:
+  - [x] AC-1: Define canonical deterministic phase->role mapping contract for `/auto` (`intake=po`, `discovery=po`, `research=po|tech-lead` per policy, `architecture=tech-lead`, `sprint-plan=tech-lead`, `plan-verify=qa|tech-lead` per policy, `execute=dev`, `qa=qa`, `verify-work=qa`, `release=release`, `refresh-context=curator|po` per policy).
+  - [x] AC-2: `/auto` must fail closed with deterministic reason code when required phase role capability is unavailable (no implicit fallback to unrelated role).
+  - [x] AC-3: Boundary validation must reject phase completion evidence when `role` does not match expected role contract for that phase run.
+  - [x] AC-4: Deterministic diagnostics must include phase id, expected role, actual role/capability result, and remediation guidance.
+  - [x] AC-5: `/execute` specifically must never run under tech-lead context unless explicitly allowed by a documented override contract (default deny).
+  - [x] AC-6: Resume/continuation logic preserves role enforcement; stale resume sources cannot bypass role checks.
+  - [x] AC-7: Active/template parity is maintained for `/auto`, phase command docs, and related runbook/readme guidance.
+  - [x] AC-8: Regression coverage includes capability-available pass path, missing-capability fail-fast path, role-mismatch checkpoint rejection, and no-silent-fallback assertions.
+  - [x] AC-9: Reason-code vocabulary for role enforcement is deterministic and documented (for example `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`).
+  - [x] AC-10: Release/readiness artifacts include auditable references proving required phase roles were used for completed lifecycle boundaries.
+- Boundaries:
+  - In scope: orchestration role mapping, capability enforcement, and evidence validation contracts.
+  - Out of scope: changing product/business implementation semantics of generated repositories.
+
+## US-0070 — Configurable Auto Phase Selection Policy
+- Title: Add scratchpad-controlled phase inclusion/exclusion for /auto
+- Summary: Let operators fine-tune which lifecycle phases `/auto` should run by introducing deterministic scratchpad parameters for phase selection, while preserving safety gates and fail-fast semantics.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User requests a configurable way to skip selected phases in `/auto` (for example skip `research` or `sprint-plan`) without abandoning automation.
+  - Existing `/auto` supports mode toggles (backlog drain, bulk execute, pause), but does not expose a canonical phase-selection contract.
+  - User authority evidence: user explicitly requested this intake as a new idea.
+  - Discovery refinement (US-0070-only): treat phase plan as a **resolved ordered subset** of the canonical lifecycle (`intake` → `refresh-context`), computed once per run (and on resume) and written to continuation breadcrumbs before any phase spawn.
+  - Discovery refinement (US-0070-only): support **one active policy mode** at a time with deterministic precedence — for example `AUTO_PHASE_PLAN=full` (default), `AUTO_PHASE_EXCLUDE=<csv>`, `AUTO_PHASE_INCLUDE=<csv>`, or `AUTO_PHASE_PROFILE=<name>` — with explicit conflict/fail-closed rules when multiple modes are set.
+  - Discovery refinement (US-0070-only): define **non-skippable phases** by default (at minimum anything that records isolation + strict-proof evidence required for downstream gates, and any phase `/auto` uses for mandatory safety such as `qa` / `verify-work` / `release` unless a named **explicit high-risk profile** documents the exception and operator acknowledgment fields).
+  - Discovery refinement (US-0070-only): `start-from=<phase>` must **intersect** with the resolved phase plan (only phases at or after the start anchor that remain in the plan); empty intersection fails closed with diagnostics listing resolved plan vs requested start.
+  - Discovery refinement (US-0070-only): resume and backlog-drain/bulk/team modes must persist and re-validate the same phase-policy inputs so skipped phases do not “reappear” silently on continuation.
+  - Discovery refinement (US-0070-only): operator-visible breadcrumbs should list **selected phases**, **skipped phases + reason** (`default_full_plan`, `policy_exclude`, `non_skippable_gate`, etc.), and invalid-token **fail-fast codes** (unknown phase id, empty plan, policy conflict).
+  - Research follow-up (US-0070-only): `/research` should produce a precedence matrix, default non-skippable phase set, named profile sketch, and explicit compatibility notes with the `US-0069` phase→role contract (skipping a phase must not substitute roles or bypass capability gates).
+  - Research refinement reference (US-0070-only): `R-0049`.
+  - Architecture refinement reference (US-0070-only): `DEC-0052`.
+- Acceptance:
+  - [x] AC-1: Define canonical scratchpad contract for selectable phase policy (include list, exclude list, or named profile) with deterministic precedence.
+  - [x] AC-2: `/auto` resolves effective phase plan deterministically and records it in continuation breadcrumbs before execution.
+  - [x] AC-3: Unknown or invalid phase identifiers in policy fail closed with deterministic diagnostics (no silent ignore).
+  - [x] AC-4: Safety-critical gates cannot be bypassed silently; policy defines which phases are non-skippable by default and why.
+  - [x] AC-5: `start-from=<phase>` and phase-selection policy interaction is deterministic and documented.
+  - [x] AC-6: Team/bulk/backlog-drain modes remain compatible with phase-selection policy and preserve bounded stop behavior.
+  - [x] AC-7: Resume behavior persists selected-phase policy context so continuation is consistent after interruption.
+  - [x] AC-8: Active/template parity is maintained for `/auto`, scratchpad examples, runbook, and README documentation.
+  - [x] AC-9: Regression coverage includes default profile (all phases), selective skip examples (`research`, `sprint-plan`), invalid config fail-fast, and resume consistency checks.
+  - [x] AC-10: Operator-facing status output clearly shows selected/skipped phases and reason codes at each boundary.
+- Boundaries:
+  - In scope: workflow orchestration policy for phase selection and diagnostics.
+  - Out of scope: per-phase internal implementation logic changes unrelated to selection control.
+
+## US-0071 — User-Visible Internal Metadata Sanitization Guard
+- Title: Block internal planning identifiers from user-visible software surfaces
+- Summary: Prevent development/planning metadata (for example `US-xxxx` IDs) from appearing in user-visible UI/output by enforcing deterministic sanitization checks in implementation and QA, while allowing internal docs and code comments.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User reports repeated leakage where User Story IDs are written into visible UI elements or other end-user-facing software surfaces.
+  - User requirement: planning/development identifiers are allowed only in internal documentation and code comments, not in user-visible software content.
+  - Existing contracts do not define a global user-visible metadata redaction policy across generated project outputs.
+  - Intake research reference: `R-0046`.
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+  - Discovery refinement (2026-03-21): user-visible surfaces scoped to operator/end-user software outputs (CLI/UI/errors/installer-visible text), excluding internal `docs/**`, `.cursor/**`, sprint/handoff/decision artifacts, and code comments; forbidden baseline patterns remain `US|DEC|R` + four digits in those outputs only.
+  - Discovery refinement (2026-03-21): execute/QA/release evidence must prove checks ran with deterministic reason codes and remediation refs; active/template parity required for policy-bearing surfaces.
+- Acceptance:
+  - [x] AC-1: Define deterministic policy for forbidden internal-planning token patterns in user-visible software surfaces (minimum: `US-[0-9]{4}`, `DEC-[0-9]{4}`, `R-[0-9]{4}`).
+  - [x] AC-2: Define deterministic allowlist for internal-only surfaces where these identifiers are permitted (documentation artifacts and code comments at minimum).
+  - [x] AC-3: `/execute` adds/uses a non-bypass default guard that prevents introducing forbidden tokens into user-visible UI/text output files for in-scope changes.
+  - [x] AC-4: `/qa` performs automated verification for this policy and fails closed with deterministic reason code when leakage is detected.
+  - [x] AC-5: Findings/remediation guidance must include exact evidence refs (file/path context), detected token class, and safe replacement guidance.
+  - [x] AC-6: Deterministic reason-code vocabulary is documented (for example `USER_VISIBLE_INTERNAL_METADATA_DETECTED`, `METADATA_SANITIZATION_POLICY_MISSING`).
+  - [x] AC-7: Existing valid internal references in docs/comments remain allowed and are not falsely blocked by the guard.
+  - [x] AC-8: Active/template parity is maintained for command guidance, rules, runbook, and README surfaces.
+  - [x] AC-9: Regression coverage includes positive (no leak), negative (leak blocked), allowlist behavior, and rerun idempotence checks.
+  - [x] AC-10: Release/readiness artifacts include auditable evidence that user-visible metadata sanitization checks were executed and passed.
+- Boundaries:
+  - In scope: workflow-level policy and validation for user-visible internal metadata leakage.
+  - Out of scope: content moderation/business copywriting standards unrelated to internal planning metadata.
+
+## US-0072 — Deterministic Context Slimming and Archive Enforcement Across Core Artifacts
+- Title: Enforce compact hot-surfaces and bounded phase reads for state, handoffs, and architecture
+- Summary: Prevent unbounded artifact growth and reduce subagent hallucination risk by enforcing deterministic archive rollover for large core artifacts (`state`, handoffs, architecture), plus strict phase read budgets and minimal context packs.
+- Priority: P1
+- Status: OPEN
+- Discovery notes:
+  - User reports `docs/engineering/state.md` keeps growing while `docs/engineering/state-archive/` remains empty, indicating rollover is not being effectively enforced.
+  - User reports very large `handoffs` and `docs/engineering/architecture.md`, causing high-context noise and increased misunderstanding risk for subagents.
+  - User expects small, role-relevant context surfaces while preserving required historical evidence and problem-solving quality.
+  - Existing stories (`US-0053`, `US-0060`, `US-0061`) define compaction/ownership contracts, but operational enforcement appears incomplete in active runs.
+  - Intake research reference: `R-0047`.
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+- Acceptance:
+  - [ ] AC-1: Define deterministic hot/archive contract for `docs/engineering/state.md`, `handoffs/po_to_tl.md`, and `docs/engineering/architecture.md` with explicit thresholds and pack naming.
+  - [ ] AC-2: When threshold is exceeded, rollover must execute in the same phase boundary or fail closed with deterministic reason code (no silent continuation with oversized hot files).
+  - [ ] AC-3: Archive execution writes deterministic verification evidence (`boundary`, `moved`, `retained`, `pack_ref`) and is idempotent on reruns.
+  - [ ] AC-4: `/refresh-context` and any phase mutating high-growth artifacts must enforce archive verification gates before completion.
+  - [ ] AC-5: Define deterministic minimal-read policy per phase (required files + optional escalation path) with bounded line/file budgets.
+  - [ ] AC-6: Introduce compact phase-context artifacts (hot summaries/pointers) so subagents read latest relevant evidence first and expand only when unresolved.
+  - [ ] AC-7: Deterministic reason-code taxonomy covers archive and context-budget failures (for example `STATE_ARCHIVE_REQUIRED`, `CONTEXT_BUDGET_EXCEEDED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`).
+  - [ ] AC-8: Existing safety and traceability guarantees remain intact (no historical evidence loss; archive references remain auditable and linked).
+  - [ ] AC-9: Active/template parity is maintained for command contracts, scratchpad/runbook/readme guidance, and archive directory docs.
+  - [ ] AC-10: Regression coverage includes threshold-crossing success, empty-archive regression detection, idempotent rollover, bounded-read enforcement, and fail-safe behavior.
+- Boundaries:
+  - In scope: workflow artifact compaction enforcement, archive verification, and phase-context minimization policy.
+  - Out of scope: deleting historical evidence, weakening QA/release gates, or changing product-runtime behavior.

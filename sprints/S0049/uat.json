@@ -1,0 +1,90 @@
+{
+  "sprint_id": "S0049",
+  "story_ids": [
+    "US-0070"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Canonical scratchpad contract for phase policy: exactly one active mode among `AUTO_PHASE_PLAN`, `AUTO_PHASE_EXCLUDE`, `AUTO_PHASE_INCLUDE`, `AUTO_PHASE_PROFILE` with deterministic conflict handling.",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0049/qa-findings.md` AC-1 validation and contract surfaces in `/auto` + scratchpad examples (active/template)."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "`/auto` resolves the effective ordered phase plan deterministically and records it in continuation breadcrumbs before any phase spawn.",
+      "result": "pass",
+      "notes": "PASS per QA contract review of `.cursor/commands/auto.md` + template parity."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Unknown or invalid phase identifiers and empty/invalid plans fail closed with deterministic diagnostics (no silent ignore).",
+      "result": "pass",
+      "notes": "PASS per documented fail-fast codes (`PHASE_POLICY_CONFLICT`, unknown token, empty include, etc.) in `/auto`."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Safety-critical phases cannot be bypassed silently; non-skippable defaults and reinstatement semantics are documented.",
+      "result": "pass",
+      "notes": "PASS per QA AC-4 — non-skippable gates and reinstatement in `/auto` aligned with `DEC-0052`."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "`start-from=<phase>` intersects with the resolved plan; empty intersection fails closed with resolved plan vs anchor diagnostics.",
+      "result": "pass",
+      "notes": "PASS per QA AC-5 and `/auto` intersection contract."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Backlog-drain, bulk execute, and team modes remain compatible with phase-selection policy with bounded stop behavior preserved.",
+      "result": "pass",
+      "notes": "PASS per QA AC-6 — boundary reload and policy parity in `/auto` steps."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Resume and continuation recompute merged scratchpad phase policy so omitted phases do not reappear silently.",
+      "result": "pass",
+      "notes": "PASS per QA AC-7 — resume / continuation parity documented in `/auto`."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Active/template parity for `/auto`, scratchpad examples, runbook, and README phase-selection guidance.",
+      "result": "pass",
+      "notes": "PASS per QA AC-8 and regression **26d** string asserts in `tests/report.md` (active + template paths)."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Regression coverage: default full plan, selective skips (`research`, `sprint-plan`), invalid config fail-fast, resume consistency.",
+      "result": "pass",
+      "notes": "PASS — `tests/run-tests.ps1` / `tests/run-tests.sh` section **26d** green in `tests/report.md` (`2026-03-20T21:19:34Z`)."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Operator-facing status output lists selected phases, skipped phases + reason codes, and boundary diagnostics.",
+      "result": "pass",
+      "notes": "PASS per QA AC-10 — phase boundary status contract in `/auto`."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0049/qa-findings.md",
+    "sprints/S0049/summary.md",
+    "sprints/S0049/tasks.md",
+    "sprints/S0049/progress.md",
+    "tests/report.md"
+  ]
+}

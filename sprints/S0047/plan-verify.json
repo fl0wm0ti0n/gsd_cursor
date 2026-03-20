@@ -1,0 +1,19 @@
+{
+  "sprint_id": "S0047",
+  "story_id": "US-0068",
+  "status": "PASS",
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001", "T-003"], "status": "covered" },
+    { "ac": "AC-2", "tasks": ["T-002", "T-003"], "status": "covered" },
+    { "ac": "AC-3", "tasks": ["T-004"], "status": "covered" },
+    { "ac": "AC-4", "tasks": ["T-005"], "status": "covered" },
+    { "ac": "AC-5", "tasks": ["T-006"], "status": "covered" },
+    { "ac": "AC-6", "tasks": ["T-007"], "status": "covered" },
+    { "ac": "AC-7", "tasks": ["T-008"], "status": "covered" },
+    { "ac": "AC-8", "tasks": ["T-009"], "status": "covered" },
+    { "ac": "AC-9", "tasks": ["T-010"], "status": "covered" },
+    { "ac": "AC-10", "tasks": ["T-011"], "status": "covered" }
+  ],
+  "gaps": [],
+  "summary": "PASS - post-remediation recheck confirms complete AC-1..AC-10 to task mapping with deterministic traceability."
+}

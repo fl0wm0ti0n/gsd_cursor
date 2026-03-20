@@ -76,4 +76,25 @@ globs: ["**/*"]
   - On unresolved sprint identity or queue/notes mismatch, fail closed with
     deterministic reason codes and remediation guidance; no destructive
     reconciliation.
+- Release gate no-bypass (US-0039 / DEC-0019):
+  - Default behavior is strict no-bypass for release gates.
+  - Overrides require explicit decision evidence with rationale and risk
+    acceptance.
+- Release operator hints contract (US-0067 / DEC-0049):
+  - `/release` output must include deterministic sections:
+    `Run -> Connect -> Verify -> Credentials -> Known Issues`.
+  - Required fields include start command, runtime mode/context ref, endpoint +
+    port + health endpoint, verification steps, credentials source refs
+    (env-ref-only), and known issues.
+  - Missing/ambiguous fields or inline secrets fail closed with
+    `RELEASE_OPERATOR_HINTS_MISSING`,
+    `RELEASE_OPERATOR_HINTS_AMBIGUOUS`, or
+    `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`.
+- Cross-phase artifact ownership guard (US-0061 / DEC-0043):
+  - All delivery phases must enforce
+    `docs/engineering/artifact-ownership-policy.md` before mutating artifacts.
+  - Non-authorized phases must not delete or rewrite other-phase owned sections.
+  - On prohibited mutation, fail closed with `PHASE_OWNERSHIP_VIOLATION`.
+  - If an override-authorized mutation path is allowed but evidence is missing,
+    fail closed with `PHASE_OVERRIDE_EVIDENCE_MISSING`.
 

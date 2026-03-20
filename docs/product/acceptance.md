@@ -84,3 +84,16 @@
 - [x] US-0057: Upgrade-safe scratchpad local example refresh and installer parity
 - [x] US-0058: Deterministic artifact ordering and write discipline
 - [x] US-0059: Deterministic intake runtime capability guard and single-writer drift safety
+- [x] US-0060: Deterministic state hot-surface rollover and archive enforcement
+- [x] US-0061: Cross-phase artifact ownership guard and deterministic archive control
+- [x] US-0062: Installer-owned `its_magic/` folder for framework metadata
+- [x] US-0063: OS-aware runbook command auto-bootstrap with verified quality gates
+- [x] US-0064: Remote runtime connectivity contract for QA/release/publish
+- [x] US-0065: Runtime QA Autopilot for generated projects (startup/connectivity/logs/bounded debug retries)
+- [x] US-0066: Generated test scaffolding + auto-run contract for app projects
+- [x] US-0067: Release operator Run/Connect/Verify hints contract
+- [x] US-0068: Mandatory intake question packs for first and small intakes
+- [x] US-0069: Strict phase role enforcement in `/auto` orchestration
+- [x] US-0070: Scratchpad-controlled `/auto` phase selection policy
+- [x] US-0071: User-visible internal metadata sanitization guard
+- [ ] US-0072: Deterministic context slimming and archive enforcement across core artifacts

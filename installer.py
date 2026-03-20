@@ -2,6 +2,8 @@ import argparse
 import filecmp
 import json
 import os
+import re
+import shlex
 import shutil
 import sys
 from datetime import datetime
@@ -107,11 +109,11 @@ def choose_mode():
 FRAMEWORK_PREFIXES = (
     ".cursor/commands/", ".cursor/rules/", ".cursor/agents/",
     ".cursor/skills/", ".cursor/hooks/", ".github/workflows/",
-    "scripts/validate-and-push", "docs/engineering/context/",
+    "scripts/validate-and-push", "docs/engineering/context/", "its_magic/",
 )
 FRAMEWORK_EXACT = {
     ".cursor/hooks.json", ".cursor/scratchpad.local.example.md",
-    ".its-magic-version",
+    ".its-magic-version", "its_magic/.its-magic-version", "its_magic/README.md",
 }
 USER_DATA_PREFIXES = (
     "docs/product/", "docs/engineering/", "docs/user-guides/",
@@ -136,17 +138,197 @@ def classify_file(rel_path):
 
 
 def read_installed_version(target_root):
-    vf = os.path.join(target_root, ".its-magic-version")
-    if os.path.isfile(vf):
-        with open(vf, "r", encoding="utf-8") as f:
+    primary = os.path.join(target_root, "its_magic", ".its-magic-version")
+    if os.path.isfile(primary):
+        with open(primary, "r", encoding="utf-8") as f:
+            return f.read().strip()
+    legacy = os.path.join(target_root, ".its-magic-version")
+    if os.path.isfile(legacy):
+        with open(legacy, "r", encoding="utf-8") as f:
             return f.read().strip()
     return "unknown"
 
 
 def write_installed_version(target_root, ver):
-    vf = os.path.join(target_root, ".its-magic-version")
+    vf = os.path.join(target_root, "its_magic", ".its-magic-version")
+    ensure_parent(vf)
     with open(vf, "w", encoding="utf-8") as f:
         f.write(ver)
+    legacy = os.path.join(target_root, ".its-magic-version")
+    if os.path.isfile(legacy):
+        os.remove(legacy)
+
+
+def sync_root_readme_to_its_magic(target_root):
+    root_readme = os.path.join(target_root, "README.md")
+    if not os.path.isfile(root_readme):
+        return False
+    its_magic_readme = os.path.join(target_root, "its_magic", "README.md")
+    ensure_parent(its_magic_readme)
+    shutil.copy2(root_readme, its_magic_readme)
+    return True
+
+
+def read_runbook_key(runbook_path, key):
+    if not os.path.isfile(runbook_path):
+        return ""
+    needle = f"{key}:"
+    with open(runbook_path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.rstrip("\n")
+            if line.startswith(needle):
+                return line[len(needle):].strip()
+    return ""
+
+
+def write_runbook_key(runbook_path, key, value):
+    with open(runbook_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+    needle = f"{key}:"
+    changed = False
+    for idx, raw in enumerate(lines):
+        line = raw.rstrip("\n")
+        if line.startswith(needle):
+            lines[idx] = f"{needle} {value}\n"
+            changed = True
+            break
+    if changed:
+        with open(runbook_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+    return changed
+
+
+def package_has_script(target_root, script_name):
+    pkg_path = os.path.join(target_root, "package.json")
+    if not os.path.isfile(pkg_path):
+        return False
+    try:
+        with open(pkg_path, "r", encoding="utf-8") as f:
+            pkg = json.load(f)
+        scripts = pkg.get("scripts", {})
+        val = scripts.get(script_name)
+        return isinstance(val, str) and val.strip() != ""
+    except Exception:
+        return False
+
+
+def detect_runbook_defaults(target_root):
+    is_windows = os.name == "nt"
+    tests_ps1 = os.path.join(target_root, "tests", "run-tests.ps1")
+    tests_sh = os.path.join(target_root, "tests", "run-tests.sh")
+    has_pkg = os.path.isfile(os.path.join(target_root, "package.json"))
+    has_py = any(
+        os.path.isfile(os.path.join(target_root, p))
+        for p in ("pyproject.toml", "requirements.txt", "setup.py")
+    )
+    has_go = os.path.isfile(os.path.join(target_root, "go.mod"))
+
+    result = {"TEST_COMMAND": "", "LINT_COMMAND": "", "TYPECHECK_COMMAND": ""}
+
+    if has_pkg and package_has_script(target_root, "test"):
+        result["TEST_COMMAND"] = "npm run test"
+        if package_has_script(target_root, "lint"):
+            result["LINT_COMMAND"] = "npm run lint"
+        if package_has_script(target_root, "typecheck"):
+            result["TYPECHECK_COMMAND"] = "npm run typecheck"
+    elif has_go:
+        result["TEST_COMMAND"] = "go test ./..."
+    elif has_py:
+        result["TEST_COMMAND"] = "python -m pytest"
+    elif is_windows and os.path.isfile(tests_ps1):
+        result["TEST_COMMAND"] = "powershell -ExecutionPolicy Bypass -File \"tests/run-tests.ps1\""
+    elif os.path.isfile(tests_sh):
+        result["TEST_COMMAND"] = "sh tests/run-tests.sh"
+
+    return result
+
+
+def validate_bootstrap_command(target_root, key, command):
+    if not command:
+        return False, f"{key}_UNDETECTED"
+    if command.startswith("npm run "):
+        if not shutil.which("npm"):
+            return False, "NPM_NOT_FOUND"
+        script_name = command[len("npm run "):].strip()
+        if not package_has_script(target_root, script_name):
+            return False, f"NPM_SCRIPT_MISSING:{script_name}"
+        return True, "OK"
+    if command.startswith("python -m "):
+        if not shutil.which("python"):
+            return False, "PYTHON_NOT_FOUND"
+        if command == "python -m pytest":
+            has_py = any(
+                os.path.isfile(os.path.join(target_root, p))
+                for p in ("pyproject.toml", "requirements.txt", "setup.py")
+            )
+            if not has_py:
+                return False, "PYTHON_STACK_MARKERS_MISSING"
+        return True, "OK"
+    if command.startswith("go test "):
+        if not shutil.which("go"):
+            return False, "GO_NOT_FOUND"
+        if not os.path.isfile(os.path.join(target_root, "go.mod")):
+            return False, "GO_MOD_MISSING"
+        return True, "OK"
+    if command.startswith("powershell "):
+        if not os.path.isfile(os.path.join(target_root, "tests", "run-tests.ps1")):
+            return False, "RUN_TESTS_PS1_MISSING"
+        return True, "OK"
+    if command.startswith("sh "):
+        if not shutil.which("sh"):
+            return False, "SH_NOT_FOUND"
+        if not os.path.isfile(os.path.join(target_root, "tests", "run-tests.sh")):
+            return False, "RUN_TESTS_SH_MISSING"
+        return True, "OK"
+    try:
+        parts = shlex.split(command)
+    except ValueError:
+        return False, "COMMAND_PARSE_FAILED"
+    if not parts:
+        return False, "COMMAND_EMPTY"
+    if not shutil.which(parts[0]):
+        return False, f"EXECUTABLE_NOT_FOUND:{parts[0]}"
+    return True, "OK"
+
+
+def bootstrap_runbook_commands(target_root):
+    runbook_path = os.path.join(target_root, "docs", "engineering", "runbook.md")
+    if not os.path.isfile(runbook_path):
+        return True, []
+
+    defaults = detect_runbook_defaults(target_root)
+    diagnostics = []
+    changed = []
+
+    for key in ("TEST_COMMAND", "LINT_COMMAND", "TYPECHECK_COMMAND"):
+        current = read_runbook_key(runbook_path, key)
+        if current:
+            continue
+        candidate = defaults.get(key, "")
+        if not candidate:
+            if key == "TEST_COMMAND":
+                diagnostics.append(
+                    "[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED: could not detect a valid baseline test command. "
+                    "Fix: define TEST_COMMAND in docs/engineering/runbook.md or add detectable stack markers (package.json scripts.test, pyproject.toml, go.mod)."
+                )
+            continue
+        valid, reason = validate_bootstrap_command(target_root, key, candidate)
+        if valid:
+            if write_runbook_key(runbook_path, key, candidate):
+                changed.append(f"{key}={candidate}")
+        elif key == "TEST_COMMAND":
+            diagnostics.append(
+                f"[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_INVALID:{reason}. "
+                "Fix: set a valid TEST_COMMAND in docs/engineering/runbook.md."
+            )
+
+    if changed:
+        diagnostics.append("[RUNBOOK_BOOTSTRAP] Applied defaults: " + ", ".join(changed))
+
+    has_test = read_runbook_key(runbook_path, "TEST_COMMAND") != ""
+    if not has_test:
+        return False, diagnostics
+    return True, diagnostics
 
 
 def prompt_yes_no(label, default=False):
@@ -207,13 +389,17 @@ def show_help(version):
     print("  --backup          Before overwriting, save existing files to backups/<timestamp>/.")
     print("                    Ignored when mode is 'missing' (nothing gets replaced).")
     print("  --create          Create the target directory if it does not exist.")
+    print("  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands")
+    print("        from OS+stack detection; unresolved TEST_COMMAND fails fast with")
+    print("        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.")
     print()
     print("Clean options:")
     print("  --clean-repo      Remove all its-magic workflow artifacts from the target repo")
     print("                    (owned paths from installer manifest, including .cursor,")
     print("                    docs/product, docs/engineering, docs/user-guides, sprints,")
     print("                    handoffs, decisions, workflow scripts, CI files, and")
-    print("                    .its-magic-version). Your own source code is never touched.")
+    print("                    installer metadata under its_magic/ (legacy .its-magic-version")
+    print("                    is also removed when present). Your own source code is never touched.")
     print("  --target <path>   Repo to clean (default: current directory).")
     print("  --yes             Skip the confirmation prompt.")
     print()
@@ -374,6 +560,12 @@ def main():
                 continue
 
         write_installed_version(target_root, version)
+        sync_root_readme_to_its_magic(target_root)
+        runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
+        for note in runbook_notes:
+            print(note)
+        if not runbook_ok:
+            return 1
 
         show_banner()
         g = "\033[1;32m"
@@ -439,6 +631,12 @@ def main():
                 shutil.copy2(src, dst)
 
     write_installed_version(target_root, version)
+    sync_root_readme_to_its_magic(target_root)
+    runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
+    for note in runbook_notes:
+        print(note)
+    if not runbook_ok:
+        return 1
 
     show_banner(include_install_message=True)
     print(f"its-magic v{version}")

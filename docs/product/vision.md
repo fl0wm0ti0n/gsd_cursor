@@ -253,3 +253,274 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   are not treated as external concurrent mutation.
 - External conflicting writer activity must remain fail-safe with deterministic
   reason code and no partial overwrite behavior.
+
+## Intake Notes — US-0060
+
+- User reports `docs/engineering/state.md` grows very quickly in fresh repos
+  (around 1800 lines after two sprints), despite prior compaction expectations.
+- Expected outcome: deterministic, enforced rollover from hot surface to
+  `docs/engineering/state-archive/` packs with bounded hot-surface size.
+- Required behavior: non-destructive archival, idempotent reruns, and fail-safe
+  handling when archive operations cannot be completed safely.
+
+## Discovery Notes — US-0060
+
+- Compaction must move from policy-only guidance to deterministic trigger
+  enforcement (`max lines` and `max checkpoints`).
+- Archive boundary selection and pack naming must be stable so reruns do not
+  duplicate or reorder history.
+- Fail-safe behavior must block partial mutation when archive boundary detection
+  or archive write persistence fails.
+
+## Intake Notes — US-0061
+
+- User requests a global cross-phase non-destructive write rule: each phase can
+  update only its owned artifact scope and must not delete text owned by other
+  phases unless an explicit override-authorized phase is defined.
+- User reports prior architecture history loss in a fresh repository run, which
+  indicates missing ownership guardrails for `docs/engineering/architecture.md`.
+- User requests stricter and more specific archive control to ensure archival is
+  actually executed deterministically (not policy-only) while keeping `state.md`
+  bounded.
+
+## Discovery Notes — US-0061
+
+- Ordering policy and canonical status ownership are necessary but not sufficient
+  to prevent cross-phase destructive rewrites; an explicit ownership matrix is
+  required.
+- `docs/engineering/architecture.md` needs an explicit non-destructive contract
+  (append new story sections / target-section-only update) to preserve history.
+- Archive controls must include deterministic verification outputs and fail-safe
+  mismatch handling, not just threshold configuration.
+
+## Intake Notes — US-0062
+
+- User requests a dedicated installer-owned folder (`its_magic/`) for
+  framework metadata and non-project files (for example README framework surface
+  and version marker).
+- User expects project-owned artifacts (such as `src/`, project docs, and
+  feature/runtime files) to remain outside this framework metadata folder.
+- Expected outcome: deterministic install/upgrade/clean ownership behavior with
+  clear separation between framework-managed vs project-managed files.
+
+## Intake Notes — US-0063
+
+- User requests onboarding-safe runbook auto-configuration that does not weaken
+  quality gates and does not rely on placeholders.
+- User expects OS-aware command defaults (for example Windows vs Unix) and
+  stack-aware command generation for project checks.
+- User reports practical mismatch case: Windows environment while runbook
+  baseline command is Unix shell (`sh tests/run-tests.sh`).
+
+## Intake Notes — US-0064
+
+- User requests extending release/target configuration with runtime connectivity
+  details such as domain, IP/host, port, and Traefik/ingress context.
+- User requests Docker-over-SSH support as first-class remote runtime/deploy
+  option.
+- User expects remote-aware phase behavior: release/qa (and relevant execution
+  steps) should consume this contract when project context is remote.
+- User expects agents to provide clear operator connection information (where
+  hosted, how to connect) and write this in a canonical document.
+
+## Intake Notes — US-0065 to US-0068
+
+- User requests stronger real-project runtime verification in generated repos:
+  start app/service, verify connectivity/health, inspect logs, and attempt
+  bounded self-debug retries before QA can pass.
+- User requests generated baseline tests (unit/integration/acceptance) to be
+  scaffolded and run automatically as part of execute/qa quality evidence.
+- User requests operator-ready release outputs with concrete
+  `Run/Connect/Verify` guidance (commands, endpoints/ports, expected health
+  checks, env-ref credential sources, known issues).
+- User requests mandatory intake question packs:
+  - first-intake comprehensive questionnaire,
+  - small-intake minimal questionnaire,
+  with required coverage before persistence.
+
+## Intake Notes — US-0069 and US-0070
+
+- User reports a real generated-repository orchestration drift where `/auto`
+  effectively ran only tech-lead for implementation flow, skipping intended
+  role separation (`dev`, `qa`, `release`, etc.).
+- User expects strict fail-closed role enforcement per phase, with no silent
+  fallback to unrelated roles when required capability is unavailable.
+- User requests a configurable scratchpad parameter to fine-tune which phases
+  `/auto` runs (for example skip `research` or `sprint-plan`) while retaining
+  deterministic behavior and safety visibility.
+
+## Discovery Notes — US-0069
+
+- Role enforcement must be a **preflight gate**: `/auto` resolves the required
+  capability for the next canonical phase **before** spawning phase work, and
+  fails closed if the required role is unavailable (no silent substitution).
+- The canonical phase→role contract in backlog AC-1 is the source of truth;
+  phases that allow multiple roles (`research`, `plan-verify`, `refresh-context`)
+  require a **deterministic disambiguation policy** (for example scratchpad
+  policy keys with documented precedence) so the expected role is never
+  ambiguous at runtime.
+- Phase completion is invalid when isolation evidence lists a `role` that does
+  not satisfy the expected role contract for that `phase_id` (including
+  policy-resolved alternates).
+- **`execute` must default to `dev`**: `tech-lead` (or any non-dev) execution
+  context is denied unless an explicit, documented override contract exists
+  (default deny aligns with AC-5).
+- Diagnostics must be operator-actionable: include `phase_id`, expected role(s),
+  observed role/capability resolution, deterministic reason code, and
+  remediation (for example spawn the correct subagent role or adjust policy).
+- Strict runtime proof and isolation tuples must carry the same **resolved
+  canonical role** so US-0048 evidence and US-0056 attestation stay aligned for
+  auditors.
+- Resume and `start-from` paths must run the same role preflight; stale or
+  partial resume sources cannot bypass capability checks (AC-6).
+- Scope boundary: this story covers **role mapping and enforcement** only;
+  configurable phase inclusion/exclusion for `/auto` remains **`US-0070`**.
+
+## Discovery Notes — US-0070
+
+- Operators need **deterministic scratchpad controls** to include/exclude lifecycle
+  phases (for example skip `research` / `sprint-plan`) without turning `/auto`
+  into a manual phase runner; defaults must remain “full canonical lifecycle”.
+- Phase selection must be **policy-single-valued**: one resolution path
+  (`full` vs `exclude list` vs `include list` vs named `profile`) with documented
+  precedence and fail-closed behavior on conflicts or unknown phase ids.
+- **Safety gates cannot be silently bypassed**: default policy marks
+  evidence-bearing and QA/release-related phases as non-skippable; any narrower
+  profile must be explicitly named and traceable (not an accidental empty
+  config).
+- **`start-from` composes** with the resolved plan: execution begins at the
+  latest of “resume/start anchor” and “first phase in resolved plan”, with empty
+  intersection failing fast and listing both inputs.
+- **Continuation parity**: backlog-drain, bulk execute, team scope, and pause
+  boundaries must carry the same resolved phase plan metadata so resumes do not
+  re-run skipped phases or drop policy without operator visibility.
+- **Observability**: status output and `state.md` breadcrumbs should show
+  `effective_phase_plan`, `skipped_phases`, and deterministic reason codes at
+  phase boundaries for auditability.
+- **Non-overlap with US-0069**: phase selection changes which phases run; it must
+  not weaken role-capability preflight — skipped phases simply never spawn.
+
+## Intake Notes — US-0071
+
+- User reports repeated leakage of planning/development identifiers (for example
+  User Story IDs) into user-visible UI/software outputs.
+- User requires a strict boundary: such identifiers are allowed in internal
+  documentation and code comments, but not in user-visible product surfaces.
+- User expects deterministic automated enforcement during implementation and QA,
+  with fail-closed diagnostics when leakage is detected.
+
+## Discovery Notes — US-0071
+
+- **User-visible surface** (for this kit): any software output intended for
+  operators or end users outside internal engineering docs — including CLI
+  stdout/stderr, generated app UI copy, user-facing error strings, and
+  installer-visible messages — but excluding repository documentation trees,
+  `docs/**`, `.cursor/**` policy text, sprint/handoff markdown, and
+  source comments.
+- **Forbidden token classes** (minimum baseline): planning identifiers matching
+  `US-[0-9]{4}`, `DEC-[0-9]{4}`, and `R-[0-9]{4}` in those user-visible
+  surfaces; research may extend the taxonomy without narrowing AC-1’s minimum.
+- **Allowlisted internal-only use**: backlog, acceptance, architecture, state,
+  handoffs, decisions, research notes, and code comments remain valid homes for
+  those tokens; guards must target **outputs**, not **internal artifact
+  authoring**.
+- **Execute/QA contract**: default non-bypass checks on in-scope changes;
+  deterministic fail-closed findings with path/context, token class, and
+  remediation (aligns with AC-3–AC-5); reason codes such as
+  `USER_VISIBLE_INTERNAL_METADATA_DETECTED` and
+  `METADATA_SANITIZATION_POLICY_MISSING` (AC-6) should be documented in
+  runbook/command surfaces.
+- **False-positive control**: pattern scope is planning-id shaped tokens in
+  user-visible channels only — not generic “US” substrings in prose where
+  context proves non-planning usage; QA negatives must prove leak blocking without
+  breaking allowlisted docs/comments (AC-7, AC-9).
+- **Parity**: active and template copies of commands, rules, runbook, and README
+  stay aligned when policy text or guard instructions change (AC-8).
+- **Non-overlap**: does not subsume `US-0069` role routing, `US-0070` phase
+  selection, or general content/style governance (see backlog boundaries).
+
+## Intake Notes — US-0072
+
+- User reports state archiving is still not functioning in practice: active
+  `state.md` grows while `state-archive` remains empty.
+- User reports high-growth handoff and architecture artifacts are becoming too
+  large, increasing context noise and agent misunderstanding/hallucination risk.
+- User requests a stronger process that keeps artifacts compact and ensures
+  subagents read only necessary context for each phase without losing required
+  historical evidence.
+
+## Discovery Notes — US-0065
+
+- Runtime QA for generated projects must be evidence-first and executable: PASS
+  requires successful startup, reachability/health validation, runtime log
+  inspection, and bounded retry outcomes, not only static command checks.
+- Bounded self-debug behavior needs deterministic limits and explicit per-attempt
+  traceability so retries increase reliability without creating unbounded loops.
+- Stack-aware startup/health command resolution should cover at least
+  Node/Python/Go/Java/.NET with deterministic fallback and fail-safe handling
+  when no reliable runtime profile is available.
+- Webapp contexts should include browser-level verification guidance (smoke
+  navigation plus console/network error inspection) as part of runtime QA
+  evidence when applicable.
+- QA artifacts should capture canonical runtime evidence fields: startup command,
+  runtime mode (`local|remote`), endpoint/health result, log summary, retry
+  ledger, and final reason-coded verdict.
+- Reason-code taxonomy should be explicit and deterministic across runtime
+  failure boundaries (startup failure, unreachable endpoint, critical log signal,
+  retry budget exhaustion, unresolved stack profile) with operator remediation
+  guidance.
+- Story boundary must remain strict: US-0065 defines runtime verification
+  contract/evidence; generated test scaffolding and release operator hints remain
+  in US-0066/US-0067.
+- Discovery remediation rerun for strict-proof continuity confirms no scope
+  change: US-0065 remains limited to runtime verification contract/evidence only.
+
+## Discovery Notes — US-0066
+
+- Generated-project quality should include baseline runnable tests by default;
+  quality gates cannot assume tests already exist in fresh app repositories.
+- Test scaffold generation must be deterministic and non-destructive: create
+  missing baseline tests and runnable command wiring without overwriting
+  user-authored test suites or custom test commands.
+- QA must execute generated baseline tests automatically and produce explicit
+  evidence for pass/fail outcomes; absence of runnable generation for a detected
+  stack must fail closed with reason-coded remediation.
+- Rerun behavior should be idempotent and auditable: repeated execute/qa passes
+  must not duplicate scaffolding or oscillate runbook command configuration.
+- Scope boundary must remain strict: US-0066 covers test scaffold generation and
+  automatic execution evidence; runtime startup autopilot remains in US-0065,
+  release operator hints remain in US-0067.
+
+## Discovery Notes — US-0067
+
+- Release outputs should include a deterministic operator contract section with
+  fixed ordering and concise required fields: `Run` -> `Connect` -> `Verify` ->
+  `Credentials (env-ref only)` -> `Known Issues`.
+- `Run` should capture exact startup command(s) and runtime mode (`local|remote`)
+  to avoid operator ambiguity across local and remote execution contexts.
+- `Connect` should capture endpoint details (`url/ip:port`) and expected health
+  signal so first verification is reproducible from release notes alone.
+- `Credentials` guidance must remain reference-only (env variable names and
+  value source), with explicit no-secret-inline policy in release surfaces.
+- Release finalization should fail closed when any required run/connect/verify
+  field is missing or ambiguous, with deterministic reason-coded remediation.
+- Scope boundary must remain strict: this story defines release operator hints
+  contract only; runtime QA autopilot stays in `US-0065`, test scaffolding in
+  `US-0066`, and intake question-pack policy in `US-0068`.
+
+## Discovery Notes — US-0068
+
+- Intake must enforce deterministic minimum topic coverage before persistence,
+  not only adaptive "ask more when unclear" behavior.
+- Two canonical questionnaire packs are required: first-intake comprehensive
+  and small-intake compact, each with explicit required coverage topics.
+- Persistence gating must be fail-closed when required answers are missing,
+  unless bounded assumptions are explicitly confirmed by the user and recorded.
+- Low-touch mode remains supported, but it must still ask and capture a minimum
+  critical safety subset before allowing persistence.
+- Intake outputs should carry auditable questioning evidence
+  (covered topics, missing topics, assumption confirmations, and block reason
+  codes) so downstream phases can trust intake completeness deterministically.
+- Scope boundary must remain strict: `US-0068` defines intake questionnaire and
+  persistence-gate policy only; runtime QA/test scaffolding/release operator
+  guidance remain in `US-0065`/`US-0066`/`US-0067`.

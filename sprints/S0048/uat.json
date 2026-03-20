@@ -1,0 +1,90 @@
+{
+  "sprint_id": "S0048",
+  "story_ids": [
+    "US-0069"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Canonical deterministic phase→role mapping for `/auto` is documented (matrix + `AUTO_ROLE_*` alternates per policy).",
+      "result": "pass",
+      "notes": "Verified via `qa-findings.md` contract review and section **26c** string asserts in both runners (`tests/report.md`)."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Fail-closed preflight when required phase role capability is unavailable (`PHASE_ROLE_CAPABILITY_MISSING`); no unrelated-role substitution.",
+      "result": "pass",
+      "notes": "PASS per `/auto` + runbook contract surfaces and regression asserts."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Boundary validation rejects completion when isolation `role` conflicts with expected phase contract (`PHASE_ROLE_MISMATCH`).",
+      "result": "pass",
+      "notes": "PASS per documented checkpoint validation in `/auto` and release gate **4a**."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Deterministic diagnostics include phase id, expected role, observed capability/role, and remediation guidance.",
+      "result": "pass",
+      "notes": "PASS per `/auto` + `docs/engineering/runbook.md` (active + template)."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "`/execute` runs only under `dev` unless documented override contract (`AUTO_EXECUTE_ROLE_OVERRIDE` + `EXECUTE_OVERRIDE_GOVERNANCE_REF`) is satisfied.",
+      "result": "pass",
+      "notes": "PASS per default-deny + override path in `/auto` and scratchpad examples."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Resume and continuation paths preserve role enforcement; stale resume cannot bypass preflight.",
+      "result": "pass",
+      "notes": "PASS per `/auto` resume / `start-from` parity documentation and QA review."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Active/template parity for `/auto`, phase command docs, runbook, README, and scratchpad examples.",
+      "result": "pass",
+      "notes": "PASS per **26c** parity asserts and `qa-findings.md` spot-check."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Regression coverage for pass path, fail-fast path, role-mismatch rejection, and no-silent-fallback assertions.",
+      "result": "pass",
+      "notes": "PASS — `tests/run-tests.ps1` / `tests/run-tests.sh` section **26c** in `tests/report.md`."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Deterministic reason-code vocabulary documented (e.g. `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`).",
+      "result": "pass",
+      "notes": "PASS per `/auto` baseline list, runbook, and release command references."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Release/readiness artifacts require auditable phase-role and strict-proof alignment for lifecycle boundaries.",
+      "result": "pass",
+      "notes": "PASS per `/release` gates **4a** / **4b** (active + template) citing US-0069 / DEC-0051."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0048/qa-findings.md",
+    "sprints/S0048/summary.md",
+    "sprints/S0048/tasks.md",
+    "sprints/S0048/progress.md",
+    "tests/report.md"
+  ]
+}

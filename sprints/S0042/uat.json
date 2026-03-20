@@ -1,0 +1,19 @@
+{
+  "sprint_id": "S0042",
+  "story_id": "US-0062",
+  "status": "pass",
+  "checks": [
+    {
+      "id": "install-metadata-location",
+      "status": "pass"
+    },
+    {
+      "id": "upgrade-migration-legacy-marker",
+      "status": "pass"
+    },
+    {
+      "id": "clean-repo-boundary-safety",
+      "status": "pass"
+    }
+  ]
+}

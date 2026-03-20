@@ -5,8 +5,8 @@
 TEST_COMMAND: sh tests/run-tests.sh
 LINT_COMMAND:
 TYPECHECK_COMMAND:
-DEPLOY_STAGING_COMMAND:
-DEPLOY_PROD_COMMAND:
+DEPLOY_STAGING_COMMAND: echo "No staging deploy target configured for this repository"
+DEPLOY_PROD_COMMAND: echo "No production deploy target configured for this repository"
 
 LINT_FIX_COMMAND:
 FORMAT_COMMAND:
@@ -34,6 +34,84 @@ intentional defaults, not configuration errors:
 - `TYPECHECK_COMMAND`
 
 Teams may set these keys when needed for their own project stack.
+
+## OS-aware runbook command bootstrap (US-0063 / DEC-0046)
+
+Installer/upgrade flows auto-bootstrap runbook command keys with deterministic
+precedence:
+
+- `user override > detected defaults > safe fail-fast`
+- user-provided non-empty values are never overwritten
+- defaults are inferred from OS + project stack markers
+  (`package.json` scripts, `pyproject.toml`, `go.mod`, platform test scripts)
+
+Baseline detection contract:
+
+- `TEST_COMMAND` is mandatory for push-eligible quality gates.
+- `LINT_COMMAND` and `TYPECHECK_COMMAND` are optional and only auto-populated
+  when confidently detectable.
+- if `TEST_COMMAND` remains unresolved/invalid, installer fails fast with:
+  - `[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED`, or
+  - `[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_INVALID:<reason>`
+
+Remediation:
+
+- define `TEST_COMMAND` explicitly in `docs/engineering/runbook.md`, or
+- add detectable stack markers/scripts then rerun installer upgrade.
+
+## User-visible internal metadata guard (US-0071 / DEC-0053)
+
+**Goal:** keep planning-shaped identifiers out of **operator-visible software
+channels** (CLI/installer/validate-and-push strings), while they remain valid in
+internal documentation trees and in source comments that are not emitted to
+users.
+
+### Forbidden tokens (user-visible channels only)
+
+Match planning-shaped tokens:
+
+- `US-[0-9]{4}`
+- `DEC-[0-9]{4}`
+- `R-[0-9]{4}`
+
+### Inclusive scan roots (deterministic)
+
+From repository root, the checker walks **only**:
+
+- `bin/**` (`*.js`)
+- `installer.py`, `installer.ps1`, `installer.sh`
+- `packaging/**` (`*.js`, `*.py`, `*.ps1`, `*.sh`)
+- `scripts/validate-and-push.ps1`, `scripts/validate-and-push.sh`
+
+Paths outside this set are **not** scanned by this tool (for example `docs/**`,
+`.cursor/**`, `sprints/**`, `handoffs/**`, `decisions/**` remain free to use
+story/decision/research IDs). If a new operator-visible deliverable is added
+outside these roots, extend the scan list or you risk
+`METADATA_SANITIZATION_SCOPE_AMBIGUOUS` classification during review.
+
+### Command
+
+```bash
+python scripts/check-user-visible-metadata.py
+python scripts/check-user-visible-metadata.py --json
+```
+
+### Reason codes (minimum)
+
+- `USER_VISIBLE_INTERNAL_METADATA_DETECTED` — forbidden token matched inside a
+  scanned user-visible string/literal.
+- `METADATA_SANITIZATION_POLICY_MISSING` — checker entrypoint missing or
+  unusable.
+- `METADATA_SANITIZATION_SCOPE_AMBIGUOUS` — cannot classify whether a path
+  belongs in inclusive scan roots; treat as fail-closed until the runbook table
+  is updated.
+
+### Findings / remediation (contract)
+
+On failure, diagnostics must cite **evidence_ref** (`path:line:column` when
+available), **token class** (`US` \| `DEC` \| `R`), and remediation: remove the
+token from operator-visible strings; keep traceability in allowlisted internal
+artifacts or non-emitting comments per `DEC-0053`.
 
 ## Guided intake mode (US-0033)
 
@@ -76,6 +154,60 @@ decomposition and adaptive questioning behavior:
   - intake output must capture decomposition/questioning evidence in
     `docs/product/backlog.md`, `docs/product/acceptance.md`, and
     `handoffs/po_to_tl.md`.
+
+## Mandatory intake question packs and persistence coverage gate (US-0068 / DEC-0050)
+
+Intake persistence is fail-closed unless required topic coverage is complete (or
+bounded assumptions are explicitly confirmed).
+
+Deterministic pack contract:
+
+- `first-intake-pack` (first/new/broad intake)
+  - required topics:
+    - `users_problem`
+    - `runtime_target_environment`
+    - `language_framework_runtime`
+    - `architecture_preference`
+    - `ui_design_expectations`
+    - `security_compliance`
+    - `non_functional_priorities`
+    - `scope_timeline`
+- `small-intake-pack` (small follow-up intake)
+  - required topics:
+    - `outcome_success_criteria`
+    - `impacted_components`
+    - `constraints_compatibility_risks`
+    - `required_tests_acceptance_checks`
+    - `done_definition`
+
+Pack selection and coverage behavior:
+
+- Select exactly one pack per intake write path.
+- Unknown/ambiguous stack or project cues must fail closed to
+  `first-intake-pack`.
+- Required coverage must be evaluated before writing
+  `docs/product/backlog.md` or `docs/product/acceptance.md`.
+- Incomplete required coverage blocks persistence unless assumptions are
+  explicitly confirmed.
+
+Deterministic fail-closed reason codes:
+
+- `INTAKE_REQUIRED_TOPIC_MISSING`
+- `INTAKE_REQUIRED_PACK_INCOMPLETE`
+- `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`
+- `INTAKE_PERSISTENCE_BLOCKED`
+
+Required remediation output on block:
+
+- include `missing_topics`
+- provide targeted follow-up prompts for missing required topics
+- request explicit assumption confirmation when assumptions are used
+
+Required persisted intake evidence fields:
+
+- `asked_topics`
+- `missing_topics`
+- `assumptions_confirmed`
 
 ## Optional ID namespace bootstrap (US-0052)
 
@@ -131,6 +263,18 @@ Context compaction policy:
   append-only/non-destructive.
 - `docs/engineering/decisions.md` is a compact index with bounded summaries and
   canonical links to full records in `decisions/DEC-xxxx.md`.
+- Enforced rollover thresholds:
+  - `STATE_HOT_MAX_LINES` (default `1200`)
+  - `STATE_HOT_MAX_CHECKPOINTS` (default `80`)
+  When either threshold is exceeded during `/refresh-context`, older checkpoints
+  are archived into deterministic `state-pack-*` files and only bounded recent
+  checkpoints remain in hot surface.
+
+Rollover fail-safe reason codes:
+
+- `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`
+- `STATE_ARCHIVE_WRITE_FAILED`
+- `STATE_ARCHIVE_VERIFICATION_FAILED`
 
 `/ask` retrieval policy:
 
@@ -154,6 +298,11 @@ Target schema contract:
   - `npm`, `choco`, `brew`, `git`, `docker`, `cloud`
   - `custom` (generic command target)
   - `ssh` (host/user/port/auth reference + remote command)
+- Connectivity metadata (for operator-safe remote/local context):
+  - `runtime.mode` (`local|remote`)
+  - endpoint fields (`domainEnv|ipEnv|hostEnv`, `port`, `protocol`)
+  - optional ingress metadata (`traefik.enabled`, `router`, `entrypoint`, `tls`)
+  - optional `dockerOverSsh` object for ssh/dockerd remote execution context
 - Each target entry must define deterministic fields:
   - `id` (stable unique target ID)
   - `type`
@@ -170,6 +319,38 @@ Safety contract:
   are not allowed.
 - Invalid target config must fail fast with deterministic diagnostics and no
   partial side effects.
+- Invalid remote connectivity metadata must fail fast with
+  `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
+- Canonical operator endpoint summary is written to
+  `docs/engineering/runtime-connectivity.md` with sanitized values only.
+
+## Release operator hints contract (US-0067 / DEC-0049)
+
+Release outputs must include deterministic operator-ready hints with mandatory
+section order:
+
+`Run -> Connect -> Verify -> Credentials -> Known Issues`
+
+Required fields for canonical sprint notes
+(`handoffs/releases/Sxxxx-release-notes.md`):
+
+- `Run`: `start_command`, `runtime_mode`, `runtime_context_ref`
+- `Connect`: `service_url`, `service_port`, `health_endpoint`
+- `Verify`: deterministic `verification_steps`, `expected_health_signal`
+- `Credentials`: env-reference-only source refs and expected value-source
+  location guidance (never inline secrets)
+- `Known Issues`: concise issue list or explicit `None`
+
+Legacy pointer contract (`handoffs/release_notes.md`):
+
+- keep concise latest run/connect/verify summary only
+- always link to canonical sprint-scoped release notes for full details
+
+Fail-closed reason codes:
+
+- `RELEASE_OPERATOR_HINTS_MISSING`
+- `RELEASE_OPERATOR_HINTS_AMBIGUOUS`
+- `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`
 
 ## Deterministic status reconciliation mode (US-0055 / DEC-0037)
 
@@ -429,6 +610,107 @@ Operator troubleshooting:
   - Replace with env-var reference fields (`tokenEnv`, `passwordEnv`,
     `privateKeyPathEnv`, ...).
 
+## Runtime QA autopilot contract (US-0065 / DEC-0047)
+
+Generated-project validation requires runtime proof, not static checks alone.
+
+Mandatory runtime stage order:
+
+`startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`
+
+Deterministic runtime failure reason codes:
+
+- `RUNTIME_STARTUP_FAILED`
+- `RUNTIME_ENDPOINT_UNREACHABLE`
+- `RUNTIME_LOG_CRITICAL_DETECTED`
+- `RUNTIME_RETRY_BUDGET_EXHAUSTED`
+- `RUNTIME_STACK_PROFILE_UNRESOLVED`
+
+Runtime evidence schema (record in QA findings):
+
+- `runtime_startup_command`
+- `runtime_stack_profile` (`node|python|go|java|dotnet`)
+- `runtime_mode` (`local|remote`)
+- `runtime_health_target`
+- `runtime_health_result`
+- `runtime_log_summary` (severity counts and key error signals)
+- `runtime_retry_count`
+- `runtime_retry_ledger` (`attempt`, `delay_ms`, `outcome`)
+- `runtime_final_verdict`
+- `runtime_reason_code`
+- `runtime_evidence_refs`
+
+Bounded retry policy:
+
+- retry only transient startup/connectivity failures
+- enforce configured max-attempt cap (`attempt <= max`)
+- fail fast on non-transient critical runtime log signals
+
+Stack/profile resolution:
+
+- Minimum supported runtime profiles: Node, Python, Go, Java, .NET.
+- Unknown or ambiguous profile must fail closed with
+  `RUNTIME_STACK_PROFILE_UNRESOLVED`.
+
+Webapp verification path (when applicable):
+
+- include browser-surface load validation
+- capture console error summary and failed network request summary
+- add these signals to `runtime_log_summary` and evidence refs
+
+Optional debug escalation (bounded):
+
+- use for reproducible runtime failures only
+- keep instrumentation bounded and reversible
+- record applied debug steps and explicit cleanup confirmation
+
+## Generated test scaffolding + auto-run contract (US-0066 / DEC-0048)
+
+Generated app projects require deterministic baseline test scaffolding and
+automatic QA test execution evidence.
+
+Detection/profile contract:
+
+- Resolve one deterministic stack profile from:
+  `node|python|go|java|dotnet` (minimum supported).
+- If profile cannot be resolved, fail closed with
+  `TEST_SCAFFOLD_STACK_UNRESOLVED`.
+- If detected stack is outside supported baseline set, fail closed with
+  `TEST_SCAFFOLD_UNSUPPORTED_STACK`.
+
+Generation contract (`/execute`):
+
+- Generate only missing baseline assets for:
+  - unit tests
+  - integration tests
+  - acceptance tests
+- Use stable scaffold paths so reruns are idempotent (no duplicate file churn).
+- Record generated paths and actions in execution evidence.
+- If generation fails, fail closed with `TEST_SCAFFOLD_GENERATION_FAILED`.
+
+Runbook command wiring:
+
+- `TEST_COMMAND` baseline is stack-aware and deterministic.
+- Non-destructive precedence is mandatory:
+  - preserve user-authored non-empty `TEST_COMMAND`,
+  - write baseline command only when `TEST_COMMAND` is missing/unset.
+
+QA auto-run evidence contract (`/qa`):
+
+- Execute generated baseline tests automatically.
+- Record evidence fields:
+  - `generated_test_stack_profile`
+  - `generated_test_command`
+  - `generated_test_result`
+  - `generated_test_output_ref`
+  - `generated_test_paths_ref`
+  - `generated_test_reason_code`
+
+Runtime boundary with US-0065:
+
+- Generated static test PASS is required but never sufficient for QA PASS.
+- Runtime-autopilot verdict remains mandatory; non-starting apps cannot PASS QA.
+
 ## Auto continuation resume contract
 
 `/auto` continuation uses deterministic phase resolution (DEC-0017):
@@ -552,6 +834,86 @@ Boundary behavior:
 - Release finalization must consume strict runtime proof in addition to existing
   isolation evidence checks.
 - Pause/resume provenance must reference latest valid strict-proof boundary.
+
+## Strict `/auto` phase→role enforcement (US-0069 / DEC-0051)
+
+`/auto` must treat phase roles as a **fail-closed admission and checkpoint
+contract** (see `decisions/DEC-0051.md` and `/auto` command text).
+
+### Canonical matrix and scratchpad alternates
+
+- Fixed phase→role defaults are documented in `/auto` (for example `execute` →
+  `dev`, `release` → `release`).
+- Alternate phases resolve **one** expected role via scratchpad:
+  - `AUTO_ROLE_RESEARCH`: `po` \| `tech-lead` (empty → default `tech-lead`)
+  - `AUTO_ROLE_PLAN_VERIFY`: `qa` \| `tech-lead` (empty → default `qa`)
+  - `AUTO_ROLE_REFRESH_CONTEXT`: `curator` \| `po` (empty → default `curator`)
+- Non-empty values outside the allowed set fail closed (no unrelated-role
+  substitution).
+
+### Preflight and checkpoints
+
+- **Preflight (before spawn)**: resolve expected role; verify the required
+  subagent capability exists. Missing capability → `PHASE_ROLE_CAPABILITY_MISSING`
+  with `phase_id`, expected role, observed result, remediation. Do not spawn a
+  substitute role.
+- **Post-completion**: isolation evidence `role` and strict-proof `role` must
+  both match the same preflight-resolved role; else `PHASE_ROLE_MISMATCH`.
+- **`proof_hash`**: SHA-256 over sorted-key JSON of the strict-proof tuple fields
+  (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`,
+  `proof_issued_at`, `proof_ttl_seconds`).
+
+### Execute default deny and rare override
+
+- Default: `execute` requires `dev`.
+- Override allowed only when **both** hold:
+  `AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` and
+  `EXECUTE_OVERRIDE_GOVERNANCE_REF` references a parseable approved exception (for
+  example `DEC-xxxx` or a documented state anchor).
+
+### Continuation parity
+
+- Every `/auto` run recomputes role policy and preflight; `start-from`, fresh
+  `resume_brief`, and `state.md` fallback cannot bypass the gate with stale role
+  intent alone.
+
+## Configurable `/auto` phase plan (US-0070 / DEC-0052)
+
+`/auto` schedules a **resolved ordered phase plan** from merged scratchpad
+before any spawn. See `decisions/DEC-0052.md` and `/auto` command text.
+
+### Selectors (exactly one active mode)
+
+- `AUTO_PHASE_PLAN=full` (default when unset and no other selector is set)
+- `AUTO_PHASE_EXCLUDE=<csv>` — remove listed canonical phase ids from `full`
+- `AUTO_PHASE_INCLUDE=<csv>` — only listed ids, re-sorted into canonical lifecycle order
+- `AUTO_PHASE_PROFILE=<name>` — expand a named profile (unknown → fail closed)
+- `AUTO_PHASE_HIGH_RISK_ACK=<token>` — required when a documented high-risk profile demands acknowledgment
+
+Conflicting selectors → `PHASE_POLICY_CONFLICT` (no plan materialization).
+
+### Materialization and gates
+
+- Expand → apply **non-skippable reinstatement** (`qa`, `verify-work`, `release`,
+  plus evidence-chain closure per `/auto`) → intersect **`start-from` / resume
+  anchor** with the plan → **empty intersection** →
+  `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`.
+- Record `resolved_phase_plan`, `skipped_phases` (+ reasons such as
+  `policy_exclude`, `non_skippable_gate`), and **phase boundary status** entries
+  in continuation breadcrumbs (`docs/engineering/state.md`).
+- **Backlog-drain**, **bulk execute**, and **team scope** paths must **reload**
+  scratchpad phase-selection inputs and **recompute** the plan at each bounded
+  boundary (no silent revival of omitted phases).
+
+### Failure codes (deterministic)
+
+- `PHASE_POLICY_CONFLICT`
+- `PHASE_PLAN_UNKNOWN_PHASE`
+- `PHASE_PLAN_EMPTY_INCLUDE`
+- `PHASE_PLAN_UNKNOWN_PROFILE`
+- `PHASE_PLAN_INVALID_AUTO_PHASE_PLAN`
+- `PHASE_PLAN_HIGH_RISK_ACK_REQUIRED`
+- `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`
 
 ## Optional backlog-drain auto mode (US-0044)
 
@@ -809,7 +1171,7 @@ Use this matrix to validate end-to-end installer/CLI lifecycle behavior:
 
 | Scenario | Primary command path | Coverage location | Required evidence |
 |---|---|---|---|
-| Fresh install (`missing`) | `its-magic --mode missing --create` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Required files exist + `.its-magic-version` exists |
+| Fresh install (`missing`) | `its-magic --mode missing --create` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Required files exist + `its_magic/.its-magic-version` exists |
 | Overwrite + backup | `its-magic --mode overwrite --backup` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh` | Backup snapshot contains overwritten framework file |
 | Upgrade lifecycle | `its-magic --mode upgrade` and direct installer | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local tests | Framework file restored, scratchpad example refreshed, user local scratchpad preserved |
 | Clean-repo safety | `its-magic --clean-repo --yes` and direct installer clean path | `tests/run-tests.ps1`, `tests/run-tests.sh`, CI lifecycle subset | Framework artifacts removed, non-framework marker preserved |
@@ -846,6 +1208,26 @@ Fail-safe contract:
   `STATE_TIMESTAMP_NON_MONOTONIC`.
 - No partial mutation on fail-safe path.
 - Re-run without semantic changes must be ordering-idempotent.
+
+## Cross-phase artifact ownership guard (US-0061 / DEC-0043)
+
+Canonical policy source:
+- `docs/engineering/artifact-ownership-policy.md`
+
+Required ownership discipline:
+- Each phase may mutate only its declared owned scopes for target context.
+- Cross-phase non-owned section rewrite/deletion is forbidden by default.
+- `docs/engineering/architecture.md` is history-preserving: append new story
+  sections or mutate target section only; unrelated story-section deletion is
+  prohibited.
+
+Fail-safe contract:
+- Ownership violations fail closed with `PHASE_OWNERSHIP_VIOLATION`.
+- Missing evidence on override-authorized mutation path fails closed with
+  `PHASE_OVERRIDE_EVIDENCE_MISSING`.
+- Architecture history deletion detection fails with
+  `ARCH_HISTORY_DELETION_DETECTED`.
+- No partial mutation on fail-safe path.
 
 Execution guidance:
 - Local baseline: run `sh tests/run-tests.sh` (or `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1`).

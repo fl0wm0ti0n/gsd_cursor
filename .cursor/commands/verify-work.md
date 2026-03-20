@@ -82,6 +82,18 @@ Fail-closed behavior (no continuation):
 Remediation: rerun affected phase(s) in fresh subagent contexts and write new
 strict-proof tuples linked to checkpoint evidence.
 
+## Generated-test readiness evidence gate (US-0066 / DEC-0048)
+
+Before handing off to `/release`, verify generated-test evidence is present and
+traceable for generated-project scope:
+
+- `sprints/Sxxxx/summary.md` must include generated baseline test scope/evidence refs.
+- `sprints/Sxxxx/qa-findings.md` must include generated-test auto-run evidence
+  (`command`, `result`, `output ref`, `paths ref`, reason code when failing).
+- If generated-test evidence is missing/ambiguous, fail closed with
+  `TEST_SCAFFOLD_GENERATION_FAILED` and require `/execute` or `/qa` rerun with
+  deterministic evidence capture.
+
 ## Steps
 1. Convert acceptance criteria into testable UAT steps. Derive steps directly from the story's acceptance criteria in `docs/product/acceptance.md`. Each AC should map to at least one UAT step.
 2. Populate UAT artifacts: write derived steps into `uat.json` (with description and result per step, accurate pass/fail counts) and `uat.md` (step list with results, summary section). Ensure UAT artifacts are in **populated** state per DEC-0009 — not placeholder.

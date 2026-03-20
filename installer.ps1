@@ -122,12 +122,14 @@ function Classify-File($RelPath) {
     '.cursor/hooks/',
     '.github/workflows/',
     'scripts/validate-and-push',
-    'docs/engineering/context/'
+    'docs/engineering/context/',
+    'its_magic/'
   )
   $frameworkExact = @(
     '.cursor/hooks.json',
     '.cursor/scratchpad.local.example.md',
-    '.its-magic-version'
+    'its_magic/.its-magic-version',
+    'its_magic/README.md'
   )
   foreach ($p in $frameworkPrefixes) {
     if ($normalized.StartsWith($p)) { return 'framework' }
@@ -150,16 +152,219 @@ function Classify-File($RelPath) {
 }
 
 function Read-InstalledVersion($TargetRoot) {
-  $vf = Join-Path $TargetRoot ".its-magic-version"
-  if (Test-Path $vf -PathType Leaf) {
-    return (Get-Content -Path $vf -Raw).Trim()
+  $primary = Join-Path $TargetRoot "its_magic\.its-magic-version"
+  if (Test-Path $primary -PathType Leaf) {
+    return (Get-Content -Path $primary -Raw).Trim()
+  }
+  $legacy = Join-Path $TargetRoot ".its-magic-version"
+  if (Test-Path $legacy -PathType Leaf) {
+    return (Get-Content -Path $legacy -Raw).Trim()
   }
   return "unknown"
 }
 
 function Write-InstalledVersion($TargetRoot, $Ver) {
-  $vf = Join-Path $TargetRoot ".its-magic-version"
-  Set-Content -Path $vf -Value $Ver -NoNewline
+  $primary = Join-Path $TargetRoot "its_magic\.its-magic-version"
+  Ensure-Parent $primary
+  Set-Content -Path $primary -Value $Ver -NoNewline
+
+  $legacy = Join-Path $TargetRoot ".its-magic-version"
+  if (Test-Path $legacy -PathType Leaf) {
+    Remove-Item -Path $legacy -Force -ErrorAction SilentlyContinue
+  }
+}
+
+function Sync-RootReadmeToItsMagic($TargetRoot) {
+  $rootReadme = Join-Path $TargetRoot "README.md"
+  if (-not (Test-Path $rootReadme -PathType Leaf)) { return $false }
+  $itsMagicReadme = Join-Path $TargetRoot "its_magic\README.md"
+  Ensure-Parent $itsMagicReadme
+  Copy-Item -Path $rootReadme -Destination $itsMagicReadme -Force
+  return $true
+}
+
+function Read-RunbookKeyValue($RunbookPath, $Key) {
+  if (-not (Test-Path $RunbookPath -PathType Leaf)) { return "" }
+  $needle = "${Key}:"
+  foreach ($raw in (Get-Content -Path $RunbookPath)) {
+    if ($raw.StartsWith($needle)) {
+      return $raw.Substring($needle.Length).Trim()
+    }
+  }
+  return ""
+}
+
+function Write-RunbookKeyValue($RunbookPath, $Key, $Value) {
+  if (-not (Test-Path $RunbookPath -PathType Leaf)) { return $false }
+  $needle = "${Key}:"
+  $lines = Get-Content -Path $RunbookPath
+  $changed = $false
+  for ($i = 0; $i -lt $lines.Count; $i++) {
+    if ($lines[$i].StartsWith($needle)) {
+      $lines[$i] = "$needle $Value"
+      $changed = $true
+      break
+    }
+  }
+  if ($changed) {
+    Set-Content -Path $RunbookPath -Value $lines
+  }
+  return $changed
+}
+
+function Test-PackageHasScript($TargetRoot, $ScriptName) {
+  $pkgPath = Join-Path $TargetRoot "package.json"
+  if (-not (Test-Path $pkgPath -PathType Leaf)) { return $false }
+  try {
+    $pkg = Get-Content -Path $pkgPath -Raw | ConvertFrom-Json
+    if ($null -eq $pkg.scripts) { return $false }
+    $value = $pkg.scripts.$ScriptName
+    return -not [string]::IsNullOrWhiteSpace([string]$value)
+  } catch {
+    return $false
+  }
+}
+
+function Get-DetectedRunbookDefaults($TargetRoot) {
+  $defaults = @{
+    TEST_COMMAND = ""
+    LINT_COMMAND = ""
+    TYPECHECK_COMMAND = ""
+  }
+
+  $testsPs1 = Join-Path $TargetRoot "tests\run-tests.ps1"
+  $testsSh = Join-Path $TargetRoot "tests\run-tests.sh"
+  $pkgPath = Join-Path $TargetRoot "package.json"
+  $goMod = Join-Path $TargetRoot "go.mod"
+  $pyproject = Join-Path $TargetRoot "pyproject.toml"
+  $requirements = Join-Path $TargetRoot "requirements.txt"
+  $setupPy = Join-Path $TargetRoot "setup.py"
+
+  $hasPkg = Test-Path $pkgPath -PathType Leaf
+  $hasGo = Test-Path $goMod -PathType Leaf
+  $hasPy = (Test-Path $pyproject -PathType Leaf) -or (Test-Path $requirements -PathType Leaf) -or (Test-Path $setupPy -PathType Leaf)
+
+  if ($hasPkg -and (Test-PackageHasScript $TargetRoot "test")) {
+    $defaults.TEST_COMMAND = "npm run test"
+    if (Test-PackageHasScript $TargetRoot "lint") { $defaults.LINT_COMMAND = "npm run lint" }
+    if (Test-PackageHasScript $TargetRoot "typecheck") { $defaults.TYPECHECK_COMMAND = "npm run typecheck" }
+    return $defaults
+  }
+
+  if ($hasGo) {
+    $defaults.TEST_COMMAND = "go test ./..."
+    return $defaults
+  }
+
+  if ($hasPy) {
+    $defaults.TEST_COMMAND = "python -m pytest"
+    return $defaults
+  }
+
+  if (Test-Path $testsPs1 -PathType Leaf) {
+    $defaults.TEST_COMMAND = "powershell -ExecutionPolicy Bypass -File `"tests/run-tests.ps1`""
+    return $defaults
+  }
+
+  if (Test-Path $testsSh -PathType Leaf) {
+    $defaults.TEST_COMMAND = "sh tests/run-tests.sh"
+    return $defaults
+  }
+
+  return $defaults
+}
+
+function Test-BootstrapCommandValid($TargetRoot, $Key, $Command) {
+  if ([string]::IsNullOrWhiteSpace($Command)) { return [PSCustomObject]@{ valid = $false; reason = "${Key}_UNDETECTED" } }
+
+  if ($Command.StartsWith("npm run ")) {
+    $npm = Get-Command "npm" -ErrorAction SilentlyContinue
+    if (-not $npm) { return [PSCustomObject]@{ valid = $false; reason = "NPM_NOT_FOUND" } }
+    $script = $Command.Substring("npm run ".Length).Trim()
+    if (-not (Test-PackageHasScript $TargetRoot $script)) { return [PSCustomObject]@{ valid = $false; reason = "NPM_SCRIPT_MISSING:$script" } }
+    return [PSCustomObject]@{ valid = $true; reason = "OK" }
+  }
+
+  if ($Command -eq "python -m pytest") {
+    $python = Get-Command "python" -ErrorAction SilentlyContinue
+    if (-not $python) { return [PSCustomObject]@{ valid = $false; reason = "PYTHON_NOT_FOUND" } }
+    return [PSCustomObject]@{ valid = $true; reason = "OK" }
+  }
+
+  if ($Command.StartsWith("go test")) {
+    $go = Get-Command "go" -ErrorAction SilentlyContinue
+    if (-not $go) { return [PSCustomObject]@{ valid = $false; reason = "GO_NOT_FOUND" } }
+    if (-not (Test-Path (Join-Path $TargetRoot "go.mod") -PathType Leaf)) {
+      return [PSCustomObject]@{ valid = $false; reason = "GO_MOD_MISSING" }
+    }
+    return [PSCustomObject]@{ valid = $true; reason = "OK" }
+  }
+
+  if ($Command.StartsWith("powershell ")) {
+    if (-not (Test-Path (Join-Path $TargetRoot "tests\run-tests.ps1") -PathType Leaf)) {
+      return [PSCustomObject]@{ valid = $false; reason = "RUN_TESTS_PS1_MISSING" }
+    }
+    return [PSCustomObject]@{ valid = $true; reason = "OK" }
+  }
+
+  if ($Command.StartsWith("sh ")) {
+    $sh = Get-Command "sh" -ErrorAction SilentlyContinue
+    if (-not $sh) { return [PSCustomObject]@{ valid = $false; reason = "SH_NOT_FOUND" } }
+    if (-not (Test-Path (Join-Path $TargetRoot "tests\run-tests.sh") -PathType Leaf)) {
+      return [PSCustomObject]@{ valid = $false; reason = "RUN_TESTS_SH_MISSING" }
+    }
+    return [PSCustomObject]@{ valid = $true; reason = "OK" }
+  }
+
+  $exe = ($Command -split ' ')[0]
+  if (-not (Get-Command $exe -ErrorAction SilentlyContinue)) {
+    return [PSCustomObject]@{ valid = $false; reason = "EXECUTABLE_NOT_FOUND:$exe" }
+  }
+  return [PSCustomObject]@{ valid = $true; reason = "OK" }
+}
+
+function Invoke-RunbookBootstrap($TargetRoot) {
+  $runbookPath = Join-Path $TargetRoot "docs\engineering\runbook.md"
+  if (-not (Test-Path $runbookPath -PathType Leaf)) {
+    return [PSCustomObject]@{ ok = $true; notes = @() }
+  }
+
+  $defaults = Get-DetectedRunbookDefaults $TargetRoot
+  $notes = New-Object System.Collections.Generic.List[string]
+  $applied = New-Object System.Collections.Generic.List[string]
+
+  foreach ($key in @("TEST_COMMAND","LINT_COMMAND","TYPECHECK_COMMAND")) {
+    $current = Read-RunbookKeyValue -RunbookPath $runbookPath -Key $key
+    if (-not [string]::IsNullOrWhiteSpace($current)) { continue }
+
+    $candidate = [string]$defaults[$key]
+    if ([string]::IsNullOrWhiteSpace($candidate)) {
+      if ($key -eq "TEST_COMMAND") {
+        $notes.Add("[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED: could not detect a valid baseline test command. Fix: define TEST_COMMAND in docs/engineering/runbook.md or add detectable stack markers (package.json scripts.test, pyproject.toml, go.mod).")
+      }
+      continue
+    }
+
+    $valid = Test-BootstrapCommandValid -TargetRoot $TargetRoot -Key $key -Command $candidate
+    if ($valid.valid) {
+      if (Write-RunbookKeyValue -RunbookPath $runbookPath -Key $key -Value $candidate) {
+        $applied.Add("$key=$candidate")
+      }
+    } elseif ($key -eq "TEST_COMMAND") {
+      $notes.Add("[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_INVALID:$($valid.reason). Fix: set a valid TEST_COMMAND in docs/engineering/runbook.md.")
+    }
+  }
+
+  if ($applied.Count -gt 0) {
+    $notes.Add("[RUNBOOK_BOOTSTRAP] Applied defaults: $($applied -join ', ')")
+  }
+
+  $finalTest = Read-RunbookKeyValue -RunbookPath $runbookPath -Key "TEST_COMMAND"
+  $ok = -not [string]::IsNullOrWhiteSpace($finalTest)
+  return [PSCustomObject]@{
+    ok = $ok
+    notes = @($notes)
+  }
 }
 
 function Files-ContentEqual($PathA, $PathB) {
@@ -232,13 +437,17 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host "  --backup          Before overwriting, save existing files to backups/<timestamp>/."
   Write-Host "                    Ignored when mode is 'missing' (nothing gets replaced)."
   Write-Host "  --create          Create the target directory if it does not exist."
+  Write-Host "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from"
+  Write-Host "        OS+stack detection; unresolved TEST_COMMAND fails fast with"
+  Write-Host "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics."
   Write-Host ""
   Write-Host "Clean options:"
   Write-Host "  --clean-repo      Remove all its-magic workflow artifacts from the target repo"
   Write-Host "                    (owned paths from installer manifest, including .cursor,"
   Write-Host "                    docs/product, docs/engineering, docs/user-guides, sprints,"
   Write-Host "                    handoffs, decisions, workflow scripts, CI files, and"
-  Write-Host "                    .its-magic-version). Your own source code is never touched."
+  Write-Host "                    installer metadata under its_magic/ (legacy .its-magic-version"
+  Write-Host "                    is also removed when present). Your own source code is never touched."
   Write-Host "  --target <path>   Repo to clean (default: current directory)."
   Write-Host "  --yes             Skip the confirmation prompt."
   Write-Host ""
@@ -417,6 +626,10 @@ if ($mode -eq "upgrade") {
   }
 
   Write-InstalledVersion $targetRoot $appVersion
+  Sync-RootReadmeToItsMagic $targetRoot | Out-Null
+  $runbookBootstrap = Invoke-RunbookBootstrap -TargetRoot $targetRoot
+  foreach ($note in $runbookBootstrap.notes) { Write-Host $note }
+  if (-not $runbookBootstrap.ok) { exit 1 }
 
   Show-ItsMagicBanner
   Write-Host "Upgrade complete: v$oldVersion -> v$appVersion" -ForegroundColor Green
@@ -491,6 +704,10 @@ foreach ($rel in $files) {
 }
 
 Write-InstalledVersion $targetRoot $appVersion
+Sync-RootReadmeToItsMagic $targetRoot | Out-Null
+$runbookBootstrap = Invoke-RunbookBootstrap -TargetRoot $targetRoot
+foreach ($note in $runbookBootstrap.notes) { Write-Host $note }
+if (-not $runbookBootstrap.ok) { exit 1 }
 
 Show-ItsMagicBanner -IncludeInstallMessage
 Write-Host "its-magic v$appVersion"

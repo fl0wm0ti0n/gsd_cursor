@@ -16,6 +16,8 @@ with pause/resume, decision gates, and persistent artifacts.
 - Pause/resume with checkpoints (`handoffs/resume_brief.md`).
 - Automated execute/QA loop with safety caps (optional).
 - 3-layer quality chain: AI loop → local validate-and-push → CI auto-fix.
+- User-visible metadata guard for operator-facing scripts/CLI (`US-0071` / `DEC-0053`):
+  `python scripts/check-user-visible-metadata.py` (see `docs/engineering/runbook.md`).
 - CI/CD templates driven by `docs/engineering/runbook.md`.
 - Team-friendly local overrides (`scratchpad.local.md`).
 - Optional remote/docker execution and autonomous installs.
@@ -80,7 +82,10 @@ What upgrade does:
 - **User data** (docs, sprints, handoffs, decisions, runbook) is never touched.
 - **Mixed files** (`.cursor/scratchpad.md`, `README.md`) are preserved. If the
   template version has new content, a review notice is printed.
-- A `.its-magic-version` file tracks the installed version in your repo.
+- A canonical version marker is stored at `its_magic/.its-magic-version` in your repo.
+- Installer bootstrap is OS-aware + stack-aware for runbook command defaults
+  (`TEST_COMMAND`, optional `LINT_COMMAND`/`TYPECHECK_COMMAND`) and preserves
+  explicit user overrides.
 
 Upgrade with backup (backs up framework files before updating):
 
@@ -128,7 +133,7 @@ its-magic --clean-repo --target .
 
 | Flag | Description |
 |------|-------------|
-| `--clean-repo` | Remove installer-owned its-magic workflow artifacts from the target repo (manifest-owned paths including `.cursor`, `docs/product`, `docs/engineering`, `docs/user-guides`, `sprints`, `handoffs`, `decisions`, workflow scripts, CI files, `.its-magic-version`). Your own source code is never touched. |
+| `--clean-repo` | Remove installer-owned its-magic workflow artifacts from the target repo (manifest-owned paths including `.cursor`, `docs/product`, `docs/engineering`, `docs/user-guides`, `sprints`, `handoffs`, `decisions`, workflow scripts, CI files, installer metadata in `its_magic/`, and legacy `.its-magic-version`). Your own source code is never touched. |
 | `--yes` | Skip the confirmation prompt when cleaning. |
 
 **Info**
@@ -145,7 +150,7 @@ Primary coverage:
 
 | Scenario | Local coverage | CI coverage | Expected evidence |
 |---|---|---|---|
-| Fresh install (`missing`) | `tests/run-tests.ps1`, `tests/run-tests.sh` | npm/brew/choco jobs | Required files + `.its-magic-version` |
+| Fresh install (`missing`) | `tests/run-tests.ps1`, `tests/run-tests.sh` | npm/brew/choco jobs | Required files + `its_magic/.its-magic-version` |
 | Overwrite + backup | `tests/run-tests.ps1`, `tests/run-tests.sh` | lifecycle subset in CI jobs | Backup snapshot contains overwritten framework file |
 | Upgrade lifecycle | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local package tests | lifecycle subset in CI jobs | Framework file restored, user-data preserved |
 | Clean-repo safety | `tests/run-tests.ps1`, `tests/run-tests.sh`, npm local package tests | lifecycle subset in CI jobs | Framework artifacts removed, non-framework marker preserved |
@@ -222,6 +227,37 @@ Intake runtime safety behavior (US-0059):
   writers; true conflicting external writes fail safe with
   `INTAKE_CONCURRENT_WRITER_DETECTED`.
 
+Runtime QA autopilot behavior (US-0065):
+- Generated-project QA must include runtime proof chain:
+  `startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`.
+- Deterministic runtime fail codes:
+  `RUNTIME_STARTUP_FAILED`, `RUNTIME_ENDPOINT_UNREACHABLE`,
+  `RUNTIME_LOG_CRITICAL_DETECTED`, `RUNTIME_RETRY_BUDGET_EXHAUSTED`,
+  `RUNTIME_STACK_PROFILE_UNRESOLVED`.
+- Runtime evidence must include startup command/profile, runtime mode
+  (`local|remote`), health result, retry ledger, and log severity summary.
+- Stack-aware runtime profile resolution is required for Node/Python/Go/Java/.NET;
+  unresolved stacks fail closed (no generic silent PASS fallback).
+- For webapp contexts, QA includes browser-surface verification with
+  console/network error signals.
+
+Generated test scaffolding + auto-run behavior (US-0066):
+- `/execute` resolves stack profile (`node|python|go|java|dotnet`) and generates
+  missing baseline unit/integration/acceptance tests only.
+- Generation is non-destructive by default: preserve user-authored tests/config,
+  fill only missing baseline assets, keep reruns idempotent.
+- `TEST_COMMAND` wiring is deterministic:
+  - preserve existing non-empty user command,
+  - set stack baseline only when command is missing/unset.
+- `/qa` automatically runs the generated baseline tests and records deterministic
+  evidence (`command`, `result`, `output ref`, `generated paths ref`).
+- Fail-closed scaffold diagnostics:
+  `TEST_SCAFFOLD_STACK_UNRESOLVED`,
+  `TEST_SCAFFOLD_UNSUPPORTED_STACK`,
+  `TEST_SCAFFOLD_GENERATION_FAILED`.
+- Static baseline test pass does not bypass runtime autopilot; runtime verdict
+  remains mandatory for QA PASS.
+
 ## Workflow
 
 ### Core commands
@@ -274,6 +310,34 @@ broad/high-risk requests:
   (`docs/product/backlog.md`, `docs/product/acceptance.md`,
   `handoffs/po_to_tl.md`)
 
+### Mandatory intake question packs (US-0068)
+
+`/intake` now enforces deterministic minimum questionnaire packs before
+backlog/acceptance persistence:
+
+- `first-intake-pack` for first/new/broad requests
+- `small-intake-pack` for narrow follow-up requests
+
+Fail-closed coverage behavior:
+
+- required topic answers must be covered for the selected pack before write
+- unknown/ambiguous stack cues fail closed to `first-intake-pack`
+- persistence blocks with deterministic reason codes when required coverage is
+  incomplete and assumptions are not explicitly confirmed
+
+Deterministic reason codes:
+
+- `INTAKE_REQUIRED_TOPIC_MISSING`
+- `INTAKE_REQUIRED_PACK_INCOMPLETE`
+- `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`
+- `INTAKE_PERSISTENCE_BLOCKED`
+
+Intake artifacts must persist coverage evidence fields:
+
+- `asked_topics`
+- `missing_topics`
+- `assumptions_confirmed`
+
 ### Optional ID namespace bootstrap (US-0052)
 
 Fresh-project ID bootstrap behavior is explicit and default-off:
@@ -318,6 +382,27 @@ Compaction behavior:
   `docs/engineering/state-archive/`.
 - `docs/engineering/decisions.md` stays a compact index with bounded summaries
   and canonical links to `decisions/DEC-xxxx.md`.
+- Enforced rollover thresholds:
+  - `STATE_HOT_MAX_LINES` (default `1200`)
+  - `STATE_HOT_MAX_CHECKPOINTS` (default `80`)
+  `/refresh-context` must archive oldest checkpoints into deterministic
+  `state-pack-*` files when thresholds are exceeded, keeping only bounded recent
+  checkpoints in hot surface.
+  Archive verification mismatch fails with
+  `STATE_ARCHIVE_VERIFICATION_FAILED`.
+
+### Cross-phase artifact ownership guard (US-0061)
+
+To prevent accidental history loss across workflow phases:
+
+- canonical ownership policy: `docs/engineering/artifact-ownership-policy.md`
+- non-authorized phases must not delete or rewrite other-phase owned sections
+- `docs/engineering/architecture.md` is history-preserving (append or
+  target-section-only mutation)
+- deterministic fail-safe diagnostics:
+  `PHASE_OWNERSHIP_VIOLATION`,
+  `PHASE_OVERRIDE_EVIDENCE_MISSING`,
+  `ARCH_HISTORY_DELETION_DETECTED`
 
 `/ask` policy (read-only):
 
@@ -339,6 +424,11 @@ Supported target types include:
 - `npm`, `choco`, `brew`, `git`, `docker`, `cloud`
 - `custom` (generic command target)
 - `ssh` (generic server deployment over SSH)
+- Connectivity metadata for remote/local operator context:
+  - `runtime.mode` (`local|remote`)
+  - endpoint fields (`domainEnv|ipEnv|hostEnv`, `port`, `protocol`)
+  - optional Traefik/ingress metadata
+  - optional `dockerOverSsh` contract for remote Docker execution over SSH
 
 Safety defaults:
 
@@ -346,6 +436,10 @@ Safety defaults:
 - `confirm` mode enforces explicit operator approval before publish execution.
 - Sensitive values are env-referenced (for example `tokenEnv`, `authEnv`), not
   inline literals.
+- Remote connectivity config errors fail fast with
+  `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
+- Release/QA outputs use canonical operator connectivity doc:
+  `docs/engineering/runtime-connectivity.md`.
 
 ### Deterministic status reconciliation command (US-0055)
 
@@ -526,6 +620,32 @@ Fail-closed reason codes:
 
 `/auto`, `/verify-work`, and `/release` must validate these tuples before
 continuation/finalization.
+
+#### `/auto` phase→role enforcement (US-0069 / DEC-0051)
+
+`/auto` uses a deterministic **phase→role matrix** plus scratchpad alternates
+(`AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, `AUTO_ROLE_REFRESH_CONTEXT`).
+Before each phase spawn it runs a **preflight capability gate**; missing
+capability stops with `PHASE_ROLE_CAPABILITY_MISSING` (no unrelated-role
+substitution). After each phase, isolation `role` and strict-proof `role` must
+match the same expected role or the run stops with `PHASE_ROLE_MISMATCH`.
+`execute` defaults to `dev`; non-`dev` requires
+`AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` **and**
+`EXECUTE_OVERRIDE_GOVERNANCE_REF` pointing to a parseable approved waiver. See
+`docs/engineering/runbook.md` and `decisions/DEC-0051.md`.
+
+#### `/auto` phase selection policy (US-0070 / DEC-0052)
+
+`/auto` builds a **resolved phase plan** from scratchpad before spawning phases:
+exactly one of `AUTO_PHASE_PLAN` (default `full`), `AUTO_PHASE_EXCLUDE`,
+`AUTO_PHASE_INCLUDE`, or `AUTO_PHASE_PROFILE` applies; conflicting selectors
+stop with `PHASE_POLICY_CONFLICT`. Non-skippable safety gates (`qa`,
+`verify-work`, `release`) and evidence-chain closure reinstate omitted phases
+with breadcrumb reasons such as `non_skippable_gate`. `start-from` and resume
+anchors **intersect** with the plan (`START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`
+when empty). Backlog-drain, bulk execute, and team-mode runs **recompute** the
+plan each boundary. See `/auto`, `docs/engineering/runbook.md`, and
+`decisions/DEC-0052.md`.
 
 ### Lightweight interaction
 

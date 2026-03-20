@@ -8,7 +8,8 @@ anchors are missing or ambiguous.
 
 | Artifact | Policy | Deterministic rule |
 |---|---|---|
-| `docs/engineering/state.md` | `append-bottom` | Add new checkpoints only at end of file, in chronological order. |
+| `docs/engineering/state.md` | `append-bottom` | Add new checkpoints only at end of file, in chronological order; enforce hot-surface rollover when configured thresholds are exceeded. |
+| `docs/engineering/architecture.md` | `append-bottom` | Add new `US-xxxx` architecture sections at end of file; non-target section rewrites/deletions are forbidden. |
 | `docs/product/backlog.md` | `sorted-canonical` | Keep stories sorted by numeric `US-xxxx` ID; mutate only target story block. |
 | `docs/product/acceptance.md` | `sorted-canonical` | Keep `US-xxxx` rows ordered by numeric ID aligned to backlog order. |
 | `handoffs/release_queue.md` | `append-bottom` | Append only one row per new sprint in release order. |
@@ -22,6 +23,8 @@ anchors are missing or ambiguous.
 - No broad rewrites of unrelated story/sprint entries.
 - For `docs/engineering/state.md`, each newly appended checkpoint timestamp must
   be monotonic (`new_timestamp >= last_checkpoint_timestamp`) in UTC.
+- For rollover reruns, archive partition boundaries and pack naming must be
+  deterministic (no duplicate or oscillating pack generation).
 
 ## Fail-safe behavior
 
@@ -34,4 +37,12 @@ If a new `state.md` checkpoint timestamp is older than the current last
 checkpoint timestamp:
 - stop with reason code `STATE_TIMESTAMP_NON_MONOTONIC`,
 - emit remediation guidance with the expected minimum timestamp,
+- perform no partial mutation.
+
+If configured state hot-surface rollover cannot determine a safe archive
+boundary or cannot persist archive pack writes:
+- stop with reason code `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS` or
+  `STATE_ARCHIVE_WRITE_FAILED` (or verification mismatch
+  `STATE_ARCHIVE_VERIFICATION_FAILED`),
+- emit remediation guidance with threshold/boundary details and target path,
 - perform no partial mutation.

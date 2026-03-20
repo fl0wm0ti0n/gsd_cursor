@@ -79,3 +79,15 @@ description: "its-magic architecture: define approach, risks, and decisions."
    - If `USER_GUIDE_MODE=1`, reference canonical user-guide path and schema in
      architecture/state for in-scope feature stories; see runbook user-guide section.
 
+## Cross-phase ownership guard (US-0061 / DEC-0043)
+
+- Architecture mutations must comply with
+  `docs/engineering/artifact-ownership-policy.md`.
+- `docs/engineering/architecture.md` is history-preserving:
+  - append new `US-xxxx` section for the current story,
+  - update only current target section when needed,
+  - never delete unrelated historical story sections.
+- If non-target section deletion/rewrite is detected, fail closed with
+  `ARCH_HISTORY_DELETION_DETECTED` (or `PHASE_OWNERSHIP_VIOLATION`) and no
+  partial write.
+

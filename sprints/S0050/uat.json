@@ -1,0 +1,90 @@
+{
+  "sprint_id": "S0050",
+  "story_ids": [
+    "US-0071"
+  ],
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Forbidden internal-planning token patterns (US/DEC/R + four digits) are defined for user-visible software surfaces in policy + checker.",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0050/qa-findings.md` (AC-1); `scripts/check-user-visible-metadata.py`, runbook, `DEC-0053`."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Internal-only allowlist (docs, .cursor, sprint/handoff/decisions, code comments) excludes false blocks on permitted surfaces.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; runbook + architecture alignment."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "`/execute` default guard prevents introducing forbidden tokens into user-visible outputs for in-scope changes.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; active + template `execute.md`, `quality.mdc`."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "`/qa` runs automated verification and fails closed with deterministic reason codes on leakage.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; `/qa` command + **26e** rows in `tests/report.md`."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Findings/remediation guidance includes evidence refs, token class, and safe replacement guidance.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; runbook remediation contract."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Deterministic reason-code vocabulary documented on policy surfaces.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6 (`USER_VISIBLE_INTERNAL_METADATA_DETECTED`, `METADATA_SANITIZATION_POLICY_MISSING`, `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`)."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Valid internal references in docs/comments are not falsely blocked.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7; **26e** allowlist + non-scanned tree cases."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Active/template parity for command guidance, rules, runbook, and README.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; parity asserted in QA evidence."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Regression coverage: clean scan, leak detection, allowlist behavior, idempotent rerun.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; `tests/report.md` **26e** rows green."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Release/readiness path includes auditable evidence that metadata sanitization checks ran and passed.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; `/release` check-in gate + consolidated runner contract."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0050/qa-findings.md",
+    "sprints/S0050/summary.md",
+    "sprints/S0050/tasks.md",
+    "tests/report.md",
+    "handoffs/dev_to_qa.md"
+  ]
+}

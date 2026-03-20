@@ -1,0 +1,79 @@
+{
+  "sprint_id": "S0044",
+  "story_ids": [
+    "US-0065"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "result": "pass",
+      "notes": "Runtime QA stage chain contract is present and mandatory: startup -> readiness/connectivity -> log scan -> bounded retry -> verdict."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "result": "pass",
+      "notes": "Deterministic startup and unreachable endpoint failure reason codes are documented for QA execution."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "result": "pass",
+      "notes": "Bounded transient-only retry behavior and per-attempt runtime evidence ledger requirements are present."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "result": "pass",
+      "notes": "Canonical runtime QA evidence schema fields are defined for startup, context, health, log summary, retries, and final verdict."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "result": "pass",
+      "notes": "Stack-aware runtime profile expectations are defined for Node, Python, Go, Java, and .NET with deterministic unresolved fallback."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "result": "pass",
+      "notes": "Webapp runtime verification path includes browser-surface validation and console/network signal checks when applicable."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "result": "pass",
+      "notes": "Optional debug escalation path is bounded and includes cleanup semantics."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "result": "pass",
+      "notes": "Remote-runtime compatibility is preserved with sanitized endpoint and auth-reference reporting constraints."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "result": "pass",
+      "notes": "Active/template parity is maintained across execute, qa, quality rule, runbook, and README surfaces."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "result": "pass",
+      "notes": "Regression assertions cover runtime-autopilot pass and failure paths for US-0065."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0044/qa-findings.md",
+    "sprints/S0044/tasks.md",
+    "sprints/S0044/progress.md",
+    "sprints/S0044/summary.md"
+  ]
+}

@@ -2,53 +2,40 @@
 
 ## Current status
 
-- Post S0038 release: `US-0059` (`S0038`) is finalized (PASS, released).
-- Release gates passed; backlog/acceptance reconciled for `US-0059`.
-- Current OPEN backlog stories:
-  - (none in active intake queue)
-- Latest intake accepted:
-  - `/intake` for `US-0059` (completed),
-  - `/intake` for `US-0058` (completed),
-  - `/intake` for `US-0057` (completed),
-  - `/intake` for `US-0056` (completed).
-- Decision status update:
-  - `DEC-0041` accepted and implemented in S0038 release.
+- Queue posture:
+  - `US-0071` (**DONE**, released as **`S0050`**) — user-visible internal metadata sanitization guard (`DEC-0053`).
+  - `US-0072` (**OPEN**, P1) — deterministic context slimming + archive enforcement across core artifacts.
+- Canonical story status (`docs/product/backlog.md`): next prioritized OPEN is **`US-0072`**.
+- Governance in force for upcoming work: **`DEC-0051`** (phase→role), **`DEC-0052`** (phase plan), artifact ownership (`DEC-0043`) as applicable.
 
 ## Next actions
 
-1. Next run: continue with a new **`/intake`** story request.
-2. Recommended next phase: **`/intake`**.
-3. Then continue lifecycle: discovery -> research -> architecture -> sprint-plan -> plan-verify -> execute -> qa -> verify-work -> release.
+1. Continue lifecycle for **`US-0072`** from **`/discovery`**.
+2. Preserve strict per-phase isolation + strict runtime-proof tuples through remaining OPEN stories.
 
 ## Intended resume phase
 
-`intake`
+`discovery`
 
-## Isolation provenance (US-0048 / DEC-0029)
+## Resume target
 
-- isolation_provenance_ref=docs/engineering/state.md (refresh-context checkpoint post S0038 / no-open-intake)
+- story_id=`US-0072`
+- sprint_id=`(pending)`
+- boundary=`post-refresh-context` (`S0050` / `US-0071` released; hot-surface rollover archived 12 checkpoints to `docs/engineering/state-archive/state-pack-20260322.md`)
+
+## Isolation provenance (US-0048/US-0056)
+
+- isolation_provenance_ref=docs/engineering/state.md (latest `## Refresh-context checkpoint (2026-03-22) — post S0050 / US-0071`)
 - resume_requires_fresh_context=1
 
-## Auto continuation breadcrumb contract (US-0037)
-
-When `/auto` continuation stops before completion, include:
-- `requested_start_from`
-- `resolved_start_phase`
-- `resolution_source` (`argument|resume_brief|state_fallback`)
-- `resolution_status` (`resolved|fail-fast`)
-- `stop_reason`
-- `stop_phase`
-- `timestamp`
-
-Fail-fast resolver errors must use:
-`[AUTO_RESUME_ERROR] <code>: <summary>. Source=<source>. Fix: <action>.`
-
-## Latest auto breadcrumb
+## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
 - resolved_start_phase=discovery
-- resolution_source=resume_brief
+- resolution_source=refresh_context_post_release
 - resolution_status=resolved
 - stop_reason=completed
 - stop_phase=refresh-context
-- timestamp=2026-03-14T21:25:00Z
+- story_id=US-0072
+- orchestrator_run_id=auto-20260321-02
+- timestamp=2026-03-22T00:30:00Z

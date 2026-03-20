@@ -123,4 +123,74 @@ Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and n
    - If `USER_GUIDE_MODE=0`, add no required user-guide steps or blocking checks (zero overhead).
    - If `USER_GUIDE_MODE=1`, create or update user guide at
      `docs/user-guides/US-xxxx.md` for target story; see runbook for minimum schema.
+17. Optional remote runtime execution context (US-0064):
+   - If release target runtime metadata indicates `runtime.mode=remote`, record
+     remote execution/debug context in handoff outputs and state evidence
+     references.
+   - If remote execution is required but connectivity metadata is incomplete,
+     fail fast with `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
+   - Never expose secrets in execution outputs; only sanitized endpoint data and
+     env-reference names are allowed.
+18. Runtime QA autopilot execution contract (US-0065 / DEC-0047):
+   - Treat runtime verification as mandatory for generated-project scope; static
+     checks alone are not sufficient evidence for PASS readiness.
+   - Follow canonical stage order:
+     `startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`.
+   - Record runtime execution evidence in execute outputs:
+     - startup command and selected stack profile,
+     - runtime mode (`local|remote`) and endpoint/health snapshot,
+     - retry ledger (`attempt`, `delay_ms`, `outcome`),
+     - log severity summary (`info|warn|error|fatal` counts),
+     - final runtime verdict with deterministic reason code.
+   - Supported stack profiles (minimum): `node`, `python`, `go`, `java`, `dotnet`.
+   - If stack profile cannot be resolved deterministically, fail closed with
+     `RUNTIME_STACK_PROFILE_UNRESOLVED` and remediation guidance.
+   - Bounded retry policy:
+     - retries are allowed only for transient startup/connectivity failures,
+     - retry attempts must not exceed configured max,
+     - critical log signals are non-transient and fail closed immediately.
+   - Runtime failure reason-code baseline:
+     - `RUNTIME_STARTUP_FAILED`
+     - `RUNTIME_ENDPOINT_UNREACHABLE`
+     - `RUNTIME_LOG_CRITICAL_DETECTED`
+     - `RUNTIME_RETRY_BUDGET_EXHAUSTED`
+     - `RUNTIME_STACK_PROFILE_UNRESOLVED`
+   - When HTTP/UI context is detected, include webapp runtime evidence path for
+     QA handoff (browser-surface checks plus console/network error signals).
+19. Generated baseline test scaffolding contract (US-0066 / DEC-0048):
+   - Resolve deterministic stack/project profile before scaffold generation:
+     `node|python|go|java|dotnet` (minimum supported set).
+   - Generate baseline tests only when missing; create minimal runnable assets for
+     unit, integration, and acceptance layers using stable paths.
+   - Record generated-test evidence in execute outputs:
+     - resolved stack profile,
+     - generated paths inventory (`unit|integration|acceptance`),
+     - scaffold command/actions and outcome.
+   - Deterministic runbook baseline wiring:
+     - if `TEST_COMMAND` is missing/unset, write stack baseline command,
+     - if `TEST_COMMAND` is user-authored and non-empty, preserve it.
+   - Fail-closed diagnostics for generation/profile failures:
+     - `TEST_SCAFFOLD_STACK_UNRESOLVED`
+     - `TEST_SCAFFOLD_UNSUPPORTED_STACK`
+     - `TEST_SCAFFOLD_GENERATION_FAILED`
+   - Non-destructive precedence is mandatory:
+     - preserve existing user-authored test files and config by default,
+     - fill only missing baseline scaffold assets.
+   - Rerun behavior must be idempotent:
+     - no duplicate scaffold files on repeated `/execute`,
+     - no oscillating `TEST_COMMAND` rewrites between runs.
+   - Runtime boundary:
+     - static generated-test PASS is necessary but not sufficient for QA PASS;
+       runtime startup/connectivity/log verdict remains governed by `US-0065`.
+20. User-visible internal metadata guard (US-0071 / DEC-0053):
+   - Before completing `/execute`, run `python scripts/check-user-visible-metadata.py`
+     from the repository root (or `python scripts/check-user-visible-metadata.py --repo <root>`).
+   - On failure, stop with `USER_VISIBLE_INTERNAL_METADATA_DETECTED` and use the
+     remediation contract in `docs/engineering/runbook.md` (evidence ref, token
+     class, neutral operator copy). Do not ship planning tokens in scanned
+     operator-visible strings.
+   - If you add a new operator-facing script or binary path, update inclusive
+     scan roots in `scripts/check-user-visible-metadata.py` **and** this runbook
+     section together or fail closed with `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`
+     semantics at QA/release.
 

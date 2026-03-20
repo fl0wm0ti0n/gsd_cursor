@@ -48,6 +48,41 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
   - external conflicting mutation during active run must fail safe with
     `INTAKE_CONCURRENT_WRITER_DETECTED` and no partial overwrite.
 
+## Mandatory intake question packs and fail-closed persistence gate (US-0068 / DEC-0050)
+
+- Intake must apply one deterministic questionnaire pack before any backlog or
+  acceptance persistence:
+  - `first-intake-pack` for first/new/broad requests,
+  - `small-intake-pack` for narrow follow-up requests.
+- Pack selection must be deterministic and auditable:
+  - evaluate request breadth (`new capability` vs `bounded refinement`),
+  - use known stack/runtime cues when present,
+  - unresolved/unknown stack cues must fail closed to `first-intake-pack`
+    (never bypass to a smaller pack by default).
+- Required topic coverage must be complete before persistence unless bounded
+  assumptions are explicitly confirmed:
+  - `first-intake-pack` required topics:
+    `users_problem`, `runtime_target_environment`, `language_framework_runtime`,
+    `architecture_preference`, `ui_design_expectations`,
+    `security_compliance`, `non_functional_priorities`, `scope_timeline`.
+  - `small-intake-pack` required topics:
+    `outcome_success_criteria`, `impacted_components`,
+    `constraints_compatibility_risks`, `required_tests_acceptance_checks`,
+    `done_definition`.
+- Fail-closed deterministic reason codes:
+  - `INTAKE_REQUIRED_TOPIC_MISSING`
+  - `INTAKE_REQUIRED_PACK_INCOMPLETE`
+  - `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`
+  - `INTAKE_PERSISTENCE_BLOCKED`
+- Remediation guidance surface (mandatory on block):
+  - list `missing_topics`,
+  - request targeted answers for missing required topics,
+  - if assumptions are used, require explicit confirmation before write.
+- Persistence evidence contract (must be written in intake outputs):
+  - `asked_topics`
+  - `missing_topics`
+  - `assumptions_confirmed`
+
 ## Steps
 1. Determine intake mode from `.cursor/scratchpad.md`:
    - guided mode: `INTAKE_GUIDED_MODE=1` (default)
@@ -94,7 +129,18 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
      explicitly requests depth.
    - Keep single-story default (no forced decomposition), unless the user
      explicitly requests decomposition.
-5. Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034):
+5. Enforce mandatory question-pack coverage before persistence (US-0068):
+   - deterministically select one pack (`first-intake-pack` or
+     `small-intake-pack`) and record `selected_pack`.
+   - ask required questions for the selected pack; adaptive follow-ups remain
+     allowed but bounded.
+   - before writing backlog/acceptance artifacts, compute required coverage:
+     - if complete, proceed to persistence;
+     - if incomplete and no explicit assumption confirmation, fail closed with
+       deterministic reason code and remediation guidance.
+   - persist intake evidence fields (`asked_topics`, `missing_topics`,
+     `assumptions_confirmed`) in relevant intake artifacts.
+6. Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034):
    - Read `ID_NAMESPACE_BOOTSTRAP` from `.cursor/scratchpad.md` (`0|1`,
      default `0`).
    - Freshness eligibility is deterministic and auditable:
@@ -109,31 +155,31 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
    - Never rewrite or renumber historical IDs.
    - If bootstrap was requested but checks fail, emit deterministic diagnostic:
      `ID_BOOTSTRAP_NOT_FRESH` with brief remediation guidance.
-6. Traceability persistence contract (US-0051):
+7. Traceability persistence contract (US-0051):
    - `docs/product/backlog.md`: include decomposition evidence (single-story vs
      split decision, rationale, and boundaries).
    - `docs/product/acceptance.md`: maintain acceptance traceability for resulting
      story set (or single-story decision) with clear scope boundaries.
    - `handoffs/po_to_tl.md`: include split decision summary and adaptive
      questioning evidence (risk/unknown triggers and key assumptions).
-7. Persist the story and acceptance in product docs.
-8. Write a PO -> TL handoff with scope and risks.
-9. Optional cross-repo observability declaration (US-0034):
+8. Persist the story and acceptance in product docs.
+9. Write a PO -> TL handoff with scope and risks.
+10. Optional cross-repo observability declaration (US-0034):
    - If `CROSS_REPO_OBSERVABILITY=0`, add zero required overhead.
    - If `CROSS_REPO_OBSERVABILITY=1`, capture monitored source list from
      `COMPATIBILITY_SOURCES` (`repo/module/contract/docs`) and include
      compatibility observability intent in handoff context.
-10. Optional component scope declaration (US-0035):
+11. Optional component scope declaration (US-0035):
    - If `COMPONENT_SCOPE_MODE=0`, add zero required scope overhead.
    - If `COMPONENT_SCOPE_MODE=1`, declare in-scope and out-of-scope components
      in `docs/engineering/component-scope.md` and include references in
      `handoffs/po_to_tl.md`.
-11. Optional spec-pack (US-0031):
+12. Optional spec-pack (US-0031):
    - If `SPEC_PACK_MODE=0`, add no required spec-pack steps (zero overhead).
    - If `SPEC_PACK_MODE=1`, ensure CRS artifact for the new story is created or
      updated at canonical path per runbook spec-pack contract; link story ID in
      handoff.
-12. Optional user-guide (US-0032):
+13. Optional user-guide (US-0032):
    - If `USER_GUIDE_MODE=0`, add no required user-guide steps or blocking checks (zero overhead).
    - If `USER_GUIDE_MODE=1`, ensure handoff references canonical user-guide path
      `docs/user-guides/US-xxxx.md` for the new story when applicable; see runbook.
@@ -152,4 +198,16 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
 - If intake appends a `docs/engineering/state.md` checkpoint, enforce UTC
   monotonic timestamp guard (`new >= last`); on violation fail with
   `STATE_TIMESTAMP_NON_MONOTONIC` and avoid partial writes.
+
+## Cross-phase ownership guard (US-0061 / DEC-0043)
+
+- Intake mutations must also comply with
+  `docs/engineering/artifact-ownership-policy.md`.
+- Intake may mutate only intake-owned scopes (`vision`, `backlog`, `acceptance`,
+  `po_to_tl`) for target story context.
+- Any attempted delete/rewrite of non-intake-owned sections fails closed with
+  `PHASE_OWNERSHIP_VIOLATION`.
+- If an override-authorized path is configured for an artifact but required
+  override evidence fields are missing, fail with
+  `PHASE_OVERRIDE_EVIDENCE_MISSING`.
 
