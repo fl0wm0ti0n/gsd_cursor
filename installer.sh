@@ -46,7 +46,10 @@ show_help() {
   printf "  --create          Create the target directory if it does not exist.\n\n"
   printf "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from\n"
   printf "        OS+stack detection; unresolved TEST_COMMAND fails fast with\n"
-  printf "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.\n\n"
+  printf "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.\n"
+  printf "  Note: scratchpad Model B: .cursor/scratchpad.md is\n"
+  printf "        materialized when missing; Python 3 on PATH is required for validation.\n"
+  printf "        Recovery: python installer.py --scratchpad-postinstall --target <repo> --mode missing\n\n"
   printf "Clean options:\n"
   printf "  --clean-repo      Remove all its-magic workflow artifacts from the target repo\n"
   printf "                    (owned paths from installer manifest, including .cursor,\n"
@@ -130,10 +133,28 @@ choose_mode() {
   esac
 }
 
+scratchpad_postinstall() {
+  target_root="$1"
+  mode="$2"
+  installer_py="$SCRIPT_DIR/installer.py"
+  if [ ! -f "$installer_py" ]; then
+    printf "%s\n" "[SCRATCHPAD_POSTINSTALL_ERROR] installer.py missing next to installer.sh."
+    exit 1
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$installer_py" --scratchpad-postinstall --target "$target_root" --mode "$mode" || exit $?
+  elif command -v python >/dev/null 2>&1; then
+    python "$installer_py" --scratchpad-postinstall --target "$target_root" --mode "$mode" || exit $?
+  else
+    printf "%s\n" "[SCRATCHPAD_POSTINSTALL_ERROR] PYTHON_NOT_FOUND: Python 3 is required for scratchpad materialization/validation (Model B)."
+    exit 1
+  fi
+}
+
 classify_file() {
   rel="$1"
   case "$rel" in
-    .cursor/scratchpad.md|README.md) echo "mixed" ;;
+    README.md) echo "mixed" ;;
     .cursor/commands/*|.cursor/rules/*|.cursor/agents/*|.cursor/skills/*) echo "framework" ;;
     .cursor/hooks/*|.cursor/hooks.json|.cursor/scratchpad.local.example.md) echo "framework" ;;
     .github/workflows/*|scripts/validate-and-push*|docs/engineering/context/*|its_magic/*) echo "framework" ;;
@@ -513,6 +534,8 @@ if [ "$MODE" = "upgrade" ]; then
     fi
   done
 
+  scratchpad_postinstall "$TARGET_ROOT" "upgrade"
+
   write_installed_version "$TARGET_ROOT" "$APP_VERSION"
   sync_root_readme_to_its_magic "$TARGET_ROOT" || true
   bootstrap_runbook_commands "$TARGET_ROOT"
@@ -580,6 +603,8 @@ for rel in $FILES; do
     fi
   fi
 done
+
+scratchpad_postinstall "$TARGET_ROOT" "$MODE"
 
 write_installed_version "$TARGET_ROOT" "$APP_VERSION"
 sync_root_readme_to_its_magic "$TARGET_ROOT" || true

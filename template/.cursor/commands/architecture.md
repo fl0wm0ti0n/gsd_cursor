@@ -78,6 +78,14 @@ description: "its-magic architecture: define approach, risks, and decisions."
    - If `USER_GUIDE_MODE=0`, add no required user-guide steps or blocking checks (zero overhead).
    - If `USER_GUIDE_MODE=1`, reference canonical user-guide path and schema in
      architecture/state for in-scope feature stories; see runbook user-guide section.
+9. Triad hot-surface gate (DEC-0054) when `docs/engineering/architecture.md` is
+   mutated:
+   - run `python scripts/enforce-triad-hot-surface.py --rollover` then `--check`
+     from repository root,
+   - on failure stop with `STATE_ARCHIVE_REQUIRED` or
+     `ARTIFACT_HOT_SURFACE_OVERSIZE`,
+   - preserve non-target history in archive packs only (never delete unrelated
+     story sections without archival evidence).
 
 ## Cross-phase ownership guard (US-0061 / DEC-0043)
 

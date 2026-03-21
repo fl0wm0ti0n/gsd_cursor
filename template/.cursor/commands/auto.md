@@ -270,12 +270,16 @@ continuation breadcrumbs) including:
 - `next_scheduled_phase` (or `none` when complete/stopped)
 
 ## Inputs
-- `AUTO_FLOW_MODE` and `PHASE_MODE` from `.cursor/scratchpad.md`
-- `AUTO_IMPLEMENTATION_LOOP`, `AUTO_LOOP_MAX_CYCLES` from `.cursor/scratchpad.md`
-- `AUTO_PAUSE_REQUEST`, `AUTO_PAUSE_POLICY` from `.cursor/scratchpad.md`
-- `SECURITY_REVIEW`, `COMPLIANCE_PROFILES` from `.cursor/scratchpad.md`
+- Merged scratchpad policy (`US-0073` / `DEC-0055`): resolve flags from **local >
+  materialized `.cursor/scratchpad.md` > `.cursor/scratchpad.local.example.md`**
+  (installers materialize baseline when missing; missing required keys after merge
+  must fail closed with `[SCRATCHPAD_MERGE_ERROR]` diagnostics, not silent defaults).
+- `AUTO_FLOW_MODE` and `PHASE_MODE` from merged scratchpad
+- `AUTO_IMPLEMENTATION_LOOP`, `AUTO_LOOP_MAX_CYCLES` from merged scratchpad
+- `AUTO_PAUSE_REQUEST`, `AUTO_PAUSE_POLICY` from merged scratchpad
+- `SECURITY_REVIEW`, `COMPLIANCE_PROFILES` from merged scratchpad
 - `AUTO_EXECUTE_BULK`, `AUTO_EXECUTE_MAX_ITEMS`, `AUTO_EXECUTE_ON_BLOCK`,
-  `AUTO_EXECUTE_SELECTION`, `AUTO_TEAM_SCOPE_ENFORCE` from `.cursor/scratchpad.md`
+  `AUTO_EXECUTE_SELECTION`, `AUTO_TEAM_SCOPE_ENFORCE` from merged scratchpad
 - `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, `AUTO_ROLE_REFRESH_CONTEXT`,
   `AUTO_EXECUTE_ROLE_OVERRIDE`, `EXECUTE_OVERRIDE_GOVERNANCE_REF` from merged
   scratchpad (US-0069 / DEC-0051)

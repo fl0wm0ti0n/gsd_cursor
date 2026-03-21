@@ -111,7 +111,7 @@ function Choose-Mode {
 function Classify-File($RelPath) {
   $normalized = $RelPath -replace '\\','/'
 
-  $mixedFiles = @('.cursor/scratchpad.md', 'README.md')
+  $mixedFiles = @('README.md')
   if ($mixedFiles -contains $normalized) { return 'mixed' }
 
   $frameworkPrefixes = @(
@@ -232,7 +232,6 @@ function Get-DetectedRunbookDefaults($TargetRoot) {
     TYPECHECK_COMMAND = ""
   }
 
-  $testsPs1 = Join-Path $TargetRoot "tests\run-tests.ps1"
   $testsSh = Join-Path $TargetRoot "tests\run-tests.sh"
   $pkgPath = Join-Path $TargetRoot "package.json"
   $goMod = Join-Path $TargetRoot "go.mod"
@@ -258,11 +257,6 @@ function Get-DetectedRunbookDefaults($TargetRoot) {
 
   if ($hasPy) {
     $defaults.TEST_COMMAND = "python -m pytest"
-    return $defaults
-  }
-
-  if (Test-Path $testsPs1 -PathType Leaf) {
-    $defaults.TEST_COMMAND = "powershell -ExecutionPolicy Bypass -File `"tests/run-tests.ps1`""
     return $defaults
   }
 
@@ -391,6 +385,25 @@ function Get-AppVersion($SourceRoot) {
   return "unknown"
 }
 
+function Invoke-ScratchpadPostinstall {
+  param(
+    [string]$TargetRoot,
+    [string]$Mode
+  )
+  $installerPy = Join-Path $scriptDir "installer.py"
+  if (-not (Test-Path $installerPy -PathType Leaf)) {
+    Write-Host "[SCRATCHPAD_POSTINSTALL_ERROR] installer.py missing next to installer.ps1."
+    exit 1
+  }
+  $py = Get-Command python -ErrorAction SilentlyContinue
+  if (-not $py) {
+    Write-Host "[SCRATCHPAD_POSTINSTALL_ERROR] PYTHON_NOT_FOUND: Python is required for scratchpad materialization/validation (Model B). Fix: install Python 3 and re-run."
+    exit 1
+  }
+  & python $installerPy --scratchpad-postinstall --target $TargetRoot --mode $Mode
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+
 function Show-ItsMagicBanner([switch]$IncludeInstallMessage) {
   $prev = [Console]::OutputEncoding
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -440,6 +453,9 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from"
   Write-Host "        OS+stack detection; unresolved TEST_COMMAND fails fast with"
   Write-Host "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics."
+  Write-Host "  Note: scratchpad Model B: .cursor/scratchpad.md is"
+  Write-Host "        materialized when missing; Python 3 on PATH is required for validation."
+  Write-Host "        Recovery: python installer.py --scratchpad-postinstall --target <repo> --mode missing"
   Write-Host ""
   Write-Host "Clean options:"
   Write-Host "  --clean-repo      Remove all its-magic workflow artifacts from the target repo"
@@ -625,6 +641,8 @@ if ($mode -eq "upgrade") {
     }
   }
 
+  Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode "upgrade"
+
   Write-InstalledVersion $targetRoot $appVersion
   Sync-RootReadmeToItsMagic $targetRoot | Out-Null
   $runbookBootstrap = Invoke-RunbookBootstrap -TargetRoot $targetRoot
@@ -702,6 +720,8 @@ foreach ($rel in $files) {
     }
   }
 }
+
+Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode $mode
 
 Write-InstalledVersion $targetRoot $appVersion
 Sync-RootReadmeToItsMagic $targetRoot | Out-Null

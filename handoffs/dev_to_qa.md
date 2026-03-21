@@ -1,3 +1,137 @@
+## Dev -> QA Handoff — Sprint S0053 (US-0074)
+
+## Status
+
+Execute pass complete for **US-0074** / **DEC-0056** (npm↔Homebrew stable formula
+sync, cross-platform `TEST_COMMAND` bootstrap contract, template/active runbook
+blank `TEST_COMMAND` until installer fills `npm run test` or `sh tests/run-tests.sh`;
+triad **`--rollover`** restored **`enforce-triad-hot-surface.py --check`** green).
+Ready for **`/qa`** — do **not** mark backlog **US-0074** DONE here (**`verify-work`**
+owns that).
+
+## Scope completed (S0053 / US-0074)
+
+- **`installer.ps1`**, **`installer.py`**: removed Windows-only auto-detect that
+  emitted `tests/run-tests.ps1`; align with **`installer.sh`** / **DEC-0056** (POSIX
+  `sh tests/run-tests.sh` fallback only among shell runners).
+- **`template/docs/engineering/runbook.md`**, **`docs/engineering/runbook.md`**:
+  ship blank **`TEST_COMMAND:`** so bootstrap prefers **`npm run test`** when
+  **`package.json`** has **`scripts.test`**; document under US-0015 / **DEC-0056**.
+- **`packaging/homebrew/its-magic.rb`**: verified **`url`** / Ruby **`version`**
+  match **`package.json`** `0.1.2-30` and **`v0.1.2-30.tar.gz`** tarball segment
+  (no formula edit required in this pass).
+- **`scripts/enforce-triad-hot-surface.py --rollover`**: hot-surface caps for
+  **`state.md`**, **`po_to_tl.md`**, **`architecture.md`** (execute checkpoint
+  followed by a second rollover to stay within **`STATE_HOT_MAX_LINES`**).
+- **`bin/its-magic.js`**: unchanged (delegates to installers; bootstrap fixed
+  upstream).
+
+## QA verification checklist (S0053)
+
+1. `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` — expect **Fail: 0**
+   (710 rows at last run); `python scripts/enforce-triad-hot-surface.py --check` exit **0**.
+2. Temp install with fixture **`package.json`** containing **`scripts.test`**: materialized
+   **`docs/engineering/runbook.md`** must show **`TEST_COMMAND: npm run test`** (or allowed
+   **`sh tests/run-tests.sh`** only when npm path not used).
+3. Spot-check **`handoffs/dev_to_qa.md`** prepended block and **`docs/engineering/state.md`**
+   **Execute checkpoint** (**`orchestrator_run_id=auto-20260324-01`**, **`role=dev`**,
+   **`proof_ttl_seconds=3600`**, strict-proof tuple).
+
+## Primary artifacts
+
+- `installer.ps1`, `installer.py`, `installer.sh` (sh parity unchanged)
+- `template/docs/engineering/runbook.md`, `docs/engineering/runbook.md`
+- `packaging/homebrew/its-magic.rb`, `package.json`
+- `docs/engineering/state.md`, `docs/engineering/state-archive/` (rollover packs),
+  `handoffs/archive/`, `docs/engineering/architecture-archive/` (if touched by rollover)
+- `sprints/S0053/progress.md`, `sprints/S0053/summary.md`, `decisions/DEC-0056.md`
+- `tests/run-tests.ps1`, `tests/report.md`
+
+---
+
+## Dev -> QA Handoff — Sprint S0052 (US-0073)
+
+## Status
+
+Execute pass complete for **US-0073** / **DEC-0055** (Model B scratchpad delivery:
+example in manifest, materialized baseline, fail-closed merge validation).
+Ready for `/qa` — do **not** mark backlog **US-0073** DONE here (`verify-work` owns
+that).
+
+## Scope completed (consolidated)
+
+- Installers + CLI help: materialization, `python installer.py --scratchpad-postinstall`,
+  Python-on-PATH requirement for PS1/SH validation path.
+- Template/active parity: manifests, README, runbook, auto command Inputs,
+  `scratchpad.local.example.md` headers, triad merge order update.
+- Regression rows in `tests/run-tests.ps1` / `tests/run-tests.sh` (fresh install,
+  recovery, upgrade baseline, CLI).
+
+## QA verification checklist (S0052)
+
+1. `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` (or `sh tests/run-tests.sh`) — all rows green including new **US-0073** checks.
+2. Spot-check: temp install has `.cursor/scratchpad.md` but installed manifest does **not** list `.cursor/scratchpad.md` under `install_include_paths`.
+3. Recovery: delete `.cursor/scratchpad.md` in a fixture repo, run  
+   `python installer.py --scratchpad-postinstall --target . --mode missing` — expect exit 0 and restored file.
+
+## Primary artifacts
+
+- `installer.py`, `installer.ps1`, `installer.sh`, `bin/its-magic.js`
+- `template/docs/engineering/context/installer-owned-paths.manifest`,
+  `docs/engineering/context/installer-owned-paths.manifest`
+- `README.md`, `template/README.md`, `docs/engineering/runbook.md`,
+  `template/docs/engineering/runbook.md`
+- `.cursor/commands/auto.md`, `template/.cursor/commands/auto.md`
+- `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+- `scripts/enforce-triad-hot-surface.py`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0052/progress.md`, `sprints/S0052/summary.md`, `decisions/DEC-0055.md`
+
+---
+
+## Dev -> QA Handoff — Sprint S0051 (US-0072)
+
+## Status
+
+S0051 execute pass complete: triad hot-surface enforcement, archive packs,
+command/runbook/scratchpad parity, regression **26f**, and compact
+`docs/engineering/phase-context.md`. Ready for `/qa`.
+
+## Scope completed (T-001..T-010)
+
+- Triad contract + scratchpad keys (`STATE_*`, `PO_TO_TL_*`, `ARCH_*`) with
+  `scripts/enforce-triad-hot-surface.py` (`--check`, `--rollover`, `--self-test`).
+- Same-boundary gates documented on `/refresh-context`, `/intake`, `/discovery`,
+  `/architecture`, `/execute` (active + template).
+- Verification tuple + idempotent rollover; hot files brought under default caps
+  (see archive packs dated run).
+- Minimal-read table + reason codes in runbook/README; `phase-context.md`
+  pointer surface (active + template).
+- Tests **26f** in both runners.
+
+## QA verification checklist (S0051)
+
+1. `python scripts/enforce-triad-hot-surface.py --self-test` (exit 0).
+2. `python scripts/enforce-triad-hot-surface.py --check` (exit 0).
+3. `TEST_COMMAND` — confirm **26f** rows pass.
+
+## Primary artifacts
+
+- `scripts/enforce-triad-hot-surface.py`
+- `handoffs/archive/po-to-tl-pack-20260321.md` (rollover output)
+- `docs/engineering/architecture-archive/architecture-pack-20260321.md` (rollover output)
+- `docs/engineering/phase-context.md`, `template/docs/engineering/phase-context.md`
+- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`,
+  `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md`
+- `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`
+- `README.md`, `template/README.md`
+- `.cursor/commands/*.md` (refresh-context, intake, discovery, architecture, execute)
+  + `template/.cursor/commands/*`
+- `tests/run-tests.ps1`, `tests/run-tests.sh`
+- `sprints/S0051/tasks.md`, `sprints/S0051/progress.md`, `sprints/S0051/summary.md`
+
+---
+
 ## Dev -> QA Handoff — Sprint S0050 (US-0071)
 
 ## Status

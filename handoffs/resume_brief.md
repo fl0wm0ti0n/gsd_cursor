@@ -3,39 +3,39 @@
 ## Current status
 
 - Queue posture:
-  - `US-0071` (**DONE**, released as **`S0050`**) — user-visible internal metadata sanitization guard (`DEC-0053`).
-  - `US-0072` (**OPEN**, P1) — deterministic context slimming + archive enforcement across core artifacts.
-- Canonical story status (`docs/product/backlog.md`): next prioritized OPEN is **`US-0072`**.
-- Governance in force for upcoming work: **`DEC-0051`** (phase→role), **`DEC-0052`** (phase plan), artifact ownership (`DEC-0043`) as applicable.
+  - **`US-0074`** — **DONE** and **released** with sprint **`S0053`** (verify-work, release, refresh-context complete under `orchestrator_run_id=auto-20260324-01`).
+  - **`docs/product/backlog.md`**: **no** `Status: OPEN` rows — all tracked stories **DONE**.
+- Governance in force: **`DEC-0056`** (baseline delivered), **`DEC-0054`** (triad hot surface), **`DEC-0055`**, **`DEC-0039`**, and related records as applicable.
 
 ## Next actions
 
-1. Continue lifecycle for **`US-0072`** from **`/discovery`**.
-2. Preserve strict per-phase isolation + strict runtime-proof tuples through remaining OPEN stories.
+1. Start **`/intake`** when new product work should enter the backlog, or remain idle (**`none`**) if not planning new stories.
+2. For automation resumes with an empty backlog, treat intended phase as **`none`** until intake creates the next **OPEN** item.
 
 ## Intended resume phase
 
-`discovery`
+`none`
 
 ## Resume target
 
-- story_id=`US-0072`
-- sprint_id=`(pending)`
-- boundary=`post-refresh-context` (`S0050` / `US-0071` released; hot-surface rollover archived 12 checkpoints to `docs/engineering/state-archive/state-pack-20260322.md`)
+- story_id=`(none — backlog has no OPEN items)`
+- sprint_id=`(none)`
+- boundary=`post-refresh-context` for **S0053** / **US-0074** (see `docs/engineering/state.md` `## Refresh-context checkpoint (2026-03-24) — post S0053 / US-0074`)
 
 ## Isolation provenance (US-0048/US-0056)
 
-- isolation_provenance_ref=docs/engineering/state.md (latest `## Refresh-context checkpoint (2026-03-22) — post S0050 / US-0071`)
+- isolation_provenance_ref=docs/engineering/state.md (latest refresh-context checkpoint for **S0053**)
 - resume_requires_fresh_context=1
 
 ## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
-- resolved_start_phase=discovery
-- resolution_source=refresh_context_post_release
+- resolved_start_phase=none
+- resolution_source=refresh_complete
 - resolution_status=resolved
 - stop_reason=completed
 - stop_phase=refresh-context
-- story_id=US-0072
-- orchestrator_run_id=auto-20260321-02
-- timestamp=2026-03-22T00:30:00Z
+- story_id=(none)
+- sprint_id=S0053
+- orchestrator_run_id=auto-20260324-01
+- timestamp=2026-03-24T21:00:00Z

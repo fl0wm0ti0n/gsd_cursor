@@ -1,7 +1,8 @@
-# its-magic scratchpad (local overrides example)
+# its-magic scratchpad (framework default catalog — Model B / DEC-0055)
 #
-# Copy this file to `.cursor/scratchpad.local.md` and set personal overrides.
-# Local values override `.cursor/scratchpad.md` and should stay gitignored.
+# Copy this file to `.cursor/scratchpad.local.md` for personal overrides (gitignored).
+# Merge precedence: local > materialized `.cursor/scratchpad.md` > this example
+# (installers materialize the baseline from template when missing).
 #
 # Core behavior
 # - MAGIC_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
@@ -127,6 +128,8 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   archival rollover checks)
 # - STATE_HOT_MAX_CHECKPOINTS: integer >= 10 (max recent checkpoints to retain
 #   in `state.md` after rollover)
+# - PO_TO_TL_HOT_MAX_LINES / PO_TO_TL_HOT_MAX_SECTIONS (handoff hot caps)
+# - ARCH_HOT_MAX_LINES / ARCH_HOT_MAX_STORY_SECTIONS (architecture hot caps)
 # - Manual-override precedence: explicit flag values in this file remain authoritative
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
@@ -136,6 +139,10 @@ ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 STATE_HOT_MAX_LINES=1200
 STATE_HOT_MAX_CHECKPOINTS=80
+PO_TO_TL_HOT_MAX_LINES=800
+PO_TO_TL_HOT_MAX_SECTIONS=60
+ARCH_HOT_MAX_LINES=3500
+ARCH_HOT_MAX_STORY_SECTIONS=120
 #
 # Publish targets
 # - RELEASE_PUBLISH_MODE: disabled|confirm|auto

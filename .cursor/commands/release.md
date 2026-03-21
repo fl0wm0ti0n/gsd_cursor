@@ -85,7 +85,7 @@ Strict mutation semantics:
 
 Mandatory gate order (strict, deterministic). No step may be skipped or reordered:
 
-1. **Check-in test gate** — Verify latest `TEST_COMMAND` result is passing; block on missing, stale, or failing evidence. When `TEST_COMMAND` runs the consolidated repo runner (`tests/run-tests.*`), passing results must include **US-0071** user-visible metadata guard coverage (positive, leak detection, idempotence); otherwise treat as incomplete release evidence for this repository (`METADATA_SANITIZATION_POLICY_MISSING` / missing regression row).
+1. **Check-in test gate** — Verify latest `TEST_COMMAND` result is passing; block on missing, stale, or failing evidence.
 2. **QA completion gate** — Require no unresolved blocking findings in current sprint context before proceeding.
 3. **UAT completion gate** — Require UAT artifacts populated and verified; block on placeholder, incomplete, or unresolved-fail state.
 4. **Isolation compliance gate** — Require valid per-phase isolation evidence (US-0048 / DEC-0029); block on missing/invalid/stale evidence or violation.
@@ -255,9 +255,6 @@ Guardrails:
     - Stale/reused evidence: block with `ISOLATION_EVIDENCE_STALE`
     - Orchestrator/phase executed without fresh subagent: block with
       `PHASE_CONTEXT_ISOLATION_VIOLATION`
-    - **Phase role alignment (US-0069 / DEC-0051)**: each entry's `role` must
-      match the canonical expected role for its `phase_id` (matrix + scratchpad
-      alternates as documented in `/auto`). Mismatch → `PHASE_ROLE_MISMATCH`.
     - Remediation: re-run the affected phase(s) in fresh subagent contexts,
       write new isolation evidence, then rerun `/release`.
 4b. Strict runtime proof gate (US-0056 / DEC-0038): verify strict runtime-proof
@@ -269,11 +266,6 @@ Guardrails:
     - Expired/stale proof: block with `RUNTIME_PROOF_STALE`
     - Ambiguous proof-to-checkpoint linkage: block with
       `RUNTIME_PROOF_AMBIGUOUS_LINK`
-    - **Strict-proof role alignment (US-0069 / DEC-0051)**: tuple `role` must
-      equal the sibling isolation evidence `role` and the expected phase contract
-      role; `proof_hash` must be consistent with sorted-key JSON of the tuple
-      fields per `DEC-0038`. Violation → `RUNTIME_PROOF_INVALID` or
-      `PHASE_ROLE_MISMATCH` as applicable.
     - Remediation: rerun affected phase(s), write fresh runtime proof tuples,
       then rerun `/release`.
 5. Ensure target queue row exists; set status to `unreleased` before finalization.

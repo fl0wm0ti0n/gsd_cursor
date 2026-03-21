@@ -193,4 +193,16 @@ Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and n
      scan roots in `scripts/check-user-visible-metadata.py` **and** this runbook
      section together or fail closed with `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`
      semantics at QA/release.
+21. Triad hot-surface enforcement (DEC-0054):
+   - Before completing `/execute`, run
+     `python scripts/enforce-triad-hot-surface.py --check` from repository root
+     (or `--repo <root>`).
+   - If the check fails, run `python scripts/enforce-triad-hot-surface.py --rollover`
+     then `--check` again; if still failing, stop with `STATE_ARCHIVE_REQUIRED` or
+     `ARTIFACT_HOT_SURFACE_OVERSIZE` (no successful execute completion on oversize
+     triad hot files).
+   - When your edits touched any triad path (`docs/engineering/state.md`,
+     `handoffs/po_to_tl.md`, `docs/engineering/architecture.md`), ensure rollover
+     evidence (`boundary`, `moved`, `retained`, `pack_ref`) is recorded in the
+     execute checkpoint when packs were written.
 

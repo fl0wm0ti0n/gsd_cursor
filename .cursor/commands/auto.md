@@ -61,214 +61,6 @@ Strict-proof reason codes:
 - `RUNTIME_PROOF_STALE`
 - `RUNTIME_PROOF_AMBIGUOUS_LINK`
 
-## Strict phase role enforcement (US-0069 / DEC-0051)
-
-`/auto` must enforce a deterministic **phase→role contract** with **preflight
-admission** before each phase spawn, **fail-closed checkpoint validation** after
-each phase completes, and **aligned strict-proof `role`** values. Post-hoc
-isolation markers alone are insufficient.
-
-### Canonical phase→role matrix (fixed defaults)
-
-| phase_id | Allowed roles | Default when no valid alternate policy |
-|----------|-----------------|----------------------------------------|
-| `intake` | `po` | `po` |
-| `discovery` | `po` | `po` |
-| `research` | `po`, `tech-lead` | `tech-lead` |
-| `architecture` | `tech-lead` | `tech-lead` |
-| `sprint-plan` | `tech-lead` | `tech-lead` |
-| `plan-verify` | `qa`, `tech-lead` | `qa` |
-| `execute` | `dev` (override path only) | `dev` |
-| `qa` | `qa` | `qa` |
-| `verify-work` | `qa` | `qa` |
-| `release` | `release` | `release` |
-| `refresh-context` | `curator`, `po` | `curator` |
-
-### Alternate-role scratchpad policy (single-valued resolution)
-
-Resolve **exactly one** expected role for phases with alternates using merged
-scratchpad (active + `.cursor/scratchpad.local.md`; template parity on install):
-
-- `AUTO_ROLE_RESEARCH`: `po` \| `tech-lead` — when **unset or empty**, default
-  `tech-lead`; when set to any other value, fail closed with diagnostics (no
-  unrelated-role fallback).
-- `AUTO_ROLE_PLAN_VERIFY`: `qa` \| `tech-lead` — when **unset or empty**,
-  default `qa`; otherwise only `qa` or `tech-lead` allowed (else fail closed).
-- `AUTO_ROLE_REFRESH_CONTEXT`: `curator` \| `po` — when **unset or empty**,
-  default `curator`; otherwise only `curator` or `po` allowed (else fail closed).
-
-### Preflight capability gate (before spawn)
-
-Before spawning phase work, `/auto` must:
-
-1. Resolve `phase_id` → expected canonical `role` (matrix + policy keys above).
-2. For `execute`, apply **default deny**: expected role is `dev` unless **both**
-   `AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` **and**
-   `EXECUTE_OVERRIDE_GOVERNANCE_REF` point to a **parseable** approved exception
-   record (for example `DEC-xxxx` or a documented anchor in
-   `docs/engineering/state.md`).
-3. Evaluate **role capability availability** for that boundary (subagent/tooling
-   can satisfy the resolved role).
-4. On missing capability: stop with `PHASE_ROLE_CAPABILITY_MISSING` including
-   `phase_id`, expected role, observed capability result, and remediation. **Do
-   not** spawn under a substitute unrelated role.
-
-### Post-completion boundary validation
-
-When a phase completes, before advancing:
-
-- Isolation evidence `role` must equal the **same** preflight-resolved expected
-  role for that `phase_id`. Else stop with `PHASE_ROLE_MISMATCH`.
-- Strict-proof tuple `role` must equal isolation `role` and the expected role.
-- `proof_hash` must be SHA-256 over canonical sorted-key JSON of
-  `orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`,
-  `proof_issued_at`, `proof_ttl_seconds` (`DEC-0038` / architecture US-0069).
-
-### Resume / `start-from` parity
-
-Every `/auto` invocation (explicit `start-from`, `resume_brief`, or conservative
-`state.md` fallback) must **recompute** policy resolution and preflight from
-scratch; stale continuation artifacts must not bypass the gate.
-
-### Role-enforcement reason codes (deterministic)
-
-- `PHASE_ROLE_CAPABILITY_MISSING`
-- `PHASE_ROLE_MISMATCH`
-
-## Configurable phase selection policy (US-0070 / DEC-0052)
-
-`/auto` must treat the **resolved phase plan** as a first-class, fail-closed
-schedule: a single ordered subset of canonical phases computed from merged
-scratchpad (active + `.cursor/scratchpad.local.md`; template parity on install),
-**before** resume/`start-from` intersection and **before** any phase spawn.
-
-### Canonical lifecycle order (baseline `full` plan)
-
-Unless narrowed by policy, the canonical ordered phase list is:
-
-`intake` → `discovery` → `research` → `architecture` → `sprint-plan` →
-`plan-verify` → `execute` → `qa` → `verify-work` → `release` →
-`refresh-context`
-
-When `SECURITY_REVIEW=1`, insert `/security-review` in **design** mode
-immediately after `architecture` and before `sprint-plan`, and in **code** mode
-immediately after `execute` and before `qa`, as documented in **Steps** below.
-Record these inserts in `resolved_phase_plan` breadcrumbs using the same
-deterministic labels the orchestrator already uses for security boundaries.
-
-### Scratchpad selectors (exactly one active policy mode)
-
-At most one of the following may be materially active after merge. If two or
-more non-default selectors conflict, fail closed with `PHASE_POLICY_CONFLICT`
-and **do not** materialize a plan:
-
-- `AUTO_PHASE_PLAN=full` — full canonical lifecycle (including security-review
-  inserts when enabled). Default when unset and no other selector is set.
-- `AUTO_PHASE_EXCLUDE=<csv>` — start from `full`, remove listed phase IDs
-  (validate each token; unknown id → `PHASE_PLAN_UNKNOWN_PHASE`).
-- `AUTO_PHASE_INCLUDE=<csv>` — schedule **only** listed ids, then **re-sort**
-  into canonical lifecycle order. Unknown id → `PHASE_PLAN_UNKNOWN_PHASE`.
-  Empty result after parsing → `PHASE_PLAN_EMPTY_INCLUDE`.
-- `AUTO_PHASE_PROFILE=<name>` — expand a **named profile** from the registry
-  below. Unknown profile → `PHASE_PLAN_UNKNOWN_PROFILE`.
-
-**Conflict rule**: `AUTO_PHASE_PLAN` is default-only when it is unset, empty, or
-exactly `full`. Any explicit non-`full` `AUTO_PHASE_PLAN` value is invalid
-(fail closed with `PHASE_PLAN_INVALID_AUTO_PHASE_PLAN`) — use `INCLUDE` /
-`EXCLUDE` / `PROFILE` instead.
-
-### Profile registry (baseline)
-
-- `default` — equivalent to `full` (optional explicit alias; same behavior as
-  unset policy).
-
-**High-risk profile sketch** (illustrative; `R-0049`): `profile_high_risk_dev_fast`
-may only be selected when **both** hold: `AUTO_PHASE_PROFILE=profile_high_risk_dev_fast`
-and `AUTO_PHASE_HIGH_RISK_ACK=<operator_token>` matches the profile spec
-version documented in `decisions/DEC-0052.md` / research `R-0049`. Missing ack →
-`PHASE_PLAN_HIGH_RISK_ACK_REQUIRED`. High-risk profiles may define **narrower**
-reinstatement rules **only** as documented for that profile; default profile
-behavior applies otherwise.
-
-### Plan materialization pipeline (evaluation order)
-
-On every `/auto` entry (including resume, backlog-drain, bulk execute, and
-team-mode runs), **recompute** from merged scratchpad:
-
-1. Parse merged scratchpad policy inputs for phase selection + `SECURITY_REVIEW`.
-2. Detect active policy mode; on conflict → `PHASE_POLICY_CONFLICT` (no plan).
-3. Expand mode to a **candidate** ordered phase list in canonical order.
-4. Apply **non-skippable reinstatement** for the **default profile** (and for
-   any profile that does not explicitly document a narrower exception with ack):
-   - **Safety gates**: always reinstate if removed: `qa`, `verify-work`,
-     `release`.
-   - **Evidence-chain closure**: if the candidate retains any phase from
-     `execute` onward (`execute`, optional `security-review-code`, `qa`,
-     `verify-work`, `release`, `refresh-context`), reinstate (if removed) the
-     contiguous canonical prefix from `intake` through `plan-verify` so later
-     gates retain valid upstream isolation + strict-proof chain semantics.
-   - When `SECURITY_REVIEW=1`, reinstate the corresponding `security-review-*`
-     insert when the adjacent retained phases would otherwise violate the
-     documented security boundary contract.
-   Record each reinstatement in breadcrumbs with reason `non_skippable_gate`
-   (or a more specific documented code).
-5. Record **operator-visible plan breadcrumbs** to `docs/engineering/state.md`
-   **before** first spawn (append-bottom per `DEC-0040`):
-   - `phase_policy_mode` (`full|exclude|include|profile`)
-   - `resolved_phase_plan` (ordered `phase_id` list)
-   - `skipped_phases` (id + reason: `policy_exclude`, `non_skippable_gate`,
-     `default_full_plan`, etc.)
-   - `orchestrator_run_id` (when known for this run)
-6. **Do not** silently revive phases omitted by policy on continuation: every
-   entry re-reads scratchpad bytes and recomputes the plan class.
-
-### `start-from` and resume intersection with the resolved plan
-
-After computing the **resolved phase plan**, resolve the **nominal** start
-phase using **Deterministic resume-source precedence** (explicit `start-from`
-→ `resume_brief` → `state` fallback → fail-fast).
-
-Then **intersect**:
-
-- Keep phases that appear in the resolved plan **in plan order**, starting at
-  the first plan phase whose canonical position is **at or after** the nominal
-  anchor phase (canonical order matches the baseline list above, including
-  security inserts when enabled).
-- If the intersection is empty, fail closed with
-  `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION` and diagnostics listing
-  `resolved_phase_plan` vs `requested_start_phase` / resume inference.
-
-### Compatibility with `US-0069` / `DEC-0051`
-
-- Role resolution and preflight apply **only** to phases present in the
-  intersected schedule. Skipping `research` does **not** change the expected
-  role for `architecture` or any other retained phase.
-- Skipped phases produce **no** spawn and **no** alternate-role substitution
-  for a different phase.
-
-### Phase-plan reason codes (deterministic)
-
-Add to operator diagnostics and breadcrumb records:
-
-- `PHASE_POLICY_CONFLICT`
-- `PHASE_PLAN_UNKNOWN_PHASE`
-- `PHASE_PLAN_EMPTY_INCLUDE`
-- `PHASE_PLAN_UNKNOWN_PROFILE`
-- `PHASE_PLAN_INVALID_AUTO_PHASE_PLAN`
-- `PHASE_PLAN_HIGH_RISK_ACK_REQUIRED`
-- `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`
-
-### Phase boundary operator visibility (AC-10)
-
-At each phase boundary (after completing a scheduled phase), record a compact
-**phase boundary status** entry (for example in `docs/engineering/state.md`
-continuation breadcrumbs) including:
-
-- `resolved_phase_plan` snapshot (or stable hash pointer to the run’s plan record)
-- `skipped_phases` summary (id + reason code)
-- `phase_boundary` (completed `phase_id`)
-- `next_scheduled_phase` (or `none` when complete/stopped)
-
 ## Inputs
 - `AUTO_FLOW_MODE` and `PHASE_MODE` from `.cursor/scratchpad.md`
 - `AUTO_IMPLEMENTATION_LOOP`, `AUTO_LOOP_MAX_CYCLES` from `.cursor/scratchpad.md`
@@ -276,12 +68,6 @@ continuation breadcrumbs) including:
 - `SECURITY_REVIEW`, `COMPLIANCE_PROFILES` from `.cursor/scratchpad.md`
 - `AUTO_EXECUTE_BULK`, `AUTO_EXECUTE_MAX_ITEMS`, `AUTO_EXECUTE_ON_BLOCK`,
   `AUTO_EXECUTE_SELECTION`, `AUTO_TEAM_SCOPE_ENFORCE` from `.cursor/scratchpad.md`
-- `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, `AUTO_ROLE_REFRESH_CONTEXT`,
-  `AUTO_EXECUTE_ROLE_OVERRIDE`, `EXECUTE_OVERRIDE_GOVERNANCE_REF` from merged
-  scratchpad (US-0069 / DEC-0051)
-- `AUTO_PHASE_PLAN`, `AUTO_PHASE_EXCLUDE`, `AUTO_PHASE_INCLUDE`,
-  `AUTO_PHASE_PROFILE`, `AUTO_PHASE_HIGH_RISK_ACK` from merged scratchpad
-  (US-0070 / DEC-0052)
 - `TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS` from merged scratchpad context
 - Current product and engineering docs
 - Optional explicit argument: `start-from=<phase>`
@@ -439,15 +225,6 @@ Reason-code baseline:
 - `RUNTIME_PROOF_REUSED`
 - `RUNTIME_PROOF_STALE`
 - `RUNTIME_PROOF_AMBIGUOUS_LINK`
-- `PHASE_ROLE_CAPABILITY_MISSING`
-- `PHASE_ROLE_MISMATCH`
-- `PHASE_POLICY_CONFLICT`
-- `PHASE_PLAN_UNKNOWN_PHASE`
-- `PHASE_PLAN_EMPTY_INCLUDE`
-- `PHASE_PLAN_UNKNOWN_PROFILE`
-- `PHASE_PLAN_INVALID_AUTO_PHASE_PLAN`
-- `PHASE_PLAN_HIGH_RISK_ACK_REQUIRED`
-- `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`
 
 ## Canonical `start-from` contract
 
@@ -507,35 +284,21 @@ Required codes:
 - `STATE_PHASE_UNRECOVERABLE`
 
 ## Steps
-1. Read automation flags from merged scratchpad and **materialize the resolved
-   phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**:
-   detect exactly-one policy mode, expand, apply non-skippable reinstatement,
-   validate tokens/profile/ack requirements, and append plan breadcrumbs
-   (`phase_policy_mode`, `resolved_phase_plan`, `skipped_phases` + reasons) to
-   `docs/engineering/state.md` **before** any phase spawn. On failure, emit
-   deterministic phase-plan reason codes and stop (no partial schedule).
+1. Read automation flags from scratchpad.
 2. Parse optional `start-from=<phase>` and validate canonical phase ID rules.
    Parse optional `--execute-bulk` and treat it as explicit one-run override.
-3. Resolve **nominal** start phase using deterministic precedence:
+3. Resolve start phase using deterministic precedence:
    - explicit argument -> resume brief -> state fallback -> fail-fast.
    - Emit `[AUTO_RESUME_ERROR] ...` message on resolver failure.
-3a. **Intersect** the nominal start anchor with the resolved phase plan (plan
-   order preserved; drop scheduled phases strictly before the anchor in canonical
-   order). **Empty intersection** → fail fast with
-   `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION` and diagnostics listing
-   `resolved_phase_plan` vs `requested_start_phase` / inferred resume anchor.
-   Set the executable schedule to this intersection.
 4. Record continuation breadcrumb metadata in `docs/engineering/state.md`:
    - `invocation_mode=auto`
    - `requested_start_from`
-   - `resolved_start_phase` (first phase of the intersected schedule)
+   - `resolved_start_phase`
    - `resolution_source` (`argument|resume_brief|state_fallback`)
    - `resolution_status` (`resolved|fail-fast`)
    - `timestamp`
-5. Spawn a fresh subagent for each remaining phase in **the intersected
-   resolved schedule order** (not the full canonical list when phases are
-   omitted), starting at `resolved_start_phase`:
-   default full path:
+5. Spawn a fresh subagent for each remaining phase in canonical order, starting
+   at the resolved phase:
    intake -> discovery -> research -> architecture -> sprint plan ->
    plan verify -> execute -> QA -> verify work -> release -> refresh context.
    If `SECURITY_REVIEW=1`, run `/security-review` in a fresh security subagent:
@@ -544,25 +307,13 @@ Required codes:
    If `SECURITY_REVIEW=0` (default), skip both checks with zero overhead.
    - If `AUTO_BACKLOG_DRAIN=1`, repeat story lifecycle for next eligible OPEN
      story using deterministic selection policy until bounded stop criteria.
-     **Reload merged scratchpad phase-selection inputs and recompute the phase
-     plan at each story boundary** (same policy class as single-segment runs).
    - If bulk execute mode is active (`--execute-bulk` or
      `AUTO_EXECUTE_BULK=1`), iterate eligible planned items using
      `AUTO_EXECUTE_SELECTION` with bounded item count
      (`AUTO_EXECUTE_MAX_ITEMS`) and deterministic block/skip semantics.
-     **Reload merged scratchpad phase-selection inputs and recompute the phase
-     plan at each item boundary** (no silent revival of omitted phases).
    - In team mode with enforcement enabled, run pre-mutation scope checks against
      `TEAM_MEMBER` and `ACTIVE_TASK_IDS`; out-of-scope tasks produce deterministic
      reason codes and no writes.
-   - **US-0069 / DEC-0051**: Before each phase spawn, resolve the single-valued
-     expected role (matrix + `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`,
-     `AUTO_ROLE_REFRESH_CONTEXT`), enforce execute default deny / override
-     contract, and run the preflight capability gate; on failure stop with
-     `PHASE_ROLE_CAPABILITY_MISSING` (no unrelated-role spawn).
-   - **US-0069 / DEC-0051**: After each phase completes, validate isolation
-     `role` and strict-proof `role` against the preflight-resolved expected
-     role; on conflict stop with `PHASE_ROLE_MISMATCH`.
 6. Pass only the phase input files and current objective to each spawned
    subagent. Do not pass prior conversational reasoning as phase context.
 7. If `AUTO_IMPLEMENTATION_LOOP=1`, alternate fresh subagents for execute and QA
@@ -587,9 +338,7 @@ Required codes:
     phase in `docs/engineering/state.md` and includes all required fields. If
     missing/invalid/stale, stop with the appropriate reason code and remediation
     guidance (run the phase again in a fresh subagent context and write new
-    evidence). Append **phase boundary status** per **Configurable phase
-    selection policy (US-0070 / DEC-0052)** (selected/skipped summary + next
-    scheduled phase).
+    evidence).
 11b. At each phase boundary, verify strict runtime attestation tuple exists and
     is valid for the completed phase (`orchestrator_run_id`,
     `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`,

@@ -96,4 +96,6 @@
 - [x] US-0069: Strict phase role enforcement in `/auto` orchestration
 - [x] US-0070: Scratchpad-controlled `/auto` phase selection policy
 - [x] US-0071: User-visible internal metadata sanitization guard
-- [ ] US-0072: Deterministic context slimming and archive enforcement across core artifacts
+- [x] US-0072: Deterministic context slimming and archive enforcement across core artifacts
+- [x] US-0073: Scratchpad delivery simplification (example-only install policy)
+- [x] US-0074: Baseline regression cleanup for installer and version sync checks

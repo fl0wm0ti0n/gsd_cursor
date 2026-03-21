@@ -1,0 +1,93 @@
+{
+  "sprint_id": "S0052",
+  "story_ids": [
+    "US-0073"
+  ],
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Canonical installer delivery policy + deterministic rationale (Model B per DEC-0055).",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0052/qa-findings.md`; `DEC-0055`, architecture US-0073, manifest omits direct scratchpad copy + materialization tests."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "No silent missing-config fallback for `/auto` and phase command loaders after merge.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; `.cursor/commands/auto.md` merge order and `[SCRATCHPAD_MERGE_ERROR]` fail-closed semantics."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Upgrade preserves user-owned local overrides and applies delivery policy consistently.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; `tests/report.md` upgrade / local-override rows."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Missing/invalid baseline fails closed with diagnostics, layer attribution, remediation.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; `installer.py --scratchpad-postinstall` recovery tests; `[SCRATCHPAD_MATERIALIZE_ERROR]` / merge errors."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Explicit framework vs user ownership boundaries; clean-repo never overwrites user local.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; ownership manifest + upgrade/clean-repo asserts in `tests/report.md`."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Installer parity across PS1, SH, Python, and CLI for Model B delivery + merge semantics.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; `handoffs/dev_to_qa.md` delegated PS1/SH → Python postinstall + CLI paths."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "README + runbook explain model, migration, materialization, operator actions.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7; `sprints/S0052/summary.md`, README/runbook regression rows."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Active/template parity for scratchpad-related contracts and installer-adjacent docs.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; test runner template/active parity + US-0073 rows."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Regression: fresh install, legacy upgrade, recovery, local override preservation.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; dedicated US-0073 rows in `tests/report.md` (`Pass: 710`, `Fail: 0`)."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Traceability to US-0018/US-0057/DEC-0039/R-0050; no automation safety regression.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; `DEC-0055`, `MAGIC_CONTEXT_STRICT` materialized baseline checks."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0052/qa-findings.md",
+    "sprints/S0052/summary.md",
+    "sprints/S0052/tasks.md",
+    "tests/report.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0055.md",
+    "scripts/check-user-visible-metadata.py",
+    "scripts/enforce-triad-hot-surface.py"
+  ]
+}

@@ -4,6 +4,17 @@
 
 Implement Smart Upgrade Mode (US-0018) and document empty runbook commands (US-0015).
 
+## Context refresh pack (2026-03-24 — post S0053 / US-0074)
+
+- Latest released sprint: **`S0053`** for **`US-0074`** (**`DEC-0056`**); verify-work →
+  release → refresh-context completed under `orchestrator_run_id=auto-20260324-01`.
+- Triad **`/refresh-context`**: after new state checkpoints appended, **`--check`** as
+  needed → **`--rollover`** until **`--check` PASS** (archive packs under
+  `docs/engineering/state-archive/` per run; see refresh checkpoint in `state.md`).
+- Next OPEN story: **none** in `docs/product/backlog.md` — use **`/intake`** for new work.
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack
+  (2026-03-24 — post-release S0053 / US-0074)**.
+
 ## Result
 
 All 11 tasks completed. `--mode upgrade` is implemented across all three installers (PS1, sh, py), the JS CLI, and both test suites.
@@ -29,6 +40,30 @@ All 11 tasks completed. `--mode upgrade` is implemented across all three install
 
 ## Deferred
 - AC-6 (upgrade from pre-version repos): deferred per sprint plan
+
+## Context refresh pack (2026-03-23 — post S0052 / US-0073)
+
+- Latest released sprint: **`S0052`** for **`US-0073`** (**`DEC-0055`**); triad
+  **`/refresh-context`**: `--check` **FAIL** (`lines>1200`); **`rollover_complete units=3`**
+  → `docs/engineering/state-archive/state-pack-20260321-f.md`; post-append `--check` **FAIL**;
+  **`rollover_complete units=1`** → `docs/engineering/state-archive/state-pack-20260321-g.md`;
+  narrative expansion oversize → **`units=1`** → `docs/engineering/state-archive/state-pack-20260321-h.md`;
+  final `--check` **PASS** (`STATE_HOT_MAX_LINES=1200`).
+- Next OPEN story: **`US-0074`** — resume at **`/research`** (see
+  `handoffs/resume_brief.md`).
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack
+  (2026-03-24 — post-discovery US-0074)**.
+
+## Context refresh pack (2026-03-22 — post S0051 / US-0072)
+
+- Latest released sprint: **`S0051`** for **`US-0072`** (`DEC-0054`); triad
+  **`/refresh-context`**: **4** → `state-pack-20260321-b.md`, **3** →
+  `state-pack-20260321-c.md`, **1** → `state-pack-20260321-d.md`; final `--check`
+  **PASS** (`STATE_HOT_MAX_LINES=1200`).
+- Next OPEN story: **`US-0073`** — resume at **`/discovery`** (see
+  `handoffs/resume_brief.md`).
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack
+  (2026-03-22 — post S0051 / US-0072 released)**.
 
 ## Context refresh pack (2026-03-22 — post S0050 / US-0071)
 

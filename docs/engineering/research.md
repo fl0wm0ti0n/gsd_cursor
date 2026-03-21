@@ -1475,7 +1475,7 @@ a decision or recommendation.
 
 ## R-0047
 
-- **Date**: 2026-03-17
+- **Date**: 2026-03-17 (extended 2026-03-22)
 - **Topic**: US-0072 deterministic context slimming and archive enforcement across core artifacts
 - **Query**: Which deterministic execution patterns enforce archive rollover for hot artifacts and minimize subagent context load without losing auditable historical evidence.
 - **Sources**:
@@ -1490,11 +1490,16 @@ a decision or recommendation.
   - High-growth artifact strategy should separate hot summaries from historical archive packs to preserve fast, low-noise reads while retaining full evidence.
   - Subagent quality improves when phase reads are bounded and retrieval expands only when unresolved; this reduces irrelevant-context hallucination risk.
   - Idempotent archive pack naming/partitioning is essential to prevent duplicate or oscillating archive churn on reruns.
+  - **Post-discovery (2026-03-22) — scope triad + policy binding**: Canonical hot/archive enforcement targets for US-0072 are `docs/engineering/state.md`, `handoffs/po_to_tl.md`, and `docs/engineering/architecture.md`; additional `handoffs/*` compaction requires explicit architecture justification. Thresholds for `state.md` should continue to resolve from merged scratchpad (`STATE_HOT_MAX_LINES`, `STATE_HOT_MAX_CHECKPOINTS` per `.cursor/scratchpad.md` + `.cursor/scratchpad.local.md`); parallel scratchpad keys (or documented derived defaults) should be introduced for `po_to_tl` and `architecture` surfaces so caps are operator-configurable and auditable, not hardcoded only in prose.
+  - **Post-discovery — phase×artifact mutation ownership**: Rollover/compaction must run in the same phase that would otherwise leave an oversized hot surface, or fail closed: `refresh-context` / curator path remains the natural owner for `state.md` hot rollover (already evidenced in `state.md` checkpoints); `po_to_tl.md` growth is driven by PO intake/discovery handoffs — those phases (or a single designated PO-boundary command) must own pre-completion archive/split checks when that file exceeds policy; `architecture.md` mutations are tech-lead/architecture-phase owned — that boundary should enforce append-only history rules (per `R-0037` / `US-0061`) plus optional hot-summary front-matter or sibling compact index when size thresholds breach.
+  - **Post-discovery — minimal-read + AC-6 compact pointers**: Per-phase default read sets should name only canonical inputs for that command (for example backlog slice + prior phase handoff + one engineering index), with explicit numeric line/file budgets and an escalation path (“expand to archive pack X only when question unresolved”). Compact phase-context artifacts can be thin “latest pointer” blocks in hot headers or `docs/engineering/*-context.md` siblings that link to archive packs and sprint IDs without duplicating full checkpoint bodies.
+  - **Post-discovery — reason codes + regression hooks (AC-7/AC-10)**: Align taxonomy with backlog examples (`STATE_ARCHIVE_REQUIRED`, `CONTEXT_BUDGET_EXCEEDED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`, `STATE_ARCHIVE_VERIFICATION_FAILED`) and add fail-closed codes for “threshold exceeded but no `pack_ref` written”. Regression tests should assert: synthetic oversize hot file triggers rollover or deterministic stop; empty archive when rollover required; idempotent second run does not duplicate packs; bounded-read policy violations emit expected codes — mirroring patterns in `R-0033` (ordering), `R-0036` (rollover triggers), and `R-0037` (ownership + archive verification).
 - **Risks**:
   - Over-aggressive compaction can hide needed context if archive pointers are weak.
   - Weak enforcement can leave thresholds breached indefinitely while claiming policy compliance.
   - Non-deterministic pack boundaries can break traceability and increase operator confusion.
-- **Linked**: US-0072, US-0060, US-0061
+  - Splitting ownership across three hot files increases the chance one path forgets enforcement unless each mutating command documents a mandatory pre-completion gate.
+- **Linked**: US-0072, US-0060, US-0061, R-0033, R-0036, R-0037
 - **Confidence**: medium-high
 - **Status**: current
 
@@ -1635,3 +1640,142 @@ a decision or recommendation.
 - **Linked**: US-0070, US-0069, DEC-0051, R-0004, R-0048
 - **Confidence**: high
 - **Status**: current
+
+## R-0050
+
+- **Date**: 2026-03-23
+- **Topic**: US-0073 scratchpad delivery simplification (example-only install policy)
+- **Query**: How to simplify delivered scratchpad artifacts while preserving
+  deterministic merged resolution for `/auto` and phase commands, fail-closed
+  missing-key behavior, upgrade parity, and explicit ownership per `DEC-0039` /
+  `US-0057`.
+- **Sources**:
+  - `docs/product/backlog.md` (`US-0018`, `US-0057`, `US-0073`)
+  - `docs/product/vision.md` (Discovery Notes — `US-0073`)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — `US-0073`)
+  - `decisions/DEC-0039.md` (example refresh + ownership)
+  - `README.md` (upgrade + scratchpad ownership behavior)
+  - `docs/engineering/research.md` (`R-0049` merged scratchpad reload semantics for
+    `/auto` phase plans — config loaders must stay consistent with “recompute
+    from merged bytes” expectations)
+  - `https://12factor.net/config`
+  - `https://stackoverflow.com/questions/6009/how-do-you-deal-with-configuration-files-in-source-control`
+- **Findings**:
+  - **Two delivery models (architecture must pick one)**:
+    - **Model A — committed baseline**: ship/maintain `.cursor/scratchpad.md` as
+      the framework baseline plus `.cursor/scratchpad.local.example.md` (current
+      shape); lowest surprise for commands that open `scratchpad.md` directly.
+    - **Model B — example-only**: ship **only** the example (and docs); any
+      effective baseline must be **materialized** deterministically (install step,
+      first-run copy, or explicit generator) so merged reads still resolve every
+      required automation key — **never** infer missing keys silently (`US-0073`
+      `AC-2`, `AC-4`).
+  - **Canonical merged precedence (recommended for implementation)** — apply
+    after both files are loaded as key/value sets (exact merge mechanics in
+    architecture; order is the invariant):
+    1. **`.cursor/scratchpad.local.md`** (user-owned) overrides framework keys
+       where present; must never be deleted or overwritten by install/upgrade
+       (`US-0018`, `DEC-0039`).
+    2. **Repo `.cursor/scratchpad.md`** when Model A is selected, **or** the
+       **materialized baseline** produced under Model B (must be stable and
+       auditable — same bytes as would have been committed, or a documented
+       generated equivalent).
+    3. **`.cursor/scratchpad.local.example.md`** (framework-owned, refreshable on
+       upgrade per `DEC-0039`) supplies defaults only for keys not set above.
+    4. If a **required** key is still absent or invalid after merge → **fail
+       closed** with diagnostics naming the layer(s) checked (local, baseline /
+       materialized, example) and remediation (`US-0073` `AC-4`).
+  - **Upgrade / legacy migration**:
+    - Repos with **both** historical files need a deterministic rule: either
+      retain committed `scratchpad.md` under Model A, or migrate to Model B by
+      documenting what happens to an existing committed baseline (preserve user
+      edits vs replace with materialized template) — ambiguity is a defect.
+    - `--mode upgrade` must apply the chosen delivery policy while preserving
+      `.cursor/scratchpad.local.md` and refreshing only framework-owned example
+      content (`US-0073` discovery addendum; `DEC-0039`).
+  - **Parity**: `installer.ps1`, `installer.sh`, `installer.py`, CLI, and
+    `template/` copies must implement the **same** policy and merge semantics
+    (`US-0073` `AC-6`, `AC-8`).
+  - **Regression matrix** (minimum): fresh install, upgrade from dual-file
+    legacy, missing baseline / missing materialization, local-only override;
+    each failure mode should emit deterministic reason codes, not silent
+    defaults (`US-0073` `AC-9`, `AC-10`).
+- **Risks**:
+  - Example-only delivery may cause missing-default behavior if command loaders
+    still assume `scratchpad.md` exists on disk without a materialization step.
+  - Migration inconsistency across installer implementations creates
+    cross-platform drift.
+  - Ambiguous precedence between generated defaults and local overrides produces
+    non-deterministic `/auto` behavior — prevented only by documenting and
+    testing the merge order above.
+- **Linked**: US-0073, US-0018, US-0057, DEC-0039
+- **Confidence**: high
+- **Status**: current
+
+## R-0051
+
+- **Date**: 2026-03-22
+- **Topic**: US-0074 baseline regression cleanup for remaining failing checks
+- **Query**: Which deterministic remediation patterns can restore full baseline check health for Homebrew/npm version sync and installer/CLI `TEST_COMMAND` bootstrap failures.
+- **Sources**:
+  - `sprints/S0050/qa-findings.md` (current failing-check list)
+  - `docs/product/backlog.md` (`US-0063`, `US-0018`, `US-0057`, `US-0074`)
+  - `https://docs.brew.sh/Formula-Cookbook`
+  - `https://docs.npmjs.com/about-semantic-versioning`
+- **Findings**:
+  - Baseline check closure needs explicit source-of-truth precedence for version values (npm package version as canonical) to keep Homebrew URL/version assertions deterministic.
+  - Installer bootstrap failures should be treated as contract regressions: stack detection + command generation path must be validated for both installer and CLI entry paths.
+  - Fixes must avoid masking checks; acceptance should require formerly failing checks to pass explicitly in QA evidence.
+  - Cross-platform installer parity is essential to avoid one-path green and another path red behavior.
+- **Risks**:
+  - Patch-only fixes to one artifact (for example formula only) may leave upstream source/version derivation inconsistent.
+  - Platform-specific bootstrap assumptions can reintroduce failures on different shells/environments.
+  - Regression assertions can become flaky if test fixtures do not pin deterministic inputs.
+- **Linked**: US-0074, US-0063, US-0018, US-0057
+- **Confidence**: medium-high
+- **Status**: current
+
+### Post-discovery findings (2026-03-24) — US-0074
+
+- **Evidence anchors**: `sprints/S0051/qa-findings.md` (four-check classification at QA time),
+  `tests/run-tests.ps1` / `tests/run-tests.sh` (exact assert strings), current
+  `tests/report.md` (re-run baseline; operator should re-execute tests for story AC-7).
+- **npm vs Homebrew (root cause — version drift)**:
+  - **Canonical version**: `package.json` `version` is the single source of truth for baseline
+    sync checks.
+  - **Assert contract**: tests require `packaging/homebrew/its-magic.rb` to contain the
+    literal tarball segment `v{package.json.version}.tar.gz` and a Ruby `version
+    "{package.json.version}"` line (see `# 4b) Homebrew stable formula version sync` in
+    `tests/run-tests.ps1` / `tests/run-tests.sh`).
+  - **Failure mode**: `package.json` / npm release tag bumped without updating the committed
+    formula `url`, `version`, and (for real brew use) `sha256` — asserts fail even when the
+    product is otherwise healthy. Release automation (`scripts/release-all*.ps1`, npm
+    `release:brew-only`, etc.) should be treated as the operational backstop so the formula
+    cannot lag npm.
+- **TEST_COMMAND bootstrap (root cause — contract vs detector output)**:
+  - **Owning surfaces**: `installer.ps1` / `installer.sh` / `installer.py`
+    (`Get-DetectedRunbookDefaults` / `detect_runbook_defaults` + `Invoke-RunbookBootstrap` /
+    `bootstrap_runbook_commands`), delegated CLI entry `bin/its-magic.js` (spawns PS1 or SH
+    installer), installed file `docs/engineering/runbook.md` (from `template/` tree), narrative
+    contract in `docs/engineering/runbook.md` (active) + template mirror.
+  - **Baseline test contract**: installer and CLI missing-install scenarios assert the
+    materialized runbook’s `TEST_COMMAND` line matches **only**
+    `npm run test` **or** `sh tests/run-tests.sh` (PowerShell test runner command is **not**
+    accepted by the baseline grep/regex).
+  - **Detector behavior**: when `package.json` exists and `scripts.test` is non-empty,
+    installers prefer `npm run test` (matches baseline). If that path is skipped (no test
+    script) **and** the stack falls through on Windows/Python installers, **PowerShell**
+    `tests/run-tests.ps1` is chosen — **that value fails the US-0074 baseline asserts** even
+    though it is a valid local test command. `installer.sh` never emits the PowerShell branch;
+    it prefers `sh tests/run-tests.sh` when present after npm/go/python — cross-check parity
+    when changing detection order.
+  - **Secondary failure modes**: `npm` / `sh` missing on the install host marks the candidate
+    invalid → bootstrap notes + possible install failure with empty unresolved `TEST_COMMAND`;
+    non-empty pre-seeded `TEST_COMMAND` in template skips auto-fill (by design) — mismatches
+    must be caught by tests, not masked.
+- **Remediation direction (for architecture / execute)**:
+  - Keep formula aligned on every version bump (automate or gate in CI).
+  - Either narrow installers to emit only baseline-allowed `TEST_COMMAND` values for
+    detectable stacks, **or** extend tests to accept the PowerShell runner **only** if
+    product intent is to treat it as a first-class bootstrap outcome (document tradeoff in
+    architecture — avoids hiding real Windows defaults).

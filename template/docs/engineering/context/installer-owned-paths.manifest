@@ -8,7 +8,6 @@
 .cursor/agents
 .cursor/hooks
 .cursor/hooks.json
-.cursor/scratchpad.md
 .cursor/scratchpad.local.example.md
 docs
 sprints

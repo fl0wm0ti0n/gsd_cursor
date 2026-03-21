@@ -125,6 +125,10 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   archival rollover checks)
 # - STATE_HOT_MAX_CHECKPOINTS: integer >= 10 (max recent checkpoints to retain
 #   in `state.md` after rollover)
+# - PO_TO_TL_HOT_MAX_LINES: integer >= 200 (handoff hot-surface line cap)
+# - PO_TO_TL_HOT_MAX_SECTIONS: integer >= 10 (max top-level ## sections retained)
+# - ARCH_HOT_MAX_LINES: integer >= 500 (architecture hot-surface line cap)
+# - ARCH_HOT_MAX_STORY_SECTIONS: integer >= 20 (max # US-xxxx story sections retained)
 # - Manual-override precedence: explicit flag values in this file remain authoritative
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
@@ -134,6 +138,10 @@ ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 STATE_HOT_MAX_LINES=1200
 STATE_HOT_MAX_CHECKPOINTS=80
+PO_TO_TL_HOT_MAX_LINES=800
+PO_TO_TL_HOT_MAX_SECTIONS=60
+ARCH_HOT_MAX_LINES=3500
+ARCH_HOT_MAX_STORY_SECTIONS=120
 
 # Publish targets (US-0054)
 # - RELEASE_PUBLISH_MODE: disabled|confirm|auto

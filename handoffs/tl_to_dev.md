@@ -1,3 +1,131 @@
+## TL -> Dev Handoff — Sprint S0053 (US-0074 Baseline Regression Cleanup)
+
+## Planning summary
+
+- **Sprint**: S0053 (new)
+- **Story**: US-0074 — Baseline regression cleanup for installer and version sync checks
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0053/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0074 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0074`)
+- Decision: `decisions/DEC-0056.md` (**baseline version-sync + `TEST_COMMAND` bootstrap** — npm-canonical version ↔ Homebrew stable formula; installer + CLI runbook bootstrap; triple-installer + template parity; PowerShell runner widening explicitly out of scope)
+- Related: `DEC-0046` (runbook `TEST_COMMAND` bootstrap precedence), `US-0018` / `US-0057` / `US-0063` (ownership / upgrade contracts)
+- Research: `docs/engineering/research.md` (`R-0051`, post-discovery US-0074)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0074)
+- Sprint artifacts: `sprints/S0053/*`
+
+## Focus
+
+1. **Classification + Homebrew (T-001..T-002)**: deterministic RCA for the four baseline asserts; align `packaging/homebrew/its-magic.rb` with `package.json` / tag URL / checksum discipline.
+2. **TEST_COMMAND bootstrap (T-003..T-005)**: fix installer + CLI missing-install paths so materialized runbook meets baseline-allowed values; preserve ownership contracts; PS1/SH/py/CLI parity.
+3. **Evidence + parity (T-006..T-009)**: strengthen tests without masking; QA shows zero remaining four-check failures; active/`template/` parity; release/readiness artifacts cite passing baseline.
+4. **Operator guidance (T-010)**: document remediation for future version/bootstrap drift.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0053/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0053/tasks.md` marked done.
+- `sprints/S0053/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0053/progress.md`, `sprints/S0053/uat.json`, and `sprints/S0053/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0074` / `S0053`.
+
+## Next phase
+
+Proceed to **`/plan-verify`** for **`S0053`** (`US-0074`). `sprints/S0053/plan-verify.json` is currently a **PENDING** sprint-plan seed.
+
+---
+
+## TL -> Dev Handoff — Sprint S0052 (US-0073 Scratchpad Delivery Simplification / Model B)
+
+## Planning summary
+
+- **Sprint**: S0052 (new)
+- **Story**: US-0073 — Scratchpad delivery simplification (example-only install policy)
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0052/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0073 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0073 section)
+- Decision: `decisions/DEC-0055.md` (**Model B** — example-only + materialized baseline; merge precedence; parity; fail-closed diagnostics)
+- Related: `DEC-0039` (scratchpad example refresh + ownership), `US-0018` / `US-0057` (upgrade + scratchpad contracts)
+- Research: `docs/engineering/research.md` (`R-0050`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0073)
+- Sprint artifacts: `sprints/S0052/*`
+
+## Focus
+
+1. **Policy + materialization (T-001..T-002)**: document and enforce **`DEC-0055`** delivery model; loaders/commands never silently infer missing required keys.
+2. **Upgrade + fail-closed merge (T-003..T-005)**: upgrade preserves user local; invalid/missing baseline states fail with layer attribution and remediation.
+3. **Parity + docs (T-006..T-008)**: installer surfaces + CLI + `template/` alignment; README + runbook for operators.
+4. **Regression + traceability (T-009..T-010)**: install/upgrade/missing-file/local-override matrix; explicit overlap resolution with **`US-0018`** / **`US-0057`** and automation safety defaults.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0052/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0052/tasks.md` marked done.
+- `sprints/S0052/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0052/progress.md`, `sprints/S0052/uat.json`, and `sprints/S0052/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0073`.
+
+## Next phase
+
+Proceed to **`/plan-verify`** for **`S0052`** (`US-0073`). `sprints/S0052/plan-verify.json` is currently a **PENDING** sprint-plan seed.
+
+---
+
+## TL -> Dev Handoff — Sprint S0051 (US-0072 Deterministic Context Slimming + Triad Archive Enforcement)
+
+## Planning summary
+
+- **Sprint**: S0051 (new)
+- **Story**: US-0072 — Deterministic context slimming and archive enforcement across core artifacts
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0051/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0072 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (US-0072 section)
+- Decision: `decisions/DEC-0054.md`
+- Research: `docs/engineering/research.md` (`R-0047`)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0072)
+- Sprint artifacts: `sprints/S0051/*`
+
+## Focus
+
+1. **Triad contract (T-001)**: hot/archive paths, scratchpad keys, pack naming for `state.md`, `po_to_tl.md`, `architecture.md`.
+2. **Rollover + gates (T-002..T-004)**: same-phase rollover or fail-closed; verification tuple + idempotency; `/refresh-context` and mutating phases cannot skip archive proof.
+3. **Read minimization (T-005..T-007)**: minimal-read sets with budgets; compact pointers; reason-code taxonomy.
+4. **Safety + parity + regression (T-008..T-010)**: auditable archives, active/template docs, tests for threshold, empty-archive, idempotence, bounded reads, fail-safe.
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0051/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0051/tasks.md` marked done.
+- `sprints/S0051/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0051/progress.md`, `sprints/S0051/uat.json`, and `sprints/S0051/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0072`.
+
+## Next phase
+
+Proceed to **`/plan-verify`** for **`S0051`** (`US-0072`). `sprints/S0051/plan-verify.json` is currently a **PENDING** sprint-plan seed.
+
+---
+
 ## TL -> Dev Handoff — Sprint S0050 (US-0071 User-Visible Internal Metadata Sanitization Guard)
 
 ## Planning summary

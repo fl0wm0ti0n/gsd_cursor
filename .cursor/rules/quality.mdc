@@ -39,11 +39,4 @@ globs: ["**/*"]
   `RUNTIME_STACK_PROFILE_UNRESOLVED`.
   Include startup command/profile, runtime mode, health result, retry ledger,
   and log summary in QA artifacts.
-- User-visible internal metadata (US-0071 / DEC-0053): do not introduce
-  planning-shaped tokens (`US-[0-9]{4}`, `DEC-[0-9]{4}`, `R-[0-9]{4}`) into
-  operator-visible strings under inclusive scan roots (`bin/`, root installers,
-  `packaging/**`, `scripts/validate-and-push.*`). Use
-  `python scripts/check-user-visible-metadata.py` before handoff; on leakage use
-  `USER_VISIBLE_INTERNAL_METADATA_DETECTED` with path evidence and remediation
-  per `docs/engineering/runbook.md`.
 

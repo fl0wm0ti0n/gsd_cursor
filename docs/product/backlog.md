@@ -1334,7 +1334,7 @@
 - Title: Enforce compact hot-surfaces and bounded phase reads for state, handoffs, and architecture
 - Summary: Prevent unbounded artifact growth and reduce subagent hallucination risk by enforcing deterministic archive rollover for large core artifacts (`state`, handoffs, architecture), plus strict phase read budgets and minimal context packs.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Discovery notes:
   - User reports `docs/engineering/state.md` keeps growing while `docs/engineering/state-archive/` remains empty, indicating rollover is not being effectively enforced.
   - User reports very large `handoffs` and `docs/engineering/architecture.md`, causing high-context noise and increased misunderstanding risk for subagents.
@@ -1346,17 +1346,116 @@
     - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
     - missing_topics=`(none)`
     - assumptions_confirmed=`(none)`
+  - Discovery refinement (2026-03-22): default enforcement triad is `state.md`, `handoffs/po_to_tl.md`, and `architecture.md`; other handoffs require explicit architecture justification to include. Thresholds and hot caps must bind to merged scratchpad keys; rollover executes in the same mutating phase or fails closed.
+  - Discovery refinement (2026-03-22): minimal-read policy requires per-phase required files + bounded escalation; verification tuple `boundary`/`moved`/`retained`/`pack_ref` plus idempotent pack behavior; regression must catch oversize-hot-without-archive.
+  - Research refinement (2026-03-22): extended **`R-0047`** — triad scoped to `state.md` / `po_to_tl.md` / `architecture.md`; scratchpad-bound thresholds (extend beyond `STATE_HOT_*` for the latter two); phase×artifact mutation ownership (`refresh-context` vs PO vs tech-lead boundaries); minimal-read budgets + compact pointer artifacts; reason-code and regression alignment with `R-0033`/`R-0036`/`R-0037`.
+  - Architecture refinement reference (US-0072-only): **`DEC-0054`** (triad thresholds, archive paths, same-phase rollover, verification tuple, minimal-read/reason-code contract).
 - Acceptance:
-  - [ ] AC-1: Define deterministic hot/archive contract for `docs/engineering/state.md`, `handoffs/po_to_tl.md`, and `docs/engineering/architecture.md` with explicit thresholds and pack naming.
-  - [ ] AC-2: When threshold is exceeded, rollover must execute in the same phase boundary or fail closed with deterministic reason code (no silent continuation with oversized hot files).
-  - [ ] AC-3: Archive execution writes deterministic verification evidence (`boundary`, `moved`, `retained`, `pack_ref`) and is idempotent on reruns.
-  - [ ] AC-4: `/refresh-context` and any phase mutating high-growth artifacts must enforce archive verification gates before completion.
-  - [ ] AC-5: Define deterministic minimal-read policy per phase (required files + optional escalation path) with bounded line/file budgets.
-  - [ ] AC-6: Introduce compact phase-context artifacts (hot summaries/pointers) so subagents read latest relevant evidence first and expand only when unresolved.
-  - [ ] AC-7: Deterministic reason-code taxonomy covers archive and context-budget failures (for example `STATE_ARCHIVE_REQUIRED`, `CONTEXT_BUDGET_EXCEEDED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`).
-  - [ ] AC-8: Existing safety and traceability guarantees remain intact (no historical evidence loss; archive references remain auditable and linked).
-  - [ ] AC-9: Active/template parity is maintained for command contracts, scratchpad/runbook/readme guidance, and archive directory docs.
-  - [ ] AC-10: Regression coverage includes threshold-crossing success, empty-archive regression detection, idempotent rollover, bounded-read enforcement, and fail-safe behavior.
+  - [x] AC-1: Define deterministic hot/archive contract for `docs/engineering/state.md`, `handoffs/po_to_tl.md`, and `docs/engineering/architecture.md` with explicit thresholds and pack naming.
+  - [x] AC-2: When threshold is exceeded, rollover must execute in the same phase boundary or fail closed with deterministic reason code (no silent continuation with oversized hot files).
+  - [x] AC-3: Archive execution writes deterministic verification evidence (`boundary`, `moved`, `retained`, `pack_ref`) and is idempotent on reruns.
+  - [x] AC-4: `/refresh-context` and any phase mutating high-growth artifacts must enforce archive verification gates before completion.
+  - [x] AC-5: Define deterministic minimal-read policy per phase (required files + optional escalation path) with bounded line/file budgets.
+  - [x] AC-6: Introduce compact phase-context artifacts (hot summaries/pointers) so subagents read latest relevant evidence first and expand only when unresolved.
+  - [x] AC-7: Deterministic reason-code taxonomy covers archive and context-budget failures (for example `STATE_ARCHIVE_REQUIRED`, `CONTEXT_BUDGET_EXCEEDED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`).
+  - [x] AC-8: Existing safety and traceability guarantees remain intact (no historical evidence loss; archive references remain auditable and linked).
+  - [x] AC-9: Active/template parity is maintained for command contracts, scratchpad/runbook/readme guidance, and archive directory docs.
+  - [x] AC-10: Regression coverage includes threshold-crossing success, empty-archive regression detection, idempotent rollover, bounded-read enforcement, and fail-safe behavior.
 - Boundaries:
   - In scope: workflow artifact compaction enforcement, archive verification, and phase-context minimization policy.
   - Out of scope: deleting historical evidence, weakening QA/release gates, or changing product-runtime behavior.
+
+## US-0073 — Scratchpad Delivery Simplification (Example-Only Install Policy)
+- Title: Decide and enforce whether installer should ship only scratchpad example by default
+- Summary: Evaluate and implement a deterministic installer policy for scratchpad artifacts so delivery is simplified (example-only baseline) without breaking automation defaults, upgrade behavior, or parity across installer entry points.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - User requests simplifying delivery: shipping both `.cursor/scratchpad.md` and `.cursor/scratchpad.local.example.md` feels redundant; user proposes example-only as sufficient.
+  - Existing contracts (`US-0018`, `US-0057`, `DEC-0039`) define upgrade-safe scratchpad behavior and ownership; discovery narrows the open question to **one canonical delivery model** (retain committed baseline vs example-only with explicit materialization) and **merged resolution order** so automation flags stay deterministic.
+  - Cross-cutting risk: `/auto` and phase commands must keep the same effective policy after install/upgrade; missing required keys must **fail closed** with diagnostics — no permissive silent defaults (`AC-2`, `AC-4`).
+  - Migration: upgrade and clean-install paths must handle legacy dual-file repos and preserved `.cursor/scratchpad.local.md` without violating framework vs user ownership.
+  - Parity: all installer surfaces + active/`template/` scratchpad-related artifacts stay aligned; tests must cover fresh install, upgrade from legacy, missing baseline, and local override preservation (`AC-6`, `AC-9`).
+  - Intake research reference: `R-0050` (expand with delivery-model + merge-precedence findings in `/research`).
+  - Research pointer (2026-03-23): per **`R-0050`** — canonical **Model A vs Model B**
+    delivery choice, **merged precedence** (local → baseline/materialized →
+    example), upgrade/migration invariants, installer parity, and regression
+    matrix; see `docs/engineering/research.md` (`## R-0050`).
+  - Architecture refinement reference (US-0073-only): **`DEC-0055`** — **Model B**
+    (example-only + materialized baseline), merge precedence, upgrade/legacy
+    invariants, parity surfaces; see `docs/engineering/architecture.md` (**US-0073**
+    section).
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+- Acceptance:
+  - [x] AC-1: Define canonical installer delivery policy for scratchpad artifacts (`scratchpad.md` + example, or example-only with explicit fallback semantics), with deterministic rationale.
+  - [x] AC-2: If example-only mode is selected, `/auto` and phase commands must still resolve required flags deterministically (no missing-config silent fallback).
+  - [x] AC-3: Upgrade mode (`its-magic --mode upgrade`) preserves user-owned local overrides and applies the selected scratchpad delivery policy consistently.
+  - [x] AC-4: Missing/invalid scratchpad baseline state fails closed with deterministic diagnostics and remediation guidance.
+  - [x] AC-5: Ownership boundaries are explicit for framework-owned vs user-owned scratchpad artifacts and remain compatible with clean-repo behavior.
+  - [x] AC-6: Installer parity is maintained across `installer.ps1`, `installer.sh`, `installer.py`, and CLI entrypoint behavior.
+  - [x] AC-7: Documentation (README + runbook) clearly explains the chosen model, migration path, and operator actions.
+  - [x] AC-8: Active/template parity is preserved for scratchpad-related contracts and examples.
+  - [x] AC-9: Regression coverage includes fresh install, upgrade from legacy model, missing-file recovery, and local override preservation.
+  - [x] AC-10: Decision evidence references overlap resolution with `US-0018`/`US-0057` and confirms no regression in automation safety defaults.
+- Boundaries:
+  - In scope: installer delivery model, config-resolution safety, parity/docs/tests for scratchpad artifacts.
+  - Out of scope: removing automation controls or weakening existing fail-closed runtime gates.
+
+## US-0074 — Baseline Regression Cleanup for Installer and Version Sync Checks
+- Title: Resolve remaining baseline failing checks and restore fully green validation baseline
+- Summary: Close the known persistent baseline test failures so `tests/run-tests.*` becomes fully green again, focusing on Homebrew/npm version alignment and installer/CLI `TEST_COMMAND` bootstrap regressions.
+- Priority: P1
+- Status: DONE
+- Discovery notes:
+  - Recent QA passes for in-scope stories still report recurring out-of-scope baseline failures, reducing confidence in end-to-end compatibility health.
+  - Current known failing checks include:
+    - `Homebrew stable formula URL uses npm version tag`
+    - `Homebrew stable formula version matches npm version`
+    - `Installer bootstraps TEST_COMMAND for detectable stack`
+    - `CLI missing install bootstraps TEST_COMMAND for detectable stack`
+  - User explicitly requests these remaining baseline checks to be cleared.
+  - Intake research reference: `R-0051` (extended post-discovery: **Post-discovery findings
+    (2026-03-24) — US-0074** in `docs/engineering/research.md`; TL **`/research`** checkpoint
+    in `docs/engineering/state.md`).
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+  - Discovery refinement (2026-03-24, PO):
+    - Scope is exactly the four baseline asserts listed above (no expansion into
+      unrelated triad, scratchpad, or release-gate stories).
+    - Homebrew work centers on `packaging/homebrew/its-magic.rb` + publish/version
+      bump mechanics that must stay aligned with `package.json` / npm release tags.
+    - `TEST_COMMAND` work spans triple installer + CLI missing-install paths and
+      target `docs/engineering/runbook.md` (and `template/` mirror) with
+      stack-aware detection per existing runbook/bootstrap contracts.
+    - Primary evidence anchors for research: `sprints/S0051/qa-findings.md`,
+      `tests/report.md`, `packaging/homebrew/its-magic.rb`, installer/CLI sources,
+      `docs/engineering/research.md` (`R-0051`).
+    - PO → TL handoff addendum: `handoffs/po_to_tl.md` (Discovery Addendum —
+      US-0074); checkpoint: `docs/engineering/state.md` discovery section for
+      **`US-0074`**.
+  - Architecture (2026-03-24, Tech Lead): contract locked in **`DEC-0056`**
+    (`decisions/DEC-0056.md`); narrative and traceability in
+    `docs/engineering/architecture.md` **`# US-0074`**; research basis **`R-0051`**
+    (`docs/engineering/research.md`); checkpoint: `docs/engineering/state.md`
+    architecture section for **`US-0074`**.
+- Acceptance:
+  - [x] AC-1: Reproduce and classify each currently failing baseline check with deterministic root-cause notes and owning artifact paths.
+  - [x] AC-2: Fix Homebrew stable formula URL/version sync with npm version source so both baseline checks pass deterministically.
+  - [x] AC-3: Fix installer and CLI missing-install `TEST_COMMAND` bootstrap behavior for detectable stacks with deterministic fallback diagnostics.
+  - [x] AC-4: Preserve existing upgrade/install ownership contracts (`US-0018`, `US-0057`, `US-0063`) with no regressions.
+  - [x] AC-5: Ensure cross-platform parity across `installer.ps1`, `installer.sh`, `installer.py`, and CLI wrapper behavior.
+  - [x] AC-6: Update tests to assert corrected behavior without masking failures; no forced pass shortcuts.
+  - [x] AC-7: QA findings for this story must show zero remaining baseline failures from the known four-check set.
+  - [x] AC-8: Active/template parity is maintained for formulas, installer scripts, runbook/readme guidance, and validation scripts.
+  - [x] AC-9: Release/readiness artifacts include auditable evidence of all four formerly failing checks now passing.
+  - [x] AC-10: Document deterministic remediation guidance for future regressions in these baseline areas.
+- Boundaries:
+  - In scope: baseline regression cleanup for known failing installer/version-sync checks and related parity/docs/tests.
+  - Out of scope: introducing unrelated feature work beyond these baseline failures.

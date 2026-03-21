@@ -2,7 +2,7 @@
 
 ## Commands
 
-TEST_COMMAND: sh tests/run-tests.sh
+TEST_COMMAND: powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"
 LINT_COMMAND:
 TYPECHECK_COMMAND:
 DEPLOY_STAGING_COMMAND: echo "No staging deploy target configured for this repository"
@@ -26,9 +26,10 @@ TEST_TIMEOUT_SECONDS: 120
 
 ## Intentional empty commands (US-0015)
 
-For this template/installer repository, empty optional command keys are
-intentional defaults, not configuration errors:
+For this template/installer repository, the following command keys may be
+intentionally empty in the shipped template; they are not configuration errors:
 
+- `TEST_COMMAND` (blank until installer bootstrap per stack; **DEC-0056**)
 - `LINT_COMMAND`
 - `FORMAT_COMMAND`
 - `TYPECHECK_COMMAND`
@@ -266,15 +267,71 @@ Context compaction policy:
 - Enforced rollover thresholds:
   - `STATE_HOT_MAX_LINES` (default `1200`)
   - `STATE_HOT_MAX_CHECKPOINTS` (default `80`)
-  When either threshold is exceeded during `/refresh-context`, older checkpoints
-  are archived into deterministic `state-pack-*` files and only bounded recent
-  checkpoints remain in hot surface.
+  - `PO_TO_TL_HOT_MAX_LINES` (default `800`)
+  - `PO_TO_TL_HOT_MAX_SECTIONS` (default `60`)
+  - `ARCH_HOT_MAX_LINES` (default `3500`)
+  - `ARCH_HOT_MAX_STORY_SECTIONS` (default `120`)
+  Thresholds resolve from merged `.cursor/scratchpad.md` +
+  `.cursor/scratchpad.local.md` (DEC-0054 triad contract).
+  When a cap is exceeded, the mutating phase must run rollover **before**
+  completion or fail closed (no successful completion with an oversize hot
+  surface).
+
+### Triad hot-surface enforcement (DEC-0054)
+
+Canonical hot/archive surfaces:
+
+- `docs/engineering/state.md` → `docs/engineering/state-archive/state-pack-*.md`
+- `handoffs/po_to_tl.md` → `handoffs/archive/po-to-tl-pack-*.md`
+- `docs/engineering/architecture.md` →
+  `docs/engineering/architecture-archive/architecture-pack-*.md`
+
+Operator commands:
+
+```bash
+python scripts/enforce-triad-hot-surface.py --check
+python scripts/enforce-triad-hot-surface.py --rollover
+```
+
+- `--check` verifies all three surfaces are within policy (CI-safe).
+- `--rollover` archives oldest contiguous units into the next deterministic pack
+  name; reruns are idempotent when already within caps.
+- Successful rollover records a verification tuple:
+  `boundary`, `moved`, `retained` (counts / lines), `pack_ref`.
 
 Rollover fail-safe reason codes:
 
 - `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`
 - `STATE_ARCHIVE_WRITE_FAILED`
 - `STATE_ARCHIVE_VERIFICATION_FAILED`
+- `STATE_ARCHIVE_REQUIRED`
+- `ARTIFACT_HOT_SURFACE_OVERSIZE`
+- `CONTEXT_BUDGET_EXCEEDED`
+
+### Minimal-read defaults by phase (bounded escalation)
+
+Read `docs/engineering/phase-context.md` first, then the **required** paths for
+your phase. If unresolved, expand once to the **single** archive pack named in
+the latest verification tuple for that surface. Do not load entire archive
+directories by default.
+
+| Phase | Required reads (default) | Combined line budget (guidance) |
+|-------|--------------------------|----------------------------------|
+| `/intake` | `phase-context.md`, target story in `docs/product/backlog.md`, `handoffs/po_to_tl.md` (tail) | ≤ 900 lines |
+| `/discovery` | `phase-context.md`, `docs/product/vision.md` (story notes), `handoffs/po_to_tl.md` (tail) | ≤ 900 lines |
+| `/research` | `phase-context.md`, `docs/engineering/research.md` (target entry), `docs/product/backlog.md` (target story) | ≤ 800 lines |
+| `/architecture` | `phase-context.md`, `docs/engineering/architecture.md` (target story section), `docs/engineering/research.md` | ≤ 1200 lines |
+| `/sprint-plan` | `phase-context.md`, `docs/engineering/architecture.md` (target story), `handoffs/tl_to_dev.md` | ≤ 1000 lines |
+| `/plan-verify` | `phase-context.md`, `sprints/Sxxxx/tasks.md`, `docs/product/backlog.md` (ACs) | ≤ 900 lines |
+| `/execute` | `phase-context.md`, `sprints/Sxxxx/tasks.md`, `handoffs/tl_to_dev.md` | ≤ 800 lines |
+| `/qa` | `phase-context.md`, `sprints/Sxxxx/`, `tests/report.md` | ≤ 900 lines |
+| `/verify-work` | `phase-context.md`, `sprints/Sxxxx/uat.json`, QA findings | ≤ 600 lines |
+| `/release` | `phase-context.md`, release queue + sprint release findings | ≤ 700 lines |
+| `/refresh-context` | `phase-context.md`, `docs/engineering/state.md` (tail), `docs/product/backlog.md` (status) | ≤ 900 lines |
+| `/auto` (resolver) | `phase-context.md`, `handoffs/resume_brief.md`, `docs/engineering/state.md` (tail) | ≤ 700 lines |
+
+If the default set is insufficient, escalate with an explicit note citing
+`pack_ref`. Unbounded broad reads fail closed with `CONTEXT_BUDGET_EXCEEDED`.
 
 `/ask` retrieval policy:
 
@@ -1188,6 +1245,22 @@ Expected deterministic outcome:
 - User local scratchpad remains preserved without overwrite.
 - Installer output reports scratchpad example refresh status
   (`added|updated|unchanged`) and preservation signal for user local file.
+
+## Scratchpad delivery Model B (US-0073 / DEC-0055)
+
+- Install manifest ships `.cursor/scratchpad.local.example.md` (framework catalog)
+  but **does not** list `.cursor/scratchpad.md` as a copied file. The installer
+  **materializes** `.cursor/scratchpad.md` from the packaged template when absent
+  (`missing`, `interactive`, `upgrade`) or refreshes it on `overwrite`.
+- Merge precedence for automation readers: **local > materialized baseline > example**
+  (same invariant as `DEC-0055`).
+- Post-install validation fails closed with `[SCRATCHPAD_MERGE_ERROR]` /
+  `[SCRATCHPAD_MATERIALIZE_ERROR]` when layers are missing or required keys are
+  empty after merge (`US-0073` `AC-4`).
+- `installer.ps1` / `installer.sh` delegate materialize+validate to
+  `python installer.py --scratchpad-postinstall` (Python 3 required on PATH).
+- Recovery: `python installer.py --scratchpad-postinstall --target <repo> --mode missing`
+  (or re-run a full install).
 
 ## Deterministic artifact ordering and write discipline (US-0058 / DEC-0040)
 

@@ -1,0 +1,91 @@
+{
+  "sprint_id": "S0051",
+  "story_ids": [
+    "US-0072"
+  ],
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Deterministic hot/archive contract for state.md, po_to_tl.md, architecture.md with scratchpad-bound thresholds and pack naming.",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0051/qa-findings.md` (AC-1); `DEC-0054`, `scripts/enforce-triad-hot-surface.py`, scratchpad keys."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Same-phase rollover or fail-closed when thresholds exceeded; no silent oversize hot surfaces.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; `--check` enforces caps; mutating phases document gates."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Archive writes verification evidence (boundary, moved, retained, pack_ref); idempotent reruns.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; pack headers + **26f** idempotent check."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "refresh-context and phases mutating high-growth artifacts enforce archive verification before completion.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; command docs + **26f** string checks (active + template)."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Minimal-read policy per phase with bounded line/file budgets.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; runbook (+ template) minimal-read table."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Compact phase-context artifacts (pointers) for subagent read order.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; `docs/engineering/phase-context.md` (+ template)."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Reason-code taxonomy for archive and context-budget failures.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7; runbook + script diagnostics (`STATE_ARCHIVE_REQUIRED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`, etc.)."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "No historical evidence loss; archive refs auditable and linked.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; archive packs retain content with headers."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Active/template parity for commands, scratchpad, runbook, README, archive docs.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; **26f** template rows PASS."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Regression: threshold success, empty-archive detection, idempotent rollover, bounded-read, fail-safe.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; **26f** in `tests/run-tests.ps1` / `tests/run-tests.sh`."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0051/qa-findings.md",
+    "sprints/S0051/summary.md",
+    "sprints/S0051/tasks.md",
+    "tests/report.md",
+    "handoffs/dev_to_qa.md",
+    "scripts/enforce-triad-hot-surface.py"
+  ]
+}

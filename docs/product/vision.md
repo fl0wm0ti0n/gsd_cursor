@@ -449,6 +449,98 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   subagents read only necessary context for each phase without losing required
   historical evidence.
 
+## Discovery Notes — US-0072
+
+- **Primary hot surfaces (AC-1 default)**: `docs/engineering/state.md`,
+  `handoffs/po_to_tl.md`, and `docs/engineering/architecture.md`. Other
+  `handoffs/*.md` files may grow by lifecycle design; research/architecture
+  should justify any expansion beyond this triad rather than implicit scope creep.
+- **Threshold authority**: Rollover and budget gates must read **merged
+  scratchpad** values (for example `STATE_HOT_MAX_LINES`,
+  `STATE_HOT_MAX_CHECKPOINTS`, and any analogous keys added for handoff or
+  architecture hot caps) so enforcement cannot drift from operator-configured
+  policy.
+- **Same-phase execution**: When a hot surface exceeds its threshold, rollover
+  runs in the **same** mutating phase boundary or that phase **fails closed**
+  with a deterministic reason code—no silent continuation with an oversized hot
+  file (aligns with AC-2, AC-4).
+- **Verification evidence (AC-3)**: Successful archive passes must emit a
+  deterministic tuple (`boundary`, `moved`, `retained`, `pack_ref`); pack naming
+  and partitioning must stay idempotent on reruns to avoid duplicate or
+  oscillating archive churn.
+- **Bounded reads (AC-5–AC-6)**: Define per-phase **required** artifact reads and
+  optional escalation with explicit line/file budgets; prefer hot-surface
+  pointers, section indexes, or compact summaries so subagents load the latest
+  relevant checkpoint first and expand only when unresolved.
+- **Regression posture (AC-10)**: Tests must detect failure modes such as hot
+  surface over threshold with **no** corresponding archive pack write, plus
+  idempotent rerun and budget-exceeded paths.
+- **Scope wall**: No overlap with `US-0071` (user-visible metadata),
+  `US-0073` (scratchpad delivery), or `US-0074` (baseline test cleanup); no
+  deletion of historical evidence or weakening of QA/release gates (backlog
+  boundaries).
+
+## Intake Notes — US-0073
+
+- User requests scratchpad delivery simplification: shipping both
+  `.cursor/scratchpad.md` and `.cursor/scratchpad.local.example.md` may be
+  redundant; user proposes example-only baseline.
+- User expectation is simpler install/update behavior while keeping deterministic
+  automation behavior and no regressions in `/auto` phase/runtime controls.
+
+## Discovery Notes — US-0073
+
+- **Delivery decision**: Research and architecture must pick a single canonical
+  installer baseline (`committed scratchpad.md` + example, or **example-only**
+  with an explicit deterministic materialization path) and document the
+  rationale; operators need a clear “what ships vs what is generated” contract.
+- **Resolution semantics**: Any example-only model must define **merged
+  scratchpad** precedence end-to-end (framework example, optional committed
+  baseline if retained, user `.cursor/scratchpad.local.md`) so `/auto` and
+  phase commands resolve the same flags as today — **no silent defaulting** when
+  required keys are absent (`AC-2`, `AC-4`).
+- **Upgrade and migration**: `--mode upgrade` and fresh install paths must
+  apply the chosen policy consistently; legacy repos that already have both
+  files need a deterministic migration or coexistence story without deleting
+  user-owned locals (`AC-3`, `AC-5`, overlap with `US-0018` / `DEC-0039`).
+- **Parity and evidence**: Installer entry points (`installer.ps1`, `.sh`,
+  `.py`, CLI) and active/`template/` copies stay aligned; regression matrix
+  must cover fresh install, upgrade from dual-file baseline, missing baseline
+  recovery, and local override preservation (`AC-6`, `AC-8`, `AC-9`).
+- **Non-regression**: Scope is delivery and config-resolution safety only — not
+  removing automation controls or weakening fail-closed gates (`US-0072` triad /
+  hot-surface contracts remain orthogonal).
+
+## Intake Notes — US-0074
+
+- User requests explicit cleanup of the remaining baseline failing checks that
+  keep appearing as out-of-scope drift in QA reports.
+- Focus areas are Homebrew/npm version-sync checks and installer/CLI
+  `TEST_COMMAND` bootstrap checks; outcome target is a fully green baseline
+  validation run for these known failures.
+
+## Discovery Notes — US-0074
+
+- **Named baseline set**: Discovery locks scope to the four asserts classified as
+  non-blocking baseline debt in `sprints/S0051/qa-findings.md` (Homebrew URL tag,
+  Homebrew `version` vs npm, installer `TEST_COMMAND` bootstrap, CLI missing-install
+  `TEST_COMMAND` bootstrap); future QA for unrelated stories must not treat these
+  as permanent noise once this story ships.
+- **Version-sync contract**: The npm/`package.json` release line is the canonical
+  semver source; the Homebrew stable formula (`packaging/homebrew/its-magic.rb`) must
+  keep `url` tag, embedded `version`, and checksum lifecycle aligned with the same
+  release the npm tarball/channel advertises (see also release/publish scripts in
+  research).
+- **`TEST_COMMAND` bootstrap**: Missing-install flows across `installer.ps1`,
+  `installer.sh`, `installer.py`, and `bin/its-magic.js` must deterministically seed
+  or refresh `TEST_COMMAND` in the target runbook when a stack is detectable,
+  consistent with `DEC-0046` / `US-0063` precedence (user override wins; no silent
+  blank where detection should apply).
+- **Evidence and parity**: Regression fixes must land with active + `template/`
+  parity, `tests/run-tests.*` / `tests/report.md` rows going green for all four
+  checks, and operator-facing remediation notes so drift is diagnosable without
+  re-triaging entire QA suites.
+
 ## Discovery Notes — US-0065
 
 - Runtime QA for generated projects must be evidence-first and executable: PASS

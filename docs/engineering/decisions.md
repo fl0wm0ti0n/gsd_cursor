@@ -1,25 +1,57 @@
 # Decisions
 
-## Current context pack (2026-03-22 — post S0050 / US-0071)
+## Current context pack (2026-03-24 — post-release S0053 / US-0074)
 
 - Latest completed/released stories (high-signal):
-  - `US-0071` (`S0050`, released), governed by `DEC-0053` (user-visible internal
-    metadata sanitization guard; execute/QA/release attestation).
-  - `US-0070` (`S0049`, released), governed by `DEC-0052`.
-  - `US-0069` (`S0048`, released), governed by `DEC-0051`.
-  - `US-0068` (`S0047`), governed by `DEC-0050`.
-  - `US-0067` (`S0046`), governed by `DEC-0049`.
-- Hot surface: `docs/engineering/state.md` rolled over; oldest checkpoints archived
-  to `docs/engineering/state-archive/state-pack-20260322.md` (12-checkpoint contiguous
-  prefix; prior packs `state-pack-20260321.md`, `state-pack-20260320.md` remain
-  historical); see refresh-context checkpoint **post S0050 / US-0071** in `state.md`.
-- Next prioritized open story: **`US-0072`** (`P1`) — deterministic context slimming
-  and archive enforcement across core artifacts (`state`, handoffs, architecture).
-- Active workflow target: **`/discovery`** for **`US-0072`** (see `handoffs/resume_brief.md`).
+  - `US-0074` (`S0053`, released), governed by **`DEC-0056`** (baseline version-sync +
+    `TEST_COMMAND` bootstrap; npm ↔ Homebrew stable; triple installer + CLI + `template/`
+    parity).
+  - `US-0073` (`S0052`, released), governed by **`DEC-0055`** (scratchpad Model B).
+  - `US-0072` (`S0051`, released), governed by **`DEC-0054`** (triad hot-surface compaction).
+  - `US-0071` (`S0050`, released), governed by **`DEC-0053`** (user-visible metadata guard).
+  - `US-0070` (`S0049`, released), governed by **`DEC-0052`**.
+  - `US-0069` (`S0048`, released), governed by **`DEC-0051`**.
+- Hot surface: **`/refresh-context`** after **`S0053`** — triad
+  `scripts/enforce-triad-hot-surface.py`: post-checkpoint-append **`--check`** →
+  **`ARTIFACT_HOT_SURFACE_OVERSIZE`** on `state.md` → **`--rollover`** (**`units=4`**) →
+  `docs/engineering/state-archive/state-pack-20260321-k.md` → final **`--check` PASS**
+  (see `## Refresh-context checkpoint (2026-03-24) — post S0053 / US-0074` in `state.md`).
+- Next prioritized open story: **none** — `docs/product/backlog.md` has **no** `Status: OPEN`
+  rows after **`US-0074`** **DONE**; next work enters via **`/intake`** when prioritized.
+- Active workflow target: operator **`none`** or **`/intake`** for net-new backlog items.
+- Continuation hygiene: `handoffs/resume_brief.md` aligned post-refresh-context
+  (`intended_resume_phase=none` unless operator selects new work).
+- Traceability (**DEC-0010**):
+  - `| US-0074 | S0053 | T-001..T-010 | DONE |` — evidence in `sprints/S0053/summary.md`,
+    `sprints/S0053/qa-findings.md`, `sprints/S0053/uat.json`, `sprints/S0053/uat.md`,
+    `sprints/S0053/release-findings.md`, `handoffs/releases/S0053-release-notes.md`,
+    `tests/report.md`, `decisions/DEC-0056.md`, `scripts/enforce-triad-hot-surface.py`.
+  - `| US-0073 | S0052 | T-001..T-010 | DONE |` — prior sprint evidence unchanged
+    (`sprints/S0052/*`, `handoffs/releases/S0052-release-notes.md`).
 - No open decision gate at this boundary.
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0056`: **baseline version-sync + TEST_COMMAND bootstrap** — `package.json`
+  `version` canonical for npm/Git tag and Homebrew stable `url` / Ruby `version` /
+  `sha256`; installer + CLI runbook bootstrap emits baseline-allowed `TEST_COMMAND`
+  (`npm run test` \| `sh tests/run-tests.sh`) with triple-installer + template parity;
+  PowerShell runner widening out of scope without explicit follow-up; linked story
+  `US-0074`.
+- `DEC-0055`: scratchpad **example-only default install (Model B)** with
+  **materialized baseline** — canonical merged precedence (local →
+  baseline/materialized → example); fail-closed missing required keys with layer
+  attribution; upgrade preserves user local + refreshes example per
+  **`DEC-0039`**; explicit legacy/migration rules; installer/CLI/`template/`
+  parity; linked story `US-0073`.
+- `DEC-0054`: **triad hot-surface compaction** — canonical targets `state.md`,
+  `handoffs/po_to_tl.md`, `architecture.md`; merged scratchpad thresholds
+  (`STATE_HOT_*`, `PO_TO_TL_HOT_*`, `ARCH_HOT_*`); deterministic archive packs
+  (`state-archive/`, `handoffs/archive/`, `architecture-archive/`); same-phase
+  rollover or fail-closed; mandatory verification tuple (`boundary`, `moved`,
+  `retained`, `pack_ref`); phase ownership gates; minimal-read budgets + reason
+  codes (`STATE_ARCHIVE_REQUIRED`, `ARTIFACT_HOT_SURFACE_OVERSIZE`,
+  `CONTEXT_BUDGET_EXCEEDED`, etc.); linked story `US-0072`.
 - `DEC-0053`: user-visible **internal metadata sanitization guard** — forbidden
   planning-token patterns (`US|DEC|R` + four digits) in operator/end-user
   software outputs only; explicit allowlist for `docs/**`, `.cursor/**`,
@@ -123,4 +155,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0053.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0056.md`.

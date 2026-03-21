@@ -183,6 +183,14 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
    - If `USER_GUIDE_MODE=0`, add no required user-guide steps or blocking checks (zero overhead).
    - If `USER_GUIDE_MODE=1`, ensure handoff references canonical user-guide path
      `docs/user-guides/US-xxxx.md` for the new story when applicable; see runbook.
+14. Triad hot-surface gate (DEC-0054) when `handoffs/po_to_tl.md` is mutated:
+   - run `python scripts/enforce-triad-hot-surface.py --rollover` then `--check`
+     from repository root,
+   - on failure stop with `STATE_ARCHIVE_REQUIRED` or
+     `ARTIFACT_HOT_SURFACE_OVERSIZE` (no successful intake completion with an
+     oversize handoff hot file),
+   - record the verification tuple (`boundary`, `moved`, `retained`,
+     `pack_ref`) in intake outputs when rollover occurred.
 
 ## Deterministic artifact ordering contract (US-0058 / DEC-0040)
 

@@ -27,14 +27,24 @@ description: "its-magic refresh context: compact state and decisions."
 1. Compact state and decisions into a short context pack.
 2. Update sprint summary with current status.
 3. Ensure handoffs and state are consistent.
-4. Enforce state hot-surface rollover when configured thresholds are exceeded:
-   - evaluate `STATE_HOT_MAX_LINES` and `STATE_HOT_MAX_CHECKPOINTS` from
-     `.cursor/scratchpad.md`,
-   - archive oldest low-frequency checkpoints into deterministic pack files under
-     `docs/engineering/state-archive/`,
-   - preserve only bounded recent checkpoints in `docs/engineering/state.md`,
-   - write deterministic verification evidence (archive boundary, moved entries,
-     retained hot-surface markers); fail closed on verification mismatch.
+4. Enforce **triad** hot-surface rollover when merged scratchpad thresholds are
+   exceeded (DEC-0054):
+   - read caps from `.cursor/scratchpad.md` + `.cursor/scratchpad.local.md`,
+     including `STATE_HOT_MAX_LINES`, `STATE_HOT_MAX_CHECKPOINTS`,
+     `PO_TO_TL_HOT_MAX_LINES`, `PO_TO_TL_HOT_MAX_SECTIONS`, `ARCH_HOT_MAX_LINES`,
+     and `ARCH_HOT_MAX_STORY_SECTIONS` (see runbook defaults),
+   - run `python scripts/enforce-triad-hot-surface.py --rollover` from repo root
+     (or `--repo <root>`) so `state.md`, `handoffs/po_to_tl.md`, and
+     `docs/engineering/architecture.md` archive oldest contiguous units into
+     deterministic packs under `docs/engineering/state-archive/`,
+     `handoffs/archive/`, and `docs/engineering/architecture-archive/`,
+   - immediately rerun `python scripts/enforce-triad-hot-surface.py --check`;
+     on failure stop with `STATE_ARCHIVE_REQUIRED` or
+     `ARTIFACT_HOT_SURFACE_OVERSIZE` (no successful phase completion on oversize
+     hot files),
+   - record verification tuple fields (`boundary`, `moved`, `retained`,
+     `pack_ref`) in the new `state.md` checkpoint when any rollover occurred;
+     idempotent reruns must not duplicate archived content.
 
 ## Deterministic artifact ordering contract (US-0058 / DEC-0040)
 

@@ -16,6 +16,8 @@ with pause/resume, decision gates, and persistent artifacts.
 - Pause/resume with checkpoints (`handoffs/resume_brief.md`).
 - Automated execute/QA loop with safety caps (optional).
 - 3-layer quality chain: AI loop → local validate-and-push → CI auto-fix.
+- User-visible metadata guard for operator-facing scripts/CLI (`US-0071` / `DEC-0053`):
+  `python scripts/check-user-visible-metadata.py` (see `docs/engineering/runbook.md`).
 - CI/CD templates driven by `docs/engineering/runbook.md`.
 - Team-friendly local overrides (`scratchpad.local.md`).
 - Optional remote/docker execution and autonomous installs.
@@ -78,8 +80,13 @@ What upgrade does:
 - **Framework files** (commands, rules, agents, hooks, skills, CI, scripts) are
   updated to the latest version.
 - **User data** (docs, sprints, handoffs, decisions, runbook) is never touched.
-- **Mixed files** (`.cursor/scratchpad.md`, `README.md`) are preserved. If the
-  template version has new content, a review notice is printed.
+- **Mixed files** (`README.md`) are preserved. If the template version has new
+  content, a review notice is printed.
+- **Scratchpad baseline (DEC-0055 / US-0073, Model B):** `.cursor/scratchpad.md`
+  is not copied as a manifest file; the installer **materializes** it from the
+  packaged template when missing and validates required merged keys (Python
+  required). Legacy repos that already committed `.cursor/scratchpad.md` keep it on
+  upgrade (not overwritten).
 - A canonical version marker is stored at `its_magic/.its-magic-version` in your repo.
 - Installer bootstrap is OS-aware + stack-aware for runbook command defaults
   (`TEST_COMMAND`, optional `LINT_COMMAND`/`TYPECHECK_COMMAND`) and preserves
@@ -177,8 +184,8 @@ your-project/
   .cursor/agents/            Subagent definitions
   .cursor/skills/            Reusable skills
   .cursor/hooks/             Automation hooks
-  .cursor/scratchpad.md      Shared configuration flags
-  .cursor/scratchpad.local.example.md
+  .cursor/scratchpad.md      Materialized shared defaults (Model B; not manifest-copied)
+  .cursor/scratchpad.local.example.md   Framework default key catalog
   docs/                      Engineering & product docs, runbook
   sprints/                   Sprint tracking artifacts
   handoffs/                  Phase handoff artifacts
@@ -191,20 +198,30 @@ your-project/
 
 ### Team mode local overrides (recommended)
 
-Use two layers:
+Use three layers (merge precedence: **local > materialized baseline > example**,
+`DEC-0055`):
 
-- Shared defaults: `.cursor/scratchpad.md` (committed)
-- Personal overrides: `.cursor/scratchpad.local.md` (gitignored)
+- Framework catalog: `.cursor/scratchpad.local.example.md` (installed; refreshed on upgrade)
+- Shared team baseline: `.cursor/scratchpad.md` (materialized on install when missing; commit as you prefer)
+- Personal overrides: `.cursor/scratchpad.local.md` (gitignored; never overwritten by install/upgrade)
 
 Setup:
 
-1. Copy `.cursor/scratchpad.local.example.md` to `.cursor/scratchpad.local.md`
-2. Set personal values there (`TEAM_MEMBER`, `ACTIVE_TASK_IDS`, automation style)
-3. Hook merges shared + local (local wins)
+1. Run `its-magic` — baseline is materialized and merged validation runs (requires Python on PATH for `installer.ps1` / `installer.sh`).
+2. Optionally copy `.cursor/scratchpad.local.example.md` to `.cursor/scratchpad.local.md` for personal values (`TEAM_MEMBER`, `ACTIVE_TASK_IDS`, …).
+
+Recovery if `.cursor/scratchpad.md` is missing or merge validation fails:
+
+```bash
+python installer.py --scratchpad-postinstall --target . --mode missing
+```
 
 Upgrade behavior (US-0057):
+- Aligns with **DEC-0039** (example vs local ownership) and Model B baseline rules below.
+
 - `.cursor/scratchpad.local.example.md` is framework-owned and refreshed on `--mode upgrade`.
 - `.cursor/scratchpad.local.md` is user-owned and preserved on `--mode upgrade`.
+- Existing `.cursor/scratchpad.md` is left untouched on upgrade (legacy parity).
 - Installer output includes scratchpad example refresh status and local-preserved signal.
 
 Deterministic ordering behavior (US-0058):
@@ -383,9 +400,15 @@ Compaction behavior:
 - Enforced rollover thresholds:
   - `STATE_HOT_MAX_LINES` (default `1200`)
   - `STATE_HOT_MAX_CHECKPOINTS` (default `80`)
-  `/refresh-context` must archive oldest checkpoints into deterministic
-  `state-pack-*` files when thresholds are exceeded, keeping only bounded recent
-  checkpoints in hot surface.
+  - `PO_TO_TL_HOT_MAX_LINES` (default `800`)
+  - `PO_TO_TL_HOT_MAX_SECTIONS` (default `60`)
+  - `ARCH_HOT_MAX_LINES` (default `3500`)
+  - `ARCH_HOT_MAX_STORY_SECTIONS` (default `120`)
+  Triad hot surfaces (`state.md`, `handoffs/po_to_tl.md`,
+  `docs/engineering/architecture.md`) must stay within merged scratchpad caps.
+  Use `python scripts/enforce-triad-hot-surface.py --check` before completing a
+  phase that mutates them; use `--rollover` to archive oldest material into
+  deterministic packs when over cap (DEC-0054).
   Archive verification mismatch fails with
   `STATE_ARCHIVE_VERIFICATION_FAILED`.
 
@@ -618,6 +641,32 @@ Fail-closed reason codes:
 
 `/auto`, `/verify-work`, and `/release` must validate these tuples before
 continuation/finalization.
+
+#### `/auto` phase→role enforcement (US-0069 / DEC-0051)
+
+`/auto` uses a deterministic **phase→role matrix** plus scratchpad alternates
+(`AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, `AUTO_ROLE_REFRESH_CONTEXT`).
+Before each phase spawn it runs a **preflight capability gate**; missing
+capability stops with `PHASE_ROLE_CAPABILITY_MISSING` (no unrelated-role
+substitution). After each phase, isolation `role` and strict-proof `role` must
+match the same expected role or the run stops with `PHASE_ROLE_MISMATCH`.
+`execute` defaults to `dev`; non-`dev` requires
+`AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` **and**
+`EXECUTE_OVERRIDE_GOVERNANCE_REF` pointing to a parseable approved waiver. See
+`docs/engineering/runbook.md` and `decisions/DEC-0051.md`.
+
+#### `/auto` phase selection policy (US-0070 / DEC-0052)
+
+`/auto` builds a **resolved phase plan** from scratchpad before spawning phases:
+exactly one of `AUTO_PHASE_PLAN` (default `full`), `AUTO_PHASE_EXCLUDE`,
+`AUTO_PHASE_INCLUDE`, or `AUTO_PHASE_PROFILE` applies; conflicting selectors
+stop with `PHASE_POLICY_CONFLICT`. Non-skippable safety gates (`qa`,
+`verify-work`, `release`) and evidence-chain closure reinstate omitted phases
+with breadcrumb reasons such as `non_skippable_gate`. `start-from` and resume
+anchors **intersect** with the plan (`START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`
+when empty). Backlog-drain, bulk execute, and team-mode runs **recompute** the
+plan each boundary. See `/auto`, `docs/engineering/runbook.md`, and
+`decisions/DEC-0052.md`.
 
 ### Lightweight interaction
 

@@ -136,11 +136,18 @@ if [ -f "$ROOT/installer.sh" ]; then
   assert_true "Installer (sh) installs commands" "[ -f \"$TMP/.cursor/commands/intake.md\" ]"
   assert_true "Installer (sh) installs ownership manifest" "[ -f \"$TMP/docs/engineering/context/installer-owned-paths.manifest\" ]"
   assert_true "Installer ownership manifest includes its_magic boundary" "file_contains \"$TMP/docs/engineering/context/installer-owned-paths.manifest\" \"its_magic\""
-  assert_true "Installer bootstraps TEST_COMMAND for detectable stack" "file_contains \"$TMP/docs/engineering/runbook.md\" \"TEST_COMMAND: npm run test\""
+  assert_true "Installer manifest omits manifest-copied scratchpad.md (US-0073)" "! file_contains \"$TMP/docs/engineering/context/installer-owned-paths.manifest\" \".cursor/scratchpad.md\""
+  assert_true "Fresh install materializes scratchpad baseline (US-0073)" "[ -f \"$TMP/.cursor/scratchpad.md\" ]"
+  assert_true "Materialized scratchpad contains MAGIC_CONTEXT_STRICT (US-0073)" "file_contains \"$TMP/.cursor/scratchpad.md\" \"MAGIC_CONTEXT_STRICT=\""
+  assert_true "Installer runbook TEST_COMMAND present for detectable stack" "grep -qE '^TEST_COMMAND:[[:space:]]*(npm run test|sh tests/run-tests\\.sh)' \"$TMP/docs/engineering/runbook.md\""
   assert_true "Installer mirrors root README into its_magic README" "file_contains \"$TMP/its_magic/README.md\" \"US-0015 intent contract\""
   assert_true "Fresh install has neutral status-normalization report" "file_contains \"$TMP/docs/engineering/status-normalization-report.md\" \"(none yet)\""
   assert_true "Fresh install has no seeded status-normalization row" "! grep -q 'US-0018' \"$TMP/docs/engineering/status-normalization-report.md\""
   assert_true "Fresh install research has no hardcoded DEC-0011 reference" "! grep -q 'DEC-0011' \"$TMP/docs/engineering/research.md\""
+  rm -f "$TMP/.cursor/scratchpad.md"
+  if command -v python3 >/dev/null 2>&1; then SPY=python3; elif command -v python >/dev/null 2>&1; then SPY=python; else SPY=""; fi
+  assert_true "scratchpad-postinstall recovery exit 0 (US-0073)" "[ -n \"$SPY\" ] && \"$SPY\" \"$ROOT/installer.py\" --scratchpad-postinstall --target \"$TMP\" --mode missing"
+  assert_true "scratchpad-postinstall restores materialized baseline (US-0073)" "[ -f \"$TMP/.cursor/scratchpad.md\" ]"
 else
   assert_true "Installer (sh) exists" "false"
 fi
@@ -170,6 +177,8 @@ if [ -f "$ROOT/installer.sh" ]; then
   assert_true "Upgrade preserves user data" "grep -q 'My Custom Vision' \"$UPGRADE_TMP/docs/product/vision.md\""
   assert_true "Upgrade refreshes scratchpad local example" "! grep -q 'modified-local-example-marker' \"$UPGRADE_TMP/.cursor/scratchpad.local.example.md\" && grep -q 'RELEASE_PUBLISH_MODE=confirm' \"$UPGRADE_TMP/.cursor/scratchpad.local.example.md\""
   assert_true "Upgrade preserves user scratchpad local overrides" "grep -q 'user-local-marker=keep' \"$UPGRADE_TMP/.cursor/scratchpad.local.md\""
+  assert_true "Upgrade leaves materialized scratchpad baseline present (US-0073)" "[ -f \"$UPGRADE_TMP/.cursor/scratchpad.md\" ]"
+  assert_true "Upgrade baseline still documents AUTO_FLOW_MODE (US-0073)" "file_contains \"$UPGRADE_TMP/.cursor/scratchpad.md\" \"AUTO_FLOW_MODE=\""
   assert_true "Upgrade does not overwrite explicit user TEST_COMMAND" "file_contains \"$UPGRADE_TMP/docs/engineering/runbook.md\" \"TEST_COMMAND: custom test command\""
   assert_true "Version file updated after upgrade (its_magic)" "[ -f \"$UPGRADE_TMP/its_magic/.its-magic-version\" ]"
   assert_true "Legacy top-level version file migrated away on upgrade" "[ ! -f \"$UPGRADE_TMP/.its-magic-version\" ]"
@@ -199,9 +208,10 @@ if [ -f "$CLI_ENTRY" ] && command -v node >/dev/null 2>&1; then
   run_with_timeout node "$CLI_ENTRY" --target "$CLI_TMP" --mode missing --create < /dev/null >/dev/null
   assert_true "CLI missing install writes version file (its_magic)" "[ -f \"$CLI_TMP/its_magic/.its-magic-version\" ]"
   assert_true "CLI missing install writes metadata README (its_magic)" "[ -f \"$CLI_TMP/its_magic/README.md\" ]"
-  assert_true "CLI missing install bootstraps TEST_COMMAND for detectable stack" "file_contains \"$CLI_TMP/docs/engineering/runbook.md\" \"TEST_COMMAND: npm run test\""
+  assert_true "CLI missing install runbook TEST_COMMAND present" "grep -qE '^TEST_COMMAND:[[:space:]]*(npm run test|sh tests/run-tests\\.sh)' \"$CLI_TMP/docs/engineering/runbook.md\""
   assert_true "CLI missing install mirrors root README into its_magic README" "file_contains \"$CLI_TMP/its_magic/README.md\" \"US-0015 intent contract\""
   assert_true "CLI missing install writes command file" "[ -f \"$CLI_TMP/.cursor/commands/intake.md\" ]"
+  assert_true "CLI missing install materializes scratchpad baseline (US-0073)" "[ -f \"$CLI_TMP/.cursor/scratchpad.md\" ]"
   assert_true "CLI missing install writes ownership manifest" "[ -f \"$CLI_TMP/docs/engineering/context/installer-owned-paths.manifest\" ]"
   assert_true "CLI missing install status-normalization report is neutral" "file_contains \"$CLI_TMP/docs/engineering/status-normalization-report.md\" \"(none yet)\""
   assert_true "CLI missing install research has no DEC-0011 reference" "! grep -q 'DEC-0011' \"$CLI_TMP/docs/engineering/research.md\""
@@ -990,6 +1000,36 @@ assert_true "runbook documents user-visible metadata guard (active)" "file_conta
 assert_true "runbook documents user-visible metadata guard (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"User-visible internal metadata guard (US-0071 / DEC-0053)\""
 assert_true "execute command documents metadata guard step (active)" "file_contains \"$ROOT/.cursor/commands/execute.md\" \"User-visible internal metadata guard (US-0071 / DEC-0053)\""
 assert_true "execute command documents metadata guard step (template)" "file_contains \"$TPL/.cursor/commands/execute.md\" \"User-visible internal metadata guard (US-0071 / DEC-0053)\""
+
+# 26f) Triad hot-surface enforcement (DEC-0054)
+TRIAD_SCRIPT="$ROOT/scripts/enforce-triad-hot-surface.py"
+assert_true "triad enforcement script exists" "test -f \"$TRIAD_SCRIPT\""
+set +e
+"$PY" "$TRIAD_SCRIPT" --self-test
+TRI_SELF=$?
+set -e
+assert_true "triad self-test passes" "[ \"$TRI_SELF\" -eq 0 ]"
+set +e
+"$PY" "$TRIAD_SCRIPT" --repo "$ROOT" --check
+TRI_CHK=$?
+set -e
+assert_true "triad check passes on repo" "[ \"$TRI_CHK\" -eq 0 ]"
+set +e
+"$PY" "$TRIAD_SCRIPT" --repo "$ROOT" --check
+TRI_CHK2=$?
+set -e
+assert_true "triad check idempotent rerun passes" "[ \"$TRI_CHK2\" -eq 0 ]"
+assert_true "runbook documents triad enforcement (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"scripts/enforce-triad-hot-surface.py\""
+assert_true "runbook documents triad enforcement (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"scripts/enforce-triad-hot-surface.py\""
+assert_true "runbook documents minimal-read phase table (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Minimal-read defaults by phase\""
+assert_true "phase-context pointer file exists (active)" "test -f \"$ROOT/docs/engineering/phase-context.md\""
+assert_true "phase-context pointer file exists (template)" "test -f \"$TPL/docs/engineering/phase-context.md\""
+assert_true "scratchpad defines PO_TO_TL hot caps (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"PO_TO_TL_HOT_MAX_LINES\""
+assert_true "scratchpad defines PO_TO_TL hot caps (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"PO_TO_TL_HOT_MAX_LINES\""
+assert_true "execute command documents triad gate (active)" "file_contains \"$ROOT/.cursor/commands/execute.md\" \"enforce-triad-hot-surface.py\""
+assert_true "execute command documents triad gate (template)" "file_contains \"$TPL/.cursor/commands/execute.md\" \"enforce-triad-hot-surface.py\""
+assert_true "refresh-context documents triad rollover (active)" "file_contains \"$ROOT/.cursor/commands/refresh-context.md\" \"enforce-triad-hot-surface.py\""
+assert_true "refresh-context documents triad rollover (template)" "file_contains \"$TPL/.cursor/commands/refresh-context.md\" \"enforce-triad-hot-surface.py\""
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {

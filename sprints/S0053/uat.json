@@ -1,0 +1,93 @@
+{
+  "sprint_id": "S0053",
+  "story_ids": [
+    "US-0074"
+  ],
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Root-cause classification and owning paths documented for each baseline check.",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0053/qa-findings.md`; research, architecture, and decision records cited."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Homebrew stable formula URL and version aligned with npm package source.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; formula literals vs `package.json`."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Installer and CLI missing-install paths bootstrap runbook test command for detectable stacks.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; runbook bootstrap contract."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Upgrade and install ownership contracts preserved (no regressions).",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; consolidated suite and lifecycle rows."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Cross-platform parity across PowerShell, shell, Python installers and CLI wrapper.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; triple-installer + CLI parity."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Tests assert corrected behavior without masking or forced passes.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; full green consolidated runner, strict rows."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Zero failures in the four named baseline checks in QA evidence.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7 table; `tests/report.md` rows all PASS."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Active and template parity for formula, installers, runbook, and validation scripts.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; template/active alignment in runner and handoffs."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Release and readiness artifacts cite auditable evidence that baseline checks pass.",
+      "result": "pass",
+      "notes": "PASS per verify-work + release artifacts; consolidated report + QA findings."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Deterministic remediation guidance documented for future version-sync and test-command drift.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; decision + architecture + runbook pointers."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0053/qa-findings.md",
+    "sprints/S0053/summary.md",
+    "sprints/S0053/tasks.md",
+    "tests/report.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0056.md",
+    "scripts/check-user-visible-metadata.py",
+    "scripts/enforce-triad-hot-surface.py"
+  ]
+}

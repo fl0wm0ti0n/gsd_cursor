@@ -119,7 +119,143 @@ USER_DATA_PREFIXES = (
     "docs/product/", "docs/engineering/", "docs/user-guides/",
     "sprints/", "handoffs/", "decisions/",
 )
-MIXED_FILES = {".cursor/scratchpad.md", "README.md"}
+MIXED_FILES = {"README.md"}
+
+# Model B (DEC-0055 / US-0073): baseline bytes live in template only; installs materialize `.cursor/scratchpad.md`.
+SCRATCHPAD_BASELINE_REL = os.path.join(".cursor", "scratchpad.md")
+SCRATCHPAD_EXAMPLE_REL = os.path.join(".cursor", "scratchpad.local.example.md")
+SCRATCHPAD_LOCAL_REL = os.path.join(".cursor", "scratchpad.local.md")
+
+# After merge (local > baseline > example), these must be non-empty (fail closed).
+REQUIRED_SCRATCHPAD_KEYS = (
+    "MAGIC_CONTEXT_STRICT",
+    "AUTO_FLOW_MODE",
+    "PHASE_MODE",
+    "PERMISSION_MODE",
+    "AUTO_LOOP_MAX_CYCLES",
+    "SYNC_POLICY_MODE",
+    "DONE",
+    "TEAM_MODE",
+)
+
+
+def parse_scratchpad_file(path):
+    """Parse KEY=value lines; empty values are retained (explicit override to empty)."""
+    if not os.path.isfile(path):
+        return {}
+    out = {}
+    with open(path, "r", encoding="utf-8") as f:
+        for raw in f:
+            line = raw.strip()
+            if not line or line.startswith("#") or line.startswith("- "):
+                continue
+            if "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            key = key.strip()
+            if not key:
+                continue
+            out[key] = val.strip()
+    return out
+
+
+def merge_scratchpad_layers(target_root):
+    """
+    Model B merge precedence: local > materialized baseline > example (later wins only when key absent).
+    """
+    ex_path = os.path.join(target_root, SCRATCHPAD_EXAMPLE_REL)
+    base_path = os.path.join(target_root, SCRATCHPAD_BASELINE_REL)
+    loc_path = os.path.join(target_root, SCRATCHPAD_LOCAL_REL)
+    example = parse_scratchpad_file(ex_path)
+    baseline = parse_scratchpad_file(base_path)
+    local = parse_scratchpad_file(loc_path)
+    merged = {}
+    all_keys = set(example) | set(baseline) | set(local)
+    for key in all_keys:
+        if key in local:
+            merged[key] = local[key]
+        elif key in baseline:
+            merged[key] = baseline[key]
+        elif key in example:
+            merged[key] = example[key]
+    paths = {"example": ex_path, "baseline": base_path, "local": loc_path}
+    return merged, paths
+
+
+def validate_merged_scratchpad(target_root):
+    """Return (ok, list of diagnostic lines)."""
+    merged, paths = merge_scratchpad_layers(target_root)
+    diagnostics = []
+    if not os.path.isfile(paths["example"]):
+        diagnostics.append(
+            "[SCRATCHPAD_MERGE_ERROR] EXAMPLE_LAYER_MISSING: "
+            f".cursor/scratchpad.local.example.md not found under {target_root}. "
+            "Fix: re-run its-magic install/upgrade."
+        )
+    if not os.path.isfile(paths["baseline"]):
+        diagnostics.append(
+            "[SCRATCHPAD_MERGE_ERROR] MATERIALIZED_BASELINE_MISSING: "
+            f".cursor/scratchpad.md not found under {target_root}. "
+            "Fix: run `python installer.py --scratchpad-postinstall --target <repo> --mode missing` "
+            "or re-run its-magic install (Model B materialization; see docs)."
+        )
+    missing = []
+    for key in REQUIRED_SCRATCHPAD_KEYS:
+        val = merged.get(key)
+        if val is None or str(val).strip() == "":
+            missing.append(key)
+    if missing:
+        diagnostics.append(
+            "[SCRATCHPAD_MERGE_ERROR] REQUIRED_KEY_MISSING_AFTER_MERGE: "
+            f"keys={','.join(missing)}. Layers consulted: local, baseline|materialized, example "
+            f"({paths['local']}, {paths['baseline']}, {paths['example']}). "
+            "Fix: set non-empty values in .cursor/scratchpad.local.md or restore materialized baseline from template."
+        )
+    ok = not diagnostics
+    return ok, diagnostics
+
+
+def materialize_scratchpad_baseline(target_root, source_root, mode):
+    """
+    Write stable baseline bytes from template when Model B requires it.
+    Never touches .cursor/scratchpad.local.md.
+    """
+    src = os.path.join(source_root, SCRATCHPAD_BASELINE_REL)
+    dst = os.path.join(target_root, SCRATCHPAD_BASELINE_REL)
+    if not os.path.isfile(src):
+        print(
+            "[SCRATCHPAD_MATERIALIZE_ERROR] TEMPLATE_BASELINE_MISSING: "
+            f"expected template file at {src}. Reinstall its-magic package."
+        )
+        return False
+    if mode == "overwrite":
+        ensure_parent(dst)
+        shutil.copy2(src, dst)
+        return True
+    if mode == "upgrade":
+        if not os.path.isfile(dst):
+            ensure_parent(dst)
+            shutil.copy2(src, dst)
+        return True
+    # missing, interactive
+    if not os.path.isfile(dst):
+        ensure_parent(dst)
+        shutil.copy2(src, dst)
+    return True
+
+
+def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+    if not materialize_scratchpad_baseline(target_root, source_root, mode):
+        return False
+    ok, diagnostics = validate_merged_scratchpad(target_root)
+    for line in diagnostics:
+        print(line)
+    if ok and print_ok:
+        print(
+            "[SCRATCHPAD_POSTINSTALL_OK] Model B: materialized baseline (if required) "
+            "and merged scratchpad validation passed."
+        )
+    return ok
 
 
 def classify_file(rel_path):
@@ -213,8 +349,6 @@ def package_has_script(target_root, script_name):
 
 
 def detect_runbook_defaults(target_root):
-    is_windows = os.name == "nt"
-    tests_ps1 = os.path.join(target_root, "tests", "run-tests.ps1")
     tests_sh = os.path.join(target_root, "tests", "run-tests.sh")
     has_pkg = os.path.isfile(os.path.join(target_root, "package.json"))
     has_py = any(
@@ -235,8 +369,6 @@ def detect_runbook_defaults(target_root):
         result["TEST_COMMAND"] = "go test ./..."
     elif has_py:
         result["TEST_COMMAND"] = "python -m pytest"
-    elif is_windows and os.path.isfile(tests_ps1):
-        result["TEST_COMMAND"] = "powershell -ExecutionPolicy Bypass -File \"tests/run-tests.ps1\""
     elif os.path.isfile(tests_sh):
         result["TEST_COMMAND"] = "sh tests/run-tests.sh"
 
@@ -392,6 +524,10 @@ def show_help(version):
     print("  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands")
     print("        from OS+stack detection; unresolved TEST_COMMAND fails fast with")
     print("        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.")
+    print("  Note: scratchpad Model B: `.cursor/scratchpad.md` is")
+    print("        materialized from the packaged template when missing; merged validation")
+    print("        requires Python 3 on PATH for installer.ps1 / installer.sh. Recovery:")
+    print("        python installer.py --scratchpad-postinstall --target <repo> --mode missing")
     print()
     print("Clean options:")
     print("  --clean-repo      Remove all its-magic workflow artifacts from the target repo")
@@ -445,6 +581,11 @@ def main():
     parser.add_argument("--yes", action="store_true", help="Skip clean confirmation prompt")
     parser.add_argument("--help", "-h", action="store_true", help="Show help")
     parser.add_argument("--version", "-v", action="store_true", help="Show version")
+    parser.add_argument(
+        "--scratchpad-postinstall",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args()
 
     if len(sys.argv) == 1 or args.help:
@@ -454,6 +595,24 @@ def main():
     if args.version:
         print(f"its-magic v{version}")
         return 0
+
+    if args.scratchpad_postinstall:
+        target_root = normalize(args.target) if args.target else normalize(".")
+        mode = args.mode or "missing"
+        if mode not in ("missing", "overwrite", "interactive", "upgrade"):
+            print(
+                "[SCRATCHPAD_POSTINSTALL_ERROR] INVALID_MODE: use --mode "
+                "missing|overwrite|interactive|upgrade with --scratchpad-postinstall."
+            )
+            return 1
+        if not os.path.isdir(source_root):
+            print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
+            return 1
+        if not os.path.isdir(target_root):
+            print(f"[SCRATCHPAD_POSTINSTALL_ERROR] TARGET_MISSING: {target_root}")
+            return 1
+        ok = run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True)
+        return 0 if ok else 1
 
     if not os.path.isdir(source_root):
         print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
@@ -559,6 +718,9 @@ def main():
                     review.append(rel)
                 continue
 
+        if not run_scratchpad_postinstall(target_root, source_root, "upgrade", print_ok=True):
+            return 1
+
         write_installed_version(target_root, version)
         sync_root_readme_to_its_magic(target_root)
         runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
@@ -629,6 +791,9 @@ def main():
                     print(f"Backed up: {rel} -> {broot}")
                 ensure_parent(dst)
                 shutil.copy2(src, dst)
+
+    if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+        return 1
 
     write_installed_version(target_root, version)
     sync_root_readme_to_its_magic(target_root)

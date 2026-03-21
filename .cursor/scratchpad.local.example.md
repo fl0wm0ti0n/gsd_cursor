@@ -55,26 +55,6 @@ AUTO_EXECUTE_ON_BLOCK=stop
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
 #
-# `/auto` phase role policy (US-0069 / DEC-0051)
-# - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
-# - AUTO_ROLE_PLAN_VERIFY: qa|tech-lead (empty -> default qa)
-# - AUTO_ROLE_REFRESH_CONTEXT: curator|po (empty -> default curator)
-# - AUTO_EXECUTE_ROLE_OVERRIDE: empty or allowed_non_dev_execute
-# - EXECUTE_OVERRIDE_GOVERNANCE_REF: parseable waiver pointer when override set
-AUTO_ROLE_RESEARCH=
-AUTO_ROLE_PLAN_VERIFY=
-AUTO_ROLE_REFRESH_CONTEXT=
-AUTO_EXECUTE_ROLE_OVERRIDE=
-EXECUTE_OVERRIDE_GOVERNANCE_REF=
-#
-# `/auto` phase selection policy (US-0070 / DEC-0052)
-# Exactly one active mode after merge; conflict -> PHASE_POLICY_CONFLICT (no plan).
-AUTO_PHASE_PLAN=
-AUTO_PHASE_EXCLUDE=
-AUTO_PHASE_INCLUDE=
-AUTO_PHASE_PROFILE=
-AUTO_PHASE_HIGH_RISK_ACK=
-#
 # Team mode
 # - TEAM_MODE: 0|1 (enable task/member scoped team workflow)
 # - TEAM_MEMBER: short id for current developer

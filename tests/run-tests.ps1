@@ -147,11 +147,23 @@ if (Test-Path $installer -PathType Leaf) {
     Assert-True "Installer (ps1) installs commands" $installed
     Assert-True "Installer (ps1) installs ownership manifest" $manifestInstalled
     Assert-True "Installer ownership manifest includes its_magic boundary" (File-Contains $manifestPath "its_magic")
-    Assert-True "Installer bootstraps TEST_COMMAND for detectable stack" (File-Contains $freshRunbook "TEST_COMMAND: npm run test")
+    Assert-True "Installer manifest omits manifest-copied scratchpad.md (US-0073 Model B)" (-not (File-Contains $manifestPath ".cursor/scratchpad.md"))
+    Assert-True "Fresh install materializes scratchpad baseline (US-0073)" (Test-Path (Join-Path $tempRoot ".cursor\scratchpad.md") -PathType Leaf)
+    Assert-True "Materialized scratchpad contains MAGIC_CONTEXT_STRICT (US-0073)" (File-Contains (Join-Path $tempRoot ".cursor\scratchpad.md") "MAGIC_CONTEXT_STRICT=")
+    $freshRunbookRaw = Get-Content -Path $freshRunbook -Raw
+    $testCmdOk = $freshRunbookRaw -match 'TEST_COMMAND:\s*npm run test' -or $freshRunbookRaw -match 'TEST_COMMAND:\s*sh tests/run-tests\.sh'
+    Assert-True "Installer runbook TEST_COMMAND present for detectable stack (npm or sh template default)" $testCmdOk
     Assert-True "Installer mirrors root README into its_magic README" (File-Contains (Join-Path $tempRoot "its_magic\README.md") "US-0015 intent contract")
     Assert-True "Fresh install has neutral status-normalization report" (File-Contains $freshStatusReport "(none yet)")
     Assert-True "Fresh install has no seeded status-normalization row" (-not (File-Contains $freshStatusReport "US-0018"))
     Assert-True "Fresh install research has no hardcoded DEC-0011 reference" (-not (File-Contains $freshResearch "DEC-0011"))
+    # US-0073: missing baseline recovery via --scratchpad-postinstall
+    $spBaseline = Join-Path $tempRoot ".cursor\scratchpad.md"
+    Remove-Item -Path $spBaseline -Force -ErrorAction SilentlyContinue
+    $pyPost = Join-Path $root "installer.py"
+    $postProc = Start-Process -FilePath "python" -ArgumentList @($pyPost, "--scratchpad-postinstall", "--target", $tempRoot, "--mode", "missing") -Wait -PassThru -NoNewWindow
+    Assert-True "scratchpad-postinstall recovery exit 0 (US-0073)" ($postProc.ExitCode -eq 0)
+    Assert-True "scratchpad-postinstall restores materialized baseline (US-0073)" (Test-Path $spBaseline -PathType Leaf)
   } catch {
     Assert-True "Installer (ps1) installs commands" $false $_.Exception.Message
   }
@@ -218,6 +230,9 @@ if (Test-Path $installer -PathType Leaf) {
 
     $scratchpadLocalPreserved = (Get-Content -Path $scratchpadLocal -Raw) -match "user-local-marker=keep"
     Assert-True "Upgrade preserves user scratchpad local overrides" $scratchpadLocalPreserved
+    $upgradeBaseline = Join-Path $upgradeTemp ".cursor\scratchpad.md"
+    Assert-True "Upgrade leaves materialized scratchpad baseline present (US-0073)" (Test-Path $upgradeBaseline -PathType Leaf)
+    Assert-True "Upgrade baseline still documents AUTO_FLOW_MODE (US-0073)" (File-Contains $upgradeBaseline "AUTO_FLOW_MODE=")
     Assert-True "Upgrade does not overwrite explicit user TEST_COMMAND" (File-Contains $upgradeRunbook "TEST_COMMAND: custom test command")
 
     $versionUpdated = (Test-Path $versionFile -PathType Leaf)
@@ -279,9 +294,12 @@ if ((Test-Path $cli -PathType Leaf) -and $nodeCmd) {
     & node $cli --target $cliTemp --mode missing --create | Out-Null
     Assert-True "CLI missing install writes version file (its_magic)" (Test-Path (Join-Path $cliTemp "its_magic\.its-magic-version") -PathType Leaf)
     Assert-True "CLI missing install writes metadata README (its_magic)" (Test-Path (Join-Path $cliTemp "its_magic\README.md") -PathType Leaf)
-    Assert-True "CLI missing install bootstraps TEST_COMMAND for detectable stack" (File-Contains (Join-Path $cliTemp "docs\engineering\runbook.md") "TEST_COMMAND: npm run test")
+    $cliRunbookRaw = Get-Content -Path (Join-Path $cliTemp "docs\engineering\runbook.md") -Raw
+    $cliTestOk = $cliRunbookRaw -match 'TEST_COMMAND:\s*npm run test' -or $cliRunbookRaw -match 'TEST_COMMAND:\s*sh tests/run-tests\.sh'
+    Assert-True "CLI missing install runbook TEST_COMMAND present (npm or sh template default)" $cliTestOk
     Assert-True "CLI missing install mirrors root README into its_magic README" (File-Contains (Join-Path $cliTemp "its_magic\README.md") "US-0015 intent contract")
     Assert-True "CLI missing install writes command file" (Test-Path (Join-Path $cliTemp ".cursor\commands\intake.md") -PathType Leaf)
+    Assert-True "CLI missing install materializes scratchpad baseline (US-0073)" (Test-Path (Join-Path $cliTemp ".cursor\scratchpad.md") -PathType Leaf)
     Assert-True "CLI missing install writes ownership manifest" (Test-Path (Join-Path $cliTemp "docs\engineering\context\installer-owned-paths.manifest") -PathType Leaf)
     Assert-True "CLI missing install status-normalization report is neutral" (File-Contains (Join-Path $cliTemp "docs\engineering\status-normalization-report.md") "(none yet)")
     Assert-True "CLI missing install research has no DEC-0011 reference" (-not (File-Contains (Join-Path $cliTemp "docs\engineering\research.md") "DEC-0011"))
@@ -1228,6 +1246,27 @@ Assert-True "runbook documents user-visible metadata guard (active)" (File-Conta
 Assert-True "runbook documents user-visible metadata guard (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
 Assert-True "execute command documents metadata guard step (active)" (File-Contains (Join-Path $root ".cursor\commands\execute.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
 Assert-True "execute command documents metadata guard step (template)" (File-Contains (Join-Path $tpl ".cursor\commands\execute.md") "User-visible internal metadata guard (US-0071 / DEC-0053)")
+
+# 26f) Triad hot-surface enforcement (DEC-0054)
+$triadScript = Join-Path $root "scripts\enforce-triad-hot-surface.py"
+Assert-True "triad enforcement script exists" (Test-Path $triadScript -PathType Leaf)
+$triSelf = Start-Process python -ArgumentList @($triadScript, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "triad self-test passes" ($triSelf.ExitCode -eq 0)
+$triCheck = Start-Process python -ArgumentList @($triadScript, "--repo", $root, "--check") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "triad check passes on repo" ($triCheck.ExitCode -eq 0)
+$triCheck2 = Start-Process python -ArgumentList @($triadScript, "--repo", $root, "--check") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "triad check idempotent rerun passes" ($triCheck2.ExitCode -eq 0)
+Assert-True "runbook documents triad enforcement (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "scripts/enforce-triad-hot-surface.py")
+Assert-True "runbook documents triad enforcement (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "scripts/enforce-triad-hot-surface.py")
+Assert-True "runbook documents minimal-read phase table (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "Minimal-read defaults by phase")
+Assert-True "phase-context pointer file exists (active)" (Test-Path (Join-Path $root "docs\engineering\phase-context.md") -PathType Leaf)
+Assert-True "phase-context pointer file exists (template)" (Test-Path (Join-Path $tpl "docs\engineering\phase-context.md") -PathType Leaf)
+Assert-True "scratchpad defines PO_TO_TL hot caps (active)" (File-Contains (Join-Path $root ".cursor\scratchpad.md") "PO_TO_TL_HOT_MAX_LINES")
+Assert-True "scratchpad defines PO_TO_TL hot caps (template)" (File-Contains (Join-Path $tpl ".cursor\scratchpad.md") "PO_TO_TL_HOT_MAX_LINES")
+Assert-True "execute command documents triad gate (active)" (File-Contains (Join-Path $root ".cursor\commands\execute.md") "enforce-triad-hot-surface.py")
+Assert-True "execute command documents triad gate (template)" (File-Contains (Join-Path $tpl ".cursor\commands\execute.md") "enforce-triad-hot-surface.py")
+Assert-True "refresh-context documents triad rollover (active)" (File-Contains (Join-Path $root ".cursor\commands\refresh-context.md") "enforce-triad-hot-surface.py")
+Assert-True "refresh-context documents triad rollover (template)" (File-Contains (Join-Path $tpl ".cursor\commands\refresh-context.md") "enforce-triad-hot-surface.py")
 
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
