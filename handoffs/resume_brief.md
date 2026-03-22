@@ -3,39 +3,39 @@
 ## Current status
 
 - Queue posture:
-  - **`US-0074`** — **DONE** and **released** with sprint **`S0053`** (verify-work, release, refresh-context complete under `orchestrator_run_id=auto-20260324-01`).
-  - **`docs/product/backlog.md`**: **no** `Status: OPEN` rows — all tracked stories **DONE**.
-- Governance in force: **`DEC-0056`** (baseline delivered), **`DEC-0054`** (triad hot surface), **`DEC-0055`**, **`DEC-0039`**, and related records as applicable.
+  - **`docs/product/backlog.md`** — **no** `Status: OPEN` stories (all tracked backlog rows through **`US-0075`** are **DONE** and released as applicable).
+  - Latest released sprint: **`S0054`** (**`US-0075`**, **`DEC-0057`**).
+- Canonical story status: next prioritized work should enter via **`/intake`** when the PO prioritizes a new item.
 
 ## Next actions
 
-1. Start **`/intake`** when new product work should enter the backlog, or remain idle (**`none`**) if not planning new stories.
-2. For automation resumes with an empty backlog, treat intended phase as **`none`** until intake creates the next **OPEN** item.
+1. When ready for new scope, run **`/intake`** (or equivalent PO workflow) to add the next story.
+2. Preserve strict per-phase isolation + strict runtime-proof tuples on future auto runs.
 
 ## Intended resume phase
 
-`none`
+`intake`
 
 ## Resume target
 
-- story_id=`(none — backlog has no OPEN items)`
-- sprint_id=`(none)`
-- boundary=`post-refresh-context` for **S0053** / **US-0074** (see `docs/engineering/state.md` `## Refresh-context checkpoint (2026-03-24) — post S0053 / US-0074`)
+- story_id=`none`
+- sprint_id=`pending`
+- boundary=`post-refresh-context` (see `docs/engineering/state.md` **Refresh-context checkpoint (2026-03-21) — post S0054 / US-0075**)
 
 ## Isolation provenance (US-0048/US-0056)
 
-- isolation_provenance_ref=docs/engineering/state.md (latest refresh-context checkpoint for **S0053**)
+- isolation_provenance_ref=docs/engineering/state.md (Refresh-context checkpoint (2026-03-21) — post S0054 / US-0075)
 - resume_requires_fresh_context=1
 
 ## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
-- resolved_start_phase=none
-- resolution_source=refresh_complete
+- resolved_start_phase=intake
+- resolution_source=refresh_context_reconcile
 - resolution_status=resolved
-- stop_reason=completed
+- stop_reason=backlog_empty_open
 - stop_phase=refresh-context
-- story_id=(none)
-- sprint_id=S0053
-- orchestrator_run_id=auto-20260324-01
-- timestamp=2026-03-24T21:00:00Z
+- story_id=none
+- sprint_id=pending
+- orchestrator_run_id=auto-20260326-01
+- timestamp=2026-03-21T19:50:00Z

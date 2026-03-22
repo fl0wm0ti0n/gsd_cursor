@@ -636,10 +636,10 @@ assert_true "scratchpad local example includes detailed core behavior descriptio
 assert_true "scratchpad local example includes detailed automation descriptions (template)" "file_contains \"$TPL/.cursor/scratchpad.local.example.md\" \"- AUTO_FLOW_MODE: manual|auto_until_decision\""
 assert_true "scratchpad local example includes release publish mode override (active)" "file_contains \"$ROOT/.cursor/scratchpad.local.example.md\" \"RELEASE_PUBLISH_MODE=confirm\""
 assert_true "scratchpad local example includes release publish mode override (template)" "file_contains \"$TPL/.cursor/scratchpad.local.example.md\" \"RELEASE_PUBLISH_MODE=confirm\""
-assert_true "runbook documents scratchpad upgrade contract (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039)\""
-assert_true "runbook documents scratchpad upgrade contract (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039)\""
-assert_true "README documents scratchpad upgrade behavior (active)" "file_contains \"$ROOT/README.md\" \"Upgrade behavior (US-0057):\""
-assert_true "README documents scratchpad upgrade behavior (template)" "file_contains \"$TPL/README.md\" \"Upgrade behavior (US-0057):\""
+assert_true "runbook documents scratchpad upgrade contract (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039 / DEC-0057)\""
+assert_true "runbook documents scratchpad upgrade contract (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Scratchpad example upgrade contract (US-0057 / DEC-0039 / DEC-0057)\""
+assert_true "README documents scratchpad upgrade behavior (active)" "file_contains \"$ROOT/README.md\" \"Upgrade behavior (US-0057 / DEC-0057):\""
+assert_true "README documents scratchpad upgrade behavior (template)" "file_contains \"$TPL/README.md\" \"Upgrade behavior (US-0057 / DEC-0057):\""
 
 # 21h) Deterministic artifact ordering checks (US-0058)
 assert_true "artifact ordering policy exists (active)" "[ -f \"$ROOT/docs/engineering/artifact-ordering-policy.md\" ]"
@@ -1030,6 +1030,15 @@ assert_true "execute command documents triad gate (active)" "file_contains \"$RO
 assert_true "execute command documents triad gate (template)" "file_contains \"$TPL/.cursor/commands/execute.md\" \"enforce-triad-hot-surface.py\""
 assert_true "refresh-context documents triad rollover (active)" "file_contains \"$ROOT/.cursor/commands/refresh-context.md\" \"enforce-triad-hot-surface.py\""
 assert_true "refresh-context documents triad rollover (template)" "file_contains \"$TPL/.cursor/commands/refresh-context.md\" \"enforce-triad-hot-surface.py\""
+
+# 26g) Scratchpad paired catalog parity (US-0075 / DEC-0057 / AC-11)
+PARITY_SCRIPT="$ROOT/scripts/check-scratchpad-pair-parity.py"
+assert_true "scratchpad pair parity script exists" "[ -f \"$PARITY_SCRIPT\" ]"
+set +e
+"$PY" "$PARITY_SCRIPT" --repo "$ROOT"
+PARITY_OK=$?
+set -e
+assert_true "scratchpad pair parity check passes on repo" "[ \"$PARITY_OK\" -eq 0 ]"
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {

@@ -81,6 +81,14 @@ AUTO_PHASE_INCLUDE=
 AUTO_PHASE_PROFILE=
 AUTO_PHASE_HIGH_RISK_ACK=
 #
+# Team mode
+# - TEAM_MODE: 0|1 (enable task/member scoped team workflow)
+# - TEAM_MEMBER: short id for current developer
+# - ACTIVE_TASK_IDS: comma-separated task ids (for example T-12,T-13)
+TEAM_MODE=0
+TEAM_MEMBER=
+ACTIVE_TASK_IDS=
+#
 # Sprint planning
 # - SPRINT_MAX_TASKS: integer >= 1 (max atomic tasks per sprint, default 12)
 # - SPRINT_AUTO_SPLIT: 0|1 (propose splitting when over threshold)

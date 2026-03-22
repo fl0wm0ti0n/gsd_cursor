@@ -616,3 +616,48 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - Scope boundary must remain strict: `US-0068` defines intake questionnaire and
   persistence-gate policy only; runtime QA/test scaffolding/release operator
   guidance remain in `US-0065`/`US-0066`/`US-0067`.
+
+## Intake Notes — US-0075
+
+- **Problem**: On upgrade, **`.cursor/scratchpad.md`** can change while
+  **`.cursor/scratchpad.local.example.md`** does not, leaving operators without
+  an up-to-date catalog to copy into **`.cursor/scratchpad.local.md`**.
+- **Intent**: Treat **example** surfaces as the **primary** shipped documentation
+  of new/changed scratchpad keys; keep them **in lockstep** with
+  **`template/.cursor/scratchpad.local.example.md`** and refresh them on every
+  upgrade path that touches scratchpad layers.
+- **Success**: After upgrade, example bytes match template example; materialized
+  baseline refresh never implies a **newer** key catalog in `scratchpad.md` than
+  in example for the same release.
+- **Constraints**: Preserve **DEC-0055** merge semantics and user-local file;
+  no silent overwrite of **`.cursor/scratchpad.local.md`**.
+- **Overlap**: Reasserts **US-0057** guarantees; closes reported drift under
+  **US-0073** / Model B materialization ordering.
+- **Refinement (2026-03-25)**: Beyond upgrade ordering, **both** scratchpad
+  surfaces must list the **same** framework settings: e.g. **Team** block must
+  appear in **`.cursor/scratchpad.md`** if it appears in the example, and
+  **`.cursor/scratchpad.local.example.md`** must include every block present in
+  the materialized file (**`/auto` role**, **phase selection**, **triad** caps
+  `PO_TO_TL_*` / `ARCH_*`, etc.). Enforce with a **deterministic parity check**
+  (**US-0075** **AC-11**).
+
+## Discovery Notes — US-0075
+
+- **Example-first operator contract**: After install or upgrade, **`.cursor/scratchpad.local.example.md`**
+  must remain the **authoritative copy-from catalog** for framework keys; materialized
+  **`.cursor/scratchpad.md`** must never advance to a **richer** documented key set than
+  the example in the same release step (**DEC-0055** / **US-0073** ordering stays
+  consistent with **AC-1** / **AC-3**).
+- **Paired parity (AC-11)**: Beyond ordering, **both** shipped scratchpad surfaces must
+  expose the **same** framework **section headers** and **`KEY=`** inventory (Team,
+  `/auto` role/phase policy, triad **`STATE_*` / `PO_TO_TL_*` / `ARCH_*`**, and the rest),
+  with **`template/`** mirrors held to the same rule so skew cannot re-enter via packaging.
+- **Parity check UX**: Failures must be **deterministic** and **operator-actionable**
+  (path pair, missing section or key, remediation: align to template pair, re-run upgrade,
+  verify manifest paths) — no silent drift.
+- **Non-goals for discovery**: No change to merged-scratchpad value precedence
+  (**DEC-0055**) except where required to fix refresh **ordering**; **`.cursor/scratchpad.local.md`**
+  remains user-owned and untouched by framework refresh (**AC-5**).
+- **Research handoff**: Extend **`R-0052`** with concrete file-level refresh ordering,
+  manifest path evidence, and a minimal **parity schema** (what counts as a “framework key”
+  for the deterministic check) before **`/architecture`**.

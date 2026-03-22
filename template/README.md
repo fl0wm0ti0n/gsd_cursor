@@ -216,13 +216,20 @@ Recovery if `.cursor/scratchpad.md` is missing or merge validation fails:
 python installer.py --scratchpad-postinstall --target . --mode missing
 ```
 
-Upgrade behavior (US-0057):
-- Aligns with **DEC-0039** (example vs local ownership) and Model B baseline rules below.
+Upgrade behavior (US-0057 / DEC-0057):
+- Aligns with **DEC-0039** (example vs local ownership), **DEC-0057** (example-first
+  ordering relative to baseline materialization), and Model B baseline rules below.
 
-- `.cursor/scratchpad.local.example.md` is framework-owned and refreshed on `--mode upgrade`.
+- `.cursor/scratchpad.local.example.md` is framework-owned and always refreshed from
+  the shipped template during post-install **before** baseline handling (`DEC-0057` **AC-1..AC-3**).
 - `.cursor/scratchpad.local.md` is user-owned and preserved on `--mode upgrade`.
-- Existing `.cursor/scratchpad.md` is left untouched on upgrade (legacy parity).
-- Installer output includes scratchpad example refresh status and local-preserved signal.
+- Existing `.cursor/scratchpad.md` is left untouched on upgrade unless missing (then
+  materialized) or `overwrite` / fresh materialize paths apply (Model B).
+- Installer output uses `[SCRATCHPAD_LAYER]` lines to distinguish example refresh,
+  baseline materialize/skip, and user-local preservation (`DEC-0057` **AC-5**).
+- Paired catalog parity (baseline vs `.cursor/scratchpad.local.example.md`, active and
+  `template/`): `python scripts/check-scratchpad-pair-parity.py --repo .` (wired into
+  `tests/run-tests.ps1` / `tests/run-tests.sh`; **AC-11**).
 
 Deterministic ordering behavior (US-0058):
 - Mutable artifacts follow `docs/engineering/artifact-ordering-policy.md`.

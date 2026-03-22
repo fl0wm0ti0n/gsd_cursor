@@ -1,3 +1,46 @@
+## TL -> Dev Handoff — Sprint S0054 (US-0075 Scratchpad Example–First Refresh + AC-11)
+
+## Planning summary
+
+- **Sprint**: S0054 (new)
+- **Story**: US-0075 — Upgrade scratchpad **example–first** refresh (fix example drift vs materialized baseline) + **AC-11** paired key/section parity
+- **Task count**: 11 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-11 mapped 1:1 to `T-001..T-011` in `sprints/S0054/tasks.md`
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0075 AC-1..AC-11)
+- Architecture: `docs/engineering/architecture.md` (`# US-0075`)
+- Decision: `decisions/DEC-0057.md` (**example-first ordering + paired catalog parity / AC-11** — amends operational reading of **DEC-0039** relative to baseline refresh; **DEC-0055** merge precedence unchanged)
+- Related: **DEC-0039** (framework example refresh + user-local preservation), **DEC-0055** (Model B), **US-0057** / **US-0073** (prior contracts)
+- Research: `docs/engineering/research.md` (`R-0052`, post-discovery US-0075)
+- PO -> TL handoff: `handoffs/po_to_tl.md` (Discovery Addendum — US-0075)
+- Sprint artifacts: `sprints/S0054/*`
+
+## Focus
+
+1. **Ordering + refresh (T-001..T-003)**: **DEC-0057** example-first invariant; upgrade/install always refreshes **scratchpad.local.example**; no stale example while materialized baseline moves.
+2. **Parity surfaces (T-004, T-008)**: PS1/SH/py/CLI + **`installer-owned-paths.manifest`** (+ **`template/`** mirror).
+3. **Diagnostics + docs (T-005, T-007, T-010)**: layer attribution (**DEC-0039**); README/runbook; drift remediation.
+4. **Tests + QA + AC-11 (T-006, T-009, T-011)**: regression matrix for example lag; QA evidence; machine **##** + **`KEY=`** paired parity in **`tests/run-tests.*`**.
+
+## Execution order
+
+Run tasks `T-001`..`T-011` in sequence (see `sprints/S0054/tasks.md`).
+
+## Done criteria for Dev completion
+
+- All 11 tasks in `sprints/S0054/tasks.md` marked done.
+- `sprints/S0054/plan-verify.json` confirms AC-1..AC-11 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0054/progress.md`, `sprints/S0054/uat.json`, and `sprints/S0054/uat.md` updated with implementation evidence.
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0075` / `S0054`.
+
+## Next phase
+
+Proceed to **`/plan-verify`** for **`S0054`** (`US-0075`). `sprints/S0054/plan-verify.json` is currently a **PENDING** sprint-plan seed.
+
+---
+
 ## TL -> Dev Handoff — Sprint S0053 (US-0074 Baseline Regression Cleanup)
 
 ## Planning summary

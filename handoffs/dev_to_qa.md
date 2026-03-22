@@ -1,3 +1,44 @@
+## Dev -> QA Handoff — Sprint S0054 (US-0075 / DEC-0057)
+
+### Status
+
+Execute pass complete for **US-0075** (scratchpad example-first ordering, paired
+catalog parity gate, installer `[SCRATCHPAD_LAYER]` diagnostics). **Do not** mark
+**US-0075** DONE in `docs/product/backlog.md` here (**verify-work** owns closure).
+
+### Scope completed (S0054 / US-0075)
+
+- **Paired parity (AC-11):** `.cursor/scratchpad.md` ↔ `.cursor/scratchpad.local.example.md`
+  and `template/.cursor/` peers — aligned `KEY=` sets, Team block on materialized
+  baseline, AUTO_ROLE_*, AUTO_PHASE_*, PO_TO_TL_*, ARCH_* on examples; section
+  headers matched from `# Core behavior` through EOF.
+- **`scripts/check-scratchpad-pair-parity.py`:** deterministic check; wired into
+  `tests/run-tests.ps1` and `tests/run-tests.sh`.
+- **`installer.py`:** `materialize_scratchpad_example` runs before baseline handling;
+  reason-coded `[SCRATCHPAD_LAYER]` operator lines (example refresh, baseline
+  materialize/skip, user local preserved).
+- **README / runbook** (active + `template/`): **DEC-0057** upgrade ordering,
+  parity script, diagnostics; runbook heading extended with **DEC-0057**.
+- **`template/docs/engineering/context/installer-owned-paths.manifest`:** comment
+  documenting example-first / Model B baseline policy.
+- **`bin/its-magic.js`:** help text notes post-install scratchpad layer ordering (**DEC-0057**).
+
+### QA verification checklist (S0054)
+
+1. `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` — expect **Fail: 0**.
+2. `python scripts/check-scratchpad-pair-parity.py --repo .` — exit **0**.
+3. Temp upgrade: modified `.cursor/scratchpad.local.example.md` restored from template;
+   `scratchpad.local.md` preserved; console shows `[SCRATCHPAD_LAYER] example_refresh`.
+
+### Primary artifacts
+
+- `decisions/DEC-0057.md`, `.cursor/scratchpad*.md`, `template/.cursor/scratchpad*.md`
+- `scripts/check-scratchpad-pair-parity.py`, `installer.py`, `bin/its-magic.js`
+- `README.md`, `docs/engineering/runbook.md`, template mirrors
+- `docs/engineering/state.md` — Execute checkpoint **`orchestrator_run_id=auto-20260326-01`**
+
+---
+
 ## Dev -> QA Handoff — Sprint S0053 (US-0074)
 
 ## Status

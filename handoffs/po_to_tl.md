@@ -1,3 +1,30 @@
+## Discovery Addendum — US-0075 (2026-03-26)
+
+### Discovery focus
+
+- Example **`.cursor/scratchpad.local.example.md`** must refresh on every install/upgrade scratchpad touch **before or with** materialized **`.cursor/scratchpad.md`** (**AC-1**, **AC-3**).
+- **AC-11**: machine-verifiable paired **section + `KEY=`** inventory (active + **`template/`** pairs); no framework key in only one paired file without a documented manifest exception.
+
+### TL conclusions
+
+- Ordering + parity are one contract across installers, manifest, and tests (splitting re-opens drift).
+- Example = operator copy-from catalog; materialized baseline = **DEC-0055** merge input; **`.cursor/scratchpad.local.md`** stays user-owned — diagnostics name which layer changed (**AC-5**).
+- Regression: stale-example + fresh-template upgrade → post-run example matches template bytes (**AC-6**, **AC-9**).
+
+### Research targets (**`R-0052`**)
+
+1. Deterministic refresh sequence: **`installer.ps1` / `.sh` / `.py`**, **`bin/its-magic.js`**, **`installer-owned-paths.manifest`** (+ `template/` mirror).
+2. Parity check spec: normalization, **`KEY=`** taxonomy, allowed value-only differences in example.
+3. **DEC-0055** / **DEC-0039** / **US-0057** interaction — amend **DEC** only if ordering needs normative text beyond current records.
+
+### Next
+
+- **`/research`** (extend **`R-0052`**), then **`/architecture`** if a **DEC** tweak is required.
+
+> Full narrative also in `docs/product/vision.md` (**Discovery Notes — US-0075**) and `docs/product/backlog.md` (discovery refinement). Prior rollover copy: `handoffs/archive/po-to-tl-pack-20260321-c.md`.
+
+---
+
 ## Intake Addendum — Configurable Guided Intake Behavior
 
 ### New intake

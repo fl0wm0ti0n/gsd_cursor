@@ -3283,3 +3283,57 @@ contract** so execute/QA can restore a fully green baseline without scope creep.
 
 - Research basis: **`R-0051`**
 - Decision: **`DEC-0056`**
+
+---
+
+# US-0075: Upgrade scratchpad example–first refresh and paired catalog parity
+
+## Overview
+
+`US-0075` closes **example drift** and **paired-surface skew**: upgrade/install must refresh
+**`.cursor/scratchpad.local.example.md`** from the shipped template **before or together with**
+any step that advances materialized **`.cursor/scratchpad.md`**, so operators always see a
+current **copy-from** catalog. **`AC-11`** adds **deterministic parity** between each
+**baseline ↔ example** pair (active repo and `template/`) on **`##` sections** and **`KEY=`**
+lines, with values allowed to differ only for documented conservative defaults.
+
+## Ordering model
+
+1. **Template catalog authority** — Framework vocabulary ships in
+   **`template/.cursor/scratchpad.local.example.md`** (and is mirrored to active example on
+   upgrade/install per pipeline design).
+2. **No stale example + fresh baseline** — Any refresh of materialized **`scratchpad.md`**
+   from **`template/.cursor/scratchpad.md`** is preceded by or bundled with example refresh
+   from **`template/.cursor/scratchpad.local.example.md`** (**`DEC-0057`** §1).
+3. **Parity surfaces** — Same ordering and diagnostics across installers, CLI, manifest, and
+   `template/` (**`DEC-0057`**, **`US-0075`** **`AC-4`**, **`AC-8`**).
+
+## Merge and ownership (unchanged)
+
+- Precedence and layers remain **`DEC-0055`** (local → materialized baseline → example).
+- User **`.cursor/scratchpad.local.md`** is never overwritten by framework refresh (**`DEC-0039`**).
+
+## AC-11 parity gate
+
+- Compare **paired** paths only: active **`.cursor/scratchpad.md`** ↔
+  **`.cursor/scratchpad.local.example.md`** and **`template/.cursor/scratchpad.md`** ↔
+  **`template/.cursor/scratchpad.local.example.md`**.
+- Require **set equality** of **`##` section headers** and **`KEY=`** keys; manifest-documented
+  local-only exceptions are the only allowed asymmetry (**`R-0052`** design).
+- Enforce in **`tests/run-tests.*`** (or equivalent CI hook), not review-only.
+
+## Diagnostics
+
+- Distinguish **example** vs **materialized baseline** vs **user local** actions with
+  deterministic reason families (**`DEC-0039`** alignment, **`US-0075`** **`AC-5`**).
+
+## Verification
+
+- Regression tests for outdated example + current template, post-upgrade example bytes, and
+  absence of “baseline moved / example older than template” paths (**`US-0075`** **`AC-6`**,
+  **`AC-9`**).
+
+## Decision linkage
+
+- Research basis: **`R-0052`**
+- Decision: **`DEC-0057`**

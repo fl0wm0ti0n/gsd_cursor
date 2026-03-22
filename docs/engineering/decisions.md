@@ -1,8 +1,11 @@
 # Decisions
 
-## Current context pack (2026-03-24 — post-release S0053 / US-0074)
+## Current context pack (2026-03-21 — post-release S0054 / US-0075)
 
 - Latest completed/released stories (high-signal):
+  - `US-0075` (`S0054`, released), governed by **`DEC-0057`** (scratchpad **example-first**
+    upgrade ordering + **`AC-11`** paired baseline ↔ example catalog parity gate;
+    **`DEC-0039`** / **`DEC-0055`** alignment).
   - `US-0074` (`S0053`, released), governed by **`DEC-0056`** (baseline version-sync +
     `TEST_COMMAND` bootstrap; npm ↔ Homebrew stable; triple installer + CLI + `template/`
     parity).
@@ -11,17 +14,16 @@
   - `US-0071` (`S0050`, released), governed by **`DEC-0053`** (user-visible metadata guard).
   - `US-0070` (`S0049`, released), governed by **`DEC-0052`**.
   - `US-0069` (`S0048`, released), governed by **`DEC-0051`**.
-- Hot surface: **`/refresh-context`** after **`S0053`** — triad
-  `scripts/enforce-triad-hot-surface.py`: post-checkpoint-append **`--check`** →
-  **`ARTIFACT_HOT_SURFACE_OVERSIZE`** on `state.md` → **`--rollover`** (**`units=4`**) →
-  `docs/engineering/state-archive/state-pack-20260321-k.md` → final **`--check` PASS**
-  (see `## Refresh-context checkpoint (2026-03-24) — post S0053 / US-0074` in `state.md`).
-- Next prioritized open story: **none** — `docs/product/backlog.md` has **no** `Status: OPEN`
-  rows after **`US-0074`** **DONE**; next work enters via **`/intake`** when prioritized.
-- Active workflow target: operator **`none`** or **`/intake`** for net-new backlog items.
-- Continuation hygiene: `handoffs/resume_brief.md` aligned post-refresh-context
-  (`intended_resume_phase=none` unless operator selects new work).
+- Next prioritized **OPEN** story: **none** in `docs/product/backlog.md` — enter new work via **`/intake`** when prioritized.
+- Active workflow target: **`/intake`** (idle until new backlog) per `handoffs/resume_brief.md` and **`## Refresh-context checkpoint (2026-03-21) — post S0054 / US-0075`** in `docs/engineering/state.md`.
+- Hot surface: latest **`/refresh-context`** triad rollover for this run archived **`units=4`** → `docs/engineering/state-archive/state-pack-20260321-n.md` (see refresh checkpoint in `state.md`).
+- Continuation hygiene: `handoffs/resume_brief.md` → **`none`** + **`/intake`**.
 - Traceability (**DEC-0010**):
+  - `| US-0075 | S0054 | T-001..T-011 | DONE |` — evidence in `sprints/S0054/summary.md`,
+    `sprints/S0054/qa-findings.md`, `sprints/S0054/uat.json`, `sprints/S0054/uat.md`,
+    `sprints/S0054/release-findings.md`, `handoffs/releases/S0054-release-notes.md`,
+    `tests/report.md`, `decisions/DEC-0057.md`, `scripts/check-scratchpad-pair-parity.py`,
+    `scripts/enforce-triad-hot-surface.py`.
   - `| US-0074 | S0053 | T-001..T-010 | DONE |` — evidence in `sprints/S0053/summary.md`,
     `sprints/S0053/qa-findings.md`, `sprints/S0053/uat.json`, `sprints/S0053/uat.md`,
     `sprints/S0053/release-findings.md`, `handoffs/releases/S0053-release-notes.md`,
@@ -32,6 +34,12 @@
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0057`: **scratchpad example-first upgrade + paired catalog parity (`AC-11`)** —
+  example refresh ordered **before or bundled with** materialized baseline refresh so
+  example **never lags** template when baseline moves; machine-enforced **`##` + `KEY=`**
+  set equality on active + template **baseline ↔ example** pairs (manifest-documented
+  local-only exceptions only); diagnostics align with **`DEC-0039`**; merge precedence
+  unchanged (**`DEC-0055`**); linked story **`US-0075`**.
 - `DEC-0056`: **baseline version-sync + TEST_COMMAND bootstrap** — `package.json`
   `version` canonical for npm/Git tag and Homebrew stable `url` / Ruby `version` /
   `sha256`; installer + CLI runbook bootstrap emits baseline-allowed `TEST_COMMAND`
@@ -155,4 +163,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0056.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0057.md`.

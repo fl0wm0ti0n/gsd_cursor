@@ -1779,3 +1779,105 @@ a decision or recommendation.
     detectable stacks, **or** extend tests to accept the PowerShell runner **only** if
     product intent is to treat it as a first-class bootstrap outcome (document tradeoff in
     architecture — avoids hiding real Windows defaults).
+
+## R-0052
+
+- **Date**: 2026-03-25
+- **Topic**: US-0075 scratchpad **example–first** refresh and **AC-11** paired key/section
+  parity (no catalog skew between materialized baseline and framework example)
+- **Query**: Where should upgrade/install enforce ordering so
+  **`.cursor/scratchpad.local.example.md`** never lags template while
+  **`.cursor/scratchpad.md`** moves; how should a deterministic parity gate be specified
+  and implemented?
+- **Sources**:
+  - `docs/product/backlog.md` (**US-0075**)
+  - `docs/product/vision.md` (Intake / Discovery notes — **US-0075**)
+  - `handoffs/po_to_tl.md` (Discovery Addendum — **US-0075**)
+  - `decisions/DEC-0055.md`, `decisions/DEC-0039.md` (ownership + upgrade-safe example)
+  - `installer.py`, `installer.ps1`, `installer.sh`, `bin/its-magic.js`
+  - `docs/engineering/context/installer-owned-paths.manifest` (+ `template/` mirror)
+- **Findings**:
+  - **Problem class**: Under **Model B** (**DEC-0055** / **US-0073**), materialized
+    **`.cursor/scratchpad.md`** can be refreshed (copy loop +/or
+    `run_scratchpad_postinstall` / `materialize_scratchpad_baseline`) while the
+    framework-owned **example** file remains stale relative to the shipped template pair —
+    operators lose a trustworthy copy-from catalog (**DEC-0039**, **US-0057** regression
+    posture).
+  - **Ordering invariant (product)**: Any step that advances the materialized baseline from
+    **`template/.cursor/scratchpad.md`** must be preceded by or atomically bundled with
+    refresh of **`.cursor/scratchpad.local.example.md`** from
+    **`template/.cursor/scratchpad.local.example.md`** so the example never ends “older than
+    template” when the baseline moved (**US-0075** **AC-1**, **AC-3**).
+  - **AC-11**: Require the **same** set of documented **`##` section headers** and
+    **`KEY=`** lines in each **paired** surface (active and template), with values allowed
+    to differ only where the story documents intentional conservative defaults; default is
+    **no** one-sided keys (**US-0075** **AC-11**).
+  - **Diagnostics**: Operator-visible output should label **example refresh** vs
+    **materialized baseline** vs **user local preserved** with reason-coded paths aligned
+    to **DEC-0039** (**US-0075** **AC-5**).
+- **Risks**:
+  - File-copy iteration order alone is not a contract; without an explicit ordering rule,
+    future refactors can reintroduce “baseline first, example later” skew.
+  - A naive string equality test between baseline and example will false-fail — parity is
+    on **structure** (headers + keys), not identical values.
+  - Template vs active drift if checks run only on one tree.
+- **Linked**: US-0075, US-0073, US-0057, DEC-0055, DEC-0039
+- **Confidence**: high
+- **Status**: current
+
+### Post-discovery findings (2026-03-26) — US-0075
+
+- **Installer / manifest file anchors (code-level)**:
+  - **`installer.py`**
+    - Constants: `SCRATCHPAD_BASELINE_REL`, `SCRATCHPAD_EXAMPLE_REL`, `SCRATCHPAD_LOCAL_REL`;
+      merge/validation: `merge_scratchpad_layers`, `validate_merged_scratchpad`;
+      materialization: `materialize_scratchpad_baseline`, `run_scratchpad_postinstall`
+      (invoked with `mode=upgrade` after the upgrade copy loop).
+    - **`mode == "upgrade"`** path (~L669+): iterates `files` from the ownership manifest;
+      tracks `scratchpad_example_rel = ".cursor/scratchpad.local.example.md"` status
+      (`added` / `updated` / `unchanged` / `not-in-manifest`); then calls
+      `run_scratchpad_postinstall(..., "upgrade")` (materialized baseline refresh +
+      merged validation). **Architecture should treat this ordering as explicit policy**:
+      ensure example copy-from-template cannot logically follow baseline-only advancement
+      (either reorder operations, duplicate targeted refresh, or add a post-postinstall
+      example sync) — **US-0075** closes the gap.
+  - **`installer.ps1` / `installer.sh`**: parity surfaces for install/upgrade delegation;
+      must keep **same** scratchpad ordering + diagnostics contract as **`installer.py`**
+      (**US-0075** **AC-4**).
+  - **`bin/its-magic.js`**: operator CLI entry (`--mode upgrade`); ensure spawned installer
+      path cannot skip example refresh that the Python upgrade path would perform.
+  - **`docs/engineering/context/installer-owned-paths.manifest`** (and
+    **`template/docs/engineering/context/installer-owned-paths.manifest`**): both list
+    **`.cursor/scratchpad.md`** and **`.cursor/scratchpad.local.example.md`** under
+    `[install_include_paths]` — manifest parity is part of the triple-installer contract.
+  - **Template pair (source of truth for bytes)**:
+    - **`template/.cursor/scratchpad.md`**
+    - **`template/.cursor/scratchpad.local.example.md`**
+    - Installed mirrors: **`.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`**
+- **Parity check design (AC-11 / tests)**:
+  - **Scope**: Two **paired** comparisons:
+    1. **Active repo**: **`.cursor/scratchpad.md`** ↔ **`.cursor/scratchpad.local.example.md`**
+    2. **Template tree**: **`template/.cursor/scratchpad.md`** ↔
+       **`template/.cursor/scratchpad.local.example.md`**
+  - **Extraction rules (deterministic)**:
+    - **Section set**: all markdown headings that are `## ...` at line start (trimmed),
+      after removing the leading `## ` — record stable title text for set comparison.
+    - **Key set**: lines matching `^[A-Z][A-Z0-9_]*=` (framework **KEY=** assignments),
+      taking the identifier before `=` as the canonical key name; ignore commented lines
+      (`#` first non-whitespace) and blank lines.
+    - **Value stance**: do **not** require value equality between baseline and example;
+      only require **set equality** of sections and keys unless a key is listed in a
+      **small manifest allowlist** of documented *local-only* exceptions (default **empty**
+      per **US-0075**).
+  - **Failure output**: emit symmetric difference lists
+    (`only_in_baseline`, `only_in_example`) with file paths so operators and CI logs are
+    actionable; align reason codes with **DEC-0039** / scratchpad merge diagnostics where
+    applicable.
+  - **Placement**: implement as a **focused assert** in **`tests/run-tests.ps1`** and
+    **`tests/run-tests.sh`** (and optionally a small **`scripts/`** helper invoked by both)
+    so **AC-11** is machine-verified, not manual-only.
+  - **Upgrade regression tests** (**US-0075** **AC-6**): extend existing upgrade fixtures
+    (already touch **`.cursor/scratchpad.local.example.md`** in **`tests/run-tests.sh`**) so
+    post-upgrade bytes for the example **match template** whenever the baseline was updated
+    in the same run; assert **ordering** via staged temp trees (stale example + fresh
+    template) if needed.

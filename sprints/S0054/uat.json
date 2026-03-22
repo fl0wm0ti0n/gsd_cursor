@@ -1,0 +1,23 @@
+{
+  "sprint_id": "S0054",
+  "story_ids": [
+    "US-0075"
+  ],
+  "status": "verified",
+  "result": "pass",
+  "passed": 11,
+  "failed": 0,
+  "steps": [
+    { "id": "UAT-001", "ac": "AC-1", "description": "Ordering contract — example/catalog not behind baseline refresh in pipeline.", "result": "pass", "notes": "DEC-0057 + [SCRATCHPAD_LAYER] ordering; README/runbook/manifest." },
+    { "id": "UAT-002", "ac": "AC-2", "description": "Upgrade/install refreshes scratchpad.local.example per template.", "result": "pass", "notes": "tests/report.md upgrade rows PASS; dev handoff." },
+    { "id": "UAT-003", "ac": "AC-3", "description": "Example refresh bundled or precedes materialized baseline refresh.", "result": "pass", "notes": "installer.py post-install + CLI sims; no stale-example path in suite." },
+    { "id": "UAT-004", "ac": "AC-4", "description": "Cross-installer + manifest + template parity.", "result": "pass", "notes": "installer.ps1/sh/py, its-magic.js, installer-owned-paths.manifest (+ template)." },
+    { "id": "UAT-005", "ac": "AC-5", "description": "Diagnostics distinguish example / materialized / user local.", "result": "pass", "notes": "[SCRATCHPAD_LAYER] example_refresh, baseline_*, user_local." },
+    { "id": "UAT-006", "ac": "AC-6", "description": "Regression coverage for stale-example paths.", "result": "pass", "notes": "Consolidated runner + pair parity gate." },
+    { "id": "UAT-007", "ac": "AC-7", "description": "README + runbook guidance.", "result": "pass", "notes": "Active + template rows PASS in tests/report.md." },
+    { "id": "UAT-008", "ac": "AC-8", "description": "Active/template parity for scratchpad install surfaces.", "result": "pass", "notes": "Template mirror checks in suite." },
+    { "id": "UAT-009", "ac": "AC-9", "description": "QA attestation of example alignment post upgrade simulation.", "result": "pass", "notes": "sprints/S0054/qa-findings.md + tests/report.md Timestamp 2026-03-21T19:00:37Z." },
+    { "id": "UAT-010", "ac": "AC-10", "description": "Operator remediation guidance.", "result": "pass", "notes": "README/runbook + DEC-0057." },
+    { "id": "UAT-011", "ac": "AC-11", "description": "Paired-file catalog parity gate (CI).", "result": "pass", "notes": "scripts/check-scratchpad-pair-parity.py; [SCRATCHPAD_PAIR_OK]; report rows 718-719." }
+  ]
+}

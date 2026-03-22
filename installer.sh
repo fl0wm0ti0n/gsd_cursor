@@ -556,6 +556,7 @@ if [ "$MODE" = "upgrade" ]; then
   printf "  Preserved (user):    %s files\n" "$count_preserved"
   [ "$scratchpad_example_status" = "not-seen" ] && scratchpad_example_status="not-in-manifest"
   printf "  Scratchpad example:  %s (.cursor/scratchpad.local.example.md)\n" "$scratchpad_example_status"
+  printf "  Scratchpad layers:   post-install refreshed example-first, then baseline (see [SCRATCHPAD_LAYER] lines).\n"
   [ -f "$TARGET_ROOT/.cursor/scratchpad.local.md" ] && printf "  User local file:     preserved (.cursor/scratchpad.local.md)\n"
   if [ "$count_review" -gt 0 ]; then
     printf "\n  \033[1;35mReview recommended:  %s files\033[0m\n" "$count_review"

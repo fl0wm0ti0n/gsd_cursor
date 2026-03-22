@@ -1235,16 +1235,21 @@ Use this matrix to validate end-to-end installer/CLI lifecycle behavior:
 | Negative path | invalid mode/args | `tests/run-tests.ps1`, `tests/run-tests.sh` | Deterministic non-zero fail-fast behavior |
 | Platform parity subset | npm/brew/choco CI jobs | `.github/workflows/ci.yml` | Lifecycle subset passes on all three runners |
 
-## Scratchpad example upgrade contract (US-0057 / DEC-0039)
+## Scratchpad example upgrade contract (US-0057 / DEC-0039 / DEC-0057)
 
 `its-magic --mode upgrade` treats `.cursor/scratchpad.local.example.md` as
 framework-owned and `.cursor/scratchpad.local.md` as user-owned.
 
 Expected deterministic outcome:
-- Framework-owned example is refreshed to latest release contract.
+- Framework-owned example is refreshed to latest release contract **before** baseline
+  materialization runs in `installer.py --scratchpad-postinstall` (**DEC-0057** ordering).
 - User local scratchpad remains preserved without overwrite.
-- Installer output reports scratchpad example refresh status
-  (`added|updated|unchanged`) and preservation signal for user local file.
+- Installer output reports manifest copy status for the example file where applicable
+  (`added|updated|unchanged`) **and** `[SCRATCHPAD_LAYER]` diagnostics from post-install
+  (`example_refresh`, `baseline_materialize` / `baseline_skip`, `user_local` preserved).
+- CI regression: `python scripts/check-scratchpad-pair-parity.py --repo <root>` exit `0`
+  when active and `template/` baseline/example pairs share the same automation `KEY=`
+  set and catalog `#` headers from `# Core behavior` (**US-0075** **AC-11**).
 
 ## Scratchpad delivery Model B (US-0073 / DEC-0055)
 

@@ -4,6 +4,18 @@
 
 Implement Smart Upgrade Mode (US-0018) and document empty runbook commands (US-0015).
 
+## Context refresh pack (2026-03-21 — post S0054 / US-0075)
+
+- Latest released sprint: **`S0054`** for **`US-0075`** (**`DEC-0057`** — example-first
+  scratchpad upgrade + **`AC-11`** pair parity); lifecycle completed under
+  `orchestrator_run_id=auto-20260326-01`.
+- Triad **`/refresh-context`**: post-append **`--check`** tripped **`lines>1200`**;
+  **`rollover_complete units=4`** → `docs/engineering/state-archive/state-pack-20260321-n.md`;
+  final **`--check`** **PASS** (see `docs/engineering/state.md` refresh checkpoint).
+- Next OPEN story: **none** in `docs/product/backlog.md` — use **`/intake`** for new work.
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack
+  (2026-03-21 — post-release S0054 / US-0075)**.
+
 ## Context refresh pack (2026-03-24 — post S0053 / US-0074)
 
 - Latest released sprint: **`S0053`** for **`US-0074`** (**`DEC-0056`**); verify-work →

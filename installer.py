@@ -215,7 +215,30 @@ def validate_merged_scratchpad(target_root):
     return ok, diagnostics
 
 
-def materialize_scratchpad_baseline(target_root, source_root, mode):
+def materialize_scratchpad_example(target_root, source_root, print_ok=True):
+    """
+    Always refresh framework-owned scratchpad.local.example from template first
+    (example-first ordering before baseline; never touches scratchpad.local.md).
+    """
+    src = os.path.join(source_root, SCRATCHPAD_EXAMPLE_REL)
+    dst = os.path.join(target_root, SCRATCHPAD_EXAMPLE_REL)
+    if not os.path.isfile(src):
+        print(
+            "[SCRATCHPAD_EXAMPLE_ERROR] TEMPLATE_EXAMPLE_MISSING: "
+            f"expected template file at {src}. Reinstall its-magic package."
+        )
+        return False
+    ensure_parent(dst)
+    shutil.copy2(src, dst)
+    if print_ok:
+        print(
+            "[SCRATCHPAD_LAYER] example_refresh: copied template "
+            f"{SCRATCHPAD_EXAMPLE_REL} -> target (ordering: example before baseline)."
+        )
+    return True
+
+
+def materialize_scratchpad_baseline(target_root, source_root, mode, print_ok=True):
     """
     Write stable baseline bytes from template when Model B requires it.
     Never touches .cursor/scratchpad.local.md.
@@ -228,32 +251,53 @@ def materialize_scratchpad_baseline(target_root, source_root, mode):
             f"expected template file at {src}. Reinstall its-magic package."
         )
         return False
+    wrote = False
     if mode == "overwrite":
         ensure_parent(dst)
         shutil.copy2(src, dst)
-        return True
-    if mode == "upgrade":
+        wrote = True
+    elif mode == "upgrade":
         if not os.path.isfile(dst):
             ensure_parent(dst)
             shutil.copy2(src, dst)
-        return True
-    # missing, interactive
-    if not os.path.isfile(dst):
-        ensure_parent(dst)
-        shutil.copy2(src, dst)
+            wrote = True
+    else:
+        # missing, interactive
+        if not os.path.isfile(dst):
+            ensure_parent(dst)
+            shutil.copy2(src, dst)
+            wrote = True
+    if wrote and print_ok:
+        print(
+            "[SCRATCHPAD_LAYER] baseline_materialize: wrote materialized "
+            f"{SCRATCHPAD_BASELINE_REL} from template (Model B)."
+        )
+    elif print_ok and os.path.isfile(dst):
+        print(
+            "[SCRATCHPAD_LAYER] baseline_skip: materialized baseline already present "
+            f"({SCRATCHPAD_BASELINE_REL}); not overwritten in this mode."
+        )
     return True
 
 
 def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
-    if not materialize_scratchpad_baseline(target_root, source_root, mode):
+    if not materialize_scratchpad_example(target_root, source_root, print_ok=print_ok):
+        return False
+    if not materialize_scratchpad_baseline(target_root, source_root, mode, print_ok=print_ok):
         return False
     ok, diagnostics = validate_merged_scratchpad(target_root)
     for line in diagnostics:
         print(line)
     if ok and print_ok:
+        loc = os.path.join(target_root, SCRATCHPAD_LOCAL_REL)
+        if os.path.isfile(loc):
+            print(
+                "[SCRATCHPAD_LAYER] user_local: preserved "
+                f"{SCRATCHPAD_LOCAL_REL} (merge precedence unchanged)."
+            )
         print(
-            "[SCRATCHPAD_POSTINSTALL_OK] Model B: materialized baseline (if required) "
-            "and merged scratchpad validation passed."
+            "[SCRATCHPAD_POSTINSTALL_OK] Model B: example refreshed, baseline handled, "
+            "merged scratchpad validation passed."
         )
     return ok
 
@@ -749,6 +793,10 @@ def main():
         if scratchpad_example_status == "not-seen":
             scratchpad_example_status = "not-in-manifest"
         print(f"  Scratchpad example:  {scratchpad_example_status} (.cursor/scratchpad.local.example.md)")
+        print(
+            "  Scratchpad layers:   post-install refreshed example-first, then baseline "
+            "(see [SCRATCHPAD_LAYER] lines)."
+        )
         if os.path.isfile(os.path.join(target_root, ".cursor", "scratchpad.local.md")):
             print("  User local file:     preserved (.cursor/scratchpad.local.md)")
         if review:

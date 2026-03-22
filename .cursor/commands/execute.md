@@ -182,4 +182,27 @@ Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and n
    - Runtime boundary:
      - static generated-test PASS is necessary but not sufficient for QA PASS;
        runtime startup/connectivity/log verdict remains governed by `US-0065`.
+20. User-visible internal metadata guard (US-0071 / DEC-0053):
+   - Before completing `/execute`, run `python scripts/check-user-visible-metadata.py`
+     from the repository root (or `python scripts/check-user-visible-metadata.py --repo <root>`).
+   - On failure, stop with `USER_VISIBLE_INTERNAL_METADATA_DETECTED` and use the
+     remediation contract in `docs/engineering/runbook.md` (evidence ref, token
+     class, neutral operator copy). Do not ship planning tokens in scanned
+     operator-visible strings.
+   - If you add a new operator-facing script or binary path, update inclusive
+     scan roots in `scripts/check-user-visible-metadata.py` **and** this runbook
+     section together or fail closed with `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`
+     semantics at QA/release.
+21. Triad hot-surface enforcement (DEC-0054):
+   - Before completing `/execute`, run
+     `python scripts/enforce-triad-hot-surface.py --check` from repository root
+     (or `--repo <root>`).
+   - If the check fails, run `python scripts/enforce-triad-hot-surface.py --rollover`
+     then `--check` again; if still failing, stop with `STATE_ARCHIVE_REQUIRED` or
+     `ARTIFACT_HOT_SURFACE_OVERSIZE` (no successful execute completion on oversize
+     triad hot files).
+   - When your edits touched any triad path (`docs/engineering/state.md`,
+     `handoffs/po_to_tl.md`, `docs/engineering/architecture.md`), ensure rollover
+     evidence (`boundary`, `moved`, `retained`, `pack_ref`) is recorded in the
+     execute checkpoint when packs were written.
 

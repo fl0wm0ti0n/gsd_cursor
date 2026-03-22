@@ -99,3 +99,4 @@
 - [x] US-0072: Deterministic context slimming and archive enforcement across core artifacts
 - [x] US-0073: Scratchpad delivery simplification (example-only install policy)
 - [x] US-0074: Baseline regression cleanup for installer and version sync checks
+- [x] US-0075: Upgrade scratchpad example-first refresh and paired catalog parity (DEC-0057 / AC-11)

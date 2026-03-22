@@ -1459,3 +1459,95 @@
 - Boundaries:
   - In scope: baseline regression cleanup for known failing installer/version-sync checks and related parity/docs/tests.
   - Out of scope: introducing unrelated feature work beyond these baseline failures.
+
+## US-0075 — Upgrade Scratchpad Example–First Refresh (Fix Example Drift vs Materialized Baseline)
+- Title: Ensure upgrade/install always refreshes scratchpad **example** surfaces so operators can copy new keys; avoid updating only materialized `scratchpad.md`
+- Summary: Fix a regression or gap where `its-magic --mode upgrade` (or install refresh) updates `.cursor/scratchpad.md` (materialized baseline under **DEC-0055**) while **`.cursor/scratchpad.local.example.md` stays stale**. Operators expect the **example** file to carry the latest framework key catalog and guidance so they can merge into `.cursor/scratchpad.local.md` or adopt defaults safely.
+- Priority: P1
+- Status: DONE
+- Decomposition (US-0051 evaluator):
+  - **Outcome**: single story — ownership and ordering of scratchpad layer updates are one behavioral contract across installers, manifest, and tests.
+  - **Rationale**: Splitting “example only” vs “materialized baseline” would reintroduce the drift class this story removes.
+  - **Split axes**: N/A (not decomposed).
+- Overlap / duplicate evaluation:
+  - **US-0057** (DONE): already required upgrade-safe **example** refresh; current operator report indicates **example not updating** while **scratchpad.md** does — treat as **contract regression or implementation ordering bug** to close under this story.
+  - **US-0073** / **DEC-0055**: Model B materializes `scratchpad.md` from template; precedence docs must stay consistent — **example must never lag** the shipped template/catalog used to justify materialization.
+  - **DEC-0039**: framework-owned example refresh — reaffirm in acceptance with explicit ordering rules.
+- Discovery notes:
+  - Intake research reference: **`R-0052`**.
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`,`paired_scratchpad_full_key_parity`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+  - Intake refinement (2026-03-25, PO) — **full catalog parity**:
+    - Operator reports **missing sections/keys** when comparing the two shipped
+      scratchpad surfaces (for example **Team mode** present in
+      **`.cursor/scratchpad.local.example.md`** but **absent** from materialized
+      **`.cursor/scratchpad.md`** in the active repo).
+    - Conversely, materialized **`.cursor/scratchpad.md`** currently carries
+      blocks **not** mirrored in the example (for example **`/auto` phase role**
+      and **`/auto` phase selection`** policy keys, and **triad** caps
+      **`PO_TO_TL_HOT_*` / `ARCH_HOT_*`**), so the example is **not** a complete
+      copy-from catalog.
+    - **Acceptance expansion**: require **deterministic structural parity** —
+      every framework-documented **section header** and **`KEY=`** (same set in
+      both files, modulo documented intentional split for *local-only* keys if
+      any — default is **none**; both files list the full framework vocabulary).
+    - Template parity: **`template/.cursor/scratchpad.md`** and
+      **`template/.cursor/scratchpad.local.example.md`** must satisfy the same
+      parity rule so installs/upgrades do not reintroduce skew.
+  - Discovery refinement (2026-03-26, PO):
+    - **Ordering invariant (restatement)**: Any pipeline step that refreshes materialized
+      **`.cursor/scratchpad.md`** from template must be preceded by or bundled with a step
+      that refreshes **`.cursor/scratchpad.local.example.md`** from
+      **`template/.cursor/scratchpad.local.example.md`** so the example **never** ends older
+      than the template catalog while the baseline moves.
+    - **AC-11 check contract**: The deterministic parity gate compares **paired** paths
+      (active **`.cursor/scratchpad.md`** ↔ **`.cursor/scratchpad.local.example.md`** and
+      **`template/.cursor/scratchpad.md`** ↔ **`template/.cursor/scratchpad.local.example.md`**)
+      on **section headers** + **`KEY=`** lines; **values** may differ only where the story
+      already allows intentional conservative defaults in the example.
+    - **Diagnostics**: Upgrade/install output should surface **which layer** changed
+      (example vs materialized vs local preserved) with reason-coded paths for drift
+      detection, aligned with **DEC-0039** / **US-0057** regression posture.
+    - **Evidence for research**: PO → TL addendum and **`R-0052`** extension should cite
+      installer entry points, **`installer-owned-paths.manifest`**, and CLI **`--mode upgrade`**
+      ordering as primary code anchors.
+  - Research (2026-03-26, tech-lead): **`R-0052`** materialized + **post-discovery**
+    extension — file-level anchors (`installer.py` upgrade loop +
+    `run_scratchpad_postinstall`, PS1/SH/CLI parity, manifest active + `template/`, template
+    scratchpad pair) and **AC-11** parity gate design (paired **`##` sections** + **`KEY=`**
+    set equality on active + template pairs; machine-verified in **`tests/run-tests.*`**).
+    Source: `docs/engineering/research.md` (**`R-0052`**).
+  - Architecture (2026-03-26, tech-lead): contract locked in **`DEC-0057`**
+    (`decisions/DEC-0057.md`); narrative and traceability in
+    `docs/engineering/architecture.md` **`# US-0075`**; research basis **`R-0052`**
+    (`docs/engineering/research.md`); checkpoint: `docs/engineering/state.md`
+    architecture section for **`US-0075`**.
+- Acceptance:
+  - [x] AC-1: Document deterministic **ordering**: framework key catalog updates ship in **`.cursor/scratchpad.local.example.md`** and **`template/.cursor/scratchpad.local.example.md`** as the operator-visible source; materialized **`.cursor/scratchpad.md`** refresh must not introduce new documented keys **ahead of** example refresh in the same release pipeline.
+  - [x] AC-2: **`--mode upgrade`** (and fresh install where applicable) **always** refreshes framework-owned **scratchpad.local.example** surfaces to match the shipped template bytes unless a documented exception applies (with reason code).
+  - [x] AC-3: If installers or CLI refresh **materialized** `scratchpad.md` from `template/.cursor/scratchpad.md`, the **same operation or an earlier deterministic step** refreshes **scratchpad.local.example** from **`template/.cursor/scratchpad.local.example.md`** (no stale example + fresh baseline).
+  - [x] AC-4: Parity across **`installer.ps1`**, **`installer.sh`**, **`installer.py`**, **`bin/its-magic.js`**, and **`docs/engineering/context/installer-owned-paths.manifest`** (+ `template/` mirror) for the above ordering.
+  - [x] AC-5: Operator-visible diagnostics distinguish **example refresh**, **materialized baseline** actions, and **user local** preservation (**`.cursor/scratchpad.local.md`** never overwritten by framework refresh).
+  - [x] AC-6: Regression tests cover: upgrade with outdated example + current template; ensure post-upgrade example matches template; assert no path leaves example older than template while `scratchpad.md` was updated.
+  - [x] AC-7: **README** + **runbook** explain: copy new keys from **example** → **local**; how upgrade refreshes example; troubleshooting when drift is detected.
+  - [x] AC-8: **Active/template** parity maintained for all scratchpad-related install surfaces.
+  - [x] AC-9: **QA findings** for this story explicitly attest **example** and **template/example** alignment after upgrade simulation (evidence paths cited).
+  - [x] AC-10: Remediation guidance (deterministic) if operators still see drift (e.g. re-run upgrade, verify manifest paths, compare to template).
+  - [x] AC-11: **Complete settings catalog parity** between **`.cursor/scratchpad.md`**
+    and **`.cursor/scratchpad.local.example.md`** (and **`template/.cursor/scratchpad.md`**
+    vs **`template/.cursor/scratchpad.local.example.md`**): the **same** set of
+    documented sections and `KEY=` lines (including **Team mode**
+    (`TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`), **`/auto` role** and **phase
+    selection** keys, **triad** hot-surface caps **`STATE_*`**, **`PO_TO_TL_*`**,
+    **`ARCH_*`**, and all other framework keys). Values may differ where the
+    example intentionally shows conservative/local-oriented defaults, but **no
+    key may exist in only one** of the paired files unless explicitly documented
+    as local-only with a deterministic manifest exception; default is **full
+    mirror**. Enforce with a **deterministic check** (test or script) in CI /
+    `tests/run-tests.*`, not manual-only review.
+- Boundaries:
+  - In scope: installer/upgrade ordering, example vs materialized baseline, **paired-file key/section parity**, diagnostics, docs, tests, manifest parity.
+  - Out of scope: changing merge semantics for required keys (**DEC-0055** / **US-0073**) except where needed to fix ordering; unrelated workflow features.

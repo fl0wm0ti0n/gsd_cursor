@@ -1,7 +1,8 @@
-# its-magic scratchpad (local overrides example)
+# its-magic scratchpad (framework default catalog — Model B / DEC-0055)
 #
-# Copy this file to `.cursor/scratchpad.local.md` and set personal overrides.
-# Local values override `.cursor/scratchpad.md` and should stay gitignored.
+# Copy this file to `.cursor/scratchpad.local.md` for personal overrides (gitignored).
+# Merge precedence: local > materialized `.cursor/scratchpad.md` > this example
+# (installers materialize the baseline from template when missing).
 #
 # Core behavior
 # - MAGIC_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
@@ -55,6 +56,31 @@ AUTO_EXECUTE_ON_BLOCK=stop
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
 #
+# `/auto` phase role policy (US-0069 / DEC-0051)
+# - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
+# - AUTO_ROLE_PLAN_VERIFY: qa|tech-lead (empty -> default qa)
+# - AUTO_ROLE_REFRESH_CONTEXT: curator|po (empty -> default curator)
+# - AUTO_EXECUTE_ROLE_OVERRIDE: empty or allowed_non_dev_execute (execute default is dev)
+# - EXECUTE_OVERRIDE_GOVERNANCE_REF: parseable waiver pointer (DEC-xxxx / state anchor) when override set
+AUTO_ROLE_RESEARCH=
+AUTO_ROLE_PLAN_VERIFY=
+AUTO_ROLE_REFRESH_CONTEXT=
+AUTO_EXECUTE_ROLE_OVERRIDE=
+EXECUTE_OVERRIDE_GOVERNANCE_REF=
+#
+# `/auto` phase selection policy (US-0070 / DEC-0052)
+# Exactly one active mode after merge; conflict -> PHASE_POLICY_CONFLICT (no plan).
+# - AUTO_PHASE_PLAN: unset or full (default full canonical lifecycle)
+# - AUTO_PHASE_EXCLUDE: csv of canonical phase ids (exclude from full)
+# - AUTO_PHASE_INCLUDE: csv of canonical phase ids (re-sorted to canonical order)
+# - AUTO_PHASE_PROFILE: named profile (see /auto + DEC-0052; unknown -> fail closed)
+# - AUTO_PHASE_HIGH_RISK_ACK: required token when a high-risk profile demands it
+AUTO_PHASE_PLAN=
+AUTO_PHASE_EXCLUDE=
+AUTO_PHASE_INCLUDE=
+AUTO_PHASE_PROFILE=
+AUTO_PHASE_HIGH_RISK_ACK=
+#
 # Team mode
 # - TEAM_MODE: 0|1 (enable task/member scoped team workflow)
 # - TEAM_MEMBER: short id for current developer
@@ -93,7 +119,7 @@ SYNC_CUSTOM_PHASES=
 ALLOW_AUTO_PUSH=0
 AUTO_PUSH_BRANCH_ALLOWLIST=
 #
-# Knowledge curation / intake
+# Knowledge curation
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
 # - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
 # - INTAKE_SUBAGENT_FALLBACK: deny|allow (deny by default; when deny, missing
@@ -107,6 +133,10 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 #   archival rollover checks)
 # - STATE_HOT_MAX_CHECKPOINTS: integer >= 10 (max recent checkpoints to retain
 #   in `state.md` after rollover)
+# - PO_TO_TL_HOT_MAX_LINES: integer >= 200 (handoff hot-surface line cap)
+# - PO_TO_TL_HOT_MAX_SECTIONS: integer >= 10 (max top-level ## sections retained)
+# - ARCH_HOT_MAX_LINES: integer >= 500 (architecture hot-surface line cap)
+# - ARCH_HOT_MAX_STORY_SECTIONS: integer >= 20 (max # US-xxxx story sections retained)
 # - Manual-override precedence: explicit flag values in this file remain authoritative
 #   for that flag and override profile defaults.
 EARLY_RESEARCH=1
@@ -116,8 +146,12 @@ ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 STATE_HOT_MAX_LINES=1200
 STATE_HOT_MAX_CHECKPOINTS=80
-#
-# Publish targets
+PO_TO_TL_HOT_MAX_LINES=800
+PO_TO_TL_HOT_MAX_SECTIONS=60
+ARCH_HOT_MAX_LINES=3500
+ARCH_HOT_MAX_STORY_SECTIONS=120
+
+# Publish targets (US-0054)
 # - RELEASE_PUBLISH_MODE: disabled|confirm|auto
 #   - disabled: skip post-release publish target execution
 #   - confirm: require explicit operator confirmation before publish (default)
@@ -127,6 +161,7 @@ STATE_HOT_MAX_CHECKPOINTS=80
 RELEASE_PUBLISH_MODE=confirm
 RELEASE_TARGETS_FILE=docs/engineering/release-targets.json
 RELEASE_TARGETS_DEFAULT=
+
 #
 # Security review
 # - SECURITY_REVIEW: 0|1 (enable optional security/compliance review; default off)
@@ -135,8 +170,8 @@ RELEASE_TARGETS_DEFAULT=
 #   When SECURITY_REVIEW=0, the workflow adds zero security-review overhead.
 SECURITY_REVIEW=0
 COMPLIANCE_PROFILES=GDPR
-#
-# Compatibility observability
+
+# Cross-repo compatibility observability
 # - CROSS_REPO_OBSERVABILITY: 0|1 (enable compatibility visibility and checks)
 # - COMPATIBILITY_GATE_ON_CRITICAL: 0|1 (when enabled, critical unresolved
 #   compatibility findings trigger decision gate before release)
@@ -145,17 +180,19 @@ COMPLIANCE_PROFILES=GDPR
 CROSS_REPO_OBSERVABILITY=0
 COMPATIBILITY_GATE_ON_CRITICAL=1
 COMPATIBILITY_SOURCES=
-#
-# Component scope
+
+# Component-scoped execution mode
 # - COMPONENT_SCOPE_MODE: 0|1 (enable scoped planning/execution guardrails)
 # - TARGET_COMPONENTS: comma-separated component IDs intended in scope
 COMPONENT_SCOPE_MODE=0
 TARGET_COMPONENTS=
-#
-# Optional docs packs
+
+# Optional spec-pack documentation (US-0031)
 # - SPEC_PACK_MODE: 0|1 (enable Design Concept, CRS, Technical Spec generation/validation; default 0)
 #   When 0, intake/architecture/release add no required spec-pack steps.
+SPEC_PACK_MODE=0
+
+# Optional user-guide documentation (US-0032)
 # - USER_GUIDE_MODE: 0|1 (enable per-feature user guides at docs/user-guides/US-xxxx.md; default 0)
 #   When 0, intake/architecture/sprint-plan/execute/qa/release add no required user-guide steps or blocking checks.
-SPEC_PACK_MODE=0
 USER_GUIDE_MODE=0

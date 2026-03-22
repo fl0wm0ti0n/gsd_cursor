@@ -118,9 +118,10 @@ Install options:
   Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from
         OS+stack detection; unresolved TEST_COMMAND fails fast with
         [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.
-  Note: scratchpad Model B: .cursor/scratchpad.md is
-        materialized when missing; PowerShell/bash installers require Python 3
-        on PATH for merged scratchpad validation. Recovery:
+  Note: scratchpad Model B: .cursor/scratchpad.md is materialized when missing;
+        post-install always refreshes .cursor/scratchpad.local.example.md from the
+        template before baseline handling. PowerShell/bash installers require
+        Python 3 on PATH for merged scratchpad validation. Recovery:
         python installer.py --scratchpad-postinstall --target <repo> --mode missing
 
 Clean options:

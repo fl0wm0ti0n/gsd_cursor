@@ -1,5 +1,10 @@
 # its-magic installer ownership manifest
 # Sections are line-based path lists.
+#
+# Model B baseline: materialized scratchpad (under .cursor/) is not manifest-copied;
+# installers copy it from packaged template during post-install only. Framework-owned
+# scratchpad.local.example (under .cursor/) refreshes from template before baseline
+# handling in installer.py --scratchpad-postinstall (example-first ordering).
 
 [install_include_paths]
 .cursor/commands

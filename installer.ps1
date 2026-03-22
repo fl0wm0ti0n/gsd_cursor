@@ -664,6 +664,7 @@ if ($mode -eq "upgrade") {
   Write-Host "  Preserved (user):    $preserved files"
   if ($scratchpadExampleStatus -eq 'not-seen') { $scratchpadExampleStatus = 'not-in-manifest' }
   Write-Host "  Scratchpad example:  $scratchpadExampleStatus (.cursor/scratchpad.local.example.md)"
+  Write-Host "  Scratchpad layers:   post-install refreshed example-first, then baseline (see [SCRATCHPAD_LAYER] lines)."
   if (Test-Path (Join-Path $targetRoot '.cursor/scratchpad.local.md') -PathType Leaf) {
     Write-Host "  User local file:     preserved (.cursor/scratchpad.local.md)"
   }

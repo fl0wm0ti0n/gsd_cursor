@@ -841,10 +841,10 @@ Assert-True "scratchpad local example includes detailed core behavior descriptio
 Assert-True "scratchpad local example includes detailed automation descriptions (template)" (File-Contains $scratchpadLocalExampleTemplate "- AUTO_FLOW_MODE: manual|auto_until_decision")
 Assert-True "scratchpad local example includes release publish mode override (active)" (File-Contains $scratchpadLocalExampleActive "RELEASE_PUBLISH_MODE=confirm")
 Assert-True "scratchpad local example includes release publish mode override (template)" (File-Contains $scratchpadLocalExampleTemplate "RELEASE_PUBLISH_MODE=confirm")
-Assert-True "runbook documents scratchpad upgrade contract (active)" (File-Contains $runbookActive "Scratchpad example upgrade contract (US-0057 / DEC-0039)")
-Assert-True "runbook documents scratchpad upgrade contract (template)" (File-Contains $runbookTemplate "Scratchpad example upgrade contract (US-0057 / DEC-0039)")
-Assert-True "README documents scratchpad upgrade behavior (active)" (File-Contains $readmeActive "Upgrade behavior (US-0057):")
-Assert-True "README documents scratchpad upgrade behavior (template)" (File-Contains $readmeTemplate "Upgrade behavior (US-0057):")
+Assert-True "runbook documents scratchpad upgrade contract (active)" (File-Contains $runbookActive "Scratchpad example upgrade contract (US-0057 / DEC-0039 / DEC-0057)")
+Assert-True "runbook documents scratchpad upgrade contract (template)" (File-Contains $runbookTemplate "Scratchpad example upgrade contract (US-0057 / DEC-0039 / DEC-0057)")
+Assert-True "README documents scratchpad upgrade behavior (active)" (File-Contains $readmeActive "Upgrade behavior (US-0057 / DEC-0057):")
+Assert-True "README documents scratchpad upgrade behavior (template)" (File-Contains $readmeTemplate "Upgrade behavior (US-0057 / DEC-0057):")
 
 # 21h) Deterministic artifact ordering checks (US-0058)
 $autoCmdActiveUs0058 = Join-Path $root ".cursor\commands\auto.md"
@@ -1267,6 +1267,12 @@ Assert-True "execute command documents triad gate (active)" (File-Contains (Join
 Assert-True "execute command documents triad gate (template)" (File-Contains (Join-Path $tpl ".cursor\commands\execute.md") "enforce-triad-hot-surface.py")
 Assert-True "refresh-context documents triad rollover (active)" (File-Contains (Join-Path $root ".cursor\commands\refresh-context.md") "enforce-triad-hot-surface.py")
 Assert-True "refresh-context documents triad rollover (template)" (File-Contains (Join-Path $tpl ".cursor\commands\refresh-context.md") "enforce-triad-hot-surface.py")
+
+# 26g) Scratchpad paired catalog parity (US-0075 / DEC-0057 / AC-11)
+$parityScript = Join-Path $root "scripts\check-scratchpad-pair-parity.py"
+Assert-True "scratchpad pair parity script exists" (Test-Path $parityScript -PathType Leaf)
+$parityRun = Start-Process python -ArgumentList @($parityScript, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "scratchpad pair parity check passes on repo" ($parityRun.ExitCode -eq 0)
 
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {

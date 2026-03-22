@@ -57,6 +57,12 @@ verify no unresolved blockers.
    - `TEST_COMMAND` is mandatory baseline evidence for push eligibility.
    - Optional checks run only when configured and should be reported as
      `pass|fail|skipped` deterministically.
+   - **User-visible metadata guard (US-0071 / DEC-0053):** run
+     `python scripts/check-user-visible-metadata.py` (see runbook). On failure,
+     record blocking findings with reason `USER_VISIBLE_INTERNAL_METADATA_DETECTED`,
+     cite `path:line:column` evidence, token class, and remediation per runbook.
+     If the checker entrypoint is missing, fail closed with
+     `METADATA_SANITIZATION_POLICY_MISSING`.
 2. Record findings and severity.
    - Explicitly classify blockers that must prevent auto-push:
      unresolved blocking QA findings and unresolved critical issues.
