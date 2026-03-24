@@ -1881,3 +1881,40 @@ a decision or recommendation.
     post-upgrade bytes for the example **match template** whenever the baseline was updated
     in the same run; assert **ordering** via staged temp trees (stale example + fresh
     template) if needed.
+
+## R-0053
+
+- **Date**: 2026-03-27
+- **Topic**: US-0076 — executable linkage from scratchpad sync flags to **git push**
+- **Query**: How can **`validate-and-push`** (or successor) read **merged** scratchpad and
+  enforce **US-0038** gates without duplicating policy in two places?
+- **Sources**:
+  - `docs/engineering/runbook.md` (sync policy contract, **US-0038**)
+  - `scripts/validate-and-push.ps1`, `scripts/validate-and-push.sh`
+  - `installer.py` (`parse_scratchpad_file`, `merge_scratchpad_layers` pattern — reuse vs
+    duplicate)
+  - `decisions/DEC-0018.md` (if present) / `docs/product/backlog.md` **US-0038**
+- **Findings**:
+  - **Gap**: Scratchpad keys are **inputs** to `/auto` **documentation** of sync verdicts;
+    **validate-and-push** currently keys only off **`runbook.md`** commands — no
+    **`ALLOW_AUTO_PUSH`** gate.
+  - **Merge rule**: Implementation should mirror **DEC-0055** precedence (**local** >
+    **materialized baseline** > **example**) when reading **`SYNC_*`** / **`ALLOW_AUTO_PUSH`**
+    so team **`.cursor/scratchpad.local.md`** overrides are honored.
+  - **`by_phase` / `by_milestone`**: Scripts do not know “current workflow phase” unless
+    passed in (**env var** / **CLI flag** / **state.md** parse) — **architecture** must pick
+    one deterministic source to avoid false pushes; default-safe: **treat script invocation
+    as explicit phase boundary** when **`SYNC_POLICY_MODE=by_phase`** and document that
+    **Cursor does not auto-invoke** the script.
+  - **QA gate**: Script cannot fully infer QA state without reading sprint artifacts;
+    minimum viable check = **documented** file glob + blocking keyword scan, or **defer**
+    push if **open** `qa-findings.md` for active sprint — **architecture** chooses bounded
+    rule (**AC-5**).
+- **Risks**:
+  - **False confidence** if operators believe scratchpad alone pushes — docs must say **run
+    validate-and-push** (or CI) after eligible boundaries.
+  - **Secret leakage** if push script logs tokens — keep logs to reason codes and branch
+    names only.
+- **Linked**: US-0076, US-0038, DEC-0018, DEC-0055, US-0071
+- **Confidence**: medium-high
+- **Status**: current

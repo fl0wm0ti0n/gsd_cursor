@@ -661,3 +661,21 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Research handoff**: Extend **`R-0052`** with concrete file-level refresh ordering,
   manifest path evidence, and a minimal **parity schema** (what counts as a “framework key”
   for the deterministic check) before **`/architecture`**.
+
+## Intake Notes — US-0076
+
+- **Problem**: Operators set **`SYNC_POLICY_MODE`**, **`ALLOW_AUTO_PUSH=1`**, and
+  **`AUTO_PUSH_BRANCH_ALLOWLIST`** and expect **git push**; the kit today treats those
+  mainly as **workflow policy** (**US-0038**) while **`validate-and-push`** does not read
+  scratchpad — so **nothing pushes** unless they run push scripts manually without that
+  linkage.
+- **Intent**: **Wire** merged scratchpad into an **executable**, **opt-in** push path that
+  honors the **same gate chain** (tests, branch allowlist, QA safety) with **deterministic
+  reason codes**; **no push** when flags are off or gates fail.
+- **Success**: Running the documented command after a phase (or from CI) **respects**
+  scratchpad sync settings and either pushes with evidence or exits with a **known**
+  **`US-0038`** reason code.
+- **Constraints**: Do not weaken **US-0038**; **US-0071** safe CLI strings; cross-platform
+  **PS1** / **sh** parity.
+- **Alternative**: Prefer extending **`validate-and-push`** over many new entrypoints unless
+  architecture mandates a split (**`/architecture`** decides).

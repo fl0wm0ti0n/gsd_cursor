@@ -1174,3 +1174,16 @@ Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **S
 - `next_scheduled_phase=none`
 - `sprint_id=S0054`
 
+## Intake checkpoint (2026-03-27) — US-0076
+
+- `phase_boundary=intake`
+- `story_id=US-0076`
+- `timestamp=2026-03-27T12:00:00Z`
+- **Artifacts**: `docs/product/backlog.md`, `docs/product/acceptance.md`, `docs/product/vision.md` (Intake Notes), `docs/engineering/research.md` (**R-0053**), `handoffs/po_to_tl.md` (handoff at file **tail**; see triad note), `docs/engineering/decisions.md`, `handoffs/resume_brief.md`
+- **Intake evidence**: selected_pack=`small-intake-pack`; asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`; missing_topics=`(none)`; assumptions_confirmed=`(none)`
+- **Triad hot-surface (DEC-0054)** after `handoffs/po_to_tl.md` mutation:
+  - Pass 1: `--rollover` → `rollover_complete units=1` (archived top **US-0076** draft into `handoffs/archive/po-to-tl-pack-20260324.md`); `--check` → **PASS**.
+  - Re-appended **US-0076** at file **tail** (rollover archives top-first; tail matches runbook TL read model).
+  - Pass 2 (post-append oversize): `--rollover` → `rollover_complete units=2` (PO archive `handoffs/archive/po-to-tl-pack-20260324-a.md`: `moved=2` sections, `retained_sections=23`, `retained_body_lines=765`); `--check` → **PASS** (exit `0`).
+- **Next**: **`/discovery`** for **US-0076**
+

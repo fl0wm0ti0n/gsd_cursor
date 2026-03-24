@@ -1,8 +1,12 @@
 # Decisions
 
-## Current context pack (2026-03-21 — post-release S0054 / US-0075)
+## Current context pack (2026-03-27 — intake US-0076)
 
-- Latest completed/released stories (high-signal):
+- Next prioritized **OPEN** story: **`US-0076`** (executable scratchpad-driven sync / auto-push wiring; implements **US-0038** script linkage).
+- Active workflow target: **`/discovery`** for **US-0076** per `handoffs/resume_brief.md` and **`## Intake checkpoint (2026-03-27) — US-0076`** in `docs/engineering/state.md`.
+- Research: **`R-0053`** (scratchpad → **validate-and-push** merge and gate design).
+- Continuation hygiene: `handoffs/resume_brief.md` → **US-0076** + **`/discovery`**.
+- Latest completed/released stories (high-signal, unchanged):
   - `US-0075` (`S0054`, released), governed by **`DEC-0057`** (scratchpad **example-first**
     upgrade ordering + **`AC-11`** paired baseline ↔ example catalog parity gate;
     **`DEC-0039`** / **`DEC-0055`** alignment).
@@ -14,10 +18,7 @@
   - `US-0071` (`S0050`, released), governed by **`DEC-0053`** (user-visible metadata guard).
   - `US-0070` (`S0049`, released), governed by **`DEC-0052`**.
   - `US-0069` (`S0048`, released), governed by **`DEC-0051`**.
-- Next prioritized **OPEN** story: **none** in `docs/product/backlog.md` — enter new work via **`/intake`** when prioritized.
-- Active workflow target: **`/intake`** (idle until new backlog) per `handoffs/resume_brief.md` and **`## Refresh-context checkpoint (2026-03-21) — post S0054 / US-0075`** in `docs/engineering/state.md`.
 - Hot surface: latest **`/refresh-context`** triad rollover for this run archived **`units=4`** → `docs/engineering/state-archive/state-pack-20260321-n.md` (see refresh checkpoint in `state.md`).
-- Continuation hygiene: `handoffs/resume_brief.md` → **`none`** + **`/intake`**.
 - Traceability (**DEC-0010**):
   - `| US-0075 | S0054 | T-001..T-011 | DONE |` — evidence in `sprints/S0054/summary.md`,
     `sprints/S0054/qa-findings.md`, `sprints/S0054/uat.json`, `sprints/S0054/uat.md`,

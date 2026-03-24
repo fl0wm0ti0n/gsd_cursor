@@ -1551,3 +1551,37 @@
 - Boundaries:
   - In scope: installer/upgrade ordering, example vs materialized baseline, **paired-file key/section parity**, diagnostics, docs, tests, manifest parity.
   - Out of scope: changing merge semantics for required keys (**DEC-0055** / **US-0073**) except where needed to fix ordering; unrelated workflow features.
+
+## US-0076 — Executable Scratchpad-Driven Sync and Auto-Push Wiring
+- Title: Make `SYNC_*` / `ALLOW_AUTO_PUSH` / branch allowlist **actually drive** an optional push path (not policy-only)
+- Summary: Operators set **`SYNC_POLICY_MODE`**, **`ALLOW_AUTO_PUSH=1`**, and **`AUTO_PUSH_BRANCH_ALLOWLIST`** expecting **git push** to occur when safe; today the kit primarily **documents** eligibility (**US-0038** / **DEC-0018**) and **`validate-and-push`** ignores scratchpad. This story **wires** merged scratchpad (baseline + **`.cursor/scratchpad.local.md`**) into a **deterministic executable** path (extend **`scripts/validate-and-push.*`** and/or a thin companion) so **opt-in** auto-push honors the same gate chain (tests, QA posture, branch allowlist) with **explicit reason codes** and **no behavior change** when auto-push is off.
+- Priority: P1
+- Status: OPEN
+- Decomposition (US-0051):
+  - **Single story** — policy source (scratchpad), gate chain, scripts, docs, and tests are one delivery slice.
+  - **Rationale**: Splitting “read scratchpad” from “run git” would recreate the current gap.
+- Overlap / duplicate evaluation:
+  - **US-0038** (DONE): defines **policy**; this story **implements** the missing **executable** linkage without weakening gates.
+  - **`validate-and-push`**: primary integration surface; must remain invocable standalone with **documented** default when scratchpad disables auto-push.
+- Discovery notes:
+  - Intake research: **`R-0053`**.
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+  - **Alternatives** (PO): (1) Extend **`validate-and-push`** only; (2) New **`scripts/sync-from-scratchpad.*`** delegating to validate-and-push; (3) Document **CI-only** wiring — **recommend (1)** for minimal moving parts unless architecture finds a security reason to split.
+- Acceptance:
+  - [ ] AC-1: When **`ALLOW_AUTO_PUSH=0`** or **`SYNC_POLICY_MODE`** is **`disabled`** / **`manual`**, the executable push path performs **no push** and exits with deterministic **`SYNC_DISABLED`** / **`MANUAL_MODE_NO_AUTO`** / **`AUTO_PUSH_NOT_ENABLED`** semantics (no silent push).
+  - [ ] AC-2: When **`ALLOW_AUTO_PUSH=1`** and mode is eligible, the script(s) read **merged** scratchpad (materialized baseline + local override per **DEC-0055**) for **`SYNC_POLICY_MODE`**, **`SYNC_CUSTOM_PHASES`** (when `custom_phase_list`), **`AUTO_PUSH_BRANCH_ALLOWLIST`**, and **fail closed** on parse errors with remediation text.
+  - [ ] AC-3: Push is attempted **only** after the **US-0038** mandatory check chain (**`TEST_COMMAND`** required from **`runbook.md`**; optional lint/typecheck when set) passes; failures emit **`TEST_FAILED`**, **`TEST_COMMAND_MISSING`**, **`TEST_TIMEOUT`**, **`OPTIONAL_CHECK_FAILED`** as applicable.
+  - [ ] AC-4: **Branch safety**: current branch must match allowlist (deterministic match rules documented); else **`BRANCH_NOT_ALLOWLISTED`** and **no push**.
+  - [ ] AC-5: **QA-first / blocking findings**: document and implement how the script determines “safe to push” for **feature** work (minimum: **no push** if sprint **`qa-findings`** or equivalent declares blocking failures when those artifacts exist — exact rule locked in **architecture**); emit **`BLOCKING_QA_FINDINGS`** or **`PRE_QA_AUTOPUSH_FORBIDDEN`** when blocked.
+  - [ ] AC-6: **Cross-platform parity**: **`validate-and-push.ps1`** and **`validate-and-push.sh`** (or documented single entry + wrapper) behave consistently for scratchpad-driven mode.
+  - [ ] AC-7: **Runbook** + **README** (active + **`template/`**) explain: scratchpad flags **alone** do not push; **run** validate-and-push (or documented alias) after phases, and how **`by_phase`** / **`custom_phase_list`** map to **operator** or **CI** scheduling.
+  - [ ] AC-8: **Regression tests** in **`tests/run-tests.*`** assert: disabled manual → no push path invoked (mock/spy or dry-run flag); allowlist mismatch → exit reason; happy-path dry-run or fixture repo where feasible.
+  - [ ] AC-9: **US-0071**: operator-visible CLI strings from new/changed scripts do **not** emit forbidden internal planning tokens in scanned surfaces.
+  - [ ] AC-10: **Decision artifact** (**`DEC-0058`** or amendment to **`DEC-0018`**) records executable contract, overlap with **US-0038**, and deprecation of “policy-only” interpretation in operator docs.
+- Boundaries:
+  - In scope: scratchpad → script → git push **opt-in** wiring, docs, tests, decision record.
+  - Out of scope: **Cursor** automatically running the script every phase without operator/CI invocation (unless explicitly added as a **documented** optional hook in acceptance); weakening **US-0038** gates; auto-push to **unlisted** branches.
