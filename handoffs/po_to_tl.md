@@ -1,60 +1,20 @@
-## Intake Addendum — Multi-Repo Compatibility + Component-Scoped Execution
+## Research Addendum — US-0077
 
-### New intake (German source summary)
+> Placement: prepended; triad **`--rollover`** may archive this block to `handoffs/archive/`.
+> `orchestrator_run_id=auto-20260327-02`.
 
-User asks for:
-1. Monitoring across multiple repos/modules for software modules, docs, API descriptions, and API compatibility.
-2. A way to work on one component in a repo with multiple components, without breaking others.
+- **Closure**: **`/research`** (TL) complete for **`US-0077`**; **`R-0054`** extended with **9-cell
+  semantic-key matrix**, **artifact ownership** + **README H2 budgets**, and **deterministic
+  validation strategy** (scratchpad merge inputs, completeness scan, **US-0030** template parity,
+  tiered **AC-8** regression).
+- **Anchors**: **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`**; developer split recommended for
+  `both×balanced` and required for `both×technical-deep`; **US-0071** on user-visible shards.
+- **Boundaries**: **US-0031** / **US-0032** unchanged — profile coordinates README/developer depth
+  only.
+- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**, **`# US-0077`** in `architecture.md`).
+- **Decision gate before architecture**: **none** (superseded by architecture closure above).
 
-This is accepted as workflow/process capability (not runtime application feature behavior).
-
-### Overlap and duplicate evaluation
-
-- No direct duplicate found in current backlog.
-- Closest related stories, but distinct scope:
-  - `US-0017` template drift guard: parity/sync concern, not compatibility observability.
-  - `US-0024` memory drift audit: compares artifacts vs code in one repo, read-only audit; no cross-repo contract focus.
-  - `US-0025` traceability contract: links stories and sprint tasks; does not enforce component scoping or compatibility checks.
-  - `US-0033` guided intake behavior: interaction mode only, not execution scoping or module compatibility validation.
-- Workflow overlap noted with `/intake`, `/architecture`, `/execute`, `/qa`, but no existing story provides these capabilities end-to-end.
-
-### Split decision
-
-- Decision: create **two stories** (`US-0034`, `US-0035`) instead of one merged story.
-- Rationale:
-  - Different trigger and risk model:
-    - `US-0034` is observability + compatibility signal generation and optional release gate behavior.
-    - `US-0035` is day-to-day scoped execution safety and out-of-scope impact control.
-  - Splitting keeps acceptance tests concrete and avoids mixed pass/fail semantics.
-
-### Accepted stories
-
-#### US-0034 — Multi-Repo and Contract Compatibility Observability
-- Priority: P1
-- Status: OPEN
-- Key intent: optional, flag-driven compatibility visibility across repos/modules/contracts with zero-overhead default when disabled.
-
-#### US-0035 — Component-Scoped Execution Mode with Protection Guards
-- Priority: P1
-- Status: OPEN
-- Key intent: optional, flag-driven component targeting and unaffected-component protection checks with zero-overhead default when disabled.
-
-### TL architecture boundaries
-
-- In scope:
-  - Define canonical flags and defaults for both stories.
-  - Define canonical artifacts for compatibility findings and scoped-impact evidence.
-  - Define decision-gate rules for critical compatibility breakage or unapproved out-of-scope impact.
-  - Ensure command/rule/doc updates include active + `template/` parity.
-- Out of scope:
-  - Runtime service behavior changes.
-  - Full cross-repo orchestration platform implementation.
-  - Build-system redesign across monorepos.
-
-### Suggested implementation order
-
-1. `US-0035` first to reduce immediate change-risk in multi-component repos.
-2. `US-0034` second to add broader compatibility observability and release-time confidence.
+---
 
 ## Intake Addendum — Official Remote Config Template, Docs, and Validation
 
@@ -763,3 +723,78 @@ User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALL
 ### Recommendation
 
 **`/discovery`** → **`/research`** (finalize **R-0053**) → **`/architecture`** (**`DEC-0058`**) → **`/sprint-plan`**.
+
+---
+
+## Discovery Addendum — US-0076
+
+> Placement: **tail** hot copy after **DEC-0054** rollover archived an earlier **prepend** into
+> `handoffs/archive/po-to-tl-pack-20260327-a.md` (same wording).
+
+- **Scope**: Executable merged-scratchpad wiring for **`SYNC_*`**, **`ALLOW_AUTO_PUSH`**, and
+  **`AUTO_PUSH_BRANCH_ALLOWLIST`** so opt-in push honors the **US-0038** gate chain with
+  deterministic reason codes; **no** behavior change when auto-push is off.
+- **Conclusions**: Gap validated (**R-0053**): **`validate-and-push`** currently does not enforce
+  scratchpad merge inputs. **PO** recommends extending **`validate-and-push`** (PS1/SH parity) over
+  new entrypoints unless architecture mandates a split. **`by_phase`**/**`by_milestone`** need an
+  explicit boundary signal at invocation (not implicit Cursor phase). **AC-5** QA blocking rule
+  must be architecture-bounded (sprint artifact contract).
+- **Next recommendation**: Proceed with **`/research`** ( **`R-0053`** current) then **`/architecture`**
+  to lock phase-boundary input, QA scan rule, installer/Python merge reuse vs duplicate, and
+  **DEC-0058** / **DEC-0018** amendment plan.
+- **Artifacts**: `docs/product/vision.md` (Discovery Notes — US-0076), `docs/product/backlog.md`
+  (US-0076 discovery refinements), `docs/engineering/research.md` (**R-0053**).
+
+---
+
+## Research Addendum — US-0076 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0076**). `orchestrator_run_id=auto-20260327-01`.
+
+- **Closure**: **`/research`** (TL) complete for **US-0076**; **`R-0053`** extended with implementation anchors + mitigations.
+- **Anchors**: **`validate-and-push.ps1`/`.sh`** — merged scratchpad gate before push; prefer **`installer.py`** `merge_scratchpad_layers` / `parse_scratchpad_file`; runbook remains command source only.
+- **Boundaries**: **`by_phase`** default = invocation as boundary unless architecture fixes **`state.md`/env/CLI**; **AC-5** = bounded **`qa-findings.md`** scan + sprint path in architecture.
+- **Next**: **`/architecture`** — **DEC-0058** (or **DEC-0018** amendment), QA glob, dry-run/exit codes, **AC-8** tests.
+
+---
+
+## Architecture Addendum — US-0076 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0076**). `orchestrator_run_id=auto-20260327-01`.
+
+- **Decision**: **`decisions/DEC-0058.md`** accepted — executable scratchpad → **validate-and-push**; **`DEC-0018`** policy authority retained.
+- **AC-5**: **`sprints/S*/qa-findings.md`** bounded scan per **DEC-0058** §6.
+- **Phase signal**: default **invocation**; optional **`SYNC_PHASE_BOUNDARY`** env.
+- **Next**: **`/sprint-plan`**.
+
+---
+
+## Discovery Addendum — US-0077 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Discovery Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
+
+- **Scope**: Documentation audience/depth profiles + dual README strategy; preserve **US-0030** / **US-0031** / **US-0032** / **US-0071**; anchor **R-0054**.
+- **Conclusions**: Ownership matrix + bounded sections/split preferred; profile validation with deterministic reason codes; **US-0071** on user-visible outputs.
+- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**).
+- **Decision gate before research** (historical): **none**.
+- **Artifacts**: `docs/product/vision.md`, `docs/product/backlog.md`, `handoffs/po_to_tl.md`, `docs/engineering/state.md`, `docs/engineering/research.md` (**R-0054**).
+
+---
+
+## Research Addendum — US-0077 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
+
+- **Closure**: **`/research`** (TL) complete; **`R-0054`** — profile matrix + validation tiers + reason-code draft.
+- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**).
+- **Decision gate before architecture**: **none** (closed).
+
+---
+
+## Architecture Addendum — US-0077 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
+
+- **Decision**: **`decisions/DEC-0059.md`** — dual README (**`USER_*`** / **`DEV_*`**), validator **`scripts/validate_doc_profile.py`**, tiered **AC-8**, **`US-0030`** parity + manifest path for **`docs/developer/README.md`**.
+- **Next**: **`/sprint-plan`**.
+- **Decision gate before sprint-plan**: **none**.

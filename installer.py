@@ -1,5 +1,6 @@
 import argparse
 import filecmp
+import importlib.util
 import json
 import os
 import re
@@ -280,6 +281,47 @@ def materialize_scratchpad_baseline(target_root, source_root, mode, print_ok=Tru
     return True
 
 
+def _load_doc_profile_lib():
+    """
+    Load doc_profile_lib from scripts/ adjacent to this installer (repo checkout or npm package root).
+    Path is derived from __file__ only (no cwd / PYTHONPATH dependency).
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(here, "scripts", "doc_profile_lib.py")
+    if not os.path.isfile(path):
+        raise RuntimeError(
+            "[DOC_PROFILE_LIB_MISSING] Expected documentation profile library at "
+            f"{path} (same directory as installer.py). "
+            "Global installs require this file in the published its-magic package; "
+            f"reinstall or upgrade its-magic ({REPO_URL})."
+        )
+    spec = importlib.util.spec_from_file_location("doc_profile_lib", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(
+            "[DOC_PROFILE_LIB_LOAD_ERROR] Could not create import spec for "
+            f"{path}. Reinstall its-magic ({REPO_URL})."
+        )
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["doc_profile_lib"] = mod
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as e:
+        sys.modules.pop("doc_profile_lib", None)
+        raise RuntimeError(
+            "[DOC_PROFILE_LIB_LOAD_ERROR] doc_profile_lib failed to load "
+            f"({e!r}). Reinstall its-magic ({REPO_URL})."
+        ) from e
+    return mod
+
+
+def _doc_profile_sync(target_root, merged, print_ok=True):
+    """Append missing normative README/developer doc sections from merged profile (non-destructive)."""
+    doc_profile_lib = _load_doc_profile_lib()
+    notes = doc_profile_lib.ensure_doc_surfaces_merged(merged, target_root, print_ok=print_ok)
+    bad = [ln for ln in notes if ln.startswith("[DOC_PROFILE_INVALID]")]
+    return (not bad), notes
+
+
 def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
     if not materialize_scratchpad_example(target_root, source_root, print_ok=print_ok):
         return False
@@ -288,6 +330,18 @@ def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
     ok, diagnostics = validate_merged_scratchpad(target_root)
     for line in diagnostics:
         print(line)
+    if ok:
+        merged, _paths = merge_scratchpad_layers(target_root)
+        try:
+            dp_ok, dp_notes = _doc_profile_sync(target_root, merged, print_ok=print_ok)
+        except RuntimeError as e:
+            print(str(e))
+            ok = False
+        else:
+            for line in dp_notes:
+                print(line)
+            if not dp_ok:
+                ok = False
     if ok and print_ok:
         loc = os.path.join(target_root, SCRATCHPAD_LOCAL_REL)
         if os.path.isfile(loc):

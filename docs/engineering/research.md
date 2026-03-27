@@ -1918,3 +1918,126 @@ a decision or recommendation.
 - **Linked**: US-0076, US-0038, DEC-0018, DEC-0055, US-0071
 - **Confidence**: medium-high
 - **Status**: current
+
+### US-0076 research refinement (2026-03-27)
+
+- **Implementation anchors** (repo as of research close):
+  - **`scripts/validate-and-push.ps1`**: command sourcing is **runbook-only** today (`Read-RunbookKey` / `docs\engineering\runbook.md`); no read of `.cursor/scratchpad*.md`. Push/branch gating after tests must insert **merged** scratchpad evaluation **before** any `git push` attempt.
+  - **`scripts/validate-and-push.sh`**: same pattern (`read_runbook_key` / `docs/engineering/runbook.md` only).
+  - **`installer.py`**: canonical merge for Model B — `parse_scratchpad_file` + `merge_scratchpad_layers` (local > materialized baseline > example). **Prefer** invoking this from scripts (e.g. `python -c` with repo root) or extracting a small shared Python module **over** re-implementing merge in shell — avoids **DEC-0055** drift and keeps one precedence truth.
+  - **Phase / boundary signal**: scripts have no implicit “current `/auto` phase”; align with backlog **AC-7** — default contract = **operator or CI invocation** counts as the eligible boundary for `by_phase` unless **architecture** selects a single alternate (`state.md` last `phase_boundary`, env `SYNC_PHASE_BOUNDARY`, or CLI flag), documented in **DEC-0058** / runbook.
+  - **QA / AC-5**: implement a **bounded** scan of sprint **`qa-findings.md`** (path rule fixed in architecture — e.g. active sprint under `sprints/S*/`) for blocking verdict patterns; emit **`BLOCKING_QA_FINDINGS`** / **`PRE_QA_AUTOPUSH_FORBIDDEN`** per **US-0038** semantics without parsing free-form chat.
+  - **Tests**: `tests/run-tests.ps1` / `tests/run-tests.sh` — dry-run / fixture-repo / exit-code assertions per **AC-8**; keep PS1/SH behavior aligned.
+- **Risk mitigations**:
+  - **Dual policy source**: treat **merged scratchpad** as the only source for `SYNC_*` / `ALLOW_AUTO_PUSH` / allowlist in the executable path; runbook remains source for **commands** only — document in **DEC-0058** to prevent divergent “script policy” vs **US-0038**.
+  - **Parse / merge failure**: fail closed with `[SCRATCHPAD_MERGE_ERROR]`-style diagnostics (reuse installer messages where possible); **no push** on ambiguous merge.
+  - **Over-push on wrong branch**: allowlist match before push; deterministic match rules in architecture + tests.
+  - **Operator surprise**: stdout/stderr limited to **US-0071**-safe reason codes; optional **`--dry-run`** (or equivalent) in execute phase to print decisions without `git push`.
+- **Architecture-owned gates** (not research blockers): exact `qa-findings` glob, optional `state.md` phase reader vs invocation-only default, and **DEC-0058** vs **DEC-0018** amendment split.
+
+## R-0054
+
+- **Date**: 2026-03-27
+- **Topic**: US-0077 — configurable documentation audience/depth profiles and dual README strategy
+- **Query**: What deterministic model best separates user-facing and developer-facing docs
+  while preserving docs-as-code validation and low drift?
+- **Sources**:
+  - `docs/engineering/runbook.md` (**US-0031**, **US-0032**, **US-0030** constraints)
+  - `docs/product/backlog.md` story contracts for `US-0030`, `US-0031`, `US-0032`
+  - External framing: Diataxis documentation model (`https://diataxis.fr/`)
+- **Findings**:
+  - Existing framework already has two optional axes: technical spec-pack (**US-0031**) and
+    end-user guide (**US-0032**), but README/operator surfaces still lack an explicit
+    audience+depth profile contract.
+  - Diataxis supports a deterministic audience split by intent: user onboarding/how-to versus
+    developer reference/explanation; this maps cleanly to profile-driven section templates.
+  - A profile pair (`DOC_AUDIENCE_PROFILE`, `DOC_DETAIL_LEVEL`) is a minimal extension that
+    can stay backward-compatible with existing flags and preserve release validation.
+  - To avoid drift/conflict, generation rules must define which sections are mandatory for each
+    profile and which artifact owns each section (README vs user-guide vs spec-pack).
+- **Risks**:
+  - Ambiguous ownership between README and user-guides can duplicate or contradict instructions.
+  - "both + technical-deep" can bloat README unless section budgets are bounded.
+  - Profile matrix expansion can increase test cost unless coverage is deterministic and scoped.
+- **Linked**: US-0077, US-0030, US-0031, US-0032, US-0071, DEC-0059
+- **Confidence**: high
+- **Status**: current
+- **Delivery closure (2026-03-28)**: Normative semantics shipped in **`DEC-0059`** + **`docs/engineering/architecture.md`** **`# US-0077`** (**S0056**); this entry retained for matrix/traceability — treat architecture/decision as authoritative for literals and validator contracts.
+
+### US-0077 — Concrete profile matrix (post-discovery, research draft for architecture lock)
+
+**Dimensions**: `DOC_AUDIENCE_PROFILE` ∈ {`user`, `developer`, `both`} × `DOC_DETAIL_LEVEL` ∈
+{`concise`, `balanced`, `technical-deep`} — **9** cells; architecture locks exact heading
+strings and file paths.
+
+**Default artifact ownership (non-overlapping intents)** — names are illustrative; architecture
+may substitute equivalent paths if parity rules stay deterministic:
+
+| Surface | Primary intent | Profile use |
+|--------|----------------|-------------|
+| `README.md` (root) | User/operator **how-to** entry, quickstart, limitations | All profiles read user-required content here or via explicit pointer from here |
+| `docs/developer/` (or single `DEVELOPERS.md` / `docs/README.md` developer region) | Workflow, quality gates, extension points | `developer` and `both` |
+| `docs/engineering/runbook.md` | Operator command keys | Unchanged **US-0030** surface; profile may control cross-links from README only |
+| `docs/user-guides/US-xxxx.md` | Feature depth | **US-0032** when `USER_GUIDE_MODE=1`; profile sets **depth of examples**, not file existence when mode off |
+| Spec-pack outputs | Design/CRS/technical spec | **US-0031** when `SPEC_PACK_MODE=1`; profile does not redefine spec-pack semantics |
+
+**Mandatory *semantic* sections per cell** (validators map each key to one or more H2 headings or
+anchored regions — architecture defines the literal strings):
+
+Semantic keys (vocabulary):
+
+- **User channel**: `USER_PURPOSE`, `USER_QUICKSTART`, `USER_EXAMPLES`, `USER_TROUBLESHOOTING`,
+  `USER_LIMITATIONS`, `USER_RELATED_DOCS`
+- **Developer channel**: `DEV_PREREQS`, `DEV_WORKFLOW`, `DEV_QUALITY_GATES`, `DEV_ARCHITECTURE`,
+  `DEV_CONTRACTS`, `DEV_DECISIONS`
+
+| Audience × depth | Required semantic keys (minimum) |
+|------------------|----------------------------------|
+| user × concise | `USER_PURPOSE`, `USER_QUICKSTART`, `USER_LIMITATIONS` |
+| user × balanced | above + `USER_EXAMPLES`, `USER_RELATED_DOCS` |
+| user × technical-deep | above + `USER_TROUBLESHOOTING` (expanded body budget in architecture) |
+| developer × concise | `DEV_PREREQS`, `DEV_WORKFLOW` |
+| developer × balanced | above + `DEV_QUALITY_GATES`, `DEV_ARCHITECTURE` |
+| developer × technical-deep | above + `DEV_CONTRACTS`, `DEV_DECISIONS` |
+| both × concise | union(user×concise, developer×concise) with **split enforcement**: user keys in root README, developer keys in developer shard (or bounded regions — architecture picks one scheme) |
+| both × balanced | union(user×balanced, developer×balanced); **split recommended** (README + `docs/developer/*`) |
+| both × technical-deep | same union; **split required** — root README stays user/operator scoped; developer-deep content **not** inlined in README body beyond short pointers |
+
+**Section budgets (bloat control)** — soft caps for **H2 count in root `README.md` body** when using a
+single file; exceeding triggers `DOC_SECTION_BUDGET_EXCEEDED` unless architecture documents an
+explicit waiver path:
+
+| Cell | README H2 budget (indicative) |
+|------|-------------------------------|
+| user × * | concise ≤5, balanced ≤7, technical-deep ≤9 |
+| developer × * | prefer developer shard; if README-only, concise ≤4, balanced ≤6, technical-deep ≤8 |
+| both × concise | ≤6 total with labeled regions |
+| both × balanced | ≤8 or **must** use split files |
+| both × technical-deep | README ≤6 user H2s; developer keys **only** in shard |
+
+### US-0077 — Validation strategy (deterministic)
+
+1. **Inputs**: merged scratchpad (**DEC-0055** precedence) for `DOC_AUDIENCE_PROFILE`,
+   `DOC_DETAIL_LEVEL`; read `SPEC_PACK_MODE`, `USER_GUIDE_MODE` for additive optional checks only.
+2. **Parse gate**: invalid enum / missing keys → **`DOC_PROFILE_INVALID`** with allowed-value
+   remediation (align **AC-1**).
+3. **Merge gate**: scratchpad merge failure → **`DOC_PROFILE_MERGE_ERROR`**; no doc mutation.
+4. **Completeness scan**: for resolved profile cell, assert each required semantic key maps to an
+   existing heading/region in the **owned** artifact(s); missing → **`DOC_SECTION_MISSING:<key>`**.
+5. **US-0030 parity**: repeat the same profile cell requirements for **active + `template/`**
+   mirrored paths; mismatch → **`DOC_TEMPLATE_PARITY_FAIL`**.
+6. **Optional modes**: when `USER_GUIDE_MODE=0` / `SPEC_PACK_MODE=0`, validators **do not** require
+   those artifacts; when enabled, existing **US-0032** / **US-0031** contracts add **on top** (no
+   contradiction — profile adjusts README/developer surfaces only).
+7. **US-0071**: user-visible generated or copied strings in README/developer shards must pass
+   existing metadata guard surfaces (extend allowlists in execute phase if new tools emit stdout).
+8. **AC-8 regression (tiered, scoped cost)**:
+   - **Tier A — anchor fixtures** (full markdown snapshots): `user×concise`, `developer×balanced`,
+     `both×technical-deep` (split layout).
+   - **Tier B — table-driven presence tests**: synthetic markdown fixtures for the remaining six
+     cells exercising the semantic-key → heading resolver only.
+   - **Tier C — wiring smoke**: one CI path per `DOC_AUDIENCE_PROFILE` value at `balanced` depth to
+     catch enum/merge wiring without 9× full E2E doc generation every run.
+
+**Architecture-owned (explicit non-blockers)**: literal heading text, file split layout, validator
+implementation location (standalone script vs installer hook), and **DEC** id for profile semantics.

@@ -186,7 +186,7 @@ jobs:
           echo ""
           echo "What to do next:"
           echo "  1. Pull the latest changes"
-          echo "  2. Run:  sh scripts/validate-and-push.sh"
+          echo "  2. Run:  bash scripts/validate-and-push.sh"
           echo "     (or:  powershell scripts/validate-and-push.ps1)"
           echo "  3. Fix failures, the script loops until green, then pushes."
 

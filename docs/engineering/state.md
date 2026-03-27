@@ -9,870 +9,6 @@
 - Retrieval policy for `/ask`: prefer latest targeted sections first and expand
   only when unresolved.
 
-## Auto continuation checkpoint (2026-03-23) — invocation auto-20260323-01 / US-0073
-
-- `invocation_mode=auto`
-- `requested_start_from=(none)`
-- `resolved_start_phase=discovery`
-- `resolution_source=resume_brief`
-- `resolution_status=resolved`
-- `story_id=US-0073`
-- `timestamp=2026-03-23T00:00:00Z`
-- **Phase plan materialization (US-0070 / DEC-0052)**:
-  - `phase_policy_mode=full`
-  - `resolved_phase_plan_candidate=intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-  - `intersected_executable_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-  - `skipped_phases=intake (reason: resume_anchor_before_phase; not in executable schedule)`
-  - `orchestrator_run_id=auto-20260323-01`
-- **Phase boundary status (pre-spawn)**:
-  - `phase_boundary=(start)`
-  - `next_scheduled_phase=discovery`
-- **Sync policy (US-0038)**: boundary pre-spawn — `SYNC_POLICY_MODE=manual` → `MANUAL_MODE_NO_AUTO` (no auto-push evaluation at this breadcrumb).
-
-## Discovery checkpoint (2026-03-23) — US-0073
-
-- Discovery result: **PASS**.
-- Scope constraint: **`US-0073` only** (scratchpad delivery simplification /
-  example-only install policy evaluation).
-- Artifacts updated:
-  - `docs/product/vision.md` (Discovery Notes — US-0073)
-  - `docs/product/backlog.md` (US-0073 discovery refinements under Discovery notes)
-  - `handoffs/po_to_tl.md` (Discovery Addendum — US-0073, prepended)
-  - `docs/engineering/decisions.md` (current context pack — next phase research)
-  - `handoffs/resume_brief.md` (next phase **`/research`**)
-- Next recommended phase: **`/research`** for **`US-0073`**.
-- Isolation evidence (US-0048 / DEC-0029):
-  - phase_id=discovery
-  - role=po
-  - fresh_context_marker=po-US0073-discovery-20260323T120000Z-fresh
-  - timestamp=2026-03-23T12:00:00Z
-  - evidence_ref=docs/product/vision.md,handoffs/po_to_tl.md,docs/product/backlog.md
-- Strict runtime proof (US-0056 / DEC-0038):
-  - orchestrator_run_id=auto-20260323-01
-  - runtime_proof_id=rp-auto-20260323-01-discovery-po-20260323T120000Z-US0073
-  - phase_id=discovery
-  - role=po
-  - proof_issued_at=2026-03-23T12:00:00Z
-  - proof_ttl_seconds=3600
-  - proof_hash=630fda6dbe7b74f7e7623c3b733f15d8aadf8da3479e40fa97460dcd1a1d1c09
-
-## Research checkpoint (2026-03-23) — US-0073
-
-- `/research` completed for **`US-0073`** in fresh Tech Lead context.
-- Research evidence updated:
-  - **`R-0050`** in `docs/engineering/research.md` (delivery models A/B, canonical
-    merged precedence, upgrade/migration, parity + regression matrix; linked
-    **`DEC-0039`**).
-- Context pack synchronized: `docs/engineering/decisions.md` (post-research
-  handoff to **`/architecture`**).
-- Backlog pointer added: `docs/product/backlog.md` (`US-0073` research pointer).
-- No decision gate triggered at research boundary.
-- Next recommended phase: **`/architecture`** for **`US-0073`**.
-- Isolation evidence (US-0048 / DEC-0029):
-  - phase_id=research
-  - role=tech-lead
-  - fresh_context_marker=tl-US0073-research-20260323T130500Z-fresh
-  - timestamp=2026-03-23T13:05:00Z
-  - evidence_ref=docs/engineering/research.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/product/vision.md,handoffs/po_to_tl.md,decisions/DEC-0039.md
-- Strict runtime proof (US-0056 / DEC-0038):
-  - orchestrator_run_id=auto-20260323-01
-  - runtime_proof_id=rp-auto-20260323-01-research-tech-lead-20260323T130500Z-US0073
-  - phase_id=research
-  - role=tech-lead
-  - proof_issued_at=2026-03-23T13:05:00Z
-  - proof_ttl_seconds=3600
-  - proof_hash=9635e2f68c27b7b3d2a98d164d5bba90ebb282bec8bff57a72b104ce79553208
-
-## Architecture checkpoint (2026-03-23) — US-0073
-
-- `/architecture` completed for **`US-0073`** in fresh Tech Lead context.
-- Architecture artifacts updated:
-  - `decisions/DEC-0055.md` (example-only install policy — Model B, materialized
-    baseline, merge precedence, upgrade/legacy, parity, consequences).
-  - `docs/engineering/architecture.md` (**US-0073** section referencing **`DEC-0055`**).
-  - `docs/engineering/decisions.md` (context pack + compact index).
-  - `docs/product/backlog.md` (US-0073 architecture pointer).
-- Decision gate: **none** at architecture boundary.
-- Next recommended phase: **`/sprint-plan`** for **`US-0073`**.
-- Isolation evidence (US-0048 / DEC-0029):
-  - phase_id=architecture
-  - role=tech-lead
-  - fresh_context_marker=tl-US0073-architecture-20260323T150000Z-fresh
-  - timestamp=2026-03-23T15:00:00Z
-  - evidence_ref=decisions/DEC-0055.md,docs/engineering/architecture.md,docs/engineering/decisions.md,docs/product/backlog.md,docs/engineering/research.md
-- Strict runtime proof (US-0056 / DEC-0038):
-  - orchestrator_run_id=auto-20260323-01
-  - runtime_proof_id=rp-auto-20260323-01-architecture-tech-lead-20260323T150000Z-US0073
-  - phase_id=architecture
-  - role=tech-lead
-  - proof_issued_at=2026-03-23T15:00:00Z
-  - proof_ttl_seconds=3600
-  - proof_hash=8928bdcedd0adb7ecf922e1d3d991972c660950c033bb2b717d22d3da01ecf58
-
-## Sprint-plan checkpoint (2026-03-23) — S0052 / US-0073
-
-- `/sprint-plan` completed for **`US-0073`** in fresh Tech Lead context.
-- Sprint planned: **`S0052`** with 10 atomic tasks (`T-001..T-010`) mapped 1:1 to
-  **AC-1..AC-10** in `sprints/S0052/tasks.md`, governed by **`DEC-0055`** (Model B)
-  with architecture/research pointers **`R-0050`**, **`DEC-0039`**.
-- Sizing validation:
-  - `SPRINT_MAX_TASKS=12`
-  - planned tasks: 10
-  - split required: no
-- Sprint artifacts created:
-  - `sprints/S0052/sprint.md`
-  - `sprints/S0052/tasks.md`
-  - `sprints/S0052/progress.md`
-  - `sprints/S0052/plan-verify.json` (**PENDING** seed)
-  - `sprints/S0052/uat.json` (placeholder)
-  - `sprints/S0052/uat.md` (placeholder)
-- Traceability index (**DEC-0010**): `US-0073` → **`S0052`**, `T-001..T-010`,
-  status **PLANNED** (evidence pending execute); see `docs/engineering/decisions.md`.
-- TL -> Dev handoff updated: `handoffs/tl_to_dev.md` (S0052 block prepended).
-- Next phase recommendation: **`/plan-verify`** for **`S0052`** (**`US-0073`**).
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=sprint-plan
-- role=tech-lead
-- fresh_context_marker=tl-S0052-sprint-plan-US0073-20260323T153000Z-fresh
-- timestamp=2026-03-23T15:30:00Z
-- evidence_ref=sprints/S0052/sprint.md,sprints/S0052/tasks.md,sprints/S0052/progress.md,sprints/S0052/plan-verify.json,sprints/S0052/uat.json,sprints/S0052/uat.md,handoffs/tl_to_dev.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/engineering/state.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-sprint-plan-tech-lead-20260323T153000Z-US0073
-- phase_id=sprint-plan
-- role=tech-lead
-- proof_issued_at=2026-03-23T15:30:00Z
-- proof_ttl_seconds=3600
-- proof_hash=b966c354127034069b8ff102fb92a8ff0162b411af9f760bef5d67f4cedb4e07
-
-## Plan-verify checkpoint (2026-03-23) — S0052 / US-0073
-
-- `/plan-verify` completed for **`S0052`** / **`US-0073`** in fresh QA context.
-- Verdict: **PASS** — `sprints/S0052/tasks.md` provides explicit 1:1 coverage of backlog **AC-1..AC-10** via **T-001..T-010** (table + deterministic mapping); sprint goal in `sprints/S0052/sprint.md` aligns with US-0073 scope and **`DEC-0055`** / Model B themes; sizing 10 ≤ 12. Evidence: `sprints/S0052/plan-verify.json` (`verified_at=2026-03-23T16:00:00Z`).
-- Next phase recommendation: **`/execute`** for **`S0052`** (**`US-0073`**).
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=plan-verify
-- role=qa
-- fresh_context_marker=qa-S0052-plan-verify-US0073-20260323T160000Z-fresh
-- timestamp=2026-03-23T16:00:00Z
-- evidence_ref=sprints/S0052/plan-verify.json,sprints/S0052/tasks.md,docs/product/backlog.md,sprints/S0052/sprint.md,sprints/S0052/progress.md,handoffs/resume_brief.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-plan-verify-qa-20260323T160000Z-US0073
-- phase_id=plan-verify
-- role=qa
-- proof_issued_at=2026-03-23T16:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=f2efa10bb9ee83358b8675963157b575e5e678f12a9274314abe05310723c46c
-
-## Execute checkpoint (2026-03-23) — S0052 / US-0073
-
-- `/execute` completed **DEC-0055** Model B delivery: installers ship
-  `.cursor/scratchpad.local.example.md` via manifest, **materialize**
-  `.cursor/scratchpad.md` from packaged template when missing (or refresh on
-  `overwrite`), merged scratchpad validation with `[SCRATCHPAD_MERGE_ERROR]` /
-  `[SCRATCHPAD_MATERIALIZE_ERROR]` diagnostics, `installer.py --scratchpad-postinstall`
-  recovery; PS1/SH delegate to Python; CLI/help + README/runbook/auto Inputs
-  updated; `enforce-triad-hot-surface.py` loads example layer; regression tests in
-  both test runners.
-- Next phase recommendation: **`/qa`** for **`S0052`** (**`US-0073`**). Backlog
-  status remains **OPEN** until verify-work.
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=execute
-- role=dev
-- fresh_context_marker=dev-S0052-execute-US0073-20260323T180000Z-fresh
-- timestamp=2026-03-23T18:00:00Z
-- evidence_ref=decisions/DEC-0055.md,installer.py,installer.ps1,installer.sh,bin/its-magic.js,template/docs/engineering/context/installer-owned-paths.manifest,docs/engineering/context/installer-owned-paths.manifest,README.md,docs/engineering/runbook.md,.cursor/commands/auto.md,scripts/enforce-triad-hot-surface.py,tests/run-tests.ps1,tests/run-tests.sh,sprints/S0052/progress.md,sprints/S0052/summary.md,handoffs/dev_to_qa.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-us0073-s0052-20260323
-- phase_id=execute
-- role=dev
-- proof_issued_at=2026-03-23T18:00:00Z
-- proof_ttl_seconds=86400
-- proof_hash=b888dc8804521bcfc59de85f098981384abed5bd43521cc96b8b64bca5a1943d
-
-## QA checkpoint (2026-03-21) — S0052 / US-0073
-
-- `/qa` completed for **`S0052`** / **`US-0073`** in fresh QA context.
-- Verdict: **PASS** — `sprints/S0052/qa-findings.md` maps **AC-1..AC-10** to **PASS**
-  with evidence refs; `tests/report.md` (`Timestamp: 2026-03-21T15:40:04Z`,
-  `Pass: 710`, `Fail: 0`); `python scripts/check-user-visible-metadata.py` exit **0**;
-  `python scripts/enforce-triad-hot-surface.py --check` exit **0**. Non-blocking:
-  `sprints/S0052/tasks.md` task status rows still `planned` (reconcile at
-  verify-work / status workflow).
-- Next phase recommendation: **`/verify-work`** for **`S0052`** (**`US-0073`**).
-  Backlog **`US-0073`** remains **OPEN** until verify-work UAT closure and release
-  reconciliation.
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=qa
-- role=qa
-- fresh_context_marker=qa-S0052-qa-US0073-20260321T154004Z-fresh
-- timestamp=2026-03-21T15:40:04Z
-- evidence_ref=sprints/S0052/qa-findings.md,tests/report.md,sprints/S0052/progress.md,sprints/S0052/summary.md,handoffs/dev_to_qa.md,decisions/DEC-0055.md,handoffs/resume_brief.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-qa-qa-20260321T154004Z-US0073
-- phase_id=qa
-- role=qa
-- proof_issued_at=2026-03-21T15:40:04Z
-- proof_ttl_seconds=3600
-- proof_hash=4e6dc71b474835f34d493136795124627e44fd82b7f340e43006dbe21ed406c7
-
-## Verify-work checkpoint (2026-03-23) — S0052 / US-0073
-
-- `/verify-work` completed for **`S0052`** in fresh QA context (scope: **`US-0073`** only).
-- UAT closure:
-  - `sprints/S0052/uat.json` and `sprints/S0052/uat.md` moved from placeholder to **verified**.
-  - AC coverage: **AC-1..AC-10** mapped to **UAT-001..UAT-010**, all **PASS** (`10` passed, `0` failed).
-- Readiness evidence validation:
-  - QA readiness **PASS** (`sprints/S0052/qa-findings.md`: sprint **PASS**, AC table complete; blocking in-scope findings **none**).
-  - Baseline **PASS**: `tests/report.md` (`Timestamp: 2026-03-21T15:40:04Z`, `Pass: 710`, `Fail: 0`).
-  - `python scripts/check-user-visible-metadata.py` exit **`0`**; `python scripts/enforce-triad-hot-surface.py --check` exit **`0`**.
-  - Prior-phase isolation + strict runtime proof gate: **PASS** for **`execute`** and **`qa`** on this sprint lifecycle (`orchestrator_run_id=auto-20260323-01`, unique `runtime_proof_id` per completed phase, roles **dev** / **qa** aligned to **US-0069** matrix).
-- Canonical status (**US-0045**): `docs/product/backlog.md` — **`US-0073`** **`DONE`**, AC-1..AC-10 checked; `docs/product/acceptance.md` — **`US-0073`** checked.
-- Sprint docs reconciled: `sprints/S0052/progress.md`, `sprints/S0052/sprint.md`, `sprints/S0052/tasks.md` (T-001..T-010 → **done**).
-- Traceability index note (**DEC-0010**): `| US-0073 | S0052 | T-001..T-010 | PASS | sprints/S0052/summary.md, sprints/S0052/qa-findings.md, sprints/S0052/uat.json, sprints/S0052/uat.md, tests/report.md, decisions/DEC-0055.md |`
-- Next recommended phase: **`/release`** for **`S0052`** (**`US-0073`**).
-- Stop boundary: verify-work-only run complete; no `/release` execution in this context.
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=verify-work
-- role=qa
-- fresh_context_marker=qa-S0052-verify-work-US0073-20260323T200000Z-fresh
-- timestamp=2026-03-23T20:00:00Z
-- evidence_ref=sprints/S0052/uat.json,sprints/S0052/uat.md,sprints/S0052/qa-findings.md,sprints/S0052/summary.md,sprints/S0052/progress.md,docs/product/backlog.md,docs/product/acceptance.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-verify-work-qa-20260323T200000Z-US0073
-- phase_id=verify-work
-- role=qa
-- proof_issued_at=2026-03-23T20:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=136c6ec2a4a4e466fe04d4b1521add336b1318bd7a533a6027107bced3b06314
-
-## Release checkpoint (2026-03-23) — S0052 / US-0073
-
-- `/release` completed for **`S0052`** in fresh Release context.
-- Release gates:
-  - check-in test gate: PASS (`tests/report.md`; `Pass: 710`, `Fail: 0` on recorded run; in-scope scratchpad Model B + guard rows per `sprints/S0052/qa-findings.md`).
-  - QA gate: PASS (`sprints/S0052/qa-findings.md`; no in-scope blockers).
-  - UAT gate: PASS (`sprints/S0052/uat.json`, `sprints/S0052/uat.md`; `10/10` pass).
-  - isolation + strict runtime proof gate for prior lifecycle phases (`execute`, `qa`, `verify-work`): PASS (`orchestrator_run_id=auto-20260323-01`).
-- Release outputs:
-  - `sprints/S0052/release-findings.md`
-  - `handoffs/releases/S0052-release-notes.md`
-  - `handoffs/release_queue.md` (S0052 row finalized to `released`)
-  - `handoffs/release_notes.md` (latest pointer updated to S0052)
-- Canonical reconciliation at release boundary:
-  - `docs/product/backlog.md` → **`US-0073`** already **DONE**, AC-1..AC-10 checked (verify-work aligned; no drift).
-  - `docs/product/acceptance.md` → **`US-0073`** checked (aligned).
-- Stop boundary: release-only run complete.
-- Next recommended phase: **`/refresh-context`** for hot-surface rollover and continuation hygiene.
-
-Isolation evidence (US-0048 / DEC-0029):
-
-- phase_id=release
-- role=release
-- fresh_context_marker=release-S0052-release-US0073-20260323T210500Z-fresh
-- timestamp=2026-03-23T21:05:00Z
-- evidence_ref=sprints/S0052/release-findings.md,handoffs/releases/S0052-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md
-
-Strict runtime proof (US-0056 / DEC-0038):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-release-release-20260323T210500Z-US0073
-- phase_id=release
-- role=release
-- proof_issued_at=2026-03-23T21:05:00Z
-- proof_ttl_seconds=3600
-- proof_hash=28275998b1aa03dda16107ab0ab2ad2b95c59cf730fdb62b296ad4cce955ecef
-
-## Refresh-context checkpoint (2026-03-23) — post S0052 / US-0073
-
-- `/refresh-context` completed for **`S0052`** / **`US-0073`** in fresh Curator context (post-release hygiene).
-- Triad hot-surface enforcement (**`DEC-0054`** / merged scratchpad caps):
-  - Pre-work: `python scripts/enforce-triad-hot-surface.py --check` **failed** closed
-    (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on
-    `docs/engineering/state.md`, lines above `STATE_HOT_MAX_LINES=1200`).
-  - `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=3`**;
-    contiguous oldest checkpoint prefix archived →
-    **`docs/engineering/state-archive/state-pack-20260321-f.md`**
-    (verification tuple: `archived_body_lines=99`, `preamble_lines=11`,
-    `retained_body_lines=1190`, **3** archived, **36** retained).
-  - Post-rollover: `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit `0`).
-  - **Round B (post-append):** after this refresh-context checkpoint was appended,
-    `python scripts/enforce-triad-hot-surface.py --check` tripped **`lines>1200`** again.
-    `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** →
-    **`docs/engineering/state-archive/state-pack-20260321-g.md`**
-    (verification tuple: `archived_body_lines=32`, `preamble_lines=11`,
-    `retained_body_lines=1198`, **1** archived, **36** retained).
-  - **Round C (narrative expansion):** checkpoint text growth tripped **`lines>1200`** again.
-    `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** →
-    **`docs/engineering/state-archive/state-pack-20260321-h.md`**
-    (verification tuple: `archived_body_lines=28`, `preamble_lines=11`,
-    `retained_body_lines=1177`, **1** archived, **35** retained).
-  - **Final:** `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit `0`).
-- Canonical reconciliation verified:
-  - `docs/product/backlog.md` — **`US-0073`** **`DONE`** (authoritative); next prioritized OPEN **`US-0074`** (`P1`).
-  - `docs/product/acceptance.md` — **`US-0073`** checked (derived; aligned).
-- Resume handoff: `handoffs/resume_brief.md` → **`US-0074`** at **`/discovery`** (`sprint_id=pending` until `/sprint-plan`).
-- Context pack surfaces updated: `docs/engineering/decisions.md` (current context pack),
-  `sprints/S0001/summary.md` (refresh pointer).
-- Next recommended phase: **`/discovery`** for **`US-0074`**.
-- Stop boundary: refresh-context-only run complete.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=refresh-context
-- role=curator
-- fresh_context_marker=curator-S0052-refresh-post-US0073-US0074-20260323T220000Z-fresh
-- timestamp=2026-03-23T22:00:00Z
-- evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/state-archive/state-pack-20260321-f.md,docs/engineering/state-archive/state-pack-20260321-g.md,docs/engineering/state-archive/state-pack-20260321-h.md,scripts/enforce-triad-hot-surface.py
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260323-01
-- runtime_proof_id=rp-auto-20260323-01-refresh-context-curator-20260323T220000Z-US0074
-- phase_id=refresh-context
-- role=curator
-- proof_issued_at=2026-03-23T22:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=b557c87af0ca8cf8799178dd04889c265ea5516508e6e7ccaad5203f7af85758
-
-## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074
-
-- `invocation_mode=auto`
-- `requested_start_from=(none)`
-- `resolved_start_phase=discovery`
-- `resolution_source=resume_brief`
-- `resolution_status=resolved`
-- `story_id=US-0074`
-- `timestamp=2026-03-24T00:00:00Z`
-- **Phase plan (US-0070 / DEC-0052)**:
-  - `phase_policy_mode=full`
-  - `resolved_phase_plan_candidate=intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-  - `intersected_executable_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-  - `skipped_phases=intake (reason: resume_anchor_before_phase)`
-  - `orchestrator_run_id=auto-20260324-01`
-- **Phase boundary status (pre-spawn)**: `phase_boundary=(start)`; `next_scheduled_phase=discovery`
-- **Sync (US-0038)**: `SYNC_POLICY_MODE=manual` → `MANUAL_MODE_NO_AUTO` at this breadcrumb.
-
-## Discovery checkpoint (2026-03-24) — US-0074
-
-- `/discovery` completed for **`US-0074`** in fresh PO context (baseline regression
-  cleanup: Homebrew stable sync + `TEST_COMMAND` bootstrap).
-- Scope locked to the four asserts classified in `sprints/S0051/qa-findings.md`
-  (Homebrew URL tag, Homebrew `version` vs npm, installer bootstrap, CLI
-  missing-install bootstrap).
-- Artifacts updated:
-  - `docs/product/vision.md` (Discovery Notes — US-0074)
-  - `docs/product/backlog.md` (US-0074 discovery refinement)
-  - `handoffs/po_to_tl.md` (Discovery Addendum — US-0074, prepended)
-  - `handoffs/resume_brief.md` (next phase → **`/research`**)
-  - `docs/engineering/decisions.md` (current context pack → research target)
-  - `sprints/S0001/summary.md`, `sprints/S0052/progress.md` (continuation pointers → **`/research`**)
-- Next recommended phase: **`/research`** for **`US-0074`** (`R-0051` anchor).
-- Stop boundary: discovery-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=discovery
-- role=po
-- fresh_context_marker=po-US0074-discovery-20260324T120000Z-fresh
-- timestamp=2026-03-24T12:00:00Z
-- evidence_ref=docs/product/vision.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,docs/engineering/decisions.md,docs/engineering/state.md,sprints/S0051/qa-findings.md,sprints/S0001/summary.md,sprints/S0052/progress.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-discovery-po-20260324T120000Z-US0074
-- phase_id=discovery
-- role=po
-- proof_issued_at=2026-03-24T12:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=a07936fcd7e63a9ab07f882fc59bd8b702f8b0b7f6bac3e1a100044d05e498bb
-
-## Phase boundary status (post-discovery, US-0074 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=discovery`
-- `next_scheduled_phase=research`
-
-## Research checkpoint (2026-03-24) — US-0074
-
-- `/research` completed for **`US-0074`** in fresh **tech-lead** context (baseline
-  regression cleanup: Homebrew/npm sync + `TEST_COMMAND` bootstrap root-cause
-  notes).
-- Deliverable: **`R-0051`** extended with **Post-discovery findings (2026-03-24) —
-  US-0074** in `docs/engineering/research.md` (assert contracts, owning paths,
-  npm-canonical vs formula, installer/CLI parity notes).
-- Artifacts updated:
-  - `docs/engineering/research.md` (`R-0051` post-discovery subsection)
-  - `docs/product/backlog.md` (US-0074 research pointer)
-  - `handoffs/resume_brief.md` (next phase → **`/architecture`**)
-  - `docs/engineering/decisions.md` (current context pack → post-research)
-  - `docs/engineering/state.md` (this checkpoint + boundary status)
-- Next recommended phase: **`/architecture`** for **`US-0074`**.
-- Stop boundary: research-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=research
-- role=tech-lead
-- fresh_context_marker=tech-lead-US0074-research-20260324T150000Z-fresh
-- timestamp=2026-03-24T15:00:00Z
-- evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/decisions.md,docs/engineering/state.md,sprints/S0051/qa-findings.md,tests/run-tests.ps1,tests/run-tests.sh,packaging/homebrew/its-magic.rb,package.json
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-research-tech-lead-20260324T150000Z-US0074
-- phase_id=research
-- role=tech-lead
-- proof_issued_at=2026-03-24T15:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=d97a51b44c58fec96fe0f0e9d785e1f1296337edd9946869d1c99af3115c3ebf
-
-## Phase boundary status (post-research, US-0074 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=research`
-- `next_scheduled_phase=architecture`
-
-## Architecture checkpoint (2026-03-24) — US-0074
-
-- `/architecture` completed for **`US-0074`** in fresh **tech-lead** context (baseline
-  version-sync + `TEST_COMMAND` bootstrap contract).
-- Scope: npm-canonical version ↔ Homebrew stable formula rules; installer/CLI
-  runbook bootstrap parity; baseline-assert alignment per **`R-0051`**.
-- Artifacts updated:
-  - `decisions/DEC-0056.md` (decision record)
-  - `docs/engineering/architecture.md` (`# US-0074`)
-  - `docs/engineering/decisions.md` (index + current context pack → post-architecture)
-  - `docs/product/backlog.md` (US-0074 architecture pointer)
-  - `handoffs/resume_brief.md` (next phase → **`/sprint-plan`**)
-  - `docs/engineering/state.md` (this checkpoint + phase boundary status)
-- Next recommended phase: **`/sprint-plan`** for **`US-0074`**.
-- Stop boundary: architecture-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=architecture
-- role=tech-lead
-- fresh_context_marker=tech-lead-US0074-architecture-20260324T163500Z-fresh
-- timestamp=2026-03-24T16:35:00Z
-- evidence_ref=decisions/DEC-0056.md,docs/engineering/architecture.md,docs/engineering/decisions.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/state.md,docs/engineering/research.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-architecture-tech-lead-20260324T163500Z-US0074
-- phase_id=architecture
-- role=tech-lead
-- proof_issued_at=2026-03-24T16:35:00Z
-- proof_ttl_seconds=3600
-- proof_hash=b82e0c9f9a999a1dad778c1e51ce53a01f74a2db88c5b46ee6a61c14c18f657f
-
-## Phase boundary status (post-architecture, US-0074 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=architecture`
-- `next_scheduled_phase=sprint-plan`
-
-## Sprint-plan checkpoint (2026-03-24) — US-0074 / S0053
-
-- `/sprint-plan` completed for **`US-0074`** in fresh **tech-lead** context (sprint **`S0053`**).
-- Scope: 10 tasks **`T-001..T-010`** ↔ **`AC-1..AC-10`**; governance **`DEC-0056`**; traceability
-  **`R-0051`**, architecture **`# US-0074`**.
-- Artifacts created/updated:
-  - `sprints/S0053/sprint.md`
-  - `sprints/S0053/tasks.md`
-  - `sprints/S0053/progress.md`
-  - `sprints/S0053/plan-verify.json` (**PENDING** seed)
-  - `sprints/S0053/uat.json`, `sprints/S0053/uat.md` (placeholders)
-  - `handoffs/tl_to_dev.md` (prepended S0053 handoff; **`DEC-0056`**)
-  - `docs/engineering/decisions.md` (trace row `US-0074` → **`S0053`**)
-  - `handoffs/resume_brief.md` (next phase → **`/plan-verify`**)
-  - `docs/engineering/state.md` (this checkpoint + phase boundary status)
-- Next recommended phase: **`/plan-verify`** for **`S0053`** / **`US-0074`**.
-- Stop boundary: sprint-plan-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=sprint-plan
-- role=tech-lead
-- fresh_context_marker=tech-lead-US0074-sprint-plan-20260324T170500Z-fresh
-- timestamp=2026-03-24T17:05:00Z
-- evidence_ref=sprints/S0053/sprint.md,sprints/S0053/tasks.md,sprints/S0053/progress.md,sprints/S0053/plan-verify.json,sprints/S0053/uat.json,sprints/S0053/uat.md,handoffs/tl_to_dev.md,docs/engineering/decisions.md,handoffs/resume_brief.md,docs/engineering/state.md,decisions/DEC-0056.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-sprint-plan-tech-lead-20260324T170500Z-US0074-S0053
-- phase_id=sprint-plan
-- role=tech-lead
-- proof_issued_at=2026-03-24T17:05:00Z
-- proof_ttl_seconds=3600
-- proof_hash=420baa94e1518da0284ead8d1c1f4b436fde4d29fdba01cff7fb44b346e90c58
-
-## Phase boundary status (post-sprint-plan, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=sprint-plan`
-- `next_scheduled_phase=plan-verify`
-
-## Plan-verify checkpoint (2026-03-24) — US-0074 / S0053
-
-- `/plan-verify` completed for **`S0053`** / **`US-0074`** in fresh **qa** context.
-- Verdict: **PASS** — AC-1..AC-10 ↔ T-001..T-010 full coverage (bijection in `sprints/S0053/tasks.md`); sprint goal in `sprints/S0053/sprint.md` aligned with backlog **US-0074**; **10** tasks within `SPRINT_MAX_TASKS=12`; traceability to **`DEC-0056`**, **`DEC-0046`**, **`R-0051`**, architecture **`# US-0074`**.
-- Evidence: `sprints/S0053/plan-verify.json` (**PASS**), `sprints/S0053/progress.md`, `docs/product/backlog.md` (**US-0074**), `sprints/S0053/tasks.md`, `sprints/S0053/sprint.md`.
-- Next recommended phase: **`/execute`** for **`S0053`** / **`US-0074`**.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=plan-verify
-- role=qa
-- fresh_context_marker=qa-S0053-plan-verify-US0074-20260324T180000Z-fresh
-- timestamp=2026-03-24T18:00:00Z
-- evidence_ref=sprints/S0053/plan-verify.json,sprints/S0053/progress.md,sprints/S0053/tasks.md,sprints/S0053/sprint.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/state.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-plan-verify-qa-20260324T180000Z-US0074-S0053
-- phase_id=plan-verify
-- role=qa
-- proof_issued_at=2026-03-24T18:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=212d3bfdb898d6c8d8102c86f09eaa80a71c384f67c9675e3a44c11e5aa2c5eb
-
-## Phase boundary status (post-plan-verify, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=plan-verify`
-- `next_scheduled_phase=execute`
-
-## Execute checkpoint (2026-03-24) — US-0074 / S0053
-
-- `/execute` completed for **`S0053`** / **`US-0074`** (**`DEC-0056`**): canonical npm↔Homebrew stable formula literals; cross-platform `TEST_COMMAND` bootstrap (installer **`.ps1` / `.py`** no longer auto-emit `tests/run-tests.ps1`; **`installer.sh`** unchanged); template/active runbook ship blank `TEST_COMMAND` until bootstrap prefers `npm run test` when `package.json` declares `scripts.test`, else `sh tests/run-tests.sh` when present; triad hot-surface **`--rollover`** applied so **`scripts/enforce-triad-hot-surface.py --check`** passes under default caps (**`DEC-0054`**).
-- Tests: `tests/run-tests.ps1` — **Pass: 710**, **Fail: 0** (`tests/report.md`).
-- Next recommended phase: **`/qa`** for **`S0053`** / **`US-0074`** (do **not** mark **`US-0074`** DONE in `docs/product/backlog.md`; **`verify-work`** owns that).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=execute
-- role=dev
-- fresh_context_marker=dev-S0053-execute-US0074-20260324T193500Z-fresh
-- timestamp=2026-03-24T19:35:00Z
-- evidence_ref=installer.ps1,installer.py,packaging/homebrew/its-magic.rb,template/docs/engineering/runbook.md,docs/engineering/runbook.md,scripts/enforce-triad-hot-surface.py,docs/engineering/state-archive/,handoffs/archive/,docs/engineering/architecture-archive/,sprints/S0053/progress.md,sprints/S0053/summary.md,handoffs/dev_to_qa.md,tests/report.md,decisions/DEC-0056.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-execute-dev-20260324T193500Z-US0074-S0053
-- phase_id=execute
-- role=dev
-- proof_issued_at=2026-03-24T19:35:00Z
-- proof_ttl_seconds=3600
-- proof_hash=aa6f48493d5379822a353b6d8da759b8238dc57ff1d8433413c6b2b0913cd274
-
-## Phase boundary status (post-execute, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per prior checkpoints
-- `phase_boundary=execute`
-- `next_scheduled_phase=qa`
-
-## QA checkpoint (2026-03-21) — US-0074 / S0053
-
-- `/qa` completed for **`S0053`** / **`US-0074`** in fresh **qa** context.
-- Verdict: **PASS** — AC-1..AC-10 mapped in `sprints/S0053/qa-findings.md`; AC-7 documents **zero** failures across the four known baseline checks (Homebrew URL, Homebrew version, installer `TEST_COMMAND` bootstrap, CLI missing-install `TEST_COMMAND` bootstrap); consolidated suite **710 / 0** (`tests/report.md`, `Timestamp: 2026-03-21T16:04:30Z`); `python scripts/check-user-visible-metadata.py` exit **0**; `python scripts/enforce-triad-hot-surface.py --check` exit **0**.
-- Evidence: `sprints/S0053/qa-findings.md`, `tests/report.md`, `handoffs/dev_to_qa.md`, `decisions/DEC-0056.md`.
-- Next recommended phase: **`/verify-work`** for **`S0053`** / **`US-0074`** (canonical backlog **DONE** / acceptance checkboxes owned by verify-work).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=qa
-- role=qa
-- fresh_context_marker=qa-S0053-qa-US0074-20260321T161500Z-fresh
-- timestamp=2026-03-21T16:15:00Z
-- evidence_ref=sprints/S0053/qa-findings.md,tests/report.md,sprints/S0053/progress.md,docs/engineering/state.md,handoffs/resume_brief.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-qa-qa-20260321T161500Z-US0074-S0053
-- phase_id=qa
-- role=qa
-- proof_issued_at=2026-03-21T16:15:00Z
-- proof_ttl_seconds=3600
-- proof_hash=4963b99129f1b2e5a25cd387f204d4c8b7f4c9110ca0e14b2f76fa5fab13af63
-
-## Phase boundary status (post-qa, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per prior checkpoints
-- `phase_boundary=qa`
-- `next_scheduled_phase=verify-work`
-
-## Verify-work checkpoint (2026-03-24) — US-0074 / S0053
-
-- `/verify-work` completed for **`S0053`** / **`US-0074`** in fresh **qa** context.
-- QA findings: **PASS** (`sprints/S0053/qa-findings.md`); canonical backlog **`US-0074`**
-  **DONE** with AC-1..AC-10 **[x]** in `docs/product/backlog.md`; `docs/product/acceptance.md`
-  aligned; `sprints/S0053/uat.json` / `sprints/S0053/uat.md` — **UAT-001..UAT-010** → AC-1..AC-10,
-  all **pass**; `sprints/S0053/progress.md`, `sprints/S0053/sprint.md`, `sprints/S0053/tasks.md`
-  marked complete.
-- Next recommended phase: **`/release`** for **`S0053`**.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=verify-work
-- role=qa
-- fresh_context_marker=qa-S0053-verify-work-US0074-20260324T203000Z-fresh
-- timestamp=2026-03-24T20:30:00Z
-- evidence_ref=sprints/S0053/qa-findings.md,docs/product/backlog.md,docs/product/acceptance.md,sprints/S0053/uat.json,sprints/S0053/uat.md,sprints/S0053/progress.md,sprints/S0053/sprint.md,sprints/S0053/tasks.md,handoffs/resume_brief.md,docs/engineering/state.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-verify-work-qa-20260324T203000Z-US0074-S0053
-- phase_id=verify-work
-- role=qa
-- proof_issued_at=2026-03-24T20:30:00Z
-- proof_ttl_seconds=3600
-- proof_hash=dcc1ac1bd927612881f26415ee1f0d402187aa9cd6d5efcb0e81d483b9feb97f
-
-## Phase boundary status (post-verify-work, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per prior checkpoints
-- `phase_boundary=verify-work`
-- `next_scheduled_phase=release`
-
-## Release checkpoint (2026-03-24) — US-0074 / S0053
-
-- `/release` completed for **`S0053`** / **`US-0074`** in fresh **release** context.
-- Artifacts: `sprints/S0053/release-findings.md` (**PASS**), `handoffs/releases/S0053-release-notes.md`,
-  `handoffs/release_queue.md` (row **`S0053`** → **`released`**), `handoffs/release_notes.md` (latest
-  pointer); gate chain per **`US-0039`** / **`DEC-0019`** recorded in release findings.
-- Next recommended phase: **`/refresh-context`**.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=release
-- role=release
-- fresh_context_marker=release-S0053-US0074-20260324T204500Z-fresh
-- timestamp=2026-03-24T20:45:00Z
-- evidence_ref=sprints/S0053/release-findings.md,handoffs/releases/S0053-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,sprints/S0053/uat.json,sprints/S0053/uat.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/state.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-release-release-20260324T204500Z-US0074-S0053
-- phase_id=release
-- role=release
-- proof_issued_at=2026-03-24T20:45:00Z
-- proof_ttl_seconds=3600
-- proof_hash=4c04222fcc17130d0ca32f4e747ac1008c9d58f9fe3345a3a9fbbca4e49e7e19
-
-## Phase boundary status (post-release, US-0074 / S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per prior checkpoints
-- `phase_boundary=release`
-- `next_scheduled_phase=refresh-context`
-
-## Refresh-context checkpoint (2026-03-24) — post S0053 / US-0074
-
-- `/refresh-context` completed in fresh **curator** context after **`S0053`** release (**`US-0074`**).
-- Queue reconciliation: **`docs/product/backlog.md`** contains **no** `Status: OPEN` entries (all stories
-  **DONE**); there are **no** remaining **OPEN** **P1** items — next work should enter via **`/intake`**
-  when prioritized.
-- Triad hot-surface: `python scripts/enforce-triad-hot-surface.py --check` after this run’s state
-  appends; on **`ARTIFACT_HOT_SURFACE_OVERSIZE`**, ran deterministic **`--rollover`** until **`--check`**
-  exit **0** — state rollover **`units=4`** → `docs/engineering/state-archive/state-pack-20260321-k.md`
-  (retained hot surface within `STATE_HOT_MAX_LINES=1200`).
-- Artifacts updated: `docs/engineering/decisions.md` (this context pack), `sprints/S0001/summary.md`
-  (refresh pack stanza), `handoffs/resume_brief.md` (resume target **`none`** / **`intake`**).
-- Next recommended phase: **`none`** until new backlog intake, or **`/intake`** explicitly.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=refresh-context
-- role=curator
-- fresh_context_marker=curator-S0053-refresh-post-US0074-20260324T210000Z-fresh
-- timestamp=2026-03-24T21:00:00Z
-- evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,sprints/S0001/summary.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/product/acceptance.md,sprints/S0053/summary.md,sprints/S0053/release-findings.md,scripts/enforce-triad-hot-surface.py,docs/engineering/state-archive/state-pack-20260321-k.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260324-01
-- runtime_proof_id=rp-auto-20260324-01-refresh-context-curator-20260324T210000Z-S0053
-- phase_id=refresh-context
-- role=curator
-- proof_issued_at=2026-03-24T21:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=e814ef2f94010a6ad12740011d4dc9f5b79f186d1219cc1dcd38ba52ac2c0410
-
-## Phase boundary status (post-refresh-context, S0053 / auto-20260324-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per prior checkpoints
-- `phase_boundary=refresh-context`
-- `next_scheduled_phase=none`
-
-## Intake checkpoint (2026-03-25) — US-0075
-
-- Story **US-0075** OPEN: upgrade/install must refresh **`.cursor/scratchpad.local.example.md`**
-  in sync with template and must not leave **example** stale while **materialized**
-  **`.cursor/scratchpad.md`** updates.
-- Intake artifacts: `docs/product/backlog.md`, `docs/product/acceptance.md`,
-  `docs/product/vision.md` (**Intake Notes — US-0075**), `handoffs/po_to_tl.md`,
-  `docs/engineering/research.md` (**R-0052**).
-- Writer: intake-orchestrator; intake_run_id=intake-US-0075-20260325.
-- Next recommended phase: **`/discovery`** for **US-0075**.
-
-## Intake refinement checkpoint (2026-03-25) — US-0075 paired scratchpad parity
-
-- User refinement: **every framework setting** must appear in **both**
-  **`.cursor/scratchpad.md`** and **`.cursor/scratchpad.local.example.md`** (and
-  template pair), e.g. **Team** block and **`/auto` role/phase** blocks and **triad**
-  **`PO_TO_TL_*` / `ARCH_*`** keys — no one-sided omissions.
-- Backlog updated: **US-0075** **AC-11** + discovery notes; **`R-0052`** post-intake
-  refinement; **`docs/product/vision.md`**; **`handoffs/po_to_tl.md`**.
-- Writer: intake-orchestrator; intake_run_id=intake-US-0075-refine-20260325.
-
-## Auto continuation checkpoint (2026-03-26) — invocation auto-20260326-01 / US-0075
-
-- `invocation_mode=auto`
-- `requested_start_from=(none)`
-- `resolved_start_phase=discovery`
-- `resolution_source=resume_brief`
-- `resolution_status=resolved`
-- `story_id=US-0075`
-- `timestamp=2026-03-26T00:00:00Z`
-- **Phase plan**: `phase_policy_mode=full`; `resolved_phase_plan_candidate=intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-- `intersected_executable_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `orchestrator_run_id=auto-20260326-01`
-- `SECURITY_REVIEW=0` (no security-review inserts)
-- **Phase boundary (pre-spawn)**: `next_scheduled_phase=discovery`
-- **Sync (US-0038)**: `SYNC_POLICY_MODE=manual` → `MANUAL_MODE_NO_AUTO` at this breadcrumb.
-
-## Discovery checkpoint (2026-03-26) — US-0075
-
-- `/discovery` completed for **`US-0075`** in fresh **PO** context (scratchpad **example–first**
-  refresh + **AC-11** paired catalog parity).
-- Scope: ordering (**example** never lags materialized baseline in the same release step),
-  **template/** mirror parity, deterministic **KEY=** / section inventory check, operator
-  diagnostics — aligned with **DEC-0055**, **DEC-0039**, **US-0057**, **US-0073**.
-- Artifacts updated:
-  - `docs/product/vision.md` (Discovery Notes — US-0075)
-  - `docs/product/backlog.md` (US-0075 discovery refinement under Discovery notes)
-  - `handoffs/po_to_tl.md` (Discovery Addendum — US-0075, prepended; compact TL block +
-    pointer; triad rollover archived earlier long-form prefix →
-    `handoffs/archive/po-to-tl-pack-20260321-c.md`)
-  - `handoffs/resume_brief.md` (next phase **`/research`**)
-  - `docs/engineering/decisions.md` (current context pack → post-discovery)
-- Next recommended phase: **`/research`** for **`US-0075`** (extend **`R-0052`**).
-- Stop boundary: discovery-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=discovery
-- role=po
-- fresh_context_marker=po-US0075-discovery-20260326T120000Z-fresh
-- timestamp=2026-03-26T12:00:00Z
-- evidence_ref=docs/product/vision.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/archive/po-to-tl-pack-20260321-c.md,handoffs/resume_brief.md,docs/engineering/decisions.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260326-01
-- runtime_proof_id=rp-auto-20260326-01-discovery-po-20260326T120000Z-US0075
-- phase_id=discovery
-- role=po
-- proof_issued_at=2026-03-26T12:00:00Z
-- proof_ttl_seconds=3600
-- proof_hash=35b07900383cf42d9b7c33ed1e8faf45ad98f166925211f63038d340c02b0c80
-
-## Phase boundary status (post-discovery, US-0075 / auto-20260326-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-26) — invocation auto-20260326-01 / US-0075`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=discovery`
-- `next_scheduled_phase=research`
-
-## Research checkpoint (2026-03-26) — US-0075
-
-- `/research` completed for **`US-0075`** in fresh **tech-lead** context (scratchpad
-  **example–first** refresh + **AC-11** paired catalog parity).
-- Deliverables:
-  - **`R-0052`** extended with **Post-discovery findings (2026-03-26) — US-0075** in
-    `docs/engineering/research.md` (installer path anchors: **`installer.py`** upgrade loop +
-    `run_scratchpad_postinstall`, **`installer.ps1` / `installer.sh`**, **`bin/its-magic.js`**,
-    **`installer-owned-paths.manifest`** active + `template/` mirror, template scratchpad pair;
-    parity gate design: paired **`##` sections** + **`KEY=`** set equality on active and
-    template pairs, machine-verified in **`tests/run-tests.*`**).
-  - `docs/engineering/decisions.md` — current context pack → **post-research** handoff to
-    **`/architecture`**.
-  - `handoffs/resume_brief.md` — next phase **`architecture`**.
-  - `docs/product/backlog.md` — **US-0075** research pointer (post-discovery).
-- Next recommended phase: **`/architecture`** for **`US-0075`**.
-- Stop boundary: research-only run complete in this context.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- phase_id=research
-- role=tech-lead
-- fresh_context_marker=tech-lead-US0075-research-20260326T183000Z-fresh
-- timestamp=2026-03-26T18:30:00Z
-- evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/decisions.md,docs/engineering/state.md,installer.py,docs/engineering/context/installer-owned-paths.manifest,template/.cursor/scratchpad.md,template/.cursor/scratchpad.local.example.md
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- orchestrator_run_id=auto-20260326-01
-- runtime_proof_id=rp-auto-20260326-01-research-tech-lead-20260326T183000Z-US0075
-- phase_id=research
-- role=tech-lead
-- proof_issued_at=2026-03-26T18:30:00Z
-- proof_ttl_seconds=3600
-- proof_hash=77fafbb09af0b5f4f47df74abc49bd75a974e90cc3ab517cdd0ba7717e79b9f0
-
-## Phase boundary status (post-research, US-0075 / auto-20260326-01)
-
-- `resolved_phase_plan_snapshot=intersected_executable_plan` per
-  `## Auto continuation checkpoint (2026-03-26) — invocation auto-20260326-01 / US-0075`
-- `skipped_phases=intake (reason: resume_anchor_before_phase)`
-- `phase_boundary=research`
-- `next_scheduled_phase=architecture`
-
 ## Architecture checkpoint (2026-03-26) — US-0075
 
 - `/architecture` completed for **`US-0075`** in fresh **tech-lead** context (scratchpad
@@ -1186,4 +322,845 @@ Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **S
   - Re-appended **US-0076** at file **tail** (rollover archives top-first; tail matches runbook TL read model).
   - Pass 2 (post-append oversize): `--rollover` → `rollover_complete units=2` (PO archive `handoffs/archive/po-to-tl-pack-20260324-a.md`: `moved=2` sections, `retained_sections=23`, `retained_body_lines=765`); `--check` → **PASS** (exit `0`).
 - **Next**: **`/discovery`** for **US-0076**
+
+## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-01 / US-0076
+
+- `invocation_mode=auto`
+- `requested_start_from=(none)`
+- `resolved_start_phase=discovery`
+- `resolution_source=resume_brief`
+- `resolution_status=resolved`
+- `story_id=US-0076`
+- `timestamp=2026-03-27T12:30:00Z`
+- **Phase plan materialization (US-0070 / DEC-0052)**:
+  - `phase_policy_mode=full`
+  - `resolved_phase_plan_candidate=intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+  - `intersected_executable_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+  - `skipped_phases=intake (reason: resume_anchor_before_phase; not in executable schedule)`
+  - `orchestrator_run_id=auto-20260327-01`
+- **Phase boundary status (pre-spawn)**:
+  - `phase_boundary=(start)`
+  - `next_scheduled_phase=discovery`
+- **Sync policy (US-0038)**: boundary pre-spawn — `SYNC_POLICY_MODE=manual` -> `MANUAL_MODE_NO_AUTO` (no auto-push evaluation at this breadcrumb).
+
+## Discovery checkpoint (2026-03-27) — US-0076
+
+- Discovery result: **PASS** (story **US-0076** only).
+- Scope: executable merged-scratchpad → **validate-and-push** wiring; **US-0038** gate chain
+  preserved; cross-platform script parity.
+- Artifacts updated:
+  - `docs/product/vision.md` (**Discovery Notes — US-0076**)
+  - `docs/product/backlog.md` (**US-0076** discovery refinements under Discovery notes)
+  - `handoffs/po_to_tl.md` (**Discovery Addendum — US-0076**; see triad rollover notes below)
+- Research anchor: **`R-0053`** (`docs/engineering/research.md`) — no new research entry required for
+  discovery closure.
+- Next recommended phase: **`/research`** (confirm **R-0053** sufficiency or TL delta) then
+  **`/architecture`**.
+- Decision gate before research: **none** (open design choices: phase-boundary input for
+  **by_phase**/**by_milestone**, **AC-5** QA artifact rule — **architecture-owned** per **R-0053**).
+- **Triad hot-surface (DEC-0054)** after `handoffs/po_to_tl.md` mutations:
+  - Pass 1 (**prepend** of Discovery Addendum): `--rollover` → `rollover_complete units=1,1`
+    (**`docs/engineering/state.md`** oldest checkpoint → `docs/engineering/state-archive/state-pack-20260327.md`,
+    `moved=1`; **`handoffs/po_to_tl.md`** → **`Discovery Addendum — US-0076`** into
+    `handoffs/archive/po-to-tl-pack-20260327-a.md`, `moved=1`); `--check` → **PASS**.
+  - Pass 2 (**tail** re-append + `--rollover`): archived top unit **`## PO → TL Handoff — US-0077 (Intake)`**
+    into `handoffs/archive/po-to-tl-pack-20260327-b.md` (`archived_body_lines=18`,
+    `retained_body_lines=786`, `retained_units=24`); `--check` → **PASS** (exit `0`).
+  - Pass 3 (post-discovery **state** append): `--check` failed `lines=1234/1200`; `--rollover` →
+    `rollover_complete units=2` (**`docs/engineering/state.md`** →
+    `docs/engineering/state-archive/state-pack-20260327-a.md`, `moved=2` per pack header); `--check` → **PASS**.
+- Isolation evidence (**US-0048** / **DEC-0029**):
+  - phase_id=discovery
+  - role=po
+  - fresh_context_marker=po-US0076-discovery-20260327T140000Z-fresh
+  - timestamp=2026-03-27T14:00:00Z
+  - evidence_ref=docs/product/vision.md,docs/product/backlog.md,handoffs/po_to_tl.md,docs/engineering/research.md,handoffs/archive/po-to-tl-pack-20260327-a.md,handoffs/archive/po-to-tl-pack-20260327-b.md,docs/engineering/state-archive/state-pack-20260327.md,docs/engineering/state-archive/state-pack-20260327-a.md
+- Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of
+  **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`,
+  `proof_issued_at`, `proof_ttl_seconds`).
+  - orchestrator_run_id=auto-20260327-01
+  - runtime_proof_id=rp-auto-20260327-01-discovery-po-20260327T140000Z-US0076
+  - phase_id=discovery
+  - role=po
+  - proof_issued_at=2026-03-27T14:00:00Z
+  - proof_ttl_seconds=3600
+  - proof_hash=4067c4c3c86178e65a397433ce2fa104cd61b7ea59221aab85f48c6aaab8e849
+
+## Phase boundary status (post-discovery, US-0076 / auto-20260327-01)
+
+- `phase_boundary=discovery`
+- `next_scheduled_phase=research`
+- `story_id=US-0076`
+
+## Research checkpoint (2026-03-27) — US-0076
+
+- `/research` completed for **`US-0076`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-01`).
+- **R-0053** extended with implementation anchors (**`validate-and-push.*`**, **`installer.py`** merge reuse), phase-boundary default (invocation vs architecture-picked override), **AC-5** **`qa-findings.md`** scan bounds, and mitigations (single policy source for sync flags, fail-closed merge, allowlist, **US-0071** logs, dry-run).
+- Artifacts updated: `docs/engineering/research.md`, `docs/product/backlog.md` (research refinement bullets), `handoffs/po_to_tl.md` (research addendum **prepend** + **tail mirror** for TL read model).
+- **Decision gate before architecture**: **none** — open choices (**DEC-0058** vs **DEC-0018**, QA glob, optional `state.md` phase signal) are **architecture-owned** per **R-0053** / backlog; no PO/TL gate blocks `/architecture`.
+- **Triad hot-surface (DEC-0054)** after research-phase mutations to `handoffs/po_to_tl.md` and this file:
+  - Pass 1 (initial): `--rollover` / `--check` → surfaces within policy (**no** `rollover_complete`).
+  - Pass 2 (post-append tail mirror + research checkpoint): `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1,1`**:
+    - **`docs/engineering/state.md`** → oldest checkpoint prefix → **`docs/engineering/state-archive/state-pack-20260327-b.md`** (verification tuple: `archived_body_lines=26`, `preamble_lines=11`, `retained_body_lines=1192`, `moved=1`, retained checkpoints `35`).
+    - **`handoffs/po_to_tl.md`** → prepended **Research Addendum — US-0076** → **`handoffs/archive/po-to-tl-pack-20260327-c.md`** (verification tuple: `archived_body_lines=9`, `retained_body_lines=797`, `moved=1`, retained sections `25`); **tail mirror** retained in hot file for TL read model.
+  - `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit `0`).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=research
+- role=tech-lead
+- fresh_context_marker=tl-US0076-research-20260327T150000Z-fresh
+- timestamp=2026-03-27T15:00:00Z
+- evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/po_to_tl.md,docs/engineering/state.md,docs/engineering/state-archive/state-pack-20260327-b.md,handoffs/archive/po-to-tl-pack-20260327-c.md,scripts/enforce-triad-hot-surface.py
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-research-tech-lead-20260327T150000Z-US0076
+- phase_id=research
+- role=tech-lead
+- proof_issued_at=2026-03-27T15:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=67d63dd282ea29bc9b409bad3300f7e0ff0bdeada49ec56d302884ec4ee54aeb
+
+## Phase boundary status (post-research, US-0076 / auto-20260327-01)
+
+- `phase_boundary=research`
+- `next_scheduled_phase=architecture`
+- `story_id=US-0076`
+
+## Architecture checkpoint (2026-03-27) — US-0076
+
+- `/architecture` completed for **`US-0076`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-01`).
+- **Artifacts**: `docs/engineering/architecture.md` (**# US-0076**), `decisions/DEC-0058.md`, `docs/product/backlog.md` (architecture refinement bullets), `handoffs/po_to_tl.md` (**Architecture Addendum** prepended then triad-archived; **tail mirror** at file tail per TL read model).
+- **Decision**: **`DEC-0058`** — Executable merged-scratchpad wiring for **validate-and-push**; **`DEC-0018`** remains policy authority.
+- **Decision gate before `/sprint-plan`**: **none** — **`DEC-0058`** accepted; no PO/product gate blocks sprint planning.
+- **Triad hot-surface (DEC-0054)** after architecture-phase mutations:
+  - Pass 1 (`handoffs/po_to_tl.md` pressure): `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=2`** (**`handoffs/po_to_tl.md`** → **`handoffs/archive/po-to-tl-pack-20260327-d.md`**; verification tuple: `archived_body_lines=68`, `retained_body_lines=750`, `moved=2`, `retained_sections=25`; first archived heading `## Architecture Addendum — US-0076`, last archived `## Intake Addendum — Multi-Repo Compatibility + Component-Scoped Execution`); `--check` → **PASS** (exit `0`).
+  - Pass 2 (post-append of this checkpoint): `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** (**`docs/engineering/state.md`** oldest checkpoint → **`docs/engineering/state-archive/state-pack-20260327-c.md`**; verification tuple: `archived_body_lines=40`, `preamble_lines=11`, `retained_body_lines=1190`, `moved=1`, retained checkpoints `35`; first/last archived heading `## Sprint-plan checkpoint (2026-03-23) — S0052 / US-0073`); `--check` → **PASS** (exit `0`).
+  - **architecture.md** surface: **no** rollover (within caps).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tl-US0076-architecture-20260327T160500Z-fresh
+- timestamp=2026-03-27T16:05:00Z
+- evidence_ref=docs/engineering/architecture.md,decisions/DEC-0058.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/archive/po-to-tl-pack-20260327-d.md,docs/engineering/state-archive/state-pack-20260327-c.md,docs/engineering/research.md,scripts/enforce-triad-hot-surface.py
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-architecture-tech-lead-20260327T160500Z-US0076
+- phase_id=architecture
+- role=tech-lead
+- proof_issued_at=2026-03-27T16:05:00Z
+- proof_ttl_seconds=3600
+- proof_hash=ef55ffb3cf07b1f26c438c7c51ad982ddc7f89af536fc536fb41aa8be3a18bfe
+
+## Phase boundary status (post-architecture, US-0076 / auto-20260327-01)
+
+- `phase_boundary=architecture`
+- `next_scheduled_phase=sprint-plan`
+- `story_id=US-0076`
+
+## Sprint-plan checkpoint (2026-03-27) — US-0076 / S0055
+
+- `/sprint-plan` completed for **`US-0076`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-01`).
+- **Sprint**: **`S0055`** — **`sprints/S0055/sprint.md`**, **`sprints/S0055/tasks.md`** (**T-001..T-010** ↔ **AC-1..AC-10**), **`sprints/S0055/plan-verify.json`** (**PENDING** seed for **`/plan-verify`**).
+- **Handoff**: **`handoffs/tl_to_dev.md`** — prepended **S0055 / US-0076** implementation scope + risks.
+- **Backlog**: **`docs/product/backlog.md`** — **Sprint-plan refinements** bullet under **US-0076** (status **OPEN** unchanged).
+- **Decisions index**: **`docs/engineering/decisions.md`** — current context pack → **`/plan-verify`** for **`S0055`**.
+- **`handoffs/po_to_tl.md`**: **not mutated** in this phase — **no** triad rollover/check required for sprint-plan.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-US0076-sprint-plan-20260327T170000Z-fresh
+- timestamp=2026-03-27T17:00:00Z
+- evidence_ref=sprints/S0055/sprint.md,sprints/S0055/tasks.md,sprints/S0055/plan-verify.json,handoffs/tl_to_dev.md,docs/product/backlog.md,docs/engineering/decisions.md,docs/engineering/architecture.md,decisions/DEC-0058.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-sprint-plan-tech-lead-20260327T170000Z-US0076
+- phase_id=sprint-plan
+- role=tech-lead
+- proof_issued_at=2026-03-27T17:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=067316953ad8cb0450b61adab0b2b62ad1d9030b55dae26b66810dc8480bba07
+
+## Phase boundary status (post-sprint-plan, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(per merged scratchpad / orchestrator; this checkpoint is story-local **US-0076**)
+- `skipped_phases_summary`=(none recorded at sprint-plan artifact writer)
+- `phase_boundary=sprint-plan`
+- `next_scheduled_phase=plan-verify`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## Plan-verify checkpoint (2026-03-27) — S0055 / US-0076
+
+- `/plan-verify` completed for **`S0055`** / **`US-0076`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-01`).
+- **Verdict**: **PASS** — `sprints/S0055/plan-verify.json` (AC-1..AC-10 ↔ T-001..T-010; backlog + **DEC-0058** alignment; `gaps=[]`).
+- **Artifacts**: `sprints/S0055/plan-verify.json`, `handoffs/tl_to_dev.md` (plan-verify note + next phase), `sprints/S0055/sprint.md` (status), `docs/engineering/decisions.md` (context pack).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=plan-verify
+- role=qa
+- fresh_context_marker=qa-US0076-plan-verify-20260327T173000Z-fresh
+- timestamp=2026-03-27T17:30:00Z
+- evidence_ref=sprints/S0055/plan-verify.json,sprints/S0055/tasks.md,sprints/S0055/sprint.md,docs/product/backlog.md,decisions/DEC-0058.md,handoffs/tl_to_dev.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-plan-verify-qa-20260327T173000Z-US0076-S0055
+- phase_id=plan-verify
+- role=qa
+- proof_issued_at=2026-03-27T17:30:00Z
+- proof_ttl_seconds=3600
+- proof_hash=0b53273cb6b7837119d479632b39cc659345bf8eb42a5c67bd4f5396fa431b7f
+
+## Phase boundary status (post-plan-verify, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(per merged scratchpad / orchestrator; story-local **US-0076**)
+- `skipped_phases_summary`=(none recorded at plan-verify artifact writer)
+- `phase_boundary=plan-verify`
+- `next_scheduled_phase=execute`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## Execute checkpoint (2026-03-27) — S0055 / US-0076
+
+- `/execute` completed for **`S0055`** / **`US-0076`** in fresh **dev** context (`orchestrator_run_id=auto-20260327-01`).
+- **Delivered**: merged-scratchpad-gated **`scripts/validate-and-push.ps1`** / **`.sh`** via **`scripts/sync_push_gates.py`** (installer merge only); runbook **Executable validate-and-push wiring (DEC-0058)**; README/template parity; **`tests/run-tests.ps1`** / **`.sh`** fixtures; installer manifest + **`installer.ps1` / `installer.sh`** framework classification for **`sync_push_gates.py`**.
+- **Evidence**: `scripts/sync_push_gates.py`, `scripts/validate-and-push.ps1`, `scripts/validate-and-push.sh`, `docs/engineering/runbook.md`, `README.md`, `tests/run-tests.ps1`, `tests/report.md` (post-run).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=execute
+- role=dev
+- fresh_context_marker=dev-US0076-execute-20260327T180500Z-fresh
+- timestamp=2026-03-27T18:05:00Z
+- evidence_ref=scripts/sync_push_gates.py,scripts/validate-and-push.ps1,scripts/validate-and-push.sh,docs/engineering/runbook.md,README.md,tests/run-tests.ps1,tests/run-tests.sh,sprints/S0055/tasks.md,decisions/DEC-0058.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-execute-dev-20260327T180500Z-US0076-S0055
+- phase_id=execute
+- role=dev
+- proof_issued_at=2026-03-27T18:05:00Z
+- proof_ttl_seconds=3600
+- proof_hash=caaff5d850522315c6a242674a632ddd414f37c27753e6bc1b5b6d29639232fa
+
+## Phase boundary status (post-execute, US-0076 / S0055 / auto-20260327-01)
+
+- `phase_boundary=execute`
+- `next_scheduled_phase=qa`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## QA checkpoint (2026-03-27) — S0055 / US-0076
+
+- `/qa` completed for **`S0055`** / **`US-0076`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-01`).
+- **Verdict**: **PASS** — **`sprints/S0055/qa-findings.md`**; evidence **`tests/report.md`** (timestamp **2026-03-27T20:45:00Z**; 721 pass / 2 fail baseline-only), **`python scripts/check-user-visible-metadata.py`** exit **0**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-US0076-qa-20260327T205000Z-fresh
+- timestamp=2026-03-27T20:50:00Z
+- evidence_ref=sprints/S0055/qa-findings.md,sprints/S0055/summary.md,tests/report.md,handoffs/dev_to_qa.md,decisions/DEC-0058.md,docs/product/backlog.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-qa-qa-20260327T205000Z-US0076-S0055
+- phase_id=qa
+- role=qa
+- proof_issued_at=2026-03-27T20:50:00Z
+- proof_ttl_seconds=3600
+- proof_hash=545f2b83395fa0ebe2642ebe90da5b3ff59a3695d2364720e4ae5345404f1aa2
+
+## Phase boundary status (post-qa, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(per merged scratchpad / orchestrator; story-local **US-0076**)
+- `skipped_phases_summary`=(none recorded at QA artifact writer)
+- `phase_boundary=qa`
+- `next_scheduled_phase=verify-work`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## Verify-work checkpoint (2026-03-27) — S0055 / US-0076
+
+- `/verify-work` completed for **`S0055`** / **`US-0076`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-01`).
+- **Verdict**: **PASS** — **`sprints/S0055/uat.json`** / **`sprints/S0055/uat.md`**: **10/10** (`UAT-001..UAT-010` ↔ **AC-1..AC-10**), traceable to **`sprints/S0055/qa-findings.md`**, **`tests/report.md`** (2026-03-27T20:45:00Z), **`python scripts/check-user-visible-metadata.py`** exit **0**.
+- **User-facing validation**: merged scratchpad drives **opt-in** **`validate-and-push`** gating with **DEC-0018** reason codes; no silent push when disabled/manual; **bash** contract for **`.sh`** documented in runbook/README.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-US0076-verify-work-20260327T211500Z-fresh
+- timestamp=2026-03-27T21:15:00Z
+- evidence_ref=sprints/S0055/uat.json,sprints/S0055/uat.md,sprints/S0055/qa-findings.md,sprints/S0055/summary.md,tests/report.md,handoffs/dev_to_qa.md,decisions/DEC-0058.md,docs/product/backlog.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-verify-work-qa-20260327T211500Z-US0076-S0055
+- phase_id=verify-work
+- role=qa
+- proof_issued_at=2026-03-27T21:15:00Z
+- proof_ttl_seconds=3600
+- proof_hash=ba0fbe71eb92a49e6db80e3e6caaad4ec09e87ec1dd6e03c7685b488136189fb
+
+## Phase boundary status (post-verify-work, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(per merged scratchpad / orchestrator; story-local **US-0076**)
+- `skipped_phases_summary`=(none recorded at verify-work artifact writer)
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## Release checkpoint (2026-03-27) — S0055 / US-0076
+
+- `/release` completed for **`S0055`** / **`US-0076`** in fresh **release** context (`orchestrator_run_id=auto-20260327-01`).
+- Release gates (**US-0039** / **DEC-0019**):
+  - check-in test gate: **PASS** (`tests/report.md`; **721** pass / **2** fail **Homebrew vs npm** baseline only; **26h** sync rows **PASS** per `sprints/S0055/qa-findings.md`).
+  - QA gate: **PASS** (`sprints/S0055/qa-findings.md`; no in-scope blockers).
+  - UAT gate: **PASS** (`sprints/S0055/uat.json`, `sprints/S0055/uat.md`; **10/10**).
+  - isolation + strict runtime proof gate for prior lifecycle phases (`execute`, `qa`, `verify-work`): **PASS** (`orchestrator_run_id=auto-20260327-01`).
+- Release outputs:
+  - `sprints/S0055/release-findings.md`
+  - `handoffs/releases/S0055-release-notes.md`
+  - `handoffs/release_queue.md` (row **`S0055`** → **`released`**)
+  - `handoffs/release_notes.md` (latest pointer → **`S0055`**)
+- Backlog / acceptance: **`US-0076`** **DONE**, AC-1..AC-10 checked; **`docs/product/acceptance.md`** **US-0076** checked; no drift at release boundary.
+- Next recommended phase: **`/refresh-context`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0055-US0076-20260327T220000Z-fresh
+- timestamp=2026-03-27T22:00:00Z
+- evidence_ref=sprints/S0055/release-findings.md,handoffs/releases/S0055-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,sprints/S0055/uat.json,sprints/S0055/uat.md,docs/product/backlog.md,tests/report.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-release-release-20260327T220000Z-S0055
+- phase_id=release
+- role=release
+- proof_issued_at=2026-03-27T22:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=79d0e43561bb964c3b9aa3847f1a88a30faf97b9ea5c3ad043de310452a41fdb
+
+## Phase boundary status (post-release, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(per merged scratchpad / orchestrator; story-local **US-0076**)
+- `phase_boundary=release`
+- `next_scheduled_phase=refresh-context`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+
+## Refresh-context checkpoint (2026-03-27) — post S0055 / US-0076 (auto-20260327-01)
+
+- `/refresh-context` completed in fresh **curator** context after **`S0055`** release (**`US-0076`**).
+- **Canonical reconciliation**: `docs/product/backlog.md` — **`US-0076`** **DONE**; next prioritized **OPEN** **`US-0077`** (**P1**). `docs/product/acceptance.md` — **`US-0076`** checked; **`US-0077`** unchecked — aligned with backlog.
+- **Triad hot-surface (DEC-0054)**:
+  - Post-append of this checkpoint: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1223/1200` on **`docs/engineering/state.md`**).
+  - `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=2`** — oldest contiguous checkpoint prefix → **`docs/engineering/state-archive/state-pack-20260327-g.md`** (verification tuple: `archived_body_lines=61`, `preamble_lines=11`, `retained_body_lines=1162`, `moved=2`, retained checkpoints **`34`**; first archived heading **`## Auto continuation checkpoint (2026-03-24) — invocation auto-20260324-01 / US-0074`**, last archived **`## Discovery checkpoint (2026-03-24) — US-0074`**).
+  - Final: `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+- **Artifacts updated**: `docs/engineering/decisions.md` (current context pack), `handoffs/resume_brief.md` (next **`/discovery`** for **`US-0077`**), `docs/product/backlog.md` (**US-0076** next-pointer), `sprints/S0055/summary.md` (refresh pointer), `docs/engineering/state-archive/state-pack-20260327-g.md` (rollover pack).
+- **Orchestrator closure**: `stop_reason=completed`; `next_scheduled_phase=none` for run **`auto-20260327-01`** after lifecycle **`refresh-context`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-S0055-refresh-post-US0076-20260327T230500Z-fresh
+- timestamp=2026-03-27T23:05:00Z
+- evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/decisions.md,handoffs/resume_brief.md,sprints/S0055/summary.md,sprints/S0055/release-findings.md,docs/engineering/state.md,docs/engineering/state-archive/state-pack-20260327-g.md,scripts/enforce-triad-hot-surface.py
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-01
+- runtime_proof_id=rp-auto-20260327-01-refresh-context-curator-20260327T230500Z-S0055
+- phase_id=refresh-context
+- role=curator
+- proof_issued_at=2026-03-27T23:05:00Z
+- proof_ttl_seconds=3600
+- proof_hash=b986a4a9a45464b4f409e64f6f01cc44dfa09f928107e94a52e6b49783402051
+
+## Phase boundary status (post-refresh-context, US-0076 / S0055 / auto-20260327-01)
+
+- `resolved_phase_plan_snapshot`=(full lifecycle complete for **`auto-20260327-01`** / **`US-0076`**)
+- `phase_boundary=refresh-context`
+- `next_scheduled_phase=none`
+- `stop_reason=completed`
+- `story_id=US-0076`
+- `sprint_id=S0055`
+- `orchestrator_run_id=auto-20260327-01`
+
+## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077
+
+- `invocation_mode=auto`
+- `requested_start_from=(none)`
+- `resolved_start_phase=discovery`
+- `resolution_source=resume_brief`
+- `resolution_status=resolved`
+- `story_id=US-0077`
+- `timestamp=2026-03-27T23:20:00Z`
+- **Phase plan materialization (US-0070 / DEC-0052)**:
+  - `phase_policy_mode=full`
+  - `resolved_phase_plan_candidate=intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+  - `intersected_executable_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+  - `skipped_phases=intake (reason: resume_anchor_before_phase; not in executable schedule)`
+  - `orchestrator_run_id=auto-20260327-02`
+- **Phase boundary status (pre-spawn)**:
+  - `phase_boundary=(start)`
+  - `next_scheduled_phase=discovery`
+- **Sync policy (US-0038)**: boundary pre-spawn — `SYNC_POLICY_MODE=manual` -> `MANUAL_MODE_NO_AUTO` (no auto-push evaluation at this breadcrumb).
+
+## Discovery checkpoint (2026-03-27) — US-0077
+
+- `/discovery` completed for **`US-0077`** in fresh **PO** context (`orchestrator_run_id=auto-20260327-02`).
+- **Scope**: Documentation audience/depth profiles + dual README strategy; ownership matrix,
+  section budgets, **R-0054** alignment; preserve **US-0030** / **US-0031** / **US-0032** / **US-0071**.
+- **Artifacts updated**:
+  - `docs/product/vision.md` (**Discovery Notes — US-0077**)
+  - `docs/product/backlog.md` (**US-0077** discovery refinement bullets under Discovery notes)
+  - `handoffs/po_to_tl.md` (**Discovery Addendum — US-0077** prepended then triad-archived;
+    **tail mirror** retained per TL read model — full text in **`handoffs/archive/po-to-tl-pack-20260327-e.md`**)
+  - `docs/engineering/state.md` (this checkpoint)
+- **Research anchor**: **`R-0054`** — extend post-discovery with section matrix + file-split recommendation.
+- **Next recommended phase**: **`/research`** for **`US-0077`**.
+- **Decision gate before research**: **none** (split/budget/validator placement research/architecture-owned).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=discovery
+- role=po
+- fresh_context_marker=po-US0077-discovery-20260327T234500Z-fresh
+- timestamp=2026-03-27T23:45:00Z
+- evidence_ref=docs/product/vision.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/archive/po-to-tl-pack-20260327-e.md,docs/engineering/research.md,docs/engineering/state-archive/state-pack-20260327-h.md,scripts/enforce-triad-hot-surface.py
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-discovery-po-20260327T234500Z-US0077
+- phase_id=discovery
+- role=po
+- proof_issued_at=2026-03-27T23:45:00Z
+- proof_ttl_seconds=3600
+- proof_hash=1fde3db759de0261e6085271714a5294090a9b664200a55f334891e6e86f9b28
+
+## Phase boundary status (post-discovery, US-0077 / auto-20260327-02)
+
+- `phase_boundary=discovery`
+- `next_scheduled_phase=research`
+- `story_id=US-0077`
+
+**Triad hot-surface (DEC-0054)** (discovery phase closure for **US-0077**):
+
+- **Pass 1** — after `handoffs/po_to_tl.md` mutation (prepend + tail mirror): `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — prepended **`## Discovery Addendum — US-0077`** archived to **`handoffs/archive/po-to-tl-pack-20260327-e.md`** (verification tuple: `archived_body_lines=39`, `retained_body_lines=762`, `moved=1`, `retained_units=26`; first/last archived heading **`## Discovery Addendum — US-0077`**); `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+- **Pass 2** — after this discovery **state** checkpoint append: `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-h.md`** (verification tuple: `archived_body_lines=43`, `preamble_lines=11`, `retained_body_lines=1186`, `moved=1`, retained checkpoints **`35`**; first/last archived heading **`## Research checkpoint (2026-03-24) — US-0074`**); `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Research checkpoint (2026-03-27) — US-0077
+
+- `/research` completed for **`US-0077`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-02`).
+- **Deliverables**:
+  - **`R-0054`** extended in `docs/engineering/research.md` — **9-cell profile matrix** (semantic section keys per `DOC_AUDIENCE_PROFILE` × `DOC_DETAIL_LEVEL`), **artifact ownership** table, **README H2 budgets**, **validation strategy** (merge/parse gates, completeness scan, **US-0030** template parity, **US-0071** channel, tiered **AC-8** regression), draft **reason codes**.
+  - `docs/product/backlog.md` — **US-0077** research refinement bullet.
+  - `handoffs/po_to_tl.md` — **Research Addendum — US-0077** prepended + **tail mirror** (TL read model).
+  - `docs/engineering/decisions.md` — context pack → post-research / **`/architecture`**.
+  - `handoffs/resume_brief.md` — next phase **`architecture`** for **`US-0077`**.
+- **Decision gate before architecture**: **none** — exact file paths, heading literals, and validator placement are **architecture-owned** per **`R-0054`**.
+- **Next recommended phase**: **`/architecture`** for **`US-0077`**.
+- **Stop boundary**: research-only run complete in this context.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=research
+- role=tech-lead
+- fresh_context_marker=tech-lead-US0077-research-20260327T235800Z-fresh
+- timestamp=2026-03-27T23:58:00Z
+- evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/po_to_tl.md,docs/engineering/decisions.md,handoffs/resume_brief.md,docs/product/vision.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-research-tech-lead-20260327T235800Z-US0077
+- phase_id=research
+- role=tech-lead
+- proof_issued_at=2026-03-27T23:58:00Z
+- proof_ttl_seconds=3600
+- proof_hash=2766c701353474ee3952f071672c1c98d08caceaa953121f2ab2a0a1ce898f73
+
+## Phase boundary status (post-research, US-0077 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=research`
+- `next_scheduled_phase=architecture`
+- `story_id=US-0077`
+
+**Triad hot-surface (DEC-0054)** (research phase closure for **US-0077**):
+
+- **Pass 1** — after `docs/engineering/state.md` research checkpoint append:
+  `python scripts/enforce-triad-hot-surface.py --check` → **FAIL**
+  (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1226/1200` on **`docs/engineering/state.md`**).
+- **Pass 2** — `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`**
+  — oldest contiguous checkpoint prefix archived to
+  **`docs/engineering/state-archive/state-pack-20260327-i.md`** (verification tuple:
+  `archived_body_lines=42`, `preamble_lines=11`, `retained_body_lines=1184`, `moved=1`,
+  retained checkpoints **`35`**; first/last archived heading **`## Architecture checkpoint (2026-03-24) — US-0074`**).
+- **Pass 3** — `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+- **`handoffs/po_to_tl.md`**: **no** rollover required this phase (within **`PO_TO_TL_*`** caps after
+  prepend + tail mirror).
+
+## Architecture checkpoint (2026-03-28) — US-0077
+
+- `/architecture` completed for **`US-0077`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-02`).
+- **Deliverables**:
+  - `docs/engineering/architecture.md` — **`# US-0077`** (profile semantics, artifact ownership, README split, H2 literal table, validator/test strategy, migration constraints).
+  - `decisions/DEC-0059.md` — normative decision (**`DEC-0059`**).
+  - `docs/engineering/decisions.md` — context pack + compact index + traceability row for **`US-0077`**.
+  - `docs/product/backlog.md` — **US-0077** architecture refinement bullet + **`DEC-0059`** link.
+  - `handoffs/po_to_tl.md` — **Architecture Addendum — US-0077** prepended + **tail mirror**; triad **`--rollover`** archived the prepended block to **`handoffs/archive/po-to-tl-pack-20260327-f.md`** (hot surface at **`PO_TO_TL_HOT_MAX_LINES=800`**); **tail mirror** retained per **`DEC-0054`**.
+  - `handoffs/resume_brief.md` — next phase **`sprint-plan`** for **`US-0077`**.
+- **Decision gate before sprint-plan**: **none**.
+- **Next recommended phase**: **`/sprint-plan`** for **`US-0077`**.
+- **Stop boundary**: architecture-only run complete in this context.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tech-lead-US0077-architecture-20260328T000530Z-fresh
+- timestamp=2026-03-28T00:05:30Z
+- evidence_ref=docs/engineering/architecture.md,decisions/DEC-0059.md,docs/product/backlog.md,handoffs/po_to_tl.md,docs/engineering/decisions.md,handoffs/resume_brief.md,docs/engineering/research.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-architecture-tech-lead-20260328T000530Z-US0077
+- phase_id=architecture
+- role=tech-lead
+- proof_issued_at=2026-03-28T00:05:30Z
+- proof_ttl_seconds=3600
+- proof_hash=5227a8850951d3f58c4f29bfe1f914408bcce2b280187b4476fa74892d90aa97
+
+## Phase boundary status (post-architecture, US-0077 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=architecture`
+- `next_scheduled_phase=sprint-plan`
+- `story_id=US-0077`
+
+**Triad hot-surface (DEC-0054)** (architecture phase closure for **US-0077**):
+
+- **Pass 1** — after `handoffs/po_to_tl.md` mutation (prepend + tail mirror) and **`docs/engineering/architecture.md`** **`# US-0077`** append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** on **`handoffs/po_to_tl.md`** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=815/800`).
+- **Pass 2** — after `docs/engineering/state.md` architecture checkpoint append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** on **`docs/engineering/state.md`** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1245/1200`).
+- **Pass 3** — `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1,1,1`**:
+  - **`handoffs/po_to_tl.md`** → prepended **`## Architecture Addendum — US-0077`** archived to **`handoffs/archive/po-to-tl-pack-20260327-f.md`** (verification tuple: `archived_body_lines=15`, `retained_body_lines=800`, `moved=1`, `retained_sections=29`; first/last archived heading **`## Architecture Addendum — US-0077`**).
+  - **`docs/engineering/state.md`** → oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-j.md`** (verification tuple: `archived_body_lines=44`, `preamble_lines=11`, `retained_body_lines=1199`, `moved=1`, retained checkpoints **`35`**; first/last archived heading **`## Sprint-plan checkpoint (2026-03-24) — US-0074 / S0053`**).
+  - **`docs/engineering/architecture.md`** → oldest story block **`# US-0034`** archived to **`docs/engineering/architecture-archive/architecture-pack-20260327.md`** (verification tuple: `archived_body_lines=176`, `preamble_lines=10`, `retained_body_lines=3365`, `moved=1`, retained story sections **`32`**).
+- **Pass 4** — `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+- **Pass 5** — recording **Pass 1–4** tuples in this checkpoint pushed **`docs/engineering/state.md`** to **`lines=1205/1200`**; `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`ARTIFACT_HOT_SURFACE_OVERSIZE`); `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-k.md`** (verification tuple: `archived_body_lines=33`, `preamble_lines=11`, `retained_body_lines=1172`, `moved=1`, retained checkpoints **`34`**; first/last archived heading **`## Plan-verify checkpoint (2026-03-24) — US-0074 / S0053`**).
+- **Pass 6** — `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Sprint-plan checkpoint (2026-03-28) — US-0077 / S0056
+
+- `/sprint-plan` completed for **`US-0077`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260327-02`).
+- **Sprint**: **`S0056`** — **`sprints/S0056/sprint.md`**, **`sprints/S0056/tasks.md`** (**T-001..T-010** ↔ **AC-1..AC-10**), **`sprints/S0056/plan-verify.json`** (seed → **PASS** after **`/plan-verify`** — see **Plan-verify checkpoint (2026-03-28) — S0056 / US-0077** below).
+- **Handoff**: **`handoffs/tl_to_dev.md`** — prepended **S0056 / US-0077** implementation scope + risks.
+- **Backlog**: **`docs/product/backlog.md`** — **Sprint-plan refinements** bullet under **US-0077** (status **OPEN** unchanged).
+- **`handoffs/po_to_tl.md`**: **not mutated** in this phase — **no** triad rollover/check required for sprint-plan.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-US0077-sprint-plan-20260328T011500Z-fresh
+- timestamp=2026-03-28T01:15:00Z
+- evidence_ref=sprints/S0056/sprint.md,sprints/S0056/tasks.md,sprints/S0056/plan-verify.json,handoffs/tl_to_dev.md,docs/product/backlog.md,docs/engineering/architecture.md,decisions/DEC-0059.md,docs/engineering/research.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-sprint-plan-tech-lead-20260328T011500Z-US0077
+- phase_id=sprint-plan
+- role=tech-lead
+- proof_issued_at=2026-03-28T01:15:00Z
+- proof_ttl_seconds=3600
+- proof_hash=3e84750efab22f812dd05b067e530caf33398939ed6ebc41a9810bf9b945b753
+
+**Triad hot-surface (DEC-0054)** (sprint-plan phase closure for **US-0077**):
+
+- Post-append of this checkpoint: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** on **`docs/engineering/state.md`** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1210/1200`).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-l.md`** (verification tuple: `archived_body_lines=30`, `preamble_lines=11`, `retained_body_lines=1180`, `moved=1`, retained checkpoints **`34`**; first/last archived heading **`## Execute checkpoint (2026-03-24) — US-0074 / S0053`**).
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Phase boundary status (post-sprint-plan, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=sprint-plan`
+- `next_scheduled_phase=plan-verify`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+
+## Plan-verify checkpoint (2026-03-28) — S0056 / US-0077
+
+- `/plan-verify` completed for **`S0056`** / **`US-0077`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-02`).
+- **Verdict**: **PASS** — **`docs/product/backlog.md`** **US-0077** **AC-1..AC-10** ↔ **`sprints/S0056/tasks.md`** **T-001..T-010** (1:1 bijection; table + explicit mapping); **`sprints/S0056/sprint.md`** scope aligns with backlog acceptance + **`DEC-0059`** / **`docs/engineering/architecture.md`** **`# US-0077`** / **`R-0054`**; **`sprints/S0056/plan-verify.json`** **`status=PASS`**, **`gaps=[]`**, **`plan_integrity.sprint_goal_aligned=true`**.
+- **Artifacts**: `sprints/S0056/plan-verify.json`, `sprints/S0056/sprint.md`, `handoffs/tl_to_dev.md`, `handoffs/resume_brief.md`, `docs/engineering/decisions.md`.
+- **Next recommended phase**: **`/execute`** for **`S0056`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=plan-verify
+- role=qa
+- fresh_context_marker=qa-S0056-plan-verify-US0077-20260328T020000Z-fresh
+- timestamp=2026-03-28T02:00:00Z
+- evidence_ref=sprints/S0056/plan-verify.json,sprints/S0056/tasks.md,sprints/S0056/sprint.md,docs/product/backlog.md,decisions/DEC-0059.md,handoffs/tl_to_dev.md,handoffs/resume_brief.md,docs/engineering/decisions.md,docs/engineering/state.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-plan-verify-qa-20260328T020000Z-S0056
+- phase_id=plan-verify
+- role=qa
+- proof_issued_at=2026-03-28T02:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=5c6baacfddece092dfc2f70a777ecc51a5d1bc375bdd0ee8da88437ce64364ad
+
+**Triad hot-surface (DEC-0054)** (plan-verify phase closure for **US-0077** / **S0056**):
+
+- Post-append of this checkpoint: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** on **`docs/engineering/state.md`** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1221/1200`).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-m.md`** (verification tuple: `archived_body_lines=31`, `preamble_lines=11`, `retained_body_lines=1190`, `moved=1`, retained checkpoints **`34`**; first/last archived heading **`## QA checkpoint (2026-03-21) — US-0074 / S0053`**).
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Phase boundary status (post-plan-verify, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=plan-verify`
+- `next_scheduled_phase=execute`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+
+## Execute checkpoint (2026-03-28) — S0056 / US-0077
+
+- **`/execute`** completed for **`S0056`** / **`US-0077`** in fresh **dev** context (`orchestrator_run_id=auto-20260327-02`).
+- **Deliverables**: merged-scratchpad enums **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`** (fail-closed **`DOC_PROFILE_INVALID`** / **`DOC_PROFILE_MERGE_ERROR`**); dual README (**`USER_*`** root **`README.md`**, **`DEV_*`** **`docs/developer/README.md`** + **`## Contributing`** pointer); **`scripts/doc_profile_lib.py`** + **`scripts/validate_doc_profile.py`**; installer **`_doc_profile_sync`** on scratchpad post-install; manifest + **`template/`** parity; runbook + execute command operator guidance; tiered tests **`tests/doc_profile_fixtures_test.py`** + **`tests/run-tests.ps1`** / **`.sh`** §26j.
+- **Artifacts**: `sprints/S0056/summary.md`, `sprints/S0056/tasks.md` (T-001..T-010 **done**), `handoffs/dev_to_qa.md`, `docs/engineering/decisions.md` (context pack + migration default line).
+- **Next recommended phase**: **`/qa`** for **`S0056`** (`next_scheduled_phase=qa`).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-S0056-execute-US0077-20260328T220500Z-fresh`
+- `timestamp=2026-03-28T22:05:00Z`
+- `evidence_ref=sprints/S0056/summary.md,sprints/S0056/tasks.md,handoffs/dev_to_qa.md,scripts/doc_profile_lib.py,scripts/validate_doc_profile.py,tests/doc_profile_fixtures_test.py,docs/engineering/decisions.md,docs/engineering/runbook.md,.cursor/commands/execute.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- `orchestrator_run_id=auto-20260327-02`
+- `runtime_proof_id=rp-auto-20260327-02-execute-dev-20260328T220500Z-S0056`
+- `phase_id=execute`
+- `role=dev`
+- `proof_issued_at=2026-03-28T22:05:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=484f7f3139a47e73b6a3d8452a4bb96e933a2e618a55279a7c08648408eef0b5`
+
+## Phase boundary status (post-execute, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=execute`
+- `next_scheduled_phase=qa`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+
+## QA checkpoint (2026-03-27) — S0056 / US-0077
+
+- **`/qa`** completed for **`S0056`** / **`US-0077`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-02`).
+- **Verdict**: **PASS** — **`sprints/S0056/qa-findings.md`** maps **AC-1..AC-10** to **PASS** with command evidence; **`python scripts/validate_doc_profile.py --repo .`**, **`python tests/doc_profile_fixtures_test.py`**, **`python scripts/check-scratchpad-pair-parity.py --repo .`**, **`python scripts/check-user-visible-metadata.py --repo .`** exit **0**. Non-blocking: full **`tests/run-tests.ps1`** may still report **2 FAIL** on **Homebrew stable vs npm** version (baseline drift; out of scope for US-0077 per **`handoffs/dev_to_qa.md`**).
+- **Backlog / acceptance**: **`docs/product/backlog.md`** **US-0077** acceptance **AC-1..AC-10** checked per QA evidence; **`docs/product/acceptance.md`** **US-0077** checked; story **`Status: OPEN`** until canonical **`/verify-work`** UAT closure per **US-0027** / **US-0039** (same pattern as **S0054** **US-0075** QA note).
+- **Next recommended phase**: **`/verify-work`** for **`S0056`** / **`US-0077`** (`next_scheduled_phase=verify-work`).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=qa`
+- `role=qa`
+- `fresh_context_marker=qa-S0056-qa-US0077-20260327T233000Z-fresh`
+- `timestamp=2026-03-27T23:30:00Z`
+- `evidence_ref=sprints/S0056/qa-findings.md,sprints/S0056/summary.md,sprints/S0056/tasks.md,handoffs/dev_to_qa.md,decisions/DEC-0059.md,docs/product/backlog.md,docs/product/acceptance.md,scripts/validate_doc_profile.py,tests/doc_profile_fixtures_test.py,scripts/check-scratchpad-pair-parity.py,scripts/check-user-visible-metadata.py`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- `orchestrator_run_id=auto-20260327-02`
+- `runtime_proof_id=rp-auto-20260327-02-qa-qa-20260327T233000Z-US0077-S0056`
+- `phase_id=qa`
+- `role=qa`
+- `proof_issued_at=2026-03-27T23:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=743bd7802c4f1f50cad567653dd92b20512317aa6f439b4c7985b4f3ccd1c888`
+
+## Phase boundary status (post-qa, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=qa`
+- `next_scheduled_phase=verify-work`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+
+## Verify-work checkpoint (2026-03-28) — S0056 / US-0077
+
+- `/verify-work` completed for **`S0056`** / **`US-0077`** in fresh **qa** context (`orchestrator_run_id=auto-20260327-02`).
+- **Verdict**: **PASS** — **`sprints/S0056/uat.json`** / **`sprints/S0056/uat.md`**: **10/10** (`UAT-001..UAT-010` ↔ **AC-1..AC-10**); traceable to **`sprints/S0056/qa-findings.md`** and command evidence in **`uat.md`**.
+- **Readiness validation**:
+  - QA gate: **PASS** (`sprints/S0056/qa-findings.md`; no in-scope blockers).
+  - UAT gate: **PASS** (`10` passed, `0` failed).
+  - Command evidence (deterministic): **`python scripts/validate_doc_profile.py --repo .`**, **`python tests/doc_profile_fixtures_test.py`**, **`python scripts/check-scratchpad-pair-parity.py --repo .`**, **`python scripts/check-user-visible-metadata.py --repo .`** — exit **0** (verify-work run **2026-03-28**).
+  - Prior-phase isolation + strict runtime proof gate: **PASS** for **`execute`** and **`qa`** on this sprint lifecycle (`orchestrator_run_id=auto-20260327-02`, distinct `runtime_proof_id` per completed phase).
+- **Canonical status (US-0045)**: **`docs/product/backlog.md`** — **`US-0077`** **`DONE`**; **`docs/product/acceptance.md`** — **US-0077** checked (aligned).
+- **Release prep**: **`handoffs/release_queue.md`** — row **`S0056`** **`status=ready`**; **`handoffs/resume_brief.md`**, **`handoffs/dev_to_qa.md`**, **`handoffs/release_notes.md`** updated for **`/release`** handoff.
+- **Next recommended phase**: **`/release`** for **`S0056`** / **`US-0077`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0056-verify-work-US0077-20260328T123000Z-fresh
+- timestamp=2026-03-28T12:30:00Z
+- evidence_ref=sprints/S0056/uat.json,sprints/S0056/uat.md,sprints/S0056/qa-findings.md,sprints/S0056/summary.md,sprints/S0056/tasks.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/release_queue.md,handoffs/resume_brief.md,handoffs/dev_to_qa.md,scripts/validate_doc_profile.py,tests/doc_profile_fixtures_test.py,scripts/check-scratchpad-pair-parity.py,scripts/check-user-visible-metadata.py,decisions/DEC-0059.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-verify-work-qa-20260328T123000Z-S0056
+- phase_id=verify-work
+- role=qa
+- proof_issued_at=2026-03-28T12:30:00Z
+- proof_ttl_seconds=3600
+- proof_hash=8ea08f8a805556de1283ad1b3589a668f53ca6e0a1f3b913d1a17c58418a9029
+
+## Phase boundary status (post-verify-work, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=intersected_executable_plan` per
+  `## Auto continuation checkpoint (2026-03-27) — invocation auto-20260327-02 / US-0077`
+- `skipped_phases=intake (reason: resume_anchor_before_phase)`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+
+## Release checkpoint (2026-03-28) — S0056 / US-0077
+
+- `/release` completed for **`S0056`** / **`US-0077`** in fresh **release** context (`orchestrator_run_id=auto-20260327-02`).
+- Release gates (**US-0039** / **DEC-0019**):
+  - check-in test gate: **PASS** (`tests/report.md`; **730** pass / **2** fail **Homebrew vs npm** baseline only; tiered doc-profile + §26j rows per `sprints/S0056/qa-findings.md`; release re-verify: `validate_doc_profile`, `doc_profile_fixtures`, scratchpad pair parity, metadata guard — exit **0**, 2026-03-28).
+  - QA gate: **PASS** (`sprints/S0056/qa-findings.md`; no in-scope blockers).
+  - UAT gate: **PASS** (`sprints/S0056/uat.json`, `sprints/S0056/uat.md`; **10/10**).
+  - isolation + strict runtime proof gate for prior lifecycle phases (`execute`, `qa`, `verify-work`): **PASS** (`orchestrator_run_id=auto-20260327-02`).
+- Release outputs:
+  - `sprints/S0056/release-findings.md`
+  - `handoffs/releases/S0056-release-notes.md`
+  - `handoffs/release_queue.md` (row **`S0056`** → **`released`**)
+  - `handoffs/release_notes.md` (latest pointer → **`S0056`**)
+- Backlog / acceptance: **`US-0077`** **DONE**; no drift at release boundary.
+- Next recommended phase: **`/refresh-context`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0056-US0077-20260328T143000Z-fresh
+- timestamp=2026-03-28T14:30:00Z
+- evidence_ref=sprints/S0056/release-findings.md,handoffs/releases/S0056-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,sprints/S0056/uat.json,sprints/S0056/uat.md,docs/product/backlog.md,tests/report.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-release-release-20260328T143000Z-S0056
+- phase_id=release
+- role=release
+- proof_issued_at=2026-03-28T14:30:00Z
+- proof_ttl_seconds=3600
+- proof_hash=d20819c725fcc42a2c100ee998daf35d416781e46c3d17e46e19325b74a20af5
+
+## Phase boundary status (post-release, US-0077 / S0056 / auto-20260327-02)
+
+- `phase_boundary=release`
+- `next_scheduled_phase=refresh-context`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+- `orchestrator_run_id=auto-20260327-02`
+
+**Triad hot-surface (DEC-0054)** (post-release **`docs/engineering/state.md`** append):
+
+- `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1234/1200` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=3`** — oldest contiguous checkpoint prefix on **`docs/engineering/state.md`** archived to **`docs/engineering/state-archive/state-pack-20260327-p.md`** (verification tuple: `archived_body_lines=71`, `preamble_lines=11`, `retained_body_lines=1163`, `moved=3`, retained checkpoints **`31`**; first archived heading **`## Intake refinement checkpoint (2026-03-25) — US-0075 paired scratchpad parity`**, last archived **`## Discovery checkpoint (2026-03-26) — US-0075`**).
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)
+
+- `/refresh-context` completed in fresh **curator** context after **`S0056`** release (**`US-0077`**); closes **`orchestrator_run_id=auto-20260327-02`** with **`stop_reason=completed`** and **`next_scheduled_phase=none`**.
+- **Pre-append triad baseline**: `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**) immediately before this checkpoint append.
+- **Canonical reconciliation**: `docs/product/backlog.md` — **`US-0077`** **DONE**; no conflicting **OPEN** posture for released work; `docs/product/acceptance.md` — **`US-0077`** checked (**US-0045** alignment). **US-0076** historical **Next** line in backlog reconciled to reflect **US-0077** shipped under **`auto-20260327-02`**.
+- **Artifacts updated**: `docs/engineering/decisions.md`, `handoffs/resume_brief.md`, `docs/product/backlog.md`, `docs/engineering/research.md` (**R-0054** delivery closure line), `sprints/S0056/summary.md`, `docs/engineering/state.md` (this checkpoint), `docs/engineering/state-archive/state-pack-20260327-q.md` (triad rollover).
+
+**Triad hot-surface (DEC-0054)** (post-append **`docs/engineering/state.md`** hygiene for **refresh-context**):
+
+- Post-append of this checkpoint: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`ARTIFACT_HOT_SURFACE_OVERSIZE`, `lines=1205/1200` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — oldest contiguous checkpoint prefix archived to **`docs/engineering/state-archive/state-pack-20260327-q.md`** (verification tuple: `archived_body_lines=44`, `preamble_lines=11`, `retained_body_lines=1161`, `moved=1`, retained checkpoints **`31`**; first/last archived heading **`## Research checkpoint (2026-03-26) — US-0075`**).
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-S0056-refresh-post-US0077-20260328T154500Z-fresh
+- timestamp=2026-03-28T15:45:00Z
+- evidence_ref=docs/product/backlog.md,docs/product/acceptance.md,docs/engineering/decisions.md,handoffs/resume_brief.md,sprints/S0056/release-findings.md,handoffs/releases/S0056-release-notes.md,docs/engineering/research.md,sprints/S0056/summary.md,scripts/enforce-triad-hot-surface.py,docs/engineering/state-archive/state-pack-20260327-q.md
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
+
+- orchestrator_run_id=auto-20260327-02
+- runtime_proof_id=rp-auto-20260327-02-refresh-context-curator-20260328T154500Z-S0056
+- phase_id=refresh-context
+- role=curator
+- proof_issued_at=2026-03-28T15:45:00Z
+- proof_ttl_seconds=3600
+- proof_hash=f72877cb63ab9f0e983353a65d30c0a5e9e04372fbb4f9c0e9e694560703d961
+
+## Phase boundary status (post-refresh-context, US-0077 / S0056 / auto-20260327-02)
+
+- `resolved_phase_plan_snapshot=lifecycle_complete (auto-20260327-02)`
+- `phase_boundary=refresh-context`
+- `next_scheduled_phase=none`
+- `stop_reason=completed`
+- `story_id=US-0077`
+- `sprint_id=S0056`
+- `orchestrator_run_id=auto-20260327-02`
 

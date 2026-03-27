@@ -122,6 +122,7 @@ function Classify-File($RelPath) {
     '.cursor/hooks/',
     '.github/workflows/',
     'scripts/validate-and-push',
+    'scripts/sync_push_gates',
     'docs/engineering/context/',
     'its_magic/'
   )

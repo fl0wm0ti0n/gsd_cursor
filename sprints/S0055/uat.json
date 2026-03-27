@@ -1,0 +1,97 @@
+{
+  "sprint_id": "S0055",
+  "story_ids": [
+    "US-0076"
+  ],
+  "orchestrator_run_id": "auto-20260327-01",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "No push when auto-push disabled or sync mode disabled/manual; deterministic SYNC_DISABLED / MANUAL_MODE_NO_AUTO / AUTO_PUSH_NOT_ENABLED.",
+      "result": "pass",
+      "notes": "PASS per `sprints/S0055/qa-findings.md` AC-1; `scripts/sync_push_gates.py` + wrappers; tests/run-tests 26h."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Merged scratchpad (DEC-0055) drives SYNC_POLICY_MODE, SYNC_CUSTOM_PHASES, AUTO_PUSH_BRANCH_ALLOWLIST; fail-closed on parse errors.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; installer merge path only in sync_push_gates."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "US-0038 check chain before push: TEST_COMMAND required; optional lint/typecheck; TEST_* / OPTIONAL_CHECK_FAILED reason codes.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; validate-and-push.ps1/.sh + runbook."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Branch allowlist enforcement; BRANCH_NOT_ALLOWLISTED and no push when mismatch.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; 26h post-gate asserts."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "QA-first: bounded qa-findings scan (DEC-0058 §6); BLOCKING_QA_FINDINGS / PRE_QA_AUTOPUSH_FORBIDDEN when blocked.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; glob sprints/S*/qa-findings.md."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Cross-platform parity: validate-and-push.ps1 and validate-and-push.sh (bash) consistent for scratchpad-driven mode.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; shared Python gate module."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Runbook + README (active + template): flags alone do not push; scheduling for by_phase / custom_phase_list.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7; Executable validate-and-push wiring (DEC-0058)."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Regression tests in tests/run-tests.* for disabled path, allowlist mismatch, happy-path/dry-run fixtures.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; section 26h PS1/.sh."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "US-0071: operator-visible strings from changed scripts pass metadata guard (no forbidden internal tokens).",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; check-user-visible-metadata.py exit 0."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Decision artifact DEC-0058 records executable contract, US-0038 overlap, deprecation of policy-only interpretation.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; decisions/DEC-0058.md."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0055/qa-findings.md",
+    "sprints/S0055/summary.md",
+    "sprints/S0055/tasks.md",
+    "tests/report.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0058.md",
+    "scripts/sync_push_gates.py",
+    "scripts/validate-and-push.ps1",
+    "scripts/validate-and-push.sh",
+    "docs/engineering/runbook.md",
+    "scripts/check-user-visible-metadata.py"
+  ]
+}

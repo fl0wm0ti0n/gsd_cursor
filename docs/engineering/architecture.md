@@ -8,182 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0034: Multi-Repo and Contract Compatibility Observability
-
-## Overview
-
-US-0034 adds optional compatibility observability across repositories and
-components using manifest artifacts and contract-change signals. The goal is
-deterministic impact visibility for planning, QA, and release decisions, not
-runtime dependency orchestration.
-
-This architecture follows the user clarification:
-- Keep a global view for inventory and cross-repo links.
-- Keep per-repo and per-component manifests close to each codebase.
-- Surface API changes directly to dependent repos/components so agents can
-  derive required work.
-
-## Minimal manifest model
-
-### A1) Global registry manifest (inventory + links)
-
-Canonical artifact:
-- `docs/engineering/manifests/registry.manifest.yaml`
-
-Purpose:
-- Source-of-truth inventory of known repos/components.
-- Cross-repo contract dependency links.
-- Ownership and lifecycle visibility.
-
-Minimum required fields:
-- `schema_version`
-- `generated_at`
-- `repos[]`: `{ repo_id, repo_url_or_path, owner, status, manifest_ref }`
-- `contracts[]`: `{ contract_id, producer_repo, producer_component, contract_ref, version }`
-- `compatibility_links[]`: `{ contract_id, consumer_repo, consumer_component, expected_version_range, criticality }`
-
-### A2) Per-repo manifest
-
-Canonical artifact (inside each repo):
-- `docs/engineering/manifests/repo.manifest.yaml`
-
-Purpose:
-- Local declaration of exposed and consumed contracts.
-- Repo-level owner/version/status metadata.
-
-Minimum required fields:
-- `schema_version`
-- `repo_id`
-- `owner`
-- `version`
-- `components[]` (references to component manifests)
-- `exports[]` (contracts this repo publishes)
-- `imports[]` (contracts this repo consumes)
-
-### A3) Per-component manifest
-
-Canonical artifact:
-- `docs/engineering/manifests/components/<component_id>.manifest.yaml`
-
-Purpose:
-- Unit of scoped change analysis and protection checks.
-
-Minimum required fields:
-- `component_id`
-- `repo_id`
-- `owner`
-- `status` (`active|deprecated|experimental|retired`)
-- `exposed_contracts[]` (`contract_id`, `api_spec_ref`, `version`)
-- `consumed_contracts[]` (`contract_id`, `expected_version_range`)
-- `protected_interfaces[]` (interfaces expected to remain stable for non-target work)
-
-### A4) Compatibility map and contract links
-
-Compatibility is represented as producer->consumer edges in
-`registry.manifest.yaml.compatibility_links[]`, with each edge tied to a
-specific `contract_id` and expected consumer version range.
-
-This creates a deterministic impact graph:
-- Contract changes from producer side identify all consumer edges.
-- Each edge yields a candidate impact task in sprint planning.
-
-### A5) Change signal model (contract diff + impact)
-
-Canonical artifact:
-- `docs/engineering/compatibility-signals.md`
-
-Each signal entry records one observed contract change:
-- `signal_id` (`CS-xxxx`)
-- `date`
-- `story_id`
-- `producer_repo` / `producer_component`
-- `contract_id`
-- `from_version` / `to_version`
-- `change_type` (`additive|behavioral|breaking|docs-only`)
-- `impacted_consumers[]`
-- `severity` (`info|low|medium|high|critical`)
-- `required_actions[]` (for impacted repos/components)
-- `status` (`open|planned|validated|accepted-risk|resolved`)
-
-Severity baseline:
-- `breaking` with impacted consumers -> `high` (or `critical` for
-  production-critical links).
-- `behavioral` -> `medium`.
-- `docs-only` drift -> `low`.
-
-## Workflow integration
-
-### B1) Phase responsibilities
-
-| Phase | Manifest/compatibility responsibilities |
-|------|------------------------------------------|
-| `/intake` | If enabled, declare target repos/modules and contract artifacts in story scope. |
-| `/architecture` | Define/confirm registry and local manifest updates; create compatibility approach and risk policy. |
-| `/sprint-plan` | Convert compatibility links + open change signals into explicit tasks per impacted consumer. |
-| `/execute` | Update local manifests when contracts/components change; append contract-change signals. |
-| `/qa` | Validate impacted consumer coverage and verify signal statuses/evidence. |
-| `/verify-work` | Confirm traceability from story -> signals -> tasks -> QA evidence. |
-| `/release` | Apply compatibility gate only when enabled and unresolved high/critical findings exist. |
-| `/refresh-context` | Curator compacts stale signals, verifies manifest consistency, and updates state summary. |
-
-### B2) Impact derivation model for agents
-
-When a contract change is detected, agents derive work deterministically:
-1. Find `contract_id` in `registry.manifest.yaml`.
-2. Enumerate `compatibility_links` for consumers.
-3. For each consumer edge, create/verify tasks:
-   - contract alignment update,
-   - consumer regression/smoke verification,
-   - docs alignment if public API docs changed.
-4. Record findings in `compatibility-report.md` and link to story/sprint tasks.
-
-### B3) Findings and gating policy
-
-Canonical compatibility findings artifact:
-- `docs/engineering/compatibility-report.md`
-
-Minimum finding fields:
-- `finding_id`
-- `story_id`
-- `contract_id`
-- `producer` + `consumer`
-- `severity`
-- `evidence`
-- `recommended_action`
-- `gate_recommendation` (`none|decision-gate`)
-
-Gate behavior:
-- Default: non-blocking advisory output.
-- If `CROSS_REPO_OBSERVABILITY=1` and unresolved `critical` findings exist,
-  trigger decision gate before release progression.
-
-### B4) Default-off / zero-overhead behavior
-
-Control flags in `.cursor/scratchpad.md`:
-- `CROSS_REPO_OBSERVABILITY=0` (default)
-- `COMPATIBILITY_GATE_ON_CRITICAL=1` (effective only when observability is on)
-
-When `CROSS_REPO_OBSERVABILITY=0`:
-- No required manifest processing.
-- No required compatibility report updates.
-- No additional blocking gates.
-
-## Artifacts and status taxonomy
-
-Canonical files:
-- `docs/engineering/manifests/registry.manifest.yaml`
-- `docs/engineering/manifests/repo.manifest.yaml`
-- `docs/engineering/manifests/components/<component_id>.manifest.yaml`
-- `docs/engineering/compatibility-signals.md`
-- `docs/engineering/compatibility-report.md`
-
-Status taxonomy:
-- Manifest entity status: `active|deprecated|experimental|retired`
-- Signal status: `open|planned|validated|accepted-risk|resolved`
-- Finding severity: `info|low|medium|high|critical`
-
----
-
 # US-0035: Component-Scoped Execution Mode with Protection Guards
 
 ## Overview
@@ -3337,3 +3161,205 @@ lines, with values allowed to differ only for documented conservative defaults.
 
 - Research basis: **`R-0052`**
 - Decision: **`DEC-0057`**
+
+---
+
+# US-0076: Executable scratchpad-driven sync and auto-push wiring
+
+## Overview
+
+**`US-0076`** wires **merged scratchpad** (**`DEC-0055`**) into **`scripts/validate-and-push.ps1`**
+and **`scripts/validate-and-push.sh`** so **`SYNC_POLICY_MODE`**, **`ALLOW_AUTO_PUSH`**,
+**`SYNC_CUSTOM_PHASES`** (when applicable), and **`AUTO_PUSH_BRANCH_ALLOWLIST`** **actually**
+gate an **opt-in** push path, while **`DEC-0018` / `US-0038`** remain the semantic authority
+for **reason codes** and **gate order** (**`decisions/DEC-0058.md`** records the executable
+contract).
+
+## Approach
+
+1. **Reuse merge** — Invoke **`installer.py`** `parse_scratchpad_file` + `merge_scratchpad_layers`
+   (or a tiny extracted shared module) from both scripts so **local → baseline → example**
+   precedence cannot drift from **`DEC-0055`**.
+2. **Extend validate-and-push only** — Keep a **single** operator entrypoint (**PO/discovery**
+   recommendation); avoid a parallel **`sync-from-scratchpad.*`** unless security review forces
+   a split (not indicated).
+3. **Policy evaluation before git** — After merge, evaluate **disabled / manual / eligibility**
+   per **`DEC-0018`**; exit with **`SYNC_DISABLED`**, **`MANUAL_MODE_NO_AUTO`**,
+   **`AUTO_PUSH_NOT_ENABLED`**, or **`SYNC_TRIGGER_NOT_ELIGIBLE`** without running tests when
+   push is already ruled out (deterministic short-circuit order documented in runbook).
+4. **Runbook commands unchanged in role** — Continue reading **`TEST_COMMAND`** and optional
+   checks from **`docs/engineering/runbook.md`** only.
+5. **QA scan** — Bounded file glob + marker rules per **`DEC-0058`** §6 (not free-form chat
+   parsing).
+6. **Optional dry-run** — Flag to print decisions and reason codes without **`git push`**.
+
+## Invariants
+
+- **No push** when **`ALLOW_AUTO_PUSH=0`** or mode is **`disabled`** / **`manual`** (**`AC-1`**).
+- **No push** on merge/parse failure; **no silent push** on allowlist mismatch (**`AC-4`**).
+- **Tests before push** when push is eligible: **`TEST_COMMAND`** required; optional checks
+  when configured (**`AC-3`**).
+- **Cross-platform parity** — PS1 and sh exit codes and reason tokens match (**`AC-6`**).
+- **Operator strings** — **`US-0071`** hygiene on all new/changed script output (**`AC-9`**).
+
+## Components / scripts touched (execute phase)
+
+| Surface | Change |
+|--------|--------|
+| **`scripts/validate-and-push.ps1`** | Merged scratchpad gate + QA scan + branch allowlist + dry-run |
+| **`scripts/validate-and-push.sh`** | Same behavior as PS1 |
+| **`installer.py`** (or **`scripts/`** helper) | Callable merge entry (avoid duplicating precedence) |
+| **`docs/engineering/runbook.md`** | Document invocation contract, **`SYNC_PHASE_BOUNDARY`**, scan rules |
+| **`README.md`** + **`template/`** mirrors | **`AC-7`** operator guidance |
+| **`tests/run-tests.ps1`** / **`.sh`** | **`AC-8`** regression fixtures / dry-run assertions |
+| **`decisions/DEC-0058.md`** | Executable supplement to **`DEC-0018`** (accepted with architecture) |
+
+## Failure reason codes (non-exhaustive; align with **`US-0038`**)
+
+| Code | When |
+|------|------|
+| **`SYNC_DISABLED`** | Mode **`disabled`** |
+| **`MANUAL_MODE_NO_AUTO`** | Mode **`manual`** or unset invalid treated as manual per policy |
+| **`AUTO_PUSH_NOT_ENABLED`** | **`ALLOW_AUTO_PUSH≠1`** |
+| **`SYNC_TRIGGER_NOT_ELIGIBLE`** | Boundary/mode mismatch (e.g. **`by_phase`** invocation not eligible per script rules) |
+| **`TEST_COMMAND_MISSING`** / **`TEST_FAILED`** / **`TEST_TIMEOUT`** | Runbook test gate |
+| **`OPTIONAL_CHECK_FAILED`** | Lint/typecheck when configured |
+| **`BRANCH_NOT_ALLOWLISTED`** | Branch pattern fails deterministic allowlist match |
+| **`BLOCKING_QA_FINDINGS`** | **`DEC-0058`** §6 scan hit |
+| **`PRE_QA_AUTOPUSH_FORBIDDEN`** | **`US-0038`** QA-first signal not met (bounded rule in runbook) |
+| **`[SCRATCHPAD_MERGE_ERROR]`** (family) | Merge/parse failure — **no push** |
+
+## Tests strategy (**`AC-8`**)
+
+- **Fixture or temp repo** paths: disabled/manual → no push path; allowlist mismatch →
+  **`BRANCH_NOT_ALLOWLISTED`**; merged local override wins over baseline (**`DEC-0055`** spot
+  check); **qa-findings** fixture with blocking marker → **`BLOCKING_QA_FINDINGS`**.
+- **Dry-run** assertions: happy path reports **`SYNC_PUSHED`** or documented success token
+  without invoking **`git push`** when tests are mocked/skipped in CI-safe mode.
+- **PS1 / sh** both run the same cases where feasible.
+
+## Migration / compatibility
+
+- **Default-off unchanged**: teams with **`ALLOW_AUTO_PUSH=0`** or **`manual`/`disabled`** see
+  **no new push behavior** — scripts may exit earlier with explicit reason codes (**`AC-1`**).
+- **No Cursor auto-invocation** added by this story; CI/operator must **run** the script
+  (**backlog boundaries**).
+- **`DEC-0018`** records remain valid; **`DEC-0058`** **adds** executable interpretation — no
+  weakening of **`US-0038`** gates.
+
+## Decision linkage
+
+- Research basis: **`R-0053`**
+- Decision: **`DEC-0058`** (executable wiring; **`DEC-0018`** policy authority retained)
+
+---
+
+# US-0077: Documentation audience profiles and dual README strategy
+
+## Overview
+
+**`US-0077`** adds **merged-scratchpad** (**`DEC-0055`**) controls **`DOC_AUDIENCE_PROFILE`**
+and **`DOC_DETAIL_LEVEL`** so documentation generation and validation produce deterministic,
+audience-appropriate output. **`R-0054`** supplies the **9-cell** semantic-key matrix;
+**`DEC-0059`** locks paths, split rules, reason codes, validator location, and migration
+defaults.
+
+## Profile semantics
+
+- **Dimensions**: `DOC_AUDIENCE_PROFILE` ∈ {`user`, `developer`, `both`} ×
+  `DOC_DETAIL_LEVEL` ∈ {`concise`, `balanced`, `technical-deep`}.
+- **Inputs**: **merged** scratchpad only (local → materialized baseline → example); invalid
+  combination values → **`DOC_PROFILE_INVALID`**; merge failure → **`DOC_PROFILE_MERGE_ERROR`**.
+- **Optional modes**: `SPEC_PACK_MODE` / `USER_GUIDE_MODE` are **additive** only — validators
+  must not require their artifacts when **0** (**`R-0054`** §6).
+- **Required keys per cell**: same **semantic key** sets as **`R-0054`** matrix (USER_* and
+  DEV_* vocabulary); architecture adds **normative H2 literals** below for resolver binding.
+
+## Artifact ownership
+
+| Artifact | Role |
+|----------|------|
+| **`README.md`** (repo root) | **User channel** — all **`USER_*`** keys required for the resolved cell when profile audience includes **`user`**. |
+| **`docs/developer/README.md`** | **Developer channel** — all **`DEV_*`** keys required when audience includes **`developer`** or **`both`**. |
+| **`docs/engineering/runbook.md`** | **US-0030** command surface — unchanged; README may link into runbook; no profile-driven rewriting of runbook keys in this story. |
+| **`docs/user-guides/US-xxxx.md`** | **US-0032** when enabled. |
+| Spec-pack paths | **US-0031** when enabled. |
+
+Cross-links from README to developer shard or runbook are allowed; **authoritative** section
+bodies for **`DEV_*`** keys must not live in root README when the cell requires the developer
+shard (**`DEC-0059`** §3).
+
+## README split strategy
+
+- **Canonical layout**: **two files** — root **`README.md`** + **`docs/developer/README.md`**.
+- **`both` × `concise` / `balanced` / `technical-deep`**: user vs developer keys **split** per
+  **`R-0054`**; **`technical-deep`** forbids inlining full **`DEV_*`** bodies in root (pointers
+  only).
+- **`developer` × \***: **`DEV_*`** content **only** in developer shard; root may include one
+  minimal pointer section.
+- **H2 budgets** (root README, user-facing body): follow **`R-0054`** table; overflow →
+  **`DOC_SECTION_BUDGET_EXCEEDED`**.
+
+## Semantic keys → canonical H2 titles (validator)
+
+Exact heading text (Markdown `## …`) — execute phase implements resolver with trim/normalize
+only; renames require updating this table and tests together.
+
+**User channel (`README.md`)**
+
+| Key | H2 title |
+|-----|----------|
+| `USER_PURPOSE` | `Purpose` |
+| `USER_QUICKSTART` | `Quickstart` |
+| `USER_EXAMPLES` | `Examples` |
+| `USER_TROUBLESHOOTING` | `Troubleshooting` |
+| `USER_LIMITATIONS` | `Limitations` |
+| `USER_RELATED_DOCS` | `Related documentation` |
+
+**Developer channel (`docs/developer/README.md`)**
+
+| Key | H2 title |
+|-----|----------|
+| `DEV_PREREQS` | `Prerequisites` |
+| `DEV_WORKFLOW` | `Workflow` |
+| `DEV_QUALITY_GATES` | `Quality gates` |
+| `DEV_ARCHITECTURE` | `Architecture notes` |
+| `DEV_CONTRACTS` | `Contracts and interfaces` |
+| `DEV_DECISIONS` | `Engineering decisions` |
+
+Optional root pointer for developer-audience navigation (not a semantic-key substitute):
+`## Contributing` with a single link line to **`docs/developer/README.md`** — does not count
+toward **`DEV_*`** satisfaction.
+
+## Validator and test strategy
+
+1. **Script**: **`scripts/validate_doc_profile.py`** — loads merged scratchpad via
+   **`installer.py`** merge (**`DEC-0058`** pattern); resolves cell; checks parse gates,
+   completeness (**`DOC_SECTION_MISSING:<key>`**), H2 counts (**`DOC_SECTION_BUDGET_EXCEEDED`**),
+   and **active + `template/`** mirror paths for the same logical files (**`DOC_TEMPLATE_PARITY_FAIL`**).
+2. **Tests**: **`tests/run-tests.ps1`** / **`.sh`** invoke Tier **A/B/C** fixtures per **`R-0054`**
+   (**`AC-8`**): three anchor snapshots, table-driven remaining cells, wiring smoke per
+   audience at **`balanced`** depth.
+3. **CI cost**: full 9× heavy generation is **not** required every run — resolver + fixture
+   trees prove matrix coverage.
+4. **US-0071**: validator and generator stdout/stderr use reason codes; markdown bodies on
+   scanned surfaces stay within metadata guard allowlists (**extend** in execute if new tools
+   emit planning tokens).
+
+## Migration constraints
+
+- **Defaults**: template/example scratchpad documents **`both`** + **`balanced`** as the
+  framework recommendation; **absent keys** on merged scratchpad follow **`DEC-0059`** §6
+  transition rule (treat as **`both`×`balanced`** for resolver until CI mandates explicit
+  keys).
+- **Repos without `docs/developer/README.md`**: must add it before claiming **`developer`** or
+  **`both`** cells in validation; no silent split — generator/docs updates are **non-destructive**
+  (relocate content deliberately, do not drop).
+- **Installer/template**: when the framework ships the developer shard, update
+  **`docs/engineering/context/installer-owned-paths.manifest`** (and **`template/`** mirror)
+  per **`US-0030`** parity.
+
+## Decision linkage
+
+- Research basis: **`R-0054`**
+- Decision: **`DEC-0059`**

@@ -1,3 +1,105 @@
+## TL -> Dev Handoff — Sprint S0056 (US-0077 Documentation Profiles + Dual README)
+
+## Planning summary
+
+- **Sprint**: S0056 (new; next id after **`S0055`** release)
+- **Story**: US-0077 — Documentation audience profiles and dual README strategy (**`DEC-0059`**; merged scratchpad **`DEC-0055`**; research **`R-0054`**)
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0056/tasks.md`
+- **Plan-verify**: **PASS** (`sprints/S0056/plan-verify.json`; `orchestrator_run_id=auto-20260327-02`) — QA confirmed AC-1..AC-10 ↔ T-001..T-010 vs backlog + **DEC-0059**; no plan gaps before **`/execute`**.
+- **Verify-work / release readiness** (**2026-03-28**): **`sprints/S0056/uat.json`** / **`sprints/S0056/uat.md`** **PASS** (`10/10`); **`docs/product/backlog.md`** **US-0077** **DONE**; **`handoffs/release_queue.md`** row **`S0056`** → **`ready`**; next phase **`/release`** (see **`docs/engineering/state.md`** verify-work checkpoint).
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0077 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0077`)
+- Decision: `decisions/DEC-0059.md` (profile semantics, dual file split, H2 literals, validator path, migration)
+- Related: **US-0030** (parity), **US-0031** / **US-0032** (optional modes), **US-0071** (user-visible hygiene), **DEC-0058** pattern for merged scratchpad read in validator
+- Research: `docs/engineering/research.md` (**R-0054**)
+- PO → TL handoff: `handoffs/po_to_tl.md` (US-0077 addenda / tail mirror under **`auto-20260327-02`**)
+- Sprint artifacts: `sprints/S0056/*`
+
+## Focus
+
+1. **Profile inputs + fail-closed (T-001)**: scratchpad keys, enums, merge errors; template ships explicit values; transition default per **DEC-0059** §6.
+2. **Generation idempotence (T-002, T-003)**: profile drives README + developer shard content; `USER_*` vs `DEV_*` H2 table in architecture.
+3. **Split + optional modes (T-004, T-005)**: **DEC-0059** §3 layout; **SPEC_PACK_MODE** / **USER_GUIDE_MODE** gating.
+4. **Validator + parity (T-006, T-007)**: **`scripts/validate_doc_profile.py`**; runbook/README/template; **`installer-owned-paths.manifest`** for **`docs/developer/README.md`**.
+5. **Evidence (T-008..T-010)**: Tier A/B/C tests; **US-0071** scan; **DEC-0059** traceability in operator docs and decisions index.
+
+## Risks
+
+- **Heading drift** vs semantic keys — mitigate with validator + fixture snapshots (**AC-6**, **AC-8**).
+- **Optional-mode false failures** — explicit flag-off fixtures in **T-005** / **T-008**.
+- **New developer shard path** — must stay framework-owned per manifest (**T-007**).
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0056/tasks.md`). Implement merged-scratchpad read once (installer merge helper) before splitting README content.
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0056/tasks.md` marked done.
+- `sprints/S0056/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** — see plan-verify checkpoint in `docs/engineering/state.md`).
+- `sprints/S0056/progress.md`, `sprints/S0056/uat.json`, and `sprints/S0056/uat.md` updated with implementation evidence (during execute/QA as per repo convention).
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0077` / `S0056`.
+
+## Next phase
+
+**`/execute`** for **`S0056`** / **`US-0077`** (plan-verify **PASS** recorded in `sprints/S0056/plan-verify.json` and `docs/engineering/state.md`).
+
+---
+
+## TL -> Dev Handoff — Sprint S0055 (US-0076 Executable Scratchpad Sync / Auto-Push Wiring)
+
+## Planning summary
+
+- **Sprint**: S0055 (new)
+- **Story**: US-0076 — Executable scratchpad-driven sync and auto-push wiring (**validate-and-push** + merged scratchpad per **DEC-0055**; policy authority **DEC-0018** / **US-0038**; executable contract **DEC-0058**)
+- **Task count**: 10 (within `SPRINT_MAX_TASKS=12`)
+- **AC coverage intent**: AC-1..AC-10 mapped 1:1 to `T-001..T-010` in `sprints/S0055/tasks.md`
+- **Plan-verify**: **PASS** (`sprints/S0055/plan-verify.json`; `orchestrator_run_id=auto-20260327-01`) — QA confirmed full AC↔task coverage vs backlog + **DEC-0058**; no plan gaps before **`/execute`**.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0076 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0076`)
+- Decisions: `decisions/DEC-0058.md` (executable wiring; **DEC-0018** remains policy authority); **DEC-0055** (merge precedence)
+- Related: **US-0038** (gate chain / reason codes), **US-0071** (operator string hygiene)
+- Research: `docs/engineering/research.md` (**R-0053**)
+- PO → TL handoff: `handoffs/po_to_tl.md` (US-0076 addenda / tail mirrors under `auto-20260327-01`)
+- Sprint artifacts: `sprints/S0055/*`
+
+## Focus
+
+1. **Merge + policy gates (T-001, T-002)**: single merge source; fail closed; short-circuit when auto-push off or manual/disabled.
+2. **Pre-push chain (T-003..T-005)**: runbook tests → optional checks → branch allowlist → bounded **qa-findings** scan + **PRE_QA_AUTOPUSH_FORBIDDEN** per runbook.
+3. **Parity + docs (T-006, T-007)**: PS1/sh alignment; runbook **SYNC_PHASE_BOUNDARY**, dry-run, scheduling; README + **template/**.
+4. **Verification (T-008..T-010)**: regression tests; **US-0071** scan; **DEC-0058** / deprecation surfaced in operator docs.
+
+## Risks
+
+- **False allow / false block** from QA glob or regex — mitigate with **AC-8** fixtures and runbook examples (**DEC-0058** consequences).
+- **Python merge dependency** on push path — acceptable vs duplicated precedence; ensure clear errors on missing interpreter.
+- **Phase eligibility** ambiguity — default **invocation = boundary**; document **SYNC_PHASE_BOUNDARY** for CI only (**DEC-0058** §4).
+
+## Execution order
+
+Run tasks `T-001`..`T-010` in sequence (see `sprints/S0055/tasks.md`). Prefer implementing shared merge invocation before branching-specific logic.
+
+## Done criteria for Dev completion
+
+- All 10 tasks in `sprints/S0055/tasks.md` marked done.
+- `sprints/S0055/plan-verify.json` confirms AC-1..AC-10 coverage with no gaps (**PASS** after `/plan-verify`).
+- `sprints/S0055/progress.md`, `sprints/S0055/uat.json`, and `sprints/S0055/uat.md` updated with implementation evidence (during execute/QA as per repo convention).
+- `docs/engineering/state.md` includes lifecycle checkpoint traceability for `US-0076` / `S0055`.
+
+## Next phase
+
+Plan-verify **PASS** for **`S0055`** (`sprints/S0055/plan-verify.json`). Proceed to **`/execute`** for **`S0055`** (`US-0076`).
+
+---
+
 ## TL -> Dev Handoff — Sprint S0054 (US-0075 Scratchpad Example–First Refresh + AC-11)
 
 ## Planning summary

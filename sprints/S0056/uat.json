@@ -1,0 +1,97 @@
+{
+  "sprint_id": "S0056",
+  "story_ids": [
+    "US-0077"
+  ],
+  "orchestrator_run_id": "auto-20260327-02",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Scratchpad exposes DOC_AUDIENCE_PROFILE and DOC_DETAIL_LEVEL on active + template baseline and .cursor/scratchpad.local.example.md; invalid enums fail closed with DOC_PROFILE_INVALID; merge failures surface DOC_PROFILE_MERGE_ERROR (DEC-0059 §6 default both×balanced when keys absent).",
+      "result": "pass",
+      "notes": "PASS per sprints/S0056/qa-findings.md AC-1; scripts/doc_profile_lib.py + fixtures."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Profile inputs drive doc generation/update idempotently (installer _doc_profile_sync + ensure_doc_surfaces_merged); repeated runs with same merged inputs yield deterministic outcomes.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; installer.py + doc_profile_lib."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Root README USER_* H2 literals vs docs/developer/README.md DEV_* H2 literals; user channel plain language vs developer guardrails per architecture # US-0077.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; README.md + docs/developer/README.md + template mirrors."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Dual README strategy: split files, Contributing pointer, ownership matrix in DEC-0059; no contradictory bodies across channels within validator scope.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; DEC-0059 + validate_doc_profile split rules."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "SPEC_PACK_MODE and USER_GUIDE_MODE remain zero-overhead when 0; profile-aware depth only when enabled; fixtures optional modes off.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; tests/doc_profile_fixtures_test.py."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "scripts/validate_doc_profile.py enforces required sections, H2 budgets, template parity; emits DOC_SECTION_MISSING:<key>, DOC_SECTION_BUDGET_EXCEEDED, DOC_TEMPLATE_PARITY_FAIL.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; python scripts/validate_doc_profile.py --repo . exit 0."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Runbook Documentation profile validation (US-0077 / DEC-0059), execute step 21, template mirrors, installer-owned-paths.manifest lists doc profile paths.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7; runbook + .cursor/commands/execute.md + manifest."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Tiered regression: 9-cell matrix coverage (Tier A/B/C) in tests/doc_profile_fixtures_test.py; tests/run-tests.ps1 / run-tests.sh §26j wiring.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; python tests/doc_profile_fixtures_test.py exit 0."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "US-0071: operator-visible validator/tooling strings and scanned markdown pass check-user-visible-metadata.py.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; python scripts/check-user-visible-metadata.py --repo . exit 0."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "DEC-0059 + architecture # US-0077 document semantics, artifact boundaries, migration defaults; decisions index and operator docs cross-linked.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10; decisions/DEC-0059.md + docs/engineering/architecture.md."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0056/qa-findings.md",
+    "sprints/S0056/summary.md",
+    "sprints/S0056/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0059.md",
+    "scripts/validate_doc_profile.py",
+    "scripts/doc_profile_lib.py",
+    "tests/doc_profile_fixtures_test.py",
+    "docs/engineering/runbook.md",
+    "scripts/check-user-visible-metadata.py",
+    "scripts/check-scratchpad-pair-parity.py"
+  ]
+}

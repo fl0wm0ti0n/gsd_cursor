@@ -1556,7 +1556,7 @@
 - Title: Make `SYNC_*` / `ALLOW_AUTO_PUSH` / branch allowlist **actually drive** an optional push path (not policy-only)
 - Summary: Operators set **`SYNC_POLICY_MODE`**, **`ALLOW_AUTO_PUSH=1`**, and **`AUTO_PUSH_BRANCH_ALLOWLIST`** expecting **git push** to occur when safe; today the kit primarily **documents** eligibility (**US-0038** / **DEC-0018**) and **`validate-and-push`** ignores scratchpad. This story **wires** merged scratchpad (baseline + **`.cursor/scratchpad.local.md`**) into a **deterministic executable** path (extend **`scripts/validate-and-push.*`** and/or a thin companion) so **opt-in** auto-push honors the same gate chain (tests, QA posture, branch allowlist) with **explicit reason codes** and **no behavior change** when auto-push is off.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - Decomposition (US-0051):
   - **Single story** — policy source (scratchpad), gate chain, scripts, docs, and tests are one delivery slice.
   - **Rationale**: Splitting “read scratchpad” from “run git” would recreate the current gap.
@@ -1571,17 +1571,91 @@
     - missing_topics=`(none)`
     - assumptions_confirmed=`(none)`
   - **Alternatives** (PO): (1) Extend **`validate-and-push`** only; (2) New **`scripts/sync-from-scratchpad.*`** delegating to validate-and-push; (3) Document **CI-only** wiring — **recommend (1)** for minimal moving parts unless architecture finds a security reason to split.
+  - **Discovery refinements (2026-03-27)**:
+    - Confirms **R-0053** gap: scratchpad keys are orchestration/docs inputs today; **`validate-and-push`** must gain merged-scratchpad awareness without duplicating **US-0038** semantics in a second policy source.
+    - **Integration default**: extend **`scripts/validate-and-push.ps1`** / **`.sh`** (shared core if present) for scratchpad-driven gating; thin companion acceptable only if architecture records why split is required.
+    - **`by_phase` / `by_milestone`**: treat **script invocation** as the eligible boundary unless architecture specifies a single alternate deterministic input (env / CLI / **`state.md`** parse); document operator + CI scheduling in **AC-7** surfaces.
+    - **QA posture**: lock a **bounded** rule in **/architecture** for **AC-5** (e.g. active sprint **`qa-findings.md`** presence + blocking verdict pattern); avoid weakening **PRE_QA_AUTOPUSH_FORBIDDEN** / **BLOCKING_QA_FINDINGS** semantics.
+    - **Decision artifact**: **AC-10** remains — **`DEC-0058`** or **DEC-0018** amendment for executable contract vs policy-only interpretation; discovery does not narrow acceptance IDs.
+  - **Research refinements (2026-03-27, TL)**:
+    - **R-0053** extended: concrete hooks in **`validate-and-push.ps1`/`.sh`** (runbook-only today); merge via **`installer.py`** `merge_scratchpad_layers` (or shared module) to preserve **DEC-0055** precedence.
+    - **Phase eligibility**: default **invocation = boundary** for `by_phase`; optional explicit **`state.md` / env / CLI** signal only if architecture picks one deterministic source (**AC-7**).
+    - **AC-5**: bounded **`qa-findings.md`** scan under architecture-fixed sprint path; reason codes **`BLOCKING_QA_FINDINGS`** / **`PRE_QA_AUTOPUSH_FORBIDDEN`** — no free-form inference.
+    - **Safety**: fail closed on merge/parse errors; allowlist before push; **US-0071**-safe logs; optional dry-run in implementation.
+  - **Architecture refinements (2026-03-27, TL)** (`orchestrator_run_id=auto-20260327-01`):
+    - **Decision**: **`decisions/DEC-0058.md`** — executable merged-scratchpad wiring for **`validate-and-push.*`**; **`DEC-0018`** remains policy authority; single merge source per **`DEC-0055`**; runbook stays command-only; default **invocation = phase boundary**; optional **`SYNC_PHASE_BOUNDARY`** env; **AC-5** glob **`sprints/S*/qa-findings.md`** + blocking markers per **DEC-0058** §6.
+    - **Design pack**: **`docs/engineering/architecture.md`** — **# US-0076** (approach, invariants, components/scripts table, reason codes, tests strategy, migration).
+    - **Handoff**: **`handoffs/po_to_tl.md`** — prepended **Architecture Addendum — US-0076** + **tail mirror** (TL read model after triad rollover).
+    - **Gate before `/sprint-plan`**: **none** — **DEC-0058** accepted in architecture phase; no open PO/product decision blocks sprint planning.
+  - **Sprint-plan refinements (2026-03-27, TL)** (`orchestrator_run_id=auto-20260327-01`):
+    - **Sprint**: **`S0055`** — atomic tasks **`T-001..T-010`** map **AC-1..AC-10** 1:1 in **`sprints/S0055/tasks.md`**; goal/scope in **`sprints/S0055/sprint.md`**; **`sprints/S0055/plan-verify.json`** seeded **PENDING** for **`/plan-verify`**.
+    - **Handoff**: **`handoffs/tl_to_dev.md`** — prepended **TL → Dev** scope for **`S0055`** / **`US-0076`**.
+    - **Plan-verify (2026-03-27, QA)**: **`sprints/S0055/plan-verify.json`** **PASS** (`orchestrator_run_id=auto-20260327-01`); **`docs/engineering/state.md`** plan-verify checkpoint + strict-proof tuple.
+    - **Execute (2026-03-27, dev)**: delivered per **`handoffs/dev_to_qa.md`** and **`sprints/S0055/summary.md`**.
+    - **QA (2026-03-27, QA)**: **`sprints/S0055/qa-findings.md`** **PASS**; evidence **`tests/report.md`** (721/723 non-baseline), metadata guard exit 0.
+    - **Verify-work (2026-03-27, QA)**: **`sprints/S0055/uat.json`** / **`sprints/S0055/uat.md`** **PASS** (10/10); **`docs/engineering/state.md`** verify-work checkpoint + strict-proof tuple (`orchestrator_run_id=auto-20260327-01`).
+    - **Release (2026-03-27, Release)**: **`sprints/S0055/release-findings.md`** **PASS**; **`handoffs/releases/S0055-release-notes.md`**; queue row **`S0055`** → **`released`**; **`orchestrator_run_id=auto-20260327-01`**.
+    - **Next (historical)**: **`US-0077`** completed under **`auto-20260327-02`** (**S0056** released); **`auto-20260327-01`** closed at **`/refresh-context`** (**2026-03-27**). Current queue posture: `handoffs/resume_brief.md`.
 - Acceptance:
-  - [ ] AC-1: When **`ALLOW_AUTO_PUSH=0`** or **`SYNC_POLICY_MODE`** is **`disabled`** / **`manual`**, the executable push path performs **no push** and exits with deterministic **`SYNC_DISABLED`** / **`MANUAL_MODE_NO_AUTO`** / **`AUTO_PUSH_NOT_ENABLED`** semantics (no silent push).
-  - [ ] AC-2: When **`ALLOW_AUTO_PUSH=1`** and mode is eligible, the script(s) read **merged** scratchpad (materialized baseline + local override per **DEC-0055**) for **`SYNC_POLICY_MODE`**, **`SYNC_CUSTOM_PHASES`** (when `custom_phase_list`), **`AUTO_PUSH_BRANCH_ALLOWLIST`**, and **fail closed** on parse errors with remediation text.
-  - [ ] AC-3: Push is attempted **only** after the **US-0038** mandatory check chain (**`TEST_COMMAND`** required from **`runbook.md`**; optional lint/typecheck when set) passes; failures emit **`TEST_FAILED`**, **`TEST_COMMAND_MISSING`**, **`TEST_TIMEOUT`**, **`OPTIONAL_CHECK_FAILED`** as applicable.
-  - [ ] AC-4: **Branch safety**: current branch must match allowlist (deterministic match rules documented); else **`BRANCH_NOT_ALLOWLISTED`** and **no push**.
-  - [ ] AC-5: **QA-first / blocking findings**: document and implement how the script determines “safe to push” for **feature** work (minimum: **no push** if sprint **`qa-findings`** or equivalent declares blocking failures when those artifacts exist — exact rule locked in **architecture**); emit **`BLOCKING_QA_FINDINGS`** or **`PRE_QA_AUTOPUSH_FORBIDDEN`** when blocked.
-  - [ ] AC-6: **Cross-platform parity**: **`validate-and-push.ps1`** and **`validate-and-push.sh`** (or documented single entry + wrapper) behave consistently for scratchpad-driven mode.
-  - [ ] AC-7: **Runbook** + **README** (active + **`template/`**) explain: scratchpad flags **alone** do not push; **run** validate-and-push (or documented alias) after phases, and how **`by_phase`** / **`custom_phase_list`** map to **operator** or **CI** scheduling.
-  - [ ] AC-8: **Regression tests** in **`tests/run-tests.*`** assert: disabled manual → no push path invoked (mock/spy or dry-run flag); allowlist mismatch → exit reason; happy-path dry-run or fixture repo where feasible.
-  - [ ] AC-9: **US-0071**: operator-visible CLI strings from new/changed scripts do **not** emit forbidden internal planning tokens in scanned surfaces.
-  - [ ] AC-10: **Decision artifact** (**`DEC-0058`** or amendment to **`DEC-0018`**) records executable contract, overlap with **US-0038**, and deprecation of “policy-only” interpretation in operator docs.
+  - [x] AC-1: When **`ALLOW_AUTO_PUSH=0`** or **`SYNC_POLICY_MODE`** is **`disabled`** / **`manual`**, the executable push path performs **no push** and exits with deterministic **`SYNC_DISABLED`** / **`MANUAL_MODE_NO_AUTO`** / **`AUTO_PUSH_NOT_ENABLED`** semantics (no silent push).
+  - [x] AC-2: When **`ALLOW_AUTO_PUSH=1`** and mode is eligible, the script(s) read **merged** scratchpad (materialized baseline + local override per **DEC-0055**) for **`SYNC_POLICY_MODE`**, **`SYNC_CUSTOM_PHASES`** (when `custom_phase_list`), **`AUTO_PUSH_BRANCH_ALLOWLIST`**, and **fail closed** on parse errors with remediation text.
+  - [x] AC-3: Push is attempted **only** after the **US-0038** mandatory check chain (**`TEST_COMMAND`** required from **`runbook.md`**; optional lint/typecheck when set) passes; failures emit **`TEST_FAILED`**, **`TEST_COMMAND_MISSING`**, **`TEST_TIMEOUT`**, **`OPTIONAL_CHECK_FAILED`** as applicable.
+  - [x] AC-4: **Branch safety**: current branch must match allowlist (deterministic match rules documented); else **`BRANCH_NOT_ALLOWLISTED`** and **no push**.
+  - [x] AC-5: **QA-first / blocking findings**: document and implement how the script determines “safe to push” for **feature** work (minimum: **no push** if sprint **`qa-findings`** or equivalent declares blocking failures when those artifacts exist — exact rule locked in **architecture**); emit **`BLOCKING_QA_FINDINGS`** or **`PRE_QA_AUTOPUSH_FORBIDDEN`** when blocked.
+  - [x] AC-6: **Cross-platform parity**: **`validate-and-push.ps1`** and **`validate-and-push.sh`** (or documented single entry + wrapper) behave consistently for scratchpad-driven mode.
+  - [x] AC-7: **Runbook** + **README** (active + **`template/`**) explain: scratchpad flags **alone** do not push; **run** validate-and-push (or documented alias) after phases, and how **`by_phase`** / **`custom_phase_list`** map to **operator** or **CI** scheduling.
+  - [x] AC-8: **Regression tests** in **`tests/run-tests.*`** assert: disabled manual → no push path invoked (mock/spy or dry-run flag); allowlist mismatch → exit reason; happy-path dry-run or fixture repo where feasible.
+  - [x] AC-9: **US-0071**: operator-visible CLI strings from new/changed scripts do **not** emit forbidden internal planning tokens in scanned surfaces.
+  - [x] AC-10: **Decision artifact** (**`DEC-0058`** or amendment to **`DEC-0018`**) records executable contract, overlap with **US-0038**, and deprecation of “policy-only” interpretation in operator docs.
 - Boundaries:
   - In scope: scratchpad → script → git push **opt-in** wiring, docs, tests, decision record.
   - Out of scope: **Cursor** automatically running the script every phase without operator/CI invocation (unless explicitly added as a **documented** optional hook in acceptance); weakening **US-0038** gates; auto-push to **unlisted** branches.
+
+## US-0077 — Documentation Audience Profiles and Dual README Strategy
+- Title: Configure documentation output by audience and depth (user vs developer)
+- Summary: Current generated documentation tends to be operator/developer-dense. Add a configurable documentation profile so teams can choose audience (`user|developer|both`) and detail level (`concise|balanced|technical-deep`) and keep a deterministic split between user-facing and developer-facing docs. The strategy must preserve existing optional modes (**US-0031** spec-pack, **US-0032** user-guide) while making README output clearer for non-technical users.
+- Priority: P1
+- Status: DONE
+- Decomposition (US-0051):
+  - **Single story** — policy, templates, generation rules, validation, and docs guidance must ship together to avoid audience drift.
+  - **Rationale**: Splitting profile policy from artifact generation would recreate mismatched documentation tone/structure.
+- Overlap / duplicate evaluation:
+  - **US-0031** (DONE): optional technical spec-pack exists; this story adds cross-artifact **audience/depth profile controls**.
+  - **US-0032** (DONE): optional user guides exist; this story adds **README strategy** and profile-driven output coordination.
+  - **US-0030** (DONE): README/runbook parity gate remains; this story refines what gets written for each audience profile.
+- Discovery notes:
+  - Intake research: **`R-0054`** (Diataxis audience framing + docs-as-code role split).
+  - Triad hot-surface verification (DEC-0054): `python scripts/enforce-triad-hot-surface.py --rollover` then `--check` (PASS). Rollover archive tuple: `boundary=triad-rollover|po_to_tl`, `moved=1`, `retained=23`, `pack_ref=handoffs/archive/po-to-tl-pack-20260327.md`.
+  - Intake pack evidence:
+    - selected_pack=`small-intake-pack`
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`
+    - assumptions_confirmed=`(none)`
+  - **Alternatives** (PO): (1) Keep one README and only tune wording, (2) dual-audience README sections in one file, (3) dual-doc strategy (developer README + user-focused quickstart/guide) with profile switches — **recommend (3)** for deterministic audience boundaries.
+  - **Discovery refinement (2026-03-27, PO, orchestrator_run_id=auto-20260327-02)**: Lock an explicit **artifact ownership matrix** (which headings and files are authoritative per profile) so optional **USER_GUIDE_MODE** / **SPEC_PACK_MODE** cannot contradict profile-generated surfaces.
+  - **Discovery refinement**: Treat **section budgets** and mandatory headings per profile cell as **architecture/research deliverables** — required to mitigate README bloat for `both` + `technical-deep` (**R-0054**).
+  - **Discovery refinement**: Doc validation for profiles should mirror **US-0030** parity discipline (active + `template/`) and emit deterministic **reason codes** for incomplete required sections (**AC-6**).
+  - **Discovery refinement**: All user-visible generated wording remains subject to **US-0071** scanning surfaces; profile tooling must not emit forbidden planning-id tokens in those channels.
+  - **Research refinement (2026-03-27, TL, orchestrator_run_id=auto-20260327-02)**: **`R-0054`** extended with a **9-cell semantic-key matrix** (user/developer/both × concise/balanced/technical-deep), **artifact ownership table** (README vs developer shard vs runbook vs optional US-0031/32), **README H2 budgets** per cell, and a **tiered validation + AC-8 strategy** (anchor fixtures + table-driven resolver tests + wiring smoke); draft reason codes **`DOC_PROFILE_INVALID`**, **`DOC_PROFILE_MERGE_ERROR`**, **`DOC_SECTION_MISSING:<key>`**, **`DOC_SECTION_BUDGET_EXCEEDED`**, **`DOC_TEMPLATE_PARITY_FAIL`** — exact literals and validator placement are **architecture-owned**.
+  - **Architecture refinement (2026-03-28, TL, orchestrator_run_id=auto-20260327-02)**: Locked **dual-file split** — root **`README.md`** (**`USER_*`** H2 literals) + **`docs/developer/README.md`** (**`DEV_*`**); **`scripts/validate_doc_profile.py`** + **`installer.py`** merged scratchpad; tiered **AC-8** (anchor / table-driven / wiring smoke); migration: template ships explicit keys, absent keys treated as **`both`×`balanced`** per **`DEC-0059`** §6 until execute makes keys mandatory in CI; **`US-0030`** parity + installer manifest updates for new path. **Decision**: **`decisions/DEC-0059.md`**.
+  - **Sprint-plan refinement (2026-03-28, TL, orchestrator_run_id=auto-20260327-02)**: Sprint **`S0056`** planned — **`sprints/S0056/sprint.md`**, **`sprints/S0056/tasks.md`** (**T-001..T-010** ↔ **AC-1..AC-10**), **`sprints/S0056/plan-verify.json`** (**PENDING** until **`/plan-verify`**); handoff **`handoffs/tl_to_dev.md`**; scope: profile flags, **`validate_doc_profile.py`**, dual README, optional-mode gates, tiered regression, **US-0071** hygiene, **DEC-0059** traceability closure.
+  - **Plan-verify (2026-03-28, QA, orchestrator_run_id=auto-20260327-02)**: **`sprints/S0056/plan-verify.json`** **PASS**; **`docs/engineering/state.md`** plan-verify checkpoint + strict-proof tuple.
+  - **Execute (2026-03-28, dev, orchestrator_run_id=auto-20260327-02)**: delivered per **`handoffs/dev_to_qa.md`** and **`sprints/S0056/summary.md`**.
+  - **QA (2026-03-27, QA, orchestrator_run_id=auto-20260327-02)**: **`sprints/S0056/qa-findings.md`** **PASS**; targeted validator + fixture + parity + metadata commands (see findings); full PS suite baseline noise documented as non-blocking.
+  - **Verify-work (2026-03-28, QA, orchestrator_run_id=auto-20260327-02)**: **`sprints/S0056/uat.json`** / **`sprints/S0056/uat.md`** **PASS** (`10/10`); **`docs/engineering/state.md`** verify-work checkpoint; canonical story **DONE** transition (**US-0045**).
+  - **Release (2026-03-28, release, orchestrator_run_id=auto-20260327-02)**: **`sprints/S0056/release-findings.md`** **PASS**; **`handoffs/releases/S0056-release-notes.md`**; queue **`S0056`** **`released`**; legacy **`handoffs/release_notes.md`** pointer.
+  - **Refresh-context (2026-03-28, curator, `orchestrator_run_id=auto-20260327-02`)**: post-**S0056** hygiene complete; **`stop_reason=completed`**, **`next_scheduled_phase=none`** — see **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)**.
+- Acceptance:
+  - [x] AC-1: Add deterministic documentation profile controls in scratchpad: `DOC_AUDIENCE_PROFILE=user|developer|both` and `DOC_DETAIL_LEVEL=concise|balanced|technical-deep` (fail-closed on invalid values with reason code and remediation).
+  - [x] AC-2: Profile controls are consumed by documentation generation/update paths so outputs are reproducible and idempotent for the same inputs.
+  - [x] AC-3: User-facing outputs prioritize plain-language purpose, setup/use steps, examples, limitations, and troubleshooting; developer-facing outputs prioritize architecture/contracts/workflow guardrails.
+  - [x] AC-4: Define and implement a dual README strategy (single-file dual sections or deterministic split files/sections) with explicit ownership boundaries and no contradictory guidance.
+  - [x] AC-5: Existing optional modes remain compatible: `SPEC_PACK_MODE` and `USER_GUIDE_MODE` still provide zero-overhead when disabled and profile-aware behavior when enabled.
+  - [x] AC-6: Documentation validation checks assert required sections per selected audience/depth profile and fail with deterministic reason codes when incomplete.
+  - [x] AC-7: README/runbook/template parity remains aligned for the new profile semantics (active + `template/`).
+  - [x] AC-8: Regression coverage proves profile matrix behavior (`user|developer|both` × `concise|balanced|technical-deep`) and verifies non-destructive updates to existing docs.
+  - [x] AC-9: User-visible wording from generated docs avoids internal planning tokens per **US-0071** scanning surfaces.
+  - [x] AC-10: Architecture/decision record (new DEC or amendment) documents profile semantics, artifact boundaries, and migration guidance for existing repos.
+- Boundaries:
+  - In scope: documentation profile flags, README strategy, audience/depth output rules, validation/tests, runbook/README/template alignment.
+  - Out of scope: replacing spec-pack semantics, replacing user-guide semantics, or introducing product-runtime feature changes.

@@ -1040,6 +1040,107 @@ PARITY_OK=$?
 set -e
 assert_true "scratchpad pair parity check passes on repo" "[ \"$PARITY_OK\" -eq 0 ]"
 
+# 26h) Merged scratchpad sync gates for validate-and-push (US-0076 / DEC-0058)
+SG_SCRIPT="$ROOT/scripts/sync_push_gates.py"
+assert_true "sync_push_gates.py exists" "[ -f \"$SG_SCRIPT\" ]"
+assert_true "validate-and-push.ps1 invokes sync_push_gates" "file_contains \"$ROOT/scripts/validate-and-push.ps1\" \"sync_push_gates.py\""
+assert_true "validate-and-push.sh invokes sync_push_gates" "file_contains \"$ROOT/scripts/validate-and-push.sh\" \"sync_push_gates.py\""
+assert_true "runbook documents executable validate-and-push wiring (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Executable validate-and-push wiring (DEC-0058)\""
+assert_true "runbook documents executable validate-and-push wiring (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Executable validate-and-push wiring (DEC-0058)\""
+
+new_sync_fixture() {
+  fx="$ROOT/tests/.tmp-sync-gate-$$-$RANDOM"
+  rm -rf "$fx"
+  mkdir -p "$fx/.cursor" "$fx/docs/engineering" "$fx/sprints/S0001"
+  cp "$TPL/.cursor/scratchpad.md" "$fx/.cursor/scratchpad.md"
+  cp "$TPL/.cursor/scratchpad.local.example.md" "$fx/.cursor/scratchpad.local.example.md"
+  printf "%s\n" "$1" > "$fx/.cursor/scratchpad.local.md"
+  printf "TEST_COMMAND: echo ok\nTEST_TIMEOUT_SECONDS: 120\n" > "$fx/docs/engineering/runbook.md"
+  printf "# q\n" > "$fx/sprints/S0001/qa-findings.md"
+  printf "%s\n" "$fx"
+}
+
+FXD=$(new_sync_fixture "SYNC_POLICY_MODE=disabled
+ALLOW_AUTO_PUSH=1")
+set +e
+"$PY" "$SG_SCRIPT" policy --root "$FXD" --branch main >/dev/null 2>&1
+SGD=$?
+set -e
+rm -rf "$FXD"
+assert_true "sync_push_gates policy SYNC_DISABLED exit 2" "[ \"$SGD\" -eq 2 ]"
+
+FXE=$(new_sync_fixture "SYNC_POLICY_MODE=by_phase
+ALLOW_AUTO_PUSH=1
+AUTO_PUSH_BRANCH_ALLOWLIST=*")
+set +e
+"$PY" "$SG_SCRIPT" policy --root "$FXE" --branch main >/dev/null 2>&1
+SGE=$?
+"$PY" "$SG_SCRIPT" post --root "$FXE" --branch feature-unit >/dev/null 2>&1
+SGP=$?
+set -e
+rm -rf "$FXE"
+assert_true "sync_push_gates policy eligible exit 0" "[ \"$SGE\" -eq 0 ]"
+assert_true "sync_push_gates post eligible feature branch exit 0" "[ \"$SGP\" -eq 0 ]"
+
+FXB=$(new_sync_fixture "SYNC_POLICY_MODE=by_phase
+ALLOW_AUTO_PUSH=1
+AUTO_PUSH_BRANCH_ALLOWLIST=main")
+set +e
+"$PY" "$SG_SCRIPT" post --root "$FXB" --branch wrong-branch >/dev/null 2>&1
+SGB=$?
+set -e
+rm -rf "$FXB"
+assert_true "sync_push_gates post BRANCH_NOT_ALLOWLISTED exit 2" "[ \"$SGB\" -eq 2 ]"
+
+FXQ=$(new_sync_fixture "SYNC_POLICY_MODE=by_phase
+ALLOW_AUTO_PUSH=1
+AUTO_PUSH_BRANCH_ALLOWLIST=*")
+printf "## Blocking\n- [ ] item FAIL\n" > "$FXQ/sprints/S0001/qa-findings.md"
+set +e
+"$PY" "$SG_SCRIPT" post --root "$FXQ" --branch main >/dev/null 2>&1
+SGQ=$?
+set -e
+rm -rf "$FXQ"
+assert_true "sync_push_gates post BLOCKING_QA_FINDINGS exit 2" "[ \"$SGQ\" -eq 2 ]"
+
+FXC=$(new_sync_fixture "SYNC_POLICY_MODE=custom_phase_list
+ALLOW_AUTO_PUSH=1
+SYNC_CUSTOM_PHASES=qa,execute")
+set +e
+"$PY" "$SG_SCRIPT" policy --root "$FXC" --branch main >/dev/null 2>&1
+SGC=$?
+set -e
+rm -rf "$FXC"
+assert_true "sync_push_gates custom_phase_list without SYNC_PHASE_BOUNDARY exit 2" "[ \"$SGC\" -eq 2 ]"
+
+# 26j) Documentation profile validation (US-0077 / DEC-0059)
+DOC_PROFILE_SCRIPT="$ROOT/scripts/validate_doc_profile.py"
+DOC_PROFILE_FIXTURES="$ROOT/tests/doc_profile_fixtures_test.py"
+command -v python3 >/dev/null 2>&1 || true
+[ -z "$PY" ] && PY=python3
+command -v python3 >/dev/null 2>&1 || PY=python
+assert_true "validate_doc_profile.py exists" "[ -f \"$DOC_PROFILE_SCRIPT\" ]"
+assert_true "doc_profile_fixtures_test.py exists" "[ -f \"$DOC_PROFILE_FIXTURES\" ]"
+assert_true "scratchpad includes DOC_AUDIENCE_PROFILE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"DOC_AUDIENCE_PROFILE\""
+assert_true "scratchpad includes DOC_AUDIENCE_PROFILE (template)" "file_contains \"$TPL/.cursor/scratchpad.md\" \"DOC_AUDIENCE_PROFILE\""
+assert_true "runbook documents doc profile validation (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Documentation profile validation (US-0077 / DEC-0059)\""
+assert_true "runbook documents doc profile validation (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Documentation profile validation (US-0077 / DEC-0059)\""
+set +e
+"$PY" "$DOC_PROFILE_SCRIPT" --self-test >/dev/null 2>&1
+DOC_SELF=$?
+set -e
+assert_true "validate_doc_profile self-test passes" "[ \"$DOC_SELF\" -eq 0 ]"
+set +e
+"$PY" "$DOC_PROFILE_SCRIPT" --repo "$ROOT" >/dev/null 2>&1
+DOC_REPO=$?
+set -e
+assert_true "validate_doc_profile passes on repo (template parity)" "[ \"$DOC_REPO\" -eq 0 ]"
+set +e
+"$PY" "$DOC_PROFILE_FIXTURES" >/dev/null 2>&1
+DOC_FIX=$?
+set -e
+assert_true "doc_profile tiered fixtures pass" "[ \"$DOC_FIX\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

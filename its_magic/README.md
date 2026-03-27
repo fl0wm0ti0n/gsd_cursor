@@ -280,7 +280,7 @@ Generated test scaffolding + auto-run behavior (US-0066):
 - Static baseline test pass does not bypass runtime autopilot; runtime verdict
   remains mandatory for QA PASS.
 
-## Workflow
+## Commands and workflow
 
 ### Core commands
 
@@ -1014,25 +1014,32 @@ the safety cap (`AUTO_LOOP_MAX_CYCLES`) is reached.
 
 #### Layer 2: Local validate-and-push
 
-Run before pushing to catch anything the AI loop missed:
+Run before pushing to catch anything the AI loop missed. **Merged scratchpad** (see
+`docs/engineering/runbook.md`, **Executable validate-and-push wiring (DEC-0058)**) gates
+**`git push`**: default **`SYNC_POLICY_MODE=manual`** and **`ALLOW_AUTO_PUSH=0`** exit early
+with a **reason code** (no push). Opt-in push requires an eligible mode, **`ALLOW_AUTO_PUSH=1`**,
+a non-empty **branch allowlist** match, passing **runbook** checks, and bounded **QA** rules.
 
 ```bash
-# Bash (Linux / macOS)
-sh scripts/validate-and-push.sh
+# Bash (Linux / macOS; bash required for this script)
+bash scripts/validate-and-push.sh
 
 # PowerShell (Windows)
 powershell scripts/validate-and-push.ps1
 powershell scripts/validate-and-push.ps1 -MaxAttempts 3
+powershell scripts/validate-and-push.ps1 -DryRun
 ```
 
 The script:
-1. Runs `FORMAT_COMMAND` and `LINT_FIX_COMMAND` to auto-fix what it can
-2. Runs `LINT_COMMAND` and `TEST_COMMAND` to verify
-3. If checks fail, pauses and waits for you to fix
-4. Re-runs (up to 5 attempts, configurable)
-5. When green, commits and pushes automatically
+1. Evaluates merged scratchpad policy via **`python scripts/sync_push_gates.py`** (Python 3 on PATH)
+2. Runs `FORMAT_COMMAND` and `LINT_FIX_COMMAND` to auto-fix what it can
+3. Runs `LINT_COMMAND`, optional `TYPECHECK_COMMAND`, and `TEST_COMMAND` to verify (with `TEST_TIMEOUT_SECONDS` when `timeout`/`gtimeout` is available on Unix)
+4. If checks fail, pauses and waits for you to fix
+5. Re-runs (up to 5 attempts, configurable)
+6. When green, re-checks allowlist + QA scan, then commits and pushes automatically (unless dry-run / no-commit)
 
-Use `-NoCommit` (PowerShell) or `false` as third arg (Bash) to skip auto-push.
+Use `-NoCommit` (PowerShell), **`--dry-run`** first arg (Bash), or `false` as third arg (Bash) to skip **push**.
+**Policy-only** interpretation of scratchpad sync flags is **deprecated** for these scripts; see **`decisions/DEC-0058.md`** (policy semantics remain **`DEC-0018`** / **`US-0038`**).
 
 #### Layer 3: CI auto-fix (GitHub Actions)
 
@@ -1062,7 +1069,7 @@ push / PR  ──>  checks  ──>  PASS  ──>  done
 Auto-fix commits appear as `ci: auto-fix attempt N/3`. After 3 retries the
 workflow stops and points you to `scripts/validate-and-push` for local fixing.
 
-## Examples
+## Walkthrough examples
 
 ### Example 1: New feature from idea
 
@@ -1354,3 +1361,44 @@ flowchart TD
 - `sprints/Sxxxx/*`: sprint scope, tasks, progress, QA findings, summary.
 - `decisions/*`: decision records.
 - `handoffs/*`: role-to-role transfer notes.
+
+## Purpose
+
+This repository publishes the **its-magic** workflow kit: commands, rules, skills, and
+documentation templates that teams install into their own repositories. The goal is a
+repeatable, file-backed lifecycle from intake through release.
+
+## Quickstart
+
+Use [Setup](#setup) for install commands. First-time install:
+
+```bash
+npx its-magic --target . --mode missing --create
+```
+
+## Examples
+
+- Upgrade an existing repo: `its-magic --target . --mode upgrade`
+- Run check-in tests: use `TEST_COMMAND` from `docs/engineering/runbook.md` (often `sh tests/run-tests.sh`).
+
+## Related documentation
+
+- Operator commands and gates: `docs/engineering/runbook.md`
+- Architecture and story contracts: `docs/engineering/architecture.md`
+- Product backlog and acceptance: `docs/product/backlog.md`, `docs/product/acceptance.md`
+- Optional spec-pack mode (`SPEC_PACK_MODE=1`): engineering design artifacts under `docs/engineering/` when your team enables it
+- Optional user guides (`USER_GUIDE_MODE=1`): `docs/user-guides/` when enabled
+
+## Limitations
+
+- its-magic is a **process and documentation** framework; it does not replace your
+  application runtime, hosting, or product-specific compliance work.
+- Mixed files such as `README.md` are preserved on upgrade; review notices may appear when
+  the template adds new sections.
+- Documentation profile validation (`scripts/validate_doc_profile.py`) enforces audience and
+  depth choices from the merged scratchpad (`DOC_AUDIENCE_PROFILE`, `DOC_DETAIL_LEVEL`).
+
+## Contributing
+
+Contributor-focused workflow and guardrails live in
+[`docs/developer/README.md`](docs/developer/README.md).

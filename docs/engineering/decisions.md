@@ -1,11 +1,14 @@
 # Decisions
 
-## Current context pack (2026-03-27 — intake US-0076)
+## Current context pack (2026-03-28 — post-refresh-context US-0077 / S0056 / auto-20260327-02 closed)
 
-- Next prioritized **OPEN** story: **`US-0076`** (executable scratchpad-driven sync / auto-push wiring; implements **US-0038** script linkage).
-- Active workflow target: **`/discovery`** for **US-0076** per `handoffs/resume_brief.md` and **`## Intake checkpoint (2026-03-27) — US-0076`** in `docs/engineering/state.md`.
-- Research: **`R-0053`** (scratchpad → **validate-and-push** merge and gate design).
-- Continuation hygiene: `handoffs/resume_brief.md` → **US-0076** + **`/discovery`**.
+- **`US-0077`** (**`S0056`**): **DONE** / **released**; evidence **`sprints/S0056/release-findings.md`**, **`handoffs/releases/S0056-release-notes.md`**, **`## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)`** in **`docs/engineering/state.md`** (`orchestrator_run_id=auto-20260327-02`, `stop_reason=completed`, `next_scheduled_phase=none`).
+- Migration default: explicit scratchpad keys **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`** recommended (`both` / `balanced`); **absent keys** on merged scratchpad resolve to **`both`×`balanced`** for resolver/tests per **DEC-0059** §6 until a future cutover mandates explicit keys in CI.
+- **`US-0076`** (**`S0055`**): **DONE** / **released**; evidence **`sprints/S0055/release-findings.md`**, **`handoffs/releases/S0055-release-notes.md`**, **`## Refresh-context checkpoint (2026-03-27) — post S0055 / US-0076`** in **`docs/engineering/state.md`** (`orchestrator_run_id=auto-20260327-01`, `stop_reason=completed`).
+- Active workflow target: **`/intake`** when new work is prioritized (no scheduled auto phase; queue idle).
+- Research: **`R-0053`** (closed with **US-0076**); **`R-0054`** — retained for **US-0077** matrix traceability; normative lock-in **`DEC-0059`** + **`architecture.md`** **`# US-0077`** (delivery closure noted in **`docs/engineering/research.md`**).
+- Decision: **`DEC-0059`** — profile semantics, **`docs/developer/README.md`** shard, H2 mapping, validator **`scripts/validate_doc_profile.py`**, tiered **AC-8** tests, migration defaults — see **`decisions/DEC-0059.md`** and **`docs/engineering/architecture.md`** **`# US-0077`**.
+- Continuation hygiene: **`handoffs/resume_brief.md`** → **`none`** + **`/intake`**.
 - Latest completed/released stories (high-signal, unchanged):
   - `US-0075` (`S0054`, released), governed by **`DEC-0057`** (scratchpad **example-first**
     upgrade ordering + **`AC-11`** paired baseline ↔ example catalog parity gate;
@@ -18,23 +21,39 @@
   - `US-0071` (`S0050`, released), governed by **`DEC-0053`** (user-visible metadata guard).
   - `US-0070` (`S0049`, released), governed by **`DEC-0052`**.
   - `US-0069` (`S0048`, released), governed by **`DEC-0051`**.
-- Hot surface: latest **`/refresh-context`** triad rollover for this run archived **`units=4`** → `docs/engineering/state-archive/state-pack-20260321-n.md` (see refresh checkpoint in `state.md`).
+- Hot surface: at **`/refresh-context` (2026-03-28)**, post-append **`state.md`** oversize → **`rollover_complete units=1`** → **`docs/engineering/state-archive/state-pack-20260327-q.md`**; final triad **`--check`** **PASS** (see **`## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)`**).
 - Traceability (**DEC-0010**):
+  - `| US-0077 | S0056 | T-001..T-010 | DONE |` — **`DEC-0059`** + **`# US-0077`**; sprint artifacts
+    **`sprints/S0056/*`**; **`plan-verify.json`** **PASS**; **`sprints/S0056/release-findings.md`**;
+    **`handoffs/releases/S0056-release-notes.md`**; orchestrator **`auto-20260327-02`** closed at **`/refresh-context`**.
+  - `| US-0076 | S0055 | T-001..T-010 | DONE |` — evidence in `sprints/S0055/summary.md`,
+    `sprints/S0055/qa-findings.md`, `sprints/S0055/uat.json`, `sprints/S0055/uat.md`,
+    `sprints/S0055/release-findings.md`, `handoffs/releases/S0055-release-notes.md`,
+    `tests/report.md`, `decisions/DEC-0058.md`, `scripts/sync_push_gates.py`,
+    `scripts/validate-and-push.ps1`, `scripts/validate-and-push.sh`.
   - `| US-0075 | S0054 | T-001..T-011 | DONE |` — evidence in `sprints/S0054/summary.md`,
-    `sprints/S0054/qa-findings.md`, `sprints/S0054/uat.json`, `sprints/S0054/uat.md`,
-    `sprints/S0054/release-findings.md`, `handoffs/releases/S0054-release-notes.md`,
-    `tests/report.md`, `decisions/DEC-0057.md`, `scripts/check-scratchpad-pair-parity.py`,
-    `scripts/enforce-triad-hot-surface.py`.
-  - `| US-0074 | S0053 | T-001..T-010 | DONE |` — evidence in `sprints/S0053/summary.md`,
     `sprints/S0053/qa-findings.md`, `sprints/S0053/uat.json`, `sprints/S0053/uat.md`,
     `sprints/S0053/release-findings.md`, `handoffs/releases/S0053-release-notes.md`,
     `tests/report.md`, `decisions/DEC-0056.md`, `scripts/enforce-triad-hot-surface.py`.
   - `| US-0073 | S0052 | T-001..T-010 | DONE |` — prior sprint evidence unchanged
     (`sprints/S0052/*`, `handoffs/releases/S0052-release-notes.md`).
-- No open decision gate at this boundary.
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0059`: **documentation audience/depth profiles + dual README developer shard (`US-0077`)** —
+  merged scratchpad keys **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`**; **9-cell**
+  semantic keys per **`R-0054`**; root **`README.md`** (**`USER_*`**) + **`docs/developer/README.md`**
+  (**`DEV_*`**); normative H2 literals + budgets in **`architecture.md`**; validator
+  **`scripts/validate_doc_profile.py`** + tiered **`AC-8`** fixtures; reason codes
+  **`DOC_PROFILE_INVALID`**, **`DOC_PROFILE_MERGE_ERROR`**, **`DOC_SECTION_MISSING:<key>`**,
+  **`DOC_SECTION_BUDGET_EXCEEDED`**, **`DOC_TEMPLATE_PARITY_FAIL`**; migration defaults per
+  **`DEC-0059`** §6; **`US-0030`** / **`US-0031`** / **`US-0032`** / **`US-0071`** boundaries.
+- `DEC-0058`: **executable merged-scratchpad wiring for validate-and-push (`US-0076`)** —
+  **`validate-and-push.ps1`/`.sh`** read **merged** scratchpad per **`DEC-0055`** for
+  **`SYNC_*` / `ALLOW_AUTO_PUSH` / allowlist**; **`runbook.md`** = command keys only;
+  **`DEC-0018`** remains policy authority; bounded **`sprints/S*/qa-findings.md`** scan
+  (**AC-5**); default **invocation = phase boundary**; optional **`SYNC_PHASE_BOUNDARY`**
+  env; linked story **`US-0076`**; research **`R-0053`**.
 - `DEC-0057`: **scratchpad example-first upgrade + paired catalog parity (`AC-11`)** —
   example refresh ordered **before or bundled with** materialized baseline refresh so
   example **never lags** template when baseline moves; machine-enforced **`##` + `KEY=`**
@@ -164,4 +183,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0057.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0059.md`.

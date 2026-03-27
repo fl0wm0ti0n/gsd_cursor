@@ -24,7 +24,7 @@ globs: ["**/*"]
   (local pre-push) → CI auto-fix (GitHub Actions). Each layer catches issues
   the previous layer missed.
 - Before pushing, recommend running `scripts/validate-and-push.ps1` (Windows)
-  or `scripts/validate-and-push.sh` (Linux/Mac) to catch failures locally.
+  or `bash scripts/validate-and-push.sh` (Linux/Mac) to catch failures locally.
 - `LINT_FIX_COMMAND` and `FORMAT_COMMAND` in the runbook enable automatic
   formatting/lint fixes both locally and in CI.
 - Remote config validation errors (when `REMOTE_EXECUTION=1`) must be fail-fast

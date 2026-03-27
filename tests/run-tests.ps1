@@ -1274,6 +1274,104 @@ Assert-True "scratchpad pair parity script exists" (Test-Path $parityScript -Pat
 $parityRun = Start-Process python -ArgumentList @($parityScript, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "scratchpad pair parity check passes on repo" ($parityRun.ExitCode -eq 0)
 
+# 26h) Merged scratchpad sync gates for validate-and-push (US-0076 / DEC-0058)
+$sgScript = Join-Path $root "scripts\sync_push_gates.py"
+Assert-True "sync_push_gates.py exists" (Test-Path $sgScript -PathType Leaf)
+Assert-True "validate-and-push.ps1 invokes sync_push_gates" (File-Contains (Join-Path $root "scripts\validate-and-push.ps1") "sync_push_gates.py")
+Assert-True "validate-and-push.sh invokes sync_push_gates" (File-Contains (Join-Path $root "scripts\validate-and-push.sh") "sync_push_gates.py")
+Assert-True "runbook documents executable validate-and-push wiring (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "Executable validate-and-push wiring (DEC-0058)")
+Assert-True "runbook documents executable validate-and-push wiring (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Executable validate-and-push wiring (DEC-0058)")
+
+function New-SyncGateFixture {
+  param([string]$LocalContent)
+  $fx = Join-Path $root ("tests\.tmp-sync-gate-" + [Guid]::NewGuid().ToString("N"))
+  New-Item -ItemType Directory -Force -Path (Join-Path $fx ".cursor") | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $fx "docs\engineering") | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $fx "sprints\S0001") | Out-Null
+  Copy-Item (Join-Path $tpl ".cursor\scratchpad.md") (Join-Path $fx ".cursor\scratchpad.md")
+  Copy-Item (Join-Path $tpl ".cursor\scratchpad.local.example.md") (Join-Path $fx ".cursor\scratchpad.local.example.md")
+  # Default encoding avoids UTF-8 BOM on first line (BOM breaks KEY= parse in merge).
+  Set-Content -Path (Join-Path $fx ".cursor\scratchpad.local.md") -Value $LocalContent
+  Set-Content -Path (Join-Path $fx "docs\engineering\runbook.md") -Value "TEST_COMMAND: echo ok`nTEST_TIMEOUT_SECONDS: 120`n"
+  Set-Content -Path (Join-Path $fx "sprints\S0001\qa-findings.md") -Value "# q`n"
+  return $fx
+}
+
+$fxD = New-SyncGateFixture "SYNC_POLICY_MODE=disabled`nALLOW_AUTO_PUSH=1`n"
+Push-Location $root
+try {
+  $null = & python $sgScript policy --root $fxD --branch main 2>&1
+  $sgEc = $LASTEXITCODE
+} finally {
+  Pop-Location
+  Remove-Item -Recurse -Force $fxD -ErrorAction SilentlyContinue
+}
+Assert-True "sync_push_gates policy SYNC_DISABLED exit 2" ($sgEc -eq 2)
+
+$fxE = New-SyncGateFixture "SYNC_POLICY_MODE=by_phase`nALLOW_AUTO_PUSH=1`nAUTO_PUSH_BRANCH_ALLOWLIST=*`n"
+Push-Location $root
+try {
+  $null = & python $sgScript policy --root $fxE --branch main 2>&1
+  $sgOk = $LASTEXITCODE
+  $null = & python $sgScript post --root $fxE --branch feature-unit 2>&1
+  $sgPost = $LASTEXITCODE
+} finally {
+  Pop-Location
+  Remove-Item -Recurse -Force $fxE -ErrorAction SilentlyContinue
+}
+Assert-True "sync_push_gates policy eligible exit 0" ($sgOk -eq 0)
+Assert-True "sync_push_gates post eligible feature branch exit 0" ($sgPost -eq 0)
+
+$fxB = New-SyncGateFixture "SYNC_POLICY_MODE=by_phase`nALLOW_AUTO_PUSH=1`nAUTO_PUSH_BRANCH_ALLOWLIST=main`n"
+Push-Location $root
+try {
+  $null = & python $sgScript post --root $fxB --branch wrong-branch 2>&1
+  $sgBr = $LASTEXITCODE
+} finally {
+  Pop-Location
+  Remove-Item -Recurse -Force $fxB -ErrorAction SilentlyContinue
+}
+Assert-True "sync_push_gates post BRANCH_NOT_ALLOWLISTED exit 2" ($sgBr -eq 2)
+
+$fxQ = New-SyncGateFixture "SYNC_POLICY_MODE=by_phase`nALLOW_AUTO_PUSH=1`nAUTO_PUSH_BRANCH_ALLOWLIST=*`n"
+Set-Content -Path (Join-Path $fxQ "sprints\S0001\qa-findings.md") -Value "## Blocking`n- [ ] item FAIL`n"
+Push-Location $root
+try {
+  $null = & python $sgScript post --root $fxQ --branch main 2>&1
+  $sgQa = $LASTEXITCODE
+} finally {
+  Pop-Location
+  Remove-Item -Recurse -Force $fxQ -ErrorAction SilentlyContinue
+}
+Assert-True "sync_push_gates post BLOCKING_QA_FINDINGS exit 2" ($sgQa -eq 2)
+
+$fxC = New-SyncGateFixture "SYNC_POLICY_MODE=custom_phase_list`nALLOW_AUTO_PUSH=1`nSYNC_CUSTOM_PHASES=qa,execute`n"
+Push-Location $root
+try {
+  $null = & python $sgScript policy --root $fxC --branch main 2>&1
+  $sgCu = $LASTEXITCODE
+} finally {
+  Pop-Location
+  Remove-Item -Recurse -Force $fxC -ErrorAction SilentlyContinue
+}
+Assert-True "sync_push_gates custom_phase_list without SYNC_PHASE_BOUNDARY exit 2" ($sgCu -eq 2)
+
+# 26j) Documentation profile validation (US-0077 / DEC-0059)
+$docProfileScript = Join-Path $root "scripts\validate_doc_profile.py"
+$docProfileFixtures = Join-Path $root "tests\doc_profile_fixtures_test.py"
+Assert-True "validate_doc_profile.py exists" (Test-Path $docProfileScript -PathType Leaf)
+Assert-True "doc_profile_fixtures_test.py exists" (Test-Path $docProfileFixtures -PathType Leaf)
+Assert-True "scratchpad includes DOC_AUDIENCE_PROFILE (active)" (File-Contains (Join-Path $root ".cursor\scratchpad.md") "DOC_AUDIENCE_PROFILE")
+Assert-True "scratchpad includes DOC_AUDIENCE_PROFILE (template)" (File-Contains (Join-Path $tpl ".cursor\scratchpad.md") "DOC_AUDIENCE_PROFILE")
+Assert-True "runbook documents doc profile validation (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "Documentation profile validation (US-0077 / DEC-0059)")
+Assert-True "runbook documents doc profile validation (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Documentation profile validation (US-0077 / DEC-0059)")
+$docSelf = Start-Process python -ArgumentList @($docProfileScript, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "validate_doc_profile self-test passes" ($docSelf.ExitCode -eq 0)
+$docRepo = Start-Process python -ArgumentList @($docProfileScript, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "validate_doc_profile passes on repo (template parity)" ($docRepo.ExitCode -eq 0)
+$docFix = Start-Process python -ArgumentList @($docProfileFixtures) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "doc_profile tiered fixtures pass" ($docFix.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

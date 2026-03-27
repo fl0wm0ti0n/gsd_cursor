@@ -20,6 +20,9 @@ handoffs
 decisions
 scripts/validate-and-push.ps1
 scripts/validate-and-push.sh
+scripts/sync_push_gates.py
+scripts/doc_profile_lib.py
+scripts/validate_doc_profile.py
 .github/workflows
 README.md
 its_magic
@@ -28,12 +31,16 @@ its_magic
 .cursor
 docs/product
 docs/engineering
+docs/developer
 docs/user-guides
 sprints
 handoffs
 decisions
 scripts/validate-and-push.ps1
 scripts/validate-and-push.sh
+scripts/sync_push_gates.py
+scripts/doc_profile_lib.py
+scripts/validate_doc_profile.py
 .github/workflows/ci.yml
 .github/workflows/deploy.yml
 its_magic

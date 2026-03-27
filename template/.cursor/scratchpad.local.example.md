@@ -196,3 +196,9 @@ SPEC_PACK_MODE=0
 # - USER_GUIDE_MODE: 0|1 (enable per-feature user guides at docs/user-guides/US-xxxx.md; default 0)
 #   When 0, intake/architecture/sprint-plan/execute/qa/release add no required user-guide steps or blocking checks.
 USER_GUIDE_MODE=0
+
+# Documentation audience profile (DEC-0059)
+# - DOC_AUDIENCE_PROFILE: user|developer|both (empty -> both during transition)
+# - DOC_DETAIL_LEVEL: concise|balanced|technical-deep (empty -> balanced during transition)
+DOC_AUDIENCE_PROFILE=both
+DOC_DETAIL_LEVEL=balanced

@@ -60,6 +60,36 @@ Remediation:
 - define `TEST_COMMAND` explicitly in `docs/engineering/runbook.md`, or
 - add detectable stack markers/scripts then rerun installer upgrade.
 
+## Documentation profile validation (US-0077 / DEC-0059)
+
+**Goal:** keep root `README.md` (user channel) and `docs/developer/README.md`
+(developer shard) aligned with merged scratchpad keys `DOC_AUDIENCE_PROFILE` and
+`DOC_DETAIL_LEVEL`, with deterministic reason codes and active/`template/` parity.
+
+### Scratchpad keys
+
+- `DOC_AUDIENCE_PROFILE`: `user` \| `developer` \| `both` (empty defaults to `both` during transition).
+- `DOC_DETAIL_LEVEL`: `concise` \| `balanced` \| `technical-deep` (empty defaults to `balanced`).
+- Invalid values → `DOC_PROFILE_INVALID`. Merge/read failures → `DOC_PROFILE_MERGE_ERROR`.
+- Optional modes `SPEC_PACK_MODE` / `USER_GUIDE_MODE` stay additive only: when `0`, this
+  validator does not require spec-pack or user-guide files.
+
+### Command
+
+```bash
+python scripts/validate_doc_profile.py --repo .
+python scripts/validate_doc_profile.py --repo . --no-template-parity   # fixture trees without template/
+```
+
+### Installer hook
+
+`installer.py` scratchpad post-install refreshes missing normative `##` sections
+(non-destructive append) from the resolved profile, then operators should keep
+content accurate. Re-run `python installer.py --scratchpad-postinstall --target <repo> --mode missing`
+after template upgrades if needed.
+
+Normative H2 titles and matrix: `docs/engineering/architecture.md` (`# US-0077`).
+
 ## User-visible internal metadata guard (US-0071 / DEC-0053)
 
 **Goal:** keep planning-shaped identifiers out of **operator-visible software
@@ -1094,6 +1124,39 @@ Deterministic reason-code baseline:
 - `TEST_TIMEOUT`
 - `OPTIONAL_CHECK_FAILED`
 - `SYNC_PUSHED`
+
+## Executable validate-and-push wiring (DEC-0058)
+
+Scratchpad **`SYNC_*` / `ALLOW_AUTO_PUSH` / `AUTO_PUSH_BRANCH_ALLOWLIST`** are read from the
+**merged** scratchpad only (installer merge: local → materialized baseline → example; same
+precedence as installer post-install validation). **`scripts/validate-and-push.ps1`** and
+**`scripts/validate-and-push.sh`** call **`python scripts/sync_push_gates.py`** for policy;
+**`docs/engineering/runbook.md`** remains the sole source for **`TEST_COMMAND`** and optional
+lint/typecheck commands.
+
+**Operator rule:** changing scratchpad alone does **not** run **`git push`**. Run
+**`validate-and-push`** (or CI) after an eligible boundary. For **`by_phase`**, **`by_milestone`**,
+and **`custom_phase_list`**, scheduling is **operator or CI** responsibility.
+
+**`SYNC_PHASE_BOUNDARY`:** optional environment variable (canonical phase id, case-insensitive).
+When **`SYNC_POLICY_MODE=custom_phase_list`**, the variable must be set and must appear in
+**`SYNC_CUSTOM_PHASES`** (comma-separated) or the script exits **`SYNC_TRIGGER_NOT_ELIGIBLE`**.
+
+**Dry-run:** **`powershell .../validate-and-push.ps1 -DryRun`** or
+**`bash scripts/validate-and-push.sh --dry-run ...`** — runs merge/policy and the runbook check
+chain, then prints **`SYNC_PUSHED`** without **`git push`**.
+
+**Branch allowlist matching (`AUTO_PUSH_BRANCH_ALLOWLIST`):** comma-separated entries; each entry
+is either an exact branch name or a **`fnmatch`** pattern (for example `release/*`). An empty
+allowlist denies every branch (**`BRANCH_NOT_ALLOWLISTED`**).
+
+**QA scan (bounded):** files under **`sprints/S####/qa-findings.md`** (four digits). Blocking
+rules match **`DEC-0058`** §6. **`PRE_QA_AUTOPUSH_FORBIDDEN`** applies on branches other than
+**`main`** / **`master`** when **no** such **`qa-findings.md`** file exists yet (feature-line
+signal; see architecture **US-0076**).
+
+**Python:** merged policy evaluation requires **Python 3** on **`PATH`** (**`PYTHON_NOT_ON_PATH`**
+if missing).
 
 Required sync evidence fields:
 - `phase_boundary`

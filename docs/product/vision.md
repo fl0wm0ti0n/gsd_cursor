@@ -679,3 +679,57 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   **PS1** / **sh** parity.
 - **Alternative**: Prefer extending **`validate-and-push`** over many new entrypoints unless
   architecture mandates a split (**`/architecture`** decides).
+
+## Discovery Notes — US-0076
+
+- **Validated gap**: **`validate-and-push`** does not read merged scratchpad for **`ALLOW_AUTO_PUSH`**
+  / **`SYNC_*`** while operators expect those flags to govern an executable push path; aligns with
+  **R-0053** and **US-0038** policy-only documentation today.
+- **Delivery shape**: Keep a **single story** slice — extend **`validate-and-push.ps1`/`.sh`** (and
+  shared logic) unless **/architecture** documents a security-driven split; preserve **PS1**/**sh**
+  parity (**AC-6**).
+- **Merge contract**: Runtime reads must follow **DEC-0055** (local > materialized baseline >
+  example) for sync and push keys; parse failures remain **fail-closed** with remediation (**AC-2**).
+- **Scheduling semantics**: For **`by_phase`** / **`by_milestone`**, the script has no implicit
+  workflow phase — **explicit invocation** (operator or CI) is the boundary signal; **Cursor** does
+  not auto-run the push script unless separately documented as an optional hook (**boundaries** in
+  backlog).
+- **QA safety**: Blocking vs safe-to-push rule is **architecture-bounded** per **AC-5** (minimum:
+  respect sprint **`qa-findings`** or equivalent when present); avoid false confidence in logs
+  (**R-0053** risks).
+- **Progression**: No open **product** decision gate before **/research**; **R-0053** is the current
+  research anchor for TL follow-on.
+
+## Intake Notes — US-0077
+
+- **Problem**: Auto-maintained documentation currently reads too technical for many users,
+  especially in README surfaces that mix operator, workflow, and engineering detail.
+- **Intent**: Add deterministic profile controls so teams can choose **audience**
+  (`user|developer|both`) and **detail depth** (`concise|balanced|technical-deep`) without
+  creating conflicting docs.
+- **Success**: Generated/updated docs match selected profile style and required sections, and
+  release-time checks can prove completeness for the selected profile.
+- **Constraints**: Preserve existing optional contracts (**US-0031** spec-pack, **US-0032**
+  user-guide, **US-0030** README/runbook parity, **US-0071** user-visible metadata hygiene).
+- **Alternative**: Keep a single README with lighter wording only; preferred path is explicit
+  audience/depth profile semantics to avoid long-term drift.
+
+## Discovery Notes — US-0077
+
+- **Profile contract**: `DOC_AUDIENCE_PROFILE` and `DOC_DETAIL_LEVEL` remain the minimal,
+  backward-compatible control pair; values must fail closed with reason codes and
+  remediation (**backlog AC-1**).
+- **Audience split model**: Prefer an explicit **dual-doc / ownership-matrix** approach
+  (README vs developer doc vs pointers into `docs/**`) over wording-only edits to a single
+  README — aligns with **R-0054** (Diataxis-style intent separation) and reduces drift
+  against optional **US-0032** guides and **US-0031** spec-pack.
+- **Bloat control**: `both` + `technical-deep` requires **bounded section budgets** and/or
+  deterministic split files so operator surfaces do not grow without limit (**R-0054**
+  risks).
+- **Validation**: Profile completeness checks must be **deterministic per profile cell**
+  (required headings/sections) and integrate with **US-0030** README/runbook/template
+  parity expectations.
+- **Hygiene**: User-visible generated text stays within **US-0071** guardrails; internal
+  planning tokens belong in engineering artifacts and comments only.
+- **Research progression**: Extend **R-0054** post-discovery with concrete artifact paths,
+  mandatory section matrix, and scoped regression strategy for the profile grid (**AC-8**).

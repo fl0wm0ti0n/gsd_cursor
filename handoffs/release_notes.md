@@ -13,41 +13,49 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0054`
-- **Latest canonical notes:** `handoffs/releases/S0054-release-notes.md`
-- **Latest release date:** 2026-03-21
-- **Latest release story:** US-0075
+- **Latest released sprint:** `S0056`
+- **Latest canonical notes:** `handoffs/releases/S0056-release-notes.md`
+- **Latest release date:** 2026-03-28
+- **Latest release story:** US-0077
 
 ## Unreleased queue visibility
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-## Release readiness note (S0054)
+## Release readiness note (S0056)
 
-- Sprint: `S0054`
-- Story: `US-0075`
+- Sprint: `S0056`
+- Story: `US-0077`
+- Release: **finalized** — queue row **`released`**; canonical notes `handoffs/releases/S0056-release-notes.md`; next **`/refresh-context`** (see `docs/engineering/state.md`).
+
+## Release readiness note (S0055)
+
+- Sprint: `S0055`
+- Story: `US-0076`
 - Verify-work: PASS
-- UAT status: PASS (`11/11`, `0` failed)
-- QA findings: PASS with no in-scope blockers (`sprints/S0054/qa-findings.md`)
+- UAT status: PASS (`10/10`, `0` failed)
+- QA findings: PASS with no in-scope blockers (`sprints/S0055/qa-findings.md`)
 - Release readiness: Finalized as `released` in `handoffs/release_queue.md`
   with canonical sprint-scoped notes.
 
 ## Latest operator summary (Run/Connect/Verify)
 
 - **Start command:** Refer to `## Run` in
-  `handoffs/releases/S0054-release-notes.md`.
+  `handoffs/releases/S0056-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0054-release-notes.md`.
+  `handoffs/releases/S0056-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0054-release-notes.md`.
+  `handoffs/releases/S0056-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0054-release-notes.md` (env-ref only).
+  `handoffs/releases/S0056-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0054-release-notes.md`.
+  `handoffs/releases/S0056-release-notes.md`.
 
 ## Historical references
 
+- `S0056`: `handoffs/releases/S0056-release-notes.md`
+- `S0055`: `handoffs/releases/S0055-release-notes.md`
 - `S0054`: `handoffs/releases/S0054-release-notes.md`
 - `S0053`: `handoffs/releases/S0053-release-notes.md`
 - `S0052`: `handoffs/releases/S0052-release-notes.md`

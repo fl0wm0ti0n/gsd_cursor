@@ -193,7 +193,14 @@ Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and n
      scan roots in `scripts/check-user-visible-metadata.py` **and** this runbook
      section together or fail closed with `METADATA_SANITIZATION_SCOPE_AMBIGUOUS`
      semantics at QA/release.
-21. Triad hot-surface enforcement (DEC-0054):
+21. Documentation profile validation (US-0077 / DEC-0059):
+   - When you change `README.md`, `docs/developer/README.md`, scratchpad profile keys
+     (`DOC_AUDIENCE_PROFILE`, `DOC_DETAIL_LEVEL`), or `scripts/doc_profile_lib.py` /
+     `scripts/validate_doc_profile.py`, run `python scripts/validate_doc_profile.py --repo <root>`.
+   - Fail closed on `DOC_PROFILE_INVALID`, `DOC_PROFILE_MERGE_ERROR`,
+     `DOC_SECTION_MISSING:*`, `DOC_SECTION_BUDGET_EXCEEDED`, or `DOC_TEMPLATE_PARITY_FAIL`
+     (see `docs/engineering/runbook.md`).
+22. Triad hot-surface enforcement (DEC-0054):
    - Before completing `/execute`, run
      `python scripts/enforce-triad-hot-surface.py --check` from repository root
      (or `--repo <root>`).

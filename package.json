@@ -1,6 +1,6 @@
 {
   "name": "its-magic",
-  "version": "0.1.2-32",
+  "version": "0.1.2-34",
   "description": "its-magic - AI dev team workflow for Cursor.",
   "license": "MIT",
   "bin": {
@@ -11,6 +11,7 @@
     "installer.ps1",
     "installer.sh",
     "installer.py",
+    "scripts/doc_profile_lib.py",
     "bin/its-magic.js",
     "bin/postinstall.js"
   ],
