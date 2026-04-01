@@ -3,6 +3,17 @@ description: "Core workflow and context pack rules"
 globs: ["**/*"]
 ---
 
+- Intake backlog/acceptance writes require **US-0078** evidence validation
+  (`scripts/intake_evidence_validate.py` / **DEC-0060**) before persistence; see
+  `.cursor/commands/intake.md`.
+- For first/new/broad intake, persistence also requires **US-0081** complete-plan
+  coverage contract validation (**DEC-0064**):
+  `plan_area_inventory` + `plan_area_coverage` + `coverage_complete=true`; fail
+  closed under `INTAKE_PERSISTENCE_BLOCKED` with deterministic plan-coverage
+  subcodes.
+- Defect intake uses **`INTAKE_WORK_ITEM_KIND=bug`** and/or **`/intake bug`**; validate bugs with
+  `scripts/bug_issue_validate.py` and run `scripts/intake_bug_routing_guard.py` before allocating
+  **`US-xxxx`** for defect-shaped prose (**US-0079** / **DEC-0061**).
 - Use the phase flow: intake -> discovery -> research -> architecture ->
   [security-review: design, if SECURITY_REVIEW=1] -> sprint plan -> plan verify
   -> execute -> [security-review: code, if SECURITY_REVIEW=1] -> QA ->

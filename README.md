@@ -360,6 +360,24 @@ Intake artifacts must persist coverage evidence fields:
 - `missing_topics`
 - `assumptions_confirmed`
 
+### Interactive intake evidence + validator (US-0078 / DEC-0060)
+
+**US-0078** closes silent persistence: every intake that mutates backlog/acceptance must pass the
+deterministic **`intake_evidence`** gate — **`topic_coverage`** with valid **`ie:`** refs,
+asked-vs-covered alignment, and **`assumption_confirmation_ref`** when assumptions are affirmative.
+
+- Run `python scripts/intake_evidence_validate.py --self-test` (also exercised via `tests/run-tests.*` §26k).
+- **Packaged installs (BUG-0001 / DEC-0063)**: the intake gate modules (`intake_evidence_validate.py`, `intake_evidence_lib.py`, `intake_bug_routing_guard.py`) ship under **`template/scripts/`** and hydrate consumer repos at **`scripts/`** (npm **`files`**, Chocolatey/Homebrew **`template/`** tree, **`installer.ps1` / `installer.sh`** + **`installer-owned-paths.manifest`**). **`--mode upgrade`** treats them as framework files (added/updated like other shipped scripts). CI parity: **`python scripts/check_intake_template_parity.py --repo .`** (`tests/run-tests.*` §26N).
+- Operator docs: **`decisions/DEC-0060.md`**, **`docs/engineering/architecture.md`** **`# US-0078`**, runbook section **Interactive intake evidence validation (US-0078 / DEC-0060)**.
+- **Guided** and **low-touch** share the **same pre-persistence validation pipeline**; low-touch does not bypass mandatory pack coverage.
+
+### Bug issues + intake routing (US-0079 / DEC-0061)
+
+Defects use **`BUG-####`** under **`docs/product/backlog.md`** **`## Bug issues (canonical)`** with **`OPEN`/`DONE`** only and minimum reproducibility fields. Intake must not silently file defect prose as **`US-xxxx`**: set merged scratchpad **`INTAKE_WORK_ITEM_KIND=bug`** and/or use **`/intake bug`**, then run **`python scripts/intake_bug_routing_guard.py --kind story --file <prose.txt>`** before story allocation when in doubt.
+
+- Validators: `python scripts/bug_issue_validate.py --self-test`; `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`.
+- Operator docs: **`decisions/DEC-0061.md`**, **`docs/engineering/architecture.md`** **`# US-0079`**, runbook **Bug issues (US-0079 / DEC-0061)**.
+
 ### Optional ID namespace bootstrap (US-0052)
 
 Fresh-project ID bootstrap behavior is explicit and default-off:
@@ -413,6 +431,20 @@ Compaction behavior:
   - `ARCH_HOT_MAX_STORY_SECTIONS` (default `120`)
   Triad hot surfaces (`state.md`, `handoffs/po_to_tl.md`,
   `docs/engineering/architecture.md`) must stay within merged scratchpad caps.
+
+### Token-cost measurement and low-cache patterns (US-0080 / DEC-0062)
+
+- Prefer **fresh subagent/chat boundaries** per `/auto` phase spawn (see `.cursor/commands/auto.md`).
+- Use explicit **`/auto start-from=<phase>`** when resuming so **`resolved_phase_plan`**
+  intersection stays deterministic (**`DEC-0052`**).
+- Select **`TOKEN_PROFILE=lean`** when compatible with your work to reduce scratchpad-driven
+  breadth; mandatory gates (**`US-0048`**, **`US-0056`**, **`US-0069`**, **`US-0039`**) stay on.
+- **Comparable** cache-read baselines require identical **`run_class_hash`**; otherwise
+  **`TOKEN_COST_RUN_CLASS_MISMATCH`** (no cross-plan gaming).
+- Committed metrics: **`handoffs/token_cost_runs/<orchestrator_run_id>.md`**; link from
+  **`docs/engineering/state.md`** via **`token_cost_evidence_ref`**.
+- Tooling: **`scripts/token_cost_lib.py`**, **`scripts/token_cost_compare.py`**,
+  **`python scripts/check_token_cost_parity.py --repo .`**.
   Use `python scripts/enforce-triad-hot-surface.py --check` before completing a
   phase that mutates them; use `--rollover` to archive oldest material into
   deterministic packs when over cap (DEC-0054).

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "auto-20260401-US0083-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Intake should remain context-aware, and when users explicitly delegate unresolved decisions, persistence should proceed without repetitive hard blocks.",
+      "intake_run_id": "auto-20260401-US0083-intake",
+      "turn_index": 0,
+      "ref": "ie:auto-20260401-US0083-intake:0:bd16cec251d5b1f1"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": ".cursor/commands/intake.md, .cursor/agents/po.mdc, scripts/intake_evidence_lib.py, scripts/intake_evidence_validate.py, docs/product/backlog.md, handoffs/po_to_tl.md, and handoffs/resume_brief.md.",
+      "intake_run_id": "auto-20260401-US0083-intake",
+      "turn_index": 1,
+      "ref": "ie:auto-20260401-US0083-intake:1:28c8f795079c4205"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Keep US-0068 and US-0078 fail-closed guarantees for non-delegated required topics; delegation must be explicit, evidence-bound, and auditable.",
+      "intake_run_id": "auto-20260401-US0083-intake",
+      "turn_index": 2,
+      "ref": "ie:auto-20260401-US0083-intake:2:83933d918cf0c9c9"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add/maintain regression coverage for delegated pass path, non-delegated missing-topic block path, and deterministic diagnostics with active/template parity.",
+      "intake_run_id": "auto-20260401-US0083-intake",
+      "turn_index": 3,
+      "ref": "ie:auto-20260401-US0083-intake:3:d4fff88f5a7025eb"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Done when explicit user delegation can satisfy unresolved intake topics with recorded evidence, while non-delegated gaps still fail closed with deterministic remediation.",
+      "intake_run_id": "auto-20260401-US0083-intake",
+      "turn_index": 4,
+      "ref": "ie:auto-20260401-US0083-intake:4:f3867519057eaac7"
+    }
+  ]
+}

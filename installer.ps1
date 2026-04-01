@@ -405,6 +405,24 @@ function Invoke-ScratchpadPostinstall {
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
+function Invoke-InstallCompletenessValidation {
+  param(
+    [string]$TargetRoot
+  )
+  $installerPy = Join-Path $scriptDir "installer.py"
+  if (-not (Test-Path $installerPy -PathType Leaf)) {
+    Write-Host "[INSTALL_COMPLETENESS_FAILED] installer.py missing next to installer.ps1."
+    exit 1
+  }
+  $py = Get-Command python -ErrorAction SilentlyContinue
+  if (-not $py) {
+    Write-Host "[INSTALL_COMPLETENESS_FAILED] PYTHON_NOT_FOUND: Python is required for deterministic installer completeness validation."
+    exit 1
+  }
+  & python $installerPy --validate-install-completeness --target $TargetRoot
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+
 function Show-ItsMagicBanner([switch]$IncludeInstallMessage) {
   $prev = [Console]::OutputEncoding
   [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -643,6 +661,7 @@ if ($mode -eq "upgrade") {
   }
 
   Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode "upgrade"
+  Invoke-InstallCompletenessValidation -TargetRoot $targetRoot
 
   Write-InstalledVersion $targetRoot $appVersion
   Sync-RootReadmeToItsMagic $targetRoot | Out-Null
@@ -724,6 +743,7 @@ foreach ($rel in $files) {
 }
 
 Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode $mode
+Invoke-InstallCompletenessValidation -TargetRoot $targetRoot
 
 Write-InstalledVersion $targetRoot $appVersion
 Sync-RootReadmeToItsMagic $targetRoot | Out-Null

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "manual-20260331-US0082-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Agents should have a reliable codebase map available without requiring the user to remember a separate manual map-codebase step in fresh repos.",
+      "intake_run_id": "manual-20260331-US0082-intake",
+      "turn_index": 0,
+      "ref": "ie:manual-20260331-US0082-intake:0:f014b8cea3c67745"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": ".cursor/commands/map-codebase.md, phase command policies (intake/discovery/execute), docs/engineering/codebase-map.md ownership, and active/template parity surfaces.",
+      "intake_run_id": "manual-20260331-US0082-intake",
+      "turn_index": 1,
+      "ref": "ie:manual-20260331-US0082-intake:1:3ae6a7bf8dd02e9a"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Keep map generation deterministic and bounded to avoid noisy rewrites; preserve manual map-codebase command while adding optional/automatic bootstrap behavior; avoid violating artifact ownership contracts.",
+      "intake_run_id": "manual-20260331-US0082-intake",
+      "turn_index": 2,
+      "ref": "ie:manual-20260331-US0082-intake:2:3206c9e3d72c1825"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add regression tests proving codebase-map.md exists for fresh lifecycle runs and remains valid/idempotent on reruns; verify active/template parity and no unexpected ownership violations.",
+      "intake_run_id": "manual-20260331-US0082-intake",
+      "turn_index": 3,
+      "ref": "ie:manual-20260331-US0082-intake:3:c44e7abbbf13e929"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Done when there is a deterministic workflow path where TL or Dev creates/refreshes codebase-map for fresh repos, documented and regression-guarded, without requiring user guesswork.",
+      "intake_run_id": "manual-20260331-US0082-intake",
+      "turn_index": 4,
+      "ref": "ie:manual-20260331-US0082-intake:4:8a726eb4e7c7c4bd"
+    }
+  ]
+}

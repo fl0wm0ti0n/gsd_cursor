@@ -1,0 +1,106 @@
+{
+  "sprint_id": "S0063",
+  "bug_ids": ["BUG-0003"],
+  "orchestrator_run_id": "auto-20260331-03",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Manifest-authoritative required inventory contract is explicit and enforced from installer-owned manifest.",
+      "result": "pass",
+      "notes": "PASS: active and template `installer-owned-paths.manifest` include `[required_install_script_paths]`; validator path uses this contract."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Triad hot-surface script is included in install scope with paired clean ownership.",
+      "result": "pass",
+      "notes": "PASS: `scripts/enforce-triad-hot-surface.py` is present in install + clean sections (active/template) and mirrored at `template/scripts/`."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Missing and upgrade mode semantics remain unchanged; completeness gate is post-install only.",
+      "result": "pass",
+      "notes": "PASS: execute and QA evidence confirm `missing`/`upgrade` flows remain intact with post-install completeness validation."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Post-install completeness check verifies all required manifest script paths exist.",
+      "result": "pass",
+      "notes": "PASS: `python installer.py --validate-install-completeness --target .` completes successfully."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Missing required scripts fail closed with deterministic reason codes.",
+      "result": "pass",
+      "notes": "PASS: targeted negative-path fixtures validate `INSTALL_COMPLETENESS_FAILED` and `INSTALL_REQUIRED_SCRIPT_MISSING:scripts/enforce-triad-hot-surface.py`."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Diagnostics include actionable remediation tied to manifest parity and rerun guidance.",
+      "result": "pass",
+      "notes": "PASS: remediation guidance documented in active/template runbooks and exercised by completeness contract validation."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Parity-safe implementation keeps one contract surface across Python and wrapper installers.",
+      "result": "pass",
+      "notes": "PASS: wrapper spot-check shows `installer.ps1`/`installer.sh` delegate to `installer.py --validate-install-completeness`."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Positive matrix covers both missing and upgrade with required scripts present.",
+      "result": "pass",
+      "notes": "PASS: `python tests/installer_completeness_bug0003_test.py` runs 3 tests and covers positive `missing`/`upgrade` paths."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Negative/parity matrix covers required-script omission and active/template parity.",
+      "result": "pass",
+      "notes": "PASS: targeted tests validate staged omission diagnostics and manifest parity assertions."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Install/clean symmetry for required paths remains validated and traceable.",
+      "result": "pass",
+      "notes": "PASS: installer completeness fixtures include install/clean symmetry checks for required script ownership."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0063/qa-findings.md",
+    "sprints/S0063/summary.md",
+    "sprints/S0063/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "handoffs/qa_to_verify_work.md",
+    "tests/installer_completeness_bug0003_test.py",
+    "tests/run-tests.ps1",
+    "tests/report.md",
+    "installer.py",
+    "installer.ps1",
+    "installer.sh",
+    "docs/engineering/context/installer-owned-paths.manifest",
+    "template/docs/engineering/context/installer-owned-paths.manifest",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "handoffs/release_queue.md",
+    "handoffs/resume_brief.md",
+    "docs/engineering/state.md"
+  ],
+  "closure": {
+    "verify_work_at": "2026-03-31T22:11:46Z",
+    "runtime_proof_id": "rp-auto-20260331-03-verify-work-qa-2026-03-31T221146Z-S0063-BUG0003"
+  }
+}

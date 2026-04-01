@@ -1,0 +1,103 @@
+{
+  "sprint_id": "S0058",
+  "story_ids": [
+    "US-0079"
+  ],
+  "orchestrator_run_id": "auto-20260329-01",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Dedicated bug issue id `BUG-xxxx` distinct from `US-xxxx`; canonical `## Bug issues (canonical)` storage; deterministic allocator (`bug_issue_validate.py --print-next-id`).",
+      "result": "pass",
+      "notes": "PASS per sprints/S0058/qa-findings.md AC-1; DEC-0061."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Intake routes bug reports via `INTAKE_WORK_ITEM_KIND` and/or `/intake bug`; fail-closed `INTAKE_BUG_ROUTING_REQUIRED`; no silent US allocation.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; intake_bug_routing_guard.py + intake.md."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Bug lifecycle literals `OPEN`/`DONE` only; invalid status rejected (`BUG_VALIDATION_STATUS_INVALID` family).",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Minimum reproducibility fields + non-empty evidence_refs; deterministic `BUG_VALIDATION_*` / reconcile codes.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; bug_issue_validate.py."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Sprint tasks/summary preserve `BUG-xxxx` traceability without US conversion.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "QA/UAT/release-style artifacts document `BUG-xxxx` alongside `US-xxxx` where applicable (US-0042 style).",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; this uat.json / uat.md."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "`--check-acceptance` reconciles bug family vs `## Bug acceptance (canonical)`; US-only reconciliation preserved.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "`/ask` narrow-read includes `BUG-####` under canonical bug region.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; ask.md."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Active + `template/` parity for commands, rules, runbook, README introducing bug workflow.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Traceability: DEC-0061, architecture.md # US-0079, decisions.md index — policy closure.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0058/qa-findings.md",
+    "sprints/S0058/summary.md",
+    "sprints/S0058/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0061.md",
+    "scripts/bug_issue_lib.py",
+    "scripts/bug_issue_validate.py",
+    "scripts/intake_bug_routing_guard.py",
+    "tests/bug_issue_fixtures_test.py",
+    ".cursor/commands/intake.md",
+    ".cursor/commands/ask.md",
+    "docs/engineering/architecture.md",
+    "docs/engineering/decisions.md",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "tests/run-tests.ps1",
+    "tests/run-tests.sh"
+  ]
+}

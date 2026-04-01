@@ -733,3 +733,169 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   planning tokens belong in engineering artifacts and comments only.
 - **Research progression**: Extend **R-0054** post-discovery with concrete artifact paths,
   mandatory section matrix, and scoped regression strategy for the profile grid (**AC-8**).
+
+## Intake Notes — US-0078
+
+- **Problem**: Intake can report question-pack completion and `assumptions_confirmed` without
+  explicit in-session questioning/confirmation evidence, reducing trust in **US-0068** fail-closed guarantees.
+- **Intent**: Require verifiable interaction evidence before persistence for mandatory question
+  packs; otherwise fail closed with deterministic reason codes and remediation prompts.
+- **Success**: Intake persists only when required topic coverage and any assumption confirmations
+  are evidence-backed and auditable.
+- **Constraints**: Preserve guided/low-touch behavior patterns while enforcing **US-0068**,
+  **US-0051**, and **US-0059** contracts.
+- **Alternative**: Keep policy-only declarations with no runtime evidence checks; rejected as non-verifiable.
+
+## Discovery Notes — US-0078
+
+- **Evidence contract**: Persistence must require a deterministic **per-required-topic** evidence pointer
+  (`answer_ref` / equivalent) or an **explicit assumption-confirmation ref**; missing coverage fails closed
+  per **`INTAKE_REQUIRED_TOPIC_MISSING`** / **`INTAKE_REQUIRED_PACK_INCOMPLETE`** — aligns with **`R-0055`**.
+- **Assumption integrity**: **`assumptions_confirmed=yes`** (or equivalent) is invalid without in-session
+  confirmation evidence; otherwise **`INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`** — extends **`US-0068`** /
+  **`DEC-0050`** with verifiable semantics.
+- **Artifact fields**: Persisted intake output should distinguish **`asked_topics`** from
+  **`answered_topics`** (or parallel evidence) so audits can see questioning vs satisfied coverage
+  (**backlog AC-4**).
+- **Mode parity**: **Guided** mode keeps bounded prompts but cannot auto-satisfy required topics without
+  evidence-backed assumptions; **low-touch** (`INTAKE_GUIDED_MODE=0`) stays lightweight yet still blocks
+  persistence when mandatory pack coverage is unproven (**backlog AC-5 / AC-6**).
+- **Research progression**: Finalize interaction-event / parser contract, exact field literals, and **AC-8**
+  regression matrix in **`R-0055`** (or successor amendment) before **`/architecture`** locks **DEC**
+  intake-evidence model.
+
+## Intake Notes — US-0079
+
+- **Problem**: Bug reports are currently handled like normal user stories, which mixes defect
+  fixing with feature intent and weakens bug-focused traceability.
+- **Intent**: Add a first-class bug issue workflow distinct from user stories while keeping
+  lifecycle simple (`OPEN`/`DONE`) as requested.
+- **Success**: Intake routes bug reports into bug issues with reproducible fields and consistent
+  links through sprint, QA, verify-work, and release artifacts.
+- **Constraints**: Follow lightweight policy — no mandatory severity/SLA/triage states; preserve
+  existing US workflow and status reconciliation behavior.
+- **Alternative**: Keep all bug reports as `US-xxxx`; rejected due domain mismatch between defects
+  and feature stories.
+- **Intake gate (2026-03-29, PO, `orchestrator_run_id=auto-20260329-01`)**: **`small-intake-pack`**
+  evidence validated (**`handoffs/intake_evidence/US-0079-intake-20260329.json`**, **`DEC-0060`**
+  **`ie:`** refs); **`/discovery`** complete **`2026-03-29`**; next workflow phase **`/research`**.
+
+## Discovery Notes — US-0079
+
+- **Entity split**: Defects are tracked as **`BUG-xxxx`**, not **`US-xxxx`**, with the same artifact-first discipline; feature stories and bug issues remain distinct for traceability and reconciliation.
+- **Lifecycle**: **`OPEN`** and **`DONE`** only — optional labels or narrative severity may appear as text, but no mandatory triage state machine.
+- **Storage preference (discovery)**: Keep canonical bug status alongside story status in **`docs/product/backlog.md`** under an explicit bug region unless file growth forces a split (**architecture** confirms).
+- **Routing**: Intake or a dedicated path must **classify** bug vs feature before persistence so defects do not default into story intake.
+- **Minimum fields**: Environment/context, steps, expected, actual, and evidence refs are required for actionable bugs (**R-0056**).
+- **Safety**: Extend **`US-0045`** reconciliation and **`/ask`** retrieval to both ID families without weakening existing US semantics; document duplicate-tracking guardrails in **DEC** (**AC-10**).
+
+## Research Notes — US-0079
+
+- **Design direction**: First-class **`BUG-####`** with **`OPEN`/`DONE`** only; canonical **`## Bug issues (canonical)`** in **`docs/product/backlog.md`** unless architecture triggers file split (**`R-0056`**).
+- **Routing**: Explicit bug work-item kind (command and/or scratchpad key per **DEC**) — defects must not default into **`US-xxxx`** without operator signal.
+- **Validation**: Minimum fields **environment**, **steps_to_reproduce**, **expected**, **actual**, **evidence_refs**; Tier A–D tests in **`R-0056`** map to **AC-1..AC-10**.
+- **Next**: **`/architecture`** locks **DEC**, allocator, reconciliation, and validator hooks.
+
+## Architecture Notes — US-0079
+
+- **Normative lock**: **`DEC-0061`** + **`architecture.md`** **`# US-0079`** — scratchpad **`INTAKE_WORK_ITEM_KIND`** (`story`|`bug`) and/or **`/intake bug`**; **`INTAKE_BUG_ROUTING_REQUIRED`** / mismatch family when defect prose lacks bug signal; **`## Bug acceptance (canonical)`** in **`docs/product/acceptance.md`**; optional **`bug_ids`** CSV on **`state.md`** phase boundaries when bugs mutate (**US-0070** visibility).
+- **Next**: **`/sprint-plan`** maps **AC-1..AC-10** to tasks under **`DEC-0061`** / **`R-0056`**.
+
+## Intake Notes — US-0080
+
+- **Problem**: Orchestrated runs can accumulate very high `cache read` token volume versus input/output,
+  especially in long chats with repeated large command prefixes.
+- **Intent**: Harden token-cost behavior with measurable targets by slimming repeated command/context
+  payloads while preserving all mandatory quality/safety gates.
+- **Success**: Comparable `/auto` runs show a measurable cache-read reduction target (50% goal) with
+  no regressions in phase contracts and release gates.
+- **Constraints**: Keep US-0048/US-0056/US-0069/US-0039 enforcement intact; no quality gate removal.
+- **Alternative**: Rely only on `TOKEN_PROFILE=lean` without structural slimming; rejected as insufficient.
+- **Intake closure (2026-03-29, PO, orchestrator_run_id=auto-20260329-02)**: **`small-intake-pack`** evidence validated (**`handoffs/intake_evidence/US-0080-intake-20260329.json`**, **`DEC-0060`** **`ie:`** refs); next workflow phase **`/discovery`**.
+
+## Discovery Notes — US-0080
+
+- **Validated drivers**: Cache-read volume scales with **prefix size × call count** in long threads; structural slimming and **bounded phase-context surfaces** are the primary levers (**`R-0057`**).
+- **Constraints**: Preserve isolation, strict-proof, role/phase, and release contracts — token savings cannot bypass **`US-0048`**, **`US-0056`**, **`US-0069`**, **`US-0039`**.
+- **Research handoff**: Lock **comparable-run** definition (story class / profile / phase plan) for AC-1/AC-2; decide auditable **evidence channel** for per-run token metrics; enumerate **command + template** touchpoints for AC-3/AC-9.
+- **Discovery closure (2026-03-29, PO, orchestrator_run_id=auto-20260329-02)**: Discovery complete; next workflow phase **`/research`**.
+
+## Research Notes — US-0080
+
+- **Vendor alignment**: Prompt caching cost drivers match **prefix × calls**; usage reporting separates
+  cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source).
+- **Comparable runs**: Compare only within the same declared **run-class tuple** (story, **`TOKEN_PROFILE`**,
+  **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) — hash for baseline stability.
+- **Evidence**: Prefer committed **append-only** run metric files + **`state.md`** pointer; IDE usage as
+  secondary.
+- **Parity**: Slimming must cover **active + `template/`** command/rule surfaces with CI-enforced lists.
+- **Research closure (2026-03-30, tech-lead, orchestrator_run_id=auto-20260329-02)**: Research complete;
+  **`/architecture`** satisfied **2026-03-29** — **`DEC-0062`** / **`# US-0080`** (**`R-0057`**).
+
+## Architecture Notes — US-0080
+
+- **Normative lock**: **`DEC-0062`** + **`docs/engineering/architecture.md`** **`# US-0080`** — metric literals
+  (**`cache_read_tokens`**, **`input_tokens`**, **`output_tokens`**, **`phase_call_count`**, optional
+  **`cache_creation_tokens`**), **`run_class_hash`** for comparable runs, append-only
+  **`handoffs/token_cost_runs/`** + **`token_cost_evidence_ref`**, parity manifest for slimmed surfaces,
+  AC-10 trade-offs; gates **`US-0048`**, **`US-0056`**, **`US-0069`**, **`US-0039`** non-negotiable.
+- **Architecture closure (2026-03-29, tech-lead, orchestrator_run_id=auto-20260329-02)**: Architecture
+  complete; next workflow phase **`/sprint-plan`**.
+
+## Intake Notes — US-0081
+
+- **Problem**: A broad first intake can still end as one narrow story, leaving parts of the original full software plan uncovered.
+- **Intent**: Require complete plan-area coverage mapping at first broad intake persistence (mapped to stories or explicitly deferred with rationale).
+- **Success**: First broad intake outputs a complete story map for the submitted plan while preserving phased delivery.
+- **Constraint**: Do not force all mapped stories into one sprint; this is an intake completeness contract, not execution batching.
+- **Intake closure (2026-03-31, PO, manual run)**: **`small-intake-pack`** evidence validated in
+  **`handoffs/intake_evidence/US-0081-intake-20260331.json`**; next workflow phase **`/discovery`**.
+
+## Intake notes — BUG-0001
+
+- **Defect**: Packaged **`template/scripts/`** omits **`intake_*`** modules present under repo **`scripts/`**, so installs in other repos lack mandatory **`/intake`** validator/routing tooling (**`DEC-0060`**/**`DEC-0061`** gates).
+- **Scope**: Required **install completeness** for intake-critical scripts only — not wholesale active/`template/` mirroring (**user constraint**).
+- **Evidence**: **`handoffs/intake_evidence/BUG-0001-intake-20260330.json`** (**`small-intake-pack`**, **`[INTAKE_EVIDENCE_VALIDATION_OK]`**); research **`R-0058`** (npm **`files`**/`template/` tarball semantics).
+- **Intake closure (2026-03-30, PO, `orchestrator_run_id=manual-20260330-BUG0001`)**: Canonical **`BUG-0001`** filed; next workflow phase **`/discovery`** (TL).
+- **Discovery closure (2026-03-30, PO, `orchestrator_run_id=auto-20260330-01`)**: Confirmed **`template/scripts/`** has eight non-intake modules vs three **`scripts/intake_*.py`**; **`package.json`** **`files`** ships **`template/`** + **`scripts/doc_profile_lib.py`** only — **`BUG-0001`** **OPEN**; next **`/research`** (TL).
+- **Research closure (2026-03-30, TL, `orchestrator_run_id=auto-20260330-01`)**: **`R-0058`** extended — minimal copy set = three **`intake_*`** files; installers hydrate from **`template/`** only; parity across npm/Choco/Brew ties to **`template/`** tree. **`BUG-0001`** **OPEN**; next **`/architecture`** (TL) — see **`docs/engineering/state.md`** **Research checkpoint (2026-03-30) — BUG-0001 / auto-20260330-01**.
+- **Architecture closure (2026-03-30, TL, `orchestrator_run_id=auto-20260330-01`)**: **`DEC-0063`** + **`architecture.md`** **`# BUG-0001`** — minimal **`template/scripts/`** mirror, **`files`** policy, parity tests, **`US-0018`**. **`BUG-0001`** **OPEN**; next **`/sprint-plan`** (TL) — see **`docs/engineering/state.md`** **Architecture checkpoint (2026-03-30) — BUG-0001 / auto-20260330-01**.
+- **Sprint-plan closure (2026-03-30, TL, `orchestrator_run_id=auto-20260330-01`)**: Sprint **`S0060`** materialized (**`sprints/S0060/*`**); **`BUG-0001`** **OPEN**; next **`/plan-verify`** — see **`docs/engineering/state.md`** **Sprint-plan checkpoint (2026-03-30) — BUG-0001 / S0060 / auto-20260330-01**.
+
+## Intake notes — BUG-0002
+
+- **Reclassification**: Initial report captured as defect-shaped, later clarified as expectation mismatch (manual command vs desired automatic map availability).
+- **Closure**: `BUG-0002` is closed as workflow expectation mismatch and linked to enhancement story **`US-0082`**.
+
+## Intake Notes — US-0082
+
+- **Problem**: Agents in fresh repos may miss codebase context because `codebase-map.md` generation relies on an explicit manual `/map-codebase` step.
+- **Intent**: Add deterministic TL/Dev (or equivalent) ownership so codebase map is reliably created/refreshed for agent context without user guesswork.
+- **Success**: Fresh lifecycle path guarantees `docs/engineering/codebase-map.md` exists (or deterministic diagnostics explain why not), while manual `/map-codebase` remains valid.
+- **Constraint**: Keep map generation idempotent and ownership-safe; maintain active/template parity and avoid noisy rewrites.
+- **Intake closure (2026-03-31, PO, manual run)**: **`small-intake-pack`** evidence validated in
+  **`handoffs/intake_evidence/US-0082-intake-20260331.json`**; next workflow phase **`/discovery`**.
+- **Orchestrated intake closure (2026-03-31, PO, `orchestrator_run_id=auto-20260331-02`)**: Reaffirms the same evidence bundle; backlog **OPEN** unchanged (**US-0045**); next **`/discovery`**.
+
+## Intake Notes — US-0083
+
+- **Problem**: Intake questions can feel rigid/repetitive and often block on missing fields even when the user prefers to delegate unclear decisions.
+- **Intent**: Keep context-aware clarification and safety challenge behavior, but allow explicit user delegation for unresolved topics.
+- **Success**: Intake can proceed without hard blocking when user explicitly delegates, while non-delegated missing required topics still fail closed.
+- **Constraint**: Delegation must be explicit and evidence-bound; no silent assumption bypass.
+- **Intake closure (2026-03-31, PO, manual run)**: **`small-intake-pack`** evidence validated in
+  **`handoffs/intake_evidence/US-0083-intake-20260331.json`**; next workflow phase **`/discovery`**.
+
+## Discovery Notes — US-0083
+
+- **Discovery closure (2026-03-31T22:46:01Z, PO, `orchestrator_run_id=auto-20260331-04`)**: Delegation remains opt-in and topic-scoped; unresolved required topics without explicit delegation remain fail-closed.
+- **Research asks**: finalize deterministic delegated-topic evidence shape (`ie:`-compatible refs + rationale/confidence), validator branching semantics for delegated vs non-delegated unresolved topics, and guided/low-touch parity diagnostics.
+- **Status authority**: backlog remains canonical; **`US-0083`** stays **OPEN** (**US-0045**).
+
+## Intake notes — BUG-0003
+
+- **Defect**: Missing scripts still occur after install/upgrade with modes `missing` or `upgrade`.
+- **Scope**: Installer mode-specific completeness regression/gap across script payload installation.
+- **Evidence**: **`handoffs/intake_evidence/BUG-0003-intake-20260331.json`** and **`handoffs/intake_evidence/BUG-0003-intake-20260331-b.json`** (`small-intake-pack`, DEC-0060 `ie:` refs), plus installer and template script surfaces.
+- **Addendum**: user-provided concrete missing file after new-repo install: `scripts/enforce-triad-hot-surface.py`.
+- **Intake closure (2026-03-31, PO, manual run)**: Canonical **`BUG-0003`** filed; next workflow phase **`/discovery`** (TL).

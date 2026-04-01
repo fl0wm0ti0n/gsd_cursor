@@ -1,467 +1,3 @@
-## Research Addendum — US-0077
-
-> Placement: prepended; triad **`--rollover`** may archive this block to `handoffs/archive/`.
-> `orchestrator_run_id=auto-20260327-02`.
-
-- **Closure**: **`/research`** (TL) complete for **`US-0077`**; **`R-0054`** extended with **9-cell
-  semantic-key matrix**, **artifact ownership** + **README H2 budgets**, and **deterministic
-  validation strategy** (scratchpad merge inputs, completeness scan, **US-0030** template parity,
-  tiered **AC-8** regression).
-- **Anchors**: **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`**; developer split recommended for
-  `both×balanced` and required for `both×technical-deep`; **US-0071** on user-visible shards.
-- **Boundaries**: **US-0031** / **US-0032** unchanged — profile coordinates README/developer depth
-  only.
-- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**, **`# US-0077`** in `architecture.md`).
-- **Decision gate before architecture**: **none** (superseded by architecture closure above).
-
----
-
-## Intake Addendum — Official Remote Config Template, Docs, and Validation
-
-### New intake
-
-User request: "Ship official `.cursor/remote.json` template + docs + validation."
-
-Confirmed context in scratchpad:
-- `REMOTE_EXECUTION` flag already exists.
-- `REMOTE_CONFIG=.cursor/remote.json` already exists.
-- Repository currently lacks an official `.cursor/remote.json` template artifact.
-
-### Overlap and duplicate evaluation
-
-- No direct duplicate found in current backlog.
-- Related but non-duplicate stories:
-  - `US-0017` template drift guard: parity governance only; does not define remote config schema or validation contract.
-  - `US-0030` release doc-delta gate: release-time docs parity check; does not define remote execution configuration behavior.
-  - `US-0028` optional security review: establishes "optional feature with zero-overhead-off mode" pattern; remote config is separate capability.
-- Decision: create a new story so remote config contract/safety requirements remain explicit and testable.
-
-### Accepted story
-
-#### US-0036 — Official Remote Config Template, Docs, and Fail-Fast Validation
-- Priority: P1
-- Status: OPEN
-- Intent: make remote execution safe and deterministic by shipping canonical config artifacts, schema guidance, and strict validation rules when enabled.
-
-### TL guidance and boundaries
-
-- In scope:
-  - Canonical `.cursor/remote.json` in active + `template/`.
-  - Documented schema/field contract and example targets.
-  - Fail-fast validation behavior for enabled mode (`REMOTE_EXECUTION=1`).
-  - Clear error-message contract and remediation hints.
-  - Security guidance: no secrets committed in repo config.
-  - README + runbook instructions, plus template parity verification.
-  - Zero-overhead behavior when `REMOTE_EXECUTION=0`.
-- Out of scope:
-  - Implementing new remote transport protocols/backends.
-  - Building external secret-management infrastructure.
-
-### Planning recommendation
-
-1. Define the remote config schema first (required/optional fields + allowed values).
-2. Implement and document validation contract second (including error text expectations).
-3. Add docs/runbook/README coverage and parity checks across active + template copies.
-4. Include negative-path QA cases (missing file, malformed JSON, invalid fields, secret-like values).
-
----
-
-## Intake Addendum — Mid-Process Full Automation Continuation
-
-### New intake
-
-User asks for a way to start full automation from mid-process:
-- pause/resume plus scratchpad `PHASE_MODE=auto` still feels step-by-step with manual prompts
-- expectation is one command that continues the remaining workflow automatically from the correct point
-
-### Overlap and duplicate evaluation
-
-- Existing overlap:
-  - `US-0023` (DONE): defines fresh subagent context per phase and `/auto` orchestration model.
-  - Existing commands `.cursor/commands/auto.md`, `.cursor/commands/resume.md`, `.cursor/commands/pause.md` describe pieces of the behavior.
-- Gap identified:
-  - No explicit `/auto` mid-process resume-point input contract (`start-from` style).
-  - No deterministic precedence contract for resume source resolution (resume brief vs state fallback) with conflict handling.
-  - No single, testable "continue remaining phases without manual phase triggers" acceptance contract.
-- Decision:
-  - Create a new focused story (`US-0037`) instead of reopening `US-0023`, so implementation scope stays concrete and regression-safe.
-
-### Accepted story
-
-#### US-0037 — Mid-Process `/auto` Continuation with Deterministic Resume Point
-- Priority: P1
-- Status: OPEN
-- Intent: make `/auto` continuation behavior explicit, deterministic, and testable while preserving current safe defaults and decision gates.
-
-### TL guidance and boundaries
-
-- In scope:
-  - Add explicit `/auto` `start-from` phase support.
-  - Define deterministic resume-source precedence (`handoffs/resume_brief.md` first, then `docs/engineering/state.md` fallback).
-  - Define safe failure behavior for missing/stale/conflicting resume inputs.
-  - Require one-command continuation through remaining phases with existing stop conditions.
-  - Add continuation breadcrumbs/logging to artifacts for inspectability.
-  - Align `/pause`, `/resume`, `/auto` semantics and keep active + `template/` parity.
-- Out of scope:
-  - Bypassing decision gates or missing-input blockers.
-  - Changing phase deliverables or introducing unrelated runtime features.
-
-### Suggested implementation order
-
-1. Define canonical phase IDs and `start-from` validation contract.
-2. Implement deterministic resume-source resolver and conflict policy.
-3. Update `/auto`, `/resume`, `/pause` docs/rules for semantic alignment.
-4. Add QA cases for explicit start, implicit resume, conflict, missing source, and stop-reason logging.
-
----
-
-## Intake Addendum — Phase-Triggered Sync + Release Gate Tightening
-
-### New intake (translated requirement intent)
-
-User asks for:
-1. Push/sync functionality triggered after completed phases.
-2. Configurable cadence defining which phase intervals trigger sync.
-3. Prefer sync only after tests and QA are complete.
-4. Automatic check-in tests should always run.
-5. Release should happen only after those checks.
-
-### Overlap and duplicate evaluation
-
-- No direct duplicate found in backlog.
-- Related but non-duplicate stories:
-  - `US-0014` quality chain: establishes local validate-and-push and CI layering, but not phase-trigger policy semantics.
-  - `US-0030` release doc-delta gate: release-time documentation parity, not test/QA gate ordering.
-  - `US-0037` auto continuation: orchestration resume behavior, not sync/push policy.
-- Current workflow/script observations:
-  - `scripts/validate-and-push.ps1` and `scripts/validate-and-push.sh` already enforce check-before-push in manual invocation flow.
-  - `/qa` currently suggests validate-and-push before pushing, but does not enforce phase-trigger policy.
-  - `/release` currently has UAT readiness gate, but no explicit mandatory check-in test + QA gate ordering contract.
-
-### Split decision
-
-- Decision: split into **two stories**.
-- Rationale:
-  - Sync cadence policy and guarded auto-push (`US-0038`) is phase-boundary orchestration behavior.
-  - Release gate tightening (`US-0039`) is a final-stage blocking policy with deterministic evidence requirements.
-  - Splitting avoids ambiguous acceptance tests and keeps safety gates independently verifiable.
-
-### Accepted stories
-
-#### US-0038 — Phase-Triggered Sync Policy with Guarded Auto-Push
-- Priority: P1
-- Status: OPEN
-- Intent: configurable sync cadence with default-off safety, mandatory test checks, and no auto-push before QA pass for feature work.
-
-#### US-0039 — Release Gate Tightening for Check-In Tests and QA/UAT Completion
-- Priority: P1
-- Status: OPEN
-- Intent: `/release` proceeds only when check-in tests, QA, and UAT readiness gates pass in deterministic order.
-
-### TL guidance and boundaries
-
-- In scope:
-  - Canonical sync policy modes and phase-trigger eligibility contract.
-  - Mandatory `TEST_COMMAND` pre-push gate semantics with optional lint/typecheck integration.
-  - Branch safety defaults (default deny for protected/default branch auto-push, explicit opt-in required).
-  - Deterministic release gate order and evidence logging in state/handoff artifacts.
-  - Active and `template/` parity for affected commands/rules/scripts docs.
-- Out of scope:
-  - New CI platform integrations.
-  - Runtime application feature changes unrelated to workflow/release policy.
-  - Forcing a single branching model across all repos.
-
-### Recommended implementation order
-
-1. Define `US-0038` policy schema and default-safe behavior first.
-2. Implement release gate sequence (`US-0039`) using explicit evidence contracts.
-3. Align `/execute`, `/qa`, `/release`, runbook notes, and validate-and-push scripts with the same decision vocabulary.
-4. Add QA negative tests for pre-QA auto-push prevention, stale check evidence, and gate bypass attempts.
-
----
-
-## Intake Addendum — Non-Overwriting Release Notes + Unreleased Sprint Queue
-
-### New intake
-
-User confirmed implementation of prior release-file recommendation:
-1. Avoid overwriting single `handoffs/release_notes.md`.
-2. Track unreleased sprints explicitly.
-
-### Overlap and duplicate evaluation
-
-- No direct duplicate found in backlog.
-- Closest related stories:
-  - `US-0038`: sync-policy evidence and push cadence semantics.
-  - `US-0039`: release gate ordering and readiness blocking.
-- Assessment: related but non-duplicate.
-  - Existing stories govern gating and readiness criteria.
-  - New request governs release artifact lifecycle/history preservation and queue visibility.
-- Decision: create a new focused story to keep lifecycle/migration requirements testable.
-
-### Accepted story
-
-#### US-0040 — Per-Sprint Release Notes and Release Queue Tracker
-- Priority: P1
-- Status: OPEN
-- Intent: preserve release history by sprint and provide deterministic queue state for unreleased/released sprint tracking.
-
-### TL guidance and boundaries
-
-- In scope:
-  - Canonical per-sprint release note artifact path and naming contract.
-  - Canonical release queue artifact with deterministic state transitions (`unreleased` -> `released`).
-  - Safe migration/backfill behavior for existing `handoffs/release_notes.md`.
-  - Backward compatibility behavior for workflows still reading `handoffs/release_notes.md`.
-  - Command/rule/doc updates plus active/template parity checks.
-- Out of scope:
-  - Runtime deployment pipeline changes.
-  - External release-management platform integration.
-  - Redefining QA/UAT evidence model.
-
-### Planning recommendation
-
-1. Define canonical artifact contracts first (per-sprint notes + queue schema + ownership).
-2. Define migration/backfill semantics second (resolvable sprint vs unresolved legacy content).
-3. Update release command/rules/docs with deterministic transitions and fail-safe behavior.
-4. Add QA coverage for overwrite prevention, unresolved sprint context, migration path, and parity checks.
-
----
-
-## Intake Addendum — Lifecycle QA Expansion for Installer + CLI
-
-### New intake
-
-User requests deeper live QA for installation lifecycle behavior, including:
-- install/update flows via `its-magic` command
-- overwrite + backup behavior
-- clean-repo safety (no accidental deletion of non-framework files)
-- parity across PowerShell/shell/CI paths
-
-### Overlap and duplicate evaluation
-
-- Existing overlap:
-  - `US-0008` (CLI installer) provides feature implementation.
-  - current tests provide baseline install/upgrade checks.
-- Gap identified:
-  - missing full end-to-end lifecycle verification for clean-repo safety,
-    CLI/direct-installer parity, and negative-path fail-fast behavior.
-- Decision:
-  - create focused QA expansion story `US-0041` (already added to backlog) to
-    avoid mixing feature semantics with test-hardening scope.
-
-### Accepted story
-
-#### US-0041 — End-to-End Lifecycle QA for `its-magic` Install/Upgrade/Clean
-- Priority: P1
-- Status: OPEN
-- Intent: increase release confidence with deterministic lifecycle coverage for
-  install, overwrite+backup, upgrade, clean-repo safety, and invalid-argument paths.
-
-### TL guidance and boundaries
-
-- In scope:
-  - lifecycle E2E test matrix for installer and CLI invocation paths
-  - temp-dir isolation/idempotency guarantees in test scripts
-  - platform parity subset in CI (`npm-test`, `brew-test`, `choco-test`)
-  - README/runbook lifecycle QA documentation updates
-- Out of scope:
-  - redesigning installer behavior
-  - introducing new installer modes or runtime deployment changes
-
----
-
-## Intake Addendum — Post-QA Release Findings Workflow
-
-### New intake
-
-User requested an official workflow for issues found after QA at release gates,
-with documentation symmetry to QA findings.
-
-### Accepted story
-
-#### US-0042 — Release Findings Artifact and Post-QA Issue Workflow
-- Priority: P1
-- Status: DONE
-- Intent: ensure post-QA release issues are captured deterministically in a
-  dedicated artifact + handoff path.
-
----
-
-## Intake Addendum — Backlog Reconciliation After Release
-
-### New intake
-
-User reports repeated drift: sprint/release artifacts show completion while
-`docs/product/backlog.md` still shows story status/ACs as incomplete.
-
-Primary requirement:
-- this mismatch must be solved structurally and must not happen again.
-
-### Overlap and duplicate evaluation
-
-- Related stories:
-  - `US-0025` (backlog-to-sprint traceability): defines linkage/index behavior.
-  - `US-0024` (memory drift audit): read-only detection/reporting.
-  - `US-0040`/`US-0042`: release queue + release findings artifacts.
-- Assessment:
-  - No direct duplicate for **enforced post-release backlog reconciliation**.
-  - Existing items either provide traceability or audit visibility, but do not
-    enforce deterministic backlog mutation/fail-safe behavior at release boundary.
-- Decision:
-  - Create a focused story `US-0043` to make this invariant explicit and testable.
-
-### Accepted story
-
-#### US-0043 — Backlog Reconciliation Gate for Released Sprints
-- Priority: P1
-- Status: OPEN
-- Intent: prevent recurrence of release/backlog contradiction by enforcing
-  deterministic reconciliation or fail-safe blocking with explicit reason code.
-
-### TL guidance and boundaries
-
-- In scope:
-  - Define canonical evidence precedence for reconciliation.
-  - Add deterministic release-boundary reconciliation step.
-  - Add fail-safe reason code and remediation contract for drift.
-  - Add regression tests for positive and negative reconciliation paths.
-  - Keep active/template command/rule/docs behavior aligned.
-- Out of scope:
-  - Replacing story ownership semantics.
-  - Reworking sprint lifecycle phases.
-  - Runtime product feature changes unrelated to workflow integrity.
-
-### Planning recommendation
-
-1. Define a single source-of-truth precedence for completion evidence.
-2. Wire reconciliation at `/release` finalize boundary (or explicit
-   post-release reconciliation step with equivalent guarantees).
-3. Add deterministic reason-code/error output for contradictory states.
-4. Add tests covering stale backlog after release and successful auto-reconcile.
-
----
-
-## Intake Addendum — US-0015 Completion Clarification
-
-### Context
-
-`US-0015` already exists in backlog and does not require a new intake story.
-The required work is execution completion: make the optional empty runbook
-commands explicitly documented as intentional and regression-protected.
-
-### Scope confirmation
-
-- Keep optional command keys blank by default for this template repo.
-- Document this intent clearly in runbook and README (active + template).
-- Add regression checks so intent does not regress.
-
-### Discovery notes
-
-- Primary references reviewed for reconciliation patterns:
-  - Evidence-first release readiness/checklist approaches (quality-gate style).
-  - Status synchronization patterns where checklist completeness drives state
-    transition, but only when deterministic evidence is present.
-- Discovery conclusion:
-  - Keep scope process/workflow-level and deterministic.
-  - Prefer canonical evidence precedence + fail-safe drift reason codes over
-    permissive auto-correction.
-
----
-
-## Intake Addendum — Continuous `/auto` Backlog-Drain Mode
-
-### New intake
-
-User requests that once plans and stories are already defined, `/auto` should
-continue working across stories until delivery completion, with configurable
-switches to fine-tune stopping behavior.
-
-### Overlap and duplicate evaluation
-
-- Related stories:
-  - `US-0037`: deterministic mid-process continuation for one flow.
-  - `US-0038`: phase-triggered sync policy and guarded push controls.
-  - `US-0043`: deterministic release/backlog reconciliation.
-- Assessment:
-  - no direct duplicate for **multi-story backlog-drain orchestration mode**.
-  - existing stories govern single-flow continuation and safety gates, but not
-    deterministic next-story selection + bounded multi-story progression.
-- External references reviewed per `R-0008`:
-  - deterministic checkpoint/replay orchestration patterns
-  - human-approval gate patterns for high-impact operations
-- Decision:
-  - create `US-0044` as a dedicated orchestration story with explicit switches.
-
-### Accepted story
-
-#### US-0044 — Continuous `/auto` Backlog-Drain Mode with Fine-Tune Switches
-- Priority: P1
-- Status: OPEN
-- Intent: allow optional unattended multi-story progress while preserving current
-  safe defaults and decision-gate controls.
-
-### TL guidance and boundaries
-
-- In scope:
-  - switch-controlled enable/disable of backlog-drain mode (default off)
-  - deterministic next-story selection policy
-  - bounded execution controls (max stories per run, stop/skip on blocked story)
-  - per-story breadcrumbs and final run summary artifacts
-  - active/template parity for command/rule/docs behavior
-- Out of scope:
-  - bypassing decision gates
-  - changing story acceptance ownership/content model
-  - runtime product behavior changes unrelated to workflow orchestration
-
----
-
-## Intake Addendum — Canonical Story Status + Global Drift Normalization
-
-### New intake
-
-User requests a durable fix for recurring status drift across
-`docs/product/backlog.md`, `docs/product/acceptance.md`, and
-`docs/engineering/state.md`, including known completed stories still marked OPEN.
-Intake objective is to make this mismatch class deterministic and non-recurring.
-
-### Overlap and duplicate evaluation
-
-- Related stories:
-  - `US-0043`: released-sprint backlog reconciliation at release boundary.
-  - `US-0044`: optional multi-story `/auto` backlog-drain orchestration.
-  - `US-0025`: backlog-to-sprint traceability contract (still OPEN).
-- Assessment:
-  - not a duplicate of `US-0043`; current scope is broader than release boundary
-    and includes historical normalization + cross-artifact status ownership.
-  - complements `US-0044`; automation breadth does not solve status authority.
-  - compatible with `US-0025`; this intake focuses status truth and drift guard.
-- Research reference:
-  - `R-0009` (canonical source + reconciliation/normalization pattern).
-- Decision:
-  - create `US-0045` as a dedicated P1 workflow integrity story.
-
-### Accepted story
-
-#### US-0045 — Canonical Story Status Source + Global Drift Guard
-- Priority: P1
-- Status: OPEN
-- Intent: establish one authoritative status source and deterministic
-  reconciliation so OPEN/DONE contradictions stop recurring in normal operation.
-
-### TL guidance and boundaries
-
-- In scope:
-  - canonical story-status ownership contract (backlog authoritative)
-  - deterministic reconciliation rules across backlog/acceptance/state
-  - one-time historical normalization with auditable output
-  - fail-safe reason-code handling for contradictory states
-  - command/rule/doc updates plus active/template parity checks
-- Out of scope:
-  - runtime application feature changes
-  - bypassing release/decision safety gates
-  - replacing sprint sizing/planning policy with unbounded batching
-
 ## Discovery Addendum — US-0045
 
 ### Discovery focus and references
@@ -798,3 +334,440 @@ User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALL
 - **Decision**: **`decisions/DEC-0059.md`** — dual README (**`USER_*`** / **`DEV_*`**), validator **`scripts/validate_doc_profile.py`**, tiered **AC-8**, **`US-0030`** parity + manifest path for **`docs/developer/README.md`**.
 - **Next**: **`/sprint-plan`**.
 - **Decision gate before sprint-plan**: **none**.
+
+---
+
+## Discovery Addendum — US-0078 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with archived **Discovery Addendum — US-0078** in **`handoffs/archive/po-to-tl-pack-20260328-b.md`**). `orchestrator_run_id=auto-20260328-01`.
+
+- **Scope**: Runtime intake question-pack **evidence** before persistence (**US-0068** / **DEC-0050**); per-topic **`answer_ref`** or explicit assumption-confirmation ref; reject unverifiable **`assumptions_confirmed`**.
+- **Conclusions**: Persist **`asked_topics`** vs answered/coverage evidence; **guided** and **low-touch** both **fail closed** without proof; extend **`R-0055`** then **DEC** for schema + migration.
+- **Next**: **`/architecture`** for **`US-0078`** (**`/research`** complete; **`R-0055`** refined).
+- **Decision gate before research** (historical): **none**.
+
+---
+
+## Research Addendum — US-0078 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0078**, archived to **`handoffs/archive/po-to-tl-pack-20260328-d.md`** on post-research triad rollover). `orchestrator_run_id=auto-20260328-01`.
+
+- **Closure**: **`/research`** (**tech-lead**) complete; **`R-0055`** — schema, rules, **AC-8** tiers.
+- **Next**: **`/architecture`** — **DEC-0050** / DEC for **`ref`** format + migration.
+- **Decision gate before architecture**: **none**.
+
+---
+
+## Architecture Addendum — US-0078 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0078**). `orchestrator_run_id=auto-20260328-01`.
+
+- **Decision**: **`decisions/DEC-0060.md`** — **`ie:`** **`ref`** binding; extends **`DEC-0050`**; grandfather migration until next intake mutation.
+- **Architecture**: **`docs/engineering/architecture.md`** **`# US-0078`**.
+- **Next**: **`/sprint-plan`**.
+- **Decision gate before sprint-plan**: **none**.
+
+---
+
+## PO → TL Handoff — US-0080 (Intake)
+
+- **Orchestrator**: **`auto-20260329-02`** — intake complete in fresh **PO** context.
+- **Evidence**: **`handoffs/intake_evidence/US-0080-intake-20260329.json`** — **`[INTAKE_EVIDENCE_VALIDATION_OK]`** (`small-intake-pack`, **`ie:`** per **DEC-0060**).
+- **Research anchor**: **`R-0057`** (current) — structural levers (command/context slimming, comparable-run measurement); **`TOKEN_PROFILE=lean`** alone insufficient.
+- **Alternatives**: **(1)** status quo pricing tolerance — rejected; **(2)** profile-only — rejected; **(3)** slimming + bounded phase-context + auditable metrics — **recommended** (aligned with backlog).
+- **Artifacts**: **`docs/product/backlog.md`** (US-0080 intake closure + topic_coverage), **`docs/product/vision.md`** (intake closure line), **`handoffs/resume_brief.md`** → **`/discovery`**, **`docs/engineering/state.md`** (isolation + strict proof + phase boundary; triad rollover **`docs/engineering/state-archive/state-pack-20260329-m.md`**).
+- **Next**: **`/discovery`** for **`US-0080`**, then **`/research`** / **`/architecture`** to lock metric definitions and **DEC** for **AC-10** trade-offs.
+- **Decision gate before discovery**: **none** (intake evidence satisfied).
+
+---
+
+## PO → TL Handoff — US-0080 (Discovery)
+
+- **Orchestrator**: **`auto-20260329-02`** — discovery complete in fresh **PO** context.
+- **Evidence**: **`docs/product/backlog.md`** (US-0080 discovery notes), **`docs/product/vision.md`** (**Discovery Notes — US-0080**), **`docs/engineering/state.md`** (Discovery checkpoint + strict proof); research anchor remains **`R-0057`** (current).
+- **Findings**: Dominant lever is **structural** — reduce repeated large command/policy prefixes and tighten **per-phase context packs** while preserving mandatory gates; **`TOKEN_PROFILE=lean`** alone insufficient.
+- **Research asks**: Deterministic **run-class/baseline** for AC-1/AC-2; **metric/evidence** placement contract; **active/template** parity list for slimmed orchestration surfaces.
+- **Risks**: Over-slimming obscuring policy; baseline drift enabling metric gaming; template divergence.
+- **Artifacts**: **`handoffs/resume_brief.md`** → **`/research`** for **`US-0080`**.
+- **Next**: **`/research`** (then **`/architecture`**) to lock metric definitions and **DEC** for **AC-10** trade-offs.
+- **Decision gate before research**: **none** (discovery satisfied).
+
+---
+
+## PO → TL Handoff — US-0080 (Research)
+
+- **Orchestrator**: **`auto-20260329-02`** — research complete in fresh **tech-lead** context.
+- **Evidence**: **`docs/engineering/research.md`** **`R-0057`** (extension + research closure line);
+  **`docs/product/backlog.md`** / **`docs/product/vision.md`** (research closure notes);
+  **`docs/engineering/state.md`** (Research checkpoint + strict proof; triad rollover
+  **`docs/engineering/state-archive/state-pack-20260329-o.md`**).
+- **Findings**: **Run-class tuple** frozen for AC-1/AC-2 comparability; **append-only in-repo metric
+  records** + **`state.md`** pointer for AC-6; **explicit parity manifest** for `.cursor/commands/`,
+  `.cursor/rules/`, `template/` mirrors (AC-3/AC-9); vendor **`cache_read_input_tokens`** semantics
+  as conceptual anchor for metric naming in upcoming **DEC**.
+- **Artifacts**: **`handoffs/resume_brief.md`** → **`/architecture`** for **`US-0080`**.
+- **Next**: **`/architecture`** to lock **`architecture.md`** story section + **DEC** for AC-10.
+- **Decision gate before architecture**: **none** (research satisfied; story **OPEN**).
+
+---
+
+## Architecture Addendum — US-0080 (tail mirror)
+
+- **Orchestrator**: **`auto-20260329-02`** — architecture complete in fresh **tech-lead** context.
+- **Evidence**: **`decisions/DEC-0062.md`**; **`docs/engineering/architecture.md`** **`# US-0080`**;
+  **`docs/engineering/decisions.md`** (context pack + **`DEC-0062`** index); **`docs/engineering/research.md`**
+  **`R-0057`** architecture closure line; **`docs/engineering/state.md`** (Architecture checkpoint + strict
+  proof; triad rollover if hot-surface enforcement runs post-append).
+- **Decision**: **`DEC-0062`** — metric fields, **`run_class_hash`**, **`handoffs/token_cost_runs/`** channel,
+  **`token_cost_evidence_ref`**, parity manifest, AC-10 trade-offs / phase boundary visibility.
+- **Artifacts**: **`docs/product/backlog.md`**, **`docs/product/vision.md`** (architecture closure),
+  **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`** → **`/sprint-plan`**.
+- **Next (historical)**: **`/sprint-plan`** — satisfied by **Sprint-plan Addendum** below.
+- **Decision gate before sprint-plan**: **none** (architecture satisfied).
+
+---
+
+## Sprint-plan Addendum — US-0080 / S0059 (tail mirror)
+
+- **Orchestrator**: **`auto-20260329-02`** — sprint-plan complete in fresh **tech-lead** context.
+- **Evidence**: **`sprints/S0059/sprint.md`**, **`sprints/S0059/tasks.md`**, **`sprints/S0059/plan-verify.json`** (**PENDING**); **`docs/engineering/state.md`** (Sprint-plan checkpoint + strict proof); **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`handoffs/qa_plan_verify.md`**.
+- **Sprint**: **`S0059`** — **T-001..T-010** ↔ **AC-1..AC-10**; governance **`DEC-0062`**, **`# US-0080`**, **`R-0057`**.
+- **Next**: **`/plan-verify`** for **`S0059`** / **`US-0080`** (story **OPEN**).
+- **Decision gate before plan-verify**: **none** (sprint artifacts materialized).
+
+---
+
+## Plan-verify Addendum — US-0080 / S0059 (tail)
+
+- **Orchestrator**: **`auto-20260329-02`** — plan-verify **PASS** in fresh **qa** context (**`2026-03-29T21:00:00Z`**).
+- **Evidence**: **`sprints/S0059/plan-verify.json`** (**PASS**); **`docs/engineering/state.md`** (plan-verify checkpoint + strict proof); **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`handoffs/qa_plan_verify.md`**.
+- **Sprint**: **`S0059`** — story **`US-0080`** **OPEN** (**US-0045**).
+- **Next**: **`/execute`** for **`S0059`** / **`US-0080`**.
+- **Decision gate before execute**: **none** (plan-verify satisfied).
+
+---
+
+## Execute Addendum — US-0080 / S0059 (tail)
+
+- **Orchestrator**: **`auto-20260329-02`** — **`/execute`** complete in fresh **dev** context (**`2026-03-29T22:15:00Z`**).
+- **Evidence**: **`sprints/S0059/summary.md`**, **`sprints/S0059/tasks.md`** (**T-001..T-010** **done**), **`handoffs/dev_to_qa.md`**, **`handoffs/token_cost_runs/auto-20260329-02.md`**, **`docs/engineering/token-cost-parity-manifest.md`**, **`docs/engineering/state.md`** (execute checkpoint + strict proof); reduced-length **`/auto`** + **`docs/engineering/auto-orchestration-reference.md`**.
+- **Governance**: **`DEC-0062`** (**§6** trade-offs), **`architecture.md`** **`# US-0080`**, **`R-0057`** — story **`OPEN`** (**US-0045**).
+- **Next**: **`/qa`** for **`S0059`** / **`US-0080`**.
+- **Decision gate before qa**: **none** (execute satisfied for dev scope).
+
+---
+
+## Discovery Addendum — US-0081
+
+- **Orchestrator**: **`auto-20260331-01`** — discovery complete in fresh **PO** context.
+- **Evidence**: **`docs/product/backlog.md`** (US-0081 discovery checkpoint note), **`docs/engineering/state.md`** (discovery checkpoint + strict proof), **`handoffs/resume_brief.md`** (resume target set to research).
+- **Findings**: First/new/broad intake must produce deterministic complete-plan accounting before persistence. Discovery defines required mapping contract for research: normalized `plan_area_inventory`; coverage binding `plan_area_id -> story_id[] | deferred_ref`; fail-closed gap handling via `INTAKE_PLAN_COVERAGE_MISSING` under `INTAKE_PERSISTENCE_BLOCKED`; bounded decomposition allowed but no silent omission of major plan areas.
+- **Research handoff scope**: finalize machine-verifiable schema fields and validator behavior, lock deterministic diagnostics/remediation text, and define parity/test matrix for active + `template/` intake surfaces.
+- **Status authority**: story remains **`OPEN`** in **`docs/product/backlog.md`** per **US-0045**.
+- **Next**: **`/research`** for **`US-0081`**.
+- **Decision gate before research**: **none** (discovery checkpoint satisfied).
+
+---
+
+## Research Addendum — US-0081 (tail)
+
+- **Orchestrator**: **`auto-20260331-01`** — research complete in fresh **tech-lead** context.
+- **Evidence**: **`docs/engineering/research.md`** (**`R-0059`**), **`docs/product/backlog.md`** (US-0081 research closure line, status still **OPEN**), **`docs/engineering/state.md`** (research checkpoint + strict proof), **`handoffs/resume_brief.md`** (resume target set to architecture).
+- **Findings**: Lock deterministic first-intake coverage gate pattern: normalize `plan_area_inventory`; require total `plan_area_id -> story_id[] | deferred_ref` coverage; fail closed on unmapped major areas with `INTAKE_PLAN_COVERAGE_MISSING` under `INTAKE_PERSISTENCE_BLOCKED`; preserve backlog status authority (US-0045). Regression scope: pass/fail/defer matrix + active/template parity checks.
+- **Next**: **`/architecture`** for **`US-0081`**.
+- **Decision gate before architecture**: **none** (research checkpoint satisfied; story remains **OPEN**).
+
+---
+
+## Architecture Addendum — US-0081 (tail)
+
+- **Orchestrator**: **`auto-20260331-01`** — architecture complete in fresh **tech-lead** context.
+- **Evidence**: **`decisions/DEC-0064.md`**; **`docs/engineering/architecture.md`** **`# US-0081`**; **`docs/product/backlog.md`** (`architecture_notes`, status still **OPEN**); **`docs/engineering/decisions.md`** (index update); **`docs/engineering/state.md`** (architecture checkpoint + strict proof); **`handoffs/tl_to_dev.md`**; **`handoffs/resume_brief.md`**.
+- **Decision**: **`DEC-0064`** — deterministic first/new/broad intake coverage gate: normalized `plan_area_inventory`, total `plan_area_id -> story_ids[] | deferred_ref` contract, fail-closed `INTAKE_PERSISTENCE_BLOCKED` subcodes, and pass/fail/defer verification + active/template parity requirements.
+- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
+- **Next**: **`/sprint-plan`** for **`US-0081`**.
+- **Decision gate before sprint-plan**: **none** (architecture satisfied).
+
+---
+
+## Sprint-plan Addendum — US-0081 / S0061 (tail)
+
+- **Orchestrator**: **`auto-20260331-01`** — sprint-plan complete in fresh **tech-lead** context.
+- **Evidence**: **`sprints/S0061/sprint.md`**, **`sprints/S0061/tasks.md`**, **`sprints/S0061/plan-verify.json`** (**PENDING**), **`sprints/S0061/summary.md`**, **`sprints/S0061/qa-findings.md`**, **`sprints/S0061/uat.json`**, **`sprints/S0061/uat.md`**, **`sprints/S0061/release-findings.md`**; **`docs/product/backlog.md`** (`sprint_plan_notes`, status still **OPEN**); **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** sprint-plan checkpoint + strict proof.
+- **Sprint**: **`S0061`** — deterministic mapping **AC-1..AC-10** ↔ **T-001..T-010**.
+- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
+- **Next**: **`/plan-verify`** for **`S0061`** / **`US-0081`**.
+- **Decision gate before plan-verify**: **none** (sprint artifacts materialized; QA verification pending).
+
+---
+
+## Plan-verify Addendum — US-0081 / S0061 (tail)
+
+- **Orchestrator**: **`auto-20260331-01`** — plan-verify **PASS** in fresh **qa** context (**`2026-03-31T12:15:00Z`**).
+- **Evidence**: **`sprints/S0061/plan-verify.json`** (**PASS**), **`sprints/S0061/sprint.md`**, **`sprints/S0061/summary.md`**, **`docs/product/backlog.md`** (`plan_verify_notes`, status still **OPEN**), **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof), **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`**.
+- **Verdict**: Deterministic AC-to-task coverage verified (**AC-1..AC-10** ↔ **T-001..T-010**, no gaps) and governance alignment confirmed against **`DEC-0064`**, **`architecture.md`** **`# US-0081`**, and **`R-0059`**.
+- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
+- **Next**: **`/execute`** for **`S0061`** / **`US-0081`**.
+- **Decision gate before execute**: **none** (plan-verify satisfied).
+
+---
+
+## Orchestrated intake handoff — US-0082 / auto-20260331-02
+
+### Target
+
+- `story_id=US-0082`
+- `orchestrator_run_id=auto-20260331-02`
+- phase completed: **`intake`** (**`po`**)
+- `next_scheduled_phase=discovery`
+
+### Summary
+
+- Prior **`small-intake-pack`** evidence remains authoritative: **`handoffs/intake_evidence/US-0082-intake-20260331.json`** (`intake_run_id=manual-20260331-US0082-intake`). This run records the formal **`/auto`** intake boundary in **`docs/engineering/state.md`** only.
+- Canonical backlog **Status** stays **OPEN** (**US-0045**); acceptance portfolio row for **US-0082** stays unchecked.
+- Next: **`/discovery`** — refine lifecycle touchpoints for **`docs/engineering/codebase-map.md`**, ownership-safe triggers, **`/map-codebase`** manual path, diagnostics, and active/template parity scope already listed in **AC-1..AC-10**.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## US-0082`**)
+- `docs/product/vision.md` (**Intake Notes — US-0082**)
+- `handoffs/intake_evidence/US-0082-intake-20260331.json`
+- `docs/engineering/state.md` (**Intake checkpoint (2026-03-31) — US-0082 / auto-20260331-02**)
+
+---
+
+## Orchestrated discovery handoff — US-0082 / auto-20260331-02
+
+### Target
+
+- `story_id=US-0082`
+- `orchestrator_run_id=auto-20260331-02`
+- phase completed: **`discovery`** (**`po`**)
+- `next_scheduled_phase=research`
+
+### Summary
+
+- Discovery treated **AC-1..AC-10** and **Boundaries** in **`docs/product/backlog.md`** as the bounded problem statement; no backlog status mutation (**US-0045**).
+- **`/research`** should produce **`R-####`** findings on lifecycle hook options, **`/map-codebase`** behavior, ownership-safe triggers, diagnostics, and parity/test expectations—without preempting **`/architecture`**.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## US-0082`** — discovery closure bullet)
+- `handoffs/intake_evidence/US-0082-intake-20260331.json`
+- `docs/engineering/state.md` (**Discovery checkpoint (2026-03-31) — US-0082 / auto-20260331-02**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated research handoff — US-0082 / auto-20260331-02
+
+### Target
+
+- `story_id=US-0082`
+- `orchestrator_run_id=auto-20260331-02`
+- phase completed: **`research`** (**`tech-lead`**)
+- `next_scheduled_phase=architecture`
+
+### Summary
+
+- **`R-0060`** records vendor-aligned onboarding practice (rules/docs as primary agent context), confirms the manual **`/map-codebase`** contract, and lists **hook-option families** (phase-gated generation, preflight diagnostics, CI guard, orchestrator profile extension) plus idempotency/ownership/parity risks for **`/architecture`** to lock — **no DEC-xxxx** and **no architecture section** written in research.
+- Canonical backlog **Status** stays **OPEN** (**US-0045**); acceptance portfolio row for **US-0082** stays unchecked.
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**`R-0060`**)
+- `docs/product/backlog.md` (**`## US-0082`** — research closure bullet)
+- `handoffs/intake_evidence/US-0082-intake-20260331.json`
+- `docs/engineering/state.md` (**Research checkpoint (2026-03-31) — US-0082 / auto-20260331-02**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated architecture handoff — US-0082 / auto-20260331-02
+
+### Target
+
+- `story_id=US-0082`
+- `orchestrator_run_id=auto-20260331-02`
+- phase completed: **`architecture`** (**`tech-lead`**)
+- `next_scheduled_phase=sprint-plan`
+
+### Summary
+
+- **`DEC-0065`** locks phase-gated codebase map bootstrap: **`/architecture`** primary lifecycle guarantee (**tech-lead**), optional policy-gated **`/refresh-context`**, **`/map-codebase`** manual; idempotency, ownership, **`CODEBASE_MAP_*`** diagnostics, parity/regression expectations; **`docs/engineering/architecture.md`** **`# US-0082`**.
+- Canonical backlog **Status** stays **OPEN** (**US-0045**); acceptance portfolio row for **US-0082** stays unchecked.
+- Next: **`/sprint-plan`** — materialize sprint tasks against **AC-1..AC-10** under **`DEC-0065`** / **`R-0060`**.
+
+### Evidence refs
+
+- `decisions/DEC-0065.md`
+- `docs/engineering/architecture.md` (**`# US-0082`**)
+- `docs/engineering/decisions.md` (index + context pack)
+- `docs/engineering/research.md` (**`R-0060`** architecture closure line)
+- `docs/product/backlog.md` (**`## US-0082`** — architecture closure bullet)
+- `handoffs/intake_evidence/US-0082-intake-20260331.json`
+- `docs/engineering/state.md` (**Architecture checkpoint (2026-03-31) — US-0082 / auto-20260331-02**)
+- `handoffs/resume_brief.md`
+- `handoffs/tl_to_dev.md` (**US-0082** pre-sprint architecture section)
+
+---
+
+## Orchestrated intake handoff — BUG-0003 / auto-20260331-03
+
+### Target
+
+- `bug_id=BUG-0003`
+- `orchestrator_run_id=auto-20260331-03`
+- phase completed: **`intake`** (**`po`**)
+- `next_scheduled_phase=discovery`
+
+### Summary
+
+- Canonical intake evidence remains authoritative: **`handoffs/intake_evidence/BUG-0003-intake-20260331-b.json`** (`selected_pack=small-intake-pack`, `missing_topics=[]`), revalidated for this boundary with **`[INTAKE_EVIDENCE_VALIDATION_OK]`**.
+- Intake scope is bug-led and mode-specific: `missing`/`upgrade` installs still miss required scripts, with explicit reported gap `scripts/enforce-triad-hot-surface.py`; parity across `installer.ps1`, `installer.sh`, and `installer.py` remains mandatory.
+- Canonical status authority unchanged (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0003`** **OPEN**; acceptance bug row remains unchecked until downstream phases.
+- Next: **`/discovery`** to isolate per-mode copy/skip logic and lock required script inventory contract before research/architecture.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## Bug issues (canonical)`** / **`### BUG-0003`**)
+- `docs/product/acceptance.md` (**`## Bug acceptance (canonical)`**)
+- `handoffs/intake_evidence/BUG-0003-intake-20260331-b.json`
+- `docs/engineering/state.md` (**Intake checkpoint (2026-03-31) — BUG-0003 / auto-20260331-03**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated discovery handoff — BUG-0003 / auto-20260331-03
+
+### Target
+
+- `bug_id=BUG-0003`
+- `orchestrator_run_id=auto-20260331-03`
+- phase completed: **`discovery`** (**`po`**)
+- `next_scheduled_phase=research`
+
+### Summary
+
+- Discovery confirms a bounded follow-up defect, not a new feature request: the unresolved risk surface is mode-specific installer completeness in `missing` and `upgrade`, with reported miss `scripts/enforce-triad-hot-surface.py`.
+- Overlap with **`BUG-0001`** is lineage-only (`duplicate_of`) rather than closure-equivalence: baseline intake payload parity was fixed, but this gap is about mode-path copy/skip behavior and completeness validation after run.
+- Research is now ready and scoped: (1) map per-mode branching and skip predicates in `installer.ps1` / `installer.sh` / `installer.py`, (2) define deterministic required-script inventory contract for post-install completeness, and (3) define parity/regression checks proving `missing`/`upgrade` cannot silently omit framework-critical scripts.
+- Canonical status authority unchanged (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0003`** **OPEN**; acceptance bug row remains unchecked.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## Bug issues (canonical)`** / **`### BUG-0003`** — discovery addendum)
+- `handoffs/intake_evidence/BUG-0003-intake-20260331-b.json`
+- `docs/engineering/state.md` (**Discovery checkpoint (2026-03-31) — BUG-0003 / auto-20260331-03**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated research handoff — BUG-0003 / auto-20260331-03
+
+### Target
+
+- `bug_id=BUG-0003`
+- `orchestrator_run_id=auto-20260331-03`
+- phase completed: **`research`** (**`tech-lead`**)
+- `next_scheduled_phase=architecture`
+
+### Summary
+
+- **`R-0061`** documents mode-branch inventory for `missing`/`upgrade` across `installer.ps1`, `installer.sh`, and `installer.py`: branch behavior is parity-aligned, so observed misses are inventory-source issues rather than branch drift.
+- Research identifies the concrete gap: manifest-driven install source of truth omits `scripts/enforce-triad-hot-surface.py`, allowing successful `missing`/`upgrade` runs with incomplete framework script payload.
+- Recommended architecture direction: keep installer ownership manifest as single required-script source of truth, add deterministic post-install completeness diagnostics, and lock parity regression tests for `missing`/`upgrade` (active + template surfaces).
+- Canonical status authority unchanged (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0003`** **OPEN**; acceptance bug row remains unchecked.
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**`R-0061`**)
+- `docs/product/backlog.md` (**`## Bug issues (canonical)`** / **`### BUG-0003`**)
+- `installer.ps1`
+- `installer.sh`
+- `installer.py`
+- `docs/engineering/context/installer-owned-paths.manifest`
+- `docs/engineering/state.md` (**Research checkpoint (2026-03-31) — BUG-0003 / auto-20260331-03**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated intake handoff — US-0083 / auto-20260331-04
+
+### Target
+
+- `story_id=US-0083`
+- `orchestrator_run_id=auto-20260331-04`
+- phase completed: **`intake`** (**`po`**)
+- `next_scheduled_phase=discovery`
+
+### Summary
+
+- Intake evidence refreshed for this orchestrated boundary with deterministic `small-intake-pack` coverage in `handoffs/intake_evidence/US-0083-intake-20260331-b.json` (`missing_topics=[]`, `assumptions_confirmed=(none)`), validated by `scripts/intake_evidence_validate.py`.
+- Canonical status authority unchanged (**US-0045**): `docs/product/backlog.md` keeps `US-0083` as **OPEN**.
+- Discovery should focus on explicit delegation semantics: when delegation is valid evidence vs when required topics remain fail-closed, plus guided/low-touch parity and deterministic diagnostics.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## US-0083`**)
+- `handoffs/intake_evidence/US-0083-intake-20260331-b.json`
+- `handoffs/intake_evidence/US-0083-intake-20260331.json`
+- `docs/product/vision.md` (**Intake Notes — US-0083**)
+- `docs/product/acceptance.md` (**US-0083 row remains unchecked**)
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated discovery handoff — US-0083 / auto-20260331-04
+
+### Target
+
+- `story_id=US-0083`
+- `orchestrator_run_id=auto-20260331-04`
+- phase completed: **`discovery`** (**`po`**)
+- `fresh_context_marker=po-US0083-discovery-20260331T224601Z-fresh`
+- `next_scheduled_phase=research`
+
+### Summary
+
+- Discovery narrowed the delegation contract: delegation must be explicit and topic-scoped for unresolved required intake topics; non-delegated unresolved required topics continue to fail closed.
+- Research should lock deterministic evidence and validator semantics: delegated-topic representation (DEC-0060-compatible refs), required rationale/confidence metadata, and fail-closed diagnostics when delegation evidence is absent or malformed.
+- Guided vs low-touch parity must be explicit in research outputs so delegation behavior is consistent across both modes without silent bypasses.
+- Canonical status authority unchanged (**US-0045**): `docs/product/backlog.md` keeps `US-0083` as **OPEN**.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`## US-0083`** — discovery closure bullets)
+- `docs/product/vision.md` (**`## Discovery Notes — US-0083`**)
+- `docs/product/acceptance.md` (**US-0083 row remains unchecked**)
+- `handoffs/intake_evidence/US-0083-intake-20260331-b.json`
+- `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated research handoff — US-0083 / auto-20260331-04
+
+### Target
+
+- `story_id=US-0083`
+- `orchestrator_run_id=auto-20260331-04`
+- phase completed: **`research`** (**`tech-lead`**)
+- `fresh_context_marker=tl-US0083-research-20260401T004910Z-fresh`
+- `next_scheduled_phase=architecture`
+
+### Summary
+
+- Research completed as **`R-0062`** with explicit option analysis for delegable intake evidence while preserving fail-closed safety for non-delegated required-topic gaps.
+- Recommended architecture direction is the simplest bounded extension of current `topic_coverage` semantics: allow `satisfied_by=delegation_ref` (topic-scoped only) plus required `delegation_scope`, `delegation_rationale`, and `delegation_confidence`, all tied to DEC-0060-compatible `ie:` evidence binding.
+- Validator branch contract for architecture lock: (1) non-delegated unresolved required topic remains existing `INTAKE_REQUIRED_TOPIC_MISSING` fail-closed behavior, (2) delegated topic with complete evidence passes, (3) delegated topic with missing/malformed evidence fails closed under delegation-specific deterministic diagnostics.
+- Guided/low-touch parity remains required (no mode-specific bypass semantics).
+- Canonical status authority unchanged (**US-0045**): `docs/product/backlog.md` keeps `US-0083` as **OPEN**.
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**`R-0062`**)
+- `docs/product/backlog.md` (**`## US-0083`** — research closure bullet)
+- `docs/product/vision.md` (**Intake Notes / Discovery Notes — US-0083**)
+- `scripts/intake_evidence_lib.py`
+- `scripts/intake_evidence_validate.py`
+- `handoffs/resume_brief.md`

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "manual-20260330-BUG0001-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "After its-magic install in a consumer repo, intake-critical scripts (intake_evidence_validate.py, intake_evidence_lib.py, intake_bug_routing_guard.py) are present so mandatory intake pre-persistence gates can run.",
+      "intake_run_id": "manual-20260330-BUG0001-intake",
+      "turn_index": 0,
+      "ref": "ie:manual-20260330-BUG0001-intake:0:e8d60db1b7aa9b83"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "its_magic installer file lists, template/scripts/ payload, npm/choco/brew packaging if they filter copied paths; parity with repo-root scripts/.",
+      "intake_run_id": "manual-20260330-BUG0001-intake",
+      "turn_index": 1,
+      "ref": "ie:manual-20260330-BUG0001-intake:1:27d0230de68538c5"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Scope is required install completeness only; not full active versus template mirroring. Triple-installer parity (PS, Bash, Python) must be preserved.",
+      "intake_run_id": "manual-20260330-BUG0001-intake",
+      "turn_index": 2,
+      "ref": "ie:manual-20260330-BUG0001-intake:2:36b64e4f71cdf0dd"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Regression or fixture: installed tree includes intake_* scripts; python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance; intake_evidence_validate --self-test on installed copy.",
+      "intake_run_id": "manual-20260330-BUG0001-intake",
+      "turn_index": 3,
+      "ref": "ie:manual-20260330-BUG0001-intake:3:35c67f795f843e1a"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "BUG-0001 DONE when all distribution paths deliver intake_* scripts on new install and on upgrade new-file delivery per framework rules.",
+      "intake_run_id": "manual-20260330-BUG0001-intake",
+      "turn_index": 4,
+      "ref": "ie:manual-20260330-BUG0001-intake:4:5ca69d1ba07a5d23"
+    }
+  ]
+}

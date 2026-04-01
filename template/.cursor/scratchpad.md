@@ -124,6 +124,7 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 # - INTAKE_GUIDED_MODE: 0|1 (guided intake follow-up/options/research behavior)
 # - INTAKE_SUBAGENT_FALLBACK: deny|allow (deny by default; when deny, missing
 #   role-specific intake subagent capability fails fast)
+# - INTAKE_WORK_ITEM_KIND: story|bug (default story; bug selects BUG-#### path per DEC-0061 / US-0079)
 # - ID_NAMESPACE_BOOTSTRAP: 0|1 (optional fresh-project ID bootstrap mode; when 1, allow first IDs to start at 0001 only if deterministic freshness checks pass)
 # - TOKEN_PROFILE: lean|balanced|full (tiered token-cost profile defaults)
 #   - lean: lowest-token default profile; reduce non-critical automation/research intensity
@@ -142,6 +143,7 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
 INTAKE_SUBAGENT_FALLBACK=deny
+INTAKE_WORK_ITEM_KIND=story
 ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
 STATE_HOT_MAX_LINES=1200

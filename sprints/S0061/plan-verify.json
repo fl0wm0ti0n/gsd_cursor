@@ -1,0 +1,63 @@
+{
+  "sprint_id": "S0061",
+  "story_id": "US-0081",
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (US-0081 AC-1..AC-10)",
+    "task_source": "sprints/S0061/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0061/sprint.md",
+    "decision_source": "decisions/DEC-0064.md",
+    "architecture_traceability": [
+      "DEC-0064",
+      "docs/engineering/architecture.md (# US-0081)",
+      "docs/engineering/research.md (R-0059)",
+      "US-0051",
+      "US-0068",
+      "US-0078",
+      "US-0045"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead): backlog US-0081 AC-1..AC-10 each assigned exactly one task T-001..T-010 in tasks.md (1:1 bijection intended).",
+      "Cross-read sprint.md scope against DEC-0064, architecture # US-0081, and R-0059.",
+      "Sizing: 10 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "QA /plan-verify is required before /execute.",
+      "QA verified AC-to-task coverage deterministically: AC-1..AC-10 in backlog/sprint scope map 1:1 to T-001..T-010 in sprints/S0061/tasks.md.",
+      "QA verified governance alignment: sprint goal/scope and task set align with DEC-0064, architecture # US-0081, and R-0059.",
+      "QA confirmed no AC coverage gaps and no sizing violations; execute is unblocked."
+    ],
+    "orchestrator_run_id": "auto-20260331-01",
+    "planned_at": "2026-03-31T11:30:00Z",
+    "plan_verified_at": "2026-03-31T12:15:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "First/new/broad inventory gate" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "Total mapping or defer_ref required" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "Complete story-map output with phased sequencing" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "Vertical-slice decomposition guard" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "Low-touch enforcement parity" },
+    { "ac": "AC-6", "tasks": ["T-006"], "status": "verified", "notes": "Machine-verifiable coverage-map fields" },
+    { "ac": "AC-7", "tasks": ["T-007"], "status": "verified", "notes": "Deterministic fail-code emission" },
+    { "ac": "AC-8", "tasks": ["T-008"], "status": "verified", "notes": "/ask + runbook policy guidance" },
+    { "ac": "AC-9", "tasks": ["T-009"], "status": "verified", "notes": "Active/template parity updates + checks" },
+    { "ac": "AC-10", "tasks": ["T-010"], "status": "verified", "notes": "Pass/fail/defer regression matrix" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Major-area normalization may over/under-group user intent if aliases are weak.",
+    "Coverage-map contract can drift between prose guidance and validator behavior without parity checks."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "DEC-0064",
+      "docs/engineering/architecture.md (# US-0081)",
+      "docs/engineering/research.md (R-0059)"
+    ]
+  },
+  "summary": "PASS - Sprint S0061 plan-verify complete for US-0081; AC-1..AC-10 remain 1:1 mapped to T-001..T-010 with governance alignment verified; /execute is unblocked."
+}

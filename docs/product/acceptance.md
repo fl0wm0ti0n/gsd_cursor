@@ -102,3 +102,19 @@
 - [x] US-0075: Upgrade scratchpad example-first refresh and paired catalog parity (DEC-0057 / AC-11)
 - [x] US-0076: Executable scratchpad-driven sync and auto-push wiring (DEC-0018 implementation)
 - [x] US-0077: Documentation audience profiles and dual README strategy
+- [x] US-0078: Enforced interactive intake question evidence (UAT closure: `sprints/S0057/uat.json`, `sprints/S0057/uat.md`, verify-work **2026-03-28** / `orchestrator_run_id=auto-20260328-01`; release **2026-03-29**: `sprints/S0057/release-findings.md`, `handoffs/releases/S0057-release-notes.md`)
+- [x] US-0079: First-class bug issue workflow (open/closed only)
+- [x] US-0080: Token-cost hardening for orchestrated runs (UAT closure: `sprints/S0059/uat.json`, `sprints/S0059/uat.md`, verify-work **2026-03-29** / `orchestrator_run_id=auto-20260329-02`; release **2026-03-29**: `sprints/S0059/release-findings.md`, `handoffs/releases/S0059-release-notes.md`, queue **`S0059`** → **`released`**)
+- [x] US-0081: First-intake full-plan coverage and story-map gate
+- [x] US-0082: Agent-driven codebase map bootstrap (UAT closure: `sprints/S0062/uat.json`, `sprints/S0062/uat.md`, verify-work **2026-03-31T21:20:00Z** / `orchestrator_run_id=auto-20260331-02`)
+- [x] US-0083: Delegable intake clarification without hard blocks
+
+## Bug acceptance (canonical)
+
+Per **`DEC-0061`** §8 / **`US-0079`**: portfolio checkbox rows **`- [ ]` / `- [x]`** per **`BUG-xxxx`**, sorted by id, derived from **`docs/product/backlog.md`** **`## Bug issues (canonical)`** — never the inverse (**`US-0045`** bug family). When no bug issues exist, leave this subsection as narrative stub only (no orphan **`BUG-####`** rows).
+
+- [x] BUG-0001: Template/install payload omits intake gate scripts
+- [x] BUG-0002: map-codebase does not write codebase-map in fresh repos
+- [x] BUG-0003: Missing scripts still occur on install modes missing/upgrade
+
+Validator (backlog bugs + optional drift vs this section): `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`.

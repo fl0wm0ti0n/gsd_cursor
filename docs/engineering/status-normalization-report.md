@@ -30,6 +30,7 @@
 | US-0036 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
 | US-0037 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
 | US-0038 | DONE | unchecked | DONE | checked | `STATUS_RECONCILE_APPLIED`; `docs/product/backlog.md`, `docs/product/acceptance.md` | 2026-03-14 |
+| — | — | — | — | — | `STATUS_RECONCILE_NOOP` (`/status-reconcile` **2026-03-31**); mismatch_set=∅ (matrix 1–4); `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → `[BUG_VALIDATION_OK]`; refs: `docs/product/backlog.md`, `docs/product/acceptance.md`, `handoffs/resume_brief.md`, `handoffs/release_queue.md` | 2026-03-31T18:50:00Z |
 
 ## Procedure notes
 

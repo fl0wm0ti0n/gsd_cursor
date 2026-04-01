@@ -1,0 +1,99 @@
+{
+  "sprint_id": "S0057",
+  "story_ids": [
+    "US-0078"
+  ],
+  "orchestrator_run_id": "auto-20260328-01",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Required-topic coverage gate: each pack key has topic_coverage row with valid satisfied_by and parseable ie: ref; INTAKE_REQUIRED_TOPIC_MISSING / INTAKE_REQUIRED_PACK_INCOMPLETE before persistence.",
+      "result": "pass",
+      "notes": "PASS per sprints/S0057/qa-findings.md AC-1; scripts/intake_evidence_lib.py + DEC-0060."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "assumptions_confirmed=yes only with validator-approved assumption_confirmation_ref; else INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-2; fixtures P4, P2 positive path."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Fail-closed persistence: validation failures emit INTAKE_PERSISTENCE_BLOCKED (primary codes preserved); no backlog/acceptance mutation until PASS.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-3; .cursor/commands/intake.md gate ordering."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Auditable evidence: asked_topics vs topic_coverage / answered evidence and assumption_confirmation_ref; asked-vs-covered alignment.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-4; fixture P5."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "INTAKE_GUIDED_MODE=1: bounded questioning; same validation rules; no silent auto-satisfaction of required topics without evidence-backed assumptions.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-5; guided parity, validator mode no-op."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "INTAKE_GUIDED_MODE=0: same pre-persistence validation pipeline as guided; low-touch does not bypass mandatory pack coverage.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-6; self_test dual-mode + intake.md."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Deterministic diagnostics: missing topics, reason codes, remediation prompts via ValidationResult / format_blocked_message.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-7."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "R-0055 regression matrix P1–P5, unknown pack, subprocess --file smoke; tests/run-tests.ps1 / .sh §26k wiring.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-8; tests/intake_evidence_fixtures_test.py + §26k."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Active/template parity: intake command, rules, runbook, README, template/ mirrors for strengthened evidence contract (US-0030).",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-9; dev handoff + spot parity."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Traceability: DEC-0060, architecture.md # US-0078, docs/engineering/decisions.md index cite validator paths and migration.",
+      "result": "pass",
+      "notes": "PASS per qa-findings AC-10."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0057/qa-findings.md",
+    "sprints/S0057/summary.md",
+    "sprints/S0057/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0060.md",
+    "scripts/intake_evidence_lib.py",
+    "scripts/intake_evidence_validate.py",
+    "tests/intake_evidence_fixtures_test.py",
+    ".cursor/commands/intake.md",
+    "docs/engineering/architecture.md",
+    "docs/engineering/decisions.md",
+    "tests/run-tests.ps1",
+    "tests/run-tests.sh"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "sprint_id": "S0061",
+  "story_ids": ["US-0081"],
+  "orchestrator_run_id": "auto-20260331-01",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "First/new/broad intake requires explicit plan-area inventory before persistence.",
+      "result": "pass",
+      "notes": "PASS: python tests/intake_evidence_fixtures_test.py -> [INTAKE_EVIDENCE_FIXTURES_OK]"
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Persistence blocks when any plan area is unmapped unless explicitly deferred with rationale.",
+      "result": "pass",
+      "notes": "PASS: fixture suite covers missing mapping fail-closed and justified defer pass."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Story-map output preserves complete plan coverage while allowing phased sequencing.",
+      "result": "pass",
+      "notes": "PASS: regression matrix includes complete mapping + phased compatibility assertions."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Decomposition remains vertical-slice/workflow oriented by policy default.",
+      "result": "pass",
+      "notes": "PASS: deterministic contract behavior validated via fixture expectations and qa spot-check."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Low-touch mode cannot bypass complete-plan coverage gate.",
+      "result": "pass",
+      "notes": "PASS: tests/intake_evidence_fixtures_test.py asserts guided and low-touch parity."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Machine-verifiable coverage fields are enforced (`plan_area_inventory`, `plan_area_coverage`, `coverage_complete`).",
+      "result": "pass",
+      "notes": "PASS: deterministic validator contract verified in fixture matrix."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Deterministic fail codes emitted on coverage gaps under `INTAKE_PERSISTENCE_BLOCKED`.",
+      "result": "pass",
+      "notes": "PASS: fail-closed subcodes including INTAKE_PLAN_COVERAGE_MISSING are asserted."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "/ask and runbook guidance reflect complete first-intake coverage policy.",
+      "result": "pass",
+      "notes": "PASS: QA spot-check confirmed policy text alignment in command/runbook surfaces."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Active/template parity is maintained for intake command, guidance, validators, and fixtures.",
+      "result": "pass",
+      "notes": "PASS: python scripts/check_intake_template_parity.py --repo . -> [INTAKE_TEMPLATE_PARITY_OK]"
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Regression tests cover full coverage pass, justified defer pass, and missing mapping block.",
+      "result": "pass",
+      "notes": "PASS: python tests/intake_evidence_fixtures_test.py -> [INTAKE_EVIDENCE_FIXTURES_OK]"
+    }
+  ],
+  "verified_state": "verify-work-complete",
+  "evidence_refs": [
+    "sprints/S0061/qa-findings.md",
+    "sprints/S0061/summary.md",
+    "sprints/S0061/tasks.md",
+    "sprints/S0061/uat.md",
+    "scripts/intake_evidence_lib.py",
+    "tests/intake_evidence_fixtures_test.py",
+    "scripts/check_intake_template_parity.py",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "handoffs/release_queue.md",
+    "docs/engineering/state.md"
+  ],
+  "closure": {
+    "verify_work_at": "2026-03-31T15:05:00Z",
+    "runtime_proof_id": "rp-auto-20260331-01-verify-work-qa-20260331T150500Z-S0061-US0081"
+  }
+}

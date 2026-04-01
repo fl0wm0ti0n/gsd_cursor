@@ -1,0 +1,99 @@
+{
+  "sprint_id": "S0062",
+  "story_ids": ["US-0082"],
+  "orchestrator_run_id": "auto-20260331-02",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Deterministic lifecycle point(s) where TL/Dev ensures `docs/engineering/codebase-map.md` exists in fresh repos (primary: `/architecture` exit per DEC-0065).",
+      "result": "pass",
+      "notes": "PASS: `.cursor/commands/architecture.md` step 10 + `scripts/materialize_codebase_map.py --trigger architecture`; run on repo → `[CODEBASE_MAP_OK] preserved_existing`."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Keep `/map-codebase` as explicit/manual command; document when auto/bootstrap runs vs operator-invoked runs.",
+      "result": "pass",
+      "notes": "PASS: active + `template/` `map-codebase.md` and runbook distinguish lifecycle materializer vs manual `/map-codebase`."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Idempotent map refresh (reruns safe; no unstable churn).",
+      "result": "pass",
+      "notes": "PASS: repeated `materialize_codebase_map.py` invocation preserves existing map (`preserved_existing`); fixtures in `tests/codebase_map_materialize_test.py`."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Respect artifact ownership policy when generation is triggered outside intake.",
+      "result": "pass",
+      "notes": "PASS: DEC-0065 + materializer ownership/skip semantics (`CODEBASE_MAP_LIFECYCLE_SKIP`, installer manifest entries)."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Deterministic diagnostics when map generation is skipped/blocked (`CODEBASE_MAP_*` family + remediation).",
+      "result": "pass",
+      "notes": "PASS: script emits `[CODEBASE_MAP_OK]`, `CODEBASE_MAP_BLOCKED:*`, `[CODEBASE_MAP_MISSING]` with `--check-present`; aligned with `architecture.md` # US-0082."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Runbook and `/ask` guidance naming where map responsibility lives.",
+      "result": "pass",
+      "notes": "PASS: `docs/engineering/runbook.md` (active + template) Codebase map bootstrap; `.cursor/commands/ask.md` narrow-read bullet."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "Active and `template/` parity for commands/rules/docs/tests implementing this behavior.",
+      "result": "pass",
+      "notes": "PASS: mirrored commands + `template/scripts/materialize_codebase_map.py`; §26N in `tests/run-tests.ps1` / `run-tests.sh` (per QA findings)."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Regression tests: fresh bootstrap, rerun, failure-path diagnostics.",
+      "result": "pass",
+      "notes": "PASS: `python tests/codebase_map_materialize_test.py` — 6 tests OK (verify-work re-run)."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Backward compatibility for repos with pre-existing map files.",
+      "result": "pass",
+      "notes": "PASS: lifecycle run on this repo preserved existing `codebase-map.md` (`preserved_existing`); materializer tests cover preserve paths."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Story owns closure/reclassification of `BUG-0002` to avoid duplicate issue tracking.",
+      "result": "pass",
+      "notes": "PASS: `docs/product/backlog.md` — `BUG-0002` **DONE** (expectation mismatch); delivery traceability under **US-0082** / **S0062** / **T-010**."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0062/qa-findings.md",
+    "sprints/S0062/summary.md",
+    "sprints/S0062/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "decisions/DEC-0065.md",
+    "docs/engineering/architecture.md",
+    "docs/engineering/decisions.md",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "scripts/materialize_codebase_map.py",
+    "template/scripts/materialize_codebase_map.py",
+    "tests/codebase_map_materialize_test.py",
+    "tests/run-tests.ps1",
+    "tests/run-tests.sh",
+    "docs/engineering/state.md"
+  ]
+}

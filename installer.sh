@@ -151,6 +151,23 @@ scratchpad_postinstall() {
   fi
 }
 
+validate_install_completeness() {
+  target_root="$1"
+  installer_py="$SCRIPT_DIR/installer.py"
+  if [ ! -f "$installer_py" ]; then
+    printf "%s\n" "[INSTALL_COMPLETENESS_FAILED] installer.py missing next to installer.sh."
+    exit 1
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$installer_py" --validate-install-completeness --target "$target_root" || exit $?
+  elif command -v python >/dev/null 2>&1; then
+    python "$installer_py" --validate-install-completeness --target "$target_root" || exit $?
+  else
+    printf "%s\n" "[INSTALL_COMPLETENESS_FAILED] PYTHON_NOT_FOUND: Python is required for deterministic installer completeness validation."
+    exit 1
+  fi
+}
+
 classify_file() {
   rel="$1"
   case "$rel" in
@@ -535,6 +552,7 @@ if [ "$MODE" = "upgrade" ]; then
   done
 
   scratchpad_postinstall "$TARGET_ROOT" "upgrade"
+  validate_install_completeness "$TARGET_ROOT"
 
   write_installed_version "$TARGET_ROOT" "$APP_VERSION"
   sync_root_readme_to_its_magic "$TARGET_ROOT" || true
@@ -606,6 +624,7 @@ for rel in $FILES; do
 done
 
 scratchpad_postinstall "$TARGET_ROOT" "$MODE"
+validate_install_completeness "$TARGET_ROOT"
 
 write_installed_version "$TARGET_ROOT" "$APP_VERSION"
 sync_root_readme_to_its_magic "$TARGET_ROOT" || true

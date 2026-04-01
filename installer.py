@@ -11,6 +11,7 @@ from datetime import datetime
 
 REPO_URL = "https://github.com/fl0wm0ti0n/its-magic"
 MANIFEST_RELATIVE_PATH = os.path.join("docs", "engineering", "context", "installer-owned-paths.manifest")
+MANIFEST_REQUIRED_SCRIPTS_SECTION = "required_install_script_paths"
 
 
 def normalize(path):
@@ -67,10 +68,40 @@ def load_ownership_manifest(source_root, script_dir):
             continue
         install_paths = read_manifest_paths(path, "install_include_paths")
         clean_paths = read_manifest_paths(path, "clean_paths")
+        required_script_paths = read_manifest_paths(path, MANIFEST_REQUIRED_SCRIPTS_SECTION)
         if not install_paths or not clean_paths:
             raise RuntimeError(f"[INSTALL_MANIFEST_ERROR] {path} is missing required sections or entries.")
-        return install_paths, clean_paths
+        if not required_script_paths:
+            raise RuntimeError(
+                f"[INSTALL_MANIFEST_ERROR] {path} is missing [{MANIFEST_REQUIRED_SCRIPTS_SECTION}] entries."
+            )
+        return install_paths, clean_paths, required_script_paths, path
     raise RuntimeError("[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic package.")
+
+
+def validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
+    missing_paths = []
+    for rel in sorted(set(required_script_paths)):
+        src = os.path.join(source_root, rel)
+        dst = os.path.join(target_root, rel)
+        if not os.path.isfile(src) or not os.path.isfile(dst):
+            missing_paths.append(rel.replace("\\", "/"))
+    if not missing_paths:
+        return True
+    print(
+        "[INSTALL_COMPLETENESS_FAILED] Required installer scripts are missing after "
+        "copy/classification invariant check."
+    )
+    for rel in missing_paths:
+        print(f"[INSTALL_REQUIRED_SCRIPT_MISSING:{rel}]")
+    print(
+        "Fix: update manifest parity and required-script inventory at "
+        f"{MANIFEST_RELATIVE_PATH} (section [{MANIFEST_REQUIRED_SCRIPTS_SECTION}]), "
+        "ensure each listed script exists in template/scripts and clean-path ownership, "
+        "then rerun installer missing/upgrade."
+    )
+    print(f"Manifest source: {manifest_path}")
+    return False
 
 
 def ensure_parent(path):
@@ -684,6 +715,12 @@ def main():
         action="store_true",
         help=argparse.SUPPRESS,
     )
+    parser.add_argument("--source-root", help=argparse.SUPPRESS)
+    parser.add_argument(
+        "--validate-install-completeness",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     args = parser.parse_args()
 
     if len(sys.argv) == 1 or args.help:
@@ -693,6 +730,9 @@ def main():
     if args.version:
         print(f"its-magic v{version}")
         return 0
+
+    if args.source_root:
+        source_root = normalize(args.source_root)
 
     if args.scratchpad_postinstall:
         target_root = normalize(args.target) if args.target else normalize(".")
@@ -712,11 +752,31 @@ def main():
         ok = run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True)
         return 0 if ok else 1
 
+    if args.validate_install_completeness:
+        target_root = normalize(args.target) if args.target else normalize(".")
+        if not os.path.isdir(target_root):
+            print(f"[INSTALL_COMPLETENESS_FAILED] target directory missing: {target_root}")
+            return 1
+        if not os.path.isdir(source_root):
+            print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
+            return 1
+        try:
+            _install_paths, _clean_paths, required_script_paths, manifest_path = load_ownership_manifest(
+                source_root, script_dir
+            )
+        except RuntimeError as exc:
+            print(str(exc))
+            return 1
+        ok = validate_install_completeness(target_root, source_root, required_script_paths, manifest_path)
+        return 0 if ok else 1
+
     if not os.path.isdir(source_root):
         print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
         return 1
     try:
-        include_paths, clean_paths = load_ownership_manifest(source_root, script_dir)
+        include_paths, clean_paths, required_script_paths, manifest_path = load_ownership_manifest(
+            source_root, script_dir
+        )
     except RuntimeError as exc:
         print(str(exc))
         return 1
@@ -818,6 +878,8 @@ def main():
 
         if not run_scratchpad_postinstall(target_root, source_root, "upgrade", print_ok=True):
             return 1
+        if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
+            return 1
 
         write_installed_version(target_root, version)
         sync_root_readme_to_its_magic(target_root)
@@ -895,6 +957,8 @@ def main():
                 shutil.copy2(src, dst)
 
     if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+        return 1
+    if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
         return 1
 
     write_installed_version(target_root, version)

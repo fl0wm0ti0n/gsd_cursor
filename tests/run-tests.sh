@@ -330,6 +330,20 @@ assert_true "README documents US-0068 intake pack behavior (active)" "file_conta
 assert_true "README documents US-0068 intake pack behavior (template)" "file_contains \"$TPL/README.md\" \"Mandatory intake question packs (US-0068)\""
 assert_true "intake command includes deterministic fail code INTAKE_PERSISTENCE_BLOCKED (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"INTAKE_PERSISTENCE_BLOCKED\""
 assert_true "intake command includes deterministic evidence field asked_topics (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"asked_topics\""
+assert_true "intake command documents US-0078 interactive evidence gate (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"Interactive intake evidence gate (US-0078 / DEC-0060 / R-0055)\""
+assert_true "intake command documents US-0078 interactive evidence gate (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"Interactive intake evidence gate (US-0078 / DEC-0060 / R-0055)\""
+assert_true "intake command documents same pre-persistence validation pipeline guided and low-touch (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"same pre-persistence validation pipeline\""
+assert_true "intake command documents same pre-persistence validation pipeline guided and low-touch (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"same pre-persistence validation pipeline\""
+assert_true "intake command documents bug issue routing US-0079 DEC-0061 (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"Bug issue routing (US-0079 / DEC-0061)\""
+assert_true "intake command documents bug issue routing US-0079 DEC-0061 (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"Bug issue routing (US-0079 / DEC-0061)\""
+assert_true "runbook documents interactive intake evidence validation section (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Interactive intake evidence validation (US-0078 / DEC-0060)\""
+assert_true "runbook documents interactive intake evidence validation section (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Interactive intake evidence validation (US-0078 / DEC-0060)\""
+assert_true "README documents US-0078 intake evidence validator (active)" "file_contains \"$ROOT/README.md\" \"Interactive intake evidence + validator (US-0078 / DEC-0060)\""
+assert_true "README documents US-0078 intake evidence validator (template)" "file_contains \"$TPL/README.md\" \"Interactive intake evidence + validator (US-0078 / DEC-0060)\""
+assert_true "README documents bug issues US-0079 DEC-0061 (active)" "file_contains \"$ROOT/README.md\" \"Bug issues + intake routing (US-0079 / DEC-0061)\""
+assert_true "README documents bug issues US-0079 DEC-0061 (template)" "file_contains \"$TPL/README.md\" \"Bug issues + intake routing (US-0079 / DEC-0061)\""
+assert_true "runbook documents bug issues US-0079 section (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"Bug issues (US-0079 / DEC-0061)\""
+assert_true "runbook documents bug issues US-0079 section (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"Bug issues (US-0079 / DEC-0061)\""
 
 # Auto continuation deterministic contract checks (US-0037)
 assert_true "auto includes explicit start-from contract (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"start-from=<phase>\""
@@ -587,6 +601,8 @@ assert_true "README documents context compaction and tiered token profile (activ
 assert_true "README documents context compaction and tiered token profile (template)" "file_contains \"$TPL/README.md\" \"Context compaction + tiered token profile (US-0053)\""
 assert_true "ask command documents narrow-read policy (active)" "file_contains \"$ROOT/.cursor/commands/ask.md\" \"Apply narrow-read retrieval policy (US-0053)\""
 assert_true "ask command documents narrow-read policy (template)" "file_contains \"$TPL/.cursor/commands/ask.md\" \"Apply narrow-read retrieval policy (US-0053)\""
+assert_true "ask command documents BUG-#### id family (active)" "file_contains \"$ROOT/.cursor/commands/ask.md\" \"BUG-####\""
+assert_true "ask command documents BUG-#### id family (template)" "file_contains \"$TPL/.cursor/commands/ask.md\" \"BUG-####\""
 assert_true "state documents active context surface policy (active)" "file_contains \"$ROOT/docs/engineering/state.md\" \"Active context surface (US-0053 / DEC-0035)\""
 assert_true "state template documents active context surface policy" "file_contains \"$TPL/docs/engineering/state.md\" \"Active context surface (US-0053 / DEC-0035)\""
 assert_true "state archive README exists (active)" "[ -f \"$ROOT/docs/engineering/state-archive/README.md\" ]"
@@ -1140,6 +1156,116 @@ set +e
 DOC_FIX=$?
 set -e
 assert_true "doc_profile tiered fixtures pass" "[ \"$DOC_FIX\" -eq 0 ]"
+
+# 26k) Intake evidence validation (US-0078 / DEC-0060 / R-0055 AC-8)
+INTAKE_LIB="$ROOT/scripts/intake_evidence_lib.py"
+INTAKE_VAL="$ROOT/scripts/intake_evidence_validate.py"
+INTAKE_FIX="$ROOT/tests/intake_evidence_fixtures_test.py"
+assert_true "intake_evidence_lib.py exists" "[ -f \"$INTAKE_LIB\" ]"
+assert_true "intake_evidence_validate.py exists" "[ -f \"$INTAKE_VAL\" ]"
+assert_true "intake_evidence_fixtures_test.py exists" "[ -f \"$INTAKE_FIX\" ]"
+set +e
+"$PY" "$INTAKE_VAL" --self-test >/dev/null 2>&1
+IE_SELF=$?
+set -e
+assert_true "intake_evidence_validate self-test passes" "[ \"$IE_SELF\" -eq 0 ]"
+set +e
+"$PY" "$INTAKE_FIX" >/dev/null 2>&1
+IE_FIX=$?
+set -e
+assert_true "intake_evidence tiered fixtures pass" "[ \"$IE_FIX\" -eq 0 ]"
+
+# 26L) Bug issues + intake routing (US-0079 / DEC-0061 / R-0056)
+BUG_LIB="$ROOT/scripts/bug_issue_lib.py"
+BUG_VAL="$ROOT/scripts/bug_issue_validate.py"
+BUG_GUARD="$ROOT/scripts/intake_bug_routing_guard.py"
+BUG_FIX="$ROOT/tests/bug_issue_fixtures_test.py"
+assert_true "bug_issue_lib.py exists" "[ -f \"$BUG_LIB\" ]"
+assert_true "bug_issue_validate.py exists" "[ -f \"$BUG_VAL\" ]"
+assert_true "intake_bug_routing_guard.py exists" "[ -f \"$BUG_GUARD\" ]"
+assert_true "bug_issue_fixtures_test.py exists" "[ -f \"$BUG_FIX\" ]"
+set +e
+"$PY" "$BUG_VAL" --self-test >/dev/null 2>&1
+BUG_SELF=$?
+set -e
+assert_true "bug_issue_validate self-test passes" "[ \"$BUG_SELF\" -eq 0 ]"
+set +e
+"$PY" "$BUG_VAL" --backlog "$ROOT/docs/product/backlog.md" --acceptance "$ROOT/docs/product/acceptance.md" --check-acceptance >/dev/null 2>&1
+BUG_REPO=$?
+set -e
+assert_true "bug_issue_validate repo + acceptance reconciliation passes" "[ \"$BUG_REPO\" -eq 0 ]"
+set +e
+"$PY" "$BUG_FIX" >/dev/null 2>&1
+BUG_FIX_RUN=$?
+set -e
+assert_true "bug_issue tiered fixtures pass" "[ \"$BUG_FIX_RUN\" -eq 0 ]"
+
+# 26N) Intake gate active/template parity (BUG-0001 / DEC-0063 / S0060)
+INTAKE_PARITY="$ROOT/scripts/check_intake_template_parity.py"
+INTAKE_PARITY_TEST="$ROOT/tests/intake_template_parity_fixtures_test.py"
+assert_true "check_intake_template_parity.py exists" "[ -f \"$INTAKE_PARITY\" ]"
+assert_true "intake_template_parity_fixtures_test.py exists" "[ -f \"$INTAKE_PARITY_TEST\" ]"
+set +e
+"$PY" "$INTAKE_PARITY" --repo "$ROOT" >/dev/null 2>&1
+INTAKE_PARITY_RUN=$?
+set -e
+assert_true "intake template parity (scripts vs template/scripts) passes" "[ \"$INTAKE_PARITY_RUN\" -eq 0 ]"
+set +e
+"$PY" "$INTAKE_PARITY_TEST" >/dev/null 2>&1
+INTAKE_PARITY_PY=$?
+set -e
+assert_true "intake_template_parity fixtures pass" "[ \"$INTAKE_PARITY_PY\" -eq 0 ]"
+
+# 26M) Token-cost parity + metrics harness (US-0080 / DEC-0062)
+TCP_PARITY="$ROOT/scripts/check_token_cost_parity.py"
+TC_LIB="$ROOT/scripts/token_cost_lib.py"
+TC_CMP="$ROOT/scripts/token_cost_compare.py"
+TC_TEST="$ROOT/tests/token_cost_fixtures_test.py"
+AUTO_CMD_TEST="$ROOT/tests/auto_command_contract_test.py"
+assert_true "check_token_cost_parity.py exists" "[ -f \"$TCP_PARITY\" ]"
+assert_true "token_cost_lib.py exists" "[ -f \"$TC_LIB\" ]"
+assert_true "token_cost_compare.py exists" "[ -f \"$TC_CMP\" ]"
+assert_true "token_cost_fixtures_test.py exists" "[ -f \"$TC_TEST\" ]"
+assert_true "auto_command_contract_test.py exists" "[ -f \"$AUTO_CMD_TEST\" ]"
+set +e
+"$PY" "$TCP_PARITY" --repo "$ROOT" >/dev/null 2>&1
+TCP_RUN=$?
+set -e
+assert_true "token-cost active/template parity passes" "[ \"$TCP_RUN\" -eq 0 ]"
+set +e
+"$PY" "$TC_TEST" >/dev/null 2>&1
+TC_FIX_RUN=$?
+set -e
+assert_true "token_cost fixtures + CLI pass" "[ \"$TC_FIX_RUN\" -eq 0 ]"
+set +e
+"$PY" "$AUTO_CMD_TEST" >/dev/null 2>&1
+AUTO_CMD_RUN=$?
+set -e
+assert_true "slim auto command contract markers pass" "[ \"$AUTO_CMD_RUN\" -eq 0 ]"
+
+# 26N) Codebase map materialize (US-0082 / DEC-0065)
+MAP_MAT="$ROOT/scripts/materialize_codebase_map.py"
+MAP_MAT_TEST="$ROOT/tests/codebase_map_materialize_test.py"
+assert_true "materialize_codebase_map.py exists" "[ -f \"$MAP_MAT\" ]"
+assert_true "codebase_map_materialize_test.py exists" "[ -f \"$MAP_MAT_TEST\" ]"
+assert_true "architecture command documents map materialize (active)" "grep -q materialize_codebase_map.py \"$ROOT/.cursor/commands/architecture.md\""
+assert_true "architecture command documents map materialize (template)" "grep -q materialize_codebase_map.py \"$TPL/.cursor/commands/architecture.md\""
+assert_true "runbook documents codebase map bootstrap (active)" "grep -q 'Codebase map bootstrap (US-0082 / DEC-0065)' \"$ROOT/docs/engineering/runbook.md\""
+assert_true "runbook documents codebase map bootstrap (template)" "grep -q 'Codebase map bootstrap (US-0082 / DEC-0065)' \"$TPL/docs/engineering/runbook.md\""
+set +e
+"$PY" "$MAP_MAT_TEST" >/dev/null 2>&1
+MAP_MAT_PY=$?
+set -e
+assert_true "codebase_map_materialize_test passes" "[ \"$MAP_MAT_PY\" -eq 0 ]"
+
+# 26O) Installer completeness deterministic contract (BUG-0003 / DEC-0066)
+INSTALLER_COMPLETENESS_TEST="$ROOT/tests/installer_completeness_bug0003_test.py"
+assert_true "installer_completeness_bug0003_test.py exists" "[ -f \"$INSTALLER_COMPLETENESS_TEST\" ]"
+set +e
+"$PY" "$INSTALLER_COMPLETENESS_TEST" >/dev/null 2>&1
+INSTALLER_COMPLETENESS_PY=$?
+set -e
+assert_true "installer completeness BUG-0003 fixtures pass" "[ \"$INSTALLER_COMPLETENESS_PY\" -eq 0 ]"
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {

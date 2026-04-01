@@ -1,3 +1,526 @@
+## TL -> Dev Handoff - Sprint S0064 (US-0083 delegable intake clarification)
+
+## Planning summary
+
+- **Sprint**: **S0064** (next id after **S0063**)
+- **Story**: **US-0083** - **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0064/tasks.md`**
+- **Plan-verify**: **PENDING** (`sprints/S0064/plan-verify.json`; planned **`2026-04-01T01:20:00Z`**, role `tech-lead`) - **`/plan-verify`** required before execute
+- **Bounded read**: Load this **S0064** section + **`sprints/S0064/*`** + cited governance only
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (**US-0083** AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0083`)
+- Decision: `decisions/DEC-0067.md`
+- Research: `docs/engineering/research.md` (**R-0062**)
+- Related: **US-0068**, **US-0078**, **US-0045**, **DEC-0050**, **DEC-0060**
+- Sprint artifacts: `sprints/S0064/*`
+
+## Focus
+
+1. **Adaptive intake behavior (T-001, T-002)**: reduce repetitive prompting through context-aware topic handling and explicit delegation capture.
+2. **Validator branch semantics (T-003, T-004, T-005)**: delegated pass path with strict required delegation evidence and unchanged non-delegated fail-closed behavior.
+3. **Mode and contract parity (T-006, T-008, T-009)**: guided/low-touch parity, DEC-0060-compatible evidence shape, active/template parity.
+4. **Operator guidance and regressions (T-007, T-010)**: update command/runbook/PO guidance and land deterministic delegated/non-delegated regression matrix.
+
+## Risks
+
+- Implicit delegation bypass if explicit topic-scoped opt-in and `ie:` binding are not enforced consistently.
+- Drift between `/intake` guidance and validator reason-code behavior can create ambiguous outcomes.
+- Active/template parity drift can regress installed-repo behavior for delegation schema support.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0064/tasks.md`**) after **`/plan-verify`** **PASS**.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0064/tasks.md`** marked **done**
+- **`sprints/S0064/plan-verify.json`** is **PASS** after **`/plan-verify`** (**QA**) before execute begins
+- **`US-0083`** remains **OPEN** until downstream verify-work reconciliation (**US-0045**)
+
+## Next phase
+
+1. **QA**: **`/plan-verify`** for **`S0064`** / **`US-0083`**.
+
+---
+
+## TL -> Dev Handoff — US-0083 (Explicit delegable intake topics) — pre-sprint architecture
+
+## Planning summary
+
+- **Story**: **US-0083** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Architecture**: `docs/engineering/architecture.md` (`# US-0083`)
+- **Decision**: `decisions/DEC-0067.md`
+- **Research**: `docs/engineering/research.md` (**R-0062**)
+- **Orchestrator run**: `auto-20260331-04`
+- **Fresh context marker**: `tl-US0083-architecture-20260331T225217Z-fresh`
+- **Bounded read**: load US-0083 backlog block + architecture section + DEC only
+
+## Focus for `/sprint-plan`
+
+1. Add tasks to implement `topic_coverage.satisfied_by=delegation_ref` with required fields (`delegation_scope`, `delegation_rationale`, `delegation_confidence`) while preserving DEC-0060 `ie:` binding.
+2. Add tasks for deterministic validator branches: delegated pass, delegated malformed/missing fail, and unchanged non-delegated fail-closed path.
+3. Add tasks for deterministic diagnostics/remediation using `INTAKE_DELEGATION_EVIDENCE_MISSING` and `INTAKE_DELEGATION_EVIDENCE_INVALID` under `INTAKE_PERSISTENCE_BLOCKED`.
+4. Add tasks for guided/low-touch parity and active/template parity across intake command/rules/validator/test surfaces.
+5. Add tasks for regression fixtures covering delegated pass, non-delegated block, and delegated invalid-evidence block.
+
+## Risks to plan explicitly
+
+- Implicit bypass risk if delegation is accepted without explicit user evidence binding.
+- Contract drift risk between command prose and validator behavior/reason codes.
+- Active/template parity drift risk for installed repos.
+
+## Next phase
+
+1. **Tech-lead**: **`/sprint-plan`** for **`US-0083`**.
+
+---
+
+## TL -> Dev Handoff — Sprint S0063 (BUG-0003 installer completeness)
+
+## Planning summary
+
+- **Sprint**: **S0063** (next id after **S0062**)
+- **Bug**: **BUG-0003** - **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: Sprint-local **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0063/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0063/plan-verify.json`; verified **`2026-03-31T21:55:25Z`**, QA, **`auto-20260331-03`**) — **`/execute`** unblocked
+- **Bounded read**: Load this **S0063** section + **`sprints/S0063/*`** + cited governance only
+
+## Architecture and decision references
+
+- Bug definition: `docs/product/backlog.md` (**BUG-0003** expected/actual)
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0003`)
+- Decision: `decisions/DEC-0066.md`
+- Research: `docs/engineering/research.md` (**R-0061**)
+- Related: **BUG-0001**, **US-0018**, **US-0045**, **DEC-0038**
+- Sprint artifacts: `sprints/S0063/*`
+
+## Focus
+
+1. **Inventory + ownership (T-001, T-002)**: manifest-authoritative required inventory and required triad script install/clean pairing.
+2. **Invariant + diagnostics (T-003, T-004, T-005, T-006)**: post-install completeness gate with deterministic fail codes and remediation.
+3. **Parity + regressions (T-007, T-008, T-009, T-010)**: shared contract across installers, positive/negative matrix, active/template parity, install/clean symmetry.
+
+## Risks
+
+- Manifest drift can silently reintroduce required-script omissions.
+- Wrapper-level divergence can desynchronize diagnostics across PS1/SH/PY.
+- Install/clean ownership asymmetry can create stale files or unintended cleanup.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0063/tasks.md`**) after **`/plan-verify`** **PASS**.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0063/tasks.md`** marked **done**
+- **`sprints/S0063/plan-verify.json`** is **PASS** after **`/plan-verify`** (**QA**)
+- **`BUG-0003`** remains **OPEN** until downstream verify-work reconciliation (**US-0045**)
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0063`** / **`BUG-0003`** (plan-verify **PASS** recorded).
+
+---
+
+## TL -> Dev Handoff — BUG-0003 (installer completeness) — pre-sprint architecture
+
+## Planning summary
+
+- **Bug**: **BUG-0003** — **Status `OPEN`** (canonical authority: `docs/product/backlog.md`, per **US-0045**)
+- **Architecture**: `docs/engineering/architecture.md` (`# BUG-0003`)
+- **Decision**: `decisions/DEC-0066.md`
+- **Research**: `docs/engineering/research.md` (**R-0061**)
+- **Bounded read**: load BUG-0003 backlog block + architecture section + DEC only
+
+## Focus for `/sprint-plan`
+
+1. Add tasks for required-script inventory contract in `docs/engineering/context/installer-owned-paths.manifest`, including `scripts/enforce-triad-hot-surface.py`.
+2. Add tasks for deterministic post-install completeness validation and stable reason-code surface (`INSTALL_COMPLETENESS_FAILED`, `INSTALL_REQUIRED_SCRIPT_MISSING:<path>`).
+3. Add tasks for parity-safe implementation across `installer.ps1`, `installer.sh`, and `installer.py` (shared validator path preferred).
+4. Add tasks for positive/negative test matrix in `missing` and `upgrade`, plus active/template parity and install/clean symmetry checks.
+5. Add tasks for runbook/operator remediation text tied to deterministic diagnostics.
+
+## Risks to plan explicitly
+
+- Manifest drift can silently reintroduce required-script omissions.
+- Wrapper parity drift can diverge diagnostics across platforms if checks are duplicated.
+- Install/clean asymmetry can leave stale files or remove non-owned paths.
+
+## Next phase
+
+1. **Tech-lead**: **`/sprint-plan`** for **`BUG-0003`**.
+
+---
+
+## TL -> Dev Handoff — Sprint S0062 (US-0082 — Agent-driven codebase map bootstrap)
+
+## Planning summary
+
+- **Sprint**: **S0062** (next id after **S0061**)
+- **Story**: **US-0082** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0062/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0062/plan-verify.json`; verified **`2026-03-31T20:20:00Z`**, QA, **`auto-20260331-02`**) — **`/execute`** unblocked
+- **Bounded read**: Load this **S0062** section + **`sprints/S0062/*`** + cited governance only
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (**US-0082** AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0082`)
+- Decision: `decisions/DEC-0065.md`
+- Research: `docs/engineering/research.md` (**R-0060**)
+- Related: **US-0001**, **BUG-0002**, **DEC-0052**, **US-0045**
+- Sprint artifacts: `sprints/S0062/*`
+
+## Focus (after plan-verify PASS)
+
+1. **Lifecycle (T-001, T-002, T-003)**: **`/architecture`**-exit map guarantee, operator docs for manual vs auto path, idempotent refresh.
+2. **Policy + diagnostics (T-004, T-005, T-006)**: ownership-safe writes, **`CODEBASE_MAP_*`** vocabulary, runbook + **`/ask`**.
+3. **Parity + quality (T-007, T-008, T-009)**: active/template parity, regression matrix, existing-map compatibility.
+4. **Traceability (T-010)**: **BUG-0002** closure/reclassification with backlog alignment.
+
+## Risks
+
+- **DEC-0052** profiles skipping **`architecture`** — mitigate per **DEC-0065** diagnostics / optional CI follow-up.
+- **Merge/idempotency** semantics — avoid destructive overwrites of operator-customized maps.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0062/tasks.md`**) after **`/plan-verify`** **PASS**.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0062/tasks.md`** marked **done**
+- **`sprints/S0062/plan-verify.json`** is **PASS** after **`/plan-verify`** (**QA**) before execute begins
+- **`US-0082`** remains **OPEN** until downstream verify-work reconciliation (**US-0045**)
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0062`** / **`US-0082`** (plan-verify **PASS** recorded).
+
+---
+
+## TL -> Dev Handoff — US-0082 (Agent-driven codebase map bootstrap) — pre-sprint architecture (reference)
+
+## Planning summary
+
+- **Story**: **US-0082** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Architecture**: **`docs/engineering/architecture.md`** (`# US-0082`)
+- **Decision**: **`decisions/DEC-0065.md`**
+- **Research**: **`docs/engineering/research.md`** (**R-0060**)
+- **Bounded read**: load US-0082 backlog block + architecture section + DEC only
+
+## Note
+
+Sprint execution baton: see **Sprint S0062** section above (**`sprints/S0062/*`**).
+
+---
+
+## TL -> Dev Handoff — Sprint S0061 (US-0081 First-intake full-plan coverage gate)
+
+## Planning summary
+
+- **Sprint**: **S0061** (next id after **S0060**)
+- **Story**: **US-0081** - **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0061/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0061/plan-verify.json`; `2026-03-31T12:15:00Z`, role `qa`) - **`/execute`** unblocked
+- **Bounded read**: Load this **S0061** section + **`sprints/S0061/*`** + cited governance only
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (**US-0081** AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0081`)
+- Decision: `decisions/DEC-0064.md`
+- Research: `docs/engineering/research.md` (**R-0059**)
+- Related: **US-0051**, **US-0068**, **US-0078**, **US-0045**
+- Sprint artifacts: `sprints/S0061/*`
+
+## Focus
+
+1. **Coverage inventory (T-001, T-002)**: normalize major plan areas and enforce total mapping/defer accounting.
+2. **Story-map integrity (T-003, T-004)**: complete mapping output while preserving vertical-slice decomposition guardrails.
+3. **Mode parity + contract fields (T-005, T-006, T-009)**: low-touch enforcement and active/template parity for command/rules/validators/tests.
+4. **Diagnostics + guidance (T-007, T-008)**: deterministic fail codes and operator remediation in `/ask` + runbook.
+5. **Regression closure (T-010)**: pass/fail/defer matrix with guided and low-touch coverage.
+
+## Risks
+
+- **Over/under-normalization** of plan areas can cause false blocks or silent merges.
+- **Policy/validator drift** can desynchronize prose guidance from fail-closed enforcement.
+- **Template parity drift** can regress first-intake behavior in installed repos.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0061/tasks.md`**). Land data-contract fields and diagnostics before docs/tests closure.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0061/tasks.md`** marked **done**
+- **`sprints/S0061/plan-verify.json`** is **PASS** after **`/plan-verify`** (**QA**) before execute begins
+- **`US-0081`** remains **OPEN** until downstream verify-work reconciliation (**US-0045**)
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0061`** / **`US-0081`**.
+
+---
+
+## TL -> Dev Handoff — US-0081 (First-intake full-plan coverage gate) — pre-sprint architecture
+
+## Planning summary
+
+- **Story**: **US-0081** - **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Architecture**: **`docs/engineering/architecture.md`** (`# US-0081`)
+- **Decision**: **`decisions/DEC-0064.md`**
+- **Research**: **`docs/engineering/research.md`** (**R-0059**)
+- **Bounded read**: load US-0081 backlog block + architecture section + DEC only
+
+## Focus for `/sprint-plan`
+
+1. Add tasks for deterministic first/new/broad trigger and normalized `plan_area_inventory`.
+2. Add tasks for total coverage mapping (`plan_area_id -> story_ids[] | deferred_ref`) and validator invariants.
+3. Add tasks for fail-closed diagnostics under `INTAKE_PERSISTENCE_BLOCKED` with DEC-0064 subcodes.
+4. Add tasks for pass/fail/defer fixtures, guided/low-touch enforcement, and active/template parity checks.
+5. Add tasks for `/ask` and runbook guidance updates tied to remediation text.
+
+## Risks to plan explicitly
+
+- Over-blocking from poor major-area normalization.
+- Contract drift between prose intake notes and validator output.
+- Template parity drift for intake command/rules/tests.
+
+## Next phase
+
+1. **Tech-lead**: **`/sprint-plan`** for **`US-0081`**.
+
+---
+
+## TL -> Dev Handoff — Sprint S0060 (BUG-0001 Intake script install completeness)
+
+> **Execute complete** **`2026-03-30`** (`orchestrator_run_id=auto-20260330-01`) — see **`docs/engineering/state.md`** **Execute checkpoint**; **`handoffs/dev_to_qa.md`**; **`sprints/S0060/summary.md`**. Next: **`/qa`**. **`BUG-0001`** **OPEN** until **`/verify-work`**.
+
+## Planning summary
+
+- **Sprint**: **S0060** (next id after **S0059**)
+- **Bug**: **BUG-0001** — **Status `OPEN`** (**US-0045**); **`docs/product/acceptance.md`** **`BUG-0001`** row **unchecked** until **`/verify-work`**
+- **Task count**: **5** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: Sprint-local **AC-1..AC-5** (see **`sprints/S0060/sprint.md`**) mapped **1:1** to **`T-001..T-005`** in **`sprints/S0060/tasks.md`** — decomposes backlog **expected** + **`DEC-0063`**
+- **Plan-verify**: **PASS** (`sprints/S0060/plan-verify.json`; **qa**, **`2026-03-30T23:55:00Z`**, `orchestrator_run_id=auto-20260330-01`) — **`/execute`** unblocked
+- **Bounded read**: Load **S0060** section + **`sprints/S0060/*`** + cited paths only
+
+## Architecture and decision references
+
+- Bug definition: `docs/product/backlog.md` (**BUG-0001**)
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0001`)
+- Decision: `decisions/DEC-0063.md`
+- Research: `docs/engineering/research.md` (**R-0058**)
+- Related: **US-0008**, **US-0018**, **DEC-0061**, **US-0030**
+- Sprint artifacts: `sprints/S0060/*`
+
+## Focus
+
+1. **Mirror + manifest (T-001, T-002)**: **`template/scripts/`** intake trio; **`package.json` `files`** per **§2**
+2. **Parity gate (T-003)**: CI-friendly **`scripts/`** ↔ **`template/scripts/`** check
+3. **Upgrade (T-004)**: **`US-0018`** classification + fresh/upgrade evidence
+4. **Ops (T-005)**: README/runbook + triple-installer consistency
+
+## Risks
+
+- **Copy drift** — T-003 parity; single-PR expectation for dual-tree edits
+- **Upgrade misses files** — T-004 matrix + **`US-0018`** hooks
+
+## Execution order
+
+Run **`T-001`..`T-005`** in sequence (see **`sprints/S0060/tasks.md`**). Establish mirror before parity tests; upgrade evidence after files land.
+
+## Done criteria for Dev completion
+
+- All **5** tasks in **`sprints/S0060/tasks.md`** marked **done**
+- **`sprints/S0060/plan-verify.json`** **PASS** after **`/plan-verify`** (**QA**)
+- **`BUG-0001`** remains **OPEN** until **`/verify-work`** reconciles **`acceptance.md`**
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0060`** / **`BUG-0001`** — see **`handoffs/resume_brief.md`**, **`sprints/S0060/tasks.md`** (plan-verify **PASS**)
+
+---
+
+## TL -> Dev Handoff — Sprint S0059 (US-0080 Token-Cost Hardening)
+
+## Planning summary
+
+- **Sprint**: **S0059** (next id after **S0058**)
+- **Story**: **US-0080** — Token-cost hardening — **Status `OPEN`** until delivery (**US-0045**)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0059/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0059/plan-verify.json`; **qa**, **`2026-03-29T21:00:00Z`**, `orchestrator_run_id=auto-20260329-02`) — **`/execute`** unblocked.
+- **Bounded read (`DEC-0062` §4)**: Load this **S0059** section + **`sprints/S0059/*`** + cited paths only; historical sprint sections below are archive — do not pull entire `tl_to_dev.md` into working context unless tasked.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0080 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0080`)
+- Decision: `decisions/DEC-0062.md`
+- Research: `docs/engineering/research.md` (**R-0057**)
+- Related: **DEC-0052** (run class / phase plan), **US-0053** (token profile), **US-0030** (parity), **US-0048**, **US-0056**, **US-0069**, **US-0039**
+- Sprint artifacts: `sprints/S0059/*`
+
+## Focus
+
+1. **Metrics + comparability (T-001, T-002)**: **`DEC-0062`** §1 fields; **`run_class_hash`**; **50%** `cache_read_tokens` on comparable runs; **`TOKEN_COST_RUN_CLASS_MISMATCH`**.
+2. **Slimming + parity (T-003, T-004, T-009)**: command surfaces; bounded phase context; versioned manifest + CI.
+3. **Gates unchanged (T-005)**: **`/auto`** isolation / strict-proof / role / release semantics preserved.
+4. **Evidence + ops (T-006, T-007)**: **`handoffs/token_cost_runs/*`**; **`token_cost_evidence_ref`**; README/runbook.
+5. **Tests + closure (T-008, T-010)**: regressions; decisions index + operator citations.
+
+## Risks
+
+- **Over-slimming** — AC-8 + runbook deep links (**DEC-0062** §6).
+- **Baseline gaming** — strict **`run_class_hash`** rule.
+- **Template drift** — manifest + CI.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0059/tasks.md`**). Establish metric capture and **`run_class_hash`** before claiming AC-2; manifest early for T-003/T-009.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0059/tasks.md`** marked done.
+- **`sprints/S0059/plan-verify.json`** **PASS** after **`/plan-verify`** (QA) with no AC gaps.
+- Lifecycle evidence in **`docs/engineering/state.md`** for **`US-0080`** / **`S0059`** per repo convention.
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0059`** / **`US-0080`** — plan-verify **PASS**; see **`docs/engineering/state.md`** plan-verify checkpoint + **`handoffs/resume_brief.md`**.
+2. **QA**: **`/qa`** after dev delivery per lifecycle.
+
+---
+
+## TL -> Dev Handoff — US-0080 (Token-Cost Hardening) — pre-sprint architecture (historical)
+
+> **Superseded** by **Sprint S0059** above. Retained as architecture-only tail anchor.
+
+### Planning summary
+
+- **Story**: **US-0080** — **Status `OPEN`** (**US-0045**)
+- **Architecture**: **`docs/engineering/architecture.md`** (`# US-0080`)
+- **Decision**: **`decisions/DEC-0062.md`**
+- **Research**: **`docs/engineering/research.md`** (**R-0057**)
+
+### Next phase (current)
+
+1. **Dev**: **`/execute`** for **`S0059`** / **`US-0080`** (plan-verify **PASS**).
+
+---
+
+## TL -> Dev Handoff — Sprint S0058 (US-0079 First-Class Bug Issues)
+
+## Planning summary
+
+- **Sprint**: **S0058** (next id after **S0057**)
+- **Story**: **US-0079** — First-class bug issue workflow (`BUG-####`, **`OPEN`/`DONE`**) — **Status `OPEN`** until delivery (**US-0045**)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0058/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0058/plan-verify.json`; QA **`2026-03-29`**, `orchestrator_run_id=auto-20260329-01`) — **`/execute`** unblocked.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0079 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0079`)
+- Decision: `decisions/DEC-0061.md`
+- Research: `docs/engineering/research.md` (**R-0056**)
+- Related: **US-0045** (status authority), **US-0042** (release-issue traceability style), **DEC-0055** (**`INTAKE_WORK_ITEM_KIND`**), **US-0030** (parity), **US-0070** (optional **`bug_ids`** on phase boundaries)
+- Sprint artifacts: `sprints/S0058/*`
+
+## Focus
+
+1. **Identity + storage (T-001)**: **`BUG-####`** allocator; **`## Bug issues (canonical)`**; sort discipline (**DEC-0061** §§1–2).
+2. **Routing (T-002)**: scratchpad + **`/intake bug`**; **`INTAKE_BUG_ROUTING_REQUIRED`** / mismatch family; no silent **`US-xxxx`** for defects.
+3. **Lifecycle + schema (T-003, T-004)**: **`OPEN`/`DONE`** only; minimum reproducibility fields + **`BUG_VALIDATION_*`**.
+4. **Traceability (T-005, T-006)**: sprint + QA/UAT/release rows may cite **`BUG-xxxx`** (**US-0042** pattern).
+5. **Reconciliation + surfaces (T-007, T-008)**: extend **`US-0045`** guards; **`/ask`** allowlists.
+6. **Parity + closure (T-009, T-010)**: **`template/`** mirrors; decisions index + operator citations for **DEC-0061** / **`# US-0079`**.
+
+## Risks
+
+- **Duplicate US+BUG** — **`duplicate_of`/`supersedes`** + routing fail-closed (**DEC-0061**).
+- **Validator drift** — single module + **R-0056** Tier A fixtures.
+- **Reconciliation regressions** — extend US-0045 without weakening US-only paths.
+
+## Execution order
+
+Run **`T-001`..`T-010`** in sequence (see **`sprints/S0058/tasks.md`**). Implement allocator + backlog section before intake routing; validator before broad doc edits.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0058/tasks.md`** marked done.
+- **`sprints/S0058/plan-verify.json`** **PASS** after **`/plan-verify`** (QA) with no AC gaps.
+- Lifecycle evidence in **`docs/engineering/state.md`** for **`US-0079`** / **`S0058`** per repo convention.
+
+## Next phase
+
+1. **Dev**: **`/execute`** for **`S0058`** / **`US-0079`** (plan-verify **PASS** recorded).
+
+---
+
+## TL -> Dev Handoff — Sprint S0057 (US-0078 Enforced Interactive Intake Question Evidence)
+
+## Planning summary
+
+- **Sprint**: **S0057** (new; next id after **S0056**)
+- **Story**: **US-0078** — Runtime enforcement of intake question-pack evidence (**`DEC-0060`**, **`R-0055`**, **`DEC-0050`** packs; architecture **`# US-0078`**)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0057/tasks.md`**
+- **Plan-verify**: **PASS** (`sprints/S0057/plan-verify.json`; QA **`2026-03-28`**, `orchestrator_run_id=auto-20260328-01`) — **`/execute`** unblocked.
+
+## Architecture and decision references
+
+- Story acceptance: `docs/product/backlog.md` (US-0078 AC-1..AC-10)
+- Architecture: `docs/engineering/architecture.md` (`# US-0078`)
+- Decisions: `decisions/DEC-0060.md` (extends `decisions/DEC-0050.md`)
+- Research: `docs/engineering/research.md` (**R-0055**)
+- Related: **US-0068** (pack fields), **US-0033** (guided vs low-touch), **US-0030** (parity)
+- PO → TL handoff: `handoffs/po_to_tl.md` (US-0078 addenda / tail mirrors under **`auto-20260328-01`**)
+- Sprint artifacts: `sprints/S0057/*`
+
+## Focus
+
+1. **Coverage + refs (T-001)**: **`topic_coverage`** rows + **`ie:`** binding; required keys from **`selected_pack`**.
+2. **Assumptions (T-002)**: literal **`assumptions_confirmed`** vs **`assumption_confirmation_ref`**; **`INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`**.
+3. **Gate ordering (T-003, T-004)**: validate-then-write; persist **`asked_topics`** vs covered keys audibly.
+4. **Modes (T-005, T-006)**: same validator for guided and **`INTAKE_GUIDED_MODE=0`**; no low-touch bypass.
+5. **Operator UX (T-007)**: missing-topic diagnostics and remediation prompts.
+6. **Evidence (T-008..T-010)**: **`R-0055`** regression matrix; active/template parity; **DEC-0060** / architecture traceability in operator docs and decisions index.
+
+## Risks
+
+- **`ie:`** parser drift — single module + **AC-8** golden vectors (**architecture.md**).
+- **Grandfathered legacy** intake rows — read-only until next mutation; tests must not treat legacy as write **PASS** without full evidence (**DEC-0060** §5).
+- **Friction in low-touch** — mitigate with **AC-7** targeted diagnostics; preserve mandatory coverage invariant.
+
+## Execution order
+
+Run tasks **`T-001`..`T-010`** in sequence (see **`sprints/S0057/tasks.md`**). Implement shared validation module before persistence wiring.
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0057/tasks.md`** marked done.
+- **`sprints/S0057/plan-verify.json`** **PASS** after **`/plan-verify`** (QA) with no AC gaps.
+- **`sprints/S0057/progress.md`**, **`sprints/S0057/uat.json`**, and **`sprints/S0057/uat.md`** updated with implementation evidence (during execute/QA per repo convention).
+- **`docs/engineering/state.md`** includes lifecycle checkpoint traceability for **`US-0078`** / **`S0057`**.
+
+## Next phase
+
+**`/execute`** for **`S0057`** / **`US-0078`** — plan-verify **PASS** recorded in **`sprints/S0057/plan-verify.json`** and **`docs/engineering/state.md`**.
+
+---
+
 ## TL -> Dev Handoff — Sprint S0056 (US-0077 Documentation Profiles + Dual README)
 
 ## Planning summary
@@ -2211,3 +2734,28 @@ Positive-path coverage should confirm:
 
 Dev execution completed for S0008. All T-001..T-010 tasks are marked done and
 the sprint is handed off via `handoffs/dev_to_qa.md` for QA verification.
+
+---
+
+## Research readiness brief — BUG-0003 (pre-architecture)
+
+- `orchestrator_run_id=auto-20260331-03`
+- completed phase: `research` (`tech-lead`)
+- next scheduled phase: `architecture`
+
+### What architecture must lock
+
+1. Required-script source of truth for installer completeness in `missing` and `upgrade`:
+   - preferred: manifest-authoritative (`docs/engineering/context/installer-owned-paths.manifest`).
+2. Deterministic post-install completeness diagnostics for required scripts:
+   - include stable reason code contract on missing framework-critical script(s).
+3. Triple-installer parity strategy:
+   - keep mode semantics aligned across `installer.ps1`, `installer.sh`, `installer.py`,
+     with shared validation logic where practical.
+4. Regression/test obligations:
+   - positive `missing`/`upgrade` completeness checks + negative missing-script fixture;
+     ensure active/template parity coverage.
+
+### Key research anchor
+
+- `docs/engineering/research.md` (`R-0061`)

@@ -107,4 +107,35 @@ Mandatory intake question packs (`US-0068` / `DEC-0050`):
   - `asked_topics`
   - `missing_topics`
   - `assumptions_confirmed`
+- **US-0078 / DEC-0060**: also persist **`topic_coverage`** (with valid **`ie:`** refs per row),
+  keep **`asked_topics`** aligned with covered required keys, and supply
+  **`assumption_confirmation_ref`** (+ quoted text + run/turn metadata) whenever
+  `assumptions_confirmed` is affirmative or non-placeholder. Run
+  `python scripts/intake_evidence_validate.py` on the bundle **before** backlog/acceptance writes;
+  on failure emit deterministic codes (`INTAKE_REQUIRED_TOPIC_MISSING`,
+  `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`, umbrella `INTAKE_PERSISTENCE_BLOCKED`) and **abort** writes.
+  **`INTAKE_GUIDED_MODE=0`** uses the **same** validation pipeline as guided mode.
+- **US-0083 / DEC-0067**: for explicitly delegated unresolved required topics, set
+  `topic_coverage[].satisfied_by=delegation_ref` with bounded metadata
+  (`delegation_scope`, `delegation_rationale`, `delegation_confidence=low|medium|high`);
+  missing/malformed delegation rows fail closed with
+  `INTAKE_DELEGATION_EVIDENCE_MISSING` / `INTAKE_DELEGATION_EVIDENCE_INVALID`
+  under umbrella `INTAKE_PERSISTENCE_BLOCKED`.
+- **US-0083 AC-1 accounting**: if equivalent evidence was already captured, avoid repetitive
+  re-asking by recording `evidence_source=equivalent_evidence_ref` plus
+  `equivalent_evidence_ref` for that `topic_coverage` row (required-topic accounting stays explicit).
+- **US-0081 / DEC-0064**: for `first-intake-pack` (first/new/broad) persist
+  full-plan coverage contract fields and block persistence unless:
+  - `plan_area_inventory` is normalized and has unique valid `plan_area_id`,
+  - `plan_area_coverage` has exactly one row per `plan_area_id`,
+  - each row uses xor mapping (`story_ids[]` or `deferred_ref` +
+    `deferred_reason`),
+  - `coverage_complete=true` matches derived validator result.
+  Emit deterministic subcodes under umbrella `INTAKE_PERSISTENCE_BLOCKED`:
+  `INTAKE_PLAN_COVERAGE_MISSING`, `INTAKE_PLAN_AREA_ID_INVALID`,
+  `INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`, `INTAKE_PLAN_DEFERRED_REF_MISSING`.
+- **US-0079 / DEC-0061**: for **defect** work use **`INTAKE_WORK_ITEM_KIND=bug`** and/or **`/intake bug`**;
+  run **`python scripts/intake_bug_routing_guard.py`** when allocating **`US-xxxx`** for ambiguous prose;
+  persist **`BUG-####`** under **`## Bug issues (canonical)`** with required fields and validate with
+  **`python scripts/bug_issue_validate.py --check-acceptance`**.
 

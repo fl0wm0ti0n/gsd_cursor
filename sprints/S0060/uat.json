@@ -1,0 +1,50 @@
+{
+  "sprint_id": "S0060",
+  "bug_ids": ["BUG-0001"],
+  "orchestrator_run_id": "auto-20260330-01",
+  "status": "populated",
+  "result": "pass",
+  "passed": 5,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Minimal template mirror: three intake_*.py under template/scripts/ byte-match scripts/.",
+      "result": "pass",
+      "notes": "PASS: python scripts/check_intake_template_parity.py --repo . → [INTAKE_TEMPLATE_PARITY_OK]"
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "package.json files aligns with DEC-0063 §2 (template/ + explicit intake paths).",
+      "result": "pass",
+      "notes": "PASS: parity script covers listed pairs; package.json reviewed in sprint summary."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Deterministic parity/regression gate wired (script + pytest).",
+      "result": "pass",
+      "notes": "PASS: pytest tests/intake_template_parity_fixtures_test.py → 1 passed"
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "US-0018 installer-owned paths include intake + parity script for upgrade delivery.",
+      "result": "pass",
+      "notes": "PASS: installer-owned-paths.manifest (active + template) per sprints/S0060/summary.md"
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Operator docs state intake script layout; packaging hydrates from template/.",
+      "result": "pass",
+      "notes": "PASS: README/runbook updates per summary; spot-check narrative in qa-findings + summary"
+    }
+  ],
+  "closure": {
+    "verify_work_at": "2026-03-30T21:00:00Z",
+    "runtime_proof_id": "rp-auto-20260330-01-verify-work-qa-20260330T210000Z-S0060-BUG0001"
+  }
+}

@@ -27,6 +27,13 @@ description: "its-magic refresh context: compact state and decisions."
 1. Compact state and decisions into a short context pack.
 2. Update sprint summary with current status.
 3. Ensure handoffs and state are consistent.
+3a. Optional codebase map refresh (US-0082 / DEC-0065): when merged scratchpad
+    sets `CODEBASE_MAP_REFRESH_ON_ROLLOVER=1`, from repository root run
+    `python scripts/materialize_codebase_map.py --trigger refresh-context`.
+    Default is **skip** (omit this step) to avoid map churn. On
+    `CODEBASE_MAP_BLOCKED:*`, record the token and remediation in the new
+    `state.md` checkpoint; do not rewrite operator-authored maps outside the
+    bootstrap contract.
 4. Enforce **triad** hot-surface rollover when merged scratchpad thresholds are
    exceeded (DEC-0054):
    - read caps from `.cursor/scratchpad.md` + `.cursor/scratchpad.local.md`,

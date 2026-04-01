@@ -469,6 +469,20 @@ Assert-True "README documents US-0068 intake pack behavior (active)" (File-Conta
 Assert-True "README documents US-0068 intake pack behavior (template)" (File-Contains $readmeTemplate "Mandatory intake question packs (US-0068)")
 Assert-True "intake command includes deterministic fail code INTAKE_PERSISTENCE_BLOCKED (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "INTAKE_PERSISTENCE_BLOCKED")
 Assert-True "intake command includes deterministic evidence field asked_topics (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "asked_topics")
+Assert-True "intake command documents US-0078 interactive evidence gate (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "Interactive intake evidence gate (US-0078 / DEC-0060 / R-0055)")
+Assert-True "intake command documents US-0078 interactive evidence gate (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "Interactive intake evidence gate (US-0078 / DEC-0060 / R-0055)")
+Assert-True "intake command documents same pre-persistence validation pipeline guided and low-touch (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "same pre-persistence validation pipeline")
+Assert-True "intake command documents same pre-persistence validation pipeline guided and low-touch (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "same pre-persistence validation pipeline")
+Assert-True "intake command documents bug issue routing US-0079 DEC-0061 (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "Bug issue routing (US-0079 / DEC-0061)")
+Assert-True "intake command documents bug issue routing US-0079 DEC-0061 (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "Bug issue routing (US-0079 / DEC-0061)")
+Assert-True "runbook documents interactive intake evidence validation section (active)" (File-Contains $runbookActive "Interactive intake evidence validation (US-0078 / DEC-0060)")
+Assert-True "runbook documents interactive intake evidence validation section (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Interactive intake evidence validation (US-0078 / DEC-0060)")
+Assert-True "README documents US-0078 intake evidence validator (active)" (File-Contains $readmeActive "Interactive intake evidence + validator (US-0078 / DEC-0060)")
+Assert-True "README documents US-0078 intake evidence validator (template)" (File-Contains $readmeTemplate "Interactive intake evidence + validator (US-0078 / DEC-0060)")
+Assert-True "README documents bug issues US-0079 DEC-0061 (active)" (File-Contains $readmeActive "Bug issues + intake routing (US-0079 / DEC-0061)")
+Assert-True "README documents bug issues US-0079 DEC-0061 (template)" (File-Contains $readmeTemplate "Bug issues + intake routing (US-0079 / DEC-0061)")
+Assert-True "runbook documents bug issues US-0079 section (active)" (File-Contains $runbookActive "Bug issues (US-0079 / DEC-0061)")
+Assert-True "runbook documents bug issues US-0079 section (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Bug issues (US-0079 / DEC-0061)")
 
 # 13) Auto continuation deterministic contract checks (US-0037)
 $autoActive = Join-Path $root ".cursor\commands\auto.md"
@@ -783,6 +797,8 @@ Assert-True "README documents context compaction and tiered token profile (activ
 Assert-True "README documents context compaction and tiered token profile (template)" (File-Contains $readmeTemplate "Context compaction + tiered token profile (US-0053)")
 Assert-True "ask command documents narrow-read policy (active)" (File-Contains $askCommandActive "Apply narrow-read retrieval policy (US-0053)")
 Assert-True "ask command documents narrow-read policy (template)" (File-Contains $askCommandTemplate "Apply narrow-read retrieval policy (US-0053)")
+Assert-True "ask command documents BUG-#### id family (active)" (File-Contains $askCommandActive "BUG-####")
+Assert-True "ask command documents BUG-#### id family (template)" (File-Contains $askCommandTemplate "BUG-####")
 Assert-True "state documents active context surface policy (active)" (File-Contains $stateActive "Active context surface (US-0053 / DEC-0035)")
 Assert-True "state template documents active context surface policy" (File-Contains $stateTemplate "Active context surface (US-0053 / DEC-0035)")
 Assert-True "state archive README exists (active)" (Test-Path $stateArchiveReadmeActive -PathType Leaf)
@@ -1371,6 +1387,80 @@ $docRepo = Start-Process python -ArgumentList @($docProfileScript, "--repo", $ro
 Assert-True "validate_doc_profile passes on repo (template parity)" ($docRepo.ExitCode -eq 0)
 $docFix = Start-Process python -ArgumentList @($docProfileFixtures) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "doc_profile tiered fixtures pass" ($docFix.ExitCode -eq 0)
+
+# 26k) Intake evidence validation (US-0078 / DEC-0060 / R-0055 AC-8)
+$intakeLib = Join-Path $root "scripts\intake_evidence_lib.py"
+$intakeVal = Join-Path $root "scripts\intake_evidence_validate.py"
+$intakeFix = Join-Path $root "tests\intake_evidence_fixtures_test.py"
+Assert-True "intake_evidence_lib.py exists" (Test-Path $intakeLib -PathType Leaf)
+Assert-True "intake_evidence_validate.py exists" (Test-Path $intakeVal -PathType Leaf)
+Assert-True "intake_evidence_fixtures_test.py exists" (Test-Path $intakeFix -PathType Leaf)
+$ieSelf = Start-Process python -ArgumentList @($intakeVal, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake_evidence_validate self-test passes" ($ieSelf.ExitCode -eq 0)
+$ieFix = Start-Process python -ArgumentList @($intakeFix) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake_evidence tiered fixtures pass" ($ieFix.ExitCode -eq 0)
+
+# 26L) Bug issues + intake routing (US-0079 / DEC-0061 / R-0056)
+$bugLib = Join-Path $root "scripts\bug_issue_lib.py"
+$bugVal = Join-Path $root "scripts\bug_issue_validate.py"
+$bugGuard = Join-Path $root "scripts\intake_bug_routing_guard.py"
+$bugFix = Join-Path $root "tests\bug_issue_fixtures_test.py"
+Assert-True "bug_issue_lib.py exists" (Test-Path $bugLib -PathType Leaf)
+Assert-True "bug_issue_validate.py exists" (Test-Path $bugVal -PathType Leaf)
+Assert-True "intake_bug_routing_guard.py exists" (Test-Path $bugGuard -PathType Leaf)
+Assert-True "bug_issue_fixtures_test.py exists" (Test-Path $bugFix -PathType Leaf)
+$bugSelf = Start-Process python -ArgumentList @($bugVal, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "bug_issue_validate self-test passes" ($bugSelf.ExitCode -eq 0)
+$bugRepo = Start-Process python -ArgumentList @($bugVal, "--backlog", "docs/product/backlog.md", "--acceptance", "docs/product/acceptance.md", "--check-acceptance") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "bug_issue_validate repo + acceptance reconciliation passes" ($bugRepo.ExitCode -eq 0)
+$bugFixRun = Start-Process python -ArgumentList @($bugFix) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "bug_issue tiered fixtures pass" ($bugFixRun.ExitCode -eq 0)
+
+# 26N) Intake gate active/template parity (BUG-0001 / DEC-0063 / S0060)
+$intakeParity = Join-Path $root "scripts\check_intake_template_parity.py"
+$intakeParityTest = Join-Path $root "tests\intake_template_parity_fixtures_test.py"
+Assert-True "check_intake_template_parity.py exists" (Test-Path $intakeParity -PathType Leaf)
+Assert-True "intake_template_parity_fixtures_test.py exists" (Test-Path $intakeParityTest -PathType Leaf)
+$intakeParityRun = Start-Process python -ArgumentList @($intakeParity, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake template parity (scripts vs template/scripts) passes" ($intakeParityRun.ExitCode -eq 0)
+$intakeParityPytest = Start-Process python -ArgumentList @($intakeParityTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake_template_parity fixtures pass" ($intakeParityPytest.ExitCode -eq 0)
+
+# 26M) Token-cost parity + metrics harness (US-0080 / DEC-0062)
+$tcpParity = Join-Path $root "scripts\check_token_cost_parity.py"
+$tcLib = Join-Path $root "scripts\token_cost_lib.py"
+$tcCmp = Join-Path $root "scripts\token_cost_compare.py"
+$tcTest = Join-Path $root "tests\token_cost_fixtures_test.py"
+$autoCmdTest = Join-Path $root "tests\auto_command_contract_test.py"
+Assert-True "check_token_cost_parity.py exists" (Test-Path $tcpParity -PathType Leaf)
+Assert-True "token_cost_lib.py exists" (Test-Path $tcLib -PathType Leaf)
+Assert-True "token_cost_compare.py exists" (Test-Path $tcCmp -PathType Leaf)
+Assert-True "token_cost_fixtures_test.py exists" (Test-Path $tcTest -PathType Leaf)
+Assert-True "auto_command_contract_test.py exists" (Test-Path $autoCmdTest -PathType Leaf)
+$tcpRun = Start-Process python -ArgumentList @($tcpParity, "--repo", $root) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "token-cost active/template parity passes" ($tcpRun.ExitCode -eq 0)
+$tcFixRun = Start-Process python -ArgumentList @($tcTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "token_cost fixtures + CLI pass" ($tcFixRun.ExitCode -eq 0)
+$autoCmdRun = Start-Process python -ArgumentList @($autoCmdTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "slim auto command contract markers pass" ($autoCmdRun.ExitCode -eq 0)
+
+# 26N) Codebase map materialize (US-0082 / DEC-0065)
+$mapMat = Join-Path $root "scripts\materialize_codebase_map.py"
+$mapMatTest = Join-Path $root "tests\codebase_map_materialize_test.py"
+Assert-True "materialize_codebase_map.py exists" (Test-Path $mapMat -PathType Leaf)
+Assert-True "codebase_map_materialize_test.py exists" (Test-Path $mapMatTest -PathType Leaf)
+Assert-True "architecture command documents map materialize (active)" (File-Contains (Join-Path $root ".cursor\commands\architecture.md") "materialize_codebase_map.py")
+Assert-True "architecture command documents map materialize (template)" (File-Contains (Join-Path $tpl ".cursor\commands\architecture.md") "materialize_codebase_map.py")
+Assert-True "runbook documents codebase map bootstrap (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "Codebase map bootstrap (US-0082 / DEC-0065)")
+Assert-True "runbook documents codebase map bootstrap (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "Codebase map bootstrap (US-0082 / DEC-0065)")
+$mapMatRun = Start-Process python -ArgumentList @($mapMatTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "codebase_map_materialize_test passes" ($mapMatRun.ExitCode -eq 0)
+
+# 26O) Installer completeness deterministic contract (BUG-0003 / DEC-0066)
+$installerCompletenessTest = Join-Path $root "tests\installer_completeness_bug0003_test.py"
+Assert-True "installer_completeness_bug0003_test.py exists" (Test-Path $installerCompletenessTest -PathType Leaf)
+$installerCompletenessRun = Start-Process python -ArgumentList @($installerCompletenessTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "installer completeness BUG-0003 fixtures pass" ($installerCompletenessRun.ExitCode -eq 0)
 
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {

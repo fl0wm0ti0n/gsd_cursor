@@ -1,14 +1,27 @@
 # Decisions
 
-## Current context pack (2026-03-28 — post-refresh-context US-0077 / S0056 / auto-20260327-02 closed)
+## Current context pack (2026-04-01 — **`US-0083` DONE**; sprint **`S0064` released**; curator **`/refresh-context`** completed on **`auto-20260331-04`**; next intended phase **`/intake`** for portfolio continuation; prior **`BUG-0003` / `S0063`** and **`US-0082` / `S0062`** remain released)
 
+- **`US-0079`** (**DONE**, **`S0058`**, **released**): full lifecycle on **`auto-20260329-01`** — **`/release`** **PASS** **`2026-03-30`**; **`handoffs/release_queue.md`** **`S0058`** **`released`**; **`handoffs/releases/S0058-release-notes.md`**; curator **`/refresh-context`** **PASS** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-30) — post S0058 / US-0079 (auto-20260329-01)** (`stop_reason=completed`, `next_scheduled_phase=none`); normative **`DEC-0061`**, **`architecture.md`** **`# US-0079`**, **`R-0056`** delivery closed.
+- **`US-0078`** (**`S0057`**): **DONE** / **released**; evidence **`sprints/S0057/release-findings.md`**, **`handoffs/releases/S0057-release-notes.md`**, **`handoffs/release_queue.md`** row **`S0057`** **`released`**; **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-29) — post S0057 / US-0078 (auto-20260328-01)** (`stop_reason=completed`, `next_scheduled_phase=none`, curator isolation + strict-proof tuple); release traceability **Release checkpoint (2026-03-29) — S0057 / US-0078 / auto-20260328-01**; governance **`DEC-0060`**, **`architecture.md`** **`# US-0078`**.
 - **`US-0077`** (**`S0056`**): **DONE** / **released**; evidence **`sprints/S0056/release-findings.md`**, **`handoffs/releases/S0056-release-notes.md`**, **`## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)`** in **`docs/engineering/state.md`** (`orchestrator_run_id=auto-20260327-02`, `stop_reason=completed`, `next_scheduled_phase=none`).
 - Migration default: explicit scratchpad keys **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`** recommended (`both` / `balanced`); **absent keys** on merged scratchpad resolve to **`both`×`balanced`** for resolver/tests per **DEC-0059** §6 until a future cutover mandates explicit keys in CI.
 - **`US-0076`** (**`S0055`**): **DONE** / **released**; evidence **`sprints/S0055/release-findings.md`**, **`handoffs/releases/S0055-release-notes.md`**, **`## Refresh-context checkpoint (2026-03-27) — post S0055 / US-0076`** in **`docs/engineering/state.md`** (`orchestrator_run_id=auto-20260327-01`, `stop_reason=completed`).
-- Active workflow target: **`/intake`** when new work is prioritized (no scheduled auto phase; queue idle).
-- Research: **`R-0053`** (closed with **US-0076**); **`R-0054`** — retained for **US-0077** matrix traceability; normative lock-in **`DEC-0059`** + **`architecture.md`** **`# US-0077`** (delivery closure noted in **`docs/engineering/research.md`**).
+- **`US-0080`** (**DONE**, **`S0059`**, **released**): full lifecycle on **`auto-20260329-02`** — **`/release`** **PASS** **`2026-03-29`**; **`handoffs/release_queue.md`** **`S0059`** **`released`**; **`handoffs/releases/S0059-release-notes.md`**; curator **`/refresh-context`** **PASS** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-30) — post S0059 / US-0080 (auto-20260329-02)** (`stop_reason=completed`, `next_scheduled_phase=none`); normative **`DEC-0062`**, **`architecture.md`** **`# US-0080`**, **`R-0057`** delivery closed.
+- **`US-0081`** (**DONE**, **`S0061`**, **released**): full lifecycle on **`auto-20260331-01`** — **`/release`** **PASS** **`2026-03-31`**; **`handoffs/release_queue.md`** **`S0061`** **`released`**; **`handoffs/releases/S0061-release-notes.md`**; curator **`/refresh-context`** **PASS** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-31) — S0061 / US-0081 / auto-20260331-01** (`stop_reason=completed`, `next_scheduled_phase=none`); normative **`DEC-0064`**, **`architecture.md`** **`# US-0081`**, **`R-0059`** delivery closed.
+- **`US-0082`** (**DONE**, **`S0062`**, **released**): full lifecycle on **`auto-20260331-02`** — **`/release`** **PASS** **`2026-03-31`**; **`handoffs/release_queue.md`** **`S0062`** **`released`**; **`handoffs/releases/S0062-release-notes.md`**; curator **`/refresh-context`** **PASS** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-31) — S0062 / US-0082 / auto-20260331-02** (`stop_reason=completed`, `next_scheduled_phase=none`); normative **`DEC-0065`**, **`architecture.md`** **`# US-0082`**, **`R-0060`** delivery closed.
+- **`BUG-0001`** (**DONE**, **`S0060`**, **released**): full defect lifecycle on **`auto-20260330-01`** — **`/release`** **PASS** **`2026-03-30`**; **`handoffs/release_queue.md`** **`S0060`** **`released`**; **`handoffs/releases/S0060-release-notes.md`**; curator **`/refresh-context`** **PASS** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-30) — S0060 / BUG-0001 / auto-20260330-01** (`stop_reason=completed`, `next_scheduled_phase=none`); normative **`DEC-0063`**, **`architecture.md`** **`# BUG-0001`**, **`R-0058`** delivery closed. Sprint artifacts **`sprints/S0060/*`**.
+- **`BUG-0003`** (**DONE**, **`S0063`**, **released**): full defect lifecycle on **`auto-20260331-03`** — **`/release`** **PASS** **`2026-03-31`**; **`handoffs/release_queue.md`** **`S0063`** **`released`**; **`handoffs/releases/S0063-release-notes.md`**; curator **`/refresh-context`** closure captured in **`docs/engineering/state.md`** with `stop_reason=completed` and `next_scheduled_phase=none`; normative **`DEC-0066`**, **`architecture.md`** **`# BUG-0003`**, **`R-0061`** delivery closed.
+- **`US-0083`** (**DONE**, **`S0064`**, **released**): full lifecycle on **`auto-20260331-04`** — **`/release`** **PASS** **`2026-03-31`**; **`handoffs/release_queue.md`** **`S0064`** **`released`**; **`handoffs/releases/S0064-release-notes.md`**; curator **`/refresh-context`** reconciliation completed (**`2026-04-01T01:15:55Z`**) with closure posture aligned in sprint/research/resume artifacts; normative **`DEC-0067`**, **`docs/engineering/architecture.md`** **`# US-0083`**, **`R-0062`** delivery closed.
+- Research: **`R-0053`** (closed with **US-0076**); **`R-0054`** — retained for **US-0077** matrix traceability; normative lock-in **`DEC-0059`** + **`architecture.md`** **`# US-0077`** (delivery closure noted in **`docs/engineering/research.md`**). **`R-0055`** — **US-0078** delivery closed **2026-03-29** with **`S0057`** + **`DEC-0060`** / **`# US-0078`**. **`R-0056`** — **US-0079** delivery closed **2026-03-30** with **`S0058`** + **`DEC-0061`** / **`# US-0079`**. **`R-0057`** — **US-0080** delivery closed **2026-03-30** with **`S0059`** + **`DEC-0062`** / **`# US-0080`**. **`R-0058`** — **BUG-0001** delivery closed **2026-03-30** with **`S0060`** + **`DEC-0063`** / **`# BUG-0001`** (curator **`/refresh-context`** on **`auto-20260330-01`**). **`R-0059`** — **US-0081** delivery closed **2026-03-31** with **`S0061`** + **`DEC-0064`** / **`# US-0081`** (curator **`/refresh-context`** on **`auto-20260331-01`**). **`R-0060`** — **US-0082** delivery closed **2026-03-31** with **`S0062`** + **`DEC-0065`** / **`# US-0082`** (curator **`/refresh-context`** on **`auto-20260331-02`** **`2026-03-31T21:50:00Z`**). **`R-0061`** — **BUG-0003** delivery closed **2026-03-31** with **`S0063`** + **`DEC-0066`** / **`# BUG-0003`** (curator **`/refresh-context`** on **`auto-20260331-03`**). **`R-0062`** — **US-0083** delivery closed **2026-04-01** with **`S0064`** + **`DEC-0067`** / **`# US-0083`** (curator **`/refresh-context`** on **`auto-20260331-04`** **`2026-04-01T01:15:55Z`**).
+- Decision: **`DEC-0062`** — **`US-0080`** token-cost metrics, **`run_class_hash`**, **`handoffs/token_cost_runs/`**, parity manifest, AC-10 trade-offs — see **`decisions/DEC-0062.md`** and **`docs/engineering/architecture.md`** **`# US-0080`**.
+- Decision: **`DEC-0063`** — **`BUG-0001`** intake gate script ship path (**`template/scripts/`** minimal mirror, **`package.json` `files`**, parity tests, **`US-0018`**) — see **`decisions/DEC-0063.md`** and **`docs/engineering/architecture.md`** **`# BUG-0001`**.
+- Decision: **`DEC-0064`** — **`US-0081`** deterministic first-intake full-plan coverage gate (**`plan_area_inventory`**, **`plan_area_coverage`**, fail-closed `INTAKE_PERSISTENCE_BLOCKED` + subcodes, parity/fixture verification) — see **`decisions/DEC-0064.md`** and **`docs/engineering/architecture.md`** **`# US-0081`**.
+- Decision: **`DEC-0066`** — **`BUG-0003`** deterministic installer completeness in `missing`/`upgrade` (manifest-authoritative required script inventory, post-install diagnostics, parity/symmetry tests) — see **`decisions/DEC-0066.md`** and **`docs/engineering/architecture.md`** **`# BUG-0003`**.
+- Decision: **`DEC-0067`** — **`US-0083`** explicit topic-scoped intake delegation (`satisfied_by=delegation_ref` + bounded delegation fields), deterministic delegation fail codes under `INTAKE_PERSISTENCE_BLOCKED`, guided/low-touch parity, and DEC-0060-compatible `ie:` evidence binding — see **`decisions/DEC-0067.md`** and **`docs/engineering/architecture.md`** **`# US-0083`**.
 - Decision: **`DEC-0059`** — profile semantics, **`docs/developer/README.md`** shard, H2 mapping, validator **`scripts/validate_doc_profile.py`**, tiered **AC-8** tests, migration defaults — see **`decisions/DEC-0059.md`** and **`docs/engineering/architecture.md`** **`# US-0077`**.
-- Continuation hygiene: **`handoffs/resume_brief.md`** → **`none`** + **`/intake`**.
+- Decision: **`DEC-0065`** — **`US-0082`** codebase map bootstrap lifecycle (**`/architecture`** primary gate, optional **`/refresh-context`**, **`/map-codebase`** manual; idempotency; **`CODEBASE_MAP_*`** diagnostics; parity) — see **`decisions/DEC-0065.md`** and **`docs/engineering/architecture.md`** **`# US-0082`**.
+- Continuation hygiene: **`handoffs/resume_brief.md`** now routes to **`/intake`** for the next portfolio target after **`US-0083`** release/refresh closure on **`auto-20260331-04`**; prior released evidence unchanged for **`S0061`** / **`S0062`** / **`S0063`** / **`S0064`**.
 - Latest completed/released stories (high-signal, unchanged):
   - `US-0075` (`S0054`, released), governed by **`DEC-0057`** (scratchpad **example-first**
     upgrade ordering + **`AC-11`** paired baseline ↔ example catalog parity gate;
@@ -21,8 +34,36 @@
   - `US-0071` (`S0050`, released), governed by **`DEC-0053`** (user-visible metadata guard).
   - `US-0070` (`S0049`, released), governed by **`DEC-0052`**.
   - `US-0069` (`S0048`, released), governed by **`DEC-0051`**.
-- Hot surface: at **`/refresh-context` (2026-03-28)**, post-append **`state.md`** oversize → **`rollover_complete units=1`** → **`docs/engineering/state-archive/state-pack-20260327-q.md`**; final triad **`--check`** **PASS** (see **`## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)`**).
+- Hot surface: latest **`/refresh-context` (2026-04-01)** post-**`S0064`** / **`US-0083`** on **`auto-20260331-04`** (closure posture reconciled for decisions/research/sprint/resume artifacts). Prior: post-**`S0063`** / **`BUG-0003`** (**`auto-20260331-03`**); post-**`S0062`** / **`US-0082`** (**`auto-20260331-02`**); post-**`S0061`** / **`US-0081`** (**`auto-20260331-01`**).
 - Traceability (**DEC-0010**):
+  - `| US-0082 | S0062 | T-001..T-010 | DONE |` — **`DEC-0065`** + **`# US-0082`**; **`sprints/S0062/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0062/uat.json`**, **`sprints/S0062/uat.md`** **PASS**;
+    **`sprints/S0062/release-findings.md`**; **`handoffs/releases/S0062-release-notes.md`**;
+    orchestrator **`auto-20260331-02`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0062`** **`released`**.
+  - `| US-0081 | S0061 | T-001..T-010 | DONE |` — **`DEC-0064`** + **`# US-0081`**; **`sprints/S0061/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0061/uat.json`**, **`sprints/S0061/uat.md`** **PASS**;
+    **`sprints/S0061/release-findings.md`**; **`handoffs/releases/S0061-release-notes.md`**;
+    orchestrator **`auto-20260331-01`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0061`** **`released`**.
+  - `| US-0079 | S0058 | T-001..T-010 | DONE |` — **`DEC-0061`** + **`# US-0079`**; **`sprints/S0058/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0058/uat.json`**, **`sprints/S0058/uat.md`** **PASS**;
+    **`sprints/S0058/release-findings.md`**; **`handoffs/releases/S0058-release-notes.md`**;
+    orchestrator **`auto-20260329-01`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0058`** **`released`**.
+  - `| US-0080 | S0059 | T-001..T-010 | DONE |` — **`DEC-0062`** + **`# US-0080`**; **`sprints/S0059/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0059/uat.json`**, **`sprints/S0059/uat.md`** **PASS**;
+    **`sprints/S0059/release-findings.md`**; **`handoffs/releases/S0059-release-notes.md`**;
+    orchestrator **`auto-20260329-02`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0059`** **`released`**.
+  - `| BUG-0001 | S0060 | T-001..T-005 | DONE |` — **`DEC-0063`** + **`architecture.md`** **`# BUG-0001`**; **`sprints/S0060/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0060/uat.json`**, **`sprints/S0060/uat.md`** **PASS**;
+    **`sprints/S0060/release-findings.md`**; **`handoffs/releases/S0060-release-notes.md`**;
+    orchestrator **`auto-20260330-01`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0060`** **`released`**.
+  - `| BUG-0003 | S0063 | T-001..T-010 | DONE |` — **`DEC-0066`** + **`architecture.md`** **`# BUG-0003`**; **`sprints/S0063/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0063/uat.json`**, **`sprints/S0063/uat.md`** **PASS**;
+    **`sprints/S0063/release-findings.md`**; **`handoffs/releases/S0063-release-notes.md`**;
+    orchestrator **`auto-20260331-03`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0063`** **`released`**.
+  - `| US-0078 | S0057 | T-001..T-010 | DONE |` — **`DEC-0060`** + **`# US-0078`**; **`sprints/S0057/*`**;
+    **`plan-verify.json`** **PASS**; **`sprints/S0057/uat.json`**, **`sprints/S0057/uat.md`** **PASS**;
+    **`sprints/S0057/release-findings.md`**; **`handoffs/releases/S0057-release-notes.md`**;
+    orchestrator **`auto-20260328-01`** closed at **`/refresh-context`**; **`handoffs/release_queue.md`** **`S0057`** **`released`**.
   - `| US-0077 | S0056 | T-001..T-010 | DONE |` — **`DEC-0059`** + **`# US-0077`**; sprint artifacts
     **`sprints/S0056/*`**; **`plan-verify.json`** **PASS**; **`sprints/S0056/release-findings.md`**;
     **`handoffs/releases/S0056-release-notes.md`**; orchestrator **`auto-20260327-02`** closed at **`/refresh-context`**.
@@ -40,6 +81,35 @@
 
 ## Compact decision index (bounded summaries)
 
+- `DEC-0067`: **explicit topic-scoped intake delegation (`US-0083`)** — extend `topic_coverage.satisfied_by` with `delegation_ref`; require `delegation_scope`, `delegation_rationale`, `delegation_confidence`, and DEC-0060-compatible `ie:` evidence binding; preserve non-delegated fail-closed path and add deterministic delegation diagnostics (`INTAKE_DELEGATION_EVIDENCE_MISSING`, `INTAKE_DELEGATION_EVIDENCE_INVALID`) under `INTAKE_PERSISTENCE_BLOCKED`; guided/low-touch parity; **`R-0062`** basis; architecture **`# US-0083`**.
+- `DEC-0066`: **installer completeness contract for `missing`/`upgrade` (`BUG-0003`)** — manifest is single required-script source of truth (`installer-owned-paths.manifest`), required inclusion of `scripts/enforce-triad-hot-surface.py`, deterministic post-install checks with `INSTALL_COMPLETENESS_FAILED` / `INSTALL_REQUIRED_SCRIPT_MISSING:<path>`, parity-safe shared validator path across PS1/SH/PY, and positive/negative/symmetry regression scope; **`R-0061`** basis; architecture **`# BUG-0003`**.
+- `DEC-0065`: **codebase map bootstrap lifecycle (`US-0082`)** — primary guarantee at **`/architecture`** completion (**tech-lead**); optional policy-gated **`/refresh-context`** refresh; **`/map-codebase`** manual; idempotent regeneration; ownership aligned with map command; deterministic **`CODEBASE_MAP_*`** diagnostics; active/**`template/`** parity + regression matrix; profile containment vs **DEC-0052**; **`R-0060`** basis; architecture **`# US-0082`**.
+- `DEC-0064`: **first-intake full-plan coverage gate (`US-0081`)** — normalized **`plan_area_inventory`** + total **`plan_area_id -> story_ids[] | deferred_ref`** mapping required before persistence; fail-closed **`INTAKE_PERSISTENCE_BLOCKED`** family (**`INTAKE_PLAN_COVERAGE_MISSING`**, **`INTAKE_PLAN_AREA_ID_INVALID`**, **`INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`**, **`INTAKE_PLAN_DEFERRED_REF_MISSING`**); guided/low-touch parity and active/**`template/`** fixture checks; **`R-0059`** basis; architecture **`# US-0081`**.
+- `DEC-0063`: **intake script ship path (`BUG-0001`)** — three **`intake_*`** files under **`template/scripts/`** mirroring **`scripts/`**; **`package.json` `files`** (**`template/`** primary, optional explicit **`scripts/intake_*.py`**); deterministic parity tests; **`US-0018`** upgrade delivery; **`R-0058`** basis; architecture **`# BUG-0001`**.
+- `DEC-0062`: **token-cost metrics + `run_class_hash` + evidence channel (`US-0080`)** — canonical
+  fields **`cache_read_tokens`** / **`input_tokens`** / **`output_tokens`** / **`phase_call_count`** (+ optional
+  **`cache_creation_tokens`**); **SHA-256** sorted-key JSON **`run_class_hash`** for AC-2 comparability;
+  append-only **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** (or **`.jsonl`**) + **`state.md`**
+  **`token_cost_evidence_ref`**; parity manifest for **`.cursor/commands/`** / **`.cursor/rules/`** / **`template/`**;
+  trade-off table + **`TOKEN_COST_RUN_CLASS_MISMATCH`**; phase boundary **`token_cost_evidence_ref`** (**AC-10**);
+  **`R-0057`** basis; architecture **`# US-0080`**.
+- `DEC-0061`: **first-class bug issues `BUG-xxxx` + `OPEN`/`DONE` (`US-0079`)** — canonical
+  **`## Bug issues (canonical)`** in **`backlog.md`** (optional split per §2); allocator matches
+  **`US-xxxx`** policy; minimum schema **environment** / **steps_to_reproduce** / **expected** /
+  **actual** / **evidence_refs**; routing via **`INTAKE_WORK_ITEM_KIND`** and/or **`/intake bug`**;
+  fail closed **`INTAKE_BUG_ROUTING_REQUIRED`** / mismatch family; **`## Bug acceptance (canonical)`**
+  in **`acceptance.md`**; validators **`scripts/bug_issue_validate.py`**, **`scripts/intake_bug_routing_guard.py`**,
+  **`tests/bug_issue_fixtures_test.py`**; **`US-0045`** bug-family reconciliation; sprint/QA/release/**`/ask`**
+  traceability; optional **`bug_ids`** on **`state.md`** phase boundaries (**US-0070** visibility);
+  **`R-0056`** test tiers; architecture **`# US-0079`**.
+- `DEC-0060`: **intake question-pack interactive evidence + `ie:` ref binding (`US-0078`)** —
+  extends **`DEC-0050`** with mandatory **`topic_coverage`** rows, **`satisfied_by`**, canonical **`ref`**
+  (`ie:<intake_run_id>:<turn_index>:<sha256_16>` over sorted-key JSON), asked-vs-covered default
+  fail-closed, assumption **`assumption_confirmation_ref`**, mode parity (**guided** / **low-touch**),
+  migration grandfather for legacy rows until next intake mutation; reason codes align **`R-0055`**;
+  executable validator **`scripts/intake_evidence_validate.py`** + library **`scripts/intake_evidence_lib.py`**
+  + **`tests/intake_evidence_fixtures_test.py`** (**AC-8**); architecture **`# US-0078`**;
+  linked story **`US-0078`**.
 - `DEC-0059`: **documentation audience/depth profiles + dual README developer shard (`US-0077`)** —
   merged scratchpad keys **`DOC_AUDIENCE_PROFILE`** / **`DOC_DETAIL_LEVEL`**; **9-cell**
   semantic keys per **`R-0054`**; root **`README.md`** (**`USER_*`**) + **`docs/developer/README.md`**
@@ -183,4 +253,4 @@
 ## Canonical full records
 
 - Full records live in decisions/DEC-xxxx.md.
-- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0059.md`.
+- Index pattern: `decisions/DEC-0003.md` ... `decisions/DEC-0067.md`.

@@ -2,42 +2,47 @@
 
 ## Current status
 
-- Queue posture:
-  - **`docs/product/backlog.md`** — **`US-0077`** **DONE** (**S0056** released); no further phased work scheduled for **`orchestrator_run_id=auto-20260327-02`** (**`stop_reason=completed`**, **`next_scheduled_phase=none`**).
-  - Latest released sprint: **`S0056`** (**`US-0077`**, **`DEC-0059`**); queue row **`released`** (`handoffs/release_queue.md`).
-  - **`/refresh-context`** complete (**2026-03-28**, curator) — see **`## Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)`** in **`docs/engineering/state.md`**.
-- Next prioritized work enters via **`/intake`** when available.
+- **Refresh-context complete**: post-release curation for **`US-0083`** in fresh **curator** context (`orchestrator_run_id=auto-20260331-04`) at `2026-04-01T01:15:55Z`; sprint **`S0064`** remains finalized as `released`.
+- **Fresh context marker**: `curator-US0083-refresh-context-20260401T011555Z-fresh`.
+- **Boundary evidence**: `docs/engineering/decisions.md`, `docs/engineering/research.md`, `sprints/S0064/summary.md`, `handoffs/resume_brief.md`.
+- **Canonical status posture**: `docs/product/backlog.md` remains the authority and records `US-0083` as `Status: DONE` (US-0045).
+- **Release queue posture**: `handoffs/release_queue.md` row `S0064` is `released` and aligned with release notes.
 
 ## Next actions
 
-1. Run **`/intake`** when you want to add or refine backlog stories.
-2. Optional: **`/auto`** with explicit story selection after a new intake anchor exists (no implicit continuation from **`auto-20260327-02`**).
+1. Run **`/refresh-context`** in fresh **curator** context:
+   - completed for `US-0083` / `S0064`.
+2. Start next portfolio cycle at **`/intake`**:
+   - capture next user-priority backlog item (new story/bug id assigned during intake),
+   - preserve canonical status authority in `docs/product/backlog.md` (US-0045),
+   - route to discovery only after bounded intake evidence is recorded.
 
 ## Intended resume phase
 
-`none`
+`intake`
 
 ## Resume target
 
-- story_id=`(none — queue idle)`
-- sprint_id=`(none)`
-- boundary=`post-refresh-context` (see **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02)**)
+- bug_id=(none)
+- story_id=(next-portfolio-intake; to be assigned)
+- sprint_id=(none)
+- boundary=post-**`refresh-context`** checkpoint **`auto-20260331-04`** / **US-0083**
 
 ## Isolation provenance (US-0048/US-0056)
 
-- isolation_provenance_ref=docs/engineering/state.md (Refresh-context checkpoint (2026-03-28) — post S0056 / US-0077 (auto-20260327-02))
-- resume_requires_fresh_context=0
+- isolation_provenance_ref=docs/engineering/decisions.md
+- resume_requires_fresh_context=1 (spawn fresh phase subagent per boundary)
 
 ## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
-- resolved_start_phase=none
-- resolution_source=refresh_context_complete
+- resolved_start_phase=intake
+- resolution_source=resume_brief
 - resolution_status=resolved
 - stop_reason=completed
 - stop_phase=refresh-context
-- next_scheduled_phase=none
-- story_id=US-0077
-- sprint_id=S0056
-- orchestrator_run_id=auto-20260327-02
-- timestamp=2026-03-28T15:45:00Z
+- next_scheduled_phase=intake
+- bug_id=(none)
+- story_id=(next-portfolio-intake; to be assigned)
+- sprint_id=(none)
+- orchestrator_run_id=auto-20260331-04

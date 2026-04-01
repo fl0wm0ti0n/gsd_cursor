@@ -1,0 +1,98 @@
+{
+  "sprint_id": "S0064",
+  "story_ids": ["US-0083"],
+  "orchestrator_run_id": "auto-20260331-04",
+  "status": "populated",
+  "result": "pass",
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "ac": "AC-1",
+      "description": "Intake questioning adapts to context and avoids fixed repetitive prompts when equivalent information exists.",
+      "result": "pass",
+      "notes": "PASS: equivalent-evidence accounting path (`evidence_source=equivalent_evidence_ref`, `equivalent_evidence_ref`) is implemented and covered by regression evidence in QA findings."
+    },
+    {
+      "id": "UAT-002",
+      "ac": "AC-2",
+      "description": "Users can explicitly delegate unresolved intake decisions with auditable persisted evidence.",
+      "result": "pass",
+      "notes": "PASS: validator accepts topic-scoped `satisfied_by=delegation_ref` and requires explicit delegation metadata."
+    },
+    {
+      "id": "UAT-003",
+      "ac": "AC-3",
+      "description": "Explicit delegation provides non-blocking persistence for unresolved delegated topics while preserving deterministic validation behavior.",
+      "result": "pass",
+      "notes": "PASS: delegated required-topic paths validate with deterministic outcomes via fixture matrix (`tests/intake_evidence_fixtures_test.py`)."
+    },
+    {
+      "id": "UAT-004",
+      "ac": "AC-4",
+      "description": "Non-delegated unresolved required topics remain fail-closed with deterministic reason codes/remediation.",
+      "result": "pass",
+      "notes": "PASS: non-delegated fail path remains `INTAKE_REQUIRED_TOPIC_MISSING` under `INTAKE_PERSISTENCE_BLOCKED` per execute + QA evidence."
+    },
+    {
+      "id": "UAT-005",
+      "ac": "AC-5",
+      "description": "Delegated assumptions carry bounded scope, rationale, and confidence for downstream revisitability.",
+      "result": "pass",
+      "notes": "PASS: delegated rows require `delegation_scope`, `delegation_rationale`, and bounded `delegation_confidence`."
+    },
+    {
+      "id": "UAT-006",
+      "ac": "AC-6",
+      "description": "Guided and low-touch modes support delegation consistently without silent bypass.",
+      "result": "pass",
+      "notes": "PASS: QA findings confirm guided/low-touch parity through shared validator matrix assertions."
+    },
+    {
+      "id": "UAT-007",
+      "ac": "AC-7",
+      "description": "`/intake`, PO guidance, and runbook explain ask-vs-delegate behavior and evidence recording.",
+      "result": "pass",
+      "notes": "PASS: touched docs/command surfaces were updated and validated in QA (`.cursor/commands/intake.md`, `.cursor/agents/po.mdc`, `docs/engineering/runbook.md`)."
+    },
+    {
+      "id": "UAT-008",
+      "ac": "AC-8",
+      "description": "Intake evidence schema/validator supports delegated-topic representation with DEC-0060-compatible machine-verifiable refs.",
+      "result": "pass",
+      "notes": "PASS: self-test and delegated fixtures pass using deterministic schema validation (`python scripts/intake_evidence_validate.py --self-test`)."
+    },
+    {
+      "id": "UAT-009",
+      "ac": "AC-9",
+      "description": "Active/template parity is maintained for delegation-related command/rule/docs/tests surfaces.",
+      "result": "pass",
+      "notes": "PASS: template parity check succeeded (`python scripts/check_intake_template_parity.py --repo .`)."
+    },
+    {
+      "id": "UAT-010",
+      "ac": "AC-10",
+      "description": "Regression coverage includes delegated pass, non-delegated block, and deterministic delegation diagnostics.",
+      "result": "pass",
+      "notes": "PASS: fixture matrix validates pass/fail branches and delegation diagnostics (`INTAKE_DELEGATION_EVIDENCE_MISSING`, `INTAKE_DELEGATION_EVIDENCE_INVALID`)."
+    }
+  ],
+  "verified_state": "qa-pass-and-uat-pass",
+  "evidence_refs": [
+    "sprints/S0064/qa-findings.md",
+    "sprints/S0064/summary.md",
+    "sprints/S0064/tasks.md",
+    "handoffs/qa_to_verify_work.md",
+    "tests/intake_evidence_fixtures_test.py",
+    "scripts/intake_evidence_validate.py",
+    "scripts/check_intake_template_parity.py",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "handoffs/release_queue.md",
+    "handoffs/resume_brief.md"
+  ],
+  "closure": {
+    "verify_work_at": "2026-03-31T23:09:23Z"
+  }
+}

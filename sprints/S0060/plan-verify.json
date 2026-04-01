@@ -1,0 +1,58 @@
+{
+  "sprint_id": "S0060",
+  "bug_id": "BUG-0001",
+  "story_id": null,
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (BUG-0001 expected/actual) + docs/product/acceptance.md (BUG-0001 row) + sprints/S0060/sprint.md (AC-1..AC-5 decomposition)",
+    "task_source": "sprints/S0060/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0060/sprint.md",
+    "decision_source": "decisions/DEC-0063.md",
+    "architecture_traceability": [
+      "DEC-0063",
+      "DEC-0061",
+      "docs/engineering/architecture.md (# BUG-0001)",
+      "docs/engineering/research.md (R-0058)",
+      "US-0018",
+      "US-0030",
+      "US-0045"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead): sprint-local AC-1..AC-5 each assigned exactly one task T-001..T-005 in tasks.md (1:1 bijection).",
+      "Cross-read sprint.md scope vs DEC-0063, architecture # BUG-0001, and R-0058.",
+      "Sizing: 5 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "AWAITING_QA_PLAN_VERIFY — QA /plan-verify must confirm bijection, governance, and plan_integrity before /execute.",
+      "Canonical bug status remains OPEN (US-0045); acceptance.md BUG-0001 row unchanged until verify-work.",
+      "QA (2026-03-30): Re-validated table AC column vs tasks.md mapping block; sprint.md AC themes match backlog expected (intake script completeness); portfolio acceptance row text aligns with sprint goal; plan_integrity flags consistent; coverage rows marked verified."
+    ],
+    "orchestrator_run_id": "auto-20260330-01",
+    "planned_at": "2026-03-30T23:45:00Z",
+    "plan_verified_at": "2026-03-30T23:55:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "template/scripts/ intake trio mirror — DEC-0063 §1" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "package.json files policy — DEC-0063 §2" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "Deterministic parity CI — DEC-0063 §3 / US-0030" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "US-0018 upgrade delivery — DEC-0063 §4" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "Operator docs + triple-installer consistency — R-0058" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Drift between scripts/ and template/scripts/ — mitigate with T-003 parity gate.",
+    "Upgrade skips new intake files — mitigate with T-004 US-0018 evidence."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "DEC-0063",
+      "docs/engineering/architecture.md (# BUG-0001)",
+      "docs/engineering/research.md (R-0058)"
+    ]
+  },
+  "summary": "PASS — QA plan-verify for S0060 / BUG-0001: AC-1..AC-5 ↔ T-001..T-005 bijection, governance alignment, BUG-0001 remains OPEN until verify-work; /execute unblocked."
+}

@@ -82,6 +82,62 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
   - `asked_topics`
   - `missing_topics`
   - `assumptions_confirmed`
+  - For `first-intake-pack` (first/new/broad): `plan_area_inventory`,
+    `plan_area_coverage`, `coverage_complete=true` (derived), and candidate story
+    set refs used for map validation (**US-0081** / **DEC-0064**).
+
+## Interactive intake evidence gate (US-0078 / DEC-0060 / R-0055)
+
+Machine-verifiable **`intake_evidence`** extends **DEC-0050** literals with
+**`topic_coverage`** (one row per required pack key), canonical **`ie:`** refs,
+and assumption binding. **Do not** mutate `docs/product/backlog.md` or
+`docs/product/acceptance.md` until validation **PASS**es.
+
+- Bundle minimum (logical shape — serialize inline in handoff/backlog notes or JSON sidecar):
+  - `selected_pack`, `asked_topics`, `missing_topics`, `assumptions_confirmed`
+  - `topic_coverage[]`: `topic_key`, `satisfied_by` (`answer_ref` \| `assumption_confirmation_ref` \| `delegation_ref`),
+    `ref` (**`ie:`** per **DEC-0060**), `quoted_user_text`, per-row `intake_run_id` / `turn_index`
+    (or bundle-level `intake_run_id` shared by rows)
+  - Delegated required topic rows (`satisfied_by=delegation_ref`) must include:
+    `delegation_scope`, `delegation_rationale`, `delegation_confidence` (`low|medium|high`)
+  - Equivalent-evidence accounting (optional; suppress repetitive ask for already captured evidence):
+    `evidence_source=equivalent_evidence_ref` + `equivalent_evidence_ref` on the row
+  - Affirmative / non-placeholder `assumptions_confirmed`: `assumption_confirmation_ref`,
+    `assumption_confirmation_intake_run_id`, `assumption_confirmation_turn_index`,
+    `assumption_confirmation_quoted`
+- Validator (fail-closed; preserves primary sub-codes under umbrella **`INTAKE_PERSISTENCE_BLOCKED`**):
+  - `python scripts/intake_evidence_validate.py --self-test`
+  - `python scripts/intake_evidence_validate.py --file <bundle.json>` or `--stdin`
+- Deterministic diagnostics (**AC-7**): on block, list `missing_topics`, cite reason codes, and emit
+  remediation prompts for unresolved required keys only.
+- Delegation-specific fail-closed diagnostics under umbrella `INTAKE_PERSISTENCE_BLOCKED`:
+  - `INTAKE_DELEGATION_EVIDENCE_MISSING`
+  - `INTAKE_DELEGATION_EVIDENCE_INVALID`
+- **US-0081 complete-plan gate** (first/new/broad only): enforce
+  `plan_area_id -> story_ids[] | deferred_ref` coverage for every
+  `plan_area_inventory` row; emit deterministic subcodes under umbrella
+  `INTAKE_PERSISTENCE_BLOCKED`:
+  - `INTAKE_PLAN_COVERAGE_MISSING`
+  - `INTAKE_PLAN_AREA_ID_INVALID`
+  - `INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`
+  - `INTAKE_PLAN_DEFERRED_REF_MISSING`
+- **Guided vs low-touch parity**: **`INTAKE_GUIDED_MODE=1`** and **`INTAKE_GUIDED_MODE=0`** run the
+  **same pre-persistence validation pipeline**; low-touch may skip optional follow-ups but **must not**
+  bypass mandatory pack evidence or first-intake complete-plan mapping
+  (**AC-5**, **AC-6**).
+- **Grandfathering**: legacy intake rows remain valid for read/display; the **next** intake-driven
+  mutation must supply full **US-0078** evidence or the write is blocked (**DEC-0060** §5).
+
+## Bug issue routing (US-0079 / DEC-0061)
+
+- **Work item kind** (merged scratchpad per **DEC-0055**): **`INTAKE_WORK_ITEM_KIND=story`** (default) or **`INTAKE_WORK_ITEM_KIND=bug`**.
+- **Explicit argv**: when the operator invokes **`/intake bug`** (bug mode for this run), treat **`INTAKE_WORK_ITEM_KIND`** as **`bug`** for routing even if scratchpad defaults to story (command wins for the session).
+- **No silent US allocation for defects**: before creating a **`US-xxxx`** for **defect-shaped** input while in **story** kind, run **`python scripts/intake_bug_routing_guard.py --kind story --file <condensed-prose.txt>`** (or **`--stdin`**). Exit **3** → **`INTAKE_BUG_ROUTING_REQUIRED`** — **abort** backlog/acceptance mutation; remediation: set **`INTAKE_WORK_ITEM_KIND=bug`** and/or re-run as **`/intake bug`**, collect minimum bug fields, then allocate **`BUG-####`**.
+- **Bug persistence** (after **US-0078** evidence still passes for narrative packs when applicable):
+  - Next id: **`python scripts/bug_issue_validate.py --print-next-id`** (reads **`docs/product/backlog.md`**).
+  - Append **`### BUG-#### — Title`** under **`## Bug issues (canonical)`** with **Status**, **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`**.
+  - Add matching **`- [ ]` / `- [x]`** row under **`## Bug acceptance (canonical)`**, sorted by id.
+  - Run **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** before completing the handoff.
 
 ## Steps
 1. Determine intake mode from `.cursor/scratchpad.md`:
@@ -129,17 +185,32 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
      explicitly requests depth.
    - Keep single-story default (no forced decomposition), unless the user
      explicitly requests decomposition.
-5. Enforce mandatory question-pack coverage before persistence (US-0068):
+5. Enforce mandatory question-pack coverage before persistence (US-0068) **and**
+   interactive evidence (**US-0078 / DEC-0060**):
    - deterministically select one pack (`first-intake-pack` or
      `small-intake-pack`) and record `selected_pack`.
    - ask required questions for the selected pack; adaptive follow-ups remain
      allowed but bounded.
-   - before writing backlog/acceptance artifacts, compute required coverage:
-     - if complete, proceed to persistence;
-     - if incomplete and no explicit assumption confirmation, fail closed with
-       deterministic reason code and remediation guidance.
+   - accumulate **`topic_coverage`** rows with valid **`ie:`** refs; keep
+     `asked_topics` aligned with covered required keys (asked-vs-covered rule).
+   - before writing backlog/acceptance artifacts, run **`python scripts/intake_evidence_validate.py`**
+     on the captured bundle (or equivalent in-process validation):
+     - if validation **PASS**es, proceed to persistence;
+    - on **FAIL**, emit `INTAKE_REQUIRED_TOPIC_MISSING` /
+      `INTAKE_REQUIRED_PACK_INCOMPLETE` / `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED` /
+      `INTAKE_DELEGATION_EVIDENCE_MISSING` / `INTAKE_DELEGATION_EVIDENCE_INVALID`
+       plus first-intake coverage subcodes (`INTAKE_PLAN_COVERAGE_MISSING`,
+       `INTAKE_PLAN_AREA_ID_INVALID`, `INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`,
+       `INTAKE_PLAN_DEFERRED_REF_MISSING`) under umbrella
+       `INTAKE_PERSISTENCE_BLOCKED` with remediation guidance — **no write**.
+   - for `first-intake-pack` requests, derive a normalized
+     `plan_area_inventory`, require one coverage row per `plan_area_id`, enforce
+     xor mapping (`story_ids` xor `deferred_ref` + `deferred_reason`), and set
+     `coverage_complete=true` only when all areas are fully mapped.
    - persist intake evidence fields (`asked_topics`, `missing_topics`,
-     `assumptions_confirmed`) in relevant intake artifacts.
+     `assumptions_confirmed`, `topic_coverage`, assumption ref fields per
+     **DEC-0060**, and first-intake coverage fields (`plan_area_inventory`,
+     `plan_area_coverage`, `coverage_complete`) in relevant intake artifacts.
 6. Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034):
    - Read `ID_NAMESPACE_BOOTSTRAP` from `.cursor/scratchpad.md` (`0|1`,
      default `0`).

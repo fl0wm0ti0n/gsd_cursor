@@ -60,6 +60,41 @@ Remediation:
 - define `TEST_COMMAND` explicitly in `docs/engineering/runbook.md`, or
 - add detectable stack markers/scripts then rerun installer upgrade.
 
+## Codebase map bootstrap (US-0082 / DEC-0065)
+
+**Goal:** `docs/engineering/codebase-map.md` exists in fresh repos without ad-hoc
+operator memory, while **`/map-codebase`** stays the explicit manual analysis
+command.
+
+### Responsibility
+
+| Path | Owner | Mechanism |
+|------|-------|-----------|
+| Primary | **`/architecture`** (tech-lead) | Before **`/sprint-plan`**, run `python scripts/materialize_codebase_map.py --trigger architecture` from repo root |
+| Optional refresh | **`/refresh-context`** (curator) | Same script with `--trigger refresh-context` only when scratchpad sets **`CODEBASE_MAP_REFRESH_ON_ROLLOVER=1`** (default off) |
+| Manual / deep pass | Operator | **`/map-codebase`** |
+
+### Write surfaces
+
+Same as **`/map-codebase`**: `docs/engineering/codebase-map.md`,
+`docs/engineering/dependencies.json`. The materializer does **not** append
+`docs/engineering/state.md`. Non-bootstrap maps (no bootstrap sentinel in the
+file) are never replaced silently.
+
+### Deterministic diagnostics
+
+- **`CODEBASE_MAP_MISSING`** — use when a lifecycle checkpoint requires the map
+  but it is absent and generation did not run (e.g. custom **`/auto`** profile
+  skipped **`architecture`**).
+- **`CODEBASE_MAP_BLOCKED:<subreason>`** — materializer or policy blocked
+  creation (`policy_skip`, permissions, etc.); stdout includes remediation
+  pointing here and to **`/map-codebase`**.
+
+**Command:** `python scripts/materialize_codebase_map.py --repo .`  
+**Tests:** `python tests/codebase_map_materialize_test.py`
+
+Normative architecture: `docs/engineering/architecture.md` (**# US-0082**).
+
 ## Documentation profile validation (US-0077 / DEC-0059)
 
 **Goal:** keep root `README.md` (user channel) and `docs/developer/README.md`
@@ -240,6 +275,75 @@ Required persisted intake evidence fields:
 - `missing_topics`
 - `assumptions_confirmed`
 
+## First-intake full-plan coverage gate (US-0081 / DEC-0064)
+
+For first/new/broad intake (`selected_pack=first-intake-pack`), persistence is
+additionally blocked unless complete-plan coverage is machine-verifiable.
+
+Required coverage contract fields:
+
+- `plan_area_inventory[]` with unique stable `plan_area_id` values
+- `plan_area_coverage[]` with exactly one row per `plan_area_id`
+- xor mapping per row: `story_ids[]` or `deferred_ref` + `deferred_reason`
+- `coverage_complete=true` only when derived validation succeeds
+
+Coverage diagnostics (under umbrella `INTAKE_PERSISTENCE_BLOCKED`):
+
+- `INTAKE_PLAN_COVERAGE_MISSING`
+- `INTAKE_PLAN_AREA_ID_INVALID`
+- `INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`
+- `INTAKE_PLAN_DEFERRED_REF_MISSING`
+
+Guided and low-touch parity:
+
+- `INTAKE_GUIDED_MODE=1` and `INTAKE_GUIDED_MODE=0` must run the same
+  first-intake complete-plan validator path.
+- Low-touch may reduce optional prompts but cannot bypass complete-plan coverage
+  validation.
+
+## Interactive intake evidence validation (US-0078 / DEC-0060 / US-0083 / DEC-0067)
+
+**US-0078** adds machine-verifiable **`topic_coverage`** rows, canonical **`ie:`** refs
+(**DEC-0060**), asked-vs-covered enforcement, and **`assumption_confirmation_ref`**
+binding before backlog/acceptance writes.
+
+- Validator entrypoints: `python scripts/intake_evidence_validate.py --self-test`;
+  `python scripts/intake_evidence_validate.py --file <bundle.json>` or `--stdin`.
+- Library: `scripts/intake_evidence_lib.py` (shared rules for tests and tooling).
+- Regression: `tests/intake_evidence_fixtures_test.py` (R-0055 **AC-8** matrix tiers A/B),
+  invoked from `tests/run-tests.ps1` / `tests/run-tests.sh` §26k.
+- **Packaged installs (BUG-0001 / DEC-0063)**: `intake_evidence_validate.py`, `intake_evidence_lib.py`, and `intake_bug_routing_guard.py` are mirrored under `template/scripts/` and listed in `docs/engineering/context/installer-owned-paths.manifest` so fresh install and `upgrade` copy them to the consumer’s `scripts/`. Drift guard: `python scripts/check_intake_template_parity.py --repo .` (also §26N in `tests/run-tests.*`). **Release (S0060)**: operator notes `handoffs/releases/S0060-release-notes.md` (gate summary + verify steps).
+- **Installer completeness gate (BUG-0003 / DEC-0066)**: post-install invariant checks every path in `[required_install_script_paths]` from `docs/engineering/context/installer-owned-paths.manifest`. Missing paths fail closed with `INSTALL_COMPLETENESS_FAILED` and `INSTALL_REQUIRED_SCRIPT_MISSING:<path>`. Remediation: update manifest parity (active + `template/`), ensure required script exists under `template/scripts/`, keep install/clean ownership paired, then rerun `its-magic --mode missing|upgrade` (or `python installer.py --validate-install-completeness --target <repo>` for direct diagnostics).
+- **Guided** and **low-touch** (`INTAKE_GUIDED_MODE=0`) share the **same** pre-persistence
+  validation pipeline; mandatory pack evidence is never skipped.
+- Legacy intake evidence without **`ie:`** refs remains **grandfathered** for display until the
+  next intake-driven mutation, which must supply full evidence (**DEC-0060** §5).
+- **Delegated required-topic path (US-0083 / DEC-0067)**:
+  - Allowed: `topic_coverage[].satisfied_by=delegation_ref` with required
+    `delegation_scope`, `delegation_rationale`, `delegation_confidence` (`low|medium|high`).
+  - Missing delegation fields fail closed with `INTAKE_DELEGATION_EVIDENCE_MISSING`.
+  - Malformed delegation values or invalid `ie:` binding fail closed with
+    `INTAKE_DELEGATION_EVIDENCE_INVALID`.
+  - Non-delegated unresolved required topics remain unchanged fail-closed
+    (`INTAKE_REQUIRED_TOPIC_MISSING` path).
+- **Repetitive-ask suppression with accounting (US-0083 AC-1)**:
+  - When equivalent evidence already exists, avoid re-asking by recording row-level
+    `evidence_source=equivalent_evidence_ref` plus `equivalent_evidence_ref`.
+  - Required-topic accounting remains explicit through `topic_coverage` rows.
+
+## Bug issues (US-0079 / DEC-0061)
+
+- **Canonical ids**: **`BUG-####`** in **`docs/product/backlog.md`** **`## Bug issues (canonical)`**; status literals **`OPEN`** | **`DONE`** only — illegal values fail **`BUG_VALIDATION_STATUS_INVALID`**.
+- **Minimum fields** (non-empty): **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`** — missing/empty → **`BUG_VALIDATION_FIELD_EMPTY`** (or **`BUG_VALIDATION_SECTION_MISSING`** when the region is absent).
+- **Ordering**: bug blocks sorted by id ascending — violation → **`BUG_VALIDATION_ORDER_INVERSION`**.
+- **Intake routing**: merged **`INTAKE_WORK_ITEM_KIND=story|bug`** and/or explicit **`/intake bug`**; defect-shaped prose with **`story`** kind → **`INTAKE_BUG_ROUTING_REQUIRED`** via **`python scripts/intake_bug_routing_guard.py`** (**DEC-0061** §5). Mismatch/conflict → **`INTAKE_WORK_ITEM_KIND_MISMATCH`** family (documented in command surfaces).
+- **Acceptance reconciliation**: **`docs/product/acceptance.md`** **`## Bug acceptance (canonical)`** checkbox rows must match backlog bug status — drift codes **`BUG_RECONCILE_ACCEPTANCE_*`**.
+- **Commands**:
+  - `python scripts/bug_issue_validate.py --self-test`
+  - `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md [--check-acceptance] [--print-next-id]`
+  - `python scripts/intake_bug_routing_guard.py --kind story|bug --file <path>` (or **`--stdin`**)
+- **Regression**: `tests/bug_issue_fixtures_test.py` (R-0056 Tier A/B), invoked from **`tests/run-tests.ps1` / `tests/run-tests.sh`** §26L.
+
 ## Optional ID namespace bootstrap (US-0052)
 
 Fresh-project ID bootstrap is optional and default-off in
@@ -285,6 +389,21 @@ Manual override precedence:
 - If a flag is explicitly set, it overrides profile defaults.
 - Profile changes must not disable mandatory gate contracts
   (`/qa`, `/verify-work`, `/release`).
+
+### Token-cost evidence + comparability (US-0080 / DEC-0062)
+
+- **Fresh context**: spawn **new** subagents per `/auto` phase; avoid carrying prior chat
+  reasoning as phase input.
+- **`start-from`**: use **`/auto start-from=<canonical_phase_id>`** when resuming so the
+  schedule intersection matches materialized **`resolved_phase_plan`** (**`DEC-0052`**).
+- **`TOKEN_PROFILE`**: `lean` lowers default automation breadth; does **not** remove
+  isolation, strict-proof, role, or release gates.
+- **Metrics**: append-only **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** (or
+  **`.jsonl`**); copy path into **`token_cost_evidence_ref`** on **`state.md`** checkpoints.
+- **AC-2**: compare **`cache_read_tokens`** only when **`run_class_hash`** matches; else
+  **`TOKEN_COST_RUN_CLASS_MISMATCH`**.
+- **CI/repo checks**: `python scripts/check_token_cost_parity.py --repo .` (manifest-listed
+  active/`template/` pairs); **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** §26M.
 
 Context compaction policy:
 

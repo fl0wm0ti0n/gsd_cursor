@@ -36,9 +36,10 @@ description: "its-magic status-reconcile: deterministic status normalization and
 - Ambiguous next OPEN story / phase resolution
 
 ## Canonical precedence (US-0045 / DEC-0025)
-- Story status authority is `docs/product/backlog.md` only.
+- Story status authority is `docs/product/backlog.md` only (including **`BUG-####`** under **`## Bug issues (canonical)`** per **DEC-0061** / **US-0079**).
 - `docs/product/acceptance.md` and `docs/engineering/state.md` are derived views.
 - Reconciliation must not infer canonical story status from derived artifacts.
+- Bug portfolio drift vs **`## Bug acceptance (canonical)`** is machine-checkable: **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** (**`BUG_RECONCILE_ACCEPTANCE_*`** codes).
 
 ## Deterministic detection matrix
 1. Backlog story `Status: DONE` with unchecked AC checkboxes.

@@ -86,6 +86,18 @@ description: "its-magic architecture: define approach, risks, and decisions."
      `ARTIFACT_HOT_SURFACE_OVERSIZE`,
    - preserve non-target history in archive packs only (never delete unrelated
      story sections without archival evidence).
+10. Codebase map lifecycle gate (US-0082 / DEC-0065) — before handoff to
+    `/sprint-plan`, from repository root run:
+    `python scripts/materialize_codebase_map.py --trigger architecture`
+    - On success, stdout includes `[CODEBASE_MAP_OK]` (created, noop, or
+      `preserved_existing` when a non-bootstrap map is left untouched).
+    - On `CODEBASE_MAP_BLOCKED:<subreason>` or non-zero exit after a failed
+      materialization policy, stop the phase with that token; remediation is on
+      stdout (run `/map-codebase`; see runbook **Codebase map bootstrap** and
+      `docs/engineering/architecture.md` **# US-0082**).
+    - The script writes only `docs/engineering/codebase-map.md` and
+      `docs/engineering/dependencies.json` (same surfaces as `/map-codebase`);
+      do not use it to bulk-append `state.md`.
 
 ## Cross-phase ownership guard (US-0061 / DEC-0043)
 

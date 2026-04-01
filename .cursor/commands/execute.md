@@ -48,9 +48,30 @@ as stale isolation evidence).
 
 Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and no-bypass/override contract are enforced at `/release`; see `.cursor/commands/release.md` and `.cursor/commands/qa.md`.
 
+## Intake evidence tooling reference (US-0078 / DEC-0060)
+
+Stories that harden intake persistence ship **`scripts/intake_evidence_lib.py`**,
+**`scripts/intake_evidence_validate.py`**, and **`tests/intake_evidence_fixtures_test.py`**
+(invoked from **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** §26k). See
+**`docs/engineering/architecture.md`** **`# US-0078`** and **`decisions/DEC-0060.md`**.
+
+## Bug issue tooling reference (US-0079 / DEC-0061)
+
+Ship **`scripts/bug_issue_lib.py`**, **`scripts/bug_issue_validate.py`**, **`scripts/intake_bug_routing_guard.py`**, and **`tests/bug_issue_fixtures_test.py`** (§26L in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**). See **`docs/engineering/architecture.md`** **`# US-0079`** and **`decisions/DEC-0061.md`**.
+
+## Token-cost evidence (US-0080 / DEC-0062)
+
+When persisting token metrics for an orchestrated run: use append-only
+**`handoffs/token_cost_runs/<orchestrator_run_id>.md`** (or **`.jsonl`**) per
+**`DEC-0062`** §3; set **`token_cost_evidence_ref`** on **`docs/engineering/state.md`**
+checkpoints when rows exist. **`run_class_hash`** comparability for **AC-2** uses
+**`scripts/token_cost_lib.py`** / **`scripts/token_cost_compare.py`**; active/`template/`
+parity for listed paths: **`python scripts/check_token_cost_parity.py --repo .`**
+(§26M in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**).
+
 ## Canonical status contract (US-0045)
 
-- Story status authority is `docs/product/backlog.md`.
+- Story status authority is `docs/product/backlog.md` (including **`BUG-####`** under **`## Bug issues (canonical)`** per **DEC-0061**).
 - `docs/product/acceptance.md` and `docs/engineering/state.md` are derived and
   must not be treated as canonical readiness sources when contradictory.
 - `/execute` must not start/continue implementation solely based on

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "auto-20260329-02-US0080-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Measurable baseline/target for cache_read_tokens, input/output, per-phase calls; >=50% cache_read reduction on comparable /auto runs; mandatory workflow gates unchanged.",
+      "intake_run_id": "auto-20260329-02-US0080-intake",
+      "turn_index": 0,
+      "ref": "ie:auto-20260329-02-US0080-intake:0:e61ebb94c4073c50"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": ".cursor/commands (orchestration surfaces), rules/agents, docs/engineering/state.md and handoffs, runbook/README operator guidance, template/ parity, optional telemetry or logging hooks for token-cost evidence.",
+      "intake_run_id": "auto-20260329-02-US0080-intake",
+      "turn_index": 1,
+      "ref": "ie:auto-20260329-02-US0080-intake:1:64cca4356b809cb5"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "US-0048/US-0056 isolation and strict-proof, US-0069 role matrix, US-0039 verify-work/release gates must not be weakened; over-aggressive slimming risks hiding policy; active/template command surfaces must stay in lockstep.",
+      "intake_run_id": "auto-20260329-02-US0080-intake",
+      "turn_index": 2,
+      "ref": "ie:auto-20260329-02-US0080-intake:2:0789b52f1f382c45"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "AC-1..AC-10 in backlog remain authority; regression coverage that slimming does not break slash-command behavior or artifact contracts; comparable-run methodology testable per AC-6 and DEC-bound metrics.",
+      "intake_run_id": "auto-20260329-02-US0080-intake",
+      "turn_index": 3,
+      "ref": "ie:auto-20260329-02-US0080-intake:3:1825b30fdf1e892f"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "All acceptance criteria checked; decision record documents metric definitions, comparison method, and trade-offs; run-level token-cost evidence logging/reporting shipped; operator low-cost usage patterns documented in README/runbook.",
+      "intake_run_id": "auto-20260329-02-US0080-intake",
+      "turn_index": 4,
+      "ref": "ie:auto-20260329-02-US0080-intake:4:aa4be252f9988306"
+    }
+  ]
+}

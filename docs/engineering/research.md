@@ -2041,3 +2041,373 @@ explicit waiver path:
 
 **Architecture-owned (explicit non-blockers)**: literal heading text, file split layout, validator
 implementation location (standalone script vs installer hook), and **DEC** id for profile semantics.
+
+## R-0055
+
+- **Date**: 2026-03-28
+- **Topic**: US-0078 — runtime enforcement of intake question-pack evidence
+- **Query**: How should intake prove required topics and assumption confirmations were actually
+  collected before persisting backlog/acceptance artifacts?
+- **Sources**:
+  - `.cursor/commands/intake.md` (US-0068 / DEC-0050 contracts)
+  - `docs/engineering/runbook.md` intake sections for US-0051 / US-0068
+  - External product discovery guidance on explicit assumption confirmation (assumption mapping)
+- **Findings**:
+  - Current contract language already requires fail-closed persistence on missing topic coverage
+    and explicit assumption confirmation; gap is **evidence enforcement** at runtime.
+  - Persisted fields (`asked_topics`, `missing_topics`, `assumptions_confirmed`) are insufficient
+    alone when not tied to explicit interaction evidence.
+  - Minimal hardening model: require deterministic evidence references for each required topic
+    (`answer_ref` or confirmed assumption ref), and block if any required topic lacks one.
+  - `assumptions_confirmed=yes` must require explicit user confirmation reference; inferred
+    assumptions without confirmation must fail closed.
+- **Risks**:
+  - Overly strict enforcement can increase friction; remediation prompts must be targeted and bounded.
+  - Schema drift across artifacts if evidence fields are introduced without parity updates.
+  - False positives if parsers cannot reliably detect confirmation events.
+- **Linked**: US-0078, US-0068, DEC-0050, DEC-0060, US-0051, US-0059
+- **Confidence**: high
+- **Status**: current — **US-0078 research refinement closed 2026-03-28**; **delivery closed 2026-03-29** with **`S0057`** release + **`/refresh-context`** (closes **`auto-20260328-01`**; normative lock-in **`DEC-0060`** / **`architecture.md`** **`# US-0078`**)
+
+### US-0078 — Evidence schema (concrete v1 sketch)
+
+Minimal persisted shape (implementation may serialize as markdown bullets or structured sidecar; **architecture** picks storage and literal `ref` format):
+
+| Field | Purpose |
+|-------|---------|
+| `selected_pack` | `first-intake-pack` \| `small-intake-pack` (existing **US-0068**). |
+| `asked_topics` | Ordered list of **required topic keys** for which the intake run **actually emitted** a question (or a deterministic “assumption proposal” prompt) in-session. |
+| `missing_topics` | Subset of required keys still **not** satisfied at gate time (empty when passing). |
+| `topic_coverage` | List of `{ topic_key, satisfied_by, ref }` — **one row per required topic** at persistence time. |
+| `satisfied_by` | `answer_ref` — user supplied substantive answer tied to `ref`; or `assumption_confirmation_ref` — user explicitly confirmed a stated assumption tied to `ref`. |
+| `ref` | Opaque but **canonical** pointer resolvable by validators (e.g. orchestrator message id + turn index, or hash of quoted user text + `intake_run_id`; **DEC** locks format). |
+| `assumptions_confirmed` | Literal mirror of today’s contract (`(none)` / free text). |
+| `assumption_confirmation_ref` | Required **whenever** `assumptions_confirmed` is non-`(none)` **and** non-empty **and** implies confirmation; must point to the **affirmative** user turn (not model inference). |
+
+**Invariant**: `answered_topics` in backlog/vision language maps to the **set of `topic_key` entries in `topic_coverage`**; audits compare `asked_topics` vs that set to detect “claimed without ask” drift.
+
+### US-0078 — Validation / parser rules (deterministic)
+
+1. **Pack resolution**: derive `required_keys` from `selected_pack` per **intake.md** lists; unknown pack → fail `INTAKE_REQUIRED_PACK_INCOMPLETE`.
+2. **Coverage completeness**: ∀ `k` ∈ `required_keys`, ∃ row in `topic_coverage` with `topic_key=k` and non-empty `ref` → else `INTAKE_REQUIRED_TOPIC_MISSING` (aggregate: `INTAKE_REQUIRED_PACK_INCOMPLETE` when multiple gaps).
+3. **Asked-vs-covered**: ∀ `k` ∈ keys in `topic_coverage`, `k` must appear in `asked_topics` **unless** `satisfied_by=assumption_confirmation_ref` and architecture documents a single-shot “assumption bundle” ask covering multiple keys (bounded **DEC** exception); default **fail closed** if a covered key was never asked.
+4. **Assumption literal integrity**: if `assumptions_confirmed` parses as affirmative / non-placeholder **without** `assumption_confirmation_ref` → `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`.
+5. **False `assumptions_confirmed`**: values like `yes`, `true`, `confirmed` (case-normalized allowlist) **without** matching `assumption_confirmation_ref` → reject (same reason code); do not infer from model-only summaries.
+6. **Persistence gate**: any rule 1–5 failure → `INTAKE_PERSISTENCE_BLOCKED` **and** no backlog/acceptance mutation (align **AC-3**).
+7. **Mode parity**: `INTAKE_GUIDED_MODE=0` still runs rules 1–6; low-touch may shorten **follow-ups** but **not** skip mandatory pack coverage evidence.
+
+### US-0078 — Reason code mapping (literal alignment)
+
+| Condition | Code |
+|-----------|------|
+| Missing `topic_coverage` row for required key | `INTAKE_REQUIRED_TOPIC_MISSING` |
+| Multiple missing keys or pack not satisfiable | `INTAKE_REQUIRED_PACK_INCOMPLETE` |
+| Affirmative assumptions without confirmation ref | `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED` |
+| Any gate failure before write | `INTAKE_PERSISTENCE_BLOCKED` (optional umbrella in diagnostics; sub-codes above remain primary) |
+
+### US-0078 — AC-8 regression matrix and test strategy
+
+| Case | Fixture intent | Expected |
+|------|----------------|----------|
+| **P1 — full answers** | All `small-intake-pack` keys in `topic_coverage` with `answer_ref` | Persistence allowed; evidence rows present in golden output |
+| **P2 — assumption path** | One key satisfied by `assumption_confirmation_ref`; others `answer_ref` | Persistence allowed; refs non-empty |
+| **P3 — missing topic** | Omit one `topic_coverage` row | `INTAKE_REQUIRED_TOPIC_MISSING` (or pack incomplete); **no** backlog diff |
+| **P4 — false confirmation** | `assumptions_confirmed=yes` + empty `assumption_confirmation_ref` | `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`; **no** backlog diff |
+| **P5 — asked drift (optional Tier B)** | `topic_coverage` includes key absent from `asked_topics` | Fail per rule 3 default (unless DEC documents bundle exception) |
+
+**Test implementation tiers** (cost-scoped):
+
+- **Tier A**: table-driven validator unit tests on synthetic `intake_evidence` objects (no live LLM).
+- **Tier B**: golden-file tests on minimal markdown intake handoff snippets produced by fixtures.
+- **Tier C**: one integration smoke per `INTAKE_GUIDED_MODE` ∈ {0,1} ensuring gate invoked before persistence hook.
+
+### Architecture-owned (explicit non-blockers for `/architecture`)
+
+- **Update (2026-03-28)**: **`ref`** syntax and migration are locked in **`DEC-0060`**; evidence storage location (inline vs sidecar) remains an execute-phase implementation choice within the logical bundle shape.
+- Whether `INTAKE_PERSISTENCE_BLOCKED` is always emitted with a primary sub-code or only granular codes.
+
+## R-0056
+
+- **Date**: 2026-03-28
+- **Topic**: US-0079 — first-class bug issue workflow with open/closed lifecycle
+- **Query**: How can the framework separate bugs from user stories while staying lightweight and
+  avoiding heavy severity/SLA triage?
+- **Sources**:
+  - `docs/engineering/runbook.md` (status ownership, post-QA release issue workflow, reconciliation)
+  - `docs/product/backlog.md` / `docs/product/acceptance.md` (current US-only tracking model)
+  - User requirement in intake: bug workflow should be official-style but simple (`OPEN`/`DONE`)
+- **Findings**:
+  - Current workflow is US-centric; release and QA already distinguish defect contexts in sprint
+    artifacts, but there is no first-class bug entity at intake/backlog level.
+  - A lightweight `BUG-xxxx` model can align with existing open/closed status discipline and avoid
+    introducing mandatory severity/SLA fields.
+  - Minimal viable bug schema should include reproducibility essentials (context, steps, expected,
+    actual, evidence refs) so bugs remain actionable without heavy triage bureaucracy.
+  - Status reconciliation and `/ask` retrieval need explicit extension to support both US and BUG
+    identifiers consistently.
+- **Risks**:
+  - Mixed migration period could create duplicate tracking (same defect as US and BUG) unless
+    conversion/link rules are explicit.
+  - Adding a second entity type increases ordering/ownership complexity if policy docs are not
+    updated in lockstep.
+  - Over-lightweight bug fields can reduce reproducibility if minimum schema is underspecified.
+- **Linked**: US-0079, US-0045, US-0042, US-0078
+- **Intake traceability (2026-03-29)**: PO intake gate **PASS** on **`auto-20260329-01`** — bundle **`handoffs/intake_evidence/US-0079-intake-20260329.json`** (**`small-intake-pack`**, **`DEC-0060`** **`ie:`** refs); aligns with findings above.
+- **Discovery traceability (2026-03-29)**: PO **`/discovery`** **PASS** on **`auto-20260329-01`** — alternatives **(1) US-only / (2) heavy triage / (3) lightweight `BUG-xxxx`** with **(3)** recommended; canonical storage favor **`backlog.md`** bug region vs split file TBD in **`/architecture`**; checkpoint **`docs/engineering/state.md`** **Discovery checkpoint (2026-03-29) — US-0079 / auto-20260329-01**; next **`/research`**.
+- **Research closure (2026-03-29, tech-lead, `orchestrator_run_id=auto-20260329-01`)**: Deepened routing, schema, reconciliation, and test guidance for **`/architecture`** / **DEC** (**AC-10**). Checkpoint: **`docs/engineering/state.md`** **Research checkpoint (2026-03-29) — US-0079 / auto-20260329-01**; next **`/architecture`**.
+- **Recommended design direction**:
+  - **Identifier**: `BUG-` + **four-digit** decimal (`BUG-0001`…), assigned with the **same deterministic “next after highest existing”** policy as **`US-xxxx`** (architecture may alias this to a shared allocator doc).
+  - **Canonical home**: dedicated **`## Bug issues (canonical)`** section in **`docs/product/backlog.md`**, **append-new** for new bugs, stable ordering **by id** within the section; **split to** `docs/product/bugs.md` **only** if triad/line-budget or operator policy triggers (mirror **DEC-0054**-style compaction), with **explicit cross-links** and **US-0045** reconciliation text naming both surfaces.
+  - **Status**: exactly **`OPEN`** | **`DONE`** in the bug header line (same literal discipline as stories); optional free-text **severity/narrative** allowed **outside** required state fields (no state machine).
+  - **Minimum schema (AC-4)**: each bug entry is a **single markdown story-like block** with required sub-bullets or labeled lines (DEC locks literals):
+    - `environment` / context (product area, OS/tooling, branch/commit if known)
+    - `steps_to_reproduce` (ordered, deterministic)
+    - `expected`
+    - `actual`
+    - `evidence_refs` (paths, logs, screenshots, or opaque refs — non-empty list)
+  - **Routing (AC-2)**: **no silent** “defect prose → **`US-xxxx`**”. Require an **explicit operator signal** before persistence, e.g. **`/intake bug`** (or equivalent command flag) **and/or** scratchpad key **`INTAKE_WORK_ITEM_KIND=bug`** (name finalized in architecture) checked by intake rules; misclassified attempts → deterministic **`INTAKE_WORK_ITEM_KIND_MISMATCH`** (or successor code) **without** backlog write.
+  - **Anti-duplication**: one canonical **`BUG-xxxx`** per defect; **`supersedes` / `duplicate_of`** optional fields; discourage parallel **`US-xxxx`** for same defect — if a bug drives feature work, use **`related_us`** / **`blocks_us`** link lists (markdown bullets) rather than converting the bug into a story.
+  - **Sprint / QA / release (AC-5, AC-6)**: sprint **`tasks.md`** and **`summary.md`** may reference **`BUG-xxxx`** in task titles or **Traceability** rows; **`qa-findings.md`**, **`uat.*`**, **`release-findings.md`** accept **`BUG-xxxx`** alongside **`US-xxxx`** using the same “id + evidence ref” style as **US-0042** post-QA issues.
+  - **`/ask` + context packs (AC-8)**: narrow-read lists and engineering **state** breadcrumbs treat **`BUG-`** as a **first-class id prefix** alongside **`US-`** (regex / allowlist extension; no semantic merge of families).
+- **Constraints (reaffirmed)**:
+  - No mandatory **severity / SLA / triage** states; no incident-platform integration in this story.
+  - Must **not** regress **US-0045** story semantics; bug status is a **second family** with parallel reconciliation rules.
+- **Alternatives / tradeoffs** (for **DEC** summary):
+
+| Option | Upside | Downside |
+|--------|--------|----------|
+| **A — US-only defects** | One artifact type | Conflates feature intent and defects; weak traceability (**rejected** per discovery) |
+| **B — Heavy triage** | Enterprise defect flow | Out of scope; operator overhead |
+| **C — `BUG-xxxx` + OPEN/DONE (recommended)** | Clear identity, lightweight | Second allocator + reconciliation path; needs disciplined routing |
+| **D — GitHub-Issues-only tracking** | External tool native | Breaks canonical **`backlog.md`** authority (**US-0045**); **rejected** for this framework |
+
+- **Test / validation guidance (maps to AC-1..AC-10)**:
+  - **Tier A — Parser/validator fixtures**: synthetic **`backlog.md`** snippets — valid bug, missing `steps_to_reproduce`, missing `evidence_refs`, illegal status literal, malformed id; expect deterministic fail codes.
+  - **Tier B — Routing/intake**: guided + low-touch parity — attempt defect persistence **without** bug kind signal → **no write** + diagnostic; with signal → **`BUG-xxxx`** allocated + evidence row shape valid.
+  - **Tier C — Reconciliation**: golden tests for **US-0045**-style scripts: backlog bug **OPEN** vs acceptance/state contradiction detection includes **`BUG-`** rows.
+  - **Tier D — Traceability spot-check**: sprint template + one **`qa-findings`** / **`release-findings`** example line referencing **`BUG-xxxx`** (documentation or fixture).
+- **Architecture / DEC gates** (**AC-10**): allocator rules, literal field names, routing keys + reason codes, optional file-split policy, migration (**grandfather**: existing defects remain prose under **`US-xxxx`** until manually ported), validator entrypoint(s), and **`acceptance.md`** row strategy (**separate bug checklist subsection** vs inline — pick one for determinism).
+- **Architecture closure (2026-03-29, tech-lead, `orchestrator_run_id=auto-20260329-01`)**: **`DEC-0061`** + **`architecture.md`** **`# US-0079`** lock routing (**`INTAKE_WORK_ITEM_KIND`**, **`/intake bug`**), **`## Bug acceptance (canonical)`**, optional **`bug_ids`** on **`state.md`** phase boundaries; checkpoint **`docs/engineering/state.md`** **Architecture checkpoint (2026-03-29) — US-0079 / auto-20260329-01**; next **`/sprint-plan`**.
+- **Delivery closure (2026-03-30, curator, `orchestrator_run_id=auto-20260329-01`)**: Shipped via sprint **`S0058`** — validators, canonical bug regions, §26L tests; **`/release`** **PASS**; run closed at **`/refresh-context`** — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-30) — post S0058 / US-0079 (auto-20260329-01)** (`stop_reason=completed`, `next_scheduled_phase=none`).
+- **Sources**:
+  - https://docs.github.com/en/issues/tracking-your-work-with-issues/configuring-issues/planning-and-tracking-work-for-your-team-or-project (lightweight issue planning patterns; analog for minimal **`OPEN`/`closed`**-style workflows)
+  - `docs/engineering/runbook.md`, **US-0042**, **US-0045**, **US-0078**/**DEC-0060** (evidence + fail-closed persistence precedent)
+- **Confidence**: high (for recommended path **C**); medium (for exact routing key naming pending **DEC**)
+- **Status**: closed (delivered with **US-0079** / **`S0058`** / **`DEC-0061`**; see delivery closure above)
+
+## R-0057
+
+- **Date**: 2026-03-29
+- **Topic**: US-0080 — token-cost hardening for orchestration/cache-read-heavy runs
+- **Query**: Which deterministic changes can reduce cache-read token volume significantly without
+  weakening workflow gates?
+- **Sources**:
+  - `docs/engineering/runbook.md` (US-0053 token-profile and context compaction contracts)
+  - Observed operator symptom: cache-read far exceeding fresh input/output in long orchestration threads
+  - [Anthropic — Prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching)
+    (automatic vs explicit `cache_control` breakpoints; usage fields including
+    `cache_read_input_tokens` and `cache_creation_input_tokens`, and their relationship to
+    `input_tokens`; default 5-minute TTL vs
+    optional 1-hour TTL; minimum cacheable prefix lengths; below-minimum prompts succeed **without**
+    caching—verify via usage fields when both cache counters are zero)
+  - [Cursor — Dynamic context discovery](https://cursor.com/blog/dynamic-context-discovery)
+    (file-backed tool outputs, incremental reads, fresh-chat boundaries—analogous operator patterns
+    for limiting repeated mega-context in long agent threads)
+- **Findings**:
+  - High cache-read is expected when many calls repeatedly include large stable prefixes; it scales
+    with call count and prefix size, not just user message size.
+  - Biggest levers are structural: fewer repeated large instruction blocks and tighter per-phase
+    context packs, plus fewer orchestration hops where safe.
+  - `TOKEN_PROFILE=lean` helps but is insufficient alone without command/context payload slimming.
+  - Comparable-run measurement must be explicit (same story class/profile) to make a 50% target auditable.
+  - Vendor-reported **`cache_read_input_tokens`**-style fields are the right *conceptual* accounting
+    for “cache read” in API-shaped usage; map any product-specific UI labels to those semantics in **DEC**
+    so AC-1/AC-2 stay unambiguous even if the host environment changes.
+  - **Run-class tuple (answers discovery open question)**: freeze a deterministic comparison key:
+    `story_id` + merged **`TOKEN_PROFILE`** + **`SECURITY_REVIEW`** + materialized **`phase_policy_mode`**
+    and ordered **`resolved_phase_plan`** (as recorded pre-spawn per **DEC-0052**) + resume anchor
+    (`requested_start_from`, `resolution_source`, `resolved_start_phase`). Hash or canonicalize this
+    tuple for regression baselines; do not compare across different phase plans or profiles.
+  - **Evidence channel (answers discovery open question)**: store **append-only** per-run metric rows
+    in-repo (for example `handoffs/token_cost_runs/<orchestrator_run_id>.md` or JSONL) with
+    per-phase rollups: `cache_read_tokens`, `input_tokens`, `output_tokens`, phase call counts; link
+    from `docs/engineering/state.md` auto continuation breadcrumbs. Treat IDE usage panes as
+    supplementary—canonical audit trail remains committed artifacts.
+  - **Active/template parity (answers discovery open question)**: enumerate touched paths under
+    `.cursor/commands/`, `.cursor/rules/`, and `template/` mirrors; extend parity checks beyond
+    scratchpad pairs (pattern aligned with existing `scripts/check-scratchpad-pair-parity.py` discipline)
+    so slimming cannot ship with template drift.
+- **Risks**:
+  - Over-aggressive slimming can hide required policy constraints or reduce operator clarity.
+  - Metric gaming risk if baseline/target run classes are not defined deterministically.
+  - Divergence risk if active/template command surfaces are slimmed inconsistently.
+- **Linked**: US-0080, US-0053, DEC-0035, US-0070, DEC-0052, US-0048, US-0056, US-0069
+- **Research closure (2026-03-30, tech-lead, `orchestrator_run_id=auto-20260329-02`)**: Web-grounded
+  extension above; discovery questions on **run-class**, **evidence placement**, and **parity scope**
+  resolved at research depth — normatively locked in **`DEC-0062`** + **`architecture.md`** **`# US-0080`**.
+- **Architecture closure (2026-03-29, tech-lead, `orchestrator_run_id=auto-20260329-02`)**: **`DEC-0062`**
+  + **`docs/engineering/architecture.md`** **`# US-0080`** lock metric literals, **`run_class_hash`**,
+  **`handoffs/token_cost_runs/`** evidence channel, parity manifest contract, AC-10 trade-offs + phase
+  boundary visibility; delivery completed **`S0059`** / **US-0080** **2026-03-29**; curator **`/refresh-context`**
+  **2026-03-30** (`auto-20260329-02`).
+- **Confidence**: high (vendor cache accounting + structural levers); high (host label mapping delegated
+  to **`DEC-0062`** §1 `metric_source` / comparability rules)
+- **Status**: closed (delivered with **US-0080** / **`S0059`** / **`DEC-0062`**; see **`docs/engineering/state.md`**
+  refresh-context checkpoint **`auto-20260329-02`**)
+
+## R-0058
+
+- **Date**: 2026-03-30
+- **Topic**: BUG-0001 — template/install completeness for **`intake_*`** gate scripts
+- **Query**: How does npm packaging surface affect which `template/` files reach consumers, and what does the repo ship today?
+- **Sources**:
+  - [npm — `package.json` → `files`](https://docs.npmjs.com/cli/v11/configuring-npm/package-json#files) (optional `files` array defines tarball contents; directory patterns include subtree for pack/install)
+  - `package.json` — `files` includes `template/` wholesale
+  - Repo inventory: `scripts/intake_evidence_lib.py`, `scripts/intake_evidence_validate.py`, `scripts/intake_bug_routing_guard.py` exist; `template/scripts/` contains **no** `intake_*.py` (glob audit **2026-03-30**)
+- **Findings**:
+  - Published tarballs include everything under `template/` that is not excluded by `.npmignore`/`.gitignore` rules in subtrees; completeness bugs in **`template/`** propagate to all npm-based installs.
+  - Root `scripts/` entries are only packaged if listed in `files` or default rules — **`intake_*`** today live under **`scripts/`** but **`package.json`** does **not** enumerate them (only `scripts/doc_profile_lib.py` is extra); installers that copy from **`template/`** therefore miss **`intake_*`** unless **`template/scripts/`** is fixed or install paths pull from repo **`scripts/`**.
+  - Fix axis: align **`template/scripts/`** with intake-required scripts (minimal completeness) and keep **triple-installer parity**; optional regression: assert **`intake_*`** present in packaged template or post-install tree.
+  - **Transitive import closure (2026-03-30, research)**: `intake_evidence_validate.py` imports only **`intake_evidence_lib`** (plus stdlib). **`intake_evidence_lib.py`** uses stdlib only (`hashlib`, `json`, `re`, `dataclasses`, `typing`). **`intake_bug_routing_guard.py`** is stdlib-only. **Minimal intake script set** for install completeness = those **three** modules under **`template/scripts/`** (no additional repo Python deps for gates).
+  - **Triple-installer / install source (2026-03-30, research)**: **`installer.ps1`** and **`installer.sh`** set install **`SOURCE_ROOT`** to the packaged **`template/`** directory adjacent to the installer — consumer workspaces are hydrated from **`template/`**, not from repo-root **`scripts/`**. Chocolatey/Homebrew fetch full GitHub tag archives, but the same installer entrypoints apply; parity across npm tarball, Choco zip, and Brew tarball therefore reduces to **keeping `template/` (especially `template/scripts/`) identical** for the shipped release artifact set — root **`scripts/intake_*`** in a source zip does **not** fix target repos unless installers or **`files`** are deliberately extended (separate design choice).
+  - **Architecture handoff**: Decide **`package.json` `files`** policy (list **`template/`** only vs also root **`scripts/intake_*`**), add deterministic parity checks (**active `scripts/` ↔ `template/scripts/`** for intake modules), and regression tests or pack-time assertions so upgrades deliver new files per **US-0018**. **Resolved (2026-03-30)** — **`DEC-0063`** / **`architecture.md`** **`# BUG-0001`**.
+- **Research closure (2026-03-30, tech-lead, `orchestrator_run_id=auto-20260330-01`)**: Extended after **post-discovery** inventory; handed off to **`/architecture`** — satisfied by **`DEC-0063`** below.
+- **Architecture traceability (2026-03-30, tech-lead, `orchestrator_run_id=auto-20260330-01`)**: **`DEC-0063`** accepted — normative ship path locked; implementation + release completed sprint **`S0060`** **2026-03-30**.
+- **Curator closure (2026-03-30, curator, `orchestrator_run_id=auto-20260330-01`)**: **`/refresh-context`** after **`S0060`** release — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-30) — S0060 / BUG-0001 / auto-20260330-01** (`stop_reason=completed`, `next_scheduled_phase=none`); **`R-0058`** research questions **resolved** in delivery (template mirror + parity gates per **`DEC-0063`**).
+- **Linked**: BUG-0001, US-0008, US-0018, DEC-0060, DEC-0061, DEC-0063
+- **Confidence**: high (local inventory + npm `files` semantics + installer source-root review + import scan)
+- **Status**: closed (delivered with **BUG-0001** / **`S0060`** / **`DEC-0063`**; see **`docs/engineering/state.md`** refresh-context checkpoint **`auto-20260330-01`**)
+
+## R-0059
+
+- **Date**: 2026-03-31
+- **Topic**: US-0081 — deterministic first-intake full-plan coverage gate
+- **Query**: Which implementation/test patterns best enforce complete broad-intake plan coverage (`plan_area_id -> story_id[] | deferred_ref`) before persistence, with deterministic fail-closed diagnostics?
+- **Sources**:
+  - [JSON Schema draft 2020-12](https://json-schema.org/draft/2020-12)
+  - [JSON Schema Validation draft 2020-12](https://json-schema.org/draft/2020-12/json-schema-validation.html)
+  - [Pytest parametrization docs](https://docs.pytest.org/parametrize.html)
+  - [RFC 8785 — JSON Canonicalization Scheme](https://www.rfc-editor.org/rfc/rfc8785)
+  - Internal context: `docs/product/backlog.md` (`US-0081` discovery notes), `handoffs/po_to_tl.md` (Discovery Addendum — US-0081), `docs/engineering/state.md` (Discovery checkpoint 2026-03-31, `auto-20260331-01`)
+- **Findings**:
+  - **Coverage schema pattern**: represent broad-intake plan completeness as a machine-verifiable map with explicit XOR outcome per area: each `plan_area_id` must resolve to either non-empty `story_id[]` or `deferred_ref` (not both empty). This maps cleanly to deterministic validator logic and JSON-schema-style `oneOf` constraints.
+  - **Persistence gate pattern**: run a pre-persistence coverage validator after inventory normalization; if any major `plan_area_id` is unmapped, fail closed with `INTAKE_PLAN_COVERAGE_MISSING` under `INTAKE_PERSISTENCE_BLOCKED`, plus deterministic remediation text naming missing IDs.
+  - **Deterministic policy implications**: keep `docs/product/backlog.md` as status authority (US-0045), so research/scope closure lines must not auto-transition story status; `US-0081` remains `OPEN` until downstream delivery phases close acceptance.
+  - **Deterministic test implications**: use parameterized pass/fail fixture rows for (a) full mapping pass, (b) justified defer pass, (c) missing mapping fail; include parity fixtures for active and `template/` intake surfaces so coverage-gate behavior cannot drift.
+  - **Proof/hash implication**: strict-proof tuples should continue canonical sorted-key JSON hashing (current DEC-0038 practice). RFC 8785 reinforces the same determinism principle for stable cross-run evidence hashing.
+- **Risks**:
+  - **Inventory drift risk**: under-normalized `plan_area_inventory` can under-report gaps; mitigate with deterministic normalization rules and snapshot fields persisted in evidence.
+  - **False-pass risk**: accepting empty/placeholder mappings defeats the gate; mitigate with non-empty constraints and explicit deferred rationale references.
+  - **Parity drift risk**: active/template intake validators can diverge; mitigate with mirrored fixtures + parity checks in CI.
+  - **Operator friction risk**: over-strict diagnostics can block legitimate phased plans; mitigate by allowing explicit `deferred_ref` with rationale while still requiring total area accounting.
+- **Curator closure (2026-03-31, curator, `orchestrator_run_id=auto-20260331-01`)**: **`/refresh-context`** after **`S0061`** release — **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-31) — S0061 / US-0081 / auto-20260331-01** (`stop_reason=completed`, `next_scheduled_phase=none`); **`R-0059`** findings are now fully resolved by delivered gate implementation and release evidence under **`DEC-0064`**.
+- **Linked**: US-0081, US-0045, US-0056, DEC-0038, DEC-0060, DEC-0064
+- **Status**: closed (delivered with **US-0081** / **`S0061`** / **`DEC-0064`**; see refresh-context closure above)
+
+## R-0060
+
+- **Date**: 2026-03-31
+- **Topic**: US-0082 — agent-driven `codebase-map.md` bootstrap (lifecycle hooks vs manual `/map-codebase`)
+- **Query**: How do Cursor-style projects usually onboard agents to repo structure, and what deterministic workflow hook patterns fit this repo’s `/auto` phases, ownership policy, and parity constraints?
+- **Sources**:
+  - [Cursor — Rules (customization)](https://cursor.com/docs/context/rules) — persistent markdown rules and referenced docs are the supported, version-controlled way to steer agents; no built-in automatic “codebase map” artifact.
+  - [Cursor — Documentation](https://cursor.com/docs) — product docs emphasize explicit project configuration rather than implicit generated repo surveys.
+  - Internal: `.cursor/commands/map-codebase.md`, `template/.cursor/commands/map-codebase.md` (declared outputs: `docs/engineering/codebase-map.md`, `docs/engineering/dependencies.json`, `docs/engineering/state.md`; phase roles **tech-lead** / **curator**).
+  - Internal: `docs/product/backlog.md` (**US-0082** AC-1..AC-10, **US-0001** DONE — command exists without guaranteed lifecycle invocation).
+- **Findings**:
+  - **Expectation gap (confirmed)**: vendors document rules/docs as the primary onboarding surface; a dedicated **`codebase-map.md`** remains a **repo-owned workflow artifact** unless a project explicitly schedules its creation — aligns with **BUG-0002** reclassification → **US-0082**.
+  - **Hook families for `/architecture` to decide** (non-exclusive): (1) **Phase-gated generation** — e.g. require or default-generate map at a named `/auto` phase boundary (**architecture**, **refresh-context**, or a profile-specific bootstrap step) with idempotent overwrite rules (**AC-3**). (2) **Preflight diagnostic** — `/ask` + runbook gate that detects missing map and routes to **`/map-codebase`** or TL/Dev action (**AC-5**, **AC-6**). (3) **CI/regression guard** — test or script fails when template/fresh-repo layout lacks map after install (**AC-8**). (4) **Orchestrator materialization** — extend deterministic `/auto` plan materialization only when policy explicitly includes map bootstrap (avoid silent scope creep vs **DEC-0052** profiles).
+  - **Ownership / non-intake writers (**AC-4**)**: any auto-trigger must cite the same artifact-ownership rules as manual **`/map-codebase`** (append-only **`state.md`**, bounded writes to engineering docs) — architecture should name the authoritative writer role and conflict policy.
+  - **Idempotency (**AC-3**)**: prefer content-aware refresh (stable sections, deterministic ordering) or explicit “skip if fresh” rules over timestamp-only churn unless acceptance requires audit stamps.
+  - **Parity (**AC-7**)**: active + `template/` command surfaces for map/bootstrap must stay mirrored; research does not pick file-level edits — defer to **`/architecture`** + sprint tasks.
+- **Risks**:
+  - **Over-automation**: running map generation on every `/auto` cycle could churn **`state.md`** or create merge noise — mitigate with explicit phase/profile gating and idempotency.
+  - **Under-automation**: diagnostics-only path may still leave fresh repos empty if operators skip runbook — mitigate with CI guard or default-once hook.
+  - **Role drift**: if both **tech-lead** and **curator** can invoke **`/map-codebase`**, architecture must define a single default owner for auto paths to satisfy **AC-1**.
+- **Research closure (2026-03-31, tech-lead, `orchestrator_run_id=auto-20260331-02`)**: Findings bounded to options + constraints; **`/architecture`** selects normative lifecycle binding and decision records (**DEC-####** as needed) without expanding backlog AC rows.
+- **Architecture closure (2026-03-31, tech-lead, `orchestrator_run_id=auto-20260331-02`)**: Normative lock **`DEC-0065`** + **`docs/engineering/architecture.md`** **`# US-0082`**.
+- **Delivery closure (2026-03-31, curator, `orchestrator_run_id=auto-20260331-02`)**: **`US-0082`** **DONE** / **`S0062`** **released**; research entry closed with sprint delivery per **US-0045** — see **`docs/engineering/state.md`** **Refresh-context checkpoint (2026-03-31) — S0062 / US-0082 / auto-20260331-02**.
+- **Linked**: US-0082, US-0001, BUG-0002, US-0045, US-0056, DEC-0051, DEC-0052, DEC-0065
+- **Confidence**: medium-high (vendor doc survey + internal command/backlog cross-check)
+- **Status**: closed (**US-0082** **DONE**, **`S0062`** **released**; **`R-0060`** basis for **`DEC-0065`** / **`# US-0082`**)
+
+## R-0061
+
+- **Date**: 2026-03-31
+- **Topic**: BUG-0003 - installer mode-path completeness for `missing` and `upgrade`
+- **Query**: Which deterministic strategy should guarantee that framework-critical scripts (including `scripts/enforce-triad-hot-surface.py`) are present after `missing` and `upgrade`, with parity across `installer.ps1`, `installer.sh`, and `installer.py` plus auditable diagnostics/tests?
+- **Sources**:
+  - [Python `shutil` docs](https://docs.python.org/3/library/shutil.html) (overwrite semantics used by `shutil.copy2` in `installer.py`)
+  - [PowerShell `Copy-Item` docs](https://learn.microsoft.com/powershell/module/microsoft.powershell.management/copy-item) (overwrite/update behavior in `installer.ps1`)
+  - [Linux `cp(1)` docs](https://www.man7.org/linux/man-pages/man1/cp.1.html) (copy/update behavior in `installer.sh`)
+  - [RFC 8785](https://www.rfc-editor.org/rfc/rfc8785) (deterministic canonicalization principle for stable diagnostics/proofs)
+  - Internal: `installer.ps1`, `installer.sh`, `installer.py`, `docs/engineering/context/installer-owned-paths.manifest`, `docs/product/backlog.md` (`BUG-0003`), `handoffs/po_to_tl.md` (BUG-0003 discovery handoff), `docs/engineering/state.md` (BUG-0003 discovery checkpoint)
+- **Findings**:
+  - **Branch-logic inventory parity (confirmed)**:
+    - `missing`: all three installers skip existing files and only copy absent paths (`installer.ps1` loop with `if ($mode -eq "missing") { if ($exists) { continue } ... }`; `installer.sh` `if [ "$MODE" = "missing" ]; then [ -f "$dst" ] && continue ...`; `installer.py` `if mode == "missing": if exists: continue ...`).
+    - `upgrade`: all three installers evaluate categorized files and update framework-class files while preserving user-data class, and add missing files (`Classify-File` / `classify_file` branches).
+    - This means path completeness is driven primarily by installer input inventory, not by branch divergence.
+  - **Current gap root cause**: installer input inventory is manifest-driven (`install_include_paths`), and the manifest currently lists selected scripts but omits `scripts/enforce-triad-hot-surface.py`; therefore both `missing` and `upgrade` can complete successfully while that script remains absent.
+  - **Required-script source-of-truth alternatives**:
+    - **A (simplest, recommended)**: treat `docs/engineering/context/installer-owned-paths.manifest` as the single required-script source of truth; add the missing script path and keep installer code unchanged.
+    - **B (dual-source fallback)**: derive required scripts from `scripts/` patterns plus manifest exclusions. Rejected as higher drift risk and harder to reason about.
+    - **C (hard-coded list in each installer)**: explicit in code but highest parity/maintenance burden (three codepaths plus template mirrors).
+    - Recommendation: **A** unless architecture identifies a concrete failure mode that manifest-only cannot cover.
+  - **Deterministic diagnostics implications**:
+    - Add a post-install completeness check in shared installer logic (prefer `installer.py` helper invoked by shell wrappers) that validates a bounded required-script set and emits stable reason codes on miss (for example `INSTALL_REQUIRED_SCRIPT_MISSING:<path>` under an install completeness umbrella).
+    - Keep strict-proof hashing model unchanged (sorted-key JSON + SHA-256 per DEC-0038); reuse deterministic field ordering for any new completeness evidence blob.
+  - **Deterministic test implications**:
+    - Add parity fixtures for both `missing` and `upgrade` proving required scripts are present after install (active + template packaging path).
+    - Add a negative fixture that intentionally omits a required script from staged template input and asserts deterministic fail code.
+    - Extend runbook/install smoke tests to verify required-script manifest entries are installed and cleaned consistently with `clean_paths`.
+- **Risks**:
+  - **False completeness risk**: if required inventory remains implicit, installs can pass while missing critical scripts. Mitigate via single manifest source + explicit completeness validator.
+  - **Parity drift risk**: if checks are duplicated in PS1/SH/PY, behavior can diverge. Mitigate with Python-shared validation path and wrapper reuse.
+  - **Over-strict gate risk**: new checks could block installs in partially customized repos. Mitigate with clear framework/user-data boundaries and deterministic remediation text.
+  - **Cleanup asymmetry risk**: adding install paths without matching clean-path policy can leave residue or remove wrong files. Mitigate with paired manifest review in architecture/sprint tasks.
+- **Research closure (2026-03-31, tech-lead, `orchestrator_run_id=auto-20260331-03`)**: bounded BUG-0003 research complete; architecture should lock manifest authority, completeness diagnostics contract, and parity regression matrix before sprint planning.
+- **Architecture closure (2026-03-31, tech-lead, `orchestrator_run_id=auto-20260331-03`)**: normative lock **`DEC-0066`** + **`docs/engineering/architecture.md`** **`# BUG-0003`**.
+- **Delivery closure (2026-04-01, curator, `orchestrator_run_id=auto-20260331-03`)**: **`BUG-0003`** **DONE** / **`S0063`** **released**; refresh-context reconciliation completed across backlog/acceptance/release queue/state and this entry is now closure-fresh.
+- **Linked**: BUG-0003, BUG-0001, US-0018, US-0045, US-0056, DEC-0038
+- **Confidence**: high (direct code-path inventory across all three installers + platform copy semantics references)
+- **Status**: closed (**`BUG-0003`** **DONE**, **`S0063`** **released**; basis for **`DEC-0066`** / **`# BUG-0003`**)
+
+## R-0062
+
+- **Date**: 2026-04-01
+- **Topic**: US-0083 - delegable intake clarification without hard blocks
+- **Query**: What deterministic evidence/validator pattern enables explicit, topic-scoped user delegation for unresolved required intake topics while preserving fail-closed behavior for non-delegated gaps and guided/low-touch parity?
+- **Sources**:
+  - [JSON Schema - Boolean JSON Schema combination](https://json-schema.org/understanding-json-schema/reference/combining.html) (`oneOf`/`anyOf` tradeoffs for mutually exclusive branch validation)
+  - [JSON Schema - Conditional schema validation](https://json-schema.org/understanding-json-schema/reference/conditionals) (`if`/`then`/`else`, `dependentRequired` for deterministic branch requirements)
+  - [OWASP Logging Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html) (audit-event field model: when/where/who/what + reason/confidence)
+  - Internal: `docs/product/backlog.md` (`US-0083` discovery scope/ACs), `docs/product/vision.md` (intake and adaptive questioning values), `scripts/intake_evidence_lib.py`, `scripts/intake_evidence_validate.py`, `handoffs/po_to_tl.md`, `handoffs/resume_brief.md`
+- **Findings**:
+  - **Current validator behavior (confirmed)**:
+    - `scripts/intake_evidence_lib.py` enforces required topics strictly by requiring each required `topic_key` to have verifiable `ie:` coverage (`satisfied_by` currently limited to `answer_ref|assumption_confirmation_ref`), and fails with `INTAKE_REQUIRED_TOPIC_MISSING` + `INTAKE_PERSISTENCE_BLOCKED` when coverage is absent.
+    - Guided vs low-touch parity is already intentional (`intake_guided_mode` is a no-op in validation), so delegation should not introduce mode-branching semantics.
+  - **Delegation evidence shape (recommended)**:
+    - Keep topic-level contract and add a third allowed branch for unresolved required topics: `satisfied_by=delegation_ref`.
+    - Require deterministic row fields when delegated: `delegation_scope` (bounded decision area), `delegation_rationale` (why user delegates), `delegation_confidence` (`low|medium|high`), and quoted user opt-in text bound by `ie:` hash input.
+    - Preserve DEC-0060-style binding by extending `ie:` payload verification to include the delegated branch literal and quoted delegation text; no opaque free-form bypass tokens.
+  - **Validator branch semantics (recommended)**:
+    - **Non-delegated unresolved required topic** -> unchanged fail-closed (`INTAKE_REQUIRED_TOPIC_MISSING` path preserved).
+    - **Delegated unresolved required topic with complete evidence** -> pass topic coverage validation.
+    - **Delegated unresolved required topic with malformed/incomplete evidence** -> fail-closed with deterministic delegation-specific code(s) before persistence.
+  - **Alternative analysis ("what's the alternative?")**:
+    - **A (simplest, recommended)**: extend existing topic row schema with `delegation_ref` branch and bounded delegation metadata.
+    - **B**: separate top-level `delegations[]` structure with cross-references to topic rows. Rejected: more joins, higher mismatch risk, and harder diagnostics.
+    - **C**: global intake-level delegation toggle for all missing topics. Rejected: violates discovery requirement for explicit topic-scoped delegation and increases unsafe bypass risk.
+  - **Diagnostics contract implications**:
+    - Delegation failures should remain under `INTAKE_PERSISTENCE_BLOCKED` envelope but use specific primary code(s), for example `INTAKE_DELEGATION_EVIDENCE_MISSING` / `INTAKE_DELEGATION_EVIDENCE_INVALID`, with remediation naming the exact topic and missing field.
+    - Success-path evidence should remain machine-auditable and script-verifiable (no narrative-only acceptance).
+- **Risks**:
+  - **Implicit bypass risk**: weak delegation wording could allow accidental pass-through. Mitigation: strict `satisfied_by=delegation_ref` literal + `ie:`-bound explicit user opt-in quote.
+  - **Schema drift risk**: adding delegated fields in active scripts without template parity can regress installs. Mitigation: active/template parity checks and fixtures in sprint scope.
+  - **Over-complexity risk**: introducing too many delegation fields may recreate friction. Mitigation: minimal bounded field set (`scope`, `rationale`, `confidence`) only.
+  - **Downstream ambiguity risk**: delegated topics may be mistaken as resolved facts. Mitigation: explicit delegated marker retained in evidence and surfaced to architecture/sprint artifacts.
+- **Research closure (2026-04-01T00:49:10Z, tech-lead, `orchestrator_run_id=auto-20260331-04`)**: bounded research complete for `US-0083`; proceed to `/architecture` to lock final delegation row schema, exact reason-code literals, and parity/regression matrix under canonical backlog authority.
+- **Delivery closure (2026-04-01T01:15:55Z, curator, `orchestrator_run_id=auto-20260331-04`)**: `US-0083` is now `DONE` and sprint `S0064` is `released`; closure posture reconciled across backlog, acceptance, release queue, sprint summary, and resume brief during `/refresh-context`.
+- **Linked**: US-0083, US-0068, US-0078, US-0045, DEC-0050, DEC-0060
+- **Confidence**: high (direct validator/code-path review + external conditional-schema and audit-evidence references)
+- **Status**: closed (`US-0083` `DONE`, `S0064` `released`; basis realized by `DEC-0067` / `# US-0083`)

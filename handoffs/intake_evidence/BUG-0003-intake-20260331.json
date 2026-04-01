@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "manual-20260331-BUG0003-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "New install with mode missing or upgrade must include all required scripts, with no missing framework-critical files after installation.",
+      "intake_run_id": "manual-20260331-BUG0003-intake",
+      "turn_index": 0,
+      "ref": "ie:manual-20260331-BUG0003-intake:0:768b4db1e5b7d420"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "installer.ps1, installer.sh, installer.py, template/scripts/, package files manifest, and install mode logic for missing/upgrade behavior.",
+      "intake_run_id": "manual-20260331-BUG0003-intake",
+      "turn_index": 1,
+      "ref": "ie:manual-20260331-BUG0003-intake:1:3d665d7e5ba486a7"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Must preserve user files in upgrade mode and avoid destructive overwrite. Keep parity across PowerShell, shell, and Python installer paths.",
+      "intake_run_id": "manual-20260331-BUG0003-intake",
+      "turn_index": 2,
+      "ref": "ie:manual-20260331-BUG0003-intake:2:b3cb8da205297562"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add fixtures/regression for fresh install missing mode and upgrade mode validating required script inventory; include parity checks and failure diagnostics.",
+      "intake_run_id": "manual-20260331-BUG0003-intake",
+      "turn_index": 3,
+      "ref": "ie:manual-20260331-BUG0003-intake:3:07dd09b460248f30"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Bug is done when reproducible installs in missing and upgrade modes produce complete required scripts set with tests guarding against regression.",
+      "intake_run_id": "manual-20260331-BUG0003-intake",
+      "turn_index": 4,
+      "ref": "ie:manual-20260331-BUG0003-intake:4:bf8e459cf4ed4d73"
+    }
+  ]
+}
