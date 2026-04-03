@@ -1175,6 +1175,15 @@ IE_FIX=$?
 set -e
 assert_true "intake_evidence tiered fixtures pass" "[ \"$IE_FIX\" -eq 0 ]"
 
+# 26R) Intake answer_ref topic distinctness (BUG-0007 / R-0066 / S0068)
+BUG0007_R0066_TEST="$ROOT/tests/intake_evidence_bug0007_r0066_test.py"
+assert_true "intake_evidence_bug0007_r0066_test.py exists" "[ -f \"$BUG0007_R0066_TEST\" ]"
+set +e
+"$PY" "$BUG0007_R0066_TEST" >/dev/null 2>&1
+BUG0007_R0066_PY=$?
+set -e
+assert_true "intake BUG-0007 R-0066 matrix passes" "[ \"$BUG0007_R0066_PY\" -eq 0 ]"
+
 # 26L) Bug issues + intake routing (US-0079 / DEC-0061 / R-0056)
 BUG_LIB="$ROOT/scripts/bug_issue_lib.py"
 BUG_VAL="$ROOT/scripts/bug_issue_validate.py"
@@ -1266,6 +1275,26 @@ set +e
 INSTALLER_COMPLETENESS_PY=$?
 set -e
 assert_true "installer completeness BUG-0003 fixtures pass" "[ \"$INSTALLER_COMPLETENESS_PY\" -eq 0 ]"
+
+# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068)
+INSTALLER_SHELL_TEST="$ROOT/tests/installer_shell_bug0004_test.py"
+assert_true "installer_shell_bug0004_test.py exists" "[ -f \"$INSTALLER_SHELL_TEST\" ]"
+set +e
+"$PY" "$INSTALLER_SHELL_TEST" >/dev/null 2>&1
+INSTALLER_SHELL_PY=$?
+set -e
+assert_true "installer shell BUG-0004 fixtures pass" "[ \"$INSTALLER_SHELL_PY\" -eq 0 ]"
+
+# 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
+INTAKE_RESUME_BRIEF_TEST="$ROOT/tests/intake_bug_resume_brief_bug0005_test.py"
+assert_true "intake_bug_resume_brief_bug0005_test.py exists" "[ -f \"$INTAKE_RESUME_BRIEF_TEST\" ]"
+assert_true "intake documents DEC-0069 resume_brief refresh script (active)" "file_contains \"$ROOT/.cursor/commands/intake.md\" \"intake_bug_resume_brief_refresh.py\""
+assert_true "intake documents DEC-0069 resume_brief refresh script (template)" "file_contains \"$TPL/.cursor/commands/intake.md\" \"intake_bug_resume_brief_refresh.py\""
+set +e
+"$PY" "$INTAKE_RESUME_BRIEF_TEST" >/dev/null 2>&1
+INTAKE_RESUME_BRIEF_PY=$?
+set -e
+assert_true "intake bug resume_brief BUG-0005 fixtures pass" "[ \"$INTAKE_RESUME_BRIEF_PY\" -eq 0 ]"
 
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {

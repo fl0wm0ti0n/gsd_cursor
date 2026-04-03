@@ -7,11 +7,33 @@
 - tech-lead
 
 ## Execution model
-- `/auto` is an orchestrator only. It must not execute phase work directly.
-- For each phase, spawn a fresh subagent context for that phase role.
+- `/auto` is a **spawn-only orchestrator**: it schedules materialization, spawns
+  fresh **phase-role** subagents, and verifies phase boundaries—it **must not**
+  execute lifecycle phase work, perform phase-role duties, or author **phase
+  deliverables** in the orchestrator context.
+- For each phase, **spawn a fresh subagent** for that phase’s canonical role;
+  phase output must arrive only via artifacts and handoff files (no in-turn
+  orchestrator execution of that phase).
 - Phase context transfer happens only through artifacts and handoff files.
 - Scope is process/workflow orchestration only. Do not claim runtime product
   orchestration changes.
+
+## Spawn-boundary integrity (BUG-0006 / US-0080)
+
+This gate is **orthogonal** to per-phase isolation (**DEC-0029**, see
+`decisions/DEC-0029.md`) and strict runtime proof (**DEC-0038**, see
+`decisions/DEC-0038.md`): satisfying one does not excuse skipping the others.
+
+- **Forbidden**: using the orchestrator context to **perform** a lifecycle phase
+  instead of **spawning** the required role subagent (for example in-turn
+  **`architecture`**, **`execute`**, or **`qa`** work attributed to the
+  orchestrator).
+- **Fail fast** with **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**. **Remediation**:
+  stop; spawn a **fresh** subagent for the canonical **`phase_id`** and **`role`**
+  per the phase→role matrix (**DEC-0051**); continue only through artifacts and
+  handoffs. **Do not** overload **`PHASE_CONTEXT_ISOLATION_VIOLATION`** or
+  **`RUNTIME_PROOF_*`** for a spawn-boundary violation—those address wrong-writer
+  isolation breaks and attestation failures, not missing spawn.
 
 ## Per-phase isolation enforcement (US-0048 / DEC-0029)
 

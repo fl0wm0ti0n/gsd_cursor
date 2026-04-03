@@ -1,3 +1,150 @@
+## TL -> Dev Handoff — Sprint S0068 / BUG-0007 — post-plan-verify → **`/execute`**
+
+> **Update (2026-04-04T19:15:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0068/plan-verify.json`** (`orchestrator_run_id=auto-20260404-01`, **qa**). **`/execute`** (**dev**) **unblocked**.
+
+## Planning summary
+
+- **Sprint**: **`S0068`** (next id after **S0067**)
+- **Bug**: **`BUG-0007`** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **6** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-6** mapped **1:1** to **`T-001..T-006`** in **`sprints/S0068/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0068/plan-verify.json`** (`2026-04-04T19:15:00Z`, **qa**, `orchestrator_run_id=auto-20260404-01`) — **`/execute`** (**dev**) **unblocked**
+- **Bounded read**: **`sprints/S0068/*`** + **`architecture.md` `# BUG-0007`** + **`R-0066`**
+
+## Architecture and research references
+
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0007`)
+- Research: `docs/engineering/research.md` (**R-0066**)
+- Intake evidence (negative exemplar): `handoffs/intake_evidence/BUG-0007-intake-20260403.json`
+- Sprint artifacts: `sprints/S0068/*`
+- **Orchestrator run**: `auto-20260404-01`
+
+## Focus
+
+1. **T-001**: **`scripts/intake_evidence_lib.py`** — duplicate / non-distinct **`answer_ref`** **`quoted_user_text`** rule; **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`**; **US-0083** / equivalent-evidence exemptions.
+2. **T-002–T-003**: **`.cursor/commands/intake.md`** + **`template/`** — truthfulness + forbid synthetic echo + cross-links.
+3. **T-004–T-005**: **R-0066** matrix tests + **`intake_evidence_validate.py --self-test`** + **`run-tests.sh` / `run-tests.ps1`**.
+4. **T-006**: **`check_intake_template_parity.py`**.
+
+## Risks
+
+- False positives on legitimate repeated short answers — tune per architecture vs matrix row **2**.
+- Template drift — **T-006** parity gate.
+
+## Execution order
+
+Run **`T-001`..`T-006`** per **`sprints/S0068/tasks.md`** (**plan-verify** already **PASS**).
+
+## Done criteria for Dev completion
+
+- All **6** tasks in **`sprints/S0068/tasks.md`** marked **done**
+- **`sprints/S0068/plan-verify.json`** is **PASS** (QA verified)
+- **`BUG-0007`** remains **OPEN** until verify-work per **US-0045**
+
+---
+
+## TL -> Dev Handoff — Sprint S0067 / BUG-0006 — post-plan-verify → `/execute`
+
+> **Update (2026-04-04T05:15:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0067/plan-verify.json`** (`orchestrator_run_id=auto-20260403-03`, **qa**). **`/execute`** (**dev**) **unblocked**.
+
+## Planning summary
+
+- **Sprint**: **`S0067`** (next id after **S0066**)
+- **Bug**: **`BUG-0006`** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **5** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-5** mapped **1:1** to **`T-001..T-005`** in **`sprints/S0067/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0067/plan-verify.json`** (`2026-04-04T05:15:00Z`, **qa**, `orchestrator_run_id=auto-20260403-03`) — **`/execute`** (**dev**) **unblocked**
+- **Bounded read**: **`sprints/S0067/*`** + **`architecture.md` `# BUG-0006`** + **`R-0065`**
+
+## Architecture and research references
+
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0006`)
+- Research: `docs/engineering/research.md` (**R-0065**)
+- Intake evidence (context): `handoffs/intake_evidence/BUG-0006-intake-20260403.json`
+- Sprint artifacts: `sprints/S0067/*`
+- **Orchestrator run**: `auto-20260403-03`
+
+## Focus
+
+1. **T-001–T-002**: Active + **`template/`** **`.cursor/commands/auto.md`** — spawn-only, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, forbidden orchestrator phase work.
+2. **T-003**: **`docs/engineering/auto-orchestration-reference.md`** — alignment + **DEC-0029** / **DEC-0038** cross-links.
+3. **T-004–T-005**: **`tests/auto_command_contract_test.py`** + **`run-tests.sh` / `run-tests.ps1`** traceability.
+
+## Risks
+
+- Diagnostic overlap with **`PHASE_CONTEXT_ISOLATION_VIOLATION`** — keep remediation text distinct per architecture table.
+- Template drift if **T-002** omitted.
+
+## Execution order
+
+Run **`T-001`..`T-005`** per **`sprints/S0067/tasks.md`** (**plan-verify** already **PASS**).
+
+## Done criteria for Dev completion
+
+- All **5** tasks in **`sprints/S0067/tasks.md`** marked **done**
+- **`sprints/S0067/plan-verify.json`** is **PASS** (verified **`2026-04-04T05:15:00Z`**, **qa**)
+- **`BUG-0006`** remains **OPEN** until verify-work per **US-0045**
+
+---
+
+## TL -> Dev Handoff — Sprint S0066 / BUG-0005 — post-plan-verify → `/execute`
+
+> **Update (2026-04-03T20:40:00Z)**: **`/execute`** complete — see **`handoffs/dev_to_qa.md`**; **`next_scheduled_phase=qa`**.
+
+## Planning summary
+
+- **Sprint**: **`S0066`** (next id after **S0065**)
+- **Bug**: **`BUG-0005`** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **9** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-9** mapped **1:1** to **`T-001..T-009`** in **`sprints/S0066/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0066/plan-verify.json`** (`2026-04-03T19:52:00Z`, **qa**, `orchestrator_run_id=auto-20260403-02`) — **`/execute`** (**dev**) **unblocked**
+- **Bounded read**: **`sprints/S0066/*`** + **DEC-0069** + **`architecture.md` `# BUG-0005`** + **R-0064**
+
+## Architecture and decision references
+
+- Decision: `decisions/DEC-0069.md`
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0005`)
+- Research: `docs/engineering/research.md` (**R-0064**)
+- Intake evidence (context): `handoffs/intake_evidence/BUG-0005-intake-20260403.json`
+- Sprint artifacts: `sprints/S0066/*`
+- **Orchestrator run**: `auto-20260403-02`
+
+## Focus
+
+1. **T-001–T-003**: Intake completion **atomic** **`resume_brief`** refresh with **DEC-0069** minimum fields and **US-0045** alignment.
+2. **T-004**: Active/**`template/`** (and parity rules) for touched **intake** surfaces.
+3. **T-005–T-008**: **`R-0064`** regression matrix (happy path, absent brief, **`start-from`**, contradiction fail-fast, portfolio switch).
+4. **T-009**: **`run-tests.sh` / `run-tests.ps1`** wiring for new fixtures.
+
+## Risks
+
+- Dual-writer races on **`resume_brief`** (**DEC-0069** §5 ownership).
+- Resume field drift vs **`/auto`** parser — lock keys via tests.
+
+## Execution order
+
+Run **`T-001`..`T-009`** per **`sprints/S0066/tasks.md`** (**plan-verify** already **PASS**).
+
+## Done criteria for Dev completion
+
+- All **9** tasks in **`sprints/S0066/tasks.md`** marked **done**
+- **`sprints/S0066/plan-verify.json`** is **PASS** (verified **`2026-04-03T19:52:00Z`**, **qa**)
+- **`BUG-0005`** remains **OPEN** until verify-work per **US-0045**
+
+---
+
+## TL -> Dev Handoff — BUG-0005 (`/auto` resume after bug intake) — post-architecture → `/sprint-plan` (historical)
+
+- **Superseded** by **S0066** block above; **`/sprint-plan`** complete (`2026-04-03T19:46:30Z`).
+
+---
+
+## TL -> Dev Handoff — BUG-0005 (`/auto` resume after bug intake) — post-research → `/architecture` (historical)
+
+- **Superseded** by post-architecture handoff above; **`DEC-0069`** and **`# BUG-0005`** now normative.
+
+---
+
 ## TL -> Dev Handoff - Sprint S0064 (US-0083 delegable intake clarification)
 
 ## Planning summary
@@ -2759,3 +2906,27 @@ the sprint is handed off via `handoffs/dev_to_qa.md` for QA verification.
 ### Key research anchor
 
 - `docs/engineering/research.md` (`R-0061`)
+
+---
+
+## Architecture readiness brief — BUG-0004 (pre-sprint-plan)
+
+- `orchestrator_run_id=auto-20260403-01`
+- completed phase: `architecture` (`tech-lead`)
+- next scheduled phase: `sprint-plan`
+
+### What sprint-plan must lock
+
+1. Bounded implementation tasks for Unix shell startup compatibility:
+   - keep `installer.sh` startup options POSIX-safe for `/bin/sh` execution.
+2. Regression obligations from `DEC-0068`:
+   - direct `sh installer.sh` paths (`missing` and `upgrade`),
+   - CLI path (`node bin/its-magic.js --mode missing`) non-regression.
+3. Scope guard:
+   - do not mix `BUG-0005` resume-handshake fixes into this bug sprint.
+
+### Key architecture anchors
+
+- `decisions/DEC-0068.md`
+- `docs/engineering/architecture.md` (`# BUG-0004`)
+- `docs/engineering/research.md` (`R-0063`)

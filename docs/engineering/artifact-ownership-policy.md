@@ -23,7 +23,7 @@ artifacts. Ordering policy and ownership policy are complementary:
 | `handoffs/release_queue.md` | target sprint row only | `release` | none |
 | `handoffs/release_notes.md` | latest pointer section | `release`, `refresh-context` | none |
 | `docs/engineering/state.md` | append-bottom checkpoints only | all delivery phases | none |
-| `handoffs/resume_brief.md` | current status/next-actions sections | `pause`, `resume`, `refresh-context`, `release` | none |
+| `handoffs/resume_brief.md` | current status/next-actions sections; latest-pointer upsert on **`/intake bug`** completion (**DEC-0069**) | `intake` (bug persistence path only), `pause`, `resume`, `refresh-context`, `release` | none |
 
 ## Non-destructive mutation rules
 

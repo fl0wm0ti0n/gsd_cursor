@@ -13,10 +13,42 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0064`
-- **Latest canonical notes:** `handoffs/releases/S0064-release-notes.md`
-- **Latest release date:** 2026-03-31
-- **Latest release work item:** US-0083
+- **Latest released sprint:** `S0068`
+- **Latest canonical notes:** `handoffs/releases/S0068-release-notes.md`
+- **Latest release date:** 2026-04-05
+- **Latest release work item:** BUG-0007
+
+## Release finalized note (S0068)
+
+- Sprint: `S0068`
+- Bug: `BUG-0007` (**R-0066** / **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`**)
+- Release: **finalized** (`2026-04-05T00:10:00Z`, `orchestrator_run_id=auto-20260404-01`, strict proof `proof_hash=6c824be4c8dfb3ecb25de8e8ca90910789436a2c916489fb15a935baf3c64202`)
+- Queue: **`handoffs/release_queue.md`** row **`S0068`** = **`released`**
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (no auto-push this boundary)
+- Portfolio: **`docs/product/backlog.md`** — canonical **bug** rows **BUG-0001..BUG-0007** all **DONE**; **next OPEN bug:** **(none)**
+- **Next**: **`/refresh-context`** (fresh **curator** context)
+
+## Release readiness note (S0068) (historical)
+
+- Pre-release verify-work **PASS** (`2026-04-04T23:45:00Z`); superseded by **Release finalized note (S0068)** above.
+
+## Release readiness note (S0067)
+
+- Sprint: `S0067`
+- Bug: `BUG-0006` (**spawn-only `/auto`**, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, **R-0065**)
+- Release: **finalized** — queue row **`released`**; canonical notes `handoffs/releases/S0067-release-notes.md` (`2026-04-04T09:00:00Z`, `orchestrator_run_id=auto-20260403-03`); **`/refresh-context`** **complete** — successor track **`S0068`** / **`BUG-0007`** **released** (`2026-04-05`).
+
+## Release readiness note (S0066)
+
+- Sprint: `S0066`
+- Bug: `BUG-0005` (**DEC-0069**)
+- Release: **finalized** — queue row **`released`**; canonical notes `handoffs/releases/S0066-release-notes.md`; **`/refresh-context`** **complete** (`auto-20260403-02`, **`2026-04-03T23:55:00Z`**) — superseded by **`S0067`** closure track; portfolio now advances via **`BUG-0007`** after **`S0067`** **`/refresh-context`**.
+
+## Release readiness note (S0065)
+
+- Sprint: `S0065`
+- Bug: `BUG-0004`
+- Release: **finalized** - queue row **`released`**; canonical notes `handoffs/releases/S0065-release-notes.md`; next **`/refresh-context`** completed.
 
 ## Release readiness note (S0064)
 
@@ -89,19 +121,23 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Refer to `## Run` in
-  `handoffs/releases/S0064-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0068`**: refer to `## Run` in
+  `handoffs/releases/S0068-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0064-release-notes.md`.
+  `handoffs/releases/S0068-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0064-release-notes.md`.
+  `handoffs/releases/S0068-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0064-release-notes.md` (env-ref only).
+  `handoffs/releases/S0068-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0064-release-notes.md`.
+  `handoffs/releases/S0068-release-notes.md`.
 
 ## Historical references
 
+- `S0068`: `handoffs/releases/S0068-release-notes.md`
+- `S0067`: `handoffs/releases/S0067-release-notes.md`
+- `S0066`: `handoffs/releases/S0066-release-notes.md`
+- `S0065`: `handoffs/releases/S0065-release-notes.md`
 - `S0064`: `handoffs/releases/S0064-release-notes.md`
 - `S0063`: `handoffs/releases/S0063-release-notes.md`
 - `S0062`: `handoffs/releases/S0062-release-notes.md`

@@ -12,6 +12,7 @@ INTAKE_TEMPLATE_PAIRS: tuple[tuple[str, str], ...] = (
     ("scripts/intake_evidence_validate.py", "template/scripts/intake_evidence_validate.py"),
     ("scripts/intake_evidence_lib.py", "template/scripts/intake_evidence_lib.py"),
     ("scripts/intake_bug_routing_guard.py", "template/scripts/intake_bug_routing_guard.py"),
+    ("scripts/intake_bug_resume_brief_refresh.py", "template/scripts/intake_bug_resume_brief_refresh.py"),
     ("scripts/check_intake_template_parity.py", "template/scripts/check_intake_template_parity.py"),
 )
 

@@ -21,6 +21,7 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
 - `docs/product/backlog.md`
 - `docs/product/acceptance.md`
 - `handoffs/po_to_tl.md`
+- `handoffs/resume_brief.md` (required on successful **`/intake bug`** persistence — **DEC-0069** / **BUG-0005**)
 - Optional (when enabled): `docs/engineering/compatibility-report.md`
 - Optional (when enabled): `docs/engineering/component-scope.md`
 
@@ -41,7 +42,7 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
 - For artifact mutations, enforce deterministic single-writer scope:
   - establish writer identity (`writer_id`) and run identity (`intake_run_id`),
   - bind writes to target artifacts (`backlog`, `acceptance`, `vision`,
-    `po_to_tl`) for this run.
+    `po_to_tl`, and when persisting bugs: `resume_brief` per **DEC-0069**) for this run.
 - Drift guard semantics:
   - self-write changes from the same `(writer_id, intake_run_id)` are valid and
     must not trigger concurrent-writer blockers,
@@ -73,6 +74,7 @@ description: "its-magic intake: clarify idea and capture story + acceptance."
   - `INTAKE_REQUIRED_TOPIC_MISSING`
   - `INTAKE_REQUIRED_PACK_INCOMPLETE`
   - `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`
+  - `INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT` (**BUG-0007** / **R-0066** — see **Truthfulness** below)
   - `INTAKE_PERSISTENCE_BLOCKED`
 - Remediation guidance surface (mandatory on block):
   - list `missing_topics`,
@@ -127,6 +129,24 @@ and assumption binding. **Do not** mutate `docs/product/backlog.md` or
   (**AC-5**, **AC-6**).
 - **Grandfathering**: legacy intake rows remain valid for read/display; the **next** intake-driven
   mutation must supply full **US-0078** evidence or the write is blocked (**DEC-0060** §5).
+- Truthfulness / anti-echo (**BUG-0007** / **R-0066**): `INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT` when
+  the same normalized `quoted_user_text` is reused across distinct required `topic_key` rows under
+  `satisfied_by=answer_ref` without an exempt path (`evidence_source=equivalent_evidence_ref` +
+  `equivalent_evidence_ref`, `delegation_ref` per **DEC-0067** / **US-0083**, or
+  `assumption_confirmation_ref` on the row). Canonical **`ie:`** integrity (**DEC-0060**) does not
+  prove a topic was actually elicited.
+
+## Truthfulness: `asked_topics` and `topic_coverage` (BUG-0007 / US-0083 / DEC-0060 / DEC-0067)
+
+- **`asked_topics`** may list a required `topic_key` only when a **user-visible question** was posed
+  **or** a **DEC-0060**-allowed alternate applies: **`delegation_ref`** (**DEC-0067**, **US-0083**),
+  **`evidence_source=equivalent_evidence_ref`** with **`equivalent_evidence_ref`**, or
+  **`assumption_confirmation_ref`** (row-level and/or bundle-level assumption binding per the gate
+  contract above).
+- **Forbidden**: fabricating **`topic_coverage`** by echoing **one** user or bug-report blob into
+  **`quoted_user_text`** on **every** required key as **`answer_ref`** solely to satisfy structure.
+  The validator rejects that pattern under **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** (see
+  **`docs/engineering/architecture.md`** **`# BUG-0007`**).
 
 ## Bug issue routing (US-0079 / DEC-0061)
 
@@ -138,6 +158,12 @@ and assumption binding. **Do not** mutate `docs/product/backlog.md` or
   - Append **`### BUG-#### — Title`** under **`## Bug issues (canonical)`** with **Status**, **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`**.
   - Add matching **`- [ ]` / `- [x]`** row under **`## Bug acceptance (canonical)`**, sorted by id.
   - Run **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** before completing the handoff.
+  - **Resume brief refresh (DEC-0069 / BUG-0005)**: immediately after successful bug persistence and backlog/acceptance validation **PASS**, run the atomic writer (temp file + replace — idempotent latest-pointer upsert):
+    - `python scripts/intake_bug_resume_brief_refresh.py --bug-id BUG-#### --backlog docs/product/backlog.md --resume-brief handoffs/resume_brief.md --intake-boundary-utc <RFC3339Z>`  
+    - Optional: `--orchestrator-run-id`, `--intake-evidence handoffs/intake_evidence/....json`, `--sprint-id` when known.  
+    - Exit non-zero → **`INTAKE_RESUME_BRIEF_*`** family — do not claim intake complete; fix backlog/brief contradiction or supply valid boundary UTC.  
+    - Post-condition: **`intended_resume_phase` / `resolved_start_phase` = `discovery`**, **`resolution_source=resume_brief`**, **`bug_id`** matches persisted row, so **`/auto`** without **`start-from`** does not false-trigger **`RESUME_BRIEF_STALE`** for a stale pre-intake **`intake`** target.  
+    - Optional audit: `python scripts/intake_bug_resume_brief_refresh.py --bug-id BUG-#### --backlog docs/product/backlog.md --resume-brief handoffs/resume_brief.md --validate-file` (no write).
 
 ## Steps
 1. Determine intake mode from `.cursor/scratchpad.md`:
@@ -283,7 +309,8 @@ and assumption binding. **Do not** mutate `docs/product/backlog.md` or
 - Intake mutations must also comply with
   `docs/engineering/artifact-ownership-policy.md`.
 - Intake may mutate only intake-owned scopes (`vision`, `backlog`, `acceptance`,
-  `po_to_tl`) for target story context.
+  `po_to_tl`, and **`handoffs/resume_brief.md`** only via the **DEC-0069** bug-intake
+  completion path / `intake_bug_resume_brief_refresh.py`) for target story context.
 - Any attempted delete/rewrite of non-intake-owned sections fails closed with
   `PHASE_OWNERSHIP_VIOLATION`.
 - If an override-authorized path is configured for an artifact but required

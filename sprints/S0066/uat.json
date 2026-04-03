@@ -1,0 +1,84 @@
+{
+  "sprint_id": "S0066",
+  "bug_id": "BUG-0005",
+  "story_id": null,
+  "status": "PASS",
+  "checked_at": "2026-04-03T22:20:45Z",
+  "checked_by_role": "qa",
+  "orchestrator_run_id": "auto-20260403-02",
+  "criteria": [
+    {
+      "id": "UAT-1",
+      "sprint_ac": "AC-1",
+      "name": "Intake completion path performs single deterministic resume_brief refresh after successful bug persistence (US-0045)",
+      "result": "PASS",
+      "evidence_ref": "scripts/intake_bug_resume_brief_refresh.py (atomic temp+replace); .cursor/commands/intake.md + template mirror document post-persistence invocation"
+    },
+    {
+      "id": "UAT-2",
+      "sprint_ac": "AC-2",
+      "name": "Minimum DEC-0069 §1 field set: bug_id, discovery resume, resolution_source seed, boundary metadata, intake_evidence pointer when supplied",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_happy_path_discovery_seed_not_intake + script CLI (--intake-evidence, --orchestrator-run-id)"
+    },
+    {
+      "id": "UAT-3",
+      "sprint_ac": "AC-3",
+      "name": "Refreshed brief cannot contradict canonical backlog facts for bug_id (fail-closed on contradiction)",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_backlog_contradiction_done_fails (INTAKE_RESUME_BRIEF_BACKLOG_CONTRADICTION)"
+    },
+    {
+      "id": "UAT-4",
+      "sprint_ac": "AC-4",
+      "name": "Active / template parity for touched intake command and parity-checked script pair",
+      "result": "PASS",
+      "evidence_ref": "python scripts/check_intake_template_parity.py --repo . -> [INTAKE_TEMPLATE_PARITY_OK]"
+    },
+    {
+      "id": "UAT-5",
+      "sprint_ac": "AC-5",
+      "name": "R-0064 #1 — post-intake brief seeds discovery; no stale intake carryover for normal path",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_happy_path_discovery_seed_not_intake"
+    },
+    {
+      "id": "UAT-6",
+      "sprint_ac": "AC-6",
+      "name": "R-0064 #2 — absent resume_brief: writer creates parseable handoff (precedence / state fallback contract preserved)",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_missing_brief_creates_file"
+    },
+    {
+      "id": "UAT-7",
+      "sprint_ac": "AC-7",
+      "name": "R-0064 #3–#4 — explicit start-from contract fields documented in brief; brief vs OPEN backlog contradiction fails fast",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_start_from_precedence_documented_contract; test_r0064_backlog_contradiction_done_fails"
+    },
+    {
+      "id": "UAT-8",
+      "sprint_ac": "AC-8",
+      "name": "R-0064 #5 — portfolio switch: refresh targets persisted OPEN bug_id in latest pointer",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_bug_resume_brief_bug0005_test.py::test_r0064_portfolio_switch_new_bug_id_in_brief"
+    },
+    {
+      "id": "UAT-9",
+      "sprint_ac": "AC-9",
+      "name": "Regression entrypoints wired in tests/run-tests.sh and tests/run-tests.ps1 (section 26Q)",
+      "result": "PASS",
+      "evidence_ref": "tests/run-tests.ps1 + tests/run-tests.sh section 26Q (intake_bug_resume_brief_bug0005_test.py + intake.md script references)"
+    }
+  ],
+  "totals": {
+    "total": 9,
+    "pass": 9,
+    "fail": 0,
+    "pending": 0
+  },
+  "notes": [
+    "Verify-work reran: python tests/intake_bug_resume_brief_bug0005_test.py (6 tests OK), check_intake_template_parity.py, intake_bug_resume_brief_refresh.py --self-test — all PASS.",
+    "DEC-0069 / R-0064 acceptance covered via sprint AC-1..AC-9 mapping above."
+  ]
+}

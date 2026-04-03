@@ -1,0 +1,55 @@
+{
+  "sprint_id": "S0065",
+  "bug_id": "BUG-0004",
+  "story_id": null,
+  "status": "PASS",
+  "checked_at": "2026-04-03T19:08:48Z",
+  "checked_by_role": "qa",
+  "orchestrator_run_id": "auto-20260403-01",
+  "criteria": [
+    {
+      "id": "UAT-1",
+      "name": "Installer startup remains POSIX-safe for sh path",
+      "result": "PASS",
+      "evidence_ref": "tests/installer_shell_bug0004_test.py::test_startup_does_not_use_bash_only_set_bundle"
+    },
+    {
+      "id": "UAT-2",
+      "name": "Direct sh missing-mode path remains healthy where sh is available",
+      "result": "PASS",
+      "evidence_ref": "tests/installer_shell_bug0004_test.py::test_direct_sh_missing_mode_succeeds"
+    },
+    {
+      "id": "UAT-3",
+      "name": "CLI Unix launcher path remains healthy where sh/node are available",
+      "result": "PASS",
+      "evidence_ref": "tests/installer_shell_bug0004_test.py::test_cli_unix_path_missing_mode_succeeds"
+    },
+    {
+      "id": "UAT-4",
+      "name": "Cross-platform test harness includes BUG-0004 contract checks",
+      "result": "PASS",
+      "evidence_ref": "tests/run-tests.sh + tests/run-tests.ps1 section 26P"
+    },
+    {
+      "id": "UAT-5",
+      "name": "Installer completeness regression remains green (BUG-0003 non-regression)",
+      "result": "PASS",
+      "evidence_ref": "tests/installer_completeness_bug0003_test.py"
+    },
+    {
+      "id": "UAT-6",
+      "name": "Canonical bug status/acceptance surfaces aligned at verify-work",
+      "result": "PASS",
+      "evidence_ref": "docs/product/backlog.md + docs/product/acceptance.md"
+    }
+  ],
+  "totals": {
+    "total": 6,
+    "pass": 6,
+    "fail": 0
+  },
+  "notes": [
+    "Windows host skips runtime sh/node checks when binaries are unavailable; fixture still enforces static startup contract."
+  ]
+}

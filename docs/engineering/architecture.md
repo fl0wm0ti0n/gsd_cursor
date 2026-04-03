@@ -8,163 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0038: Phase-Triggered Sync Policy with Guarded Auto-Push
-
-## Overview
-
-US-0038 defines workflow-level sync policy semantics at phase boundaries. The
-goal is deterministic and safe synchronization behavior with zero-overhead
-defaults when automation is disabled. This architecture does not implement a
-runtime git orchestrator; it defines policy contracts, gates, and artifacts.
-
-## Assumption challenge and alternatives
-
-### Option A: Always auto-push after every phase
-
-Pros:
-- Simple to explain.
-- Frequent backups to remote.
-
-Cons:
-- Violates QA-first safety for feature work.
-- High risk of pushing unstable/incomplete changes.
-- Conflicts with teams that intentionally stay manual.
-
-### Option B: Manual sync only
-
-Pros:
-- Maximum user control and least automation risk.
-- Already compatible with existing workflow habits.
-
-Cons:
-- No deterministic cadence policy when teams want guarded automation.
-- Misses requested phase/milestone trigger model.
-
-### Option C: Policy-driven guarded auto-sync (chosen)
-
-Pros:
-- Supports disabled/manual/by-phase/by-milestone/custom modes.
-- Enforces mandatory pre-push checks and QA-first restrictions.
-- Preserves manual behavior and keeps default non-disruptive.
-
-Cons:
-- More policy/evidence fields to maintain in artifacts.
-
-## Minimal architecture
-
-### 1) Sync policy control model
-
-Canonical policy object (stored in workflow artifacts/command context):
-- `mode`: `disabled|manual|by_phase|by_milestone|custom_phase_list`
-- `custom_phases[]`: canonical phase IDs (used only in `custom_phase_list`)
-- `allow_auto_push`: `0|1` (default `0`)
-- `auto_push_branch_allowlist[]`: explicit branch names/patterns allowed for
-  auto-push
-- `optional_checks_enabled`: inferred from runbook command presence
-
-Mode semantics:
-- `disabled`: no policy evaluation and no sync attempts.
-- `manual`: only user-invoked sync; no auto-triggered sync.
-- `by_phase`: evaluate eligibility on every phase-completion boundary.
-- `by_milestone`: evaluate only at milestone completion boundary.
-- `custom_phase_list`: evaluate only when completed phase matches configured
-  list.
-
-Default-safe posture:
-- Default mode is non-auto (`manual` or `disabled`).
-- If unset/invalid, fail closed to `manual`.
-
-### 2) Guarded auto-push eligibility model
-
-Policy evaluation runs only at phase completion boundaries. A sync attempt is
-eligible only when all conditions are true:
-1. Boundary trigger matches configured mode.
-2. `allow_auto_push=1`.
-3. QA-first guard passes for feature work:
-   - before QA pass, auto-push is forbidden;
-   - manual user-invoked sync is still allowed.
-4. No unresolved blocking QA findings / critical unresolved issues.
-5. Branch safety guard passes (see below).
-6. Mandatory pre-push check chain passes.
-
-If any condition fails, result is deterministic `no_push` with reason code.
-
-### 3) Branch safety constraints
-
-Auto-push branch policy:
-- Deny auto-push to protected/default branches by default.
-- Allow auto-push only on explicitly allowlisted branches.
-- If branch is unknown/unclassified, fail closed (no auto-push).
-- Manual push behavior remains unchanged and user-controlled.
-
-### 4) Mandatory pre-push check chain
-
-Pre-push chain order (deterministic):
-1. `TEST_COMMAND` (mandatory baseline).
-2. `LINT_COMMAND` (if configured and non-empty).
-3. `TYPECHECK_COMMAND` (if configured and non-empty).
-
-Rules:
-- Missing/blank `TEST_COMMAND` blocks push.
-- Test failure/timeout blocks push.
-- Optional checks are skipped only when not configured.
-- Optional check failures block push when configured.
-- Result details must show which checks ran, skipped, passed, or failed.
-
-This aligns with existing `validate-and-push` scripts where tests are already
-required before push.
-
-### 5) Observability and evidence artifacts
-
-Canonical sync evidence destination:
-- `docs/engineering/state.md` (session status + latest gate verdict)
-- `handoffs/dev_to_qa.md` or phase handoff context as needed
-
-Recommended structured entry fields per sync attempt:
-- `sync_id` (`SYNC-xxxx`)
-- `timestamp`
-- `phase_boundary`
-- `policy_mode`
-- `trigger_source` (`manual|auto`)
-- `branch`
-- `checks` (`test`, `lint`, `typecheck` with `pass|fail|skipped`)
-- `qa_status_snapshot`
-- `push_decision` (`pushed|blocked|not_eligible`)
-- `reason_code`
-- `evidence_refs` (paths to runbook/sprint findings/test reports)
-
-Reason code examples:
-- `SYNC_DISABLED`
-- `MANUAL_MODE_NO_AUTO`
-- `PRE_QA_AUTOPUSH_FORBIDDEN`
-- `BLOCKING_QA_FINDINGS`
-- `BRANCH_NOT_ALLOWLISTED`
-- `TEST_COMMAND_MISSING`
-- `TEST_FAILED`
-- `OPTIONAL_CHECK_FAILED`
-- `SYNC_PUSHED`
-
-### 6) Compatibility constraints
-
-- Keep existing stop conditions and decision gate behavior unchanged.
-- Preserve manual mode semantics; no forced push path is introduced.
-- Keep optional runbook checks optional; only `TEST_COMMAND` is mandatory.
-- Maintain active/template behavioral parity for command/rule/doc updates.
-
-## Sprint-plan readiness (decomposition-ready)
-
-Implementation should split into:
-1. Define sync policy schema + defaults in workflow docs/command guidance.
-2. Add phase-boundary eligibility evaluation contract and reason codes.
-3. Define branch safety deny/allowlist policy for auto-push.
-4. Align pre-push check contract with runbook commands and script semantics.
-5. Add deterministic sync evidence format to state/handoff artifacts.
-6. Add QA scenarios for pre-QA auto-push denial, check failures, and
-   disabled/manual zero-overhead behavior.
-7. Enforce active + `template/` parity for all touched behavior docs.
-
----
-
 # US-0039: Release Gate Tightening for Check-In Tests and QA/UAT Completion
 
 ## Overview
@@ -3342,6 +3185,89 @@ Regression coverage for: command/rule behavior parity after slimming; **`tests/a
 
 ---
 
+# BUG-0004: POSIX-safe installer shell startup for Unix CLI path
+
+## Overview
+
+**`BUG-0004`** addresses startup failure in Linux shell environments where installer execution aborts with `set: Illegal option -`. Research **`R-0063`** confirms Unix CLI flow (`bin/its-magic.js`) executes installer via `sh installer.sh`, so installer startup must remain POSIX-`sh` compatible and avoid bash-only `set` semantics. **`DEC-0068`** is normative for invocation/compatibility boundaries and regression requirements.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A - Force bash invocation in CLI | `bash installer.sh` on Unix | Rejected - adds dependency and weakens portability. |
+| B - Dynamic shell detection and launcher branching | choose shell at runtime | Rejected - more complexity than needed for defect scope. |
+| C - Keep `sh` contract and enforce POSIX-safe startup (chosen) | minimal and deterministic | **Chosen** - preserves current CLI behavior and fixes failure root. |
+
+## Deterministic approach
+
+1. **Unix launcher contract unchanged**: keep `bin/its-magic.js` Unix execution path via `spawnSync("sh", ...)`.
+2. **Startup option safety**: `installer.sh` startup path must use POSIX-safe `set` options only (`set -e` baseline); no unconditional bash-only flags.
+3. **Failure prevention**: startup must not fail on `/bin/sh` variants due to option incompatibility.
+4. **Status authority preserved**: `BUG-0004` remains **OPEN** in `docs/product/backlog.md` until sprint delivery closes verification/release chain (**US-0045**).
+
+## Verification strategy
+
+- **Direct `sh` matrix**:
+  - `sh installer.sh --target <tmp> --mode missing --create`
+  - `sh installer.sh --target <tmp> --mode upgrade`
+- **CLI Unix matrix**:
+  - `node bin/its-magic.js --target <tmp> --mode missing --create`
+- **Non-regression matrix**:
+  - install completeness checks and existing manifest-governed behavior remain intact.
+- **Parity matrix**:
+  - retain consistent installer behavior expectations across wrapper paths and test harness coverage.
+
+## Risks and mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Bash-only options reintroduced later | Keep explicit `sh`-path regression coverage in shared tests. |
+| Local shell mismatch hides regressions | Verify both direct `sh` and CLI invocation paths in deterministic tests. |
+| Scope drift into unrelated resume bugs | Keep this architecture bounded to shell startup compatibility (`BUG-0005` tracked separately). |
+
+## Decision linkage
+
+- Research basis: **`R-0063`**
+- Decision: **`DEC-0068`**
+- Related: **`BUG-0005`**, **`US-0008`**, **`US-0018`**, **`US-0045`**
+
+---
+
+# BUG-0005: `resume_brief` refresh at bug-intake boundary for `/auto` resume
+
+## Overview
+
+**`BUG-0005`** addresses **`RESUME_BRIEF_STALE`** on **`/auto`** immediately after canonical **`/intake bug`** persistence: the resume brief can still describe a pre-intake cycle (for example **`intake`**) while the backlog already reflects a new OPEN bug. Deterministic **`/auto`** precedence (**`start-from`** → parseable **`resume_brief`** → **`state.md`**) intentionally **does not** silently ignore a present-but-stale brief. **`R-0064`** and **`DEC-0069`** lock the fix as **intake-time refresh** of **`handoffs/resume_brief.md`** so normal **`/intake bug` → `/auto`** does not false-trigger stale-resume, without weakening fail-fast.
+
+## Contracts (normative)
+
+1. **Intake completion obligation**: On successful bug intake persistence (**`US-0045`**), the intake writer **must** refresh **`handoffs/resume_brief.md`** with **`bug_id`**, **`intended_resume_phase=discovery`** (default OPEN-bug continuation), boundary **`orchestrator_run_id`** / timestamp when known, and intake evidence pointer when present.
+2. **Precedence unchanged**: Explicit **`start-from`** overrides; parseable brief is evaluated before **`state.md`**; stale/unparseable/ambiguous briefs **fail fast** (**`RESUME_BRIEF_STALE`**, etc.) — no silent fallback when a stale brief is present.
+3. **Backlog authority**: Brief content **must not** contradict **`docs/product/backlog.md`** status facts for the referenced **`bug_id`**.
+4. **Optional self-heal**: Orchestrator-side reconciliation is **not** normative for **`BUG-0005`**; any future self-heal requires strict predicates, idempotency, **`state.md` audit**, and a separate decision (**`DEC-0069`** §4).
+
+## Affected artifacts
+
+- **`handoffs/resume_brief.md`** — primary handoff surface refreshed at intake boundary.
+- **`docs/engineering/state.md`** — phase breadcrumbs and auto continuation checkpoints remain authoritative for history; they do not replace a parseable brief in precedence order.
+- **`.cursor/commands/intake.md`** (and **`template/`** parity) — normative command surface for implementing intake-time refresh.
+- **`docs/engineering/auto-orchestration-reference.md`** / **`.cursor/commands/auto.md`** — precedence and fail-fast codes remain source of truth; **`DEC-0069`** adds intake-side obligation only.
+
+## Acceptance / architecture alignment
+
+- Satisfies **`BUG-0005`** expected behavior: after intake, **`/auto`** resolves a valid next phase without requiring manual **`start-from`** for the normal path.
+- Preserves **`US-0045`** canonical status and **`US-0070` / `DEC-0052`** phase-plan materialization (default next phase after bug intake is **`discovery`** unless product documents an exception).
+- Regression matrix: **`R-0064`** table (**five scenarios**) is minimum QA/sprint coverage.
+
+## Decision linkage
+
+- Research basis: **`R-0064`**
+- Decision: **`DEC-0069`**
+- Related: **`US-0037`**, **`US-0045`**, **`US-0070`**, **`US-0080`**, **`DEC-0038`** (strict-proof continuity on phase boundaries)
+
+---
+
 # US-0083: Explicit delegable intake topics without weakening fail-closed semantics
 
 ## Overview
@@ -3399,3 +3325,145 @@ Regression coverage for: command/rule behavior parity after slimming; **`tests/a
 - Research basis: **`R-0062`**
 - Decision: **`DEC-0067`**
 - Related: **`US-0068`**, **`US-0078`**, **`US-0045`**, **`DEC-0050`**, **`DEC-0060`**
+
+---
+
+# BUG-0006: `/auto` spawn-only enforcement (orchestrator must not execute phase work)
+
+## Overview
+
+**`BUG-0006`** closes the gap between **process** `/auto` orchestration (US-0080) and operator behavior: the orchestrator role must **only** schedule materialization, spawn fresh **phase-role** subagents, and verify boundaries—it must **not** author phase deliverables or perform phase work in the same context. **`R-0065`** recommends doc-first enforcement plus static regression; this section locks literals, surfaces, and acceptance hooks.
+
+## Locked reason-code vocabulary
+
+| Code | Use | Remediation (operator-facing) |
+|------|-----|-------------------------------|
+| **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** | Attempted direct orchestrator execution of a lifecycle phase (or equivalent “run `architecture` / `execute` / … in orchestrator context”) instead of spawning the required subagent. | Stop; spawn a **fresh** subagent for the canonical **`phase_id`** and **role** per the phase→role matrix (**DEC-0051**); do not merge phase output into orchestrator turns. |
+| **`PHASE_CONTEXT_ISOLATION_VIOLATION`** (existing) | Orchestrator wrote phase artifacts or violated per-phase isolation (**DEC-0029**). | Distinct from spawn failure: isolation applies **after** correct spawn boundary; keep both codes documented side-by-side. |
+| **`RUNTIME_PROOF_*`**, **`PHASE_ROLE_*`**, **`PHASE_POLICY_*`** (existing) | Strict proof, capability, phase-plan failures (**DEC-0038**, **DEC-0052**). | Unchanged; **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** must not overload these families. |
+| **`[AUTO_RESUME_ERROR]`** codes (existing) | Resume precedence / brief / state resolution. | Separate from spawn integrity; no merge of semantics. |
+
+## Technical approach (doc-first, test-backed)
+
+1. **Normative command (active + template)**: **`.cursor/commands/auto.md`** and **`template/.cursor/commands/auto.md`** — strengthen **non-negotiable** language: “spawn fresh subagent per phase,” “orchestrator must not execute phase work / write phase deliverables,” and enumerate **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** in the fail-fast / reason-code excerpt (alongside existing **`PHASE_CONTEXT_ISOLATION_*`** / **`RUNTIME_PROOF_*`** markers).
+2. **Expanded reference**: **`docs/engineering/auto-orchestration-reference.md`** — mirror the spawn-only rule; cross-link **DEC-0029** (isolation) and **DEC-0038** (strict proof) so operators cannot satisfy one gate and ignore the other; document **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** with one-line remediation.
+3. **Regression**: extend **`tests/auto_command_contract_test.py`** with required substrings: spawn-only phrasing, forbidden orchestrator phase execution, literal **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, and a **negative** check that the slim command does **not** imply in-orchestrator execution of named phases (pattern established in **`R-0065`** matrix rows 1–4).
+4. **Out of scope**: no claim of runtime Cursor product enforcement; no replacement of isolation or proof tuples as subagent launchers.
+
+## Files to touch (execute phase)
+
+| Path | Change |
+|------|--------|
+| **`.cursor/commands/auto.md`** | Spawn-only + **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** + forbidden direct phase execution. |
+| **`template/.cursor/commands/auto.md`** | Parity with active command (same literals where mirrored). |
+| **`docs/engineering/auto-orchestration-reference.md`** | Expanded contract alignment + cross-links + reason code. |
+| **`tests/auto_command_contract_test.py`** | Assertions for new literals and non-contradiction. |
+
+Optional parity: if repo adds an **`auto`** template parity script later, include these paths; until then, **manual or sprint QA** verifies **`template/`** mirror.
+
+## Acceptance hooks
+
+- Contract test **`python tests/auto_command_contract_test.py`** (or full unittest suite per sprint) **PASS** after edits.
+- **`BUG-0006`** **expected** in backlog: fail-fast when spawn boundary violated, with deterministic diagnostics — satisfied by documented **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** plus existing isolation/proof codes.
+- Canonical status remains **`docs/product/backlog.md`** only (**US-0045**); closure moves to **DONE** only after execute/QA/verify per backlog.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| Code overlaps **`PHASE_CONTEXT_ISOLATION_VIOLATION`** | Table above + remediation text distinguishes “no spawn” vs “wrong writer.” |
+| Template drift | Edit **`template/.cursor/commands/auto.md`** in the same change set as active **`auto.md`**. |
+| False sense of runtime enforcement | Docs + static tests only; reference states process contract, not IDE automation. |
+
+## Decision linkage
+
+- Research basis: **`R-0065`**
+- Related: **`US-0048`**, **`US-0069`**, **`US-0080`**, **`US-0045`**, **`DEC-0029`**, **`DEC-0038`**, **`DEC-0051`**, **`DEC-0052`**
+
+---
+
+# BUG-0007: Intake evidence truthfulness for `asked_topics` / `topic_coverage`
+
+## Overview
+
+**`BUG-0007`** closes the gap where **`scripts/intake_evidence_validate.py`** can return **`[INTAKE_EVIDENCE_VALIDATION_OK]`** on bundles such as **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`** that list a full **`small-intake-pack`** in **`asked_topics`** while every **`topic_coverage`** row uses **`satisfied_by=answer_ref`** with the **same** (or trivially duplicated) **`quoted_user_text`**—i.e. no real per-topic elicitation. **`R-0066`** shows **`validate_intake_evidence`** in **`scripts/intake_evidence_lib.py`** enforces structural pack coverage, **`ie:`** integrity, and **DEC-0060**-aligned bindings, but not semantic distinction of answers across topics. This section locks the minimal validator + contract + test matrix so the exemplar **fails** after implementation while **US-0083** delegation and **equivalent_evidence_ref** paths stay **PASS**.
+
+## Assumption challenge and alternatives
+
+| Option | Idea | Verdict |
+|--------|------|---------|
+| A | Documentation-only reminder in **`/intake`** | **Rejected** — validator already certifies the bad exemplar (**R-0066**). |
+| B | External chat transcript ingestion | **Deferred** — out of repo scope unless product mandates it. |
+| C | Deterministic lib rules + contract + fixtures (**chosen**) | **Chosen** — same validation pipeline for guided and low-touch; fail-closed subcodes under **`INTAKE_PERSISTENCE_BLOCKED`**. |
+
+**Residual risk**: Duplicate-text heuristics alone do not prove a “question was asked”; optional future **`question_*`** fields or stronger artifacts may be needed. Document any grandfathering in sprint **`decisions.md`** if legacy bundles must migrate.
+
+## Locked technical approach
+
+### 1) Core validation (`scripts/intake_evidence_lib.py`)
+
+Extend **`validate_intake_evidence`** (and shared helpers the lib owns) with deterministic rules applied **after** existing **`ie:`** / pack / delegation / assumption checks:
+
+1. **Duplicate **`answer_ref`** prose across distinct required topics** — For **`small-intake-pack`** (and equivalent required-topic sets), when multiple rows share **`satisfied_by=answer_ref`** and **identical** **`quoted_user_text`** (normalized per existing string rules in the lib), **fail** unless the row is covered by an allowed alternate satisfaction path (**`equivalent_evidence_ref`** / **`evidence_source`** semantics already in lib, **`delegation_ref`** per **DEC-0067**, or **`assumption_confirmation_ref`**). This targets the BUG-0007 pattern without treating two accidental short duplicate answers as the same class of abuse (tune: require duplicate across **all** required keys or use minimum distinct-count threshold — implementation sprint chooses the smallest rule that makes the exemplar **FAIL** and keeps matrix row 2 **PASS**).
+2. **Optional phase-2** — If product requires stronger audit: add optional **`question_prompt_ref`** / **`question_text`** (or bind to a stable prompt id) for **`answer_ref`** rows; then **`INTAKE_ASKED_TOPIC_NOT_EVIDENCED`** applies when **`asked_topics`** lists a key without a bound prompt artifact. **Architecture default for first sprint**: implement (1) first; gate (2) behind explicit backlog if false positives appear.
+
+**`scripts/intake_evidence_validate.py`**: keep CLI contract (**`--file`**, **`--stdin`**, **`--self-test`**); surface lib stderr codes unchanged.
+
+### 2) Normative contract (`.cursor/commands/intake.md` + **`template/`** mirror)
+
+- **`asked_topics`** may list only topics for which a **user-visible question** was posed **or** a **DEC-0060**-allowed alternate applies (**`delegation_ref`**, **`equivalent_evidence_ref`**, **`assumption_confirmation_ref`**).
+- Explicitly **forbid** fabricating per-topic **`answer_ref`** rows by echoing one bug-report blob across all keys to satisfy the validator.
+- Cross-link **DEC-0060** / **DEC-0067** / **US-0083** so operators do not conflate **`ie:`** integrity with “question asked.”
+
+Parity: **`scripts/check_intake_template_parity.py`** (or successor) must stay **PASS** for any **`intake.md`** edit.
+
+### 3) Locked reason codes (under umbrella **`INTAKE_PERSISTENCE_BLOCKED`**)
+
+| Code | When |
+|------|------|
+| **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** | Distinct **`topic_key`** rows with **`satisfied_by=answer_ref`** share non-distinct **`quoted_user_text`** without **`equivalent_evidence_ref`** / other allowed alternate. |
+| **`INTAKE_ASKED_TOPIC_NOT_EVIDENCED`** | (Optional / phase-2) **`asked_topics`** includes a topic without required question-binding artifact when that feature is enabled. |
+| **Existing** | **`INTAKE_DELEGATION_EVIDENCE_MISSING`**, **`INTAKE_DELEGATION_EVIDENCE_INVALID`**, **`INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`**, **`INTAKE_REQUIRED_TOPIC_MISSING`** — **do not overload** for BUG-0007 duplicate-answer semantics. |
+
+### 4) Test fixtures and regression matrix (**R-0066** § table — sprint must automate)
+
+| # | Scenario | Expected |
+|---|----------|----------|
+| 1 | Fixture aligned with **`BUG-0007-intake-20260403.json`** (duplicate **`answer_ref`** across keys) | **FAIL** with **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** (or locked synonym) |
+| 2 | Five **distinct** short answers + valid **`ie:`** | **PASS** |
+| 3 | **`satisfied_by=delegation_ref`** + complete delegation metadata + valid **`ie:`** | **PASS** (**US-0083** / **DEC-0067** non-regression) |
+| 4 | **`evidence_source=equivalent_evidence_ref`** row; topic omitted from **`asked_topics`** per lib rules | **PASS** |
+| 5 | **`assumption_confirmation_ref`** path | **PASS** |
+| 6 | **`python scripts/intake_evidence_validate.py --self-test`** | **PASS** after lib change |
+| 7 | Active + **`template/`** parity | **PASS** |
+
+Prefer **`tests/`** unittest module(s) invoking **`validate_intake_evidence`** directly (and/or subprocess on **`intake_evidence_validate.py`**) so CI mirrors operator commands.
+
+## US-0083 / equivalent_evidence non-regression (hard gate)
+
+- **Delegation**: Rows with **`satisfied_by=delegation_ref`**, required delegation fields, and valid **`ie:`** binding must **not** trip duplicate-**`answer_ref`** rules.
+- **Equivalent evidence**: Topics satisfied via **`equivalent_evidence_ref`** / **`evidence_source`** must **not** be forced through fake per-topic **`answer_ref`** duplicates; validator behavior must match **`# US-0083`** architecture and **R-0062** intent.
+- Sprint **execute** must add or extend fixtures that mirror **`handoffs/intake_evidence/US-0083-intake-20260331-b.json`** (or equivalent) and equivalent-evidence samples so matrix rows 3–4 cannot regress silently.
+
+## Files to touch (execute phase — indicative)
+
+| Path | Change |
+|------|--------|
+| **`scripts/intake_evidence_lib.py`** | New deterministic checks + codes. |
+| **`.cursor/commands/intake.md`** | Truthfulness / forbid synthetic **`answer_ref`** echo. |
+| **`template/.cursor/commands/intake.md`** | Parity. |
+| **`tests/`** | New regression tests for BUG-0007 **FAIL** + US-0083 / equivalent-evidence **PASS**. |
+| Optional | **`scripts/intake_bug_resume_brief_refresh.py`** / **`bug_issue_validate.py`** — only if a single choke-point should re-validate; avoid duplicate sources of truth (**R-0066**). |
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| False positives on legitimate repeated short answers | Scope duplicate rule (e.g. “same blob across **all** pack keys”); tune in sprint with matrix row 2. |
+| False confidence after only one heuristic | State residual risk; optional **`question_*`** follow-up. |
+| Template drift | Same change set for active + **`template/`**; parity script **PASS**. |
+
+## Decision linkage
+
+- Research basis: **`R-0066`**
+- Related: **`BUG-0007`**, **US-0068**, **US-0078**, **US-0079**, **US-0083**, **DEC-0060**, **DEC-0067**, **R-0062**, **R-0055**

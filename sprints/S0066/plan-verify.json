@@ -1,0 +1,61 @@
+{
+  "sprint_id": "S0066",
+  "bug_id": "BUG-0005",
+  "story_id": null,
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (BUG-0005 expected/actual) + sprints/S0066/sprint.md (AC-1..AC-9 decomposition)",
+    "task_source": "sprints/S0066/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0066/sprint.md",
+    "decision_source": "decisions/DEC-0069.md",
+    "architecture_traceability": [
+      "DEC-0069",
+      "docs/engineering/architecture.md (# BUG-0005)",
+      "docs/engineering/research.md (R-0064)",
+      "US-0037",
+      "US-0045",
+      "US-0070",
+      "US-0080"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead, 2026-04-03T19:46:30Z): sprint-local AC-1..AC-9 each assigned exactly one task T-001..T-009 in tasks.md (1:1 bijection intended).",
+      "Cross-read sprint.md scope vs DEC-0069, architecture # BUG-0005, and R-0064 regression matrix.",
+      "Sizing: 9 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "Canonical bug status remains OPEN (US-0045) until verify-work.",
+      "QA plan-verify (2026-04-03T19:52:00Z, qa, orchestrator_run_id=auto-20260403-02): confirmed AC-1..AC-9 <-> T-001..T-009 bijection (table + mapping block); no duplicate AC columns or orphan tasks; sprint goal matches DEC-0069 intake resume_brief refresh + R-0064 five-scenario coverage + run-tests wiring (AC-9)."
+    ],
+    "orchestrator_run_id": "auto-20260403-02",
+    "planned_at": "2026-04-03T19:46:30Z",
+    "plan_verified_at": "2026-04-03T19:52:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "Intake boundary atomic resume_brief refresh on successful bug persistence" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "DEC-0069 minimum fields + idempotency documentation" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "US-0045 alignment — brief vs backlog facts" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "Active/template (and parity rules) for intake surfaces" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "R-0064 #1 happy path — no false RESUME_BRIEF_STALE" },
+    { "ac": "AC-6", "tasks": ["T-006"], "status": "verified", "notes": "R-0064 #2 absent brief → state.md fallback" },
+    { "ac": "AC-7", "tasks": ["T-007"], "status": "verified", "notes": "R-0064 #3–#4 start-from + contradiction fail-fast" },
+    { "ac": "AC-8", "tasks": ["T-008"], "status": "verified", "notes": "R-0064 #5 portfolio switch" },
+    { "ac": "AC-9", "tasks": ["T-009"], "status": "verified", "notes": "run-tests.sh / run-tests.ps1 wiring" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Dual-writer races on resume_brief if non-intake paths rewrite without contract — mitigate per DEC-0069 writer ownership.",
+    "Resume parser drift vs template fields — mitigate with fixture-locked field keys and tests."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "DEC-0069",
+      "docs/engineering/architecture.md (# BUG-0005)",
+      "docs/engineering/research.md (R-0064)"
+    ]
+  },
+  "summary": "PASS — QA plan-verify for S0066 / BUG-0005: AC-1..AC-9 map 1:1 to T-001..T-009; governance (DEC-0069, # BUG-0005, R-0064) coherent; /execute unblocked."
+}

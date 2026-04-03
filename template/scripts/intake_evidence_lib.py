@@ -1,6 +1,6 @@
 """
 Deterministic intake evidence validation
-(US-0078 / US-0083 / DEC-0060 / DEC-0067 / R-0055).
+(US-0078 / US-0083 / DEC-0060 / DEC-0067 / R-0055 / BUG-0007 / R-0066).
 
 Consumes a logical intake_evidence bundle (dict). PO workflows MUST run this
 gate before mutating backlog/acceptance; failures are fail-closed.
@@ -200,6 +200,77 @@ def _row_uses_equivalent_evidence(row: dict[str, Any]) -> bool:
     if marker != "equivalent_evidence_ref":
         return False
     return bool(str(row.get("equivalent_evidence_ref") or "").strip())
+
+
+def _norm_answer_ref_quoted_user_text(value: Any) -> str:
+    """Normalize quoted_user_text for BUG-0007 duplicate detection (DEC-0060 strip parity)."""
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _row_exempt_from_answer_ref_topic_distinctness(row: dict[str, Any]) -> bool:
+    """BUG-0007: alternate satisfaction paths do not participate in answer_ref blob reuse checks."""
+    return _row_uses_equivalent_evidence(row)
+
+
+def _validate_answer_ref_topic_distinctness(
+    bundle: dict[str, Any],
+    required: list[str],
+    by_key: dict[str, dict[str, Any]],
+    res: ValidationResult,
+) -> None:
+    """
+    BUG-0007 / R-0066: distinct required topic_key rows must not reuse the same
+    quoted_user_text under satisfied_by=answer_ref (normalized), except exempt rows.
+    """
+    norm_to_topics: dict[str, list[str]] = {}
+    for k in required:
+        row = by_key.get(k)
+        if not row:
+            continue
+        sat = (row.get("satisfied_by") or "").strip()
+        if sat != "answer_ref":
+            continue
+        if _row_exempt_from_answer_ref_topic_distinctness(row):
+            continue
+        irid = _row_run_id(bundle, row)
+        tit = _row_turn(row)
+        if irid is None or tit is None:
+            continue
+        qraw = row.get("quoted_user_text")
+        qtxt = "" if qraw is None else str(qraw)
+        ref = (row.get("ref") or "").strip()
+        if not ref or not verify_ie_ref(
+            ref,
+            intake_run_id=irid,
+            turn_index=int(tit),
+            topic_key=k,
+            satisfied_by=sat,
+            quoted_user_text=qtxt,
+        ):
+            continue
+        norm = _norm_answer_ref_quoted_user_text(qraw)
+        norm_to_topics.setdefault(norm, []).append(k)
+
+    dup_groups: list[str] = []
+    for norm, topics in norm_to_topics.items():
+        uniq = sorted(set(topics))
+        if len(uniq) < 2:
+            continue
+        dup_groups.append("text=" + repr(norm[:120]) + " topics=" + ",".join(uniq))
+
+    if dup_groups:
+        res.ok = False
+        res.add_code("INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT")
+        res.diagnostics.append(
+            "Remediation: distinct required topics must not reuse the same quoted_user_text "
+            "under satisfied_by=answer_ref (BUG-0007 / R-0066). Duplicates: "
+            + "; ".join(dup_groups)
+            + ". Use per-topic answers, or an allowed alternate path "
+            "(evidence_source=equivalent_evidence_ref + equivalent_evidence_ref, "
+            "delegation_ref per DEC-0067 / US-0083, or assumption_confirmation_ref on the row)."
+        )
 
 
 def _candidate_story_ids(bundle: dict[str, Any]) -> set[str]:
@@ -527,6 +598,8 @@ def validate_intake_evidence(
                 res.missing_topics.append(k)
     res.missing_topics = sorted(set(res.missing_topics))
 
+    _validate_answer_ref_topic_distinctness(bundle, required, by_key, res)
+
     # US-0081 / DEC-0064: first/new/broad intake requires complete-plan coverage contract.
     if pack == "first-intake-pack":
         _validate_plan_coverage_contract(bundle, res)
@@ -667,6 +740,32 @@ def self_test() -> None:
     d1 = validate_intake_evidence(delegated_bundle, intake_guided_mode=1)
     assert d0.ok and d1.ok
     assert d0.primary_codes == d1.primary_codes
+
+    # BUG-0007: same quoted_user_text across multiple answer_ref required topics fails
+    dup_txt = "synthetic blob echoed for every topic"
+    dup_rows = []
+    for i, key in enumerate(small):
+        dup_rows.append(
+            {
+                "topic_key": key,
+                "satisfied_by": "answer_ref",
+                "quoted_user_text": dup_txt,
+                "intake_run_id": rid,
+                "turn_index": 300 + i,
+                "ref": build_ie_ref(rid, 300 + i, key, "answer_ref", dup_txt),
+            }
+        )
+    dup_bundle = {
+        "selected_pack": "small-intake-pack",
+        "intake_run_id": rid,
+        "asked_topics": list(small),
+        "missing_topics": [],
+        "assumptions_confirmed": "(none)",
+        "topic_coverage": dup_rows,
+    }
+    dup_res = validate_intake_evidence(dup_bundle)
+    assert not dup_res.ok
+    assert "INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT" in dup_res.primary_codes
 
     # First-intake full-plan coverage contract (US-0081 / DEC-0064)
     first = PACK_REQUIRED_KEYS["first-intake-pack"]

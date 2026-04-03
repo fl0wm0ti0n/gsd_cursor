@@ -1,6 +1,9 @@
 #!/usr/bin/env sh
 set -e
 
+# BUG-0004: keep startup shell options POSIX-safe for /bin/sh execution.
+# Do not use bash-only "set" flags in this unconditional startup path.
+
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 SOURCE_ROOT="$SCRIPT_DIR/template"
 MANIFEST_NAME="docs/engineering/context/installer-owned-paths.manifest"

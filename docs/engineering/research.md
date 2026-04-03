@@ -2411,3 +2411,150 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
 - **Linked**: US-0083, US-0068, US-0078, US-0045, DEC-0050, DEC-0060
 - **Confidence**: high (direct validator/code-path review + external conditional-schema and audit-evidence references)
 - **Status**: closed (`US-0083` `DONE`, `S0064` `released`; basis realized by `DEC-0067` / `# US-0083`)
+
+## R-0063
+
+- **Date**: 2026-04-03
+- **Topic**: BUG-0004 - installer shell startup compatibility (`set: Illegal option -`)
+- **Query**: What deterministic fix path should eliminate shell startup failure when `its-magic` invokes `installer.sh` through `sh`, while preserving installer parity and minimizing regression risk?
+- **Sources**:
+  - [Dash as /bin/sh portability notes](https://wiki.ubuntu.com/DashAsBinSh) (POSIX-shell compatibility constraints vs bash-specific options)
+  - [POSIX Shell Command Language (`set` utility)](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_25) (`set -e` portability baseline)
+  - Internal: `bin/its-magic.js` (Unix path spawns `sh installer.sh`), `installer.sh` (line-2 startup option handling), `tests/run-tests.sh` (installer smoke paths under `sh`)
+- **Findings**:
+  - **Execution-path confirmation**: CLI currently invokes `installer.sh` via `spawnSync("sh", [installer,...])`; therefore script startup must remain valid for POSIX `sh` implementations (`dash`, `busybox sh`, etc.), not only `bash`.
+  - **Defect mechanism**: startup options in shell scripts are sensitive to non-POSIX flags; `pipefail` or grouped option patterns that are valid in bash can fail immediately in `/bin/sh` environments with `set: Illegal option -`.
+  - **Bounded fix alternatives**:
+    - **A (recommended)**: keep `installer.sh` strictly POSIX-compatible (`set -e` baseline) and avoid bash-only `set` flags; preserves current CLI invocation contract (`sh installer.sh`).
+    - **B**: force CLI to execute `bash installer.sh` and require bash at runtime. Rejected for portability and additional dependency assumptions in minimal Linux environments.
+    - **C**: dual-path launcher with runtime shell detection and fallback. Higher complexity without clear benefit for this script.
+  - **Regression expectations**: add explicit tests that run installer paths under `sh` for `missing` and `upgrade`, plus CLI path parity check (`node bin/its-magic.js --mode missing`) to prevent reintroduction.
+- **Risks**:
+  - **Portability regression**: introducing bash-only semantics in future edits can silently break non-bash shells. Mitigation: keep strict `sh` execution tests.
+  - **Behavior drift**: changing CLI execution shell could diverge from documented/install test flow. Mitigation: preserve `sh` contract and codify in regression coverage.
+  - **False confidence risk**: a single local shell can hide cross-shell failures. Mitigation: include deterministic smoke commands in shared test harness.
+- **Research closure (2026-04-03T18:23:11Z, tech-lead, `orchestrator_run_id=auto-20260403-01`)**: bounded research complete for `BUG-0004`; proceed to `/architecture` to lock chosen portability contract and required regression matrix.
+- **Linked**: BUG-0004, BUG-0005, US-0008, US-0018, US-0037, US-0045
+- **Confidence**: high (direct execution-path inspection + POSIX shell references + existing test harness review)
+- **Status**: closed (architecture accepted via `DEC-0068`; delivery completed in `S0065`)
+
+## R-0064
+
+- **Date**: 2026-04-03
+- **Topic**: BUG-0005 — `/auto` resume continuity after bug intake (`RESUME_BRIEF_STALE` vs deterministic precedence)
+- **Query**: How can `/intake bug` → `/auto` continue without a false stale-resume block while preserving explicit `start-from`, `resume_brief`, and `state.md` precedence and existing fail-fast safety contracts?
+- **Sources**:
+  - Internal: `.cursor/commands/auto.md` (deterministic resume-source precedence: `start-from` → `resume_brief` → `state.md` fallback; `RESUME_BRIEF_STALE` / unparseable fail-fast), `docs/engineering/auto-orchestration-reference.md` (expanded contract), `handoffs/intake_evidence/BUG-0005-intake-20260403.json`, `docs/product/backlog.md` (**BUG-0005**), **US-0045** (canonical status authority), **US-0070** / **DEC-0052** (phase plan materialization)
+- **Findings**:
+  - **Precedence vs `RESUME_BRIEF_STALE`**: When `resume_brief.md` is present and parseable but semantically stale relative to a newer backlog fact (e.g. bug persisted while brief still says `intended_resume_phase=intake` for a closed cycle), strict precedence forces the orchestrator to honor the brief and fail with `RESUME_BRIEF_STALE` rather than silently falling back to `state.md`. That is consistent with the documented “no silent fallback on stale brief” rule; the defect is a **handoff gap** (brief not refreshed at bug-intake boundary), not an argument for weakening fail-fast.
+  - **Options to refresh `resume_brief` after bug intake** (architecture should pick one primary + explicit alternates):
+    - **A (recommended default)**: On successful canonical bug intake persistence, the intake phase writer **prepends or atomically rewrites** `handoffs/resume_brief.md` with a deterministic template: `bug_id`, `intended_resume_phase=discovery` (or next valid phase for the bug lifecycle), `orchestrator_run_id` / boundary timestamp, and explicit `resolution_source` seed so the next `/auto` run resolves **`discovery`** without override.
+    - **B**: Extend `/auto` with a **narrow self-heal** path: if `resume_brief` targets a phase inconsistent with **US-0045** OPEN bug rows and `state.md` last boundary agrees on the active `bug_id`, rewrite brief deterministically and continue — higher complexity and risk of masking operator edits; requires strict predicates and reason codes.
+    - **C**: Document **operator-only** remediation (`/auto start-from=discovery` or manual brief edit). Acceptable as interim guidance but does not meet **BUG-0005** “no manual override for normal continuation.”
+  - **Self-healing vs explicit fail-fast**:
+    - **Fail-fast** remains correct when the brief is **unparseable**, **ambiguous**, or **conflicts** with authoritative backlog without a deterministic reconciliation rule (**US-0045** wins on status; brief cannot override DONE/OPEN facts).
+    - **Self-heal** is only appropriate when reconciliation inputs are **machine-verifiable** (e.g. single unambiguous OPEN bug row + last `state.md` checkpoint + intake completion marker) and the heal action is **idempotent** and **audited** in `state.md`.
+  - **Regression matrix (`/intake bug` → `/auto`)** (minimum scenarios for sprint/QA):
+    | # | Scenario | Expected |
+    |---|----------|----------|
+    | 1 | Intake persists new OPEN bug; brief updated at intake boundary | `/auto` resolves next phase (`discovery` or policy-defined) without `RESUME_BRIEF_STALE` |
+    | 2 | Intake persists bug; brief intentionally absent | `/auto` uses `state.md` fallback per precedence; no false stale |
+    | 3 | Operator sets explicit `start-from` | Argument precedence; no stale brief error on valid phase |
+    | 4 | Brief parseable but contradicts backlog (simulated corrupt handoff) | Fail-fast with deterministic code (`RESUME_BRIEF_STALE` or dedicated conflict code); no silent continue |
+    | 5 | Portfolio switch: prior bug DONE, new bug OPEN | Brief points to new `bug_id` and phase; no carryover `intake` target |
+- **Risks**:
+  - **Over-broad self-heal** could hide real operator intent or race with parallel edits — mitigate with strict gates and breadcrumb logging.
+  - **Intake writer scope creep** if intake must infer phase plans beyond bug lifecycle — mitigate by tying refresh to documented default next phase only and deferring profile/exclude logic to `/auto` materialization (**DEC-0052**).
+  - **Dual-writer conflict** if curator and intake both rewrite `resume_brief` — mitigate with single canonical writer list in architecture.
+- **Research closure (2026-04-03T19:42:00Z, tech-lead, `orchestrator_run_id=auto-20260403-02`)**: bounded research complete for **BUG-0005**; proceed to **`/architecture`** to lock chosen refresh/self-heal policy, DEC/handoff updates, and executable regression matrix.
+- **Delivery closure (2026-04-03T23:55:00Z, curator, `orchestrator_run_id=auto-20260403-02`)**: **`BUG-0005`** is **DONE**; sprint **`S0066`** is **released**; normative lock-in realized via **`DEC-0069`**, **`docs/engineering/architecture.md`** **`# BUG-0005`**, and **`tests/intake_bug_resume_brief_bug0005_test.py`** (R-0064 matrix); curator **`/refresh-context`** reconciles research posture with delivery.
+- **Linked**: BUG-0005, US-0037, US-0045, US-0070, US-0080
+- **Confidence**: high (contract text + intake evidence + backlog scope alignment)
+- **Status**: closed (delivered with **BUG-0005** / **S0066** / **DEC-0069**; see **`docs/engineering/state.md`** refresh-context checkpoint **`auto-20260403-02`**)
+
+## R-0065
+
+- **Date**: 2026-04-04
+- **Topic**: BUG-0006 — `/auto` spawn-only enforcement, fail-fast reason codes, and regression shape
+- **Query**: Where can `/auto` documentation imply direct orchestrator phase execution; what minimal enforcement and reason-code vocabulary satisfies US-0048 / US-0069 / US-0080; what test shape proves spawn-or-fail without claiming runtime product orchestration?
+- **Sources**:
+  - Internal: `.cursor/commands/auto.md`, `docs/engineering/auto-orchestration-reference.md`, `tests/auto_command_contract_test.py`, `handoffs/intake_evidence/BUG-0006-intake-20260403.json`, `docs/product/backlog.md` (**BUG-0006**), **DEC-0029**, **DEC-0038**, **DEC-0051** (`decisions/DEC-0038.md`, `decisions/DEC-0029.md` as applicable via index)
+- **Findings**:
+  - **Surfaces that must stay aligned (active + template parity where mirrored)**:
+    - **Normative command**: `.cursor/commands/auto.md` — already states orchestrator-only scope and subagent spawning; fix should tighten **non-negotiable** spawn language, explicit **forbidden** pattern (“orchestrator must not write phase deliverables / perform phase role work”), and add **deterministic fail-fast reason codes** listed in-command and in the reference doc.
+    - **Expanded contract**: `docs/engineering/auto-orchestration-reference.md` — carry the same spawn-only rule, cross-link isolation (**DEC-0029**) and strict-proof (**DEC-0038**) gates so operators cannot satisfy one artifact and ignore the other.
+    - **Handoffs**: `handoffs/resume_brief.md` / `handoffs/po_to_tl.md` — optional short pointers only; canonical enforcement text stays in command + reference to avoid drift.
+  - **Reason-code vocabulary (recommended)**:
+    - **Primary (new, spawn boundary)**: introduce a dedicated code for attempted orchestrator-side phase work, e.g. `AUTO_ORCHESTRATOR_PHASE_EXECUTION` or `PHASE_SUBAGENT_SPAWN_REQUIRED`, documented beside existing **`PHASE_CONTEXT_ISOLATION_VIOLATION`** so diagnostics distinguish “wrong writer” from “missing spawn instruction.”
+    - **Adjacent reuse (do not overload meaning)**: keep **`PHASE_CONTEXT_ISOLATION_*`**, **`RUNTIME_PROOF_*`**, **`PHASE_ROLE_*`**, **`PHASE_POLICY_*`** families as-is; BUG-0006 adds **spawn-attempt** coverage, not a replacement for isolation or proof failures.
+    - **Resume/orchestration errors**: existing **`[AUTO_RESUME_ERROR]`** codes remain separate; spawn violation is a **phase-boundary integrity** failure, not resume precedence.
+  - **Enforcement model (doc-first, test-backed)**:
+    - **A (recommended)**: strengthen markdown contracts + extend **`tests/auto_command_contract_test.py`** (or sibling) with required substrings: e.g. explicit “spawn fresh subagent”, “orchestrator must not execute phase work”, and each new reason code literal. Matches repo pattern for DEC-0029/0038/0051/0052 markers.
+    - **B**: standalone script in `scripts/` scanning command files. Heavier; only if contract grows beyond unittest readability.
+    - **C**: behavioral test in a real Cursor runtime. Out of scope for this repository’s test harness; avoid claiming product runtime enforcement.
+  - **Regression matrix (minimum)**:
+    | # | Scenario | Expected |
+    |---|----------|----------|
+    | 1 | `.cursor/commands/auto.md` retains spawn-only + orchestration-only statements | Contract test **PASS** |
+    | 2 | New spawn-violation reason code(s) present in slim `auto.md` and referenced from `auto-orchestration-reference.md` | Contract test **PASS** |
+    | 3 | Template parity (if `template/` mirrors `auto.md`) | Parity check **PASS** (existing intake/template patterns as applicable) |
+    | 4 | No contradictory language implying orchestrator may “run” `architecture`/`execute`/etc. in-process | Grep-based or negative assertion in contract test |
+  - **Alternatives (“what’s the alternative?”)**:
+    - **Weaken to advisory wording only** — rejected: fails intake acceptance (fail-fast + reason codes).
+    - **Single file edit without tests** — rejected: high drift risk; **`auto_command_contract_test.py`** already establishes precedent.
+- **Risks**:
+  - **False precision**: reason codes that overlap **`PHASE_CONTEXT_ISOLATION_VIOLATION`** confuse operators — mitigate with one-line remediation text per code in `auto.md`.
+  - **Template drift**: editing active `.cursor/commands/auto.md` without `template/` mirror — mitigate with parity tooling already used elsewhere.
+  - **Scope creep into real orchestrator implementation** — mitigate: docs + static tests only; DEC-0038 proof tuples remain evidence of phase completion, not a runtime subagent launcher.
+- **Research closure (2026-04-04T02:45:00Z, tech-lead, `orchestrator_run_id=auto-20260403-03`)**: bounded research complete for **BUG-0006**; proceed to **`/architecture`** to lock exact reason-code literals, reference-doc diff, and unittest assertions.
+- **Delivery closure (2026-04-04T10:30:00Z, curator, `orchestrator_run_id=auto-20260403-03`)**: **`BUG-0006`** is **DONE**; sprint **`S0067`** is **released**; shipped via doc + test contract — **`docs/engineering/architecture.md`** **`# BUG-0006`**, active + template **`.cursor/commands/auto.md`**, **`docs/engineering/auto-orchestration-reference.md`** (**`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, **DEC-0029** / **DEC-0038** cross-links), **`tests/auto_command_contract_test.py`**; curator **`/refresh-context`** reconciles research posture with delivery.
+- **Linked**: BUG-0006, US-0048, US-0069, US-0080, US-0045, DEC-0029, DEC-0038, DEC-0051, DEC-0052
+- **Confidence**: high (contract + existing contract-test pattern + discovery asks)
+- **Status**: closed (delivered with **BUG-0006** / **S0067**; see **`docs/engineering/state.md`** refresh-context checkpoint **`auto-20260403-03`**)
+
+## R-0066
+
+- **Date**: 2026-04-04
+- **Topic**: BUG-0007 — false **`asked_topics`** / **`topic_coverage`** vs real chat (intake evidence truthfulness)
+- **Query**: Why can intake evidence claim all **`small-intake-pack`** topics were asked and answered when the user reports no question round; where do validator and **`/intake`** contract fail to detect this; what minimal fail-closed guards and tests close the gap without breaking **`delegation_ref`** / **`equivalent_evidence_ref`** (**US-0083**)?
+- **Sources**:
+  - Internal: **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`**, **`scripts/intake_evidence_validate.py`**, **`scripts/intake_evidence_lib.py`** (`validate_intake_evidence`), **`.cursor/commands/intake.md`** (US-0068 / US-0078 / DEC-0060), **`handoffs/po_to_tl.md`** (orchestrated discovery handoff — **BUG-0007**), **`docs/product/backlog.md`** (**BUG-0007**), **DEC-0060** (`ie:` ref binds **`quoted_user_text`** + metadata, not “question was posed”)
+- **Findings**:
+  - **Empirical validator gap (pre-delivery)**: `python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/BUG-0007-intake-20260403.json` returned **`[INTAKE_EVIDENCE_VALIDATION_OK]`** (exit **0**) — the exemplar misleading bundle was **certified** before **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** shipped (**`S0068`** / **`BUG-0007`**). **Post-delivery**: the same file **FAIL**s with **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** under **`INTAKE_PERSISTENCE_BLOCKED`**.
+  - **Root cause hypotheses** (not mutually exclusive; architecture picks primary + mitigations):
+    1. **Semantic coverage vs syntactic coverage**: **`intake_evidence_lib.validate_intake_evidence`** enforces pack keys present, **`ie:`** hash match to **`quoted_user_text`**, **`asked_topics`** membership (unless **`evidence_source=equivalent_evidence_ref`**), and delegation fields — it does **not** require distinct answers per topic, user-visible **question** text, or correlation between **`turn_index`** and an actual Q/A pair in chat.
+    2. **Authoring shortcut**: PO workflow can populate **`asked_topics`** with the full required set and reuse the same (or near-duplicate) **`quoted_user_text`** across rows as **`answer_ref`**, producing internally consistent hashes while misrepresenting elicitation.
+    3. **Binding limit of `ie:`**: DEC-0060 digest covers **`intake_run_id`**, **`turn_index`**, **`topic_key`**, **`satisfied_by`**, **`quoted_user_text`** — it proves payload consistency, not that **`quoted_user_text`** is an answer to the canonical prompt for **`topic_key`** nor that a prompt occurred.
+    4. **Low-touch / bug path pressure**: **`/intake bug`** may emphasize backlog persistence speed; without hard validator rules, agents align fields to pass the gate rather than to mirror chat.
+  - **Validator / command surfaces** (where to implement — architecture decides scope split):
+    - **`scripts/intake_evidence_lib.py`**: add deterministic rules under existing umbrella **`INTAKE_PERSISTENCE_BLOCKED`** (new subcodes TBD by DEC), e.g. (a) for **`satisfied_by=answer_ref`**, reject identical **`quoted_user_text`** across multiple required-topic rows unless **`equivalent_evidence_ref`** is used; (b) optional **`question_prompt_ref`** / **`question_text`** field required for **`answer_ref`** rows; (c) heuristics that **`quoted_user_text`** must not equal a single prior “umbrella” bug report blob for every key — bounded false-positive risk, document in architecture.
+    - **`scripts/intake_evidence_validate.py`**: unchanged CLI contract (`--file`, `--stdin`, `--self-test`); failures continue stderr + exit **1**.
+    - **`.cursor/commands/intake.md`**: tighten normative text — **`asked_topics`** may list only topics for which a user-visible question (or allowed alternate) exists; forbid fabricating Q/A alignment pre-validator.
+    - **`scripts/intake_bug_resume_brief_refresh.py`** / **`bug_issue_validate.py`**: optional cross-check that intake evidence file exists and validator **PASS** before claiming intake complete (architecture: avoid duplicate validation sources of truth).
+  - **Fail-closed reason codes (recommended vocabulary; architecture locks names)** — all under umbrella **`INTAKE_PERSISTENCE_BLOCKED`** unless DEC chooses split:
+    - **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** (or **`INTAKE_SYNTHETIC_ANSWER_REF`**) — duplicate / non-distinct **`quoted_user_text`** across **`answer_ref`** rows for distinct **`topic_key`** without **`equivalent_evidence_ref`**.
+    - **`INTAKE_ASKED_TOPIC_NOT_EVIDENCED`** — **`asked_topics`** includes a key without a matching prompt artifact / question binding (if architecture adds **`question_*`** fields).
+    - **`INTAKE_TOPIC_COVERAGE_CHAT_MISMATCH`** — reserved if future external transcript binding is introduced (optional; higher complexity).
+    - Reuse existing: **`INTAKE_REQUIRED_TOPIC_MISSING`**, **`INTAKE_DELEGATION_EVIDENCE_*`**, **`INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`** — do not overload for BUG-0007-specific semantics.
+  - **Regression / test matrix** (minimum):
+    | # | Scenario | Expected |
+    |---|----------|----------|
+    | 1 | Fixture clone of **`BUG-0007-intake-20260403.json`** (duplicate prose **`answer_ref`** across keys) | Validator **FAIL** with deterministic subcode after guard lands |
+    | 2 | Legitimate five distinct short answers + valid **`ie:`** refs | **PASS** |
+    | 3 | **`satisfied_by=delegation_ref`** with complete delegation metadata + valid ref | **PASS** (no regression vs **US-0083** / **R-0062**) |
+    | 4 | **`evidence_source=equivalent_evidence_ref`** + **`equivalent_evidence_ref`** on row; topic omitted from **`asked_topics`** per lib rules | **PASS** |
+    | 5 | **`assumption_confirmation_ref`** path for assumptions | **PASS**; distinct from **`answer_ref`** abuse |
+    | 6 | Active + **`template/`** parity for any **`intake.md`** / lib / installer mirror changes | Parity script **PASS** |
+    | 7 | **`python scripts/intake_evidence_validate.py --self-test`** after lib change | **PASS** |
+- **Risks**:
+  - **False positives** if legitimate user pastes the same short answer twice — mitigate with duplicate detection scoped to “same blob across all pack keys” or minimum length / entropy thresholds (architecture-bounded).
+  - **False sense of security** if only duplicate-text rule is added — deeper fix may require explicit **question** artifact or transcript binding; document residual risk in architecture.
+  - **Divergence** between “validator truth” and PO behavioral honesty — mitigate with contract tests + intake command wording.
+- **Alternatives**:
+  - **Doc-only reminder** — rejected: validator already **PASS**es on the defect exemplar.
+  - **External chat log ingestion** — likely out of scope for repo; defer unless product mandates it.
+- **Research closure (2026-04-04T14:30:00Z, tech-lead, `orchestrator_run_id=auto-20260404-01`)**: bounded research complete for **BUG-0007**; proceed to **`/architecture`** to lock schema deltas, exact subcodes, grandfathering, and unittest/fixture paths.
+- **Delivery closure (2026-04-05T01:30:00Z, curator, `orchestrator_run_id=auto-20260404-01`)**: **`BUG-0007`** is **DONE**; sprint **`S0068`** is **released**; shipped via **`scripts/intake_evidence_lib.py`** (**`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** + **US-0083** exemptions), active + **`template/`** **`.cursor/commands/intake.md`**, **`tests/intake_evidence_bug0007_r0066_test.py`**; curator **`/refresh-context`** reconciles research posture with delivery (**`handoffs/releases/S0068-release-notes.md`**, **`docs/engineering/state.md`** refresh-context checkpoint).
+- **Linked**: BUG-0007, US-0068, US-0078, US-0079, US-0083, DEC-0060, DEC-0069, R-0062, R-0055
+- **Confidence**: high (reproducible pre-ship validator gap on misleading JSON + code review of **`validate_intake_evidence`**; post-ship exemplar **FAIL** closed the gap)
+- **Status**: closed (delivered with **BUG-0007** / **S0068**; see **`docs/engineering/state.md`** refresh-context checkpoint **`auto-20260404-01`**)

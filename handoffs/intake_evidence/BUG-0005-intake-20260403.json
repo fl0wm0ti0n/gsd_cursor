@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "manual-20260403-BUG0005-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "After a completed /intake bug run (for example BUG-0004), running /auto without explicit start-from should resolve the next phase correctly instead of failing with AUTO_RESUME_ERROR about stale intake target.",
+      "intake_run_id": "manual-20260403-BUG0005-intake",
+      "turn_index": 0,
+      "ref": "ie:manual-20260403-BUG0005-intake:0:728d85bbd46c67fb"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "/auto resume-source resolution, handoffs/resume_brief.md freshness handling, and intake-to-auto transition breadcrumbs/state updates.",
+      "intake_run_id": "manual-20260403-BUG0005-intake",
+      "turn_index": 1,
+      "ref": "ie:manual-20260403-BUG0005-intake:1:0e9058b83de3da95"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Preserve deterministic resume precedence and fail-fast semantics while allowing valid post-intake continuation; avoid bypassing role/phase safety gates.",
+      "intake_run_id": "manual-20260403-BUG0005-intake",
+      "turn_index": 2,
+      "ref": "ie:manual-20260403-BUG0005-intake:2:629cd88f65bab36b"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add regression coverage for sequence: /intake bug -> /auto; assert correct phase resolution or deterministic self-healing behavior without RESUME_BRIEF_STALE false block.",
+      "intake_run_id": "manual-20260403-BUG0005-intake",
+      "turn_index": 3,
+      "ref": "ie:manual-20260403-BUG0005-intake:3:4e8ececb7ac136fb"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Done when /auto can continue immediately after canonical bug intake for BUG-0004-like flow without requiring manual start-from override and without violating existing safety contracts.",
+      "intake_run_id": "manual-20260403-BUG0005-intake",
+      "turn_index": 4,
+      "ref": "ie:manual-20260403-BUG0005-intake:4:3432d50b963480b5"
+    }
+  ]
+}

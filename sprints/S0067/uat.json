@@ -1,0 +1,56 @@
+{
+  "sprint_id": "S0067",
+  "bug_id": "BUG-0006",
+  "story_id": null,
+  "status": "PASS",
+  "checked_at": "2026-04-04T08:30:00Z",
+  "checked_by_role": "qa",
+  "orchestrator_run_id": "auto-20260403-03",
+  "criteria": [
+    {
+      "id": "UAT-1",
+      "sprint_ac": "AC-1",
+      "name": "Active `.cursor/commands/auto.md` — spawn-only orchestrator; forbid phase execution / phase deliverables in orchestrator context; `AUTO_ORCHESTRATOR_PHASE_EXECUTION` with remediation",
+      "result": "PASS",
+      "evidence_ref": ".cursor/commands/auto.md (Spawn-boundary integrity BUG-0006, US-0080 excerpt); `python tests/auto_command_contract_test.py` active-command assertions"
+    },
+    {
+      "id": "UAT-2",
+      "sprint_ac": "AC-2",
+      "name": "Template parity — `template/.cursor/commands/auto.md` mirrors active contract literals and spawn-only obligations",
+      "result": "PASS",
+      "evidence_ref": "template/.cursor/commands/auto.md; tests/auto_command_contract_test.py template parity checks"
+    },
+    {
+      "id": "UAT-3",
+      "sprint_ac": "AC-3",
+      "name": "`docs/engineering/auto-orchestration-reference.md` — spawn-only rule aligned; cross-link DEC-0029 / DEC-0038; `AUTO_ORCHESTRATOR_PHASE_EXECUTION` remediation",
+      "result": "PASS",
+      "evidence_ref": "docs/engineering/auto-orchestration-reference.md; tests/auto_command_contract_test.py reference substrings"
+    },
+    {
+      "id": "UAT-4",
+      "sprint_ac": "AC-4",
+      "name": "Regression — `tests/auto_command_contract_test.py` (R-0065): required literals, negative phrasing vs in-process phase names, `AUTO_ORCHESTRATOR_PHASE_EXECUTION`",
+      "result": "PASS",
+      "evidence_ref": "python tests/auto_command_contract_test.py -> OK (4 tests)"
+    },
+    {
+      "id": "UAT-5",
+      "sprint_ac": "AC-5",
+      "name": "Harness traceability — `tests/run-tests.sh` and `tests/run-tests.ps1` invoke `tests/auto_command_contract_test.py`",
+      "result": "PASS",
+      "evidence_ref": "tests/run-tests.sh (~AUTO_CMD_TEST invocation), tests/run-tests.ps1 (~$autoCmdTest invocation)"
+    }
+  ],
+  "totals": {
+    "total": 5,
+    "pass": 5,
+    "fail": 0,
+    "pending": 0
+  },
+  "notes": [
+    "Verify-work rerun: `python tests/auto_command_contract_test.py` — Ran 4 tests in 0.004s, OK.",
+    "Doc + test acceptance for BUG-0006 / R-0065 / US-0080 spawn-only `/auto` contract verified per sprints/S0067/sprint.md AC-1..AC-5."
+  ]
+}

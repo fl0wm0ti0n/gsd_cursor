@@ -1400,6 +1400,12 @@ Assert-True "intake_evidence_validate self-test passes" ($ieSelf.ExitCode -eq 0)
 $ieFix = Start-Process python -ArgumentList @($intakeFix) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "intake_evidence tiered fixtures pass" ($ieFix.ExitCode -eq 0)
 
+# 26R) Intake answer_ref topic distinctness (BUG-0007 / R-0066 / S0068)
+$bug0007R0066Test = Join-Path $root "tests\intake_evidence_bug0007_r0066_test.py"
+Assert-True "intake_evidence_bug0007_r0066_test.py exists" (Test-Path $bug0007R0066Test -PathType Leaf)
+$bug0007R0066Run = Start-Process python -ArgumentList @($bug0007R0066Test) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake BUG-0007 R-0066 matrix passes" ($bug0007R0066Run.ExitCode -eq 0)
+
 # 26L) Bug issues + intake routing (US-0079 / DEC-0061 / R-0056)
 $bugLib = Join-Path $root "scripts\bug_issue_lib.py"
 $bugVal = Join-Path $root "scripts\bug_issue_validate.py"
@@ -1461,6 +1467,20 @@ $installerCompletenessTest = Join-Path $root "tests\installer_completeness_bug00
 Assert-True "installer_completeness_bug0003_test.py exists" (Test-Path $installerCompletenessTest -PathType Leaf)
 $installerCompletenessRun = Start-Process python -ArgumentList @($installerCompletenessTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "installer completeness BUG-0003 fixtures pass" ($installerCompletenessRun.ExitCode -eq 0)
+
+# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068)
+$installerShellTest = Join-Path $root "tests\installer_shell_bug0004_test.py"
+Assert-True "installer_shell_bug0004_test.py exists" (Test-Path $installerShellTest -PathType Leaf)
+$installerShellRun = Start-Process python -ArgumentList @($installerShellTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "installer shell BUG-0004 fixtures pass" ($installerShellRun.ExitCode -eq 0)
+
+# 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
+$intakeResumeBriefTest = Join-Path $root "tests\intake_bug_resume_brief_bug0005_test.py"
+Assert-True "intake_bug_resume_brief_bug0005_test.py exists" (Test-Path $intakeResumeBriefTest -PathType Leaf)
+Assert-True "intake documents DEC-0069 resume_brief refresh script (active)" (File-Contains (Join-Path $root ".cursor\commands\intake.md") "intake_bug_resume_brief_refresh.py")
+Assert-True "intake documents DEC-0069 resume_brief refresh script (template)" (File-Contains (Join-Path $tpl ".cursor\commands\intake.md") "intake_bug_resume_brief_refresh.py")
+$intakeResumeBriefRun = Start-Process python -ArgumentList @($intakeResumeBriefTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "intake bug resume_brief BUG-0005 fixtures pass" ($intakeResumeBriefRun.ExitCode -eq 0)
 
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {

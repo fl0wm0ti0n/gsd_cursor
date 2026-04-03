@@ -116,5 +116,9 @@ Per **`DEC-0061`** §8 / **`US-0079`**: portfolio checkbox rows **`- [ ]` / `- [
 - [x] BUG-0001: Template/install payload omits intake gate scripts
 - [x] BUG-0002: map-codebase does not write codebase-map in fresh repos
 - [x] BUG-0003: Missing scripts still occur on install modes missing/upgrade
+- [x] BUG-0004: installer.sh fails in shell path with `set: Illegal option -`
+- [x] BUG-0005: `/auto` fails with stale resume target after bug intake
+- [x] BUG-0006: `/auto` executes phases without spawning required subagents (UAT closure: `sprints/S0067/uat.json`, `sprints/S0067/uat.md`, verify-work **2026-04-04T08:30:00Z** / `orchestrator_run_id=auto-20260403-03`)
+- [x] BUG-0007: intake evidence records asked questions that were never asked (UAT closure: `sprints/S0068/uat.json`, `sprints/S0068/uat.md`, verify-work **2026-04-04T23:45:00Z** / `orchestrator_run_id=auto-20260404-01`; release notes `handoffs/releases/S0068-release-notes.md`, queue **`S0068`** → **`ready`**)
 
 Validator (backlog bugs + optional drift vs this section): `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`.

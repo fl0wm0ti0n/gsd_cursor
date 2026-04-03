@@ -9,11 +9,29 @@ description: "its-magic auto: deterministic continuation orchestrator."
 - tech-lead
 
 ## Execution model
-- `/auto` is an orchestrator only. It must not execute phase work directly.
-- For each phase, spawn a fresh subagent context for that phase role.
+- `/auto` is a **spawn-only orchestrator**: it schedules materialization, spawns
+  fresh **phase-role** subagents, and verifies phase boundaries—it **must not**
+  execute lifecycle phase work, perform phase-role duties, or author **phase
+  deliverables** in the orchestrator context.
+- For each phase, **spawn a fresh subagent** for that phase’s canonical role;
+  phase output must arrive only via artifacts and handoff files (no in-turn
+  orchestrator execution of that phase).
 - Phase context transfer happens only through artifacts and handoff files.
 - Scope is process/workflow orchestration only. Do not claim runtime product
   orchestration changes.
+
+## Spawn-boundary integrity (BUG-0006)
+
+- **Forbidden**: treating the orchestrator turn as the executor of a lifecycle
+  phase (for example running **`architecture`**, **`execute`**, **`qa`**, or any
+  other **`phase_id`** in the orchestrator instead of spawning the required
+  subagent).
+- **Fail fast** with **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**. **Remediation**:
+  stop; spawn a **fresh** subagent for the canonical **`phase_id`** and **`role`**
+  per the phase→role matrix (**DEC-0051**); do not merge phase output into
+  orchestrator turns. **Distinct from** **`PHASE_CONTEXT_ISOLATION_VIOLATION`**
+  (wrong writer / isolation break) and **`RUNTIME_PROOF_*`** / **`PHASE_ROLE_*`**
+  families—do not overload those codes for a missing-spawn violation.
 
 ## Full specification (US-0080 / DEC-0062)
 

@@ -1,5 +1,40 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — (queue empty at hot inbox ordering)
+
+- **Latest PASS**: **`S0068`** / **`BUG-0007`** — **`/execute`** (**dev**, fresh context) per **`handoffs/resume_brief.md`**.
+
+## Completed — S0068 / BUG-0007 (2026-04-04)
+
+- **Verdict**: **PASS** — **`sprints/S0068/plan-verify.json`** **`status=PASS`** (`2026-04-04T19:15:00Z`, **qa**, `orchestrator_run_id=auto-20260404-01`); **AC-1..AC-6** map **1:1** to **T-001..T-006**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# BUG-0007`**, **`R-0066`**) aligned; **`/execute`** unblocked.
+- **Sprint artifacts**: **`sprints/S0068/plan-verify.json`**, **`sprints/S0068/sprint.md`**, **`sprints/S0068/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Coverage intent**: **AC-1..AC-6** ↔ **T-001..T-006** for **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`**, intake contract + template, **R-0066** matrix, **`--self-test`**, parity gate
+- **Canonical status**: **`BUG-0007`** remains **`OPEN`** (**US-0045**)
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0068`** / **`BUG-0007`**
+
+## Completed — S0067 / BUG-0006 (2026-04-04)
+
+- **Verdict**: **PASS** — **`sprints/S0067/plan-verify.json`** **`status=PASS`** (`2026-04-04T05:15:00Z`, **qa**, `orchestrator_run_id=auto-20260403-03`); **AC-1..AC-5** map **1:1** to **T-001..T-005**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# BUG-0006`**, **`R-0065`**) aligned; **`/execute`** unblocked.
+- **Sprint artifacts**: **`sprints/S0067/plan-verify.json`**, **`sprints/S0067/sprint.md`**, **`sprints/S0067/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Coverage intent**: **AC-1..AC-5** ↔ **T-001..T-005** for spawn-only **`/auto`**, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, template parity, contract tests, run-tests wiring
+- **Canonical status**: **`BUG-0006`** remains **`OPEN`** (**US-0045**)
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0067`** / **`BUG-0006`**
+
+## Completed — S0066 / BUG-0005 (2026-04-03)
+
+- **Verdict**: **PASS** — **`sprints/S0066/plan-verify.json`** **`status=PASS`** (`2026-04-03T19:52:00Z`, **qa**); **AC-1..AC-9** map **1:1** to **T-001..T-009**; governance (**`DEC-0069`**, **`architecture.md` `# BUG-0005`**, **`R-0064`**) aligned; **`/execute`** unblocked.
+- **`orchestrator_run_id`**: **`auto-20260403-02`**
+- **Sprint artifacts**: **`sprints/S0066/plan-verify.json`**, **`sprints/S0066/sprint.md`**, **`sprints/S0066/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint)
+- **Coverage intent**: **AC-1..AC-9** ↔ **T-001..T-009** for **DEC-0069** / **`# BUG-0005`** / **R-0064**
+- **Canonical status**: **`BUG-0005`** **`DONE`** (**US-0045**); historical queue was **`/execute`** for **`S0066`**
+
+## Completed — S0065 / BUG-0004 (2026-04-03)
+
+- **Verdict**: **PASS** — **`sprints/S0065/plan-verify.json`** confirms deterministic **AC-1..AC-8** -> **T-001..T-008** coverage with no gaps/duplicates; sprint scope aligns with **`DEC-0068`**, **`docs/engineering/architecture.md`** **`# BUG-0004`**, and **`R-0063`**; **`/execute`** unblocked.
+- **`orchestrator_run_id`**: **`auto-20260403-01`**
+- **Canonical status**: **`BUG-0004`** remained **`OPEN`** during plan-verify per **US-0045**; closure applied at verify-work.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0065`** / **`BUG-0004`**.
+
 ## Completed — S0064 / US-0083 (2026-03-31)
 
 - **Verdict**: **PASS** — **`sprints/S0064/plan-verify.json`** confirms deterministic **AC-1..AC-10** -> **T-001..T-010** coverage with no gaps/duplicates; sprint scope aligns with **`DEC-0067`**, **`docs/engineering/architecture.md`** **`# US-0083`**, and **`R-0062`**; **`/execute`** unblocked.
@@ -42,7 +77,7 @@
 
 ## Next queue
 
-- **`S0064` / `US-0083`** — plan-verify **PASS**; next: **`/execute`** (fresh **dev**).
+- **`S0068` / `BUG-0007`** — **`sprints/S0068/plan-verify.json`** **`PASS`**; next: **`/execute`** (**dev**, fresh context).
 
 ---
 

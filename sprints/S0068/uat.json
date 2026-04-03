@@ -1,0 +1,62 @@
+{
+  "sprint_id": "S0068",
+  "bug_id": "BUG-0007",
+  "story_id": null,
+  "status": "PASS",
+  "checked_at": "2026-04-04T23:45:00Z",
+  "checked_by_role": "qa",
+  "orchestrator_run_id": "auto-20260404-01",
+  "criteria": [
+    {
+      "id": "UAT-1",
+      "sprint_ac": "AC-1",
+      "name": "`scripts/intake_evidence_lib.py` — duplicate / non-distinct `answer_ref` `quoted_user_text` guard; `INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`; US-0083 exemptions",
+      "result": "PASS",
+      "evidence_ref": "scripts/intake_evidence_lib.py,template/scripts/intake_evidence_lib.py,handoffs/intake_evidence/BUG-0007-intake-20260403.json (FAIL exemplar),tests/intake_evidence_bug0007_r0066_test.py"
+    },
+    {
+      "id": "UAT-2",
+      "sprint_ac": "AC-2",
+      "name": "Active `.cursor/commands/intake.md` — truthful asked_topics / topic_coverage; forbid synthetic echo; DEC/US cross-links",
+      "result": "PASS",
+      "evidence_ref": ".cursor/commands/intake.md,scripts/check_intake_template_parity.py --repo ."
+    },
+    {
+      "id": "UAT-3",
+      "sprint_ac": "AC-3",
+      "name": "Template `template/.cursor/commands/intake.md` parity with active intake.md",
+      "result": "PASS",
+      "evidence_ref": "template/.cursor/commands/intake.md,[INTAKE_TEMPLATE_PARITY_OK]"
+    },
+    {
+      "id": "UAT-4",
+      "sprint_ac": "AC-4",
+      "name": "Regression tests — R-0066 matrix rows 1–5 (FAIL exemplar + PASS paths)",
+      "result": "PASS",
+      "evidence_ref": "tests/intake_evidence_bug0007_r0066_test.py (verify-work rerun)"
+    },
+    {
+      "id": "UAT-5",
+      "sprint_ac": "AC-5",
+      "name": "`python scripts/intake_evidence_validate.py --self-test` + run-tests harness wiring",
+      "result": "PASS",
+      "evidence_ref": "python scripts/intake_evidence_validate.py --self-test -> [INTAKE_EVIDENCE_SELF_TEST_OK],tests/run-tests.sh,tests/run-tests.ps1"
+    },
+    {
+      "id": "UAT-6",
+      "sprint_ac": "AC-6",
+      "name": "`python scripts/check_intake_template_parity.py --repo .` → `[INTAKE_TEMPLATE_PARITY_OK]`",
+      "result": "PASS",
+      "evidence_ref": "python scripts/check_intake_template_parity.py --repo . (verify-work rerun)"
+    }
+  ],
+  "totals": {
+    "total": 6,
+    "pass": 6,
+    "fail": 0,
+    "pending": 0
+  },
+  "notes": [
+    "UAT closed at /verify-work (fresh qa) — orchestrator_run_id=auto-20260404-01; strict proof proof_hash=d3cb27503ca1c274e15b25dc4c1630bcd98b4005715dac13f33cbc2e91500cf4."
+  ]
+}

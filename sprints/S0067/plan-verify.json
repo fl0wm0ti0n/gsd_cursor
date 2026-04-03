@@ -1,0 +1,62 @@
+{
+  "sprint_id": "S0067",
+  "bug_id": "BUG-0006",
+  "story_id": null,
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (BUG-0006 expected/actual) + sprints/S0067/sprint.md (AC-1..AC-5 decomposition)",
+    "task_source": "sprints/S0067/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0067/sprint.md",
+    "decision_source": "(none — doc-contract sprint; governance: architecture # BUG-0006, R-0065)",
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# BUG-0006)",
+      "docs/engineering/research.md (R-0065)",
+      "US-0048",
+      "US-0069",
+      "US-0080",
+      "US-0045",
+      "DEC-0029",
+      "DEC-0038",
+      "DEC-0051",
+      "DEC-0052"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead, 2026-04-04T04:30:00Z, orchestrator_run_id=auto-20260403-03): sprint-local AC-1..AC-5 each assigned exactly one task T-001..T-005 in tasks.md (1:1 bijection intended).",
+      "Cross-read sprint.md scope vs architecture # BUG-0006 and R-0065 regression matrix.",
+      "Sizing: 5 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "Canonical bug status remains OPEN (US-0045) until verify-work.",
+      "QA plan-verify (2026-04-04T05:15:00Z, qa, fresh context): Re-verified tasks.md table AC column matches sprint.md AC-1..AC-5 themes 1:1; deterministic mapping block AC-i -> T-00i; no duplicate AC or orphan tasks; plan_integrity.task_ac_bijection=true.",
+      "Governance: sprint goal and file-touch list align with architecture.md # BUG-0006 and R-0065 (no standalone decision file for this bug).",
+      "Verdict PASS — /execute unblocked for S0067 / BUG-0006."
+    ],
+    "orchestrator_run_id": "auto-20260403-03",
+    "planned_at": "2026-04-04T04:30:00Z",
+    "plan_verified_at": "2026-04-04T05:15:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "Active .cursor/commands/auto.md spawn-only + AUTO_ORCHESTRATOR_PHASE_EXECUTION" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "template/.cursor/commands/auto.md parity" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "auto-orchestration-reference.md alignment + DEC cross-links" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "auto_command_contract_test.py R-0065 matrix" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "run-tests.sh / run-tests.ps1 harness references" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Reason-code overlap confusion with PHASE_CONTEXT_ISOLATION_VIOLATION — mitigate via architecture table + remediation text in command/reference.",
+    "Template drift if T-002 skipped — mitigate same change set as T-001.",
+    "Docs-only fix does not change IDE product behavior — explicit in architecture out-of-scope; static tests prove contract text only."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# BUG-0006)",
+      "docs/engineering/research.md (R-0065)"
+    ]
+  },
+  "summary": "PASS — QA plan-verify complete for S0067 / BUG-0006; AC-1..AC-5 map 1:1 to T-001..T-005; next phase /execute (dev)."
+}

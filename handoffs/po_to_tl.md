@@ -1,108 +1,3 @@
-## Discovery Addendum — US-0045
-
-### Discovery focus and references
-
-- Discovery objective: refine `US-0045` from intake scope into architecture-ready
-  status-contract boundaries and operator-facing drift diagnostics.
-- References captured:
-  - product vision value statement for single-source status trust
-  - current artifact set: `backlog.md`, `acceptance.md`, `state.md`
-  - release boundary reconciliation precedent from `US-0043`
-  - research anchor: `R-0009`
-
-### Discovery conclusions for TL
-
-- Canonical ownership should be explicit and singular:
-  - `docs/product/backlog.md` owns story `OPEN|DONE`.
-- Secondary artifacts should be treated as derived/reconciled views:
-  - `docs/product/acceptance.md` for portfolio checklist visibility.
-  - `docs/engineering/state.md` for checkpoint/evidence traceability.
-- Historical drift already exists and needs one-time normalization before strict
-  guardrails can become reliable.
-- Operator UX must prefer deterministic explainability over silent mutation:
-  emit per-story mismatch evidence and remediation guidance.
-
-### Research handoff targets
-
-1. Define precedence and conflict-resolution semantics when backlog, acceptance,
-   and state disagree.
-2. Define normalization entry criteria and safe mutation scope (targeted writes
-   only, no broad rewrites).
-3. Define reason-code contract for contradictory states and where the contract
-   is enforced in release/reconciliation flow.
-4. Define regression matrix for:
-   - pre-existing drift normalization
-   - post-normalization drift prevention
-   - non-target-story non-mutation guarantees
-
-### Recommendation
-
-- Proceed to `/research` for `US-0045` with emphasis on deterministic precedence
-  model, auditable normalization report schema, and fail-safe reason-code design.
-
----
-
-## Intake Addendum — Explicit Bulk Planning + Bulk Execution Modes
-
-### New intake
-
-User requests two explicit high-autonomy capabilities:
-1. Bulk sprint planning mode so one command can plan many OPEN stories.
-2. Bulk execution mode so planned sprints/stories run with fresh agent contexts
-   and execute↔QA loops until bounded stop conditions.
-
-### Overlap and duplicate evaluation
-
-- Related stories:
-  - `US-0023`: fresh subagent context per phase/handoff (already established).
-  - `US-0044`: optional `/auto` backlog-drain mode with bounded controls.
-  - `US-0045`: canonical status source and drift guard.
-- Assessment:
-  - not a duplicate of `US-0044`; this intake requests explicit command-level
-    bulk modes (especially for planning) rather than only flag-driven behavior.
-  - complements `US-0023`; preserves and operationalizes fine-granular context
-    isolation in explicit bulk execution semantics.
-  - compatible with `US-0045`; status integrity remains orthogonal to planning/
-    execution batching behavior.
-- Research reference:
-  - `R-0010` (explicit bulk modes + deterministic bounded orchestration).
-- Decision:
-  - create two dedicated stories: `US-0046` (bulk sprint planning) and
-    `US-0047` (bulk execute orchestration).
-
-### Accepted stories
-
-#### US-0046 — Explicit `/sprint-plan --bulk` Mode
-- Priority: P1
-- Status: OPEN
-- Intent: allow explicit, bounded planning of multiple OPEN stories in one run
-  while preserving sizing/splitting safety.
-
-#### US-0047 — Explicit Bulk Execute Orchestration Mode
-- Priority: P1
-- Status: OPEN
-- Intent: allow explicit, bounded multi-item execution with mandatory fresh
-  subagent isolation and deterministic execute↔QA loop controls.
-
-### TL guidance and boundaries
-
-- In scope:
-  - explicit mode contracts for bulk planning and bulk execution
-  - deterministic selection/grouping and bounded limits
-  - stop/skip reason-code semantics and breadcrumb auditability
-  - strict preservation of decision gates and fail-safe behavior
-  - active/template parity for command/rule/docs updates
-- Out of scope:
-  - runtime product feature changes
-  - bypassing release/decision safety controls
-  - replacing artifact-first handoff model
-
-### Suggested implementation order
-
-1. `US-0046` first to make backlog-to-sprint generation explicit and bounded.
-2. `US-0047` second to consume planned backlog/sprint scope in autonomous runs
-   with strict context isolation guarantees.
-
 ## Discovery Addendum — US-0046 and US-0047
 
 ### Discovery focus and references
@@ -771,3 +666,116 @@ User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALL
 - `scripts/intake_evidence_lib.py`
 - `scripts/intake_evidence_validate.py`
 - `handoffs/resume_brief.md`
+
+---
+
+## Orchestrated discovery handoff — BUG-0005 / auto-20260403-02
+
+### Target
+
+- `bug_id=BUG-0005`
+- `orchestrator_run_id=auto-20260403-02`
+- phase completed: **`discovery`** (**`po`**)
+- `fresh_context_marker=po-BUG0005-discovery-20260403T193500Z-fresh`
+- `next_scheduled_phase=research`
+
+### Summary
+
+- **Scope**: Post-**bug intake** `/auto` continuation — `handoffs/resume_brief.md` can still describe a pre-intake **`intake`** target, triggering **`AUTO_RESUME_ERROR` / `RESUME_BRIEF_STALE`** when `/auto` runs without explicit `start-from`. Discovery confirms this is **orchestration resume continuity**, not installer/runtime issues (**`BUG-0004`**) or installer payload completeness (**`BUG-0003`**).
+- **Impacted surfaces**: `/auto` **resume-source precedence** (resume brief vs explicit start-from vs `docs/engineering/state.md` fallback); **`resume_brief` freshness** semantics and safe rewrite policy at intake boundaries; **intake→auto** breadcrumbs so the next scheduled phase matches the new bug context.
+- **Canonical status** (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0005`** **OPEN**; acceptance bug row stays unchecked.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`### BUG-0005`** — `discovery_notes`)
+- `handoffs/intake_evidence/BUG-0005-intake-20260403.json`
+- `handoffs/resume_brief.md`
+- `docs/engineering/state.md` (**Discovery checkpoint (2026-04-03) — BUG-0005 / auto-20260403-02**)
+
+### Open questions for `/research`
+
+1. Under what conditions should **`resume_brief`** be **auto-refreshed** or **superseded** after canonical bug intake vs requiring explicit operator rewrite?
+2. What is the minimal **deterministic self-heal** (if any) that preserves resume precedence and fail-fast contracts (**US-0037**, **US-0070**) without masking real staleness?
+3. **Regression matrix**: scripted or documented sequence **`/intake bug` → `/auto`** asserting valid phase resolution or expected deterministic error with **non-stale** semantics.
+4. Interaction with **`state.md`** fallback when **`resume_brief`** is present but **invalid/stale** — align with existing **`AUTO_RESUME_ERROR`** vocabulary.
+
+### Next
+
+- **`/research`** (tech-lead) for **`BUG-0005`**; then architecture/sprint path per TL.
+- **Decision gate before research**: none (discovery satisfied; bug **OPEN**).
+
+---
+
+## Orchestrated discovery handoff — BUG-0006 / auto-20260403-03
+
+### Target
+
+- `bug_id=BUG-0006`
+- `orchestrator_run_id=auto-20260403-03`
+- phase completed: **`discovery`** (**`po`**)
+- `fresh_context_marker=po-BUG0006-discovery-20260404T002000Z-fresh`
+- `next_scheduled_phase=research`
+
+### Summary
+
+- **Scope**: **`/auto`** orchestration integrity — orchestrator **must not** perform phase work directly; each phase requires **fresh subagent** spawn per **US-0048** / **US-0069** / **US-0080**; on violation, **fail fast** with deterministic reason-code coverage (intake: **`handoffs/intake_evidence/BUG-0006-intake-20260403.json`**).
+- **Discovery conclusions**: Defect is bounded to **workflow/docs/enforcement** surfaces (command + reference + optional tests); preserve existing isolation and strict-runtime-proof contracts (**DEC-0029**, **DEC-0038**); add regression that proves spawn-or-fail behavior is not bypassed by “orchestrator executes phase” paths.
+- **Canonical status** (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0006`** **OPEN**; acceptance bug row unchanged.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`### BUG-0006`** — `discovery_notes`)
+- `handoffs/intake_evidence/BUG-0006-intake-20260403.json`
+- `.cursor/commands/auto.md`
+- `docs/engineering/state.md` (**Discovery checkpoint — BUG-0006 / auto-20260403-03**; triad archive **`docs/engineering/state-archive/state-pack-20260403-n.md`**)
+- `handoffs/resume_brief.md`
+
+### Open questions for `/research`
+
+1. Concrete locations (commands, **`auto-orchestration-reference.md`**, runbook, tests) where “direct execution” could be read as allowed vs forbidden.
+2. Minimal **R-####** recommendation: doc-only hardening vs scripted guardrails vs both; align reason codes with **`PHASE_CONTEXT_ISOLATION_*`** / spawn enforcement vocabulary.
+3. **Regression matrix**: positive (spawn implied) and negative (orchestrator must not claim phase completion without subagent boundary) — test or contract-check shape.
+
+### Next
+
+- **`/research`** (**tech-lead**, default) for **`BUG-0006`**; then **`/architecture`** / **`/sprint-plan`** per TL.
+- **Decision gate before research**: none (discovery satisfied; bug **OPEN**).
+
+---
+
+## Orchestrated discovery handoff — BUG-0007 / auto-20260404-01
+
+### Target
+
+- `bug_id=BUG-0007`
+- `orchestrator_run_id=auto-20260404-01`
+- phase completed: **`discovery`** (**`po`**)
+- `fresh_context_marker=po-BUG0007-discovery-20260404T120000Z-fresh`
+- `next_scheduled_phase=research`
+
+### Summary
+
+- **Scope**: Intake evidence integrity — **`asked_topics`** and **`topic_coverage`** must truthfully record which required-pack topics were **actually asked** in user-visible form (or satisfied via explicit **DEC-0060** mechanisms: **`delegation_ref`** with scope/rationale/confidence, **`equivalent_evidence_ref`**, or **`assumption_confirmation_ref`**). The defect is **misleading evidence**: persistence/validation may treat free-form user bug text as if it were structured answers to required questions.
+- **Exemplar**: **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`** — `small-intake-pack` with `asked_topics` populated and five `topic_coverage` rows using the same complaint prose as `quoted_user_text` under `satisfied_by=answer_ref` without a distinct Q/A turn; contrasts with **`.cursor/commands/intake.md`** (US-0068 / US-0078) expectation that evidence matches real questioning.
+- **Canonical status** (**US-0045**): **`docs/product/backlog.md`** keeps **`BUG-0007`** **OPEN** until **`/verify-work`** closure; acceptance bug row unchanged.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (**`### BUG-0007`** — `discovery_notes`)
+- `handoffs/intake_evidence/BUG-0007-intake-20260403.json`
+- `.cursor/commands/intake.md` (**interactive intake evidence gate**)
+- `scripts/intake_evidence_validate.py` (validator surface for fail-closed persistence)
+- `docs/engineering/state.md` (**Discovery checkpoint — BUG-0007 / auto-20260404-01**)
+- `handoffs/resume_brief.md`
+
+### Open questions for `/research`
+
+1. Where evidence is authored relative to **actual chat turns** (PO subagent, scripts, templates) and what minimal **audit binding** (e.g. turn refs, question text hash, explicit “not asked” state) is feasible.
+2. Validator and/or command changes so **`asked_topics`** cannot list topics that were never prompted, and **`topic_coverage`** cannot use **`answer_ref`** without a verifiable user answer artifact — without breaking legitimate **`delegation_ref`** / **`equivalent_evidence_ref`** flows (**US-0083**).
+3. Interaction with **`/intake bug`** path: **`intake_bug_resume_brief_refresh.py`**, **`bug_issue_validate.py`**, and whether a new deterministic subcode under **`INTAKE_PERSISTENCE_BLOCKED`** is warranted.
+4. **Regression matrix**: fixture JSON + validator test that fails on BUG-0007-shaped bundles.
+
+### Next
+
+- **`/research`** (**tech-lead**, default) for **`BUG-0007`**; then **`/architecture`** / **`/sprint-plan`** per TL.
+- **Decision gate before research**: none (discovery satisfied; bug **OPEN**).

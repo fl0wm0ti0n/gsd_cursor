@@ -899,3 +899,31 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Evidence**: **`handoffs/intake_evidence/BUG-0003-intake-20260331.json`** and **`handoffs/intake_evidence/BUG-0003-intake-20260331-b.json`** (`small-intake-pack`, DEC-0060 `ie:` refs), plus installer and template script surfaces.
 - **Addendum**: user-provided concrete missing file after new-repo install: `scripts/enforce-triad-hot-surface.py`.
 - **Intake closure (2026-03-31, PO, manual run)**: Canonical **`BUG-0003`** filed; next workflow phase **`/discovery`** (TL).
+
+## Intake notes — BUG-0004
+
+- **Defect**: Shell-path installer fails immediately with `/usr/lib/node_modules/its-magic/installer.sh: 2: set: Illegal option -` when running `its-magic --mode missing`.
+- **Scope**: Shell/runtime compatibility of installer startup options and CLI execution path in Linux environments.
+- **Evidence**: **`handoffs/intake_evidence/BUG-0004-intake-20260403.json`** (`small-intake-pack`, DEC-0060 `ie:` refs), reported runtime output, and affected installer surface `installer.sh`.
+- **Intake closure (2026-04-03, PO, manual run)**: Canonical **`BUG-0004`** filed as **OPEN**; next workflow phase **`/discovery`** (TL).
+
+## Intake notes — BUG-0005
+
+- **Defect**: `/auto` fails immediately after bug intake with stale resume target (`AUTO_RESUME_ERROR` / `RESUME_BRIEF_STALE`) instead of continuing workflow.
+- **Scope**: Intake-to-auto continuation consistency, resume-source freshness handling, and deterministic boundary progression for bug-mode intake.
+- **Evidence**: **`handoffs/intake_evidence/BUG-0005-intake-20260403.json`** (`small-intake-pack`, DEC-0060 `ie:` refs), user report, and stale `handoffs/resume_brief.md` posture after `BUG-0004` intake.
+- **Intake closure (2026-04-03, PO, manual run)**: Canonical **`BUG-0005`** filed as **OPEN**; next workflow phase **`/discovery`** (TL).
+
+## Intake notes — BUG-0006
+
+- **Defect**: `/auto` can execute phase work without spawning the required fresh role subagent.
+- **Scope**: Enforce strict phase dispatch integrity so orchestrator-only phase execution is blocked with deterministic fail-fast reason-code coverage.
+- **Evidence**: **`handoffs/intake_evidence/BUG-0006-intake-20260403.json`** (`small-intake-pack`, DEC-0060 `ie:` refs), user report, and `/auto` orchestrator contract in `.cursor/commands/auto.md`.
+- **Intake closure (2026-04-03, PO, manual run)**: Canonical **`BUG-0006`** filed as **OPEN**; next workflow phase **`/discovery`** (TL).
+
+## Intake notes — BUG-0007
+
+- **Defect**: Intake evidence records that required questions were asked and answered even when the user reports no such questions were asked.
+- **Scope**: Truthful asked-vs-covered intake evidence accounting (`asked_topics`, `topic_coverage`) with fail-closed handling when required topics are not actually collected.
+- **Evidence**: **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`** and user-provided example **`handoffs/intake_evidence/BUG-0006-intake-20260403.json`**.
+- **Intake closure (2026-04-03, PO, manual run)**: Canonical **`BUG-0007`** filed as **OPEN**; next workflow phase **`/discovery`** (TL).
