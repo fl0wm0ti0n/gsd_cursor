@@ -1,0 +1,63 @@
+{
+  "sprint_id": "S0069",
+  "bug_id": null,
+  "story_id": "US-0084",
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (US-0084 AC-1..AC-10) + sprints/S0069/sprint.md (sprint-local AC themes)",
+    "task_source": "sprints/S0069/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0069/sprint.md",
+    "decision_source": "(none at seed — governance: architecture # US-0084, R-0067)",
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# US-0084)",
+      "docs/engineering/research.md (R-0067)",
+      "US-0045",
+      "US-0064",
+      "US-0036",
+      "BUG-0004"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead, 2026-04-04T18:00:00Z, orchestrator_run_id=auto-20260404-02): backlog US-0084 AC-1..AC-10 each assigned exactly one task T-001..T-010 in tasks.md (1:1 bijection intended).",
+      "Cross-read sprint.md scope vs architecture # US-0084 and R-0067 (POSIX installer, remote map, helper contract, H1–H5).",
+      "Sizing: 10 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "Canonical story status remains OPEN (US-0045); acceptance checkboxes unchanged until verify-work.",
+      "QA plan-verify (qa, 2026-04-04T19:15:00Z, orchestrator_run_id=auto-20260404-02): re-verified tasks table + deterministic AC↔T mapping — AC-1..AC-10 each maps exactly one of T-001..T-010; no duplicate task IDs or orphan ACs.",
+      "QA: sprint-local AC themes and sprint goal match architecture # US-0084 (POSIX/dash/LF installer, CI/prepublish/dash -n, US-0064 remote map, remote_config_summary.py, runbook/handoffs, security, template parity, E2E, H1–H5) and R-0067 findings.",
+      "QA: plan_integrity flags confirmed; gaps=[]; residual_risks acknowledged per architecture."
+    ],
+    "orchestrator_run_id": "auto-20260404-02",
+    "planned_at": "2026-04-04T18:00:00Z",
+    "plan_verified_at": "2026-04-04T19:15:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "POSIX installer + LF publish parity" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "CI/prepublish + installer regression + dash -n when available" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "Runbook troubleshooting dash/CRLF/bash" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "US-0064 remote profile map for dev/QA" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "remote_config_summary.py + exit codes" },
+    { "ac": "AC-6", "tasks": ["T-006"], "status": "verified", "notes": "REMOTE_EXECUTION evidence cues" },
+    { "ac": "AC-7", "tasks": ["T-007"], "status": "verified", "notes": "No credentials; non-secret helper output" },
+    { "ac": "AC-8", "tasks": ["T-008"], "status": "verified", "notes": "template/ parity" },
+    { "ac": "AC-9", "tasks": ["T-009"], "status": "verified", "notes": "Minimal E2E path doc" },
+    { "ac": "AC-10", "tasks": ["T-010"], "status": "verified", "notes": "run-tests H1–H5 registration" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "CI runners may lack dash — skip vs hard must stay documented per architecture.",
+    "Helper could regress to printing resolved env values — mitigate via T-007 review and fixtures.",
+    "Template drift if T-008 lags active runbook/commands."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# US-0084)",
+      "docs/engineering/research.md (R-0067)"
+    ]
+  },
+  "summary": "PASS — QA /plan-verify complete for S0069 / US-0084 (orchestrator_run_id=auto-20260404-02); /execute (dev) unblocked."
+}

@@ -9,442 +9,6 @@
 - Retrieval policy for `/ask`: prefer latest targeted sections first and expand
   only when unresolved.
 
-## Execute checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02
-
-- **`/execute`** completed in fresh **dev** context for **`S0066`** / **`BUG-0005`** (`orchestrator_run_id=auto-20260403-02`).
-- **Verdict**: **DEC-0069** intake-boundary automation landed — **`scripts/intake_bug_resume_brief_refresh.py`** (atomic **`handoffs/resume_brief.md`** latest-pointer upsert with **`discovery`** resume seed, **`US-0045`** backlog validation, **`--validate-file`** audit); **`tests/intake_bug_resume_brief_bug0005_test.py`** (**R-0064** matrix); active + **`template/`** **`intake.md`**; **`check_intake_template_parity.py`** extended with script pair; **`run-tests.sh` / `run-tests.ps1`** section **26Q**.
-- **Artifacts**: **`handoffs/dev_to_qa.md`**, **`handoffs/resume_brief.md`** → **`/qa`**, **`sprints/S0066/summary.md`**, **`sprints/S0066/tasks.md`**, **`docs/product/backlog.md`** (**`execute_notes`** under **`### BUG-0005`**), **`.cursor/commands/intake.md`**, **`template/.cursor/commands/intake.md`**, **`docs/engineering/artifact-ownership-policy.md`**, **`template/docs/engineering/artifact-ownership-policy.md`**, **`scripts/intake_bug_resume_brief_refresh.py`**, **`template/scripts/intake_bug_resume_brief_refresh.py`**, **`tests/intake_bug_resume_brief_bug0005_test.py`**
-- **Canonical bug status (US-0045)**: **`BUG-0005`** remains **OPEN**; next phase **`/qa`**.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-S0066-BUG0005-execute-20260403T204000Z-fresh`
-- `timestamp=2026-04-03T20:40:00Z`
-- `evidence_ref=sprints/S0066/summary.md,sprints/S0066/tasks.md,scripts/intake_bug_resume_brief_refresh.py,template/scripts/intake_bug_resume_brief_refresh.py,tests/intake_bug_resume_brief_bug0005_test.py,tests/run-tests.sh,tests/run-tests.ps1,.cursor/commands/intake.md,template/.cursor/commands/intake.md,scripts/check_intake_template_parity.py,template/scripts/check_intake_template_parity.py,docs/engineering/artifact-ownership-policy.md,template/docs/engineering/artifact-ownership-policy.md,handoffs/dev_to_qa.md,handoffs/resume_brief.md,docs/product/backlog.md,handoffs/tl_to_dev.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-02`
-- `runtime_proof_id=rp-auto-20260403-02-execute-dev-20260403T204000Z-S0066-BUG0005`
-- `phase_id=execute`
-- `role=dev`
-- `proof_issued_at=2026-04-03T20:40:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=fec7558cfb57506ff45d2cf2c7d9728ffb1feb86ef02e06fea3ec7b7deb9f01c`
-
-## Phase boundary status (post-execute, S0066 / BUG-0005 / auto-20260403-02)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-02`** — not rewritten at execute writer)
-- `skipped_phases_summary`=(none at execute writer)
-- `phase_boundary=execute`
-- `next_scheduled_phase=qa`
-- `bug_id=BUG-0005`
-- `story_id=(none)`
-- `sprint_id=S0066`
-- `orchestrator_run_id=auto-20260403-02`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=execute`; `next_scheduled_phase=qa`; `bug_id=BUG-0005`; `sprint_id=S0066`; `orchestrator_run_id=auto-20260403-02`.
-
-**Triad hot-surface (DEC-0054)** (post-execute S0066 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-i.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## QA checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02
-
-- **`/qa`** completed for **`S0066`** / **`BUG-0005`** in fresh **qa** context (`orchestrator_run_id=auto-20260403-02`).
-- **Verdict**: **`sprints/S0066/qa-findings.md`** **PASS** — **DEC-0069** intake **`resume_brief`** refresh script + **R-0064** regression tests + **`intake.md`** contract reviewed; targeted commands green (see **`qa_notes`** on **`### BUG-0005`** in **`docs/product/backlog.md`**).
-- **Canonical bug status (US-0045)**: **`BUG-0005`** remains **OPEN** until **`/verify-work`** applies closure.
-- **Next recommended phase**: **`/verify-work`** for **`S0066`** / **`BUG-0005`** (`next_scheduled_phase=verify-work`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=qa`
-- `role=qa`
-- `fresh_context_marker=qa-S0066-BUG0005-qa-20260403T213500Z-fresh`
-- `timestamp=2026-04-03T21:35:00Z`
-- `evidence_ref=sprints/S0066/qa-findings.md,sprints/S0066/summary.md,sprints/S0066/tasks.md,scripts/intake_bug_resume_brief_refresh.py,tests/intake_bug_resume_brief_bug0005_test.py,.cursor/commands/intake.md,template/.cursor/commands/intake.md,scripts/check_intake_template_parity.py,decisions/DEC-0069.md,handoffs/dev_to_qa.md,handoffs/qa_to_verify_work.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-02`
-- `runtime_proof_id=rp-auto-20260403-02-qa-qa-20260403T213500Z-S0066-BUG0005`
-- `phase_id=qa`
-- `role=qa`
-- `proof_issued_at=2026-04-03T21:35:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=a78678f3dd3499e9a1f2d1a6589d661ee39b783770c351a8545a5c56d7606ac3`
-
-## Phase boundary status (post-qa, S0066 / BUG-0005 / auto-20260403-02)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-02`** — not rewritten at qa writer)
-- `skipped_phases_summary`=(none at qa writer)
-- `phase_boundary=qa`
-- `next_scheduled_phase=verify-work`
-- `bug_id=BUG-0005`
-- `story_id=(none)`
-- `sprint_id=S0066`
-- `orchestrator_run_id=auto-20260403-02`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=qa`; `next_scheduled_phase=verify-work`; `bug_id=BUG-0005`; `sprint_id=S0066`; `orchestrator_run_id=auto-20260403-02`.
-
-**Triad hot-surface (DEC-0054)** (post-qa S0066 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-j.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Verify-work checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02
-
-- **`/verify-work`** completed for **`S0066`** / **`BUG-0005`** in fresh **qa** context (`orchestrator_run_id=auto-20260403-02`).
-- **Verdict**: **PASS** — **`sprints/S0066/uat.json`** / **`sprints/S0066/uat.md`** record **9/9** coverage for **`AC-1..AC-9`** (**`DEC-0069`**, **`R-0064`**). Rerun evidence: **`python tests/intake_bug_resume_brief_bug0005_test.py`** -> **PASS** (6 tests); **`python scripts/check_intake_template_parity.py --repo .`** -> **`[INTAKE_TEMPLATE_PARITY_OK]`**; **`python scripts/intake_bug_resume_brief_refresh.py --self-test`** -> **`[INTAKE_BUG_RESUME_BRIEF_REFRESH_OK]`**.
-- **Canonical closure (US-0045)**: **`docs/product/backlog.md`** **`BUG-0005`** -> **DONE**; **`docs/product/acceptance.md`** bug row checked; **`handoffs/release_queue.md`** **`S0066`** -> **`ready`**; **`handoffs/release_notes.md`** release-candidate pointer; **`handoffs/resume_brief.md`** -> **`/release`**.
-- **Next recommended phase**: **`/release`** (`next_scheduled_phase=release`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=verify-work`
-- `role=qa`
-- `fresh_context_marker=qa-S0066-BUG0005-verify-work-20260403T222045Z-fresh`
-- `timestamp=2026-04-03T22:20:45Z`
-- `evidence_ref=sprints/S0066/uat.json,sprints/S0066/uat.md,sprints/S0066/qa-findings.md,sprints/S0066/summary.md,sprints/S0066/sprint.md,decisions/DEC-0069.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/release_queue.md,handoffs/release_notes.md,handoffs/resume_brief.md,tests/intake_bug_resume_brief_bug0005_test.py,scripts/intake_bug_resume_brief_refresh.py,scripts/check_intake_template_parity.py,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-02`
-- `runtime_proof_id=rp-auto-20260403-02-verify-work-qa-20260403T222045Z-S0066-BUG0005`
-- `phase_id=verify-work`
-- `role=qa`
-- `proof_issued_at=2026-04-03T22:20:45Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=b90624ee7c87286d96473023f699415fda1c46d87c045f782ac62c80d8aa9df7`
-
-## Phase boundary status (post-verify-work, S0066 / BUG-0005 / auto-20260403-02)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-02`** — not rewritten at verify-work writer)
-- `skipped_phases_summary`=(none at verify-work writer)
-- `phase_boundary=verify-work`
-- `next_scheduled_phase=release`
-- `bug_id=BUG-0005`
-- `story_id=(none)`
-- `sprint_id=S0066`
-- `orchestrator_run_id=auto-20260403-02`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=verify-work`; `next_scheduled_phase=release`; `bug_id=BUG-0005`; `sprint_id=S0066`; `orchestrator_run_id=auto-20260403-02`.
-
-**Triad hot-surface (DEC-0054)** (post-verify-work S0066 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-k.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Release checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02
-
-- **`/release`** completed in fresh **release** context (`orchestrator_run_id=auto-20260403-02`).
-- **Verdict**: **PASS** — canonical notes **`handoffs/releases/S0066-release-notes.md`**; **`handoffs/release_queue.md`** **`S0066`** -> **`released`**; **`sprints/S0066/release-findings.md`** **PASS**; legacy pointer **`handoffs/release_notes.md`** refreshed; **`handoffs/resume_brief.md`** -> **`/refresh-context`** with portfolio hint **`BUG-0006`** (next OPEN).
-- **Sync (US-0038 / DEC-0018)**: merged scratchpad **`ALLOW_AUTO_PUSH=0`** -> **`policy_mode=manual`**, **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`**, **`trigger_source=manual`** (no auto-push this boundary).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=release`
-- `role=release`
-- `fresh_context_marker=release-S0066-BUG0005-release-20260403T233045Z-fresh`
-- `timestamp=2026-04-03T23:30:45Z`
-- `evidence_ref=handoffs/releases/S0066-release-notes.md,handoffs/release_queue.md,handoffs/release_notes.md,sprints/S0066/release-findings.md,handoffs/resume_brief.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-02`
-- `runtime_proof_id=rp-auto-20260403-02-release-release-20260403T233045Z-S0066-BUG0005`
-- `phase_id=release`
-- `role=release`
-- `proof_issued_at=2026-04-03T23:30:45Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=90d99c38520e95120a8215b4f872ad92f05df0ca9c7582b6acbd476243e2378d`
-
-## Phase boundary status (post-release, S0066 / BUG-0005 / auto-20260403-02)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-02`** — not rewritten at release writer)
-- `skipped_phases_summary`=(none at release writer)
-- `phase_boundary=release`
-- `next_scheduled_phase=refresh-context`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=S0066`
-- `orchestrator_run_id=auto-20260403-02`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=release`; `next_scheduled_phase=refresh-context`; `bug_id=BUG-0006` (portfolio next OPEN); `sprint_id=S0066`; `orchestrator_run_id=auto-20260403-02`.
-
-**Triad hot-surface (DEC-0054)** (post-release S0066 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-l.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Refresh-context checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02
-
-- **`/refresh-context`** (**curator**, fresh context): post-release reconciliation for **`S0066`** / **`BUG-0005`**. Refreshed **`docs/engineering/decisions.md`** (context pack, **`BUG-0004`**/**`BUG-0005`** closure rows, **`BUG-0006`** portfolio pointer, **`R-0063`**/**`R-0064`** research closures, traceability rows **`S0065`**/**`S0066`**), **`docs/engineering/research.md`** (**`R-0064`** **closed** with delivery closure stanza), **`sprints/S0066/summary.md`** (closure summary), **`handoffs/resume_brief.md`** (**`BUG-0006`**, **`intended_resume_phase=discovery`**), **`handoffs/release_notes.md`** (S0066 readiness note: refresh complete), **`docs/product/backlog.md`** (**`release_closure_notes`** + **`refresh_context_notes`** under **`### BUG-0005`**).
-- **Canonical status alignment (US-0045)**: **`docs/product/backlog.md`** keeps **`BUG-0005`** **DONE** / **`BUG-0006`** **OPEN**; **`docs/product/acceptance.md`** keeps **`BUG-0005`** checked; **`handoffs/release_queue.md`** keeps **`S0066=released`**; **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** -> **`[BUG_VALIDATION_OK]`**.
-- **Terminal boundary (auto run closure)**: `stop_reason=completed`; `stop_phase=refresh-context`; `next_scheduled_phase=discovery` (portfolio **`BUG-0006`**; mirrors **`auto-20260403-01`** auto-stop breadcrumb pattern).
-- **Next recommended phase**: **`/discovery`** for **`BUG-0006`** (`next_scheduled_phase=discovery`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=refresh-context`
-- `role=curator`
-- `fresh_context_marker=curator-S0066-BUG0005-refresh-context-20260403T235500Z-fresh`
-- `timestamp=2026-04-03T23:55:00Z`
-- `evidence_ref=docs/engineering/decisions.md,docs/engineering/research.md,sprints/S0066/summary.md,handoffs/resume_brief.md,handoffs/release_notes.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/release_queue.md,handoffs/releases/S0066-release-notes.md,sprints/S0066/release-findings.md,scripts/bug_issue_validate.py,docs/engineering/state-archive/state-pack-20260403-m.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-02`
-- `runtime_proof_id=rp-auto-20260403-02-refresh-context-curator-20260403T235500Z-S0066-BUG0005`
-- `phase_id=refresh-context`
-- `role=curator`
-- `proof_issued_at=2026-04-03T23:55:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=cf751834c92a3ffd24e890dbe3b216f22e0d2d4a8a95ca5d4dbae3b8a3576fe6`
-
-## Phase boundary status (post-refresh-context, S0066 / BUG-0005 / auto-20260403-02) — auto run closure
-
-- `resolved_phase_plan_snapshot=lifecycle_complete (auto-20260403-02)`
-- `skipped_phases_summary=(none; full plan executed)`
-- `phase_boundary=refresh-context`
-- `next_scheduled_phase=discovery`
-- `stop_reason=completed`
-- `stop_phase=refresh-context`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=S0066`
-- `orchestrator_run_id=auto-20260403-02`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=refresh-context`; `stop_reason=completed`; `stop_phase=refresh-context`; `next_scheduled_phase=discovery`; `bug_id=BUG-0006` (portfolio next OPEN); `sprint_id=S0066`; `orchestrator_run_id=auto-20260403-02`.
-
-**Triad hot-surface (DEC-0054)** (post-refresh-context S0066 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-m.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Auto stop breadcrumb (2026-04-03) — auto-20260403-02
-
-- `phase_boundary=refresh-context`
-- `stop_reason=completed`
-- `stop_phase=refresh-context`
-- `next_scheduled_phase=discovery`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=(none)`
-- `resolution_source=resume_brief`
-- `resolution_status=resolved`
-
-## `/auto` orchestration materialization (2026-04-03) — auto-20260403-03
-
-- `timestamp=2026-04-03T23:59:00Z` (orchestrator breadcrumb; monotonic after post-refresh-context checkpoint)
-- `invocation_mode=auto`
-- `requested_start_from=(none)`
-- `resolved_start_phase=discovery`
-- `resolution_source=resume_brief`
-- `resolution_status=resolved`
-- `orchestrator_run_id=auto-20260403-03`
-- `phase_policy_mode=full` (merged scratchpad: **`AUTO_PHASE_PLAN`** unset; no **`AUTO_PHASE_EXCLUDE` / `AUTO_PHASE_INCLUDE` / `AUTO_PHASE_PROFILE`**)
-- `SECURITY_REVIEW=0` (no security-review phase inserts)
-- `resolved_phase_plan` (intersected schedule; anchor **`discovery`** per **`handoffs/resume_brief.md`**): `discovery` → `research` → `architecture` → `sprint-plan` → `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
-- `skipped_phases`: `intake` — `resume_start_anchor` (canonical phases before **`discovery`** omitted for this continuation segment; portfolio **`BUG-0006`** post-**`refresh-context`**)
-- `phase_boundary=(orchestrator pre-spawn)`
-- `next_scheduled_phase=discovery`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=(none)`
-- `AUTO_BACKLOG_DRAIN=1` / `AUTO_BACKLOG_MAX_STORIES=10` (drain enabled; this run begins segment for **`BUG-0006`**)
-
-**Preflight (US-0069 / DEC-0051)**: first spawn **`phase_id=discovery`** with resolved role **`po`** (defaults; **`AUTO_ROLE_RESEARCH`** etc. empty → matrix defaults).
-
-**AC-10 operator visibility**: `resolved_phase_plan` materialized before first phase spawn; prior run closure **`auto-20260403-02`** at **`phase_boundary=refresh-context`** with **`next_scheduled_phase=discovery`**.
-
-## Discovery checkpoint (2026-04-04) — BUG-0006 / auto-20260403-03
-
-- **`/discovery`** complete in fresh **PO** context (`orchestrator_run_id=auto-20260403-03`).
-- **Summary**: Bounded **orchestration integrity** defect — **`/auto`** must **not** execute phase work in orchestrator context; each lifecycle phase requires a **fresh role subagent** spawn per **US-0048** / **US-0069** / **US-0080** (`.cursor/commands/auto.md`). Done criteria from intake: deterministic **fail-fast** when direct orchestrator phase execution is attempted, with explicit **reason-code** coverage for missing subagent spawn; preserve isolation + strict-runtime-proof contracts (**DEC-0029**, **DEC-0038**); add **regression** proving rejection of in-orchestrator phase execution. Intake evidence: **`handoffs/intake_evidence/BUG-0006-intake-20260403.json`** (`small-intake-pack`, required topics satisfied).
-- **Research asks for TL**: (1) Where `/auto` (and related docs) can imply or allow direct phase execution vs spawn-only; (2) minimal enforcement surface (command text, reference doc cross-links, optional validator/tests) for spawn-or-fail semantics; (3) deterministic reason-code vocabulary aligned with existing **`PHASE_CONTEXT_ISOLATION_*`** / **`RUNTIME_PROOF_*`** families; (4) regression shape (scripted or doc-contract test) that fails if orchestrator “runs” a phase without subagent boundary.
-- **Canonical status (US-0045)**: **`docs/product/backlog.md`** keeps **`BUG-0006`** **OPEN**; no acceptance mutation.
-- **Next recommended phase**: **`/research`** (**tech-lead** default; `next_scheduled_phase=research`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=discovery`
-- `role=po`
-- `fresh_context_marker=po-BUG0006-discovery-20260404T002000Z-fresh`
-- `timestamp=2026-04-04T00:20:00Z`
-- `evidence_ref=handoffs/intake_evidence/BUG-0006-intake-20260403.json,.cursor/commands/auto.md,docs/engineering/auto-orchestration-reference.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-03`
-- `runtime_proof_id=rp-auto-20260403-03-discovery-po-20260404T002000Z-BUG0006`
-- `phase_id=discovery`
-- `role=po`
-- `proof_issued_at=2026-04-04T00:20:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=348e89ad0bdf932474b46a68c6eb58abc97b55237ec0a97b14855ee6d21a16a4`
-
-## Phase boundary status (post-discovery, BUG-0006 / auto-20260403-03)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-03`** — discovery segment; not rewritten at discovery writer)
-- `skipped_phases_summary`=(prior segment: `intake` omitted per resume anchor — unchanged at discovery writer)
-- `phase_boundary=discovery`
-- `next_scheduled_phase=research`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260403-03`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=discovery`; `next_scheduled_phase=research`; `bug_id=BUG-0006`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260403-03`.
-
-**Triad hot-surface (DEC-0054)** (post-discovery BUG-0006 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-n.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Research checkpoint (2026-04-04) — BUG-0006 / auto-20260403-03
-
-- **`/research`** complete in fresh **tech-lead** context (`orchestrator_run_id=auto-20260403-03`).
-- **Summary**: **R-0065** maps **BUG-0006** to doc-first spawn-only enforcement for **`/auto`**: tighten **`.cursor/commands/auto.md`** and **`docs/engineering/auto-orchestration-reference.md`** (mirror **`template/`** where applicable); add deterministic **fail-fast reason code(s)** for orchestrator-side phase work / missing subagent spawn (distinct from **`PHASE_CONTEXT_ISOLATION_*`** and **`RUNTIME_PROOF_*`** overload); extend **`tests/auto_command_contract_test.py`** (or sibling unittest) for required contract literals and drift prevention. No runtime product orchestration claims—static contract + tests only.
-- **Canonical status (US-0045)**: **`docs/product/backlog.md`** keeps **`BUG-0006`** **OPEN**; **`research_notes`** reference **R-0065**.
-- **Next recommended phase**: **`/architecture`** (**tech-lead**; `next_scheduled_phase=architecture`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=research`
-- `role=tech-lead`
-- `fresh_context_marker=tech-lead-BUG0006-research-20260404T024500Z-fresh`
-- `timestamp=2026-04-04T02:45:00Z`
-- `evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/resume_brief.md,.cursor/commands/auto.md,docs/engineering/auto-orchestration-reference.md,handoffs/intake_evidence/BUG-0006-intake-20260403.json,handoffs/po_to_tl.md,tests/auto_command_contract_test.py,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-03`
-- `runtime_proof_id=rp-auto-20260403-03-research-tech-lead-20260404T024500Z-BUG0006`
-- `phase_id=research`
-- `role=tech-lead`
-- `proof_issued_at=2026-04-04T02:45:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=063e23a1c863d77cea3c91c8ff7f944679c5f8dce0f802fa5469d37f0bbdabd5`
-
-## Phase boundary status (post-research, BUG-0006 / auto-20260403-03)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-03`** — research segment; not rewritten at research writer)
-- `skipped_phases_summary`=(prior segment: `intake` omitted per resume anchor — unchanged at research writer)
-- `phase_boundary=research`
-- `next_scheduled_phase=architecture`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260403-03`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=research`; `next_scheduled_phase=architecture`; `bug_id=BUG-0006`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260403-03`.
-
-**Triad hot-surface (DEC-0054)** (post-research BUG-0006 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-o.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Architecture checkpoint (2026-04-04) — BUG-0006 / auto-20260403-03
-
-- **`/architecture`** complete in fresh **tech-lead** context (`orchestrator_run_id=auto-20260403-03`).
-- **Summary**: Locked spawn-only **`/auto`** approach per **`docs/engineering/architecture.md`** **`# BUG-0006`**: primary fail-fast code **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** (orchestrator must not execute lifecycle phase work in-process); preserve **`PHASE_CONTEXT_ISOLATION_*`**, **`RUNTIME_PROOF_*`**, **`PHASE_ROLE_*`**, **`PHASE_POLICY_*`**, **`[AUTO_RESUME_ERROR]`** as adjacent families; implementation targets **`.cursor/commands/auto.md`**, **`template/.cursor/commands/auto.md`**, **`docs/engineering/auto-orchestration-reference.md`**, **`tests/auto_command_contract_test.py`** (**R-0065** alignment).
-- **Canonical status (US-0045)**: **`docs/product/backlog.md`** keeps **`BUG-0006`** **OPEN**; **`architecture_notes`** updated.
-- **Next recommended phase**: **`/sprint-plan`** (**tech-lead**; `next_scheduled_phase=sprint-plan`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=architecture`
-- `role=tech-lead`
-- `fresh_context_marker=tech-lead-BUG0006-architecture-20260404T031500Z-fresh`
-- `timestamp=2026-04-04T03:15:00Z`
-- `evidence_ref=docs/engineering/architecture.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/research.md,handoffs/intake_evidence/BUG-0006-intake-20260403.json,.cursor/commands/auto.md,docs/engineering/auto-orchestration-reference.md,template/.cursor/commands/auto.md,tests/auto_command_contract_test.py,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-03`
-- `runtime_proof_id=rp-auto-20260403-03-architecture-tech-lead-20260404T031500Z-BUG0006`
-- `phase_id=architecture`
-- `role=tech-lead`
-- `proof_issued_at=2026-04-04T03:15:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=5ec61427d5fdc3d7b162efb0be063c464d2a75fcbaccdf46118200df491856ba`
-
-## Phase boundary status (post-architecture, BUG-0006 / auto-20260403-03)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-03`** — architecture segment; not rewritten at architecture writer)
-- `skipped_phases_summary`=(prior segment: `intake` omitted per resume anchor — unchanged at architecture writer)
-- `phase_boundary=architecture`
-- `next_scheduled_phase=sprint-plan`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260403-03`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=architecture`; `next_scheduled_phase=sprint-plan`; `bug_id=BUG-0006`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260403-03`.
-
-**Triad hot-surface (DEC-0054)** (post-architecture BUG-0006 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`** and **`docs/engineering/architecture.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1,1`** — **`docs/engineering/state-archive/state-pack-20260403-p.md`**, **`docs/engineering/architecture-archive/architecture-pack-20260403.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
-## Sprint-plan checkpoint (2026-04-04) — S0067 / BUG-0006 / auto-20260403-03
-
-- **`/sprint-plan`** completed for **`BUG-0006`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260403-03`).
-- **Summary**: Seeded sprint **`S0067`** — doc-first **`/auto`** spawn-only enforcement (**`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**), active + **`template/`** **`auto.md`**, **`docs/engineering/auto-orchestration-reference.md`**, **`tests/auto_command_contract_test.py`**, run-tests harness traceability (**AC-1..AC-5** -> **T-001..T-005**) per **`docs/engineering/architecture.md`** **`# BUG-0006`** / **`R-0065`**.
-- **Artifacts**: `sprints/S0067/sprint.md`, `sprints/S0067/tasks.md`, `sprints/S0067/plan-verify.json` (**PENDING**, `AWAITING_QA_PLAN_VERIFY`), `sprints/S0067/summary.md`, `sprints/S0067/qa-findings.md`, `sprints/S0067/uat.json`, `sprints/S0067/uat.md`, `sprints/S0067/release-findings.md`, `handoffs/tl_to_dev.md`, `handoffs/qa_plan_verify.md`, `handoffs/resume_brief.md`, `docs/product/backlog.md` (**`sprint_plan_notes`** / **`sprint_id=S0067`** under **`### BUG-0006`**).
-- **Sizing**: 5 tasks <= `SPRINT_MAX_TASKS=12`; split not required.
-- **Canonical bug status (US-0045)**: **`BUG-0006`** remains **OPEN** in **`docs/product/backlog.md`** only.
-- **Next recommended phase**: **`/plan-verify`** for **`S0067`** / **`BUG-0006`** (`next_scheduled_phase=plan-verify`).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `fresh_context_marker=tech-lead-S0067-BUG0006-sprint-plan-20260404T043000Z-fresh`
-- `timestamp=2026-04-04T04:30:00Z`
-- `evidence_ref=sprints/S0067/sprint.md,sprints/S0067/tasks.md,sprints/S0067/plan-verify.json,sprints/S0067/summary.md,sprints/S0067/qa-findings.md,sprints/S0067/uat.json,sprints/S0067/uat.md,sprints/S0067/release-findings.md,handoffs/tl_to_dev.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/architecture.md,docs/engineering/research.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
-
-- `orchestrator_run_id=auto-20260403-03`
-- `runtime_proof_id=rp-auto-20260403-03-sprint-plan-tech-lead-20260404T043000Z-S0067-BUG0006`
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `proof_issued_at=2026-04-04T04:30:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=c8256e0a000fcb2319ff6abe36702696cef0fa1199dc3e5a5f2cd8adec986043`
-
-## Phase boundary status (post-sprint-plan, S0067 / BUG-0006 / auto-20260403-03)
-
-- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260403-03`** — sprint-plan segment; not rewritten at sprint-plan writer)
-- `skipped_phases_summary`=(prior segment: `intake` omitted per resume anchor — unchanged at sprint-plan writer)
-- `phase_boundary=sprint-plan`
-- `next_scheduled_phase=plan-verify`
-- `bug_id=BUG-0006`
-- `story_id=(none)`
-- `sprint_id=S0067`
-- `orchestrator_run_id=auto-20260403-03`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=sprint-plan`; `next_scheduled_phase=plan-verify`; `bug_id=BUG-0006`; `sprint_id=S0067`; `orchestrator_run_id=auto-20260403-03`.
-
-**Triad hot-surface (DEC-0054)** (post-sprint-plan S0067 hygiene):
-
-- Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
-- `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-q.md`**.
-- Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
-
 ## Plan-verify checkpoint (2026-04-04) — S0067 / BUG-0006 / auto-20260403-03
 
 - **`/plan-verify`** completed for **`S0067`** / **`BUG-0006`** in fresh **qa** context (`orchestrator_run_id=auto-20260403-03`).
@@ -1186,3 +750,414 @@ Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **S
 - Post-append: `python scripts/enforce-triad-hot-surface.py --check` -> **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
 - `python scripts/enforce-triad-hot-surface.py --rollover` -> **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260403-ai.md`** (first archived heading: **`## Plan-verify checkpoint (2026-04-03) — S0066 / BUG-0005 / auto-20260403-02`**, last: same).
 - Final `python scripts/enforce-triad-hot-surface.py --check` -> **PASS** (exit **0**).
+
+## `/auto` orchestration materialization (2026-04-04) — auto-20260404-02
+
+- `timestamp=2026-04-04T14:00:00Z` (orchestrator breadcrumb; new segment after manual **`/intake`** for **`US-0084`**)
+- `invocation_mode=auto`
+- `requested_start_from=(none)`
+- `resolved_start_phase=discovery`
+- `resolution_source=resume_brief`
+- `resolution_status=resolved`
+- `orchestrator_run_id=auto-20260404-02`
+- `phase_policy_mode=full` (merged scratchpad: **`AUTO_PHASE_PLAN`** unset; no exclude/include/profile conflict)
+- `SECURITY_REVIEW=0`
+- `resolved_phase_plan` (intersected schedule; anchor **`discovery`**): `discovery` → `research` → `architecture` → `sprint-plan` → `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+- `skipped_phases`: `intake` — `resume_start_anchor` (post-**`/intake`** for **`US-0084`** per **`handoffs/resume_brief.md`**)
+- `phase_boundary=(orchestrator pre-spawn)`
+- `next_scheduled_phase=discovery`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=(none)`
+- `AUTO_BACKLOG_DRAIN=1` / `AUTO_BACKLOG_MAX_STORIES=10` / `backlog_drain_stories_remaining_budget=10` (segment start for **`US-0084`**)
+
+**Preflight (US-0069)**: first spawn **`phase_id=discovery`**, **`role=po`**.
+
+**AC-10**: prior terminal closure **`auto-20260404-01`** at **`phase_boundary=refresh-context`** with **`next_scheduled_phase=none`**; superseded for continuation by **`resume_brief`** → **`US-0084`** / **`intended_resume_phase=discovery`**.
+
+## Discovery checkpoint (2026-04-04) — US-0084 / auto-20260404-02
+
+- **`/discovery`** completed for **`US-0084`** in fresh **PO** context (`orchestrator_run_id=auto-20260404-02`).
+- **Verdict**: **complete** — problem reframed around **published npm** **`installer.sh`** POSIX/dash + **LF** vs repo drift, **CRLF**/bash-only **`set`** class; surfaces scoped to installer/publish pipeline, runbook + **US-0064** alignment (**`release-targets.json`**, **`runtime-connectivity.md`**), optional **`scripts/`** helper, harness/parity; **research asks** captured in **`docs/product/backlog.md`** and **`handoffs/po_to_tl.md`**. **Next recommended phase**: **`/research`** (tech-lead default).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=discovery`
+- `role=po`
+- `fresh_context_marker=po-US0084-discovery-20260404T150000Z-fresh`
+- `timestamp=2026-04-04T15:00:00Z`
+- `evidence_ref=handoffs/intake_evidence/US-0084-intake-20260404.json,docs/product/backlog.md,docs/product/acceptance.md,handoffs/po_to_tl.md,docs/engineering/release-targets.json,docs/engineering/runtime-connectivity.md,docs/engineering/architecture.md,handoffs/resume_brief.md,docs/engineering/state.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-discovery-po-20260404T150000Z-US0084`
+- `phase_id=discovery`
+- `role=po`
+- `proof_issued_at=2026-04-04T15:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=d565385fc8b94780eba3fb5b4bd76804c24e4a4b7c711ba5d1bf79256bbb07ec`
+
+## Phase boundary status (post-discovery, US-0084 / auto-20260404-02)
+
+- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260404-02`** — discovery segment; not rewritten at discovery writer)
+- `skipped_phases_summary`=(intake omitted per resume anchor — unchanged at discovery writer)
+- `phase_boundary=discovery`
+- `next_scheduled_phase=research`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=discovery`; `next_scheduled_phase=research`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260404-02`.
+
+## Research checkpoint (2026-04-04) — US-0084 / auto-20260404-02
+
+- **`/research`** completed for **`US-0084`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260404-02`).
+- **Summary**: Repo **`installer.sh`** unconditional startup is POSIX-safe (**`set -e`** only at **`installer.sh:2`**; **BUG-0004** comment **`installer.sh:4–5`**); **`bin/its-magic.js`** spawns **`sh`** with package **`installer.sh`** on non-Windows (**`bin/its-magic.js:182–195`**). Publish parity risk is **tarball/CRLF vs git**, not a second **`template/installer.sh`** copy. Extend guards with **LF/CRLF check**, optional **`dash -n`**, and harness registration; map **WSL** / **SSH** / **Docker-over-SSH** to existing **`docs/engineering/release-targets.json`** (**`ssh-server`**, **`dockerOverSsh`**) + **`runtime-connectivity.md`**; sketch **`REMOTE_CONFIG`** helper + exit codes in **`R-0067`**. **Next recommended phase**: **`/architecture`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=research`
+- `role=tech-lead`
+- `fresh_context_marker=tech-lead-US0084-research-20260404T160000Z-fresh`
+- `timestamp=2026-04-04T16:00:00Z`
+- `evidence_ref=docs/engineering/research.md,docs/product/backlog.md,handoffs/po_to_tl.md,installer.sh,bin/its-magic.js,package.json,docs/engineering/release-targets.json,docs/engineering/runtime-connectivity.md,.cursor/scratchpad.md,tests/installer_shell_bug0004_test.py,tests/run-tests.sh,tests/run-tests.ps1,handoffs/intake_evidence/US-0084-intake-20260404.json`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-research-tech-lead-20260404T160000Z-US0084`
+- `phase_id=research`
+- `role=tech-lead`
+- `proof_issued_at=2026-04-04T16:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=d323717a9051edfd2a5a0842694fb79a7486fe627806a8a1274f59302e3bc87e`
+
+## Phase boundary status (post-research, US-0084 / auto-20260404-02)
+
+- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260404-02`** — research segment; not rewritten at research writer)
+- `skipped_phases_summary`=(intake omitted per resume anchor — unchanged at research writer)
+- `phase_boundary=research`
+- `next_scheduled_phase=architecture`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=research`; `next_scheduled_phase=architecture`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260404-02`.
+
+## Architecture checkpoint (2026-04-04) — US-0084 / auto-20260404-02
+
+- **`/architecture`** completed for **`US-0084`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260404-02`).
+- **Summary**: Locked POSIX/dash/LF for published **`installer.sh`**, layered **CI**/**prepublish**/Python + optional **`dash -n`**, **US-0064** doc map (**WSL** / **`ssh-server`** / **`dockerOverSsh`**), helper **`scripts/remote_config_summary.py`** + exit codes, harness **H1–H5**, runbook **`REMOTE_EXECUTION`** troubleshooting + evidence cues, active/**`template/`** parity. Canonical: **`docs/engineering/architecture.md`** **`# US-0084`**. **Next recommended phase**: **`/sprint-plan`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=architecture`
+- `role=tech-lead`
+- `fresh_context_marker=tech-lead-US0084-architecture-20260404T170000Z-fresh`
+- `timestamp=2026-04-04T17:00:00Z`
+- `evidence_ref=docs/engineering/architecture.md,docs/product/backlog.md,docs/engineering/research.md,installer.sh,package.json,docs/engineering/release-targets.json,docs/engineering/runtime-connectivity.md,docs/engineering/runbook.md,bin/its-magic.js,tests/installer_shell_bug0004_test.py,tests/run-tests.sh,tests/run-tests.ps1,handoffs/intake_evidence/US-0084-intake-20260404.json`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-architecture-tech-lead-20260404T170000Z-US0084`
+- `phase_id=architecture`
+- `role=tech-lead`
+- `proof_issued_at=2026-04-04T17:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=6bdea97d888d2d70c024c137b250f314cdd2c4544c589a8cb70f35931d776c44`
+
+## Phase boundary status (post-architecture, US-0084 / auto-20260404-02)
+
+- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260404-02`** — architecture segment; not rewritten at architecture writer)
+- `skipped_phases_summary`=(intake omitted per resume anchor — unchanged at architecture writer)
+- `phase_boundary=architecture`
+- `next_scheduled_phase=sprint-plan`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=architecture`; `next_scheduled_phase=sprint-plan`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260404-02`.
+
+## Sprint-plan checkpoint (2026-04-04) — S0069 / US-0084 / auto-20260404-02
+
+- **`/sprint-plan`** completed for **`US-0084`** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260404-02`).
+- **Summary**: Sprint **`S0069`** seeded — **`sprints/S0069/sprint.md`**, **`sprints/S0069/tasks.md`** (**T-001..T-010** ↔ **AC-1..AC-10**); **`sprints/S0069/plan-verify.json`** **PENDING**; governance **`architecture.md`** **`# US-0084`**, **`R-0067`**. **Next recommended phase**: **`/plan-verify`** (QA).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `fresh_context_marker=tech-lead-S0069-US0084-sprint-plan-20260404T180000Z-fresh`
+- `timestamp=2026-04-04T18:00:00Z`
+- `evidence_ref=sprints/S0069/sprint.md,sprints/S0069/tasks.md,sprints/S0069/plan-verify.json,docs/product/backlog.md,docs/engineering/architecture.md,docs/engineering/research.md,handoffs/tl_to_dev.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-sprint-plan-tech-lead-20260404T180000Z-S0069-US0084`
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `proof_issued_at=2026-04-04T18:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=af3d4f89d1540f073dba854ed009b56e81cb328f2147705af5f07aed963f774d`
+
+## Phase boundary status (post-sprint-plan, S0069 / US-0084 / auto-20260404-02)
+
+- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260404-02`** — sprint-plan segment; not rewritten at sprint-plan writer)
+- `skipped_phases_summary`=(intake omitted per resume anchor — unchanged at sprint-plan writer)
+- `phase_boundary=sprint-plan`
+- `next_scheduled_phase=plan-verify`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=sprint-plan`; `next_scheduled_phase=plan-verify`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+## Plan-verify checkpoint (2026-04-04) — S0069 / US-0084 / auto-20260404-02
+
+- **`/plan-verify`** completed for **`S0069` / `US-0084`** in fresh **qa** context (`orchestrator_run_id=auto-20260404-02`).
+- **Summary**: **`sprints/S0069/plan-verify.json`** **PASS** — backlog **AC-1..AC-10** ↔ **T-001..T-010** bijection confirmed vs **`sprints/S0069/tasks.md`**; sprint goal and scope align with **`docs/engineering/architecture.md`** **`# US-0084`** and **`docs/engineering/research.md`** **`R-0067`**; **`plan_integrity`** consistent (**`gaps=[]`**). **Next recommended phase**: **`/execute`** (**dev**).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=plan-verify`
+- `role=qa`
+- `fresh_context_marker=qa-S0069-US0084-plan-verify-20260404T191500Z-fresh`
+- `timestamp=2026-04-04T19:15:00Z`
+- `evidence_ref=sprints/S0069/plan-verify.json,sprints/S0069/sprint.md,sprints/S0069/tasks.md,docs/product/backlog.md,docs/engineering/architecture.md,docs/engineering/research.md,handoffs/tl_to_dev.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-plan-verify-qa-20260404T191500Z-S0069-US0084`
+- `phase_id=plan-verify`
+- `role=qa`
+- `proof_issued_at=2026-04-04T19:15:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=f6ef297f9a186abb1bdd76bad76430b46b7bf6dcd36fa1bd6876553434e97603`
+
+## Phase boundary status (post-plan-verify, S0069 / US-0084 / auto-20260404-02)
+
+- `resolved_phase_plan_snapshot`=(orchestrator materialization for **`auto-20260404-02`** — plan-verify segment; not rewritten at plan-verify writer)
+- `skipped_phases_summary`=(intake omitted per resume anchor — unchanged at plan-verify writer)
+- `phase_boundary=plan-verify`
+- `next_scheduled_phase=execute`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=plan-verify`; `next_scheduled_phase=execute`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+**Triad hot-surface (DEC-0054)** (post-plan-verify S0069 hygiene):
+
+- Post-append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**, lines **1223**/1200).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260404-d.md`** (oldest checkpoint prefix archived; hot retained **25** units).
+- Final `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Execute checkpoint (2026-04-04) — S0069 / US-0084 / auto-20260404-02
+
+- **`/execute`** completed in fresh **dev** context — **`sprints/S0069/tasks.md`** **T-001..T-010** **done**; **`sprints/S0069/summary.md`**; **`handoffs/dev_to_qa.md`**; **`handoffs/resume_brief.md`** → **`intended_resume_phase=qa`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-S0069-US0084-execute-20260404T203000Z-fresh`
+- `timestamp=2026-04-04T20:30:00Z`
+- `evidence_ref=sprints/S0069/summary.md,sprints/S0069/tasks.md,handoffs/dev_to_qa.md,docs/product/backlog.md,scripts/remote_config_summary.py,scripts/guard_installer_publish.py,tests/installer_shell_bug0004_test.py,tests/remote_config_summary_test.py`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-execute-dev-20260404T203000Z-S0069-US0084`
+- `phase_id=execute`
+- `role=dev`
+- `proof_issued_at=2026-04-04T20:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=caeb1e64f8386490f55075a0e93657a62e32436ed37662139d2d3871a7b8190b`
+
+## Phase boundary status (post-execute, S0069 / US-0084 / auto-20260404-02)
+
+- `phase_boundary=execute`
+- `next_scheduled_phase=qa`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=execute`; `next_scheduled_phase=qa`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+## QA checkpoint (2026-04-04) — S0069 / US-0084 / auto-20260404-02
+
+- **`/qa`** completed in fresh **qa** context — **`sprints/S0069/qa-findings.md`** **PASS**; **`handoffs/qa_to_verify_work.md`**; **`handoffs/resume_brief.md`** → **`intended_resume_phase=verify-work`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=qa`
+- `role=qa`
+- `fresh_context_marker=qa-S0069-US0084-qa-20260404T230000Z-fresh`
+- `timestamp=2026-04-04T23:00:00Z`
+- `evidence_ref=sprints/S0069/qa-findings.md,sprints/S0069/tasks.md,handoffs/dev_to_qa.md,docs/product/backlog.md,tests/installer_shell_bug0004_test.py,tests/remote_config_summary_test.py,scripts/guard_installer_publish.py,scripts/remote_config_summary.py`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-qa-qa-20260404T230000Z-S0069-US0084`
+- `phase_id=qa`
+- `role=qa`
+- `proof_issued_at=2026-04-04T23:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=b9110e6414a4c103d148d74873ed3684f1738528657dc538cef7c83ee895b0e2`
+
+## Phase boundary status (post-qa, S0069 / US-0084 / auto-20260404-02)
+
+- `phase_boundary=qa`
+- `next_scheduled_phase=verify-work`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=qa`; `next_scheduled_phase=verify-work`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+**Triad hot-surface (DEC-0054)** (post-qa S0069 hygiene):
+
+- Post-append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260404-e.md`**.
+- Final `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Verify-work checkpoint (2026-04-04) — S0069 / US-0084 / auto-20260404-02
+
+- **`/verify-work`** completed in fresh **qa** context — **`sprints/S0069/uat.json`** / **`sprints/S0069/uat.md`** **PASS** (**10/10**); canonical closure (**US-0045**): **`docs/product/backlog.md`** **US-0084** **DONE**, **`docs/product/acceptance.md`** **US-0084** **`[x]`**, **`handoffs/release_queue.md`** **S0069** **`ready`**, **`handoffs/releases/S0069-release-notes.md`**, **`sprints/S0069/release-findings.md`**; **`handoffs/resume_brief.md`** → **`intended_resume_phase=release`**.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=verify-work`
+- `role=qa`
+- `fresh_context_marker=qa-S0069-US0084-verify-work-20260404T234500Z-fresh`
+- `timestamp=2026-04-04T23:45:00Z`
+- `evidence_ref=sprints/S0069/uat.json,sprints/S0069/uat.md,sprints/S0069/qa-findings.md,handoffs/dev_to_qa.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/release_queue.md,handoffs/releases/S0069-release-notes.md,handoffs/resume_brief.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-verify-work-qa-20260404T234500Z-S0069-US0084`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-04-04T23:45:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=7285615e2ad80dd55064920282bf85047268c6bb8283b4feecc04aadb79dba24`
+
+## Phase boundary status (post-verify-work, S0069 / US-0084 / auto-20260404-02)
+
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=verify-work`; `next_scheduled_phase=release`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+**Triad hot-surface (DEC-0054)** (post-verify-work S0069 hygiene):
+
+- Post-append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260404-f.md`**.
+- Final `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Release checkpoint (2026-04-05) — S0069 / US-0084 / auto-20260404-02
+
+- **`/release`** completed in fresh **release** context — **`handoffs/releases/S0069-release-notes.md`** finalized; **`sprints/S0069/release-findings.md`** **PASS**; **`handoffs/release_queue.md`** **S0069** → **`released`**; legacy **`handoffs/release_notes.md`** pointer refreshed; **`handoffs/resume_brief.md`** → **`intended_resume_phase=refresh-context`** (**curator**). **Publish posture**: merged scratchpad **`RELEASE_PUBLISH_MODE=confirm`** (no auto-publish without operator confirmation).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=release`
+- `role=release`
+- `fresh_context_marker=release-S0069-US0084-release-20260405T001000Z-fresh`
+- `timestamp=2026-04-05T00:10:00Z`
+- `evidence_ref=handoffs/releases/S0069-release-notes.md,sprints/S0069/release-findings.md,sprints/S0069/summary.md,sprints/S0069/qa-findings.md,sprints/S0069/uat.json,sprints/S0069/uat.md,handoffs/release_queue.md,handoffs/release_notes.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/product/acceptance.md,decisions/DEC-0070.md,docs/engineering/state.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-release-release-20260405T001000Z-S0069-US0084`
+- `phase_id=release`
+- `role=release`
+- `proof_issued_at=2026-04-05T00:10:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=418cbee2c8f7508880e1cbcae744d67877c08e68c91432b3de38f0e1773b07fc`
+
+**Sync (DEC-0018)**: **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`** (manual / guarded chain; no auto-push this boundary).
+
+## Phase boundary status (post-release, S0069 / US-0084 / auto-20260404-02)
+
+- `phase_boundary=release`
+- `next_scheduled_phase=refresh-context`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=release`; `next_scheduled_phase=refresh-context`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`.
+
+**Triad hot-surface (DEC-0054)** (post-release S0069 hygiene):
+
+- Post-append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260404-g.md`**.
+- Final `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).
+
+## Refresh-context checkpoint (2026-04-05) — S0069 / US-0084 / auto-20260404-02
+
+- **`/refresh-context`** (**curator**, fresh context): post-release reconciliation for **`S0069`** / **`US-0084`**. Refreshed **`docs/engineering/decisions.md`** (context pack, **`US-0084`** closure traceability, **`DEC-0070`** / **`R-0067`** research delivery closure), **`docs/engineering/research.md`** (**`R-0067`** **closed** with delivery closure stanza referencing **`S0069`**), **`sprints/S0069/summary.md`** (closure summary), **`handoffs/resume_brief.md`** (**`stop_reason=completed`**, **`next_scheduled_phase=none`**, discretionary **`/intake`** for next **US**; **`backlog_drain_segment_complete=1`**, **`stories_completed_this_run=1`**), **`docs/product/backlog.md`** (**`refresh_context_notes`** under **`## US-0084`**).
+- **Portfolio verification (US-0045)**: canonical **`docs/product/backlog.md`** **`## Bug issues`** rows **`BUG-0001`..`BUG-0007`** are all **`Status: DONE`** — **no OPEN** in range; aligns with prior portfolio posture (**`S0068`** release notes) and current bug section.
+- **Canonical status alignment**: **`docs/product/backlog.md`** keeps **`US-0084`** **DONE**; **`handoffs/release_queue.md`** keeps **`S0069=released`**; **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** → **`[BUG_VALIDATION_OK]`** (post-edit gate).
+- **Terminal boundary (auto run closure)**: `stop_reason=completed`; `stop_phase=refresh-context`; `next_scheduled_phase=none` (next work discretionary **`/intake`** for next **US** per **`AUTO_BACKLOG_DRAIN`** / operator choice; bug portfolio idle); `backlog_drain_segment_complete=1`; `stories_completed_this_run=1` (segment **`US-0084`** / sprint **`S0069`**).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=refresh-context`
+- `role=curator`
+- `fresh_context_marker=curator-S0069-US0084-refresh-context-20260405T013000Z-fresh`
+- `timestamp=2026-04-05T01:30:00Z`
+- `evidence_ref=docs/engineering/decisions.md,docs/engineering/research.md,sprints/S0069/summary.md,handoffs/resume_brief.md,docs/product/backlog.md,handoffs/release_queue.md,handoffs/releases/S0069-release-notes.md,sprints/S0069/release-findings.md,decisions/DEC-0070.md,scripts/bug_issue_validate.py,docs/engineering/state-archive/state-pack-20260404-h.md,docs/engineering/state.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). **`proof_ttl_seconds`** is serialized as a JSON **integer** (not a string) in the hashed payload.
+
+- `orchestrator_run_id=auto-20260404-02`
+- `runtime_proof_id=rp-auto-20260404-02-refresh-context-curator-20260405T013000Z-S0069-US0084`
+- `phase_id=refresh-context`
+- `role=curator`
+- `proof_issued_at=2026-04-05T01:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=3a714c67c8b09304c2d80c7256892c6ec5b1d60082c6eac807b568c5000ff270`
+
+## Phase boundary status (post-refresh-context, S0069 / US-0084 / auto-20260404-02) — auto run closure
+
+- `resolved_phase_plan_snapshot=lifecycle_complete (auto-20260404-02)`
+- `skipped_phases_summary=(none; full plan executed)`
+- `phase_boundary=refresh-context`
+- `next_scheduled_phase=none`
+- `stop_reason=completed`
+- `stop_phase=refresh-context`
+- `backlog_drain_segment_complete=1`
+- `stories_completed_this_run=1`
+- `bug_id=(none)`
+- `story_id=US-0084`
+- `sprint_id=S0069`
+- `orchestrator_run_id=auto-20260404-02`
+- `portfolio_next_open_bug_id=(none)`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=refresh-context`; `stop_reason=completed`; `stop_phase=refresh-context`; `next_scheduled_phase=none`; `backlog_drain_segment_complete=1`; `stories_completed_this_run=1`; `bug_id=(none)`; `story_id=US-0084`; `sprint_id=S0069`; `orchestrator_run_id=auto-20260404-02`; `portfolio_next_open_bug_id=(none)`.
+
+**Triad hot-surface (DEC-0054)** (post-refresh-context S0069 hygiene — curator append):
+
+- Post-append: `python scripts/enforce-triad-hot-surface.py --check` → **FAIL** (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` on **`docs/engineering/state.md`**).
+- `python scripts/enforce-triad-hot-surface.py --rollover` → **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260404-h.md`** (first archived heading: **`## Sprint-plan checkpoint (2026-04-04) — S0067 / BUG-0006 / auto-20260403-03`**, last: same).
+- Final `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (exit **0**).

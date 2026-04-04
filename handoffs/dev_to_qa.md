@@ -1,3 +1,41 @@
+## Dev -> QA Handoff — S0069 / US-0084 (`auto-20260404-02`)
+
+### Scope
+
+- **`US-0084`** per **`docs/engineering/architecture.md`** **`# US-0084`** and **`R-0067`**: root **`.gitattributes`** (`*.sh` **eol=lf**); **`installer.sh`** normalized **LF**; **`scripts/guard_installer_publish.py`** + **`package.json`** **`prepublishOnly`**; extended **`tests/installer_shell_bug0004_test.py`** (CR scan, forbidden tokens, optional **`dash -n`**); **`scripts/remote_config_summary.py`** (**`DEC-0070`**, exit **0–4**); **`tests/remote_config_summary_test.py`** + fixtures; harness **H1–H5** in **`tests/run-tests.sh`** / **`.ps1`**; runbook / **`runtime-connectivity.md`** / **`us-0084-remote-e2e.md`**; **`decisions/DEC-0070.md`**; manifest + **`template/scripts/`** parity; scratchpad + **`/execute`** + **`/qa`** command cues (**environment label**, names-only, no pasted secrets).
+
+### What changed (verification targets)
+
+- **`.gitattributes`**, **`installer.sh`** (LF), **`package.json`**, **`docs/engineering/context/installer-owned-paths.manifest`**, **`template/docs/engineering/context/installer-owned-paths.manifest`**
+- **`scripts/guard_installer_publish.py`**, **`scripts/remote_config_summary.py`**, **`template/scripts/`** copies
+- **`tests/installer_shell_bug0004_test.py`**, **`tests/remote_config_summary_test.py`**, **`tests/fixtures/remote_config_*.json`**, **`tests/run-tests.sh`**, **`tests/run-tests.ps1`**
+- **`docs/engineering/runbook.md`**, **`docs/engineering/runtime-connectivity.md`**, **`docs/engineering/us-0084-remote-e2e.md`**, **`template/docs/engineering/`** mirrors
+- **`.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.md`**, **`.cursor/commands/execute.md`**, **`template/.cursor/commands/execute.md`**, **`.cursor/commands/qa.md`**, **`template/.cursor/commands/qa.md`**
+- **`decisions/DEC-0070.md`**, **`docs/engineering/decisions.md`**
+
+### Evidence pointers
+
+- **`sprints/S0069/summary.md`**, **`sprints/S0069/tasks.md`** (**T-001..T-010** **done**)
+- **`docs/product/backlog.md`** (**`execute_notes`** under **`US-0084`**)
+- **`handoffs/resume_brief.md`** (**`intended_resume_phase=qa`**)
+- **`docs/engineering/state.md`** — execute checkpoint (**DEC-0038** strict proof)
+
+### Tests / checks run (dev)
+
+| Command | Outcome |
+|---------|---------|
+| `python tests/installer_shell_bug0004_test.py` | PASS |
+| `python tests/remote_config_summary_test.py` | PASS |
+| `python scripts/guard_installer_publish.py` | PASS (dash skipped on Windows runner) |
+| `python tests/installer_completeness_bug0003_test.py` | PASS |
+| `python scripts/enforce-triad-hot-surface.py --check` | PASS |
+
+### Next phase
+
+- **`/qa`** for **`S0069`** / **`US-0084`** (`next_scheduled_phase=qa`).
+
+---
+
 ## Dev -> QA Handoff — S0068 / BUG-0007 (`auto-20260404-01`)
 
 ### Scope

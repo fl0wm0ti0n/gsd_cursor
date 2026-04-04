@@ -313,6 +313,7 @@ binding before backlog/acceptance writes.
 - Regression: `tests/intake_evidence_fixtures_test.py` (R-0055 **AC-8** matrix tiers A/B),
   invoked from `tests/run-tests.ps1` / `tests/run-tests.sh` §26k.
 - **Packaged installs (BUG-0001 / DEC-0063)**: `intake_evidence_validate.py`, `intake_evidence_lib.py`, and `intake_bug_routing_guard.py` are mirrored under `template/scripts/` and listed in `docs/engineering/context/installer-owned-paths.manifest` so fresh install and `upgrade` copy them to the consumer’s `scripts/`. Drift guard: `python scripts/check_intake_template_parity.py --repo .` (also §26N in `tests/run-tests.*`). **Release (S0060)**: operator notes `handoffs/releases/S0060-release-notes.md` (gate summary + verify steps).
+- **US-0084**: `remote_config_summary.py` and `guard_installer_publish.py` use the same **`template/scripts/`** mirror + manifest rows; npm **`package.json` `files`** also lists the active copies for publish.
 - **Installer completeness gate (BUG-0003 / DEC-0066)**: post-install invariant checks every path in `[required_install_script_paths]` from `docs/engineering/context/installer-owned-paths.manifest`. Missing paths fail closed with `INSTALL_COMPLETENESS_FAILED` and `INSTALL_REQUIRED_SCRIPT_MISSING:<path>`. Remediation: update manifest parity (active + `template/`), ensure required script exists under `template/scripts/`, keep install/clean ownership paired, then rerun `its-magic --mode missing|upgrade` (or `python installer.py --validate-install-completeness --target <repo>` for direct diagnostics).
 - **Guided** and **low-touch** (`INTAKE_GUIDED_MODE=0`) share the **same** pre-persistence
   validation pipeline; mandatory pack evidence is never skipped.
@@ -815,6 +816,36 @@ Operator troubleshooting:
 - Security violation (inline secret-like literal):
   - Replace with env-var reference fields (`tokenEnv`, `passwordEnv`,
     `privateKeyPathEnv`, ...).
+
+### Published npm `installer.sh` / POSIX dash (US-0084)
+
+- **Symptom**: `set: Illegal option -` on an early line when running `its-magic` or
+  `sh installer.sh` on Debian/Ubuntu (**`/bin/sh`** → **dash**).
+- **Common causes**: bash-only `set` options (`pipefail`, `-o errexit`, `-u` bundles)
+  on the **unconditional** startup path, or **CRLF** line endings in the file that
+  ships from npm.
+- **`sh` vs `bash`**: the Unix CLI path uses **`sh` + `installer.sh`** (**BUG-0004** /
+  **DEC-0068**). Do not assume bash for the first lines of **`installer.sh`**.
+- **Remediation**:
+  - Upgrade to an **its-magic** build that includes **US-0084** (LF + POSIX guards).
+  - Normalize to **LF** only (e.g. `dos2unix installer.sh`, or fix checkout —
+    root **`.gitattributes`** uses `*.sh text eol=lf`).
+  - Reinstall from npm after verifying maintainer gates:
+    `python scripts/guard_installer_publish.py` (also **`npm run guard:installer`**
+    / **`prepublishOnly`**).
+- **Normative**: **`docs/engineering/architecture.md`** **`# US-0084`**.
+
+### Automated checks (US-0084)
+
+- `python tests/installer_shell_bug0004_test.py` — CR/LF rejection, forbidden
+  `set` tokens, optional **`dash -n`** when **`dash`** is on **`PATH`**.
+- `python scripts/guard_installer_publish.py` — same checks for publish/CI
+  (**`prepublishOnly`**).
+- `python scripts/remote_config_summary.py` — with **`REMOTE_EXECUTION=1`**,
+  read-only summary of **`REMOTE_CONFIG`** (default **`.cursor/remote.json`**);
+  stdout is **names-only** (no secret values). **`DEC-0070`**: when
+  **`REMOTE_EXECUTION=0`**, the helper exits **0** and skips validation
+  (stderr skip reason).
 
 ## Runtime QA autopilot contract (US-0065 / DEC-0047)
 

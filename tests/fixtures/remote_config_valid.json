@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "defaultTarget": "local-docker",
+  "targets": [
+    {
+      "id": "local-docker",
+      "type": "docker",
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 2375,
+      "workspaceRoot": "/workspace",
+      "auth": {
+        "mode": "env",
+        "tokenEnv": "REMOTE_DOCKER_TOKEN"
+      }
+    }
+  ]
+}

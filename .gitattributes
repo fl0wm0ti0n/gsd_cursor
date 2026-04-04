@@ -1,0 +1,2 @@
+# US-0084: keep packaged shell entrypoints LF for POSIX / dash (npm tarball parity).
+*.sh text eol=lf

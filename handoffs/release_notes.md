@@ -13,12 +13,22 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0068`
-- **Latest canonical notes:** `handoffs/releases/S0068-release-notes.md`
+- **Latest released sprint:** `S0069`
+- **Latest canonical notes:** `handoffs/releases/S0069-release-notes.md`
 - **Latest release date:** 2026-04-05
-- **Latest release work item:** BUG-0007
+- **Latest release work item:** US-0084
 
-## Release finalized note (S0068)
+## Release finalized note (S0069)
+
+- Sprint: `S0069`
+- Story: `US-0084` (POSIX npm installer + Linux remote test targets; **US-0064** alignment; **DEC-0070** remote-config helper skip policy)
+- Release: **finalized** (`2026-04-05T00:10:00Z`, `orchestrator_run_id=auto-20260404-02`, strict proof `proof_hash=418cbee2c8f7508880e1cbcae744d67877c08e68c91432b3de38f0e1773b07fc`)
+- Queue: **`handoffs/release_queue.md`** row **`S0069`** = **`released`**
+- Publish posture: **`RELEASE_PUBLISH_MODE=confirm`** — no auto-publish without confirmation
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (no auto-push this boundary)
+- **Next**: **`/refresh-context`** (fresh **curator** context)
+
+## Release finalized note (S0068) (historical)
 
 - Sprint: `S0068`
 - Bug: `BUG-0007` (**R-0066** / **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`**)
@@ -26,7 +36,7 @@ Canonical queue state now lives under:
 - Queue: **`handoffs/release_queue.md`** row **`S0068`** = **`released`**
 - Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (no auto-push this boundary)
 - Portfolio: **`docs/product/backlog.md`** — canonical **bug** rows **BUG-0001..BUG-0007** all **DONE**; **next OPEN bug:** **(none)**
-- **Next**: **`/refresh-context`** (fresh **curator** context)
+- **Next**: **`/refresh-context`** (fresh **curator** context) — **superseded** by **S0069** pointer above
 
 ## Release readiness note (S0068) (historical)
 
@@ -121,19 +131,20 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0068`**: refer to `## Run` in
-  `handoffs/releases/S0068-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0069`**: refer to `## Run` in
+  `handoffs/releases/S0069-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0068-release-notes.md`.
+  `handoffs/releases/S0069-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0068-release-notes.md`.
+  `handoffs/releases/S0069-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0068-release-notes.md` (env-ref only).
+  `handoffs/releases/S0069-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0068-release-notes.md`.
+  `handoffs/releases/S0069-release-notes.md`.
 
 ## Historical references
 
+- `S0069`: `handoffs/releases/S0069-release-notes.md`
 - `S0068`: `handoffs/releases/S0068-release-notes.md`
 - `S0067`: `handoffs/releases/S0067-release-notes.md`
 - `S0066`: `handoffs/releases/S0066-release-notes.md`

@@ -101,9 +101,13 @@ SPRINT_BULK_MAX_STORIES=5
 SPRINT_BULK_MAX_SPRINTS=3
 SPRINT_BULK_SELECTION=priority_then_backlog_order
 #
-# Remote execution
-# - REMOTE_EXECUTION: 0|1
-# - REMOTE_CONFIG: path to remote config
+# Remote execution (US-0084 / US-0064)
+# - REMOTE_EXECUTION: 0|1 — 0 skips remote.json validation (zero overhead; DEC-0070).
+# - REMOTE_CONFIG: path to dev/Cursor remote JSON (default .cursor/remote.json).
+#   Release/QA SSH/Docker connectivity fields live in docs/engineering/release-targets.json
+#   (ssh-server, dockerOverSsh); map WSL vs SSH vs Docker-over-SSH in
+#   docs/engineering/runtime-connectivity.md and docs/engineering/us-0084-remote-e2e.md.
+# - Summary helper (names-only stdout): python scripts/remote_config_summary.py
 REMOTE_EXECUTION=0
 REMOTE_CONFIG=.cursor/remote.json
 #

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "defaultTarget": "local-docker",
+  "targets": [
+    {
+      "id": "local-docker",
+      "type": "ftp",
+      "enabled": true,
+      "host": "127.0.0.1",
+      "port": 2375,
+      "workspaceRoot": "/workspace"
+    }
+  ]
+}

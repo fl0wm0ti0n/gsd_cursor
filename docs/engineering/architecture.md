@@ -8,165 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0039: Release Gate Tightening for Check-In Tests and QA/UAT Completion
-
-## Overview
-
-US-0039 tightens `/release` readiness with deterministic mandatory gates and
-explicit evidence requirements. The objective is to block release when check-in
-tests, QA completion, or UAT completeness are missing/stale/failing. Evidence
-flow is read-from-canonical-artifacts only; no inferred pass from absence of
-evidence (per R-0020).
-
-## Assumption challenge and alternatives
-
-### Option A: Keep UAT-only gate in release
-
-Pros:
-- Minimal documentation changes.
-
-Cons:
-- Missing hard checks for check-in test status and QA completion.
-- Permits inconsistent release readiness evidence.
-
-### Option B: Single combined "quality gate"
-
-Pros:
-- Shorter release step text.
-
-Cons:
-- Non-deterministic ordering and weak auditability.
-- Harder to diagnose exactly which prerequisite failed.
-
-### Option C: Deterministic ordered gates with explicit evidence (chosen)
-
-Pros:
-- Clear pass/fail sequencing and remediation.
-- Strong audit trail in release artifacts/state.
-- No default bypass path.
-
-Cons:
-- Adds explicit gate reporting requirements.
-
-## Minimal architecture
-
-### 1) Release gates and evidence flow
-
-- **Evidence flow**: Gates read from canonical evidence artifacts only. Pass is
-  asserted only when evidence exists and indicates pass; missing or stale
-  evidence never implies pass.
-- **Canonical evidence sources**:
-  - Check-in test: `tests/report.md` (or runbook-defined test output location).
-  - QA completion: `sprints/Sxxxx/qa-findings.md` (no unresolved blocking
-    findings in current sprint context).
-  - UAT completion: `sprints/Sxxxx/uat.json`, `sprints/Sxxxx/uat.md` (no
-    placeholder, incomplete, or unresolved-fail state).
-
-### 2) Deterministic gate order
-
-Release gate sequence is fixed and documented; ordering is enforced so audit
-trails are unambiguous:
-
-1. **Check-in test gate** — `TEST_COMMAND` baseline evidence.
-2. **QA completion gate** — no unresolved blocking findings.
-3. **UAT completion gate** — verified/populated UAT artifacts.
-4. **Release notes + runbook update steps** — only after gates 1–3 pass.
-
-No later gate is evaluated as pass if an earlier mandatory gate fails.
-
-### 3) Stale and missing evidence behavior
-
-- **Missing evidence**: Block release with deterministic reason code and
-  remediation (e.g. run `TEST_COMMAND`, re-run QA, complete verify-work). Do not
-  infer pass.
-- **Stale evidence**: Block release when evidence is absent or does not satisfy
-  validity criteria (e.g. evidence exists and passed; optional timestamp/re-run
-  policy per runbook). Prefer simple rule: "evidence exists and passed" plus
-  optional timestamp check rather than complex TTL.
-- **Reason codes** (aligned with R-0020 and existing release vocabulary):
-  - `RELEASE_SPRINT_UNRESOLVED` — sprint context not resolvable for release.
-  - `RELEASE_TEST_FAILED` — check-in test run failed.
-  - `RELEASE_TEST_STALE` — test evidence missing or stale; re-run required.
-  - `RELEASE_QA_EVIDENCE_MISSING` — QA evidence absent for sprint context.
-  - `RELEASE_QA_BLOCKERS_OPEN` — unresolved blocking findings in QA artifact.
-  - `RELEASE_UAT_INCOMPLETE` — UAT placeholder or incomplete.
-  - `RELEASE_UAT_FAILED` — UAT has unresolved fail state.
-  - `RELEASE_GATE_OVERRIDE_APPROVED` — override with DEC reference (exception path only).
-
-Each code must have documented remediation (what to fix, which artifact/command, next step).
-
-### 4) No-bypass default and decision-gate override path
-
-- **Default**: No release path may bypass test/QA/UAT gates. Default
-  configuration has no bypass (per vision Discovery Notes — US-0039).
-- **Override** (exception-only): Allowed only via explicit decision gate: user
-  approval, documented rationale (e.g. `DEC-xxxx`), and audit trail. Release
-  output must record override with `RELEASE_GATE_OVERRIDE_APPROVED` and DEC
-  reference. See DEC-0019.
-
-### 5) Auditable gate evidence
-
-- Each gate writes pass/fail and evidence pointers to handoff/state artifacts so
-  QA and TL can verify decisions; no silent or inferred state.
-- Canonical destinations: release handoff, `sprints/Sxxxx/release-findings.md`,
-  `docs/engineering/state.md` (as applicable).
-- Per-gate verdict fields: gate name, status, reason_code, evidence_refs,
-  remediation; for overrides, decision_ref (DEC-xxxx) required.
-
-### 6) Compatibility constraints
-
-- Keep existing workflow stop conditions and escalation semantics.
-- Preserve teams with blank optional lint/typecheck commands from false
-  failures (release still requires test + QA + UAT evidence only).
-- Maintain active/template parity for gate semantics (see Template parity scope below).
-
-## Template parity scope
-
-Active and `template/` release/qa/execute guidance must stay behaviorally
-aligned so installed repos get the same release-safety contract. Drift between
-active and template causes inconsistent gate semantics for new installs.
-
-**Canonical files for gate-semantics parity:**
-
-- `.cursor/commands/release.md`
-- `.cursor/commands/qa.md`
-- `.cursor/commands/execute.md`
-- Runbook sections covering release gates, reason codes, and evidence locations
-- Release-findings and reason-code documentation (e.g. runbook, release command text)
-
-**Mitigation:** (1) List these files in release checklist or parity
-verification steps; (2) Include template-parity verification in release
-checklist or regression tests; (3) Document gate order and reason codes in both
-active and template copies.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Stale-evidence threshold too strict or ambiguous | Prefer "evidence exists and passed" plus optional timestamp check; avoid complex TTL. Document in runbook. |
-| Template parity drift | Canonical file list above; parity check in release checklist or regression; gate order and reason codes documented in both active and template. |
-| Over-strict validation blocks runs if evidence writes are incomplete | Deterministic reason codes and remediation guidance (which command/artifact to fix); fail closed only when gate evidence is required and missing/invalid. |
-| Operator friction on override path | Override remains exception-only; explicit decision gate + DEC reference keeps audit trail and discourages casual bypass. |
-
-## Decision linkage
-
-- Research: R-0020, R-0005
-- Decision: DEC-0019
-
-## Sprint-plan readiness (decomposition-ready)
-
-Implementation should split into:
-1. Update `/release` gate contract with strict ordered gates.
-2. Define freshness/validity criteria for "latest check-in test" evidence (simple rule preferred).
-3. Add QA evidence contract checks for unresolved blockers.
-4. Preserve and tighten UAT verified-state gate wording.
-5. Add structured gate verdict logging to release notes/state/release-findings artifacts.
-6. Define explicit decision-gate override template and constraints (DEC ref required).
-7. Add QA regression matrix with positive/negative and stale-evidence cases.
-8. Template parity: align and verify release/qa/execute and runbook sections per canonical file list.
-
----
-
 # US-0040: Per-Sprint Release Notes and Release Queue Tracker
 
 ## Overview
@@ -3325,6 +3166,100 @@ Regression coverage for: command/rule behavior parity after slimming; **`tests/a
 - Research basis: **`R-0062`**
 - Decision: **`DEC-0067`**
 - Related: **`US-0068`**, **`US-0078`**, **`US-0045`**, **`DEC-0050`**, **`DEC-0060`**
+
+---
+
+# US-0084: POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
+
+## Overview
+
+**`US-0084`** locks how the **published** npm **`installer.sh`** stays safe under Debian **`/bin/sh`** (often **dash**), how **LF** shell entrypoints are enforced in the publish path, and how dev/QA aim work at **WSL**, bare **SSH Linux**, or **Docker-over-SSH** using the **existing** **`US-0064`** contract (**`docs/engineering/release-targets.json`**, **`docs/engineering/runtime-connectivity.md`**) — no parallel remote schema. Research basis: **`R-0067`**.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | Bash-only installer (`#!/usr/bin/env bash`, bash **`set`** flags) | **Rejected** — conflicts with **AC-1** / global npm **`sh`** path. |
+| B | New remote JSON schema beside **`release-targets.json`** | **Rejected** — **AC-4** / **US-0064** alignment only. |
+| C | POSIX **`sh`** startup + LF guards + doc map + optional **`scripts/`** helper (**chosen**) | **Chosen** — minimal delta vs repo today; **`R-0067`** confirms active **`installer.sh`** already uses **`set -e`** only on the unconditional path. |
+
+## Published `installer.sh`: POSIX, dash, and LF (**AC-1**)
+
+1. **Shebang and startup**: Keep **`#!/usr/bin/env sh`** and **only** POSIX-safe options on the unconditional startup block (today: **`set -e`** at **`installer.sh:2`**; preserve **BUG-0004** guard comment). **Forbidden** on that path: **`set -u`**, **`pipefail`**, **`set -o …`** bash-only bundles, or any **`set`** line that dash rejects.
+2. **Single shipped copy**: **`package.json`** **`files`** ships root **`installer.sh`** (no in-repo **`template/installer.sh`** today). Architecture treats **git HEAD = publish source of truth**; any future mirrored **`template/`** copy triggers the same parity rules as other template mirrors.
+3. **LF enforcement**: Add repo root **`.gitattributes`** with `*.sh text eol=lf` (and any other packaged shell entrypoints the sprint lists) so Windows checkouts do not silently CRLF the publish artifact. Complement with a **deterministic** check that rejects **`\\r`** in **`installer.sh`** (Python byte scan is sufficient on all maintainer OSes — **R-0067**).
+4. **Invocation reality**: **`bin/its-magic.js`** spawns **`sh`** + package **`installer.sh`** on non-Windows — architecture does not change that contract; it requires the file on disk to remain dash-parseable.
+
+## CI / prepublish guard shape (**AC-2**)
+
+Layered gates (sprint may implement subset if documented, but **preferred full stack**):
+
+| Layer | Purpose | Notes |
+|-------|---------|-------|
+| **Python regression** | Extend **`tests/installer_shell_bug0004_test.py`** (or successor): forbid **`set -euo`** / **`pipefail`** substrings; keep **`sh`** / CLI smokes. | Windows-friendly without **dash** on **`PATH`**. |
+| **`dash -n`** | Syntax check under dash when **`dash`** exists (**CI** or dev opt-in). | **Skip with explicit reason** on runners without **`dash`** (**R-0067** open question); do not silently drop **AC-2** — document skip vs hard in runbook. |
+| **`prepublishOnly`** (optional) | Run the same LF + token + (if available) **`dash -n`** gate before **`npm pack`/`publish`**. | Defense in depth for tarball-only mistakes. |
+
+**Sprint deliverable**: at least one **CI** step **or** **`prepublishOnly`** path that **fails closed** on CRLF in **`installer.sh`** + forbidden **`set`** patterns; **`dash -n`** when the environment provides **`dash`**.
+
+## Remote documentation map — **US-0064** alignment (**AC-4**, **AC-9**)
+
+Canonical table for operator docs (runbook / developer guide); **no new keys** in **`release-targets.json`**.
+
+| Operator path | Maps to | Scratchpad / config cues |
+|---------------|---------|---------------------------|
+| **WSL** | Local Linux kernel on the dev machine — run **`sh`/`dash`** and repo tests **inside WSL**; not a separate **`release-targets`** row by default. | Same repo; cite **environment label** in evidence (**AC-6**). |
+| **Bare SSH Linux** | **`ssh-server`** target (**`release-targets.json`**: **`hostEnv`**, **`userEnv`**, **`authEnv`**, **`remoteCommand`**, **`runtime`**, ingress). | **`REMOTE_EXECUTION`**, **`REMOTE_CONFIG=.cursor/remote.json`** per **`.cursor/scratchpad.md`**; validate shape against **`runtime-connectivity.md`**. |
+| **Docker-over-SSH** | **`ssh-server.dockerOverSsh`** — **`dockerHostEnv`**, **`dockerContextEnv`**, **`composeFile`**, **`service`** + operator **`DOCKER_HOST`** / context docs. | Cross-link **`runtime-connectivity.md`** **`docker_over_ssh`** summary (**`R-0067`**). |
+
+## Helper script contract (**AC-5**, **AC-7**, **AC-10**)
+
+- **Path / name**: **`scripts/remote_config_summary.py`** (Python 3, consistent with existing **`scripts/`** validators).
+- **Inputs**: **`--config`** default **`REMOTE_CONFIG`** env or **`.cursor/remote.json`**; read-only; no network side effects.
+- **Stdout**: **non-secret** summary only — target **label** (e.g. **`ssh-server`**), **host** as **env var name** and/or **“set / unset”** presence flags, **user** env name, **identity file path string** (path ref only, **never** key material), optional **`dockerOverSsh`** **enabled** flag and **env names**. **Do not** print resolved secret **values** (**R-0067** residual risk).
+- **Stderr**: human-readable failure reason (deterministic prefix optional).
+- **Exit codes** (locked for harness fixtures):
+  - **0** — OK (config readable and shape acceptable for documented **US-0064** patterns).
+  - **1** — usage / CLI error.
+  - **2** — config file missing or unreadable.
+  - **3** — invalid JSON.
+  - **4** — schema / required-field mismatch vs documented **US-0064** operator contract (not a second schema — “doc conformance” check).
+  - **5** — **`REMOTE_EXECUTION=0`** fast exit / intentionally skipped validation (if product chooses “no-op when remote off”; otherwise map no-op to **0** — sprint **`decisions.md`** must record the chosen branch).
+
+## `/execute`, `/qa`, and runbook cues (**AC-3**, **AC-6**)
+
+- **`docs/engineering/runbook.md`**: extend **REMOTE_EXECUTION** section (~**783+**) with **troubleshooting** — **`set: Illegal option -`**, **CRLF vs LF**, **`sh` vs `bash`**, **`dos2unix`**, reinstall from fixed version; pointer to **`installer.sh`** POSIX rules above.
+- **Handoffs / evidence**: when **`REMOTE_EXECUTION=1`**, cite **environment label** (e.g. **`WSL`**, **`ssh:<hostEnv>`**, **`dockerOverSsh`**) and **never** paste secrets or key bodies (**AC-7**).
+
+## Test harness rows (**AC-2**, **AC-10**)
+
+Register beside existing installer Python tests (**`tests/run-tests.sh`** / **`tests/run-tests.ps1`**, **§26** style per **`R-0067`**):
+
+| Row | Coverage |
+|-----|----------|
+| H1 | **LF** check + forbidden **`set`** tokens on **`installer.sh`** (extends **BUG-0004** test). |
+| H2 | **`dash -n installer.sh`** when **`dash`** available (or documented CI matrix). |
+| H3 | **`remote_config_summary.py`** — fixture **valid** minimal **`.cursor/remote.json`** → exit **0**, expected stdout keys/names only. |
+| H4 | **`remote_config_summary.py`** — fixture **invalid JSON** → exit **3**. |
+| H5 | **`remote_config_summary.py`** — fixture **schema/doc mismatch** → exit **4** (or **2** for missing file — separate fixture). |
+
+## Active + `template/` parity (**AC-8**)
+
+Any new/edited **commands**, **scratchpad examples**, **`.cursor/remote.json`** template snippets, or **runbook** sections must be mirrored under **`template/`** per existing kit parity rules (same literals where the template carries the surface). **`package.json`** changes (e.g. **`prepublishOnly`**) apply to the **shipping** package only — template mirrors **commands/docs** that consumers receive.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| CI lacks **`dash`** | Documented **skip vs hard**; Python CRLF + substring gates remain mandatory. |
+| Maintainer publish from Windows without local **`dash`** | **`prepublishOnly`** + Python checks; optional CI **`dash`**. |
+| Helper duplicates **`runtime-connectivity.md`** | Helper = **validate + summarize**; prose stays in **`runtime-connectivity.md`** / runbook. |
+| Secret leakage via “debug” print | **Names-only** / presence flags; code review + fixture asserts on stdout. |
+
+## Decision linkage
+
+- Research basis: **`R-0067`**
+- Related: **`US-0064`**, **`US-0036`**, **BUG-0004**, **`docs/engineering/release-targets.json`**, **`docs/engineering/runtime-connectivity.md`**, **`bin/its-magic.js`**, **`package.json`**
 
 ---
 

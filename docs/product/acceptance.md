@@ -108,6 +108,9 @@
 - [x] US-0081: First-intake full-plan coverage and story-map gate
 - [x] US-0082: Agent-driven codebase map bootstrap (UAT closure: `sprints/S0062/uat.json`, `sprints/S0062/uat.md`, verify-work **2026-03-31T21:20:00Z** / `orchestrator_run_id=auto-20260331-02`)
 - [x] US-0083: Delegable intake clarification without hard blocks
+- [x] US-0084: POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
+- [ ] US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
+- [ ] US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
 
 ## Bug acceptance (canonical)
 

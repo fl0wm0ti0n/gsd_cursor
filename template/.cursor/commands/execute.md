@@ -152,6 +152,12 @@ parity for listed paths: **`python scripts/check_token_cost_parity.py --repo .`*
      fail fast with `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
    - Never expose secrets in execution outputs; only sanitized endpoint data and
      env-reference names are allowed.
+17b. Remote evidence cues (US-0084):
+   - When `REMOTE_EXECUTION=1`, cite an **environment label** in
+     `handoffs/dev_to_qa.md` (e.g. `WSL`, `ssh:SSH_HOST` as the **env var name**,
+     `dockerOverSsh`) and state **where tests ran** (local vs remote host).
+   - Do not paste private keys, tokens, or resolved secret **values**; use
+     `python scripts/remote_config_summary.py` for a names-only summary when needed.
 18. Runtime QA autopilot execution contract (US-0065 / DEC-0047):
    - Treat runtime verification as mandatory for generated-project scope; static
      checks alone are not sufficient evidence for PASS readiness.

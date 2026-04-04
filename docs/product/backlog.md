@@ -1970,6 +1970,161 @@
   - In scope: intake UX/policy refinement, explicit delegation contract, validator/evidence updates, docs/tests/parity.
   - Out of scope: removing safety gates entirely or allowing implicit (unstated) assumption bypass.
 
+## US-0084 — POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
+- Title: Reliable global `its-magic` install on Debian `/bin/sh` and automatable Linux/Docker test connectivity for dev/QA
+- Summary: Close the gap where globally npm-installed `installer.sh` still fails under dash (`set: Illegal option -`) on SSH/Docker hosts, and give dev/QA a canonical, automatable way to aim tests and workflow phases at WSL, SSH Linux hosts, or container contexts—without inventing a parallel remote contract that conflicts with **`US-0064`** / **`release-targets.json`**.
+- Priority: P1
+- Status: DONE
+- Decomposition (US-0051):
+  - **Single story** — npm publish surface, installer POSIX guarantees, remote ergonomics, and regression tests are one delivery slice; splitting would leave broken global installs or undocumented remote paths.
+  - **Rationale**: operators hit install failure before any remote feature matters; remote docs must reference the same config families already in the kit.
+- Overlap / duplicate evaluation:
+  - **US-0008** (DONE): CLI installer exists; this story **repairs/extends** npm-published payload and CI guardrails, not a second installer.
+  - **BUG-0004** (DONE): tracked `installer.sh` POSIX startup; **regression** may still occur in **published** tarballs—this story **locks publish-time parity** and diagnostics.
+  - **US-0064** (DONE): remote connectivity schema exists; this story **adds dev/QA-oriented bootstrap** (WSL/SSH/Docker operator flows, optional probe script, scratchpad/remote.json hints) **aligned** to that contract—not a competing schema.
+  - **US-0036** / **REMOTE_EXECUTION**: extend only as needed; preserve fail-fast validation and zero overhead when remote is off.
+- Discovery notes:
+  - Intake closure (2026-04-04, PO, Cursor): user reports **`its-magic --mode missing`** on Linux over SSH → **`/usr/lib/node_modules/its-magic/installer.sh: 2: set: Illegal option -`** (dash vs bash-only `set` or CRLF); asks for **WSL or SSH to Linux/Docker** setup so dev/QA know where to connect for distro/container testing **with automation support**.
+  - User authority evidence: explicit **`/intake`** request referencing prior **`/ask`** diagnosis.
+  - Intake pack evidence (DEC-0060 `ie:` binding):
+    - intake_run_id=`cursor-20260404-US0084-intake`
+    - selected_pack=`small-intake-pack`
+    - evidence_file=`handoffs/intake_evidence/US-0084-intake-20260404.json`
+    - validator: `python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/US-0084-intake-20260404.json` → **`[INTAKE_EVIDENCE_VALIDATION_OK]`**
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`; assumptions_confirmed=`(none)`
+    - topic_coverage (`ref`): `outcome_success_criteria` → `ie:cursor-20260404-US0084-intake:0:5f1f94ca246dc2cb`; `impacted_components` → `ie:cursor-20260404-US0084-intake:1:cbab3d3d455a8c0d`; `constraints_compatibility_risks` → `ie:cursor-20260404-US0084-intake:2:9e2f9cfb56b1b81f`; `required_tests_acceptance_checks` → `ie:cursor-20260404-US0084-intake:3:a9d08c7f7c1668bc`; `done_definition` → `ie:cursor-20260404-US0084-intake:4:aab53f4b176faddc`.
+  - handoff_rollover_verification (2026-04-04): boundary=`PO_TO_TL_HOT_MAX_LINES=800,PO_TO_TL_HOT_MAX_SECTIONS=60`; moved=`units=1`; retained=`post-rollover check passed`; pack_ref=`handoffs/archive/po-to-tl-pack-20260404.md`.
+  - discovery_notes (2026-04-04T15:00:00Z, PO, orchestrator_run_id=auto-20260404-02):
+    - **Problem framing**: Global npm install surfaces **`installer.sh`** under **`/bin/sh`** (often **dash**) on Debian/SSH/Docker; operators still see **`set: Illegal option -`** (bash-only **`set`** flags and/or **CRLF** in published tarball). Success means **published** payload matches repo **POSIX-safe** startup and **LF** shell entrypoints, plus dev/QA can **aim** tests at **WSL**, **SSH Linux**, or **Docker-over-SSH** without a second remote schema.
+    - **Impacted surfaces**: **`installer.sh`** (active + **`template/`**), **`package.json`** / npm **`files`** / prepublish or CI parity, **`docs/engineering/runbook.md`** (troubleshooting + **`REMOTE_EXECUTION`** cues), **`.cursor/remote.json`** + **`template/.cursor/remote.json`**, optional **`scripts/`** connectivity helper, **`tests/run-tests.sh`** / **`.ps1`** registration for AC-2/AC-10.
+    - **Alignment / design refs**: **`docs/engineering/release-targets.json`** + **`docs/engineering/runtime-connectivity.md`** (**US-0064**); **`docs/engineering/architecture.md`** **`# US-0064`**; **`US-0036`** / **`REMOTE_EXECUTION`** / **`REMOTE_CONFIG`** — extend only; **BUG-0004** (DONE) = prior POSIX fix; this story **locks publish-time** parity and operator docs.
+    - **Research asks for tech-lead** (canonical **`/research`**, default role):
+      1. **POSIX/dash audit of published path**: diff repo vs packaged **`installer.sh`** (and mirrored **`template/`**) for bash-only **`set`**, shebang assumptions, and **EOL** policy; recommend **npm prepublish** vs **CI** gate vs both.
+      2. **CI guard shape**: minimal deterministic check (**`dash -n`**, **`sh -c`** smoke, or documented parse gate) wired so regression cannot ship; map to existing test harness hooks.
+      3. **Remote profile doc map**: table WSL vs bare SSH vs Docker-over-SSH operator flows → **`release-targets.json`** target shapes (**e.g.** **`ssh-server`**, **`dockerOverSsh`**) + scratchpad keys + **`.cursor/remote.json`** — no duplicate contract vs **US-0064**.
+      4. **Helper script contract**: **`scripts/`** validator or one-liner — inputs (**`REMOTE_CONFIG`**, template), **non-secret** summary (host, user, identity **path ref**, label), deterministic exit codes; align with runbook **`REMOTE_EXECUTION=1`** validation.
+      5. **Parity / test harness touchpoints**: **`template/`** mirror for new commands/snippets; **`/execute`** / **`/qa`** handoff cues (environment label in evidence, no secret leakage); fixtures for helper success/failure per **AC-10**.
+    - **Next recommended phase**: **`/research`** (tech-lead default per merged scratchpad).
+  - research_notes (2026-04-04T16:00:00Z, tech-lead, orchestrator_run_id=auto-20260404-02):
+    - **Canonical research**: **`docs/engineering/research.md`** **`R-0067`** — repo **`installer.sh`** uses POSIX-safe **`set -e`** only (**`installer.sh:2`**); **`bin/its-magic.js`** invokes **`sh` + installer** on Unix; **`package.json`** **`files`** ships **`installer.sh`** (no **`template/installer.sh`**); CRLF/LF + **`dash -n`** / prepublish guard recommendations; **US-0064** map (**`ssh-server`**, **`dockerOverSsh`**) + **`REMOTE_CONFIG`** helper sketch + **`tests/run-tests.sh`** / **`.ps1`** registration path.
+    - **Next recommended phase**: **`/architecture`**
+  - architecture_notes (2026-04-04T17:00:00Z, tech-lead, orchestrator_run_id=auto-20260404-02):
+    - **Canonical architecture**: **`docs/engineering/architecture.md`** **`# US-0084`** — POSIX/dash/LF strategy for published **`installer.sh`**; layered **CI** / **`prepublishOnly`** / Python + optional **`dash -n`** guards; **US-0064** remote doc map (**WSL** vs **`ssh-server`** vs **`dockerOverSsh`**); helper **`scripts/remote_config_summary.py`** (non-secret stdout, locked exit codes); harness rows **H1–H5**; runbook **`REMOTE_EXECUTION`** troubleshooting; active + **`template/`** parity (**AC-8**).
+    - **Next recommended phase**: **`/sprint-plan`**
+  - sprint_plan_notes (2026-04-04T18:00:00Z, tech-lead, orchestrator_run_id=auto-20260404-02):
+    - **Sprint**: **`S0069`** — **`sprints/S0069/sprint.md`**, **`sprints/S0069/tasks.md`** (**T-001..T-010** ↔ backlog **AC-1..AC-10**); **`sprints/S0069/plan-verify.json`** **PENDING** (awaiting QA **`/plan-verify`**); **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** (sprint-plan checkpoint + strict proof).
+    - **Next recommended phase**: **`/plan-verify`** (QA)
+  - plan_verify_notes (2026-04-04T19:15:00Z, qa, orchestrator_run_id=auto-20260404-02):
+    - **`/plan-verify`** **PASS** — **`sprints/S0069/plan-verify.json`**; AC-1..AC-10 ↔ T-001..T-010 bijection, sprint goal vs **`architecture.md`** **`# US-0084`** + **`R-0067`** aligned; **`plan_integrity`** verified; strict proof on **`docs/engineering/state.md`** (plan-verify checkpoint).
+    - **Next recommended phase**: **`/execute`** (**dev**)
+  - execute_notes (2026-04-04T20:30:00Z, dev, orchestrator_run_id=auto-20260404-02):
+    - **`/execute`** complete — **`sprints/S0069/tasks.md`** **T-001..T-010** **done**; **`sprints/S0069/summary.md`**; `.gitattributes`, **`guard_installer_publish.py`**, **`remote_config_summary.py`**, tests **H1–H5**, runbook / **`runtime-connectivity.md`** / **`us-0084-remote-e2e.md`**, **`DEC-0070`**, template + manifest parity.
+    - **Next recommended phase**: **`/qa`**
+  - qa_notes (2026-04-04T23:00:00Z, qa, orchestrator_run_id=auto-20260404-02):
+    - **`/qa`** **PASS** — **`sprints/S0069/qa-findings.md`**; commands **`python tests/installer_shell_bug0004_test.py`**, **`python tests/remote_config_summary_test.py`**, **`python scripts/guard_installer_publish.py`**, **`python scripts/check_intake_template_parity.py --repo .`**, **`python scripts/enforce-triad-hot-surface.py --check`** (spot: **`python tests/installer_completeness_bug0003_test.py`**) all **PASS**. Strict proof **`proof_hash=b9110e6414a4c103d148d74873ed3684f1738528657dc538cef7c83ee895b0e2`** on **`docs/engineering/state.md`** (QA checkpoint). **Status remains OPEN** per **US-0045** until **`/verify-work`**.
+    - **Next recommended phase**: **`/verify-work`**
+  - verify_work_notes (2026-04-04T23:45:00Z, qa, orchestrator_run_id=auto-20260404-02, fresh_context_marker=qa-S0069-US0084-verify-work-20260404T234500Z-fresh): **`/verify-work`** **PASS** — UAT **`sprints/S0069/uat.json`** / **`sprints/S0069/uat.md`** **10/10**; re-ran **`python tests/installer_shell_bug0004_test.py`**, **`python tests/remote_config_summary_test.py`**, **`python scripts/guard_installer_publish.py`**, **`python scripts/check_intake_template_parity.py --repo .`** (all **PASS**); **`python scripts/enforce-triad-hot-surface.py --check`** **PASS**. Canonical closure (**US-0045**): backlog **AC-1..AC-10** checked, **`docs/product/acceptance.md`** **US-0084** row **`[x]`**, **`handoffs/release_queue.md`** **S0069** **`ready`**, **`handoffs/releases/S0069-release-notes.md`** stub, **`sprints/S0069/release-findings.md`** pre-release gates; strict verify-work proof **`proof_hash=7285615e2ad80dd55064920282bf85047268c6bb8283b4feecc04aadb79dba24`** on **`docs/engineering/state.md`**. **Status: DONE**.
+    - **Next recommended phase**: **`/release`**
+  - refresh_context_notes (2026-04-05T01:30:00Z, curator, orchestrator_run_id=auto-20260404-02, fresh_context_marker=curator-S0069-US0084-refresh-context-20260405T013000Z-fresh):
+    - **`/refresh-context`** **PASS** — post-**`/release`** reconciliation for **`S0069`** / **`US-0084`**: **`docs/engineering/decisions.md`** context pack + traceability (**`DEC-0070`**, **`R-0067`** delivery closed), **`docs/engineering/research.md`** **`R-0067`** delivery closure, **`sprints/S0069/summary.md`**, **`handoffs/resume_brief.md`** (**`stop_reason=completed`**, **`stop_phase=refresh-context`**, **`next_scheduled_phase=none`**, **`backlog_drain_segment_complete=1`**, **`stories_completed_this_run=1`** segment **`US-0084`**); **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** → **`[BUG_VALIDATION_OK]`**; portfolio **BUG-0001..BUG-0007** **DONE** (**no OPEN** in range).
+    - **Next recommended phase**: discretionary **`/intake`** (next **US**) per **`AUTO_BACKLOG_DRAIN`** / operator choice
+- Acceptance:
+  - [x] AC-1: **Published npm package** `installer.sh` (and packaged `template/` mirror if applicable) matches repo **POSIX-safe** startup (**no bash-only `set` flags** on the unconditional path used when invoked as `sh`); **LF line endings** enforced for shell entrypoints in publish pipeline or documented check.
+  - [x] AC-2: **Regression test or CI step** fails if `installer.sh` (active + template copies) is not dash-safe (e.g. `dash -n` / `sh -c` smoke, or equivalent deterministic parse check documented in runbook).
+  - [x] AC-3: **Operator troubleshooting** in runbook and/or developer docs: symptoms of `set: Illegal option -`, **CRLF vs LF**, **`sh` vs `bash`**, and **remediation** (reinstall from fixed version, `dos2unix`, run with `bash` only when explicitly supported).
+  - [x] AC-4: **Canonical remote Linux profile documentation** for dev/QA: how **`WSL`**, **`SSH`**, and **`Docker-over-SSH`** flows map to existing **`docs/engineering/release-targets.json`** / **`runtime-connectivity`** patterns (**US-0064**), plus **scratchpad** keys (**`REMOTE_EXECUTION`**, **`REMOTE_CONFIG`**) and **`.cursor/remote.json`** when enabled.
+  - [x] AC-5: **Automatable connectivity helper** (script or documented one-liner under `scripts/`): validates **`REMOTE_CONFIG`** / template, prints **non-secret** connection summary (host, user, identity file ref, target label), exits with deterministic codes on misconfiguration.
+  - [x] AC-6: **`/execute`** / **`/qa`** handoff or runbook cues: when `REMOTE_EXECUTION=1`, where to run tests (local vs remote) and how evidence should cite **environment label** (no secret leakage).
+  - [x] AC-7: **Security**: no credentials in repo; SSH keys/passwords only via **agent / env** references consistent with existing remote policy.
+  - [x] AC-8: **Active + `template/` parity** for any new/edited commands, scratchpad examples, and remote template snippets.
+  - [x] AC-9: **End-to-end sanity**: document a **minimal** “from Windows dev machine → WSL or SSH Linux → run `its-magic` / tests” path using the above artifacts.
+  - [x] AC-10: **Tests** cover helper validation success/failure paths and installer POSIX guard (**AC-2**) in the existing test harness (`tests/run-tests.sh` / `.ps1` registration as needed).
+- Boundaries:
+  - In scope: npm publish/installer reliability on Linux **`sh`**, docs, optional helper script, scratchpad/remote integration, regression tests.
+  - Out of scope: replacing **US-0064** schema, provisioning cloud infrastructure, or mandating a specific Linux distro beyond what docs/helper require for examples.
+
+## US-0085 — Gitignored `.env` for remote and release connectivity (no AI read)
+- Title: Operator `.env` for `*Env` values; `.env.example`; agent/IDE exclusion from `.env`
+- Summary: Standardize a **repo-root `.env`** (gitignored) that holds **values** for environment variables referenced by **`.cursor/remote.json`** and by **`docs/engineering/release-targets.json`** operator connectivity flows (**US-0064**), alongside a committed **`.env.example`** listing **names only**. Document that operators **source** or export from `.env` **outside** agent context so SSH/Docker/remote helpers see normal process env; **agents must not read `.env`**. Extend ignore rules and operator docs so connections work without secret literals in git.
+- Priority: P1
+- Status: OPEN
+- Decomposition (US-0051):
+  - **Single story** — ignore rules, example file, runbook/runtime-connectivity alignment, optional small helper or documented shell recipe, agent/rule guardrails, and tests are one slice; splitting would leave half-implemented secret handling.
+  - **Rationale**: complements **US-0084** / **DEC-0070** (remote mode + summary) with a **local secret carrier** that stays out of git and out of AI context.
+- Overlap / duplicate evaluation:
+  - **US-0084** (DONE): POSIX installer + remote ergonomics; this story **adds** `.env` + `.env.example` + **non-AI** loading contract, not a second remote schema.
+  - **US-0064** (DONE): **`release-targets.json`** remains **env-name references** only; `.env` supplies **values** locally for operators/CI that choose this pattern.
+  - **US-0036** / **REMOTE_EXECUTION**: unchanged semantics — `.env` is **operator-local**, not a new scratchpad flag family.
+- Discovery notes:
+  - Intake closure (2026-04-04, PO, Cursor): operator wants **`.env`** in repo, **gitignored**, used for **SSH/Docker** vars backing **`.cursor/remote.json`** and **`release-targets.json`** flows; **`.env.example`** committed; **AI must not read `.env`**; agents may still **run** `ssh` / remote commands when the **shell already has** env from operator-sourced `.env`.
+  - Intake pack evidence (DEC-0060 `ie:` binding):
+    - intake_run_id=`cursor-20260404-US0085-intake`
+    - selected_pack=`small-intake-pack`
+    - evidence_file=`handoffs/intake_evidence/US-0085-intake-20260404.json`
+    - validator: `python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/US-0085-intake-20260404.json` → **`[INTAKE_EVIDENCE_VALIDATION_OK]`**
+    - asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
+    - missing_topics=`(none)`; assumptions_confirmed=`(none)`
+    - topic_coverage (`ref`): `outcome_success_criteria` → `ie:cursor-20260404-US0085-intake:0:d4c1507ebba15d33`; `impacted_components` → `ie:cursor-20260404-US0085-intake:1:ad9243cee82bc542`; `constraints_compatibility_risks` → `ie:cursor-20260404-US0085-intake:2:451c052908e96cdd`; `required_tests_acceptance_checks` → `ie:cursor-20260404-US0085-intake:3:89be48eadf561872`; `done_definition` → `ie:cursor-20260404-US0085-intake:4:c2195a69c6b7b1b4`.
+  - handoff_rollover_verification (2026-04-04): boundary=`PO_TO_TL_HOT_MAX_LINES=800,PO_TO_TL_HOT_MAX_SECTIONS=60`; moved=`units=1`; pack_ref=`handoffs/archive/po-to-tl-pack-20260404-a.md`; hot **`handoffs/po_to_tl.md`** re-compacted (**US-0085** + **US-0084** opener merged) so **`python scripts/enforce-triad-hot-surface.py --check`** → **PASS**.
+  - Next recommended phase: **`/discovery`** (PO, fresh context).
+- Acceptance:
+  - [ ] AC-1: **`.gitignore`** (active + **`template/`**) lists **`.env`** and other agreed local secret patterns (e.g. **`.env.local`**) so git never tracks secret files.
+  - [ ] AC-2: **`.cursorignore`** (or documented equivalent) excludes **`.env`** from agent/IDE file context so assistants do not routinely ingest secret files.
+  - [ ] AC-3: **`.env.example`** committed at repo root (and **`template/`** mirror) with **only** variable **names** and comments — **no** secret-shaped literals; names align with **`.cursor/remote.json`** `*Env` fields and with **`docs/engineering/release-targets.json`** `*Env` names used for connectivity.
+  - [ ] AC-4: **`docs/engineering/runbook.md`** (+ **`template/`**) documents: copy **`.env.example` → `.env`**, fill locally, **source** before remote/SSH/release connectivity checks; **forbidden**: committing `.env`; **forbidden**: agents reading **`.env`**; **allowed**: running `ssh` / **`python scripts/remote_config_summary.py`** when env is already set in the invoking shell.
+  - [ ] AC-5: **`docs/engineering/runtime-connectivity.md`** (+ **`template/`**) states that operators may populate **`release-targets.json`**-referenced **`*Env`** variables from a sourced **`.env`** (values never in JSON).
+  - [ ] AC-6: **`docs/engineering/us-0084-remote-e2e.md`** (+ **`template/`**) updated to reference **`.env` / `.env.example`** where Path B/C mention **`REMOTE_*`** env vars.
+  - [ ] AC-7: **Agent/rules** (active + **`template/`** as applicable): explicit rule — **do not** open, attach, or search inside **`.env`**; use env var **names** in prose only.
+  - [ ] AC-8: Optional **deterministic helper** (e.g. `scripts/print_remote_env_hint.py` read-only names, or documented one-liner) that **never** prints secret **values** — or architecture records deliberate omission with shell-only sourcing.
+  - [ ] AC-9: **Regression test** or script check proving **`.env`** is **gitignored** (e.g. `git check-ignore` fixture or doc-test) and **`.env.example`** is **not** ignored.
+  - [ ] AC-10: **`python scripts/remote_config_summary.py`** and existing **`remote_config_summary`** tests remain **PASS** after changes; **US-0064** JSON contract unchanged (still **env references**, not inline secrets).
+- Boundaries:
+  - In scope: ignore files, `.env.example`, operator documentation, optional non-secret helper, rule text, template parity, light tests.
+  - Out of scope: changing **`release-targets.json`** schema, storing secrets inside tracked JSON, automatic agent loading of `.env`, or mandating a specific secrets manager vendor.
+
+## US-0086 — Automation-driven remote execution selection (Docker / SSH / NL container intent)
+- Title: Agents and CI/QA automations choose execution target when needed; manual operators stay off remote config
+- Summary: Introduce a **scratchpad-gated automation profile** so **dev / CI / DI / QA / release** workflows can **select** **Docker**, **SSH Linux**, or other **declared** targets from **`.cursor/remote.json`** / **`release-targets.json`** semantics when **changed files or explicit operator intent** (e.g. **“start container `<target>`”**) warrant it. **Manual** day-to-day work should **not** require these configs. Deliver **deterministic rules**, **fail-closed** diagnostics, **agent/rule** updates, **runbook** separation (**automation vs manual**), optional **CI path-filter** or **matrix** recipe, and tests — without replacing **US-0064** schema.
+- Priority: P1
+- Status: OPEN
+- Decomposition (US-0051):
+  - **Single story (initial)** — cross-cutting policy + docs + flags + rules + optional scripts/tests in one **US-0086**; **architecture** may propose a **follow-on** story only if sprint sizing exceeds **SPRINT_MAX_TASKS** or isolation requires it.
+  - **Guided evaluator (2026-04-04, PO)**: **High breadth** (agents, CI, QA, NL parsing contract, remote config); **single story** chosen to avoid shipping **non-functional** “half automation” (target selection without evidence or security guardrails).
+- Overlap / duplicate evaluation:
+  - **US-0084** (DONE): installer + remote **docs** + **`remote_config_summary`** — **US-0086** adds **automation-time target choice**, not POSIX/LF scope.
+  - **US-0085** (OPEN): **`.env`** + **`.env.example`** + **no AI read** — **US-0086** must **compose** (automation may **use** env already set; **must not** read **`.env`**).
+  - **US-0064** (DONE): **schema unchanged**; automation maps to existing **target ids** / **`*Env`** indirection.
+  - **US-0036** / **`REMOTE_EXECUTION`**: **US-0086** may introduce **additional** scratchpad keys (e.g. automation profile) — **architecture** names them; default **manual** posture stays **zero-overhead** when automation is **off**.
+- Intake-time research (**DEC-0011**): **`docs/engineering/research.md`** **`R-0068`** — confirms current kit **does not** auto-route **TEST_COMMAND** by change type; **US-0086** closes the gap via **explicit** policy and tooling.
+- Discovery notes:
+  - Intake closure (2026-04-04, PO, Cursor): operator wants **agents/CI/QA** to **pick** Docker vs SSH (or other configured remote) **when code needs it**; **explicit** “**start container xy**” should **resolve** target from canonical config; **remote** artifacts are for **automation only**, not manual daily use.
+  - Intake pack evidence (**first-intake-pack**, DEC-0060 `ie:` binding + **US-0081** plan map):
+    - intake_run_id=`cursor-20260404-US0086-intake`
+    - selected_pack=`first-intake-pack`
+    - evidence_file=`handoffs/intake_evidence/US-0086-intake-20260404.json`
+    - validator: `python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/US-0086-intake-20260404.json` → **`[INTAKE_EVIDENCE_VALIDATION_OK]`**
+    - `plan_area_inventory` / `plan_area_coverage` / `coverage_complete=true` → all rows map to **`US-0086`** (`automation-agent-routing`, `nl-container-intent`, `ci-qa-remote-wiring`, `manual-vs-automation-docs`).
+    - asked_topics (8): `users_problem`, `runtime_target_environment`, `language_framework_runtime`, `architecture_preference`, `ui_design_expectations`, `security_compliance`, `non_functional_priorities`, `scope_timeline`
+    - missing_topics=`(none)`; assumptions_confirmed=`(none)`
+    - topic_coverage (`ref`): `users_problem` → `ie:cursor-20260404-US0086-intake:0:e303c471042b2550`; `runtime_target_environment` → `ie:cursor-20260404-US0086-intake:1:e44f2751dea4987f`; `language_framework_runtime` → `ie:cursor-20260404-US0086-intake:2:a12c56d667b548e1`; `architecture_preference` → `ie:cursor-20260404-US0086-intake:3:ede1875f428df127`; `ui_design_expectations` → `ie:cursor-20260404-US0086-intake:4:bf142970b05fcbfd`; `security_compliance` → `ie:cursor-20260404-US0086-intake:5:c5c5257e6adaa0f7`; `non_functional_priorities` → `ie:cursor-20260404-US0086-intake:6:a23e78bc5873ad2a`; `scope_timeline` → `ie:cursor-20260404-US0086-intake:7:ed0a70c1edcc10d5`.
+    - Triad hot-surface (**DEC-0054**): **`python scripts/enforce-triad-hot-surface.py --rollover`** → **`rollover_complete`**; **`boundary=2026-04-04`**, **`moved=1`** unit (**US-0086** intake handoff) → **`handoffs/archive/po-to-tl-pack-20260404-b.md`**, **`retained`** hot **`handoffs/po_to_tl.md`** + prepended **pointer** section; **`pack_ref=po-to-tl-pack-20260404-b.md`**; post-check **`--check`** **PASS**.
+  - Next recommended phase: **`/discovery`** (PO, fresh context).
+- Acceptance:
+  - [ ] AC-1: **Scratchpad + `template/`** define an **explicit automation profile** (flag names **architecture-locked**) that enables **automation-only** remote target selection; **default** leaves **manual** workflows **unchanged** (no new mandatory remote overhead).
+  - [ ] AC-2: **`docs/engineering/runbook.md`** (+ **`template/`**) documents **two modes**: **manual** (no reliance on **`.cursor/remote.json`** for daily work) vs **automation** (CI/DI/QA/dev/release may use remote config + **US-0085** **`.env`** pattern for values).
+  - [ ] AC-3: **Agent/rules** (+ **`template/`**): when **automation profile is on**, **deterministic** guidance to **propose or run** checks on **Docker** vs **SSH** vs **local** based on **documented** path/intent heuristics; when **off**, agents **do not** silently reroute **TEST_COMMAND** to remote.
+  - [ ] AC-4: **Natural-language contract**: explicit operator phrase **“start container `<target_id>`”** (or **architecture-locked** synonym table) resolves to **`remote.json`** **`targets[].id`** (or documented alias map) — **fail-closed** with reason code if **unknown** / **disabled** target.
+  - [ ] AC-5: **QA / execute handoffs**: when automation remote is used, evidence cites **target id**, **environment label**, and **automation profile** — **no** secret values (**US-0084** / **US-0085** alignment).
+  - [ ] AC-6: Optional **CI recipe** (doc and/or workflow snippet): **path filters** (e.g. `Dockerfile`, `*.sh`, `docker-compose.yml`) suggesting **Linux** / **container** job — **deterministic**, copy-pasteable; does not claim vendor-specific magic without documenting it.
+  - [ ] AC-7: **Security**: automation **never** reads **`.env`**; **never** prints credentials; uses **`*Env`** names and **remote_config_summary**-style **names-only** output where applicable.
+  - [ ] AC-8: **Tests** or **contract script**: canned inputs prove **target resolution** and **unknown-target** failure; regression **PASS** for existing **`remote_config_summary`** tests when profile is **off**.
+  - [ ] AC-9: **Architecture** (`docs/engineering/architecture.md` **`# US-0086`**) locks **reason codes**, **scratchpad key names**, and **compatibility** with **US-0064** / **DEC-0070**.
+  - [ ] AC-10: **Active + `template/`** parity for commands/rules/scratchpad examples touched by **US-0086**.
+- Boundaries:
+  - In scope: policy, documentation, scratchpad, rules, optional CI doc/snippet, tests, architecture section **# US-0086**, **R-0068** linkage.
+  - Out of scope: replacing **US-0064** JSON schema; fully managed **secrets** SaaS; **unsupervised** production deploy from agent without human gate (**release** remains **US-0045** / command gated).
+
 ## Bug issues (canonical)
 
 Per **`DEC-0061`** / **`US-0079`**: defect work items use **`BUG-####`** ids (**allocator**: next id after highest existing in this section), **`OPEN`/`DONE`** only, and required fields **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`** (non-empty). Append new bugs as **`### BUG-#### — Title`** blocks; keep blocks **sorted by id**. Optional link bullets: **`related_us`**, **`blocks_us`**, **`duplicate_of`**, **`supersedes`** (ids only).

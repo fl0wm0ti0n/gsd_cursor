@@ -1,3 +1,48 @@
+## TL -> Dev Handoff — Sprint S0069 / US-0084 — post-plan-verify → **`/execute`**
+
+> **Update (2026-04-04T19:15:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0069/plan-verify.json`** (`orchestrator_run_id=auto-20260404-02`, **qa**). **`/execute`** (**dev**) **unblocked**.
+
+## Planning summary
+
+- **Sprint**: **`S0069`**
+- **Story**: **`US-0084`** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0069/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0069/plan-verify.json`** (`2026-04-04T19:15:00Z`, **qa**, `orchestrator_run_id=auto-20260404-02`) — **`/execute`** (**dev**) **unblocked**
+- **Bounded read**: **`sprints/S0069/*`** + **`architecture.md` `# US-0084`** + **`R-0067`**
+
+## Architecture and research references
+
+- Architecture: `docs/engineering/architecture.md` (`# US-0084`)
+- Research: `docs/engineering/research.md` (**R-0067**)
+- Intake evidence: `handoffs/intake_evidence/US-0084-intake-20260404.json`
+- Sprint artifacts: `sprints/S0069/*`
+- **Orchestrator run**: `auto-20260404-02`
+
+## Focus
+
+1. **T-001–T-002**: **`.gitattributes`**, **LF/POSIX** **`installer.sh`**, **CI**/**prepublish**/**`dash -n`** + **`tests/installer_shell_bug0004_test.py`** extensions.
+2. **T-003–T-004**: **`runbook.md`** troubleshooting; **US-0064** remote map (**WSL** / **SSH** / **Docker-over-SSH**).
+3. **T-005–T-007**: **`scripts/remote_config_summary.py`**; handoff/evidence cues; **security** pass (no secret values).
+4. **T-008–T-010**: **`template/`** parity; **E2E** minimal path doc; **`run-tests.sh`** / **`.ps1`** **H1–H5**.
+
+## Risks
+
+- **dash** absent on CI — document skip vs hard; keep Python/LF gates mandatory (**architecture**).
+- Helper or logs leaking resolved env values — **T-007** + fixtures (**AC-10**).
+
+## Execution order
+
+Run **`T-001`..`T-010`** per **`sprints/S0069/tasks.md`** — **`sprints/S0069/plan-verify.json`** **`status=PASS`** (**qa**, `2026-04-04T19:15:00Z`).
+
+## Done criteria for Dev completion
+
+- All **10** tasks in **`sprints/S0069/tasks.md`** marked **done**
+- **`sprints/S0069/plan-verify.json`** is **PASS** (QA verified)
+- **`US-0084`** remains **OPEN** until verify-work per **US-0045**
+
+---
+
 ## TL -> Dev Handoff — Sprint S0068 / BUG-0007 — post-plan-verify → **`/execute`**
 
 > **Update (2026-04-04T19:15:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0068/plan-verify.json`** (`orchestrator_run_id=auto-20260404-01`, **qa**). **`/execute`** (**dev**) **unblocked**.

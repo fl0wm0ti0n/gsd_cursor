@@ -1276,14 +1276,35 @@ INSTALLER_COMPLETENESS_PY=$?
 set -e
 assert_true "installer completeness BUG-0003 fixtures pass" "[ \"$INSTALLER_COMPLETENESS_PY\" -eq 0 ]"
 
-# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068)
+# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068) — US-0084 **H1**
+#     (LF / forbidden set tokens / optional dash-n via Python test module)
 INSTALLER_SHELL_TEST="$ROOT/tests/installer_shell_bug0004_test.py"
 assert_true "installer_shell_bug0004_test.py exists" "[ -f \"$INSTALLER_SHELL_TEST\" ]"
 set +e
 "$PY" "$INSTALLER_SHELL_TEST" >/dev/null 2>&1
 INSTALLER_SHELL_PY=$?
 set -e
-assert_true "installer shell BUG-0004 fixtures pass" "[ \"$INSTALLER_SHELL_PY\" -eq 0 ]"
+assert_true "installer shell BUG-0004 / US-0084 H1 fixtures pass" "[ \"$INSTALLER_SHELL_PY\" -eq 0 ]"
+
+# 26S) US-0084 / AC-10 **H2** — optional dash -n on installer.sh (explicit harness row)
+if command -v dash >/dev/null 2>&1; then
+  set +e
+  dash -n "$ROOT/installer.sh" >/dev/null 2>&1
+  DASH_N_EC=$?
+  set -e
+  assert_true "US-0084 H2 dash -n installer.sh passes" "[ \"$DASH_N_EC\" -eq 0 ]"
+else
+  assert_true "US-0084 H2 dash -n skipped (dash not on PATH)" "true"
+fi
+
+# 26S2) US-0084 / AC-10 **H3–H5** — remote_config_summary.py fixture exit codes
+REMOTE_SUMMARY_TEST="$ROOT/tests/remote_config_summary_test.py"
+assert_true "remote_config_summary_test.py exists" "[ -f \"$REMOTE_SUMMARY_TEST\" ]"
+set +e
+"$PY" "$REMOTE_SUMMARY_TEST" >/dev/null 2>&1
+REMOTE_SUMMARY_PY=$?
+set -e
+assert_true "US-0084 H3-H5 remote_config_summary fixtures pass" "[ \"$REMOTE_SUMMARY_PY\" -eq 0 ]"
 
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 INTAKE_RESUME_BRIEF_TEST="$ROOT/tests/intake_bug_resume_brief_bug0005_test.py"

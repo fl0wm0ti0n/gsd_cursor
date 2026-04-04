@@ -1,0 +1,1 @@
+Feature: gitignored repo-root .env holds SSH and Docker connection values for .cursor/remote.json and docs/engineering/release-targets.json workflows. Commit .env.example with names only. AI/agents must not read .env; operators may load .env into shell so agents can run ssh or remote helpers without opening the file.

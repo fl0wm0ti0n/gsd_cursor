@@ -1,0 +1,1 @@
+Story: When automation is enabled, dev/CI/QA agents should choose Docker vs SSH or other remote execution based on code change or explicit NL like start container xy; remote.json and release-targets are for CI/DI/QA/dev/release automations not manual daily use. Manual operators should not need these configs.

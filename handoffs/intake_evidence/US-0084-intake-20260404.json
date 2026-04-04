@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260404-US0084-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Fix global npm its-magic installer.sh so Linux /bin/sh (dash) no longer errors with set: Illegal option - on SSH/Docker hosts; add a documented, automatable way for dev/QA to target WSL or SSH Linux/Docker for distro-specific and container testing.",
+      "intake_run_id": "cursor-20260404-US0084-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260404-US0084-intake:0:5f1f94ca246dc2cb"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "installer.sh and npm package publish pipeline; docs (runbook, developer README, remote config); optional .cursor/remote.json or scratchpad keys; scripts for connectivity probe; template parity.",
+      "intake_run_id": "cursor-20260404-US0084-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260404-US0084-intake:1:cbab3d3d455a8c0d"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Must stay POSIX-safe for sh; no secrets in repo; align with US-0064 release-targets connectivity where possible; Windows + Linux parity; do not break existing REMOTE_EXECUTION contract.",
+      "intake_run_id": "cursor-20260404-US0084-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260404-US0084-intake:2:9e2f9cfb56b1b81f"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Regression: installer.sh parsed under dash; optional CI/npm prepublish check; tests or script that validates remote profile template and prints operator connect hints for WSL/SSH.",
+      "intake_run_id": "cursor-20260404-US0084-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260404-US0084-intake:3:a9d08c7f7c1668bc"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Operators can install/run its-magic on Debian-style sh without line-2 set failure; dev/QA have canonical doc + config to run tests against WSL or SSH Linux/Docker with deterministic steps.",
+      "intake_run_id": "cursor-20260404-US0084-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260404-US0084-intake:4:aab53f4b176faddc"
+    }
+  ]
+}

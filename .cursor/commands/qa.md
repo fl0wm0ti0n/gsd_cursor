@@ -114,6 +114,11 @@ verify no unresolved blockers.
    - If remote connectivity config is incomplete for required remote checks,
      mark blocking with deterministic reason code
      `REMOTE_CONNECTIVITY_CONFIG_INVALID`.
+   - **US-0084**: when `REMOTE_EXECUTION=1`, expect **`handoffs/dev_to_qa.md`**
+     to carry an **environment label** (`WSL`, `ssh:<hostEnv>`, `dockerOverSsh`, …)
+     and **test locus** (local vs remote); reject evidence that pastes secret
+     values (keys/passwords) — **names-only** refs align with
+     `python scripts/remote_config_summary.py` output.
 13. Runtime QA autopilot contract (US-0065 / DEC-0047):
    - Runtime truth path is mandatory for generated-project QA:
      `startup -> readiness/connectivity -> log scan -> bounded retry -> verdict`.

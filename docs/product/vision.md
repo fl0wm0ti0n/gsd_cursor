@@ -36,6 +36,10 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Cross-repo aware**: optional observability can track module/API compatibility across repos and surface contract drift before release decisions.
 - **Component-scoped safety**: optional scoped execution can focus work on selected components while explicitly protecting unaffected components.
 - **Remote-ready by configuration**: optional remote execution uses a canonical `.cursor/remote.json` contract with fail-fast validation when enabled and zero overhead when disabled.
+- **Linux-host installer reliability**: globally published `its-magic` shell entrypoints remain POSIX-safe under `/bin/sh` (including dash) on SSH and container hosts; published artifacts stay aligned with repo sources.
+- **Linux/Docker test ergonomics**: dev and QA can aim checks at WSL, SSH Linux hosts, or Docker contexts through documented, automatable configuration that composes with existing remote connectivity contracts—without ad-hoc connection strings in the repo.
+- **Operator `.env` for connectivity secrets**: optional repo-root **`.env`** (gitignored) can hold values for env vars referenced by **`.cursor/remote.json`** and **release-targets** operator flows, with a committed **`.env.example`** (names only) and explicit **keep-out-of-AI-context** rules—without putting secrets in git or in tracked JSON.
+- **Automation-only remote targeting**: when explicitly enabled for CI/DI/QA/dev/release, agents and workflows can deterministically choose Docker, SSH, or other declared targets from canonical remote config—and resolve explicit “start container \<target\>” phrasing—without burdening manual daily work.
 - **Drop-in installer**: one command installs the entire workflow into any repo.
 - **Multiplatform**: available via npm, Chocolatey, and Homebrew.
 - **Voice-friendly**: multilingual voice input as a first-class input layer.

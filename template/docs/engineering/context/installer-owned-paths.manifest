@@ -28,6 +28,8 @@ scripts/intake_evidence_lib.py
 scripts/intake_bug_routing_guard.py
 scripts/check_intake_template_parity.py
 scripts/materialize_codebase_map.py
+scripts/remote_config_summary.py
+scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
 .github/workflows
 README.md
@@ -52,6 +54,8 @@ scripts/intake_evidence_lib.py
 scripts/intake_bug_routing_guard.py
 scripts/check_intake_template_parity.py
 scripts/materialize_codebase_map.py
+scripts/remote_config_summary.py
+scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
 .github/workflows/ci.yml
 .github/workflows/deploy.yml
@@ -69,4 +73,6 @@ scripts/intake_evidence_lib.py
 scripts/intake_bug_routing_guard.py
 scripts/check_intake_template_parity.py
 scripts/materialize_codebase_map.py
+scripts/remote_config_summary.py
+scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py

@@ -1,0 +1,95 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260404-US0086-intake",
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    { "plan_area_id": "automation-agent-routing", "title": "Agent/QA automation chooses Docker vs SSH vs other remote when code or intent requires it" },
+    { "plan_area_id": "nl-container-intent", "title": "Natural-language start container xy resolves to configured target and runs" },
+    { "plan_area_id": "ci-qa-remote-wiring", "title": "CI/DI/QA/dev/release automations use remote config; manual daily path stays optional" },
+    { "plan_area_id": "manual-vs-automation-docs", "title": "Documentation separates automation-only remote usage from manual operator workflows" }
+  ],
+  "plan_area_coverage": [
+    { "plan_area_id": "automation-agent-routing", "story_ids": ["US-0086"] },
+    { "plan_area_id": "nl-container-intent", "story_ids": ["US-0086"] },
+    { "plan_area_id": "ci-qa-remote-wiring", "story_ids": ["US-0086"] },
+    { "plan_area_id": "manual-vs-automation-docs", "story_ids": ["US-0086"] }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Enable automation so dev/CI/QA agents can select Docker vs SSH vs other remote targets when the changed code requires it; explicit phrases like start container xy should resolve from canonical config and run without the operator pasting connection details. Remote profiles are for CI/DI/QA/dev/release automations only; manual daily work should not depend on these files.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260404-US0086-intake:0:e303c471042b2550"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Cursor agent runtime plus optional GitHub Actions or similar CI; Docker Engine and remote Linux over SSH; host OS may orchestrate; extends existing .cursor/remote.json and release-targets env-reference patterns plus future automation flags.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260404-US0086-intake:1:e44f2751dea4987f"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Markdown rules and commands; Python validators and tests; shell and Docker CLI where applicable; extend current its-magic remote and runbook contracts without a new application stack.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260404-US0086-intake:2:a12c56d667b548e1"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Scratchpad-gated automation profile; agent rules for when to propose or run remote or diagnostic jobs; optional command or workflow hook; document automation-only remote config versus unchanged manual operator path.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260404-US0086-intake:3:ede1875f428df127"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Operator surfaces are CLI and documentation: runbook sections, command help, deterministic error codes when execution target is unknown; no graphical UI.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260404-US0086-intake:4:bf142970b05fcbfd"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Secrets stay in gitignored .env and named env references in JSON; automation must not print credentials; agents must not read .env per US-0085; handoffs record which remote profile ran.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260404-US0086-intake:5:c5c5257e6adaa0f7"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Fail-closed when execution target is ambiguous; bounded autonomy: natural-language intents and path-based cues map to deterministic profiles; avoid silent wrong-environment test runs.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260404-US0086-intake:6:a23e78bc5873ad2a"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0086: policy, documentation, and scratchpad keys first; optional CI matrix or path-filter hooks in the same story if sized; out of scope: replacing US-0064 schema or full cloud provisioning.",
+      "intake_run_id": "cursor-20260404-US0086-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260404-US0086-intake:7:ed0a70c1edcc10d5"
+    }
+  ]
+}

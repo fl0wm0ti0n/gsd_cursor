@@ -1468,11 +1468,27 @@ Assert-True "installer_completeness_bug0003_test.py exists" (Test-Path $installe
 $installerCompletenessRun = Start-Process python -ArgumentList @($installerCompletenessTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "installer completeness BUG-0003 fixtures pass" ($installerCompletenessRun.ExitCode -eq 0)
 
-# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068)
+# 26P) Installer shell startup compatibility contract (BUG-0004 / DEC-0068) — US-0084 H1
 $installerShellTest = Join-Path $root "tests\installer_shell_bug0004_test.py"
 Assert-True "installer_shell_bug0004_test.py exists" (Test-Path $installerShellTest -PathType Leaf)
 $installerShellRun = Start-Process python -ArgumentList @($installerShellTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
-Assert-True "installer shell BUG-0004 fixtures pass" ($installerShellRun.ExitCode -eq 0)
+Assert-True "installer shell BUG-0004 / US-0084 H1 fixtures pass" ($installerShellRun.ExitCode -eq 0)
+
+# 26S) US-0084 / AC-10 H2 — optional dash -n on installer.sh
+$dashCmd = Get-Command dash -ErrorAction SilentlyContinue
+if ($dashCmd) {
+  $installerSh = Join-Path $root "installer.sh"
+  $dashN = Start-Process -FilePath "dash" -ArgumentList @("-n", $installerSh) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+  Assert-True "US-0084 H2 dash -n installer.sh passes" ($dashN.ExitCode -eq 0)
+} else {
+  Assert-True "US-0084 H2 dash -n skipped (dash not on PATH)" ($true)
+}
+
+# 26S2) US-0084 / AC-10 H3-H5 — remote_config_summary.py fixtures
+$remoteSummaryTest = Join-Path $root "tests\remote_config_summary_test.py"
+Assert-True "remote_config_summary_test.py exists" (Test-Path $remoteSummaryTest -PathType Leaf)
+$remoteSummaryRun = Start-Process python -ArgumentList @($remoteSummaryTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0084 H3-H5 remote_config_summary fixtures pass" ($remoteSummaryRun.ExitCode -eq 0)
 
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 $intakeResumeBriefTest = Join-Path $root "tests\intake_bug_resume_brief_bug0005_test.py"

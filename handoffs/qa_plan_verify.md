@@ -1,8 +1,14 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
-## Next — (queue empty at hot inbox ordering)
+## Next — **`S0069` / `US-0084`** (**PASS**)
 
-- **Latest PASS**: **`S0068`** / **`BUG-0007`** — **`/execute`** (**dev**, fresh context) per **`handoffs/resume_brief.md`**.
+- **Verdict**: **PASS** — **`sprints/S0069/plan-verify.json`** **`status=PASS`** (`2026-04-04T19:15:00Z`, **qa**, `orchestrator_run_id=auto-20260404-02`); **AC-1..AC-10** map **1:1** to **T-001..T-010**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# US-0084`**, **`R-0067`**) aligned; **`/execute`** unblocked.
+- **Artifacts**: **`sprints/S0069/plan-verify.json`**, **`sprints/S0069/sprint.md`**, **`sprints/S0069/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0069`** / **`US-0084`**
+
+## Next — (historical queue)
+
+- **Prior PASS**: **`S0068`** / **`BUG-0007`** — closed portfolio segment; see **`handoffs/resume_brief.md`** archives.
 
 ## Completed — S0068 / BUG-0007 (2026-04-04)
 
@@ -77,7 +83,7 @@
 
 ## Next queue
 
-- **`S0068` / `BUG-0007`** — **`sprints/S0068/plan-verify.json`** **`PASS`**; next: **`/execute`** (**dev**, fresh context).
+- **`S0069` / `US-0084`** — **`sprints/S0069/plan-verify.json`** **`PENDING`**; next: **`/plan-verify`** (**qa**, fresh context).
 
 ---
 

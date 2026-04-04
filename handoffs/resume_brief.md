@@ -1,6 +1,65 @@
 # Resume Brief
 
-## Latest orchestration pointer — portfolio post-**`/refresh-context`** / **`S0068`** (`auto-20260404-01`)
+## Latest orchestration pointer — **US-0086** / post-**`/intake`** (manual **2026-04-04**)
+
+- **`/intake`** (PO): captured **`US-0086`** — automation-only remote target selection (**Docker** / **SSH** / declared targets); explicit **“start container \<target_id\>”** maps to **`remote.json`**; manual operators unchanged by default; evidence **`handoffs/intake_evidence/US-0086-intake-20260404.json`**; **`python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/US-0086-intake-20260404.json`** → **`[INTAKE_EVIDENCE_VALIDATION_OK]`**; **`docs/engineering/research.md`** **`R-0068`**.
+- **Canonical status (US-0045)**: **`US-0086`** **OPEN** in **`docs/product/backlog.md`**; **`docs/product/acceptance.md`** row added (**unchecked**). **`US-0085`** remains **OPEN** (`.env` / **`.env.example`**).
+- **`story_id=US-0086`**; **`bug_id=(none)`**; **`sprint_id=(none)`**; **`orchestrator_run_id=(none)`** until next **`/auto`** segment.
+- **Next command**: **`/discovery`** for **`US-0086`** in fresh **PO** context, or **`/auto start-from=discovery`** when resume precedence aligns.
+- **`intended_resume_phase=discovery`**; **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0085** / post-**`/intake`** (manual **2026-04-04**) (superseded by **US-0086** pointer above)
+
+- **`/intake`** (PO): captured **`US-0085`** — gitignored repo **`.env`** for **`.cursor/remote.json`** + **`release-targets.json`** `*Env` values; **`.env.example`** (names only); **no AI read** of **`.env`**; operators **source** before remote/SSH; evidence **`handoffs/intake_evidence/US-0085-intake-20260404.json`**; **`python scripts/intake_evidence_validate.py --file handoffs/intake_evidence/US-0085-intake-20260404.json`** → **`[INTAKE_EVIDENCE_VALIDATION_OK]`**.
+- **Canonical status (US-0045)**: **`US-0085`** **OPEN** in **`docs/product/backlog.md`**; **`docs/product/acceptance.md`** row added (**unchecked**).
+- **`story_id=US-0085`**; **`bug_id=(none)`**; **`sprint_id=(none)`**; **`orchestrator_run_id=(none)`** until next **`/auto`** segment.
+- **Next command**: **`/discovery`** for **`US-0085`** in fresh **PO** context, or **`/auto start-from=discovery`** when resume precedence aligns.
+- **`intended_resume_phase=discovery`**; **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/refresh-context`** / **`S0069`** (**2026-04-05**)
+
+- **`/refresh-context`** (curator, **`2026-04-05T01:30:00Z`**, `orchestrator_run_id=auto-20260404-02`): post-release reconciliation for **`S0069`** / **`US-0084`** — **`docs/engineering/decisions.md`**, **`docs/engineering/research.md`** (**`R-0067`** delivery closed), **`sprints/S0069/summary.md`**, **`docs/product/backlog.md`** **`refresh_context_notes`**, **`docs/engineering/state.md`** checkpoint + phase-boundary closure; **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** → **`[BUG_VALIDATION_OK]`**; triad (**DEC-0054**) — **`docs/engineering/state-archive/state-pack-20260404-h.md`** rollover per **`docs/engineering/state.md`**.
+- **Terminal auto closure**: **`stop_reason=completed`**, **`stop_phase=refresh-context`**, **`next_scheduled_phase=none`** (next work discretionary **`/intake`** for next **US**; portfolio **BUG-0001..BUG-0007** **DONE** — **no OPEN** in range), **`backlog_drain_segment_complete=1`**, **`stories_completed_this_run=1`** (segment **`US-0084`** / sprint **`S0069`**).
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=intake`** (discretionary next **US**); **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+- **Isolation provenance**: **`docs/engineering/state.md`** — **Refresh-context checkpoint (2026-04-05) — S0069 / US-0084 / auto-20260404-02** (`phase_id=refresh-context`, `role=curator`, `fresh_context_marker=curator-S0069-US0084-refresh-context-20260405T013000Z-fresh`, strict proof `runtime_proof_id=rp-auto-20260404-02-refresh-context-curator-20260405T013000Z-S0069-US0084`, `proof_hash=3a714c67c8b09304c2d80c7256892c6ec5b1d60082c6eac807b568c5000ff270`).
+- **Sync (DEC-0018)**: **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**. **Publish**: **`RELEASE_PUBLISH_MODE=confirm`** — no auto-publish without confirmation.
+
+## Latest orchestration pointer — **US-0084** / post-**`/release`** / **`S0069`** (**2026-04-05**) (historical)
+
+- **`/release`** (release, **`2026-04-05T00:10:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`handoffs/releases/S0069-release-notes.md`** finalized; **`handoffs/release_queue.md`** **S0069** **`released`**; **`sprints/S0069/release-findings.md`** **PASS**; legacy **`handoffs/release_notes.md`** pointer → **S0069**; strict proof `runtime_proof_id=rp-auto-20260404-02-release-release-20260405T001000Z-S0069-US0084`, `proof_hash=418cbee2c8f7508880e1cbcae744d67877c08e68c91432b3de38f0e1773b07fc` on **`docs/engineering/state.md`** — next **`/refresh-context`** (**curator**).
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=refresh-context`**; **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+- **Sync (DEC-0018)**: **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**. **Publish**: **`RELEASE_PUBLISH_MODE=confirm`** — no auto-publish without confirmation.
+
+## Latest orchestration pointer — **US-0084** / post-**`/verify-work`** / **`S0069`** (**2026-04-04**) (historical)
+
+- **`/verify-work`** (qa, **`2026-04-04T23:45:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`sprints/S0069/uat.json`** / **`sprints/S0069/uat.md`** **PASS** (**10/10**); **`handoffs/release_queue.md`** **S0069** **`ready`**; **`handoffs/releases/S0069-release-notes.md`** (stub); **`docs/product/backlog.md`** **US-0084** **DONE**; **`docs/product/acceptance.md`** **US-0084** **`[x]`** — **superseded** by post-**`/release`** pointer above.
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=release`** (historical); **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/qa`** / **`S0069`** (**2026-04-04**) (historical)
+
+- **`/qa`** (qa, **`2026-04-04T23:00:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`sprints/S0069/qa-findings.md`** **PASS** — **superseded** by post-**`/verify-work`** pointer above.
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=verify-work`** (historical); **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/execute`** / **`S0069`** (**2026-04-04**) (historical)
+
+- **`/execute`** (dev, **`2026-04-04T20:30:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`sprints/S0069/tasks.md`** **T-001..T-010** **done** — **superseded** by post-**`/verify-work`** pointer above.
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=qa`** (historical); **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/plan-verify`** / **`S0069`** (**2026-04-04**) (historical)
+
+- **`/plan-verify`** (qa, **`2026-04-04T19:15:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`sprints/S0069/plan-verify.json`** **`PASS`** — **superseded** by post-**`/execute`** pointer above.
+- **`story_id=US-0084`**; **`bug_id=(none)`**; **`sprint_id=S0069`**; **`intended_resume_phase=execute`** (historical); **`resolution_source=resume_brief`**; **`resolution_status=resolved`**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/sprint-plan`** / **`S0069`** (**2026-04-04**) (historical)
+
+- **`/sprint-plan`** (tech-lead, **`2026-04-04T18:00:00Z`**, `orchestrator_run_id=auto-20260404-02`): **`S0069`** seeded — **`sprints/S0069/sprint.md`**, **`sprints/S0069/tasks.md`**. **Superseded** by post-**`/plan-verify`** pointer above.
+- **Next command (historical)**: **`/plan-verify`**; **superseded**.
+
+## Latest orchestration pointer — **US-0084** / post-**`/architecture`** (**2026-04-04**) (historical)
+
+- **`/architecture`** (tech-lead, **`2026-04-04T17:00:00Z`**): **`docs/engineering/architecture.md`** **`# US-0084`**. **Superseded** by post-**`/sprint-plan`** pointer above.
+
+## Latest orchestration pointer — portfolio post-**`/refresh-context`** / **`S0068`** (`auto-20260404-01`) (historical)
 
 - **`/refresh-context`** complete in fresh **curator** context (`2026-04-05T01:30:00Z`); post-release reconciliation for **`S0068`** / **`BUG-0007`** — **`docs/engineering/decisions.md`**, **`docs/engineering/research.md`** (**`R-0066`** delivery closed), **`sprints/S0068/summary.md`**, **`docs/product/backlog.md`** **`refresh_context_notes`**; **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** → **`[BUG_VALIDATION_OK]`** (post-curator gate); triad (**DEC-0054**) — **`state-pack-20260403-ai.md`** rollover per **`docs/engineering/state.md`**.
 - **`bug_id=BUG-0007`** (**DONE**); **`orchestrator_run_id=auto-20260404-01`**; **`sprint_id=S0068`**.
@@ -229,28 +288,32 @@
 
 ## Current status
 
-- **Active segment**: Curator **`/refresh-context`** **PASS** (`2026-04-05T01:30:00Z`, **`orchestrator_run_id=auto-20260404-01`**) — terminal closure **`stop_reason=completed`**, **`stop_phase=refresh-context`**, **`next_scheduled_phase=none`**; portfolio **BUG-0001..BUG-0007** all **DONE** (**no OPEN** bugs in range); **`R-0066`** closed in **`docs/engineering/research.md`**; sprint **`S0068`** **released**; **`handoffs/release_queue.md`** **`S0067`** / **`S0068`** = **`released`**.
-- **Prior closure**: **`S0066`** / **`BUG-0005`** released under **`auto-20260403-02`**; **`S0066`** = **`released`**.
+- **Active segment**: **`/intake`** persisted **`US-0085`** (**OPEN**) — gitignored **`.env`** + **`.env.example`** for **remote.json** / **release-targets** `*Env` flows; no AI read of **`.env`**; evidence validated.
+- **Prior segment**: Curator **`/refresh-context`** **PASS** for **`S0069`** / **`US-0084`** (`2026-04-05T01:30:00Z`, **`orchestrator_run_id=auto-20260404-02`**) — **`US-0084`** **DONE** / **`S0069`** **released**; historical context only for **`US-0085`** continuation.
+- **Prior closure**: Same as prior segment (terminal **`next_scheduled_phase=none`** at that closure superseded by **`US-0085`** intake).
 
 ## Next actions
 
-1. Run **`/intake`** for the next **US** story when ready (bug portfolio idle), or remain idle until scheduled; optional **`/auto start-from=intake`** when merged scratchpad and resume precedence align.
+1. Run **`/discovery`** for **`US-0085`** in fresh **PO** context (or **`/auto`** when resume resolves to **`discovery`**).
 2. Preserve canonical status authority: **`docs/product/backlog.md`** only (**US-0045**).
 
 ## Intended resume phase
 
-`intake`
+`discovery`
 
 ## Resume target
 
 - bug_id=(none; portfolio **BUG-0001..BUG-0007** **DONE**)
-- story_id=(next **US** — assign at **`/intake`**)
-- sprint_id=(none until next sprint seeds)
-- boundary=post-**`/refresh-context`** checkpoint **`auto-20260404-01`** (isolation + strict proof on **`docs/engineering/state.md`**); queue **`S0068`** **`released`**; **`next_scheduled_phase=none`**; prior sprint **`S0067`** / **`BUG-0006`** **released** under **`auto-20260403-03`**
+- story_id=**US-0085**
+- sprint_id=(none until **`/sprint-plan`**)
+- boundary=post-**`/intake`** (**`US-0085`**, **2026-04-04**); prior **`/refresh-context`** closure **`auto-20260404-02`** / **`S0069`** remains historical
 
 ## Isolation provenance (US-0048/US-0056)
 
-- isolation_provenance_ref=docs/engineering/state.md (**Refresh-context checkpoint (2026-04-05) — S0068 / BUG-0007 / auto-20260404-01**)
+- isolation_provenance_ref=docs/engineering/state.md (**Refresh-context checkpoint (2026-04-05) — S0069 / US-0084 / auto-20260404-02**)
+- us0084_refresh_context_strict_proof_ref=`runtime_proof_id=rp-auto-20260404-02-refresh-context-curator-20260405T013000Z-S0069-US0084`, `proof_hash=3a714c67c8b09304c2d80c7256892c6ec5b1d60082c6eac807b568c5000ff270`
+- s0069_release_strict_proof_ref=`runtime_proof_id=rp-auto-20260404-02-release-release-20260405T001000Z-S0069-US0084`, `proof_hash=418cbee2c8f7508880e1cbcae744d67877c08e68c91432b3de38f0e1773b07fc`
+- isolation_provenance_ref_prior=docs/engineering/state.md (**Refresh-context checkpoint (2026-04-05) — S0068 / BUG-0007 / auto-20260404-01**)
 - bug0007_plan_verify_strict_proof_ref=`runtime_proof_id=rp-auto-20260404-01-plan-verify-qa-20260404T191500Z-S0068-BUG0007`, `proof_hash=f0174f3d8c859ea1b4e0c7af64af4e142d2ad33c034a8fe455f5a13c311dc2a0`
 - bug0007_sprint_plan_strict_proof_ref=`runtime_proof_id=rp-auto-20260404-01-sprint-plan-tech-lead-20260404T180000Z-S0068-BUG0007`, `proof_hash=3da5b486fdf3b8f3bdeebbf91b8818f98d99ebb409136fe6afeda99fef5c85e7`
 - bug0007_architecture_strict_proof_ref=`runtime_proof_id=rp-auto-20260404-01-architecture-tech-lead-20260404T160000Z-BUG0007`, `proof_hash=ce1548cd71d2c7aa0728d288f7514615476ef001e8780a187f8a70b570c96678`
@@ -273,18 +336,18 @@
 ## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
-- resolved_start_phase=intake
+- resolved_start_phase=discovery
 - resolution_source=resume_brief
 - resolution_status=resolved
-- stop_phase=refresh-context
-- stop_reason=completed
-- next_scheduled_phase=none
-- backlog_drain_segment_complete=1
-- stories_completed_this_run=1
+- stop_phase=(n/a; **US-0085** intake segment complete — await **`/discovery`**)
+- stop_reason=(n/a)
+- next_scheduled_phase=discovery
+- backlog_drain_segment_complete=(n/a until next **`/auto`**)
+- stories_completed_this_run=(n/a)
 - bug_id=(none)
-- story_id=(next US at intake)
+- story_id=US-0085
 - sprint_id=(none)
-- orchestrator_run_id=auto-20260404-01
+- orchestrator_run_id=(pending next **`/auto`**)
 - portfolio_next_open_bug_id=(none; canonical bugs BUG-0001..BUG-0007 DONE)
 - ALLOW_AUTO_PUSH=0 (sync note; DEC-0018)
-- auto_backlog_drain_hint=(optional; next cycle may reset for **US** work — **DEC-0022**)
+- auto_backlog_drain_hint=(optional; **US-0085** lifecycle may run under **`AUTO_BACKLOG_DRAIN`** — **DEC-0022**)

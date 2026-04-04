@@ -1,3 +1,32 @@
+## QA -> Verify-work — S0069 / US-0084 (`auto-20260404-02`)
+
+### Status
+
+**PASS** (QA phase) — **`sprints/S0069/qa-findings.md`** **PASS**; proceed to **`/verify-work`** in fresh **qa** context.
+
+### Scope validated
+
+- **`US-0084`** per **`docs/engineering/architecture.md`** **`# US-0084`** / **`R-0067`**: POSIX **`installer.sh`** + LF / **`.gitattributes`**; **`scripts/guard_installer_publish.py`** + **`package.json`** **`prepublishOnly`**; **`tests/installer_shell_bug0004_test.py`**; **`scripts/remote_config_summary.py`** (**`DEC-0070`**) + **`tests/remote_config_summary_test.py`**; harness **H1–H5** wiring; runbook / **`runtime-connectivity.md`** / **`us-0084-remote-e2e.md`**; template parity (intake parity script).
+
+### Commands executed (QA)
+
+- `python tests/installer_shell_bug0004_test.py` → **PASS**
+- `python tests/remote_config_summary_test.py` → **PASS**
+- `python scripts/guard_installer_publish.py` → **PASS** (`dash` skipped on Windows host; documented)
+- `python scripts/check_intake_template_parity.py --repo .` → **PASS** (`[INTAKE_TEMPLATE_PARITY_OK]`)
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS**
+- `python tests/installer_completeness_bug0003_test.py` → **PASS** (spot)
+
+### Artifacts
+
+- **`sprints/S0069/qa-findings.md`**, **`docs/product/backlog.md`** **`qa_notes`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** (QA checkpoint + **DEC-0038** strict proof).
+
+### Required next step
+
+Run **`/verify-work`** for **`S0069`** / **`US-0084`**.
+
+---
+
 ## QA -> Verify-work — S0068 / BUG-0007 (`auto-20260404-01`)
 
 ### Status
