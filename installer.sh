@@ -92,8 +92,13 @@ list_source_files() {
 
 get_manifest_paths() {
   section="$1"
+  # BUG-0008: strip trailing CR so CRLF manifests (Windows-published npm tarballs)
+  # still match [section] headers under POSIX awk on Linux.
   awk -v s="$section" '
     BEGIN { in_section=0 }
+    {
+      sub(/\r$/, "")
+    }
     /^[[:space:]]*#/ { next }
     /^[[:space:]]*$/ { next }
     /^\[/ {
@@ -205,6 +210,7 @@ write_installed_version() {
   printf "%s" "$2" > "$vf"
   legacy="$1/.its-magic-version"
   [ -f "$legacy" ] && rm -f "$legacy"
+  return 0
 }
 
 sync_root_readme_to_its_magic() {

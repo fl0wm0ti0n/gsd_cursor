@@ -303,6 +303,8 @@ Guided and low-touch parity:
 
 ## Interactive intake evidence validation (US-0078 / DEC-0060 / US-0083 / DEC-0067)
 
+- Interactive intake evidence validation (US-0078 / DEC-0060) — automation/harness anchor; extended rules for **US-0083** / **DEC-0067** follow in this section.
+
 **US-0078** adds machine-verifiable **`topic_coverage`** rows, canonical **`ie:`** refs
 (**DEC-0060**), asked-vs-covered enforcement, and **`assumption_confirmation_ref`**
 binding before backlog/acceptance writes.
@@ -1170,6 +1172,35 @@ Semantics:
   no eligible stories, or a mandatory stop condition.
 - Decision gates remain mandatory and pause progression until user decision.
 
+## Targeted bug auto drain (US-0087)
+
+Use **`/auto`** with an explicit **OPEN** bug binding when you want defect-scoped
+continuation instead of story **`AUTO_BACKLOG_DRAIN`**.
+
+**Canonical argv** (exact literals; no aliases in v1):
+
+- **`bug-target=BUG-####`** — single **OPEN** bug from **`docs/product/backlog.md`**
+  **`## Bug issues (canonical)`** (example: **`bug-target=BUG-0007`**).
+- **`bug-target=all-open`** — walk all **OPEN** bugs in ascending **numeric**
+  **`BUG-####`** order (optional per-run cap: **`AUTO_BUG_MAX_ITEMS`**).
+
+**Scratchpad** (merged; default-off — see **`.cursor/scratchpad.md`** and
+**`template/.cursor/scratchpad.local.example.md`**):
+
+- **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, **`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`**
+
+**Mutex**: do **not** enable **`AUTO_BACKLOG_DRAIN=1`** and **`AUTO_BUG_QUEUE=1`**
+together **without** an explicit **`bug-target=`** argv on that invocation — fail
+closed **`AUTO_SCHEDULER_CONFLICT`**. Supply **`bug-target=`** to select the bug
+scheduler for that run (normative detail: **`docs/engineering/auto-orchestration-reference.md`**
+**Optional bug-queue mode (US-0087)** and **`docs/engineering/architecture.md`**
+**`# US-0087`**).
+
+**Fail-closed codes**: **`AUTO_BUG_QUEUE_EMPTY`**, **`AUTO_BUG_TARGET_UNKNOWN`**,
+**`AUTO_BUG_TARGET_NOT_OPEN`**, **`AUTO_SCHEDULER_CONFLICT`** — plus spawn-only
+orchestrator rules (**`BUG-0006`**, **`US-0069`**, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**;
+see **`.cursor/commands/auto.md`**).
+
 ## Explicit bulk sprint planning mode (US-0046)
 
 `/sprint-plan` stays single-scope by default. Bulk planning is opt-in via
@@ -1546,6 +1577,15 @@ Single-writer drift safety:
 - External concurrent conflicting writes fail safe with
   `INTAKE_CONCURRENT_WRITER_DETECTED`.
 - Fail-safe path performs no partial overwrite.
+
+## Post-release operator commands (S0070 / BUG-0008 — released `2026-04-05`)
+
+**S0070** **`released`**; **`BUG-0008`** **DONE** in canonical backlog. In-repo version **`its-magic@0.1.2-41`**. **`/release`** skipped registry publish while **`RELEASE_PUBLISH_MODE=disabled`** — operators still run the steps below when pushing to npm or validating on Debian.
+
+- **Tests (canonical):** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` — refresh **`tests/report.md`**; release gate used **793**/0 @ **2026-04-05T20:21:40Z** with **US-0071** harness rows **PASS**.
+- **Prepublish:** `npm run prepublishOnly` (runs **`guard:installer`**).
+- **Publish:** `npm publish` — set **`RELEASE_PUBLISH_MODE`** to **`confirm`** or **`auto`** when ready; no inline registry secrets in docs.
+- **Debian global E2E (optional follow-up):** **`DEFERRED_DEBIAN_E2E_NO_RUNTIME`** was waived for the release cycle — when a Debian/SSH target exists (**US-0086**), run `npm install -g its-magic@0.1.2-41` (or equivalent), `cat -A` on installed `template/docs/engineering/context/installer-owned-paths.manifest` (no `^M$`), then `its-magic --target <repo> --mode missing` without `[INSTALL_MANIFEST_ERROR]`.
 
 ## Project run steps
 

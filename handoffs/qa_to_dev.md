@@ -1,3 +1,33 @@
+# QA -> Dev Handoff — Sprint S0071 (US-0087)
+
+## Status: **SUPERSEDED** — S0071 QA **PASS** (`2026-04-07T21:07:00Z`)
+
+Fresh **`/qa`** re-run after dev remediation + **DEC-0054** triad rollover (**`state-pack-20260407-b.md`**) → **`TEST_COMMAND`** **PASS** (**794**/0). See **`sprints/S0071/qa-findings.md`** (current). **Next**: **`/verify-work`**. The **FAIL** stanza below is **historical** only.
+
+---
+
+## Historical: **FAIL** — blocking remediation required (2026-04-07 pre-remediation)
+
+Fresh **`/qa`** for **`S0071`** / **`US-0087`** (`orchestrator_run_id=auto-20260405-01`) recorded **FAIL** in **`sprints/S0071/qa-findings.md`** (superseded revision).
+
+## Verification completed
+
+- **`python scripts/check-user-visible-metadata.py`**: **PASS** (exit **0**).
+- **`powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`**: **FAIL** (exit **1**).
+- Evidence: **`tests/report.md`** (`Timestamp: 2026-04-07T20:30:33Z`, **Pass: 790**, **Fail: 4**).
+
+## Blocking findings (must fix before `/verify-work`)
+
+1. **Harness substring drift**: **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** assert **`Resolve start phase in strict order:`** in **`auto.md`**; US-0087 text uses **`Resolve nominal start phase and scheduler inputs in strict order`** — update harness or restore anchor phrase (active + template).
+2. **`RELEASE_PUBLISH_MODE`**: Harness expects **`RELEASE_PUBLISH_MODE=confirm`** in **`.cursor/scratchpad.md`**; repo has **`disabled`** — align materialized baseline or relax test to documented key presence.
+3. **Scratchpad pair parity (US-0075 AC-11)**: **`AUTO_BUG_*`** + **`# Optional bug-queue mode (US-0087)`** block missing from **active** **`.cursor/scratchpad.local.example.md`**; **`template/`** baseline vs example pair also drifts — sync keys + catalog headers across **`.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`**, **`template/.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.local.example.md`**.
+
+## Required next step
+
+- **`/execute`** (fresh **dev**), then **`/qa`** re-run until **`TEST_COMMAND`** is green.
+
+---
+
 # QA -> Dev Handoff - Sprint S0050 (US-0071)
 
 ## Status: PASS - no fixes required

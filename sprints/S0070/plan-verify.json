@@ -1,0 +1,58 @@
+{
+  "sprint_id": "S0070",
+  "bug_id": "BUG-0008",
+  "story_id": null,
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (BUG-0008 expected/actual) + sprints/S0070/sprint.md (AC-1..AC-7 decomposition)",
+    "task_source": "sprints/S0070/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0070/sprint.md",
+    "decision_source": "(none — governance: architecture # BUG-0008, R-0069)",
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# BUG-0008)",
+      "docs/engineering/research.md (R-0069)",
+      "US-0045",
+      "US-0054",
+      "US-0084"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead, 2026-04-04T23:30:00Z, orchestrator_run_id=auto-20260404-03): sprint-local AC-1..AC-7 each assigned exactly one task T-001..T-007 in tasks.md (1:1 bijection).",
+      "QA plan-verify (qa, 2026-04-04T23:55:00Z, orchestrator_run_id=auto-20260404-03): re-verified tasks table + deterministic AC↔T mapping — AC-1..AC-7 each maps exactly one of T-001..T-007; no duplicate task IDs or orphan ACs.",
+      "Cross-read sprint.md scope vs architecture # BUG-0008 (remaining delivery: version bump, npm publish, Debian global E2E, R-0069 closure on DONE; in-repo mitigations + 26P2 + guards already documented).",
+      "Sizing: 7 tasks <= SPRINT_MAX_TASKS=12; split not required.",
+      "Canonical bug status remains OPEN (US-0045) until verify-work; not marked DONE at plan-verify.",
+      "plan_integrity flags confirmed; gaps cleared; residual_risks acknowledged per sprint.md and architecture."
+    ],
+    "orchestrator_run_id": "auto-20260404-03",
+    "planned_at": "2026-04-04T23:30:00Z",
+    "plan_verified_at": "2026-04-04T23:55:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "verified", "notes": "package.json (+ lock) semver bump per US-0054" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "verified", "notes": "npm pack + prepublishOnly + guard_installer_publish" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "verified", "notes": "optional README/runbook operator note" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "verified", "notes": "installer_manifest_crlf_bug0008_test.py + run-tests 26P2" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "verified", "notes": "Debian global npm E2E + evidence" },
+    { "ac": "AC-6", "tasks": ["T-006"], "status": "verified", "notes": "npm publish + S0070 release notes + release_queue" },
+    { "ac": "AC-7", "tasks": ["T-007"], "status": "verified", "notes": "UAT, bug_issue_validate, release-findings, R-0069 on DONE" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Operators remain on pre-fix global tarball until publish completes — mitigate via T-006 + release notes.",
+    "E2E host lacks npm/global install path — mitigate with docker-dmz or documented equivalent per architecture.",
+    "RELEASE_PUBLISH_MODE=confirm blocks unattended publish — expected; task documents operator gate."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# BUG-0008)",
+      "docs/engineering/research.md (R-0069)"
+    ]
+  },
+  "summary": "PASS — QA /plan-verify complete for S0070 / BUG-0008 (orchestrator_run_id=auto-20260404-03); /execute (dev) unblocked."
+}

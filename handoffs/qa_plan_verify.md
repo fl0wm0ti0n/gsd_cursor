@@ -1,5 +1,12 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0071` / `US-0087`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0071/plan-verify.json`** **`status=PASS`** (`2026-04-06T23:00:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); **AC-1..AC-10** map **1:1** to **`T-001..T-010`**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# US-0087`**, **`R-0070`**) aligned; **`/execute`** unblocked.
+- **Artifacts**: **`sprints/S0071/plan-verify.json`**, **`sprints/S0071/sprint.md`**, **`sprints/S0071/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Strict proof**: **`runtime_proof_id=rp-auto-20260405-01-plan-verify-qa-20260406T230000Z-S0071-US0087`**, **`proof_hash=487eea941a971c7fbb7bfd08eb80db4f5fbee58b3deffa7cd22e915805a7150b`**
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0071`** / **`US-0087`**
+
 ## Next — **`S0069` / `US-0084`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0069/plan-verify.json`** **`status=PASS`** (`2026-04-04T19:15:00Z`, **qa**, `orchestrator_run_id=auto-20260404-02`); **AC-1..AC-10** map **1:1** to **T-001..T-010**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# US-0084`**, **`R-0067`**) aligned; **`/execute`** unblocked.
@@ -83,7 +90,7 @@
 
 ## Next queue
 
-- **`S0069` / `US-0084`** — **`sprints/S0069/plan-verify.json`** **`PENDING`**; next: **`/plan-verify`** (**qa**, fresh context).
+- **`S0071` / `US-0087`** — **`sprints/S0071/plan-verify.json`** **`PASS`**; next: **`/execute`** (**dev**, fresh context).
 
 ---
 

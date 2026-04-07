@@ -303,6 +303,8 @@ Guided and low-touch parity:
 
 ## Interactive intake evidence validation (US-0078 / DEC-0060 / US-0083 / DEC-0067)
 
+- Interactive intake evidence validation (US-0078 / DEC-0060) — automation/harness anchor; extended rules for **US-0083** / **DEC-0067** follow in this section.
+
 **US-0078** adds machine-verifiable **`topic_coverage`** rows, canonical **`ie:`** refs
 (**DEC-0060**), asked-vs-covered enforcement, and **`assumption_confirmation_ref`**
 binding before backlog/acceptance writes.
@@ -1169,6 +1171,35 @@ Semantics:
   deterministically and run full lifecycle story-by-story until bounded limit,
   no eligible stories, or a mandatory stop condition.
 - Decision gates remain mandatory and pause progression until user decision.
+
+## Targeted bug auto drain (US-0087)
+
+Use **`/auto`** with an explicit **OPEN** bug binding when you want defect-scoped
+continuation instead of story **`AUTO_BACKLOG_DRAIN`**.
+
+**Canonical argv** (exact literals; no aliases in v1):
+
+- **`bug-target=BUG-####`** — single **OPEN** bug from **`docs/product/backlog.md`**
+  **`## Bug issues (canonical)`** (example: **`bug-target=BUG-0007`**).
+- **`bug-target=all-open`** — walk all **OPEN** bugs in ascending **numeric**
+  **`BUG-####`** order (optional per-run cap: **`AUTO_BUG_MAX_ITEMS`**).
+
+**Scratchpad** (merged; default-off — see **`.cursor/scratchpad.md`** and
+**`template/.cursor/scratchpad.local.example.md`**):
+
+- **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, **`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`**
+
+**Mutex**: do **not** enable **`AUTO_BACKLOG_DRAIN=1`** and **`AUTO_BUG_QUEUE=1`**
+together **without** an explicit **`bug-target=`** argv on that invocation — fail
+closed **`AUTO_SCHEDULER_CONFLICT`**. Supply **`bug-target=`** to select the bug
+scheduler for that run (normative detail: **`docs/engineering/auto-orchestration-reference.md`**
+**Optional bug-queue mode (US-0087)** and **`docs/engineering/architecture.md`**
+**`# US-0087`**).
+
+**Fail-closed codes**: **`AUTO_BUG_QUEUE_EMPTY`**, **`AUTO_BUG_TARGET_UNKNOWN`**,
+**`AUTO_BUG_TARGET_NOT_OPEN`**, **`AUTO_SCHEDULER_CONFLICT`** — plus spawn-only
+orchestrator rules (**`BUG-0006`**, **`US-0069`**, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**;
+see **`.cursor/commands/auto.md`**).
 
 ## Explicit bulk sprint planning mode (US-0046)
 

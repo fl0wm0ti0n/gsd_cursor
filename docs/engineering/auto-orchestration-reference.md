@@ -17,6 +17,11 @@
 - Phase context transfer happens only through artifacts and handoff files.
 - Scope is process/workflow orchestration only. Do not claim runtime product
   orchestration changes.
+- **Bug-queue mode** (**`US-0087`**) uses the same **spawn-only** model: schedule
+  materialization and spawn phase-role subagents per bug segment — **never** in-turn
+  **`execute`**, **`qa`**, or other lifecycle work in the orchestrator context.
+  Missing spawn → **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** (**`BUG-0006`**,
+  **`US-0069`**, **`DEC-0051`**).
 
 ## Spawn-boundary integrity (BUG-0006 / US-0080)
 
@@ -212,7 +217,7 @@ behavior applies otherwise.
 
 ### Plan materialization pipeline (evaluation order)
 
-On every `/auto` entry (including resume, backlog-drain, bulk execute, and
+On every `/auto` entry (including resume, backlog-drain, bug-queue, bulk execute, and
 team-mode runs), **recompute** from merged scratchpad:
 
 1. Parse merged scratchpad policy inputs for phase selection + `SECURITY_REVIEW`.
@@ -246,7 +251,8 @@ team-mode runs), **recompute** from merged scratchpad:
 
 After computing the **resolved phase plan**, resolve the **nominal** start
 phase using **Deterministic resume-source precedence** (explicit `start-from`
-→ `resume_brief` → `state` fallback → fail-fast).
+→ **`bug-target=`** argv (when present) → merged scratchpad → `resume_brief` →
+`state` fallback → fail-fast).
 
 Then **intersect**:
 
@@ -289,6 +295,19 @@ continuation breadcrumbs) including:
 - `phase_boundary` (completed `phase_id`)
 - `next_scheduled_phase` (or `none` when complete/stopped)
 
+**`US-0087` bug-queue extensions** (when bug scheduler is active or segment is
+bug-scoped; see **`architecture.md`** **`# US-0087`**):
+
+- `segment_work_item_kind` (`story|bug`)
+- `active_bug_id` (`BUG-####` or `(none)`)
+- `bug_queue_position` (1-based into **OPEN** ordering for `all-open`, or `(none)`)
+- `bug_queue_remaining` (integer or `(none)`)
+- `backlog_drain_active` (boolean — story **`AUTO_BACKLOG_DRAIN`** drives **this** run)
+- `bug_queue_active` (boolean — bug scheduler drives **this** run)
+
+**Invariant**: `backlog_drain_active` and `bug_queue_active` must **not** both be
+true for the same materialized run (scheduler mutex).
+
 ## Inputs
 - Merged scratchpad policy (`US-0073` / `DEC-0055`): resolve flags from **local >
   materialized `.cursor/scratchpad.md` > `.cursor/scratchpad.local.example.md`**
@@ -309,7 +328,11 @@ continuation breadcrumbs) including:
 - `TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS` from merged scratchpad context
 - Current product and engineering docs
 - Optional explicit argument: `start-from=<phase>`
+- Optional explicit argument: **`bug-target=BUG-####`** or **`bug-target=all-open`**
+  (**`US-0087`**; parsed before merged scratchpad scheduler keys)
 - Optional explicit argument: `--execute-bulk` (one-run explicit override)
+- `AUTO_BUG_QUEUE`, `AUTO_BUG_TARGET`, `AUTO_BUG_MAX_ITEMS`, `AUTO_BUG_ON_BLOCK`
+  from merged scratchpad (**`US-0087`**)
 - Resume-source artifacts:
   - `handoffs/resume_brief.md`
   - `docs/engineering/state.md`
@@ -358,6 +381,90 @@ Deterministic behavior when enabled (`AUTO_BACKLOG_DRAIN=1`):
 
 Default-safe behavior:
 - With `AUTO_BACKLOG_DRAIN=0`, preserve existing single-segment continuation.
+
+## Optional bug-queue mode (US-0087)
+
+`/auto` supports an optional, **default-off** bug-queue scheduler for **OPEN**
+defects in **`docs/product/backlog.md`** **`## Bug issues (canonical)`**,
+orthogonal to story-only **`AUTO_BACKLOG_DRAIN`** (**`US-0044`** / **`DEC-0022`**).
+Bug-queue mode is **spawn-only** — same **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**
+contract as other phases (**`BUG-0006`**, **`US-0069`** / **`DEC-0051`**).
+
+### Canonical argv literals (AC-1)
+
+Exact tokens (**no aliases** in v1; contract-tested):
+
+- **`bug-target=BUG-####`** — single **OPEN** bug (example: **`bug-target=BUG-0007`**).
+- **`bug-target=all-open`** — deterministic **OPEN**-only queue.
+
+### Scratchpad keys (merged; `template/` parity)
+
+Default-off when unset (see **`architecture.md`** **`# US-0087`**):
+
+- **`AUTO_BUG_QUEUE`**: `0|1`
+- **`AUTO_BUG_TARGET`**: `all-open` | **`BUG-####`** — required when **`AUTO_BUG_QUEUE=1`**
+  unless **`bug-target=`** argv supplies the target for this invocation.
+- **`AUTO_BUG_MAX_ITEMS`**: non-negative integer — optional cap on bugs consumed per
+  orchestrator run for **`all-open`**; **`0`** or unset = no cap beyond queue length.
+- **`AUTO_BUG_ON_BLOCK`**: `stop|skip` — queue behavior when a bug segment stops at a
+  pause/stop boundary.
+
+### Scheduler mutex and argv precedence (AC-3)
+
+**One active scheduler** per materialized run:
+
+- If merged scratchpad has **`AUTO_BACKLOG_DRAIN=1`** **and** **`AUTO_BUG_QUEUE=1`**
+  **and** this invocation has **no** explicit **`bug-target=`** argv token → fail
+  closed with **`[AUTO_RESUME_ERROR] AUTO_SCHEDULER_CONFLICT: ...`**.
+- When **`bug-target=`** argv is present, it **selects** the bug scheduler for this
+  run; **`AUTO_BACKLOG_DRAIN`** must **not** drive story selection for the same
+  materialized run (story drain keys ignored for scheduler selection; record
+  **`backlog_drain_active=false`**, **`bug_queue_active=true`** in **AC-10** for
+  that run).
+
+**Parsing order** before nominal resume resolution: **`start-from`** → **`bug-target=`**
+argv → merged scratchpad (**`AUTO_BACKLOG_DRAIN`**, **`AUTO_BUG_*`**) →
+**`resume_brief.md`** → **`state.md`** fallback (**`architecture.md`** **`# US-0087`**).
+
+### OPEN queue semantics (AC-4)
+
+- **OPEN** rows only in the canonical bug section — exclude **DONE** and non-matching ids.
+- **Ordering**: ascending **numeric** sort on **`BUG-####`** (stable document-order
+  tie-break if needed).
+- **`AUTO_BUG_MAX_ITEMS`**: when set to positive integer *N*, consume at most *N*
+  bugs from the head of the ordered queue this run; record **`bug_queue_remaining`**
+  for operator visibility.
+- **Empty queue** when **`bug-target=all-open`** (or equivalent) and zero **OPEN**
+  bugs → **`[AUTO_RESUME_ERROR] AUTO_BUG_QUEUE_EMPTY: ...`** (or equivalent
+  deterministic envelope).
+
+### Fail-closed reason codes (AC-1, AC-4, AC-8)
+
+| Code | When |
+|------|------|
+| **`AUTO_BUG_QUEUE_EMPTY`** | **`all-open`** and zero **OPEN** bugs. |
+| **`AUTO_BUG_TARGET_UNKNOWN`** | Malformed id / pattern, or id missing from canonical bug section. |
+| **`AUTO_BUG_TARGET_NOT_OPEN`** | Known id, status not **OPEN**. |
+| **`AUTO_SCHEDULER_CONFLICT`** | **`AUTO_BACKLOG_DRAIN=1`** ∧ **`AUTO_BUG_QUEUE=1`** without **`bug-target=`** argv. |
+
+Do **not** overload **`PHASE_POLICY_CONFLICT`** or backlog-drain codes for these.
+
+### Bug segment fields: `resume_brief.md` + `state.md` (`DEC-0069` / AC-5)
+
+Default: **paired** refresh at segment boundaries — update **`handoffs/resume_brief.md`**
+**and** append **`docs/engineering/state.md`** breadcrumbs together so continuation
+without **`start-from`** avoids false **`RESUME_BRIEF_STALE`**.
+
+| Field | Purpose |
+|-------|---------|
+| **`bug_id`** | Active **`BUG-####`** for this segment (**OPEN**), or **`(none)`**. |
+| **`bug_queue_position`** | 1-based index into **OPEN** ordering for **`all-open`**; else **`(none)`**. |
+| **`bug_queue_remaining`** | Count of **OPEN** bugs after current position; **`(none)`** when not queue-scoped. |
+| **`intended_resume_phase`** | Next phase for this segment (align with **`next_scheduled_phase`** on `state.md`). |
+
+Mirror the **AC-10** tuple (`segment_work_item_kind`, `active_bug_id`,
+`backlog_drain_active`, `bug_queue_active`, etc.) in both surfaces per
+**`architecture.md`** **`# US-0087`**.
 
 ## Optional bulk execute mode (US-0047 / DEC-0024)
 
@@ -492,23 +599,38 @@ Reason-code baseline:
 
 ## Deterministic resume-source precedence
 
-Resolve start phase in strict order:
+Resolve nominal start phase and scheduler inputs in strict order (**`US-0087`**
+extends ordering vs legacy two-step resume):
 
 1. Explicit `/auto start-from=<phase>`
-2. `handoffs/resume_brief.md`
-3. Conservative `docs/engineering/state.md` fallback
-4. Fail fast on ambiguity/conflict/unrecoverable inputs
+2. Explicit **`bug-target=`** argv token when present (`bug-target=BUG-####` or
+   `bug-target=all-open`) — parsed **before** merged scratchpad scheduler keys;
+   selects bug scheduler for this run when applicable.
+3. Merged scratchpad (**`US-0073`** / **`DEC-0055`**) — `AUTO_BACKLOG_DRAIN`,
+   **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, related flags.
+4. `handoffs/resume_brief.md`
+5. Conservative `docs/engineering/state.md` fallback
+6. Fail fast on ambiguity/conflict/unrecoverable inputs (including
+   **`AUTO_SCHEDULER_CONFLICT`** when **`AUTO_BACKLOG_DRAIN=1`** ∧
+   **`AUTO_BUG_QUEUE=1`** without **`bug-target=`** argv).
 
 Deterministic precedence behavior:
-- If explicit `start-from` is valid, it wins and lower-priority sources do not
-  affect selected start phase.
-- `state.md` fallback is used only when `resume_brief.md` is absent.
+- If explicit `start-from` is valid, it wins for the **nominal start phase** anchor;
+  scheduler mutex (**`AUTO_SCHEDULER_CONFLICT`**) is still evaluated when scratchpad
+  enables both drains without **`bug-target=`** argv resolution.
+- **`bug-target=`** argv when present overrides conflicting scratchpad scheduler
+  selection for **this** run (bug queue active; story drain inactive for scheduling).
+- `state.md` fallback applies only per the ordered chain above when higher-priority
+  sources do not supply a trustworthy anchor.
 - If `resume_brief.md` is present but stale or unparseable, fail fast instead
   of silently falling back.
 
 ## Conflict and stale/unparseable policy
 
 - Explicit valid override always wins and is logged as override.
+- **`AUTO_BACKLOG_DRAIN=1`** and **`AUTO_BUG_QUEUE=1`** together without explicit
+  **`bug-target=`** argv → **`AUTO_SCHEDULER_CONFLICT`** (fail fast; do not pick a
+  silent default scheduler).
 - No override + `resume_brief` conflicts with `state` inference: fail fast.
 - `resume_brief` exists but stale: fail fast.
 - `resume_brief` exists but unparseable: fail fast.
@@ -530,6 +652,14 @@ Required codes:
 - `STATE_PHASE_AMBIGUOUS`
 - `STATE_PHASE_UNRECOVERABLE`
 
+Bug-queue extensions (**`US-0087`**; use the same **`[AUTO_RESUME_ERROR]`** envelope
+for resolver/materialization failures):
+
+- `AUTO_SCHEDULER_CONFLICT`
+- `AUTO_BUG_QUEUE_EMPTY`
+- `AUTO_BUG_TARGET_UNKNOWN`
+- `AUTO_BUG_TARGET_NOT_OPEN`
+
 ## Steps
 1. Read automation flags from merged scratchpad and **materialize the resolved
    phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**:
@@ -539,9 +669,13 @@ Required codes:
    `docs/engineering/state.md` **before** any phase spawn. On failure, emit
    deterministic phase-plan reason codes and stop (no partial schedule).
 2. Parse optional `start-from=<phase>` and validate canonical phase ID rules.
+   Parse optional **`bug-target=`** argv literals (**`US-0087`**) and evaluate
+   **scheduler mutex** (`AUTO_SCHEDULER_CONFLICT` when **`AUTO_BACKLOG_DRAIN=1`**
+   ∧ **`AUTO_BUG_QUEUE=1`** without **`bug-target=`** argv).
    Parse optional `--execute-bulk` and treat it as explicit one-run override.
 3. Resolve **nominal** start phase using deterministic precedence:
-   - explicit argument -> resume brief -> state fallback -> fail-fast.
+   - explicit `start-from` → **`bug-target=`** argv (when present) → merged scratchpad
+     → resume brief → state fallback → fail-fast.
    - Emit `[AUTO_RESUME_ERROR] ...` message on resolver failure.
 3a. **Intersect** the nominal start anchor with the resolved phase plan (plan
    order preserved; drop scheduled phases strictly before the anchor in canonical
@@ -570,6 +704,12 @@ Required codes:
      story using deterministic selection policy until bounded stop criteria.
      **Reload merged scratchpad phase-selection inputs and recompute the phase
      plan at each story boundary** (same policy class as single-segment runs).
+   - If bug-queue mode is active (**`bug-target=`** argv or **`AUTO_BUG_QUEUE=1`**
+     with resolved target), iterate **OPEN** bugs per **Optional bug-queue mode
+     (US-0087)** — ascending numeric **`BUG-####`** order, **`AUTO_BUG_MAX_ITEMS`**
+     cap, **`AUTO_BUG_ON_BLOCK`** stop/skip — running the same **resolved phase plan**
+     per bug segment with fresh spawns only. **Reload scratchpad and revalidate
+     mutex at each bug boundary.** Empty **OPEN** queue → **`AUTO_BUG_QUEUE_EMPTY`**.
    - If bulk execute mode is active (`--execute-bulk` or
      `AUTO_EXECUTE_BULK=1`), iterate eligible planned items using
      `AUTO_EXECUTE_SELECTION` with bounded item count
@@ -636,11 +776,12 @@ Required codes:
     - `push_decision` (`pushed|blocked|not_eligible`)
     - `reason_code`
     - `evidence_refs`
-13. When backlog-drain mode or bulk execute mode is enabled, append per-item run
-    summary entries:
+13. When backlog-drain mode, bug-queue mode, or bulk execute mode is enabled,
+    append per-item run summary entries:
     - `item_id`
-    - `item_kind` (`story|sprint`)
+    - `item_kind` (`story|sprint|bug`)
     - `story_id`
+    - `bug_id` (when `item_kind=bug`)
     - `sprint_id`
     - `story_start_phase`
     - `story_stop_phase`

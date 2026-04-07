@@ -1,0 +1,65 @@
+{
+  "sprint_id": "S0071",
+  "bug_id": null,
+  "story_id": "US-0087",
+  "status": "PASS",
+  "verdict_reason_codes": [],
+  "evidence": {
+    "acceptance_source": "docs/product/backlog.md (US-0087 AC-1..AC-10) + sprints/S0071/sprint.md (sprint-local AC themes)",
+    "task_source": "sprints/S0071/tasks.md (table + Deterministic AC-to-task mapping)",
+    "sprint_goal_source": "sprints/S0071/sprint.md",
+    "decision_source": "(none — governance: architecture # US-0087, R-0070)",
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# US-0087)",
+      "docs/engineering/research.md (R-0070)",
+      "US-0044",
+      "US-0045",
+      "US-0069",
+      "US-0070",
+      "US-0079",
+      "DEC-0069"
+    ],
+    "checks_performed": [
+      "Sprint-plan seed (tech-lead, 2026-04-06T21:00:00Z, orchestrator_run_id=auto-20260405-01): backlog US-0087 AC-1..AC-10 each assigned exactly one task T-001..T-010 in tasks.md (1:1 bijection intended).",
+      "QA plan-verify (qa, 2026-04-06T23:00:00Z, orchestrator_run_id=auto-20260405-01): re-verified tasks table + deterministic AC↔T mapping — each AC-1..AC-10 maps exactly one of T-001..T-010; each task references exactly one AC; no duplicate or orphan rows.",
+      "Cross-read sprint.md scope vs architecture # US-0087 (argv bug-target, AUTO_BUG_*, AUTO_SCHEDULER_CONFLICT mutex, OPEN queue numeric sort, AUTO_BUG_MAX_ITEMS, DEC-0069 paired resume_brief/state, AC-10 tuple, spawn-only BUG-0006/US-0069, auto_command_contract_test.py, runbook recipe, template parity).",
+      "Cross-read R-0070: doc inventory, scheduler mutex, DEC-0069 queue composition, fail-closed codes, AC-10 breadcrumbs — sprint tasks cover the locked delivery surfaces.",
+      "Sizing: 10 tasks <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT=1; split not required.",
+      "Canonical story status remains OPEN (US-0045) until verify-work; not marked DONE at plan-verify.",
+      "plan_integrity flags confirmed; gaps cleared; residual_risks acknowledged per sprint.md and architecture."
+    ],
+    "orchestrator_run_id": "auto-20260405-01",
+    "planned_at": "2026-04-06T21:00:00Z",
+    "plan_verified_at": "2026-04-06T23:00:00Z",
+    "role_planned": "tech-lead",
+    "role_verified": "qa"
+  },
+  "coverage": [
+    { "ac": "AC-1", "tasks": ["T-001"], "status": "pass", "notes": "Argv syntax + fail-closed codes in auto.md + template" },
+    { "ac": "AC-2", "tasks": ["T-002"], "status": "pass", "notes": "AUTO_BUG_* scratchpad + template examples" },
+    { "ac": "AC-3", "tasks": ["T-003"], "status": "pass", "notes": "Reference + auto.md precedence + scheduler conflict" },
+    { "ac": "AC-4", "tasks": ["T-004"], "status": "pass", "notes": "OPEN queue order, max items, empty queue" },
+    { "ac": "AC-5", "tasks": ["T-005"], "status": "pass", "notes": "resume_brief + state segment fields + DEC-0069" },
+    { "ac": "AC-6", "tasks": ["T-006"], "status": "pass", "notes": "Spawn-only cross-refs BUG-0006 / US-0069" },
+    { "ac": "AC-7", "tasks": ["T-007"], "status": "pass", "notes": "auto_command_contract_test.py extension" },
+    { "ac": "AC-8", "tasks": ["T-008"], "status": "pass", "notes": "Architecture # US-0087 consistency pass" },
+    { "ac": "AC-9", "tasks": ["T-009"], "status": "pass", "notes": "Runbook targeted bug auto drain recipe" },
+    { "ac": "AC-10", "tasks": ["T-010"], "status": "pass", "notes": "template/ parity for touched paths" }
+  ],
+  "gaps": [],
+  "residual_risks": [
+    "Double scheduling if mutex wording/tests drift — mitigate with AUTO_SCHEDULER_CONFLICT contract tests.",
+    "RESUME_BRIEF_STALE on queue advance — paired resume_brief + state.md at segment boundaries (DEC-0069).",
+    "Literal drift between command, reference, template — mitigate with AC-7 / AC-10 and single vocabulary in # US-0087."
+  ],
+  "plan_integrity": {
+    "sprint_goal_aligned": true,
+    "task_ac_bijection": true,
+    "sizing_within_limit": true,
+    "architecture_traceability": [
+      "docs/engineering/architecture.md (# US-0087)",
+      "docs/engineering/research.md (R-0070)"
+    ]
+  },
+  "summary": "PASS — QA /plan-verify complete for S0071 / US-0087 (orchestrator_run_id=auto-20260405-01); /execute (dev) unblocked."
+}

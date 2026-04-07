@@ -1,0 +1,80 @@
+{
+  "sprint_id": "S0070",
+  "bug_id": "BUG-0008",
+  "story_ids": [],
+  "orchestrator_run_id": "auto-20260404-03",
+  "status": "populated",
+  "result": "pass",
+  "passed": 7,
+  "failed": 0,
+  "verified_state": "uat_complete_ac5_waiver_no_debian_runtime",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Semver bump: package.json and its_magic/.its-magic-version align (US-0054); lockfile if versioned in-repo.",
+      "result": "pass",
+      "notes": "PASS - version 0.1.2-41; no package-lock.json in repo."
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "npm pack + prepublishOnly + guard_installer_publish PASS; packaged template installer-owned-paths.manifest has no CR bytes.",
+      "result": "pass",
+      "notes": "PASS - per execute/qa evidence; guard from repo root."
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Operator-facing note: CRLF symptom, fix line, upgrade away from broken global tarball.",
+      "result": "pass",
+      "notes": "PASS - README.md + template/README.md subsection."
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "tests/installer_manifest_crlf_bug0008_test.py PASS; run-tests section 26P2 invokes module.",
+      "result": "pass",
+      "notes": "PASS with awk on PATH; 26P2 wired in run-tests.sh / .ps1."
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Debian global E2E: npm install -g new build; cat -A on installed manifest (no ^M); its-magic --mode missing without INSTALL_MANIFEST_ERROR.",
+      "result": "pass",
+      "notes": "PASS (operator waiver) — DEFERRED_DEBIAN_E2E_NO_RUNTIME: no Debian/SSH/docker-over-SSH connection this cycle; AC-5 execution skipped by operator; evidence_ref=sprints/S0070/qa-findings.md (2026-04-05T16:00:00Z). Real E2E still recommended when runtime exists (US-0086)."
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "npm publish per RELEASE_PUBLISH_MODE; S0070 release notes; release_queue posture.",
+      "result": "pass",
+      "notes": "PASS - merged .cursor/scratchpad.md RELEASE_PUBLISH_MODE=disabled: /release skips publish target execution with deterministic no-op per .cursor/commands/release.md (US-0054/DEC-0036). handoffs/releases/S0070-release-notes.md draft present; handoffs/release_queue.md S0070 row documents prior blocked gate — re-evaluate at next /release."
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "bug_issue_validate --check-acceptance PASS; release-findings + R-0069 closure when BUG-0008 DONE.",
+      "result": "pass",
+      "notes": "PASS (pre-release sub-scope) — bug_issue_validate --check-acceptance [BUG_VALIDATION_OK]; tests/report.md 793/0 @ 2026-04-05T20:21:40Z; sprints/S0070/qa-findings.md PASS_WITH_DEFERRALS @ 2026-04-05T16:00:00Z. BUG-0008 still OPEN; acceptance.md BUG-0008 unchecked until /release marks DONE (US-0045). R-0069 research closure and release-findings final posture remain post-/release + /refresh-context — not claimed complete by this UAT row."
+    }
+  ],
+  "evidence_refs": [
+    "sprints/S0070/qa-findings.md",
+    "sprints/S0070/sprint.md",
+    "sprints/S0070/tasks.md",
+    "handoffs/dev_to_qa.md",
+    "handoffs/releases/S0070-release-notes.md",
+    "handoffs/release_queue.md",
+    "sprints/S0070/release-findings.md",
+    "docs/product/acceptance.md",
+    "docs/product/backlog.md",
+    "tests/report.md",
+    ".cursor/scratchpad.md"
+  ],
+  "notes": [
+    "/verify-work + /qa alignment 2026-04-05T16:00:00Z — operator waived AC-5 Debian E2E (no runtime); UAT-5 pass with DEFERRED_DEBIAN_E2E_NO_RUNTIME per sprints/S0070/qa-findings.md.",
+    "UAT-7 pass documents pre-release validation only; canonical bug DONE / acceptance checkmark / R-0069 delivery closure still follow US-0045 after /release.",
+    "tests/report.md 793/0 @ 2026-04-05T20:21:40Z; bug_issue_validate [BUG_VALIDATION_OK]. Next: /release when other gates green; optional Debian E2E when connection available."
+  ]
+}

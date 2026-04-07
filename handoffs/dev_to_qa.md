@@ -1,3 +1,117 @@
+## Dev -> QA Handoff — S0071 / US-0087 (`auto-20260405-01`) — **QA FAIL remediation**
+
+### Scope
+
+- Remediation after **`sprints/S0071/qa-findings.md`** / **`handoffs/qa_to_dev.md`**: harness drift vs normative **`auto.md`** resume prose, **`RELEASE_PUBLISH_MODE`** contract on materialized baseline, **US-0075** scratchpad baseline/example pair parity (**`AUTO_BUG_*`** + US-0087 catalog on active **`.cursor/scratchpad.local.example.md`**) and **`template/.cursor/scratchpad.md`** parity with example.
+
+### What changed (in-repo)
+
+- **`tests/run-tests.ps1`**, **`tests/run-tests.sh`**: precedence assertion substring → **`Resolve nominal start phase and scheduler inputs in strict order`** (matches **`.cursor/commands/auto.md`** / template).
+- **`.cursor/scratchpad.md`**: **`RELEASE_PUBLISH_MODE=confirm`** (harness contract + default safe publish confirmation).
+- **`.cursor/scratchpad.local.example.md`**: **`# Optional bug-queue mode (US-0087)`** catalog + **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, **`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`** (pair parity with materialized baseline).
+- **`template/.cursor/scratchpad.md`**: same **US-0087** **`AUTO_BUG_*`** block as active materialized catalog.
+
+### Evidence pointers
+
+- **`handoffs/dev_to_qa.md`** (this block), **`sprints/S0071/summary.md`**, **`tests/report.md`**
+- **`docs/engineering/state.md`** — execute remediation checkpoint (**`DEC-0038`** **`runtime_proof_id=rp-auto-20260405-01-execute-dev-20260407T220500Z-S0071-US0087-remediation`**, **`proof_hash=01a6dc27dabd359965ce310d7056157a5c21abcc22aa9ca8bbd880d77e428382`**)
+
+### Tests / checks run (dev)
+
+| Command | Outcome |
+|---------|---------|
+| `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` | **PASS** (exit **0**); **`tests/report.md`** **Fail: 0** |
+| `python scripts/check-scratchpad-pair-parity.py --repo .` | **`[SCRATCHPAD_PAIR_OK]`** |
+| `python scripts/check-user-visible-metadata.py` | **PASS** |
+| `python scripts/enforce-triad-hot-surface.py --rollover` (pre-harness) | **`rollover_complete units=1`** — **`docs/engineering/state-archive/state-pack-20260407-a.md`** (**`state.md`** hot cap) |
+
+### Environment / remote (US-0084)
+
+- **`REMOTE_EXECUTION=1`** on materialized **`.cursor/scratchpad.md`** — remediation executed on **local Windows** (repo root **`c:\flowGit\sonstiges\gsd_cursor`**); **`TEST_COMMAND`** ran locally, not on SSH/Docker targets.
+
+### Next phase
+
+- **`/qa`** (fresh **qa** context) for **`S0071`** / **`US-0087`** (`orchestrator_run_id=auto-20260405-01`).
+
+---
+
+## Dev -> QA Handoff — S0071 / US-0087 (`auto-20260405-01`) — initial ship (historical)
+
+### Scope
+
+- **`US-0087`**: **`/auto`** explicit bug targeting — command + reference + scratchpad keys + contract tests + runbook + architecture touch-up; **`template/`** parity for **`auto.md`**, **`auto-orchestration-reference.md`**, **`runbook.md`**, **`scratchpad.local.example.md`**.
+
+### What shipped (in-repo)
+
+- **`.cursor/commands/auto.md`**, **`template/.cursor/commands/auto.md`**: **`bug-target=`** argv literals, **`AUTO_SCHEDULER_CONFLICT`**, **`AUTO_BUG_*`** fail-closed codes, resume precedence (**`start-from`** → **`bug-target=`** → scratchpad → **`resume_brief`** → **`state.md`**), spawn-only bug-queue note.
+- **`docs/engineering/auto-orchestration-reference.md`**, **`template/docs/engineering/auto-orchestration-reference.md`**: full **Optional bug-queue mode (US-0087)**; Steps + item summaries; **`DEC-0069`** field table.
+- **`.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.local.example.md`**: **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, **`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`**.
+- **`docs/engineering/runbook.md`**, **`template/docs/engineering/runbook.md`**: **Targeted bug auto drain (US-0087)**.
+- **`docs/engineering/architecture.md`**: **`# US-0087`** — **`AUTO_SCHEDULER_CONFLICT`** envelope wording aligned with reference.
+- **`tests/auto_command_contract_test.py`**: expanded markers + template reference parity + scratchpad key tests.
+- **`sprints/S0071/tasks.md`**: **T-001..T-010** → **done**; **`sprints/S0071/summary.md`** updated.
+
+### Evidence pointers
+
+- **`handoffs/dev_to_qa.md`** (this block), **`sprints/S0071/summary.md`**
+- **`docs/engineering/state.md`** — execute checkpoint (**`DEC-0038`** **`runtime_proof_id=rp-auto-20260405-01-execute-dev-20260407T124500Z-S0071-US0087`**, **`proof_hash=a9bb888e021807e7e974bdccbbf791c36fb50f1999d1a6bc150fc5a4b5348acb`**)
+
+### Tests / checks run (dev)
+
+| Command | Outcome |
+|---------|---------|
+| `python -m pytest tests/auto_command_contract_test.py -q` | **PASS** (7 tests, 41 subtests) |
+| `python scripts/check-user-visible-metadata.py` | **PASS** |
+| `python scripts/enforce-triad-hot-surface.py --check` | **PASS** after **`--rollover`** (**`state-pack-20260406-d.md`**) |
+
+### Next phase
+
+- **`/qa`** for **`S0071`** / **`US-0087`** (`orchestrator_run_id=auto-20260405-01`).
+
+---
+
+## Dev -> QA Handoff — S0070 / BUG-0008 (`auto-20260404-03`)
+
+### Scope
+
+- **`BUG-0008`** (**CRLF** manifest → empty **`install_include_paths`**) plus **`RELEASE_TEST_FAILED`** remediation: full consolidated harness must be green before **`/release`** re-attempt.
+
+### What shipped (in-repo)
+
+- **Semver** **`0.1.2-41`**: **`package.json`**, **`its_magic/.its-magic-version`**.
+- **CRLF / manifest**: **`installer.sh`** **`get_manifest_paths`**, **`.gitattributes`**, **`guard_installer_publish`**, **`installer.ps1`**, **`tests/installer_manifest_crlf_bug0008_test.py`** (**§26P2**); operator **`README.md`** / **`template/README.md`** notes.
+- **`installer.sh`** **`write_installed_version`**: **`return 0`** after legacy top-level version cleanup — fixes **`set -e`** silent exit when **`.its-magic-version`** is absent (blocked **`§26P`** **`installer_shell_bug0004_test`** on Windows).
+- **Harness hygiene**: **`packaging/homebrew/its-magic.rb`** **url/version** ↔ npm **`0.1.2-41`**; scratchpad **`.cursor`** + **`template/.cursor/scratchpad.local.example.md`** **`# Remote execution (US-0084 / US-0064)`**; **`template/docs/engineering/auto-orchestration-reference.md`** synced; runbook **US-0078** substring anchor (active+template); **`tests/installer_shell_bug0004_test.py`** fixture pre-seeds minimal **`runbook.md`**; **`tests/run-tests.ps1`** writes **`tests/report.md`** in one **`Set-Content`** (avoids editor lock on **`Add-Content`** loop).
+- **Draft** **`handoffs/releases/S0070-release-notes.md`**; **`handoffs/release_queue.md`** **`S0070`** (per current release posture).
+
+### Explicitly not done (operator / QA)
+
+1. **`npm publish`** when eligible; Debian/global **`npm install -g`** + **`cat -A`** + **`its-magic --mode missing`** E2E — record **`evidence_refs`** for **`/verify-work`**.
+2. **`BUG-0008`** **OPEN** until backlog **DONE**; **`acceptance.md`** row unchecked; **`R-0069`** closes only on **DONE**.
+
+### Evidence pointers
+
+- **`tests/report.md`** — **794** pass / **0** fail (**2026-04-04T20:25:29Z**)
+- **`docs/product/backlog.md`** — **`execute_notes`** (**2026-04-04T20:25:29Z** remediation)
+- **`docs/engineering/state.md`** — execute checkpoint (**DEC-0038** `proof_hash=9dccdb524b7ced00c8bd41075e7772eae5f85ae7937b889af3ad30f0f67e72d1`)
+
+### Tests / checks run (dev)
+
+| Command | Outcome |
+|---------|---------|
+| `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` | **PASS** (exit **0**) |
+| `python tests/installer_shell_bug0004_test.py` | PASS |
+| `python scripts/check-scratchpad-pair-parity.py --repo .` | `[SCRATCHPAD_PAIR_OK]` |
+| `python scripts/check_token_cost_parity.py --repo .` | `[TOKEN_COST_PARITY_OK]` |
+| `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` | `[BUG_VALIDATION_OK]` |
+| `python scripts/enforce-triad-hot-surface.py --check` | PASS (exit **0**; no **`--rollover`** required) |
+
+### Next phase
+
+- **`/qa`** for **`S0070`** / **`BUG-0008`**.
+
+---
+
 ## Dev -> QA Handoff — S0069 / US-0084 (`auto-20260404-02`)
 
 ### Scope

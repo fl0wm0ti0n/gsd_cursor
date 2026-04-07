@@ -349,8 +349,8 @@ assert_true "runbook documents bug issues US-0079 section (template)" "file_cont
 assert_true "auto includes explicit start-from contract (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"start-from=<phase>\""
 assert_true "auto includes explicit start-from contract (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"start-from=<phase>\""
 
-assert_true "auto precedence includes argument > resume > state (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"Resolve start phase in strict order:\""
-assert_true "auto precedence includes argument > resume > state (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"Resolve start phase in strict order:\""
+assert_true "auto precedence includes argument > resume > state (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"Resolve nominal start phase and scheduler inputs in strict order\""
+assert_true "auto precedence includes argument > resume > state (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"Resolve nominal start phase and scheduler inputs in strict order\""
 
 assert_true "auto requires fail-fast on stale resume brief (active)" "file_contains \"$ROOT/.cursor/commands/auto.md\" \"present but stale or unparseable, fail fast\""
 assert_true "auto requires fail-fast on stale resume brief (template)" "file_contains \"$TPL/.cursor/commands/auto.md\" \"present but stale or unparseable, fail fast\""
@@ -1285,6 +1285,15 @@ set +e
 INSTALLER_SHELL_PY=$?
 set -e
 assert_true "installer shell BUG-0004 / US-0084 H1 fixtures pass" "[ \"$INSTALLER_SHELL_PY\" -eq 0 ]"
+
+# 26P2) Installer manifest CRLF tolerance (BUG-0008) — awk section parse matches installer.sh
+INSTALLER_MANIFEST_CRLF_TEST="$ROOT/tests/installer_manifest_crlf_bug0008_test.py"
+assert_true "installer_manifest_crlf_bug0008_test.py exists" "[ -f \"$INSTALLER_MANIFEST_CRLF_TEST\" ]"
+set +e
+"$PY" "$INSTALLER_MANIFEST_CRLF_TEST" >/dev/null 2>&1
+INSTALLER_MANIFEST_CRLF_PY=$?
+set -e
+assert_true "installer manifest CRLF BUG-0008 fixtures pass" "[ \"$INSTALLER_MANIFEST_CRLF_PY\" -eq 0 ]"
 
 # 26S) US-0084 / AC-10 **H2** — optional dash -n on installer.sh (explicit harness row)
 if command -v dash >/dev/null 2>&1; then

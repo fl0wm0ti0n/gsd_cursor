@@ -497,8 +497,8 @@ $coreTemplate = Join-Path $tpl ".cursor\rules\core.mdc"
 Assert-True "auto includes explicit start-from contract (active)" (File-Contains $autoActive "start-from=<phase>")
 Assert-True "auto includes explicit start-from contract (template)" (File-Contains $autoTemplate "start-from=<phase>")
 
-Assert-True "auto precedence includes argument > resume > state (active)" (File-Contains $autoActive "Resolve start phase in strict order:")
-Assert-True "auto precedence includes argument > resume > state (template)" (File-Contains $autoTemplate "Resolve start phase in strict order:")
+Assert-True "auto precedence includes argument > resume > state (active)" (File-Contains $autoActive "Resolve nominal start phase and scheduler inputs in strict order")
+Assert-True "auto precedence includes argument > resume > state (template)" (File-Contains $autoTemplate "Resolve nominal start phase and scheduler inputs in strict order")
 
 Assert-True "auto requires fail-fast on stale resume brief (active)" (File-Contains $autoActive "present but stale or unparseable, fail fast")
 Assert-True "auto requires fail-fast on stale resume brief (template)" (File-Contains $autoTemplate "present but stale or unparseable, fail fast")
@@ -1474,6 +1474,12 @@ Assert-True "installer_shell_bug0004_test.py exists" (Test-Path $installerShellT
 $installerShellRun = Start-Process python -ArgumentList @($installerShellTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "installer shell BUG-0004 / US-0084 H1 fixtures pass" ($installerShellRun.ExitCode -eq 0)
 
+# 26P2) Installer manifest CRLF tolerance (BUG-0008)
+$installerManifestCrlfTest = Join-Path $root "tests\installer_manifest_crlf_bug0008_test.py"
+Assert-True "installer_manifest_crlf_bug0008_test.py exists" (Test-Path $installerManifestCrlfTest -PathType Leaf)
+$installerManifestCrlfRun = Start-Process python -ArgumentList @($installerManifestCrlfTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "installer manifest CRLF BUG-0008 fixtures pass" ($installerManifestCrlfRun.ExitCode -eq 0)
+
 # 26S) US-0084 / AC-10 H2 — optional dash -n on installer.sh
 $dashCmd = Get-Command dash -ErrorAction SilentlyContinue
 if ($dashCmd) {
@@ -1509,21 +1515,23 @@ $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
 $passCount = ($Results | Where-Object { $_.Status -eq "PASS" }).Count
 $failCount = ($Results | Where-Object { $_.Status -eq "FAIL" }).Count
 
-@"
-# its-magic Test Report
-
-Timestamp: $timestamp
-Pass: $passCount
-Fail: $failCount
-
-## Results
-"@ | Set-Content -Path $reportPath
-
-foreach ($r in $Results) {
+$resultLines = foreach ($r in $Results) {
   $line = "- [$($r.Status)] $($r.Name)"
   if ($r.Details) { $line += " - $($r.Details)" }
-  Add-Content -Path $reportPath -Value $line
+  $line
 }
+$nl = [Environment]::NewLine
+$reportBody = @(
+  "# its-magic Test Report",
+  "",
+  "Timestamp: $timestamp",
+  "Pass: $passCount",
+  "Fail: $failCount",
+  "",
+  "## Results",
+  ""
+) + $resultLines
+$reportBody -join $nl | Set-Content -Path $reportPath
 
 Write-Host "Report written to: $reportPath"
 

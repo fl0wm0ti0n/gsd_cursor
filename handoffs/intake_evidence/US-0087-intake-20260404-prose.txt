@@ -1,0 +1,1 @@
+/intake add a feature for auto command where i can explicitely say fix all bugs or fix "Bug numer" and then it makes all phases for the bugs or the bug

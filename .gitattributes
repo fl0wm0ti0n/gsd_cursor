@@ -1,2 +1,4 @@
 # US-0084: keep packaged shell entrypoints LF for POSIX / dash (npm tarball parity).
+# BUG-0008: manifest line-based parsing uses exact [section] matches — CRLF breaks Linux global installs.
 *.sh text eol=lf
+*.manifest text eol=lf

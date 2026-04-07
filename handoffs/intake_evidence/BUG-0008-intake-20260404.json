@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260404-BUG0008-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Global npm install of its-magic 0.1.2-40 on Linux fails: its-magic --mode missing exits with [INSTALL_MANIFEST_ERROR] install_include_paths section is empty despite manifest listing paths.",
+      "intake_run_id": "cursor-20260404-BUG0008-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260404-BUG0008-intake:0:16bbdce6cb1dc12f"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "installer.sh get_manifest_paths uses awk with exact [section] match; packaged template/docs/engineering/context/installer-owned-paths.manifest ships CRLF; .gitattributes currently forces LF only for *.sh (US-0084).",
+      "intake_run_id": "cursor-20260404-BUG0008-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260404-BUG0008-intake:1:87951820c3ca7088"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Fix must preserve POSIX /bin/sh and dash compatibility; prefer LF at source via gitattributes plus defensive CR strip in parser so tarballs tolerate CRLF.",
+      "intake_run_id": "cursor-20260404-BUG0008-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260404-BUG0008-intake:2:c342c3ffca1e7a87"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add automated check: CRLF manifest fixture still resolves install_include_paths, or prepublish rejects CR in manifest; extend installer tests / guard_installer_publish as appropriate.",
+      "intake_run_id": "cursor-20260404-BUG0008-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260404-BUG0008-intake:3:c5155b009f906ae5"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "npm pack / global install on Debian: cat -A shows no ^M on manifest lines; its-magic missing mode runs without INSTALL_MANIFEST_ERROR.",
+      "intake_run_id": "cursor-20260404-BUG0008-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260404-BUG0008-intake:4:5bc0015d605181f5"
+    }
+  ]
+}

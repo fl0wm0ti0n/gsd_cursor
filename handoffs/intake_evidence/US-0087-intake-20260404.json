@@ -1,0 +1,127 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260404-US0087-intake",
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "bug-target-syntax",
+      "title": "Explicit /auto inputs for fix all OPEN bugs or fix BUG-nnnn"
+    },
+    {
+      "plan_area_id": "orchestrator-bug-queue",
+      "title": "Resume and phase schedule bind to BUG ids and ordered execution"
+    },
+    {
+      "plan_area_id": "policy-interop",
+      "title": "Interaction with AUTO_BACKLOG_DRAIN US-0044 and resume_brief DEC-0069"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "Reference doc, auto.md, template parity, regression tests"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "bug-target-syntax",
+      "story_ids": [
+        "US-0087"
+      ]
+    },
+    {
+      "plan_area_id": "orchestrator-bug-queue",
+      "story_ids": [
+        "US-0087"
+      ]
+    },
+    {
+      "plan_area_id": "policy-interop",
+      "story_ids": [
+        "US-0087"
+      ]
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "story_ids": [
+        "US-0087"
+      ]
+    }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Add /auto capability to explicitly target defects: phrases or flags like fix all bugs or fix BUG-0008 so the orchestrator runs the full lifecycle phases for every OPEN bug or for one chosen bug, instead of only story-centric backlog drain.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260404-US0087-intake:0:d2efe56bd5b2f413"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Cursor-hosted agents and optional CI; same repo as its-magic; merged scratchpad and handoffs/resume_brief.md; canonical backlog BUG section in docs/product/backlog.md.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260404-US0087-intake:1:1568bec100d6aa4a"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Extend existing Markdown commands (.cursor/commands/auto.md), auto-orchestration-reference.md, Python contract tests, scratchpad keys; no new runtime language.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260404-US0087-intake:2:f3806d6c78040a6b"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Deterministic argv or scratchpad keys (e.g. AUTO_BUG_TARGET) parsed before resume precedence; queue OPEN bugs by id; intersect phase plan US-0070; spawn-only orchestration unchanged US-0069; fail-closed reason codes for unknown id or empty queue.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260404-US0087-intake:3:51aca48ccbf7c6ac"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "CLI-only: documented /auto syntax examples, help text, deterministic errors (unknown BUG id, no OPEN bugs, conflict with AUTO_BACKLOG_DRAIN story selection).",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260404-US0087-intake:4:0a7993ac7784a242"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "No elevated trust: bug targeting only selects backlog rows already authorized by operator; no auto-closure without passing QA/release gates; secrets and isolation contracts unchanged.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260404-US0087-intake:5:ebe76d1554aba09a"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Bounded runs: max bugs per segment, stop/skip policy, clear breadcrumbs in state.md and resume_brief; must not false-trigger RESUME_BRIEF_STALE DEC-0069; compatibility with DEC-0022 story drain when both off by default.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260404-US0087-intake:6:0323441b0fc401c9"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0087 for command contract + reference + tests + scratchpad template parity; architecture section # US-0087; optional follow-on only if sprint sizing forces split.",
+      "intake_run_id": "cursor-20260404-US0087-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260404-US0087-intake:7:82f8aaa53bf4c29b"
+    }
+  ]
+}

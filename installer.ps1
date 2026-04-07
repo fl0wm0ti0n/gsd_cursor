@@ -28,7 +28,7 @@ function Get-ManifestSection($ManifestPath, $SectionName) {
   $inSection = $false
   $items = New-Object System.Collections.Generic.List[string]
   foreach ($raw in $lines) {
-    $line = $raw.Trim()
+    $line = $raw.TrimEnd("`r").Trim()
     if ([string]::IsNullOrWhiteSpace($line)) { continue }
     if ($line.StartsWith("#")) { continue }
     if ($line.StartsWith("[") -and $line.EndsWith("]")) {

@@ -1,3 +1,103 @@
+## TL -> Dev Handoff — Sprint **S0071** / **US-0087** — post-**`/plan-verify`** → **`/execute`** (**unblocked**)
+
+> **Update (2026-04-06T23:00:00Z)**: **`/plan-verify`** **PASS** (**qa**, **`orchestrator_run_id=auto-20260405-01`**). **`sprints/S0071/plan-verify.json`** **`status=PASS`**. Story **`US-0087`** remains **OPEN** (**US-0045**) until verify-work. **Next**: **`/execute`** (**dev**, fresh context) or **`/auto start-from=execute`**.
+
+### Planning summary
+
+- **Sprint**: **`S0071`**
+- **Story**: **`US-0087`** — **`/auto`** explicit bug targeting (**OPEN**)
+- **Task count**: **10** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-10** mapped **1:1** to **`T-001..T-010`** in **`sprints/S0071/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0071/plan-verify.json`** (**`plan_verified_at=2026-04-06T23:00:00Z`**, **`role_verified=qa`**)
+- **Bounded read**: **`sprints/S0071/*`** + **`architecture.md` `# US-0087`** + **`R-0070`**
+- **Strict proof (sprint-plan)**: **`runtime_proof_id=rp-auto-20260405-01-sprint-plan-tech-lead-20260406T210000Z-S0071-US0087`**, **`proof_hash=ad34b2cfe4f53fe989fd1501bec84d3b88d8470f2973960e2e07f7b6cbf3b7af`**
+- **Strict proof (plan-verify)**: **`runtime_proof_id=rp-auto-20260405-01-plan-verify-qa-20260406T230000Z-S0071-US0087`**, **`proof_hash=487eea941a971c7fbb7bfd08eb80db4f5fbee58b3deffa7cd22e915805a7150b`**
+
+### Architecture and research references
+
+- Architecture: **`docs/engineering/architecture.md`** (`# US-0087`)
+- Research: **`docs/engineering/research.md`** (**R-0070**)
+- Intake evidence: **`handoffs/intake_evidence/US-0087-intake-20260404.json`**
+- Sprint artifacts: **`sprints/S0071/*`**
+- **Orchestrator run**: **`auto-20260405-01`**
+
+### Next phase (Dev)
+
+- **`/execute`** (fresh **dev** context) — follow **`sprints/S0071/tasks.md`** (**T-001..T-010**).
+
+### Dev boundary
+
+- **`/execute`** (**dev**) **unblocked** — follow task list in **`sprints/S0071/tasks.md`** (**T-001..T-010**).
+
+### Focus (after plan-verify)
+
+1. **T-001** — **`bug-target=`** argv literals + fail-closed codes (**`auto.md`** + **`template/`**).
+2. **T-002** — **`AUTO_BUG_*`** scratchpad + **`template/.cursor/scratchpad.local.example.md`**.
+3. **T-003** — **`auto-orchestration-reference.md`** + **`auto.md`** precedence + **`AUTO_SCHEDULER_CONFLICT`** mutex.
+4. **T-004** — Queue semantics + contract tests.
+5. **T-005** — **`resume_brief`** / **`state.md`** segment fields (**`DEC-0069`**).
+6. **T-006** — Spawn-only cross-refs (**`BUG-0006`** / **`US-0069`**).
+7. **T-007** — **`tests/auto_command_contract_test.py`** markers.
+8. **T-008** — **`architecture.md`** **`# US-0087`** consistency pass.
+9. **T-009** — **`runbook.md`** targeted bug auto drain recipe.
+10. **T-010** — **`template/`** parity sweep.
+
+---
+
+## TL -> Dev Handoff — **US-0087** — post-**`/architecture`** (**superseded** by **S0071** sprint-plan **`2026-04-06`**)
+
+- **Use** the **S0071** handoff above. Historical: **`/architecture`** **PASS** **`2026-04-06T18:05:00Z`** — proof **`rp-auto-20260405-01-architecture-tech-lead-20260406T180500Z-US0087`**.
+
+---
+
+## TL -> Dev Handoff — Sprint S0070 / BUG-0008 — post-plan-verify → **`/execute`**
+
+> **Update (2026-04-04T23:55:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0070/plan-verify.json`** (`orchestrator_run_id=auto-20260404-03`, **qa**). **`/execute`** (**dev**) **unblocked**.
+
+## Planning summary
+
+- **Sprint**: **`S0070`**
+- **Bug**: **`BUG-0008`** — **Status `OPEN`** (**US-0045** authority in `docs/product/backlog.md`)
+- **Task count**: **7** (within **`SPRINT_MAX_TASKS=12`**)
+- **AC coverage intent**: **AC-1..AC-7** mapped **1:1** to **`T-001..T-007`** in **`sprints/S0070/tasks.md`**
+- **Plan-verify**: **`PASS`** — **`sprints/S0070/plan-verify.json`** (`2026-04-04T23:55:00Z`, **qa**, `orchestrator_run_id=auto-20260404-03`) — **`/execute`** (**dev**) **unblocked**
+- **Bounded read**: **`sprints/S0070/*`** + **`architecture.md` `# BUG-0008`** + **`R-0069`**
+
+## Architecture and research references
+
+- Architecture: `docs/engineering/architecture.md` (`# BUG-0008`)
+- Research: `docs/engineering/research.md` (**R-0069** — open until **BUG-0008** **DONE**)
+- Intake evidence: `handoffs/intake_evidence/BUG-0008-intake-20260404.json`
+- Sprint artifacts: `sprints/S0070/*`
+- **Orchestrator run**: `auto-20260404-03`
+
+## Focus
+
+1. **T-001**: **`package.json`** / **`package-lock.json`** semver bump (**US-0054**).
+2. **T-002**: **`npm pack`** (manifest paths LF / no **`\\r`**); **`npm run prepublishOnly`**; **`python scripts/guard_installer_publish.py`** on active + **`template/`**.
+3. **T-003** (optional): **`README.md`** / **`docs/engineering/runbook.md`** — CRLF symptom, upgrade from broken global version.
+4. **T-004**: **`python tests/installer_manifest_crlf_bug0008_test.py`**; confirm **`tests/run-tests.sh`** / **`.ps1`** **§26P2** wires the test.
+5. **T-005**: Debian (or **docker-dmz**) global **`npm install -g`**; **`cat -A`** on installed manifest; **`its-magic --target <repo> --mode missing`** without **`[INSTALL_MANIFEST_ERROR]`**; evidence refs for **`handoffs/dev_to_qa.md`**.
+6. **T-006**: **`npm publish`** per **`RELEASE_PUBLISH_MODE`**; **`handoffs/releases/S0070-release-notes.md`**; **`handoffs/release_queue.md`** when required.
+7. **T-007**: **`sprints/S0070/uat.json`** / **`uat.md`**; **`bug_issue_validate.py --check-acceptance`**; **`release-findings.md`**; **`R-0069`** delivery closure in **`research.md`** **only** when backlog marks **DONE**.
+
+## Risks
+
+- Operators stay on **`its-magic@0.1.2-40`** until publish — **T-006** + release notes (**architecture**).
+- E2E environment without global npm — use **docker-dmz** or documented equivalent (**sprint** / **architecture**).
+
+## Execution order
+
+Run **`T-001`..`T-007`** per **`sprints/S0070/tasks.md`** (**plan-verify** already **PASS**).
+
+## Done criteria for Dev completion
+
+- All **7** tasks in **`sprints/S0070/tasks.md`** marked **done**
+- **`sprints/S0070/plan-verify.json`** is **PASS** (QA verified)
+- **`BUG-0008`** remains **OPEN** until verify-work per **US-0045**
+
+---
+
 ## TL -> Dev Handoff — Sprint S0069 / US-0084 — post-plan-verify → **`/execute`**
 
 > **Update (2026-04-04T19:15:00Z)**: **`/plan-verify`** **PASS** — **`sprints/S0069/plan-verify.json`** (`orchestrator_run_id=auto-20260404-02`, **qa**). **`/execute`** (**dev**) **unblocked**.
@@ -2975,3 +3075,12 @@ the sprint is handed off via `handoffs/dev_to_qa.md` for QA verification.
 - `decisions/DEC-0068.md`
 - `docs/engineering/architecture.md` (`# BUG-0004`)
 - `docs/engineering/research.md` (`R-0063`)
+
+---
+
+## Architecture readiness brief — BUG-0008 (traceability; hot handoff = top of file)
+
+- `orchestrator_run_id=auto-20260404-03`
+- completed phases: `architecture` (`tech-lead`; **`proof_hash=9a555d86738cd0c067785a90c3096b37257390c472ffff40174d94aa69e6cd13`**), `sprint-plan` (`tech-lead`; **`proof_hash=f357f9b5a5c0d8c061162fe39a74b04389bc332f9d57cc1773ffd4e2e5b70051`**), `plan-verify` (**qa**; **`proof_hash=69f5e2b8fcb882fdb7bb59c38798bc66d22e3d178d9e6f13916f7fc9602e5619`**)
+- next scheduled phase: **`/execute`** (**dev**) — see **`## TL -> Dev Handoff — Sprint S0070 / BUG-0008`** at file top
+- Normative contract: `docs/engineering/architecture.md` (`# BUG-0008`); research: `R-0069` (open until **BUG-0008** **DONE**); regression: **`run-tests`** **26P2**, **`guard_installer_publish`**

@@ -1,3 +1,60 @@
+## QA -> Verify-work — S0071 / US-0087 (`auto-20260405-01`)
+
+### Status
+
+**PASS** (QA phase) — **`sprints/S0071/qa-findings.md`** **PASS** (`2026-04-07T21:07:00Z`); proceed to **`/verify-work`** in fresh **qa** context.
+
+### Scope validated (in-repo)
+
+- **US-0087** contract: **`auto.md`**, **`auto-orchestration-reference.md`**, scratchpad **`AUTO_BUG_*`**, **`tests/auto_command_contract_test.py`**, **`template/`** parity (per **`handoffs/dev_to_qa.md`** + sprint summary).
+- **Harness**: first **`TEST_COMMAND`** attempt failed only **DEC-0054** triad hot-surface (**`state.md`** line cap) — **`python scripts/enforce-triad-hot-surface.py --rollover`** → **`docs/engineering/state-archive/state-pack-20260407-b.md`**; second **`TEST_COMMAND`** **794** pass / **0** fail (**`tests/report.md`** **`2026-04-07T20:56:59Z`**).
+- **`python scripts/check-user-visible-metadata.py`** **PASS**; **`python scripts/check-scratchpad-pair-parity.py --repo .`** → **`[SCRATCHPAD_PAIR_OK]`**; **`python -m pytest tests/auto_command_contract_test.py -q`** **PASS** (7 tests, 41 subtests).
+
+### Artifacts
+
+- **`sprints/S0071/qa-findings.md`**, **`docs/engineering/state.md`** (QA checkpoint + **US-0048** + **DEC-0038** **`proof_hash=3d5e50206822cbbe78223ade7b2be120d37fc6c816be8a462b842cd4271cac78`**), **`handoffs/resume_brief.md`**.
+
+### Required next step
+
+**`/verify-work`** — populate/execute **`sprints/S0071/uat.json`** / **`uat.md`** per acceptance; story remains **OPEN** in **`docs/product/backlog.md`** until verify-work/release (**`US-0045`**).
+
+---
+
+## QA -> Verify-work — S0070 / BUG-0008 (`auto-20260404-03`)
+
+### Status
+
+**PASS_WITH_DEFERRALS** (QA phase) — **`sprints/S0070/qa-findings.md`** (**latest `2026-04-05T16:00:00Z`**) — operator **waived AC-5 Debian global E2E** (**`DEFERRED_DEBIAN_E2E_NO_RUNTIME`**: no Debian/SSH/docker-over-SSH connection). **`sprints/S0070/uat.json`** / **`uat.md`** reconciled **7** pass / **0** fail with **honest** **UAT-5** waiver + **UAT-7** pre-release validation notes (**BUG-0008** still **OPEN**; **`acceptance.md`** unchecked until **`/release`** / **US-0045**). **Registry publish** skipped when **`RELEASE_PUBLISH_MODE=disabled`**. **`TEST_COMMAND`** → **`tests/report.md`** **793** / **0** (**2026-04-05T20:21:40Z**).
+
+### Scope validated (in-repo)
+
+- Semver **`0.1.2-41`**; **`npm pack`** template **`installer-owned-paths.manifest`** **no** `\r`; **`npm run prepublishOnly`** + **`python scripts/guard_installer_publish.py`** **PASS** (per dev handoff; spot-check backlog **`execute_notes`**).
+- **`python tests/installer_manifest_crlf_bug0008_test.py`** **PASS**; **26P2** wired in **`tests/run-tests.sh`** / **`.ps1`**.
+- **Consolidated harness**: **`tests/report.md`** **793** / **0** @ **2026-04-05T20:21:40Z** — **26P** (**`installer_shell_bug0004_test`**) **PASS** (dev fix: **`installer.sh`** **`write_installed_version`**, fixture **`runbook.md`**, atomic **`tests/report.md`** write).
+- **README** + **`template/README`** operator note; draft **`handoffs/releases/S0070-release-notes.md`**; **`handoffs/release_queue.md`** **`S0070`** posture per release gate.
+
+### Commands executed (QA, 2026-04-05)
+
+- `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → **`[BUG_VALIDATION_OK]`**
+- `python scripts/check-user-visible-metadata.py` → **PASS** (when script present)
+- `python scripts/enforce-triad-hot-surface.py --check` → **PASS** (pre-append); post-QA **`state.md`** append → **`--rollover`** as required → final **`--check`** **PASS** (**DEC-0054**)
+- **`tests/run-tests.ps1`** (**`TEST_COMMAND`**) → **`tests/report.md`** **793** pass / **0** fail (**2026-04-05T20:21:40Z**)
+
+### Deferred / follow-up
+
+- **AC-5 execution** (real Debian global E2E): **not run** this cycle — **`evidence_refs`** still recommended when **US-0086** remote target is available.
+- **Canonical closure**: **`BUG-0008` DONE**, **`acceptance.md`**, **`R-0069`** delivery notes — **post-`/release`** + **`/refresh-context`** per **US-0045** (not claimed by **UAT-7** waiver text).
+
+### Artifacts
+
+- **`sprints/S0070/qa-findings.md`**, **`docs/product/backlog.md`** **`qa_notes`**, **`docs/engineering/state.md`** (QA checkpoint **2026-04-05** + **US-0048** + **DEC-0038** `proof_hash=3540ab0af940beb4935e1d33271c4aed7aa926be50c72414a6e480af92dd6adf`), **`sprints/S0070/uat.json`**, **`sprints/S0070/uat.md`**.
+
+### Required next step
+
+**`/release`** when other release gates are green; optional **`/verify-work`** fresh pass if governance wants a duplicate attestation. Re-run **Debian E2E** when a connection exists and tighten **UAT-5** from waiver to execution evidence if required.
+
+---
+
 ## QA -> Verify-work — S0069 / US-0084 (`auto-20260404-02`)
 
 ### Status

@@ -3,6 +3,8 @@
   "story_ids": [
     "US-0070"
   ],
+  "operator_rerevalidated_at": "2026-04-04T21:00:00Z",
+  "operator_rerevalidated_via": "/verify-work US-0070",
   "status": "verified",
   "result": "pass",
   "passed": 10,
@@ -69,7 +71,7 @@
       "ac": "AC-9",
       "description": "Regression coverage: default full plan, selective skips (`research`, `sprint-plan`), invalid config fail-fast, resume consistency.",
       "result": "pass",
-      "notes": "PASS — `tests/run-tests.ps1` / `tests/run-tests.sh` section **26d** green in `tests/report.md` (`2026-03-20T21:19:34Z`)."
+      "notes": "PASS — `tests/run-tests.ps1` / `tests/run-tests.sh` section **26d** green in `tests/report.md` (original run `2026-03-20T21:19:34Z`; re-check `2026-04-04T19:30:16Z` — all **26d** lines PASS)."
     },
     {
       "id": "UAT-010",
@@ -85,6 +87,8 @@
     "sprints/S0049/summary.md",
     "sprints/S0049/tasks.md",
     "sprints/S0049/progress.md",
-    "tests/report.md"
+    "tests/report.md",
+    "docs/product/backlog.md",
+    "docs/engineering/state.md"
   ]
 }

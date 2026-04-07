@@ -111,6 +111,7 @@
 - [x] US-0084: POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
 - [ ] US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
 - [ ] US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
+- [ ] US-0087: `/auto` explicit bug targeting (fix all OPEN bugs / fix `BUG-####`)
 
 ## Bug acceptance (canonical)
 
@@ -123,5 +124,6 @@ Per **`DEC-0061`** §8 / **`US-0079`**: portfolio checkbox rows **`- [ ]` / `- [
 - [x] BUG-0005: `/auto` fails with stale resume target after bug intake
 - [x] BUG-0006: `/auto` executes phases without spawning required subagents (UAT closure: `sprints/S0067/uat.json`, `sprints/S0067/uat.md`, verify-work **2026-04-04T08:30:00Z** / `orchestrator_run_id=auto-20260403-03`)
 - [x] BUG-0007: intake evidence records asked questions that were never asked (UAT closure: `sprints/S0068/uat.json`, `sprints/S0068/uat.md`, verify-work **2026-04-04T23:45:00Z** / `orchestrator_run_id=auto-20260404-01`; release notes `handoffs/releases/S0068-release-notes.md`, queue **`S0068`** → **`ready`**)
+- [x] BUG-0008: Global Linux install fails when installer manifest is CRLF (empty `install_include_paths` parse)
 
 Validator (backlog bugs + optional drift vs this section): `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`.

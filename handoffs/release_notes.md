@@ -13,10 +13,21 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0069`
-- **Latest canonical notes:** `handoffs/releases/S0069-release-notes.md`
+- **Latest released sprint:** `S0070`
+- **Latest canonical notes:** `handoffs/releases/S0070-release-notes.md`
 - **Latest release date:** 2026-04-05
-- **Latest release work item:** US-0084
+- **Latest release work item:** BUG-0008
+
+## Release finalized note (S0070)
+
+- Sprint: `S0070`
+- Bug: `BUG-0008` (CRLF **`installer-owned-paths.manifest`** / **`R-0069`**)
+- Release: **finalized** (`2026-04-05T22:30:00Z`, `orchestrator_run_id=auto-20260404-03`, strict proof `proof_hash=29228ef7c322aa74d21b8a354adf4c45bbb8d4c64c967ee9dd3d58f7e9b2bf02`)
+- Queue: **`handoffs/release_queue.md`** row **`S0070`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0070-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — **no** **`npm publish`** this boundary (deterministic no-op)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (unless scratchpad overrides)
+- **Next**: **`/refresh-context`** (fresh **curator** context)
 
 ## Release finalized note (S0069)
 
@@ -106,6 +117,8 @@ Canonical queue state now lives under:
 
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
+
+- **`S0070` / `BUG-0008`**: **`blocked`** (`2026-04-04T23:30:00Z`) — **`RELEASE_TEST_FAILED`**, **`RELEASE_UAT_INCOMPLETE`**, deferred **publish**/**E2E**; canonical notes `handoffs/releases/S0070-release-notes.md`; do **not** treat **`S0069`** pointer as superseding this track until **`S0070`** **`released`** or row cleared.
 
 ## Release readiness note (S0057)
 

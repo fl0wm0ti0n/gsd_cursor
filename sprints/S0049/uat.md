@@ -2,7 +2,7 @@
 
 - Sprint: `S0049`
 - Stories: `US-0070`
-- State: **verified** (after `/verify-work`)
+- State: **verified** (after `/verify-work`; operator re-validation **2026-04-04T21:00:00Z**)
 
 ## Target acceptance criteria
 
@@ -20,7 +20,7 @@
 | UAT-006 | AC-6 | pass | Backlog-drain / bulk / team paths preserve policy + bounded stops. |
 | UAT-007 | AC-7 | pass | Resume continuation recomputes phase policy; no silent revival of omitted phases. |
 | UAT-008 | AC-8 | pass | Active + template parity (auto, scratchpads, runbook, README); **26d** asserts PASS. |
-| UAT-009 | AC-9 | pass | Regression **26d** in both runners; `tests/report.md` timestamp `2026-03-20T21:19:34Z`. |
+| UAT-009 | AC-9 | pass | Regression **26d** in both runners; latest `tests/report.md` **2026-04-04T19:30:16Z** (all **26d** lines PASS). |
 | UAT-010 | AC-10 | pass | Operator-visible selected/skipped phases + reason codes at boundaries. |
 
 ## Summary
@@ -36,4 +36,10 @@
 
 - `sprints/S0049/qa-findings.md` — command, result, output ref `tests/report.md`, AC-1..AC-10 matrix.
 - `sprints/S0049/summary.md` — implemented scope + primary evidence refs.
-- `tests/report.md` — regression **26d** PASS for US-0070 / DEC-0052 strings (active + template).
+- `tests/report.md` — regression **26d** PASS for US-0070 / DEC-0052 strings (active + template); latest harness timestamp **2026-04-04T19:30:16Z** (full suite has unrelated baseline failures; **26d** rows remain PASS).
+
+## Operator re-validation (`/verify-work` US-0070)
+
+- **When**: **2026-04-04T21:00:00Z** (qa context).
+- **Why**: Operator-requested UAT check against **US-0070** while story is already **DONE** / **S0049** **released** — confirms **§26d** still green in current `tests/report.md` without reopening **`docs/product/acceptance.md`** (**`US-0045`**).
+- **Outcome**: **10** passed, **0** failed — unchanged; see `docs/engineering/state.md` verify-work checkpoint (**`manual-20260404-us0070`**).

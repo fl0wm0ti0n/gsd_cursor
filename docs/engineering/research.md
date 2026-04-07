@@ -2605,3 +2605,62 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
 - **Linked**: US-0086, US-0085, US-0084, US-0064, DEC-0070
 - **Confidence**: medium (intake + repo survey; delivery pending **US-0086**)
 - **Status**: open
+
+## R-0069 — BUG-0008: CRLF `installer-owned-paths.manifest` breaks POSIX `awk` section headers
+
+- **Date**: 2026-04-04
+- **Topic**: **BUG-0008** — npm global install on Linux: **`[INSTALL_MANIFEST_ERROR] install_include_paths section is empty`**
+- **Query**: Why does the manifest show paths but the shell installer sees an empty section?
+- **Sources**:
+  - Internal: **`installer.sh`** **`get_manifest_paths`** (strict **`awk`** section header equality on `$0`); operator **`cat -A`** evidence (**`^M$`**); **`.gitattributes`** (pre-fix: **`*.sh`** LF only, **US-0084**); **`template/docs/engineering/context/installer-owned-paths.manifest`**
+- **Findings**:
+  - **Root cause**: CRLF line endings → section header line is **`[install_include_paths]\\r`**; **`awk`** equality fails; no lines attributed to section.
+  - **Mitigations**: strip trailing **`\\r`** per line before matching; enforce **`*.manifest text eol=lf`**; extend **`guard_installer_publish.py`** to reject **`\\r`** in both active and template manifest paths; **PowerShell** **`Get-ManifestSection`**: trim carriage return before **`Trim()`**.
+- **Linked**: BUG-0008, US-0084
+- **Confidence**: high (repro evidence on **`its-magic@0.1.2-40`**)
+- **Status**: delivery closed — **`BUG-0008`** **DONE**; **`S0070`** **`released`** (`2026-04-05T22:30:00Z`, `handoffs/releases/S0070-release-notes.md`); in-repo mitigations **`0.1.2-41`**; Debian operator E2E deferred **`DEFERRED_DEBIAN_E2E_NO_RUNTIME`** (documented waiver).
+
+## R-0070 — US-0087: `/auto` bug-targeted continuation vs story backlog drain
+
+- **Date**: 2026-04-04
+- **Topic**: **US-0087** — explicit **`/auto`** modes **fix all OPEN bugs** / **fix `BUG-####`**
+- **Query**: How does resume precedence (**`start-from`**, **`resume_brief`**, **`state.md`**) interact with **`AUTO_BACKLOG_DRAIN`** (**story-only** wording in **`auto-orchestration-reference.md`**) and **`DEC-0069`** single-bug **`resume_brief`** refresh?
+- **Sources**:
+  - Internal: **`.cursor/commands/auto.md`**; **`docs/engineering/auto-orchestration-reference.md`** (**Optional backlog-drain** §, **Inputs**, **Deterministic resume-source precedence**, **AC-10** phase boundary visibility, reason-code baseline); **`handoffs/resume_brief.md`** patterns; **`DEC-0069`**; **`US-0044`** / **`DEC-0022`**; **`US-0070`** / **`DEC-0052`**; **`US-0079`** / **`DEC-0061`**; **`handoffs/po_to_tl.md`** (**US-0087** discovery handoff); **`tests/auto_command_contract_test.py`**
+- **Findings** (intake-era baseline retained):
+  - **Gap**: no first-class **bug id** selector on **`/auto`** today; **`AUTO_BACKLOG_DRAIN`** text refers to **OPEN story** selection only.
+  - **Architecture must lock**: mutual exclusion or strict precedence when both story drain and bug-target mode could apply; per-segment **`bug_id`** in **`state.md`** / **`resume_brief`** for multi-bug queues; deterministic **fail-closed** when **`BUG-####`** not **OPEN** or unknown.
+- **Line-level doc inventory (architecture delivery targets)** — paragraphs/sections to extend for bug-target precedence and **`AUTO_BACKLOG_DRAIN`** interaction:
+  - **`.cursor/commands/auto.md`**: compact **Inputs** / **Outputs** / **Steps 1–9** (no bug-queue keys today); **Optional backlog-drain** stub (points to reference only); **Deterministic resume-source precedence** + **`start-from`** (must document bug-target argv and conflict with story drain); **Fail-fast** codes may need bug-scheduler siblings; **Configurable phase selection** cross-reference (**`DEC-0052`**) unchanged in shape but bug segments need **`bug_id`** in breadcrumbs.
+  - **`docs/engineering/auto-orchestration-reference.md`**: **`## Inputs`** (add merged scratchpad keys for bug queue + explicit argv tokens); **`## Optional backlog-drain mode`** (**§337–361**) — adjacent or mirrored **`## Optional bug-queue mode`** with **one active scheduler** rule vs **`AUTO_BACKLOG_DRAIN=1`**; **`## Deterministic resume-source precedence`** (**§493+**) — clarify whether bug-target argv outranks scratchpad bug keys and how **`resume_brief`** **`bug_id`** participates; **`### Phase boundary operator visibility (AC-10)`** (**§281–290**) — extend tuple (see below); **Reason-code baseline** (**§436–474**) — add **`AUTO_BUG_*`** / queue-empty / unknown-id / not-open / scheduler-conflict codes (**names architecture-locked**).
+  - **`template/`** mirrors: per **AC-10** parity, same paths as active (**`template/.cursor/commands/auto.md`**, **`template/docs/engineering/auto-orchestration-reference.md`**, scratchpad examples).
+  - **`tests/auto_command_contract_test.py`** (or successor): add fixture tokens for bug-target argv spellings and **`AUTO_BACKLOG_DRAIN` + bug mode** conflict marker per **AC-7** (without weakening **BUG-0006** spawn-only strings).
+- **`DEC-0069` / `BUG-0005` composition (multi-bug queue)**:
+  - Post-**`/intake bug`**, **`resume_brief`** must describe the **next** runnable boundary with a **non-stale** **`intended_resume_phase`** and consistent **`bug_id`** (**US-0045** authority).
+  - **Fix-all** queue: after each bug’s terminal **`refresh-context`** (or explicit segment stop), the **next** segment needs a **refreshed** brief (or deterministic **`state.md`**-authoritative cursor) so **`/auto`** without **`start-from`** does not trip **`RESUME_BRIEF_STALE`** while lawful bug-target continuation is intended.
+  - Recommend architecture record: **`bug_queue_cursor`** (e.g. ordinal / remaining ids), **`segment_work_item_kind=bug|story`**, and **`story_id`** when the portfolio driver is a **US** (e.g. meta **US-0087**) vs **`bug_id`** when executing a defect lifecycle.
+- **Candidate scratchpad / argv shape (for architecture to lock; not normative here)**:
+  - Enable + cap: e.g. **`AUTO_BUG_DRAIN`** **`0|1`**, **`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`** **`stop|skip`** (parallel to **`AUTO_BACKLOG_*`**).
+  - Target selection: explicit **`/auto`** argv **architecture-locked** (**AC-1**) plus optional scratchpad mirror; single id vs **all OPEN** enumerated from **`docs/product/backlog.md`** **`## Bug issues (canonical)`** ascending numeric id (**AC-4** / **US-0079**).
+- **Fail-closed reason codes (candidates for `# US-0087` matrix)** — separate from **`PHASE_POLICY_CONFLICT`** unless architecture collapses:
+  - **Empty queue**: **`AUTO_BUG_QUEUE_EMPTY`** (or locked equivalent).
+  - **Unknown / malformed id**: **`AUTO_BUG_TARGET_UNKNOWN`**.
+  - **Not OPEN / DONE**: **`AUTO_BUG_TARGET_NOT_OPEN`**.
+  - **Scheduler clash** (bug mode + **`AUTO_BACKLOG_DRAIN=1`** without resolution): **`AUTO_SCHEDULER_CONFLICT`** or explicit **precedence table** with a single winning mode (**AC-3**).
+- **`AC-10` breadcrumb extensions** when **`story_id=US-0087`** (portfolio driver) vs active bug work:
+  - Always record **`orchestrator_run_id`**, **`phase_boundary`**, **`next_scheduled_phase`**.
+  - Add **`segment_work_item_kind`**, **`active_bug_id`** (or **`bug_id=(none)`** during meta-story-only segments), optional **`bug_queue_remaining`** / **`bug_queue_position`**, and **`backlog_drain_mode`** vs **`bug_drain_mode`** booleans so operator visibility matches **US-0044** vs **US-0087** without ambiguous double scheduling.
+- **Risks**:
+  - **Double scheduling** if both story drain and bug queue are “on” without a hard winner.
+  - **`RESUME_BRIEF_STALE`** regressions if multi-bug segments do not refresh **`resume_brief`** at lawful boundaries (**`BUG-0005`** lineage).
+  - **Reason-code drift** between **`auto.md`**, reference, **`architecture.md` `# US-0087`**, and tests.
+  - **Template drift** if **`template/`** parity lags active command/reference (**AC-10**).
+- **Dependencies**: **US-0070** (**`DEC-0052`** phase plan per segment), **US-0044** / **`DEC-0022`**, **DEC-0069**, **US-0079** / **`DEC-0061`** bug section authority, **BUG-0006** / **US-0069** spawn-only (unchanged).
+- **External references**: N/A (repo-normative orchestration contracts only).
+- **Alternatives** (for architecture):
+  - **Bug drain as a profile of backlog drain** — rejected for clarity: story vs bug selection rules differ (**OPEN** stories vs **OPEN** bugs, sort keys, max items); keep **one scheduler** explicit.
+  - **State-only bug cursor without `resume_brief` updates** — risky vs **`RESUME_BRIEF_STALE`**; prefer paired updates or documented exception path.
+- **Linked**: US-0087, US-0044, DEC-0022, DEC-0069, BUG-0005, US-0070, DEC-0052, US-0079, DEC-0061, BUG-0006, US-0069, R-0065
+- **Confidence**: medium-high (discovery + reference/command survey **2026-04-06**; delivery pending **US-0087**)
+- **Research extension (2026-04-06T15:00:00Z, tech-lead, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=tech-lead-US0087-research-20260406T150000Z-fresh`)**: concrete doc inventory, **`DEC-0069`** queue composition notes, candidate flags/codes, **`AC-10`** tuple extensions — **closure for `/research`**; **`/architecture`** next.
+- **Status**: open (delivery closes with **US-0087** **DONE** / curator or architecture-stated rule)

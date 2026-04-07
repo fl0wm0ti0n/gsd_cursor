@@ -14,13 +14,19 @@ INSTALLER_SH = ROOT / "installer.sh"
 CLI = ROOT / "bin" / "its-magic.js"
 
 
-def write_bootstrap_package_json(target: Path) -> None:
-    payload = {
-        "name": "tmp-bug0004-fixture",
-        "version": "0.0.0",
-        "scripts": {"test": "echo ok"},
-    }
+def write_bootstrap_fixture(target: Path) -> None:
+    """Minimal tree so `installer.sh --mode missing` finishes with runbook TEST_COMMAND set.
+
+    `docs/engineering/runbook.md` is **user-data**: in missing mode the installer skips
+    overwriting an existing file. Pre-seed a tiny runbook with `TEST_COMMAND: echo ok` so
+    we do not depend on runbook auto-bootstrap (`write_runbook_key` + `mv`), which can
+    fail silently under `set -e` on some Windows/Git-Bash setups.
+    """
+    payload = {"name": "tmp-bug0004-fixture", "version": "0.0.0"}
     (target / "package.json").write_text(json.dumps(payload), encoding="utf-8")
+    eng = target / "docs" / "engineering"
+    eng.mkdir(parents=True, exist_ok=True)
+    (eng / "runbook.md").write_text("TEST_COMMAND: echo ok\n", encoding="utf-8")
 
 
 @unittest.skipUnless(INSTALLER_SH.is_file(), "installer.sh missing")
@@ -63,7 +69,7 @@ class InstallerShellBug0004Test(unittest.TestCase):
     def test_direct_sh_missing_mode_succeeds(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             target = Path(td)
-            write_bootstrap_package_json(target)
+            write_bootstrap_fixture(target)
             run = subprocess.run(
                 ["sh", str(INSTALLER_SH), "--target", str(target), "--mode", "missing", "--create"],
                 cwd=ROOT,
@@ -79,7 +85,7 @@ class InstallerShellBug0004Test(unittest.TestCase):
     def test_cli_unix_path_missing_mode_succeeds(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             target = Path(td)
-            write_bootstrap_package_json(target)
+            write_bootstrap_fixture(target)
             run = subprocess.run(
                 ["node", str(CLI), "--target", str(target), "--mode", "missing", "--create"],
                 cwd=ROOT,

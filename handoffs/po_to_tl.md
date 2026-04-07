@@ -1,72 +1,3 @@
-## PO → TL intake pointer — **US-0086** (2026-04-04)
-
-- **US-0086** (automation remote target selection; **“start container \<target_id\>**”; manual default-off): full handoff body **archived** per **DEC-0054** → **`handoffs/archive/po-to-tl-pack-20260404-b.md`** (**`rollover_complete`**, archived heading **US-0086**). Evidence **`handoffs/intake_evidence/US-0086-intake-20260404.json`**; research **`R-0068`**. **US-0085** still **OPEN** — backlog + **`US-0085-intake-20260404.json`**. Next: **`/discovery`** for **US-0086** (or **`/architecture`** if skipping discovery).
----
-
-## PO → TL discovery handoff — **US-0084** (`auto-20260404-02`)
-
-- **Scope recap**: Fix **published** npm **`installer.sh`** for **POSIX `/bin/sh` (dash)** and **LF** entrypoints; add **canonical dev/QA docs + optional automatable helper** so WSL / SSH Linux / Docker-over-SSH testing maps to existing **US-0064** / **`release-targets.json`** / **`runtime-connectivity`** — no parallel remote schema. **Constraints**: **US-0064** authoritative; **no secrets** (AC-7); **`REMOTE_EXECUTION=0`** zero-overhead; **active + `template/`** parity (AC-8).
-- **Acceptance pointers**: **AC-1** publish POSIX/LF; **AC-2** CI/test guard; **AC-3** troubleshooting (`set` error, CRLF, sh vs bash); **AC-4** remote Linux profile doc map; **AC-5** helper / one-liner; **AC-6** execute/qa handoff + env labels; **AC-7** security; **AC-8** template parity; **AC-9** minimal E2E path; **AC-10** harness coverage.
-- **Top risks**: **publish vs repo drift** reintroduces BUG-0004 class; over-scoped helper vs one-liner; doc divergence from **`runtime-connectivity.md`**; secret leakage in examples or logs.
-- **Research asks** (same as backlog **discovery_notes**):
-  1. POSIX/dash audit of **published** vs repo **`installer.sh`** + EOL policy.
-  2. CI guard shape + harness registration.
-  3. Remote profile doc map (WSL / SSH / Docker-over-SSH → **US-0064** artifacts).
-  4. Helper script contract (non-secret summary, exit codes).
-  5. Parity + **`/execute`**/**`/qa`** evidence cues + AC-10 fixtures.
-- **Next phase**: **`/research`** (TL default).
----
-
-## Discovery Addendum — US-0046 and US-0047
-
-### Discovery focus and references
-
-- Discovery objective: convert intake-level bulk-mode intent into architecture-
-  ready orchestration constraints with deterministic safety boundaries.
-- References captured:
-  - existing `/auto` bounded backlog-drain semantics (`US-0044`)
-  - fresh-context isolation contract (`US-0023`)
-  - team-local context fields (`TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`)
-  - research anchor: `R-0010`
-
-### Discovery conclusions for TL
-
-- Bulk behavior should be command-explicit, not implicit:
-  - normal mode stays lightweight and predictable
-  - bulk mode activates only on explicit operator intent.
-- `US-0046` should remain planning-only:
-  - may generate multiple sprint plans in one run
-  - must preserve all sizing/splitting and completeness guarantees.
-- `US-0047` should remain execution-only:
-  - consumes planned scope
-  - preserves strict fresh-context isolation and execute↔QA loop safety bounds.
-- Team mode must be execution-scoping aware in bulk runs:
-  - only in-scope member tasks execute
-  - out-of-scope tasks are deterministically skipped/blocked with reason codes.
-
-### Research handoff targets
-
-1. Define explicit bulk-mode triggers and precedence when both normal and bulk
-   inputs are present.
-2. Define deterministic selection/grouping policies and boundary-limit behavior
-   for `US-0046`.
-3. Define deterministic execution selection, skip/stop semantics, and resume
-   checkpoint schema for `US-0047`.
-4. Define team-context enforcement contract (`TEAM_MEMBER`/`ACTIVE_TASK_IDS`)
-   and failure/skip reason-code vocabulary.
-5. Define regression matrix for positive throughput, bounded-stop behavior, and
-   non-execution of out-of-scope tasks.
-
-### Recommendation
-
-- Proceed to `/research` for `US-0046` and `US-0047` with emphasis on
-  deterministic explicit-mode contracts, member-scope enforcement, and bounded
-  orchestration safety.
-
----
-
-# PO -> TL Handoff — Intake: Install Hygiene + Smart Intake + Bootstrap IDs
-
 ## Intake context (fresh PO run)
 
 User reported real-world first-time install and cleanup trust gaps in external repos:
@@ -798,3 +729,27 @@ User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALL
 
 - **`/research`** (**tech-lead**, default) for **`BUG-0007`**; then **`/architecture`** / **`/sprint-plan`** per TL.
 - **Decision gate before research**: none (discovery satisfied; bug **OPEN**).
+
+---
+
+## PO → TL discovery handoff — **US-0087** (`auto-20260405-01`)
+
+- **Scope recap**: Add **explicit** **`/auto`** bug targeting — **fix all OPEN bugs** (canonical backlog section, ascending id) or **single `BUG-####`** — with **spawn-only** orchestration unchanged; **default-off** new scratchpad keys; **one active scheduler** vs **`AUTO_BACKLOG_DRAIN`** (**US-0044**/**DEC-0022**); per-segment **`bug_id`** breadcrumbs in **`resume_brief`**/**`state.md`** aligned with **DEC-0069** (no stale **`RESUME_BRIEF_STALE`** on lawful runs). Intake evidence: `handoffs/intake_evidence/US-0087-intake-20260404.json`.
+- **Acceptance pointers**: **AC-1** argv spellings; **AC-2** scratchpad/**`template/`**; **AC-3** precedence + conflict doc; **AC-4** queue + max items + empty queue code; **AC-5** resume/state fields; **AC-6** spawn-only; **AC-7** contract tests; **AC-8** **`architecture.md` `# US-0087`** matrix; **AC-9** runbook; **AC-10** parity.
+- **Top risks**: double scheduling (story drain + bug queue); **`resume_brief`** freshness regressions; under-specified operator syntax; reason-code drift vs **`# US-0087`**.
+- **Research asks** (extend **`R-0070`**):
+  1. Enumerate **`auto.md`** + **`auto-orchestration-reference.md`** paragraphs that must change for bug-target precedence and **`AUTO_BACKLOG_DRAIN`** interaction.
+  2. Map **`DEC-0069`**/**`BUG-0005`** requirements onto multi-bug queue + segment boundaries.
+  3. Propose **architecture-locked** flag names + **fail-closed** reason codes (**AC-3**/**AC-4**/**AC-8**).
+  4. Define **`AC-10`** breadcrumb tuple extensions for **`orchestrator_run_id`** segments when **`story_id=US-0087`** (before **`bug_id`** is set mid-queue).
+- **Next phase**: **`/research`** (tech-lead default, **`US-0070`** plan).
+
+---
+
+## Research Addendum — US-0087 (tail mirror)
+
+- **Orchestrator**: **`auto-20260405-01`** — **`/research`** complete in fresh **tech-lead** context (**`2026-04-06T15:00:00Z`**).
+- **Evidence**: **`docs/engineering/research.md`** **`R-0070`** (extended inventory, **`DEC-0069`** queue notes, candidate **`AUTO_BUG_*`** + reason codes, **`AC-10`** tuple extensions); **`docs/product/backlog.md`** (**`research_notes`** under **`## US-0087`**); **`docs/engineering/state.md`** (Research checkpoint + **DEC-0038** **`proof_hash=cee06560f1e1278278d76d01df64466bd9f8ae942e344c65bf50cdc51251c111`**); **`handoffs/resume_brief.md`** → **`/architecture`**.
+- **Findings**: Line-level targets in **`auto.md`** / **`auto-orchestration-reference.md`** / **`template/`**; **one scheduler** vs **`AUTO_BACKLOG_DRAIN`**: architecture must lock precedence or hard fail (**`AUTO_SCHEDULER_CONFLICT`** candidate); multi-bug segments need **`resume_brief`** + **`state.md`** alignment to avoid **`RESUME_BRIEF_STALE`**; contract tests extend **`tests/auto_command_contract_test.py`** per **AC-7**.
+- **Next**: **`/architecture`** — **`docs/engineering/architecture.md`** **`# US-0087`** (reason-code matrix, locked flag names, interaction table).
+- **Decision gate before architecture**: none (research satisfied; story **OPEN** **US-0045**).

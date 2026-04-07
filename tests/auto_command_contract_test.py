@@ -23,6 +23,14 @@ class AutoCommandContractTest(unittest.TestCase):
             "| `execute` | `dev`",
             "docs/engineering/auto-orchestration-reference.md",
             "[AUTO_RESUME_ERROR]",
+            "bug-target=BUG-####",
+            "bug-target=all-open",
+            "AUTO_SCHEDULER_CONFLICT",
+            "AUTO_BUG_QUEUE_EMPTY",
+            "AUTO_BUG_TARGET_UNKNOWN",
+            "AUTO_BUG_TARGET_NOT_OPEN",
+            "US-0087",
+            "US-0069",
         ]
         for token in required:
             with self.subTest(token=token):
@@ -61,9 +69,52 @@ class AutoCommandContractTest(unittest.TestCase):
             "AUTO_ORCHESTRATOR_PHASE_EXECUTION",
             "decisions/DEC-0029.md",
             "decisions/DEC-0038.md",
+            "Optional bug-queue mode (US-0087)",
+            "bug-target=BUG-####",
+            "bug-target=all-open",
+            "AUTO_SCHEDULER_CONFLICT",
+            "AUTO_BUG_QUEUE_EMPTY",
+            "DEC-0069",
         ):
             with self.subTest(token=token):
                 self.assertIn(token, ref)
+
+    def test_template_auto_orchestration_reference_literal_parity_active(self) -> None:
+        """US-0087 / AC-10: template mirrors active auto-orchestration-reference."""
+        root = Path(__file__).resolve().parents[1]
+        active = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        template = (
+            root / "template" / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        self.assertEqual(active, template)
+
+    def test_active_scratchpad_documents_auto_bug_keys(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        text = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        for key in (
+            "AUTO_BUG_QUEUE",
+            "AUTO_BUG_TARGET",
+            "AUTO_BUG_MAX_ITEMS",
+            "AUTO_BUG_ON_BLOCK",
+        ):
+            with self.subTest(key=key):
+                self.assertIn(key, text)
+
+    def test_template_scratchpad_example_documents_auto_bug_keys(self) -> None:
+        root = Path(__file__).resolve().parents[1]
+        text = (
+            root / "template" / ".cursor" / "scratchpad.local.example.md"
+        ).read_text(encoding="utf-8")
+        for key in (
+            "AUTO_BUG_QUEUE",
+            "AUTO_BUG_TARGET",
+            "AUTO_BUG_MAX_ITEMS",
+            "AUTO_BUG_ON_BLOCK",
+        ):
+            with self.subTest(key=key):
+                self.assertIn(key, text)
 
 
 if __name__ == "__main__":

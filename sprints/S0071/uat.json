@@ -1,0 +1,10 @@
+{
+  "sprint_id": "S0071",
+  "story_ids": ["US-0087"],
+  "orchestrator_run_id": "auto-20260405-01",
+  "status": "placeholder",
+  "result": "pending",
+  "passed": 0,
+  "failed": 0,
+  "steps": []
+}
