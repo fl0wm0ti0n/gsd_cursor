@@ -1,112 +1,3 @@
-## Intake context (fresh PO run)
-
-User reported real-world first-time install and cleanup trust gaps in external repos:
-
-1. `--clean-repo` leaves framework artifacts behind.
-2. Fresh installs still contain starter references/history that look like copied memory.
-3. Broad intake still collapses into one oversized story with too few PO follow-up questions.
-4. Fresh-project teams want optional ID bootstrap (`US-0001` / `DEC-0001`).
-
-## Duplicate/overlap evaluation
-
-- Related stories:
-  - `US-0018` (upgrade mode), `US-0019` (placeholder cleanup), `US-0041` (installer lifecycle QA), `US-0033` (guided intake behavior), `US-0046`/`US-0047` (bulk planning/execution).
-- Assessment:
-  - No direct duplicate for end-to-end clean-install hygiene + complete clean-repo coverage + starter neutrality policy.
-  - No direct duplicate for intake decomposition heuristics plus risk-aware questioning.
-  - No direct duplicate for explicit fresh-project ID namespace bootstrap.
-- Decision:
-  - Split into three stories (`US-0050`, `US-0051`, `US-0052`) to avoid one oversized mixed-scope intake.
-
-## Accepted stories
-
-### US-0050 — Clean Install Hygiene and Complete Clean-Repo Coverage
-- Priority: P1
-- Status: OPEN
-- Intent: deterministic fresh install without seeded history + deterministic complete cleanup of installer-owned artifacts.
-
-### US-0051 — Intelligent Intake Decomposition and Risk-Aware PO Questioning
-- Priority: P1
-- Status: OPEN
-- Intent: decompose broad intake into multiple focused stories and increase questioning depth based on scope/risk (not ambiguity only).
-
-### US-0052 — Optional Fresh-Project ID Namespace Bootstrap
-- Priority: P2
-- Status: OPEN
-- Intent: allow explicit bootstrap of IDs from 0001 in truly fresh repos while preserving highest-existing continuation for non-fresh repos.
-
-## Research reference
-
-- `R-0024`: starter/template hygiene, deterministic cleanup ownership, vertical-slice story splitting, and adaptive elicitation questioning patterns.
-
-## TL boundaries
-
-- In scope:
-  - installer cleanup ownership contract and parity across PS1/SH/PY.
-  - starter artifact neutralization policy for template docs.
-  - intake decomposition and adaptive PO questioning contracts.
-  - optional ID bootstrap with deterministic eligibility rules.
-  - regression coverage and active/template parity.
-- Out of scope:
-  - runtime product feature behavior changes.
-  - retroactive renumbering of existing project histories.
-  - bypassing existing release/decision-gate safety contracts.
-
-## Risks
-
-- Cleanup scope expansion could accidentally remove non-framework files if ownership rules are unclear.
-- Intake decomposition may over-split without bounded heuristics and explicit user approval.
-- Bootstrap ID mode could collide with existing repos if freshness detection is weak.
-
-## Recommendation
-
-1. Architecture first on `US-0050` (ownership manifest + cleanup safety + starter neutrality).
-2. Then `US-0051` (decomposition heuristics + risk-aware questioning with bounded prompts).
-3. Then `US-0052` (explicit bootstrap mode with deterministic fresh-repo detection).
-4. Ensure parity/regression checks are planned as first-class tasks in the same sprint sequence.
-
-## Next phase
-
-- Proceed to `/research` for `US-0050`, `US-0051`, and `US-0052` (or `/architecture` directly if research depth is considered sufficient via `R-0024`).
-
----
-
-## PO → TL Handoff — US-0076 (Intake)
-
-> Placement note: appended after **DEC-0054** rollover archived the prior top copy into `handoffs/archive/po-to-tl-pack-20260324.md`; TL read model uses file **tail** (runbook).
-
-### New intake
-
-User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALLOW_AUTO_PUSH`**, and **`AUTO_PUSH_BRANCH_ALLOWLIST`** should **drive** whether/when **git push** runs — not remain **policy-only** relative to **`validate-and-push`**.
-
-### Overlap
-
-- **US-0038** (DONE): eligibility contract — **US-0076** implements the missing **script/operator** linkage.
-- **DEC-0018**: amend or extend with **DEC-0058** (execute phase) for “scratchpad + script” contract.
-
-### Decomposition
-
-- **Single story** **US-0076** — scratchpad parse/merge, gate chain, script changes, docs, tests, decision.
-
-### Intake pack
-
-- selected_pack=`small-intake-pack`
-- asked_topics=`outcome_success_criteria`,`impacted_components`,`constraints_compatibility_risks`,`required_tests_acceptance_checks`,`done_definition`
-- missing_topics=`(none)`
-- assumptions_confirmed=`(none)`
-
-### TL scope
-
-- Prefer **extend `validate-and-push.ps1` / `.sh`** to read **merged** scratchpad; add **dry-run** / **reason-code** exits; map **`by_phase`** to **explicit invocation** contract unless architecture selects **state.md** phase reader.
-- **AC-5** QA blocking rule needs a **bounded, testable** definition.
-- Research: **`R-0053`**.
-
-### Recommendation
-
-**`/discovery`** → **`/research`** (finalize **R-0053**) → **`/architecture`** (**`DEC-0058`**) → **`/sprint-plan`**.
-
----
-
 ## Discovery Addendum — US-0076
 
 > Placement: **tail** hot copy after **DEC-0054** rollover archived an earlier **prepend** into
@@ -753,3 +644,157 @@ User requests **executable** behavior: scratchpad **`SYNC_POLICY_MODE`**, **`ALL
 - **Findings**: Line-level targets in **`auto.md`** / **`auto-orchestration-reference.md`** / **`template/`**; **one scheduler** vs **`AUTO_BACKLOG_DRAIN`**: architecture must lock precedence or hard fail (**`AUTO_SCHEDULER_CONFLICT`** candidate); multi-bug segments need **`resume_brief`** + **`state.md`** alignment to avoid **`RESUME_BRIEF_STALE`**; contract tests extend **`tests/auto_command_contract_test.py`** per **AC-7**.
 - **Next**: **`/architecture`** — **`docs/engineering/architecture.md`** **`# US-0087`** (reason-code matrix, locked flag names, interaction table).
 - **Decision gate before architecture**: none (research satisfied; story **OPEN** **US-0045**).
+
+---
+
+## Discovery Addendum — US-0088 (tail)
+
+- **Orchestrator**: **`auto-20260405-01`** — discovery complete in fresh **PO** context (**`2026-04-12T22:00:00Z`**).
+- **`fresh_context_marker=po-US0088-discovery-20260412T220000Z-fresh`**
+- **Evidence**: **`docs/product/backlog.md`** (**`## US-0088`** — discovery_notes **PASS**); **`docs/engineering/state.md`** (Discovery checkpoint + isolation + **DEC-0038** strict proof); **`docs/engineering/research.md`** **`R-0071`** (discovery survey extension); **`handoffs/resume_brief.md`** → **`/research`**.
+- **Scope recap**: **Continuous `/auto`** through intersected phases per **Step 5** until **US** or **sprint-segment** boundary; **`AUTO_BACKLOG_DRAIN=1`** with **`backlog_drain_stories_remaining_budget=9`**; **quiet** operator notifications only on **`decision_gate`**, **`error`**, **`pause`**, **`loop_max`**, **`blocked`**, **missing inputs**; regression for **one-phase-stop** + **drain advance**; **spawn-only** unchanged (**BUG-0006** / **US-0069**).
+- **Scratchpad context (merged)**: **`INTAKE_GUIDED_MODE=1`**, **`EARLY_RESEARCH=1`**, **`TOKEN_PROFILE=balanced`** — research must reconcile **`AC-2`** with optional **`AUTO_QUIET`** vs profile composition.
+- **Research asks** (extend **`R-0071`**):
+  1. Line-level **Step 5** vs **`auto.md`** / reference / runbook drift that enables **single-spawn** misread.
+  2. **Contract-test** shape: assert continuation when policy requires it; fixture boundaries for orchestrator vs subagent roles.
+  3. **`resume_brief` / `state.md`** tuple for **phase depth** + **story cursor** under **US-0037** / **DEC-0069** during long **`/auto`** runs.
+  4. **US-0087** mutex: cite **R-0070** / **`# US-0087`** only — no new bug-queue semantics in **US-0088**.
+- **Risks**: Over-quiet automation hiding gates; **RESUME_BRIEF_STALE** false positives; template/command parity drift (**AC-5** / **AC-10**).
+- **Status authority**: **`US-0088`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next** *(historical at discovery writer)*: **`/research`** — **PASS** **`2026-04-12T23:15:00Z`**; see **Research Addendum — US-0088** below → **`/architecture`**.
+- **Decision gate before research**: none (discovery satisfied).
+
+---
+
+## Research Addendum — US-0088 (tail mirror)
+
+- **Orchestrator**: **`auto-20260405-01`** — **`/research`** complete in fresh **tech-lead** context (**`2026-04-12T23:15:00Z`**).
+- **Evidence**: **`docs/engineering/research.md`** **`R-0071`** (Step 5 vs compact-step drift, contract-test anchors, **`AUTO_QUIET`** vs **`TOKEN_PROFILE`**, **`resume_brief`/`state.md`** pairing); **`docs/product/backlog.md`** (**`research_notes`** under **`## US-0088`**); **`docs/engineering/state.md`** (Research checkpoint + **DEC-0038** **`proof_hash=dce665eedb088088e3205e3c81575c45af5cdda1108af0aa3b4f6370461c52c0`**); **`handoffs/resume_brief.md`** → **`/architecture`**.
+- **Findings**: Normative **multi-phase** loop lives in **`auto-orchestration-reference.md`** **`## Steps`** item **5**; **`.cursor/commands/auto.md`** compact numbering diverges — architecture should lock cross-anchors or outer-driver equivalence (**AC-1**).
+- **Next**: **`/architecture`** — **`docs/engineering/architecture.md`** **`# US-0088`** (quiet, drain, resume, tests) + optional **DEC** if required.
+- **Decision gate before architecture**: none (research satisfied; story **OPEN** **US-0045**).
+
+---
+
+## Sprint Plan Addendum — US-0088 (tail mirror)
+
+- **Orchestrator**: **`auto-20260405-01`** — **`/sprint-plan`** complete in fresh **tech-lead** context (**`2026-04-12T23:55:00Z`**).
+- **`fresh_context_marker=tl-US0088-sprint-plan-20260412T235500Z-fresh`**
+- **Evidence**: **`docs/product/backlog.md`** (**`sprint_plan_notes`** under **`## US-0088`**); **`sprints/S0072/sprint.md`**, **`sprints/S0072/tasks.md`**, **`sprints/S0072/plan-verify.json`** (**PENDING** / **`AWAITING_QA_PLAN_VERIFY`**); **`docs/engineering/state.md`** (Sprint-plan checkpoint + **DEC-0038** **`proof_hash=e160a10f33af56b56437d3be302aeceedc47ab995563169402a068b82b3318ae`**); **`handoffs/resume_brief.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`** → **`/plan-verify`** (**qa**).
+- **Coverage intent**: **AC-1..AC-7** ↔ **T-001..T-007** for continuous **`/auto`**, **`AUTO_QUIET`**, **`US-0044`** drain + tests, **`template/`** parity, **`# US-0088`** consistency, runbook recipe.
+- **Status authority**: **`US-0088`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next**: **`/plan-verify`** (**qa**) for **`S0072`** — then **`/execute`** (**dev**) when **`plan-verify.json`** → **PASS**.
+
+---
+
+## Discovery Addendum — US-0085 (tail)
+
+- **Orchestrator**: **`auto-20260405-01`** — discovery complete in fresh **PO** context (**`2026-04-13T12:05:00Z`**).
+- **`fresh_context_marker=po-US0085-discovery-20260413T120500Z-fresh`**
+- **Evidence**: **`docs/product/backlog.md`** (**`## US-0085`** — discovery_notes **PASS**); **`docs/product/vision.md`** (**Discovery Notes — US-0085**); **`docs/engineering/state.md`** (Discovery checkpoint + isolation + **DEC-0038** strict proof); **`docs/engineering/research.md`** **`R-0072`** (discovery survey stub); **`handoffs/resume_brief.md`** → **`/research`**.
+- **Scope recap**: Standardize **repo-root `.env`** (gitignored) for `*Env` values used by **`.cursor/remote.json`** and **`release-targets.json`** operator connectivity flows (**US-0064**); committed **`.env.example`** with names only; **`.cursorignore`** + agent/rule exclusion so AI never reads `.env`; runbook + `runtime-connectivity.md` + `us-0084-remote-e2e.md` doc updates; optional AC-8 helper; template parity; regression tests.
+- **Intake evidence**: `handoffs/intake_evidence/US-0085-intake-20260404.json` (**`small-intake-pack`**, **`[INTAKE_EVIDENCE_VALIDATION_OK]`**).
+- **Market context**: `.env` + `.gitignore` is baseline; AI dev tools require **`.cursorignore`** and/or explicit agent rules because agents have developer-level filesystem access. Defense-in-depth (config exclusion + behavioral rules) is industry practice.
+- **Repo survey findings**: `.gitignore` exists (no `.env` entry); no `.cursorignore`; no `.env.example`; `runtime-connectivity.md` and `us-0084-remote-e2e.md` in active + `template/`.
+- **Research asks** (extend **`R-0072`** in **`/research`**):
+  1. Full `*Env` variable name inventory from `.cursor/remote.json` template and `release-targets.json` schema for `.env.example` content.
+  2. `.cursorignore` file format and path-matching semantics; whether Cursor rules augment or replace it for agent file-context exclusion.
+  3. AC-8 decision inputs: deterministic `scripts/print_remote_env_hint.py` (names-only) vs documented shell recipe.
+  4. AC-9 regression test shape: `git check-ignore` fixture or Python test.
+  5. Template parity touchpoints for new/modified files (`.gitignore`, `.cursorignore`, `.env.example`, runbook, runtime-connectivity, us-0084-remote-e2e, rules).
+- **Risks**: `.cursorignore` syntax may differ across Cursor versions; `.env` pattern may conflict with framework-generated `.env` in generated projects; AC-8 helper could leak secret patterns if not strictly names-only.
+- **Status authority**: **`US-0085`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next**: ~~**`/research`**~~ → **`/architecture`** (tech-lead) for **US-0085**.
+- **Decision gate before research**: none (discovery satisfied; story **OPEN**).
+
+---
+
+## Research Addendum — US-0085 (tail mirror)
+
+- **Orchestrator**: **`auto-20260405-01`** — **`/research`** complete in fresh **tech-lead** context (**`2026-04-13T12:15:00Z`**).
+- **`fresh_context_marker=tl-US0085-research-20260413T121500Z-fresh`**
+- **Evidence**: **`docs/engineering/research.md`** **`R-0072`** (extended — `*Env` inventory, `.cursorignore` semantics, AC-8/AC-9 recommendations, template parity, risks); **`docs/product/backlog.md`** (**`research_notes`** under **`## US-0085`**); **`docs/engineering/state.md`** (Research checkpoint + **DEC-0038** **`proof_hash=b04b45a6f9110e8da20cfee684320bc05c2cb775387f651a2ab315aa982f221b`**); **`handoffs/resume_brief.md`** → **`/architecture`**.
+- **Key findings**:
+  1. **`*Env` inventory**: 20 unique env var names (3 from `remote.json` template, 17 from `release-targets.json`) for `.env.example`.
+  2. **`.cursorignore` confirmed**: `.gitignore` syntax, blocks agent file tools, does **not** block terminal/MCP. Defense-in-depth requires 4 layers.
+  3. **AC-8**: recommend `scripts/print_remote_env_hint.py` (names-only, cross-platform, parity check with JSON schemas).
+  4. **AC-9**: `git check-ignore` Python test fixture.
+  5. **Template parity**: 7 touchpoints; no `template/.gitignore` exists (architecture decides create vs omit).
+  6. **AC-10**: `remote_config_summary.py` unaffected — reads `remote.json` names, not `.env` values.
+  7. **Risks**: terminal bypass (medium), open-tab leak (low), framework collision (low).
+- **Next**: **`/architecture`** — **`docs/engineering/architecture.md`** **`# US-0085`** (defense-in-depth layers, `.env.example` content contract, template parity decisions, AC-8 helper shape).
+- **Decision gate before architecture**: none (research satisfied; story **OPEN** **US-0045**).
+
+---
+
+## Discovery Addendum — US-0086 (tail)
+
+- **Orchestrator**: **`auto-20260405-01`** — discovery complete in fresh **PO** context (**`2026-04-13T18:30:00Z`**).
+- **`fresh_context_marker=po-US0086-discovery-20260413T183000Z-fresh`**
+- **Evidence**: **`docs/product/backlog.md`** (**`## US-0086`** — discovery_notes **PASS**); **`docs/product/vision.md`** (**Discovery Notes — US-0086**); **`docs/engineering/research.md`** (**`R-0068`** discovery extension); **`docs/engineering/state.md`** (Discovery checkpoint + isolation + **DEC-0038** strict proof); **`handoffs/resume_brief.md`** → **`/research`**.
+- **Scope recap**: keep **manual** workflow default local/no-reroute; add **automation-only** deterministic target choice path for dev/CI/DI/QA/release when enabled.
+- **Locked discovery contracts**:
+  1. Explicit intent phrase **"start container `<target_id>`"** resolves to canonical **`targets[].id`**.
+  2. Unknown/disabled target must fail closed with deterministic reason-code diagnostics.
+  3. Composition with **US-0085** remains strict: no `.env` reads, names-only outputs, no secret echo in evidence.
+- **Research asks** (`/research`, extend **`R-0068`**):
+  1. Deterministic routing matrix from changed-file classes + explicit operator intent for Docker/SSH/local selection.
+  2. Evidence tuple contract for automation remote runs (`target_id`, `environment_label`, `automation_profile`) across execute/qa/release handoffs.
+  3. Candidate reason-code vocabulary and scratchpad key naming options for architecture lock.
+  4. Minimum regression-test surface for target-id resolution and mode-off/no-reroute behavior.
+- **Status authority**: **`US-0086`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next**: **`/research`** (**tech-lead**) for **`US-0086`**.
+- **Decision gate before research**: none (discovery satisfied; story **OPEN**).
+
+---
+
+## Research Addendum — US-0086 (tail mirror)
+
+- **Orchestrator**: **`auto-20260405-01`** — **`/research`** complete in fresh **tech-lead** context (**`2026-04-13T19:00:00Z`**).
+- **`fresh_context_marker=tl-US0086-research-20260413T190000Z-fresh`**
+- **Evidence**: **`docs/engineering/research.md`** **`R-0068`** (research extension with routing matrix, reason-code candidates, evidence tuple contract, external references); **`docs/product/backlog.md`** (**`research_notes`** under **`## US-0086`**); **`docs/engineering/state.md`** (Research checkpoint + **DEC-0038** strict proof); **`handoffs/resume_brief.md`** → **`/architecture`**.
+- **Key findings**:
+  1. **Routing precedence**: explicit NL intent `start container <target_id>` first, then automation-mode heuristic fallback, else local default.
+  2. **External contract anchors**: GitHub path filters support deterministic CI routing; Docker context precedence supports stable target binding; OpenSSH options support fail-fast host validation.
+  3. **Evidence tuple**: `target_id`, `environment_label`, `automation_profile`, `routing_source`, `secret_surface=names_only`.
+  4. **Reason-code candidates** for architecture lock: `REMOTE_AUTOMATION_MODE_OFF`, `REMOTE_TARGET_UNKNOWN`, `REMOTE_TARGET_DISABLED`, `REMOTE_TARGET_UNROUTABLE`.
+  5. **Security continuity** with **US-0085**: no `.env` reads; no secret values in logs/handoffs.
+- **Next**: **`/architecture`** — lock scratchpad key names, reason codes, routing matrix, and parity/test surfaces for **AC-1..AC-10**.
+- **Decision gate before architecture**: none (research satisfied; story **OPEN** **US-0045**).
+
+---
+
+## PO → TL Handoff — US-0089 / US-0090 (Intake) (tail mirror)
+
+> Placement: **tail** hot copy for TL read model (**runbook**). Prefix rollovers: **`handoffs/archive/po-to-tl-pack-20260414.md`** (first **US-0089**/**US-0090** prepend), then **`handoffs/archive/po-to-tl-pack-20260414-a.md`** (line-cap rebalance).
+
+### New intake
+
+Operator wants **Caveman-style** terse communication (**JuliusBrussee/caveman**-like) in **Cursor**, **scratchpad-configurable**, **default off**, **without losing** existing **its-magic** features. **Split stories**: **US-0089** (response style + scratchpad + rules/skill + tests) then **US-0090** (optional **input-side** file compression with **original preserved** and **hard deny** for canonical/evidence paths).
+
+### Evidence
+
+- **`handoffs/intake_evidence/US-0089-intake-20260414.json`** — **`first-intake-pack`**, **`[INTAKE_EVIDENCE_VALIDATION_OK]`** (`intake_run_id=cursor-20260414-caveman-intake`).
+- **`docs/product/backlog.md`** — **`## US-0089`**, **`## US-0090`**; **`docs/product/acceptance.md`**; **`docs/product/vision.md`**; **`docs/engineering/research.md`** **`R-0073`**.
+
+### Decomposition (US-0051)
+
+- **US-0089**: Caveman **output** mode + scratchpad keys + **rules/skill** + **`architecture.md`** **`# US-0089`** + tests (**default-off** invariant).
+- **US-0090**: Optional compress path; **gates** on **`CAVEMAN_MODE`** + explicit compress policy; **deny** intake evidence, backlog, acceptance, **`state.md`**, **`.env`**; **`template/`** parity.
+
+### TL scope / risks
+
+- Lock **`TOKEN_PROFILE`** vs **`CAVEMAN_*`** composition (**US-0080** lineage).
+- **US-0090** loss avoidance: **sidecar originals** + immutable deny-list; never rewrite **`handoffs/intake_evidence/*.json`** by default (**US-0078** / **DEC-0060**).
+
+### Triad (**DEC-0054**) verification tuple
+
+- **boundary**: `2026-04-14` (intake + line-cap rebalance)
+- **moved**: (1) first prepend → **`handoffs/archive/po-to-tl-pack-20260414.md`** (`units=4,1`); (2) rebalance prefix → **`handoffs/archive/po-to-tl-pack-20260414-a.md`** (`units=1`)
+- **retained**: hot **`handoffs/po_to_tl.md`** within **`PO_TO_TL_HOT_MAX_LINES`** / section caps after second rollover
+- **pack_ref**: **`handoffs/archive/po-to-tl-pack-20260414.md`**, **`handoffs/archive/po-to-tl-pack-20260414-a.md`**
+- **tooling**: `python scripts/enforce-triad-hot-surface.py --rollover` then `--check` → **PASS**
+
+### Recommendation
+
+**`/discovery`** (**US-0089** first) → **`/research`** (**`R-0073`**) → **`/architecture`** → **`/sprint-plan`** (**US-0089** before **US-0090**).

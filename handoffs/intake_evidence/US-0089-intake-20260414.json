@@ -1,0 +1,132 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260414-caveman-intake",
+  "candidate_story_ids": [
+    "US-0089",
+    "US-0090"
+  ],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "caveman-mode-core",
+      "title": "Terse Caveman-style agent responses, intensity levels, coexistence with TOKEN_PROFILE and mandatory workflow gates"
+    },
+    {
+      "plan_area_id": "scratchpad-template-contract",
+      "title": "Scratchpad + template/example flags (default off) and operator documentation"
+    },
+    {
+      "plan_area_id": "safe-input-compression",
+      "title": "Optional input-side file compression/minification with originals preserved and explicit scope policy"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "Commands, rules, hooks, scripts, tests, and template/ parity for both stories"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "caveman-mode-core",
+      "story_ids": [
+        "US-0089"
+      ]
+    },
+    {
+      "plan_area_id": "scratchpad-template-contract",
+      "story_ids": [
+        "US-0089"
+      ]
+    },
+    {
+      "plan_area_id": "safe-input-compression",
+      "story_ids": [
+        "US-0090"
+      ]
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "story_ids": [
+        "US-0089",
+        "US-0090"
+      ]
+    }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Goal: cost, speed, and readability together — Caveman-like terse assistant output in this kit, inspired by JuliusBrussee/caveman, without weakening its-magic workflow gates.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260414-caveman-intake:0:bdb9d19588125d7e"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Cursor-only: ship behavior via .cursor/commands, .cursor/rules, hooks, skills, and repo docs for operators using Cursor here.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260414-caveman-intake:1:f409cdca1c0e497b"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Surfaces: command specs, rules, hooks, Python under scripts/, engineering docs — no new mandatory npm deps unless architecture documents an exception.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260414-caveman-intake:2:68693ef7fef5bb53"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Split stories: US-0089 = core Caveman mode + scratchpad flags; US-0090 = optional bounded input/file compression with explicit loss-avoidance after US-0089.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260414-caveman-intake:3:b660ddf7c8b34bc5"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Scratchpad-first knobs (defaults off), e.g. CAVEMAN_MODE=0|1, CAVEMAN_LEVEL=lite|full|ultra, optional CAVEMAN_COMPRESS_INPUT and CAVEMAN_FILE_SCOPE — documented in scratchpad + template.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260414-caveman-intake:4:b504a083fafb5891"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Safety baseline: never target secrets paths (.env, keys), canonical intake/evidence bundles, or binaries for silent rewrite; prose-only or explicit opt-in per architecture deny/allow lists.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260414-caveman-intake:5:50a85c766d207e32"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Order: no content loss for protected artifacts, token reduction where provably safe, determinism, low maintenance, backward compatibility with TOKEN_PROFILE lineage, human readability.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260414-caveman-intake:6:fd7c2db847153bdb"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Phase 1 done: Caveman mode configurable in scratchpad default off; CAVEMAN off preserves current behavior; tests added and passing; then /discovery for US-0089 with US-0090 as follow-on.",
+      "intake_run_id": "cursor-20260414-caveman-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260414-caveman-intake:7:7aa422c2f1b4ef8c"
+    }
+  ]
+}

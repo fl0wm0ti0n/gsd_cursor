@@ -337,6 +337,60 @@ true for the same materialized run (scheduler mutex).
   - `handoffs/resume_brief.md`
   - `docs/engineering/state.md`
 
+## Automation remote routing contract (US-0086)
+
+This contract is deterministic and default-off. It composes with `US-0064`,
+`DEC-0070`, `US-0085`, and `DEC-0071`.
+
+Automation profile controls (merged scratchpad):
+
+- `AUTO_REMOTE_AUTOMATION_PROFILE`: `off|deterministic_v1`
+- `AUTO_REMOTE_ENVIRONMENT_LABEL`: `local|docker|ssh` (names-only evidence)
+- `REMOTE_EXECUTION`: `0|1` (remote config validation gate from `US-0084`)
+- `REMOTE_CONFIG`: canonical remote config path
+
+Mode split:
+
+- `AUTO_REMOTE_AUTOMATION_PROFILE=off` -> preserve manual/local behavior; no
+  silent remote reroute.
+- `AUTO_REMOTE_AUTOMATION_PROFILE=deterministic_v1` -> routing policy may resolve
+  Docker/SSH/local targets for automation workflows.
+
+NL intent resolution (v1 literal):
+
+- Parse only the exact phrase `start container <target_id>`.
+- Resolve `<target_id>` against canonical enabled `targets[].id`.
+- Unknown id -> fail closed `REMOTE_TARGET_UNKNOWN`.
+- Known but disabled id -> fail closed `REMOTE_TARGET_DISABLED`.
+
+Routing precedence when profile is enabled:
+
+1. Explicit NL intent target (`start container <target_id>`).
+2. Canonical target validation (`targets[].id`, enabled state).
+3. Heuristic fallback (documented file-class matrix).
+4. Local default when no remote target is selected.
+
+Fail-closed reason codes (locked by `architecture.md` `# US-0086`):
+
+- `REMOTE_AUTOMATION_MODE_OFF`
+- `REMOTE_TARGET_UNKNOWN`
+- `REMOTE_TARGET_DISABLED`
+- `REMOTE_TARGET_UNROUTABLE`
+
+Evidence tuple contract for execute/qa/release handoffs and `state.md`:
+
+- `target_id`
+- `environment_label`
+- `automation_profile`
+- `routing_source` (`explicit_intent|heuristic_fallback|local_default`)
+- `secret_surface=names_only`
+
+Security continuity:
+
+- Automation must not read `.env` directly.
+- Output remains names-only; do not print secret values in logs, handoffs, or
+  state artifacts.
+
 ## Canonical status contract (US-0045)
 
 - Story status authority is `docs/product/backlog.md` only.
@@ -352,10 +406,17 @@ true for the same materialized run (scheduler mutex).
 - Deterministic continuation breadcrumbs in relevant artifacts
 
 ## Stop conditions
-- Decision gate triggered
-- Missing critical input
-- `AUTO_PAUSE_REQUEST=1` reached at a safe boundary
-- `AUTO_LOOP_MAX_CYCLES` reached with unresolved defects
+
+Deterministic stop reasons for continuous and looping runs (aligned with
+**Deterministic stop matrix (US-0088)** above):
+
+- `completed` — all intersected phases finished; segment done.
+- `decision_gate` — decision gate triggered; non-suppressible.
+- `missing_input` — missing critical input; non-suppressible.
+- `pause_request` — `AUTO_PAUSE_REQUEST=1` reached at a safe boundary; non-suppressible.
+- `loop_max` — `AUTO_LOOP_MAX_CYCLES` reached with unresolved defects; non-suppressible.
+- `error` — runtime or configuration error; non-suppressible.
+- `blocked` — sync/scope gate or external blocker; non-suppressible.
 
 ## Optional backlog-drain mode (US-0044 / DEC-0022)
 
@@ -370,14 +431,25 @@ Canonical controls from `.cursor/scratchpad.md`:
 
 Deterministic behavior when enabled (`AUTO_BACKLOG_DRAIN=1`):
 - Select next eligible OPEN story via `AUTO_STORY_SELECTION`.
-- Run full story lifecycle (`discovery -> ... -> release -> refresh-context`).
-- After each story completion, continue to next eligible story until:
-  - `AUTO_BACKLOG_MAX_STORIES` limit reached, or
+- **Advance through multiple phases** of the resolved lifecycle per story
+  (**reference Step 5**) — the orchestrator does not stop after one phase
+  unless a deterministic stop condition fires (see **Deterministic stop matrix
+  (US-0088)**).
+- After each story's terminal boundary (`refresh-context` completion or policy
+  stop), **recompute the materialized phase plan** by reloading merged
+  scratchpad phase-selection inputs at the story boundary (**US-0044** /
+  **US-0088**). The next eligible OPEN story starts with a fresh plan class —
+  no silent revival of omitted phases from the prior story's plan.
+- Continue to next eligible OPEN story until:
+  - `AUTO_BACKLOG_MAX_STORIES` limit reached (`BACKLOG_MAX_STORIES_REACHED`), or
   - no eligible stories remain, or
   - stop condition / decision gate occurs.
 - On blocked story:
-  - `AUTO_BACKLOG_ON_BLOCK=stop` -> stop immediately.
-  - `AUTO_BACKLOG_ON_BLOCK=skip` -> record skip reason and continue.
+  - `AUTO_BACKLOG_ON_BLOCK=stop` → stop immediately.
+  - `AUTO_BACKLOG_ON_BLOCK=skip` → record skip reason and continue to next story.
+- Track `backlog_drain_stories_remaining_budget` across boundaries; notify
+  operator on segment handoff / drain advance (non-routine, non-suppressible
+  even when `AUTO_QUIET=1`).
 
 Default-safe behavior:
 - With `AUTO_BACKLOG_DRAIN=0`, preserve existing single-segment continuation.
@@ -660,6 +732,53 @@ for resolver/materialization failures):
 - `AUTO_BUG_TARGET_UNKNOWN`
 - `AUTO_BUG_TARGET_NOT_OPEN`
 
+## Continuous multi-phase execution (US-0088)
+
+A single `/auto` orchestrated run (or a **documented equivalent outer driver** —
+see **AC-1 equivalence** below) advances through **all phases** in the
+**intersected resolved schedule** (**Step 5** below — cross-anchor:
+**"reference Step 5"**) until a **deterministic stop condition** fires. The
+orchestrator does **not** stop after spawning one phase unless the stop matrix
+requires it.
+
+### Outer-driver equivalence (AC-1, Option B)
+
+When a single Cursor `/auto` invocation cannot schedule multiple fresh subagent
+turns (product/runtime constraint), a **documented outer driver** (operator
+script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
+**deterministically equivalent** provided all of the following hold:
+
+- Same intersected phase order as a single-invocation run.
+- Same per-phase isolation evidence (**DEC-0029**) + strict-proof attestation
+  (**DEC-0038**).
+- Same deterministic stop reasons and stop matrix evaluation.
+- Same `resume_brief` + `state.md` refresh at every materialized phase boundary.
+- Operators must follow the runbook recipe
+  (**`docs/engineering/runbook.md`** § Continuous `/auto` + backlog drain).
+
+### Deterministic stop matrix (US-0088)
+
+| Condition | Behavior | Operator notify (AC-2) |
+|-----------|----------|------------------------|
+| Next phase exists, no hard stop | **Continue** — preflight US-0069, spawn next phase | Quiet OK when `AUTO_QUIET=1` |
+| `decision_gate` | **Stop** until resolved | **Always** (non-suppressible) |
+| `error` / missing critical input | **Stop** | **Always** (non-suppressible) |
+| `AUTO_PAUSE_REQUEST` / `pause` | **Stop** at safe boundary | **Always** (non-suppressible) |
+| `AUTO_LOOP_MAX_CYCLES` / `loop_max` | **Stop** | **Always** (non-suppressible) |
+| `blocked` (sync/scope gate) | **Stop** | **Always** (non-suppressible) |
+| US lifecycle DONE / sprint segment complete | **Stop** segment; `AUTO_BACKLOG_DRAIN=1` may advance to next OPEN story (recompute phase plan — **Step 5**) | Notify on segment handoff (non-routine) |
+| `BACKLOG_MAX_STORIES_REACHED` | **Stop** | **Always** (non-suppressible) |
+
+`stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
+`pause_request`, `loop_max`, `error`, `blocked`.
+
+### `AUTO_QUIET` vs `TOKEN_PROFILE` (US-0088 / AC-2)
+
+| Key | Values | Role |
+|-----|--------|------|
+| `AUTO_QUIET` | `0` \| `1` (default `0`) | `1` = suppress routine per-phase success chatter; must **not** suppress `decision_gate`, errors, pause, `loop_max`, `blocked`, or missing inputs. |
+| `TOKEN_PROFILE` | `lean` \| `balanced` \| `full` | Unchanged — **DEC-0035** / **US-0080**; **orthogonal** to `AUTO_QUIET`. |
+
 ## Steps
 1. Read automation flags from merged scratchpad and **materialize the resolved
    phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**:
@@ -690,9 +809,15 @@ for resolver/materialization failures):
    - `resolution_source` (`argument|resume_brief|state_fallback`)
    - `resolution_status` (`resolved|fail-fast`)
    - `timestamp`
-5. Spawn a fresh subagent for each remaining phase in **the intersected
-   resolved schedule order** (not the full canonical list when phases are
-   omitted), starting at `resolved_start_phase`:
+5. **(reference Step 5 — continuous multi-phase spawn)** Spawn a fresh subagent
+   for each remaining phase in **the intersected resolved schedule order** (not
+   the full canonical list when phases are omitted), starting at
+   `resolved_start_phase`, and **advance through all subsequent phases** until a
+   **deterministic stop condition** fires (see **Deterministic stop matrix
+   (US-0088)** above). The orchestrator does **not** stop after a single phase
+   spawn unless the stop matrix requires it; outer-driver equivalence applies
+   when a single invocation cannot schedule multiple subagent turns (see
+   **Outer-driver equivalence (AC-1, Option B)** above):
    default full path:
    intake -> discovery -> research -> architecture -> sprint plan ->
    plan verify -> execute -> QA -> verify work -> release -> refresh context.

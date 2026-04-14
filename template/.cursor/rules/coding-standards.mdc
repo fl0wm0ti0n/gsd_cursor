@@ -26,6 +26,13 @@ globs: ["**/*"]
 - Remote config security (DEC-0016): never commit secret literals (tokens,
   passwords, private keys) in `.cursor/remote.json`; use environment-variable
   references only (for example `tokenEnv`, `passwordEnv`, `privateKeyPathEnv`).
+- `.env` exclusion (DEC-0071 / US-0085): do not open, attach, read, search
+  inside, or index `.env` or `.env.*` files. Use environment variable names
+  in prose only. Operators source `.env` outside agent context.
+- Automation remote routing (US-0086): when `AUTO_REMOTE_AUTOMATION_PROFILE=off`,
+  keep local behavior and never silently reroute `TEST_COMMAND` to remote.
+  Explicit NL routing is limited to `start container <target_id>` and unknown or
+  disabled targets must fail closed with documented reason codes.
 - Performance by default: avoid obvious N+1 loops, repeated expensive work, and
   unnecessary I/O in hot paths.
 - Documentation by default: update relevant docs when behavior, setup, or usage

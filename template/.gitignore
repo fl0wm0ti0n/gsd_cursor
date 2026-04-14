@@ -1,0 +1,5 @@
+# Operator-local secrets (US-0085 / DEC-0071)
+.env
+.env.local
+.env.*
+!.env.example

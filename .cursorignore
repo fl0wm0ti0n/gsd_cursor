@@ -1,0 +1,5 @@
+# Agent exclusion — secrets must not be ingested by AI tools (US-0085 / DEC-0071)
+.env
+.env.local
+.env.*
+!.env.example

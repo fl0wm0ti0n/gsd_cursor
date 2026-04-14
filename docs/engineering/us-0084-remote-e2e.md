@@ -16,22 +16,27 @@ contracts live in **`docs/engineering/architecture.md`** **`# US-0084`**,
 ## Path B — SSH to a Linux host
 
 1. SSH into the Linux machine; clone or sync the repo there.
-2. Run the same **`sh`/`dash`** installer and **`python`** tests as on native Linux.
-3. For **release/QA connectivity** semantics, align with **`ssh-server`** in
+2. Copy **`.env.example`** to **`.env`** and fill in values for `SSH_HOST`,
+   `SSH_USER`, `SSH_PRIVATE_KEY`, and any other relevant `REMOTE_*` vars.
+   Source the file (`source .env` or equivalent) before running remote ops.
+   See **`docs/engineering/runbook.md`** § Operator `.env` setup.
+3. Run the same **`sh`/`dash`** installer and **`python`** tests as on native Linux.
+4. For **release/QA connectivity** semantics, align with **`ssh-server`** in
    **`docs/engineering/release-targets.json`** (`hostEnv`, `userEnv`, `authEnv`, …).
-4. For **Cursor/dev remote** validation, set **`REMOTE_EXECUTION=1`** and
+5. For **Cursor/dev remote** validation, set **`REMOTE_EXECUTION=1`** and
    **`REMOTE_CONFIG=.cursor/remote.json`** on the merged scratchpad; run
    **`python scripts/remote_config_summary.py`** — stdout must list **names only**
    (no keys/passwords).
-5. Evidence: cite **`ssh:<hostEnv>`** (the **env var name**, not the host value) plus
+6. Evidence: cite **`ssh:<hostEnv>`** (the **env var name**, not the host value) plus
    **environment label**; never paste private key material.
 
 ## Path C — Docker-over-SSH
 
-1. Follow **Path B** on the SSH host; enable **`dockerOverSsh`** patterns per
+1. Follow **Path B** on the SSH host (including **`.env`** setup from
+   **`.env.example`**); enable **`dockerOverSsh`** patterns per
    **`runtime-connectivity.md`** (**`dockerHostEnv`**, **`dockerContextEnv`**, **`composeFile`**, **`service`**).
-2. Set operator **`DOCKER_HOST`** / context per your platform; document **env names**
-   only in handoffs.
+2. Ensure **`DOCKER_HOST`** and **`DOCKER_CONTEXT`** are set in your **`.env`**;
+   source before running Docker commands. Document **env names** only in handoffs.
 
 ## Related
 

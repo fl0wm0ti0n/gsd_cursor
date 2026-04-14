@@ -1,7 +1,7 @@
 # Sprint S0071 — summary (US-0087)
 
 - **Sprint**: **S0071**
-- **Story**: **US-0087** — **`/auto`** explicit bug targeting (**OPEN** per **`US-0045`** until verify-work)
+- **Story**: **US-0087** — **`/auto`** explicit bug targeting (**DONE** per **`US-0045`**; **`/release`** **PASS** **`2026-04-12`**)
 - **Orchestrator run**: **auto-20260405-01**
 - **QA cycle**: initial **`/qa`** **FAIL** (**790**/4); **dev remediation** + **DEC-0054** triad rollover (**`state-pack-20260407-b.md`**) before final harness; **fresh `/qa`** **PASS** (**794**/0, **`2026-04-07`**) — **`sprints/S0071/qa-findings.md`**, **`handoffs/qa_to_verify_work.md`**, **`handoffs/dev_to_qa.md`**.
 
@@ -31,6 +31,11 @@
 - **Behavioral orchestrator** implementation in Cursor still interprets these docs; contract tests lock **literals and parity**, not runtime scheduling.
 - **`AUTO_BACKLOG_DRAIN=1`** on active repo scratchpad remains **story** scheduling; **`AUTO_BUG_QUEUE=0`** avoids mutex until operators opt in.
 
-## Next
+## Release + curator closure
 
-- **`/verify-work`** (fresh **qa** context) for **`S0071`** / **`US-0087`** — UAT + acceptance attestation.
+- **`/release`** **PASS** **`2026-04-12`** — **`sprints/S0071/release-findings.md`**, **`handoffs/releases/S0071-release-notes.md`**, **`handoffs/release_queue.md`** **`S0071`** **`released`**.
+- **`/refresh-context`** **PASS** **`2026-04-12T20:35:00Z`** (curator) — reconciled **`docs/engineering/decisions.md`**, this summary, **`docs/engineering/research.md`** (**`R-0070`** closed), **`handoffs/resume_brief.md`**; checkpoint + **DEC-0038** tuple on **`docs/engineering/state.md`**.
+
+## Next (portfolio)
+
+- **`US-0088`** **OPEN** — **`/discovery`** (fresh **PO**) or **`/auto start-from=discovery`**; intake evidence **`handoffs/intake_evidence/US-0088-intake-20260407.json`**.

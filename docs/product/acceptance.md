@@ -109,9 +109,12 @@
 - [x] US-0082: Agent-driven codebase map bootstrap (UAT closure: `sprints/S0062/uat.json`, `sprints/S0062/uat.md`, verify-work **2026-03-31T21:20:00Z** / `orchestrator_run_id=auto-20260331-02`)
 - [x] US-0083: Delegable intake clarification without hard blocks
 - [x] US-0084: POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
-- [ ] US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
-- [ ] US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
-- [ ] US-0087: `/auto` explicit bug targeting (fix all OPEN bugs / fix `BUG-####`)
+- [x] US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
+- [x] US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
+- [x] US-0087: `/auto` explicit bug targeting (fix all OPEN bugs / fix `BUG-####`)
+- [x] US-0088: `/auto` continuous multi-phase loop + quiet backlog drain (close one-phase-stop gap)
+- [ ] US-0089: Cursor Caveman mode (scratchpad-configurable terse responses; default off; parity + tests)
+- [ ] US-0090: Optional Caveman-style input compression (safe file scope, originals preserved, gated after US-0089)
 
 ## Bug acceptance (canonical)
 

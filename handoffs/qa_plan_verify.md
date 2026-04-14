@@ -1,5 +1,27 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0074` / `US-0086`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0074/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-04-13T20:05:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); AC-1..AC-10 map 1:1 to T-001..T-010 with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `within_limit=true`); governance anchors validated: **`architecture.md`** `# US-0086`, **`research.md`** `R-0068`, **US-0064/DEC-0070**, **US-0085/DEC-0071`.
+- **Artifacts**: **`sprints/S0074/plan-verify.json`**, **`sprints/S0074/sprint.md`**, **`sprints/S0074/tasks.md`**, **`sprints/S0074/summary.md`**, **`sprints/S0074/qa-findings.md`**, **`sprints/S0074/uat.json`**, **`sprints/S0074/uat.md`**, **`sprints/S0074/release-findings.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** (sprint-plan checkpoint + isolation + strict proof).
+- **Strict proof**: **`runtime_proof_id=rp-auto-20260405-01-plan-verify-qa-20260413T200500Z-S0074-US0086`**, **`proof_hash=d5ce9179e02edfe588b24ef84d7425faa27564d97ee1b1862e61efd6ffbaa0ba`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0074`** / **`US-0086`**.
+
+## Next — **`S0073` / `US-0085`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0073/plan-verify.json`** **`status=PASS`** (`2026-04-13T13:00:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); **AC-1..AC-10** map **1:1** to **`T-001..T-010`**; **`plan_integrity.task_ac_bijection=true`**; task_count=10, within SPRINT_MAX_TASKS=12; governance (**`architecture.md` `# US-0085`**, **`DEC-0071`**, **`R-0072`**) aligned; **`/execute`** unblocked.
+- **Artifacts**: **`sprints/S0073/plan-verify.json`**, **`sprints/S0073/sprint.md`**, **`sprints/S0073/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Strict proof**: **`runtime_proof_id=rp-auto-20260405-01-plan-verify-qa-20260413T130000Z-S0073-US0085`**, **`proof_hash=c00b31774f96d3529e152d3bde7a5bc05e114b018455df1eb8dbbdbf58face73`**
+- **Prior sprint-plan proof**: **`runtime_proof_id=rp-auto-20260405-01-sprint-plan-tech-lead-20260413T124500Z-US0085-S0073`**, **`proof_hash=8d295c93c16cd60f24cf2bbfa9649a7e2ecf393c7b33254bd5b8053f949fb42f`**
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0073`** / **`US-0085`**
+
+## Next — **`S0072` / `US-0088`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0072/plan-verify.json`** **`status=PASS`** (`2026-04-13T00:05:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); **AC-1..AC-7** map **1:1** to **`T-001..T-007`**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# US-0088`**, **`R-0071`**) aligned; **`/execute`** unblocked.
+- **Artifacts**: **`sprints/S0072/plan-verify.json`**, **`sprints/S0072/sprint.md`**, **`sprints/S0072/tasks.md`**, **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`**, **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof)
+- **Strict proof**: **`runtime_proof_id=rp-auto-20260405-01-plan-verify-qa-20260413T000500Z-S0072-US0088`**, **`proof_hash=95d2e34f28ba5e95a9cb7234f357137d92f67d1d148a8e0f45a723e23566ad49`**
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0072`** / **`US-0088`**
+
 ## Next — **`S0071` / `US-0087`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0071/plan-verify.json`** **`status=PASS`** (`2026-04-06T23:00:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); **AC-1..AC-10** map **1:1** to **`T-001..T-010`**; **`plan_integrity.task_ac_bijection=true`**; governance (**`architecture.md` `# US-0087`**, **`R-0070`**) aligned; **`/execute`** unblocked.
@@ -90,7 +112,8 @@
 
 ## Next queue
 
-- **`S0071` / `US-0087`** — **`sprints/S0071/plan-verify.json`** **`PASS`**; next: **`/execute`** (**dev**, fresh context).
+- **`S0072` / `US-0088`** — **`sprints/S0072/plan-verify.json`** **PASS** (`2026-04-13T00:05:00Z`); next: **`/execute`** (**dev**, fresh context).
+- **`S0071` / `US-0087`** — released; see **`handoffs/release_queue.md`** / **`sprints/S0071/summary.md`**.
 
 ---
 

@@ -2,9 +2,90 @@
   "sprint_id": "S0071",
   "story_ids": ["US-0087"],
   "orchestrator_run_id": "auto-20260405-01",
-  "status": "placeholder",
-  "result": "pending",
-  "passed": 0,
-  "failed": 0,
-  "steps": []
+  "status": "PASS",
+  "result": "pass",
+  "checked_at": "2026-04-12T18:00:00Z",
+  "checked_by_role": "qa",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Syntax contract: `/auto` documents exact `bug-target=BUG-####` and `bug-target=all-open` argv literals; fail-closed codes (AUTO_BUG_TARGET_UNKNOWN, AUTO_BUG_TARGET_NOT_OPEN, AUTO_BUG_QUEUE_EMPTY, AUTO_SCHEDULER_CONFLICT) present in normative command + reference.",
+      "result": "pass",
+      "notes": "Verified `.cursor/commands/auto.md`, `docs/engineering/auto-orchestration-reference.md`, `template/.cursor/commands/auto.md`; contract markers in `tests/auto_command_contract_test.py`."
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "Scratchpad + template: architecture-locked `AUTO_BUG_QUEUE`, `AUTO_BUG_TARGET`, `AUTO_BUG_MAX_ITEMS`, `AUTO_BUG_ON_BLOCK` documented default-off on active + `template/` scratchpad examples.",
+      "result": "pass",
+      "notes": "`.cursor/scratchpad.md`, `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.md`, `template/.cursor/scratchpad.local.example.md`; `[SCRATCHPAD_PAIR_OK]` on QA pass."
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Resume precedence updated for bug-target path: explicit argv > merged scratchpad > resume_brief > state fallback; mutex when `AUTO_BACKLOG_DRAIN=1` and `AUTO_BUG_QUEUE=1` without `bug-target=` argv documented.",
+      "result": "pass",
+      "notes": "Cross-read `auto.md` + reference precedence sections; harness substring aligned per `sprints/S0071/summary.md` / `qa-findings.md`."
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Queue semantics: OPEN bugs only, numeric id sort, optional `AUTO_BUG_MAX_ITEMS`, empty-queue `AUTO_BUG_QUEUE_EMPTY` documented in reference.",
+      "result": "pass",
+      "notes": "`docs/engineering/auto-orchestration-reference.md` Optional bug-queue mode (US-0087)."
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Segment metadata: `resume_brief` + `state.md` record bug-queue segment fields (`segment_work_item_kind`, `active_bug_id`, queue position/remaining, `backlog_drain_active`, `bug_queue_active`) per DEC-0069 / AC-10.",
+      "result": "pass",
+      "notes": "Story segment in this run: `segment_work_item_kind=story`, `bug_queue_active=false`; architecture `# US-0087` and orchestration breadcrumbs reviewed."
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "Spawn-only orchestrator: `/auto` forbids in-process lifecycle phase execution; cites BUG-0006 / US-0069 / AUTO_ORCHESTRATOR_PHASE_EXECUTION.",
+      "result": "pass",
+      "notes": "`.cursor/commands/auto.md` spawn-only + bug-queue mode section."
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "`tests/auto_command_contract_test.py` asserts bug-target argv literals, scheduler conflict, US-0087 / DEC-0069 markers, reference↔template parity.",
+      "result": "pass",
+      "notes": "QA: `python -m pytest tests/auto_command_contract_test.py -q` PASS (7 tests, 41 subtests); `tests/report.md` 794/0 @ 2026-04-07T20:56:59Z."
+    },
+    {
+      "id": "UAT-8",
+      "ac": "AC-8",
+      "description": "Architecture `# US-0087`: reason codes, flag names, interaction matrix with US-0044, DEC-0069, US-0070, US-0079.",
+      "result": "pass",
+      "notes": "`docs/engineering/architecture.md` section US-0087."
+    },
+    {
+      "id": "UAT-9",
+      "ac": "AC-9",
+      "description": "Runbook operator subsection for targeted bug auto drain (`docs/engineering/runbook.md` + template parity).",
+      "result": "pass",
+      "notes": "Sprint summary lists runbook + `template/docs/engineering/runbook.md`."
+    },
+    {
+      "id": "UAT-10",
+      "ac": "AC-10",
+      "description": "Active + `template/` parity for touched command, reference, scratchpad paths.",
+      "result": "pass",
+      "notes": "Parity covered by contract tests + scratchpad pair check; see `sprints/S0071/summary.md` Implemented list."
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "notes": [
+    "UAT populated at /verify-work (fresh qa), 2026-04-12T18:00:00Z. Canonical story status remains OPEN in docs/product/backlog.md until /release + US-0045.",
+    "Acceptance criteria source: docs/product/backlog.md US-0087 AC-1..AC-10; portfolio row docs/product/acceptance.md US-0087 unchecked until release closure.",
+    "strict_proof: runtime_proof_id=rp-auto-20260405-01-verify-work-qa-20260412T180000Z-S0071-US0087, proof_hash=8276042fb0398d648cd096683000fec93a2a9815c90bdac06628cdde75f53c54"
+  ]
 }

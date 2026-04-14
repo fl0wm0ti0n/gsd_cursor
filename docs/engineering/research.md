@@ -2602,9 +2602,38 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
   - **Architecture** should lock **scratchpad key names** for an **automation profile** (distinct from manual **`REMOTE_EXECUTION`**), document **heuristics** (changed files, explicit NL intent), and **fail-closed** codes for unknown target ids.
   - **Composition with US-0085**: automation may use **env already in process**; **must not** read **`.env`** or print secrets.
 - **Open questions (for `/architecture`)**: exact flag names; optional CI snippet scope; minimal unittest surface vs doc-only matrix.
+- **Discovery extension (2026-04-13T18:30:00Z, po, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=po-US0086-discovery-20260413T183000Z-fresh`)**:
+  - **Mode split reaffirmed**: remote target selection remains **automation-only**; manual path stays default local/no-reroute.
+  - **Intent contract**: explicit phrase **"start container `<target_id>`"** must resolve against canonical **`targets[].id`** and fail closed on unknown/disabled target.
+  - **Research asks for `/research`**: lock deterministic routing heuristics (changed file classes + explicit intent), define evidence tuple for remote-run handoffs (`target_id`, `environment_label`, `automation_profile`), and enumerate reason-code names for unknown/disabled/mode-off routing cases.
+  - **Security continuity**: align with **US-0085** delivered posture (names-only outputs, no `.env` reads, no secret echo in logs/handoffs).
+- **External references (research phase, 2026-04-13)**:
+  - GitHub Actions workflow syntax (`paths` / `paths-ignore`): [https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions](https://docs.github.com/actions/using-workflows/workflow-syntax-for-github-actions)
+  - Docker contexts (`docker context use`, `DOCKER_CONTEXT`, `--context`): [https://docs.docker.com/engine/manage-resources/contexts/](https://docs.docker.com/engine/manage-resources/contexts/)
+  - OpenSSH client config (`Host` matching order, `CanonicalizeFallbackLocal`, `StrictHostKeyChecking`): [https://man7.org/linux/man-pages/man5/ssh_config.5.html](https://man7.org/linux/man-pages/man5/ssh_config.5.html)
+- **Research extension (2026-04-13T19:00:00Z, tech-lead, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=tl-US0086-research-20260413T190000Z-fresh`)**:
+  - **Deterministic routing matrix (recommended for `/architecture` lock)**:
+    - **Mode off** (`REMOTE_EXECUTION=0` or automation profile unset): always local; if explicit NL target is requested, return fail-closed mode-off reason.
+    - **Explicit NL intent first**: phrase `start container <target_id>` resolves to exact `targets[].id`; unknown/disabled target fails closed.
+    - **Heuristic fallback when automation mode is on**: changed files matching container surfaces (`Dockerfile*`, `docker-compose*.yml`, container runtime scripts) suggest Docker target; SSH deployment/runtime scripts suggest SSH target; otherwise local.
+  - **Reason-code candidates** (names to be architecture-locked): `REMOTE_AUTOMATION_MODE_OFF`, `REMOTE_TARGET_UNKNOWN`, `REMOTE_TARGET_DISABLED`, `REMOTE_TARGET_UNROUTABLE`.
+  - **Evidence tuple contract** for execute/qa/release handoffs and state breadcrumbs: `target_id`, `environment_label`, `automation_profile`, `routing_source` (`explicit_intent|heuristic|local_default`), `secret_surface=names_only`.
+  - **External-source takeaways applied to US-0086**:
+    - GitHub docs confirm path filters are deterministic and AND-composed with branch filters, supporting stable CI routing when file classes are declared explicitly.
+    - Docker docs confirm deterministic context selection precedence (`--context` override, then `DOCKER_CONTEXT`, then active context), which maps cleanly to target-id-first automation behavior.
+    - OpenSSH docs confirm host-specific first-match ordering and fail-fast controls (`CanonicalizeFallbackLocal no`, `StrictHostKeyChecking yes`) for safe SSH target resolution.
+  - **Alternatives considered**:
+    - **Single fixed remote target**: simplest implementation, but rejected because AC-4 requires explicit target-id resolution and AC-6 requires deterministic CI/routing behavior.
+    - **Always-remote when automation enabled**: rejected; violates manual-local expectations and increases blast radius for unknown/misconfigured targets.
+    - **Doc-only guidance with no reason codes**: rejected; not testable and not fail-closed.
+  - **Risks**:
+    - Drift between active and `template/` heuristics/rules could cause inconsistent routing outcomes.
+    - Over-broad path filters can route local-only work to remote contexts unexpectedly.
+    - Missing explicit reason-code wiring can blur mode-off vs unknown-target failures.
 - **Linked**: US-0086, US-0085, US-0084, US-0064, DEC-0070
-- **Confidence**: medium (intake + repo survey; delivery pending **US-0086**)
-- **Status**: open
+- **Confidence**: high (intake + discovery + research + delivered implementation evidence)
+- **Status**: closed -- delivery aligned with **US-0086** **DONE** (**US-0045**) / curator **`/refresh-context`**
+- **Delivery closure (2026-04-13T23:00:00Z, curator, `orchestrator_run_id=auto-20260405-01`)**: **`US-0086`** **DONE**; sprint **`S0074`** **released**; automation-driven remote execution selection contract delivered per **`docs/engineering/architecture.md`** **`# US-0086`** with routing reason codes and handoff/state evidence tuple expectations reconciled in the hot-surface artifacts.
 
 ## R-0069 — BUG-0008: CRLF `installer-owned-paths.manifest` breaks POSIX `awk` section headers
 
@@ -2661,6 +2690,105 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
   - **Bug drain as a profile of backlog drain** — rejected for clarity: story vs bug selection rules differ (**OPEN** stories vs **OPEN** bugs, sort keys, max items); keep **one scheduler** explicit.
   - **State-only bug cursor without `resume_brief` updates** — risky vs **`RESUME_BRIEF_STALE`**; prefer paired updates or documented exception path.
 - **Linked**: US-0087, US-0044, DEC-0022, DEC-0069, BUG-0005, US-0070, DEC-0052, US-0079, DEC-0061, BUG-0006, US-0069, R-0065
-- **Confidence**: medium-high (discovery + reference/command survey **2026-04-06**; delivery pending **US-0087**)
+- **Confidence**: high (shipped **2026-04-12** with **`S0071`** / **`US-0087`** **DONE**; findings above remain historical survey + architecture lock-in traceability)
 - **Research extension (2026-04-06T15:00:00Z, tech-lead, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=tech-lead-US0087-research-20260406T150000Z-fresh`)**: concrete doc inventory, **`DEC-0069`** queue composition notes, candidate flags/codes, **`AC-10`** tuple extensions — **closure for `/research`**; **`/architecture`** next.
-- **Status**: open (delivery closes with **US-0087** **DONE** / curator or architecture-stated rule)
+- **Delivery closure (2026-04-12T20:35:00Z, curator, `orchestrator_run_id=auto-20260405-01`)**: **`US-0087`** **DONE**; sprint **`S0071`** **released**; bug-queue + mutex contract delivered per **`architecture.md`** **`# US-0087`** and static tests — **R-0070** objectives satisfied; **`US-0088`** / **`R-0071`** is the active forward research stub.
+- **Status**: closed — delivery aligned with **US-0087** **DONE** (**`US-0045`**) / curator **`/refresh-context`**
+
+## R-0071 — US-0088: continuous `/auto` loop vs one-phase-stop + drain reliability
+
+- **Date**: 2026-04-12
+- **Topic**: **US-0088** — multi-phase **`/auto`** until US/sprint boundary; quiet operator surface with **`AUTO_BACKLOG_DRAIN=1`**; harden early-stop and drain advance
+- **Query**: Where does normative **Step 5** in **`docs/engineering/auto-orchestration-reference.md`** diverge from typical Cursor **one subagent spawn per `/auto`** behavior, and what contract tests best lock **continuation**?
+- **Sources**:
+  - Internal: **`docs/engineering/auto-orchestration-reference.md`** (**`## Steps`** item **5** — per-phase spawn loop, drain, bug-queue, security-review hooks); **`.cursor/commands/auto.md`** (**`## Steps (compact; full detail in reference)`**); **`docs/engineering/runbook.md`** (operator recipes); **`US-0044`** / **`DEC-0022`**; **`US-0037`**; **`DEC-0069`**; **`US-0069`** / **`DEC-0051`**; **`tests/auto_command_contract_test.py`**
+  - External (**EARLY_RESEARCH**): attempted web lookup for general multi-agent supervisor/worker loop patterns — **unavailable** this session; analog is **supervisor schedules discrete worker runs until a global stop** (industry pattern name only; no URL persisted).
+- **Findings** (line-level — **Step 5 vs compact Steps drift**):
+  - **Numbering misalignment (high leverage)**: In **`auto-orchestration-reference.md`**, **`## Steps`** uses a numbered list where **item 5** is the **normative multi-phase spawn block** (“Spawn a fresh subagent for each remaining phase in the intersected resolved schedule order…”) including **`AUTO_BACKLOG_DRAIN=1` → repeat story lifecycle**, bug-queue iteration, bulk execute, team checks, and **US-0069** pre/post role gates. In **`.cursor/commands/auto.md`**, the compact list maps differently: **step 4** = “Spawn fresh subagents per intersected schedule” and **step 5** = “Implementation loop, pause, stop breadcrumbs… — reference.” Readers who say “**Step 5**” without naming the file will **equate the wrong bullets** — a direct contributor to **one-phase-stop** mis-implementation.
+  - **Compression gap**: Compact **step 5** delegates the entire **per-phase iteration**, **implementation loop** (**reference** step 7), pause (**step 8**), stop reasons (**step 9**), and **resume_brief** (**step 10**) to “implementation loop” prose. That is **correct by reference** but **under-specified for Cursor** unless the normative reference block is treated as mandatory reading; **`/architecture`** should either (a) add **non-ambiguous cross-file anchors** (e.g. stable fragment ids / explicit “reference Steps 5–11”) in **`auto.md`**, or (b) accept a **documented outer-driver** pattern (operator re-invokes **`/auto`** with **`start-from`** / fresh resume) with deterministic equivalence — **AC-1** decision gate.
+  - **Normative multi-phase text (reference Step 5 — excerpt targets)**: Sub-bullets under item **5** explicitly require **each phase in intersected order**, **reload + recompute phase plan at story boundary** when **`AUTO_BACKLOG_DRAIN=1`**, and parallel **bug-queue** / **bulk** iteration rules — these are the **minimum strings / semantics** contract tests should **anchor**, not only “spawn-only” literals (already covered by **`tests/auto_command_contract_test.py`**).
+  - **runbook gap (research scope)**: Runbook must state **continuous** vs **single-invocation** operator expectation and tie to **Step 5** + compact steps — **`/architecture`** + execute phase deliverable per backlog **AC-7**.
+- **Contract-test shape** (for **`/architecture`** / dev — not implemented in research phase):
+  - **Positive**: Assert **`auto-orchestration-reference.md`** contains normative phrases for (1) **intersected resolved schedule order**, (2) **`AUTO_BACKLOG_DRAIN=1`** + **repeat** / **next eligible OPEN story**, (3) **recompute** / **reload** phase plan at **story boundary** (exact substring set to be architecture-locked to avoid brittle line noise).
+  - **Positive**: Assert **`.cursor/commands/auto.md`** compact step **4** retains **intersected schedule** + **US-0069** and explicitly points to reference for **multi-phase continuation** (add marker phrase if architecture chooses).
+  - **Negative / guard**: Extend existing **spawn-only** tests — no new wording that implies orchestrator may run phases in-turn (already **`test_slim_auto_no_affirmative_in_process_phase_run`**).
+  - **Fixture boundary**: Tests validate **repo text**; they cannot prove Cursor schedules multiple subagent turns — **architecture** should record **expected operator behavior** (single chat continuation vs explicit re-**`/auto`**).
+- **`resume_brief` / `state.md` tuple** (multi-phase depth + story cursor — **US-0037** / **DEC-0069**):
+  - **Lesson from shipped segment**: **`state.md`** post-**`/verify-work`** **`next_scheduled_phase=release`** can disagree with **top-of-file** **`resume_brief`** still pointing at a **new** story’s **`discovery`** — orchestrator **state_fallback** vs brief reconciliation is required (**already observed** for **US-0087**/**US-0088**). Continuous drain must **refresh** **`intended_resume_phase`** + **`story_id`** (and **`orchestrator_run_id`** when segment policy says so) at **every** materialized stop so **`RESUME_BRIEF_STALE`** does not fire mid lawful run.
+  - **Recommendation for architecture**: Pair **AC-10** updates: each phase completion appends **`phase_boundary`**, **`next_scheduled_phase`**, **`story_id`**, **`backlog_drain_stories_remaining_budget`** (and **US-0087** tuple fields when applicable); **`resume_brief`** prepended **Latest** pointer must **mirror** the same tuple for the **active** segment. Optional explicit **`phases_completed_this_invocation`** counter — only if it reduces ambiguity without duplicating **`state.md`** tail.
+  - **Stale policy**: No relaxation of fail-fast **stale** rules; fix is **deterministic refresh** at boundaries (**BUG-0005** lineage), not weaker validation.
+- **Quiet operator surface (`AC-2`) vs `TOKEN_PROFILE`**:
+  - **`TOKEN_PROFILE`** (**lean**/**balanced**/**full**) is a **token-cost / context breadth** control (**US-0080** lineage) — **not** a substitute for **notification semantics**.
+  - **Recommendation**: Introduce **`AUTO_QUIET=0|1`** (default-off) **architecture-locked** for “suppress routine phase chatter”; **allowed notifications** remain exactly backlog **AC-2** list (**decision_gate**, **error**, **pause**, **loop_max**, **blocked**, **missing inputs**). **`PHASE_MODE` / `PERMISSION_MODE`** stay orthogonal unless architecture documents an explicit composition matrix.
+  - **Risk**: **`AUTO_QUIET=1`** + weak operator habit could miss **decision_gate** if gates are not surfaced as **errors** or **explicit stop_reason** — architecture must lock **non-suppressible** channels.
+- **US-0087 mutex** (boundary only): Story drain vs bug-queue **single scheduler** — **`AUTO_SCHEDULER_CONFLICT`**, argv **`bug-target=`** precedence — **no new semantics** here; see **`R-0070`** and **`docs/engineering/architecture.md`** **`# US-0087`**.
+- **Risks**:
+  - **Doc anchor drift** between compact **`auto.md`** and reference **Steps** reintroduces **one-phase-stop** after edits.
+  - **Over-automation**: continuous loop without caps (**`AUTO_LOOP_MAX_CYCLES`**, **`AUTO_BACKLOG_MAX_STORIES`**) exhausts budget — existing scratchpad guards remain mandatory.
+  - **False confidence** from substring-only tests if normative **drain** sentences regress silently.
+- **Next phase pointers (`/architecture`)**:
+  - Lock **AC-1** continuous vs **outer-driver** equivalence; **AC-2** **`AUTO_QUIET`** (+ **`template/`** parity); **AC-3**/**AC-4** test substrings + **runbook** **AC-7**; **`architecture.md`** **`# US-0088`** stop/quiet/resume/**US-0087**-by-reference matrix; **DEC** if policy needs formal amendment beyond story section.
+- **Linked**: US-0088, US-0023, US-0037, US-0044, DEC-0022, US-0080, DEC-0062, US-0087, R-0070, DEC-0069, BUG-0005, BUG-0006, US-0069
+- **Confidence**: medium (repo text inventory complete; runtime Cursor scheduling out of scope)
+- **Delivery closure (2026-04-13T01:30:00Z, curator, `orchestrator_run_id=auto-20260405-01`)**: **`US-0088`** **DONE**; sprint **`S0072`** **released**; continuous multi-phase + **`AUTO_QUIET`** + drain-advance contract delivered per **`architecture.md`** **`# US-0088`** and static tests — **R-0071** objectives satisfied.
+- **Status**: closed — delivery aligned with **US-0088** **DONE** (**`US-0045`**) / curator **`/refresh-context`**
+
+## R-0072 — US-0085: gitignored `.env` for remote and release connectivity (no AI read)
+
+- **Date**: 2026-04-13
+- **Topic**: **US-0085** — repo-root **`.env`** (gitignored) holding values for `*Env` fields in **`.cursor/remote.json`** and **`release-targets.json`**; committed **`.env.example`** (names only); **`.cursorignore`** + agent rule exclusion; operator-sourced outside agent context.
+- **Query**: What `*Env` variable names must `.env.example` list; does `.cursorignore` alone prevent agent file-context ingestion or do Cursor rules need to augment it; is a deterministic helper script (AC-8) preferable to shell-only sourcing; what regression test shape proves `.env` gitignored and `.env.example` committed?
+- **Sources**:
+  - Internal: **`.gitignore`** (current — no `.env` entry); **`.cursor/remote.json`** template/schema (**`remote.json`** gitignored); **`docs/engineering/release-targets.json`** (**`*Env`** field taxonomy from **US-0064** / **DEC-0070**); **`scripts/remote_config_summary.py`**; **`docs/engineering/runtime-connectivity.md`** (active + `template/`); **`docs/engineering/us-0084-remote-e2e.md`** (active + `template/`); **`docs/product/backlog.md`** **US-0085** acceptance; intake evidence **`handoffs/intake_evidence/US-0085-intake-20260404.json`**
+  - External (discovery survey): Keyway 2026 AI secrets security guide; OpenSSF security-focused AI code assistant instructions; GitGuardian `ggshield` AI prompt scanning; `.cursorignore` documentation
+- **Findings** (discovery-era — extend in `/research`):
+  - **Market pattern**: `.env` + `.gitignore` is baseline; AI dev tools require **`.cursorignore`** and/or explicit agent rules to exclude `.env` from IDE file context — `.gitignore` alone is insufficient because Cursor/Copilot agents have developer-level filesystem access.
+  - **`*Env` inventory (TL to confirm)**: `release-targets.json` references env var names for SSH/Docker credentials (`DEPLOY_SSH_KEY_PATH`, `DOCKER_HOST`, etc.); `.cursor/remote.json` template uses `*Env` indirection for host/user/key fields. Exact name list needs repo survey in `/research`.
+  - **`.cursorignore` semantics**: Acts as an analog of `.gitignore` for Cursor's file indexing/context engine. Agent rules (`.cursor/rules/`) provide a complementary behavioral layer ("do not open `.env`"). Both layers recommended for defense-in-depth.
+  - **AC-8 helper**: Options are (a) small `scripts/print_remote_env_hint.py` that reads `.env.example` and prints required names without values, or (b) documented shell recipe (`source .env && env | grep REMOTE`). Architecture decides.
+  - **AC-9 test**: `git check-ignore .env` returns 0 and `git check-ignore .env.example` returns non-0; implementable as a Python test or shell fixture.
+- **Open questions (for `/research`)**: ~~(1)–(4) resolved~~ — see **Research extension** below.
+- **Linked**: US-0085, US-0084, US-0064, DEC-0070, R-0067, R-0068
+- **Confidence**: high (full repo survey + Cursor docs confirmed)
+- **Status**: closed — delivery aligned with **US-0085** **DONE** (**`US-0045`**) / curator **`/refresh-context`**
+- **Delivery closure (2026-04-13T18:00:00Z, curator, `orchestrator_run_id=auto-20260405-01`)**: **`US-0085`** **DONE**; sprint **`S0073`** **released**; 4-layer defense-in-depth `.env` exclusion contract delivered per **`architecture.md`** **`# US-0085`**, **`DEC-0071`**, and tests — **R-0072** objectives satisfied.
+- **Research extension (2026-04-13T12:15:00Z, tech-lead, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=tl-US0085-research-20260413T121500Z-fresh`)**:
+  - **(1) `*Env` variable name inventory** — **20 unique names** across `template/.cursor/remote.json` (3: `REMOTE_DOCKER_TOKEN`, `REMOTE_SSH_USER`, `REMOTE_SSH_KEY_PATH`) and `docs/engineering/release-targets.json` (17: `PUBLIC_DOMAIN`, `CHOCO_API_KEY`, `GITHUB_TOKEN`, `DOCKER_TOKEN`, `DOCKER_RUNTIME_HOST`, `AWS_PROFILE`, `APP_DOMAIN`, `APP_IP`, `CUSTOM_DOMAIN`, `CUSTOM_IP`, `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, `RUNTIME_DOMAIN`, `RUNTIME_IP`, `DOCKER_HOST`, `DOCKER_CONTEXT`). `.env.example` lists all 20 grouped by source config with comments.
+  - **(2) `.cursorignore` semantics confirmed** (Cursor docs `cursor.com/docs/reference/ignore-file`): `.gitignore` syntax; blocks agent file tools (`read_file`, `grep`, `@` mentions); does **not** block terminal or MCP tools; `.env*` in default indexing ignore list but explicit `.cursorignore` adds agent-tool hard block. Open-tab caveat: files open in editor may leak. **Defense-in-depth (4 layers)**: `.gitignore` (git tracking) + `.cursorignore` (agent file tools) + Cursor rules (behavioral) + operator discipline (don't open `.env` in editor).
+  - **(3) AC-8 helper recommendation**: **Option A** — `scripts/print_remote_env_hint.py` (reads `.env.example` names, validates parity with `*Env` fields, never touches `.env`, cross-platform). Option B (shell `source .env && env | grep`) is POSIX-only, leaks values — document as convenience only.
+  - **(4) AC-9 test**: `git check-ignore .env` → exit 0; `git check-ignore .env.example` → exit 1. Python test in `tests/` using `subprocess.run`.
+  - **(5) Template parity**: `.gitignore` (no `template/.gitignore` exists — architecture decides), `.cursorignore` (new, both), `.env.example` (new, both), `runtime-connectivity.md` (both), `us-0084-remote-e2e.md` (both), `runbook.md` (both), `.cursor/rules/coding-standards.mdc` (both).
+  - **(6) Risks**: terminal bypass (medium, mitigated by rules); open-tab leak (low, operator discipline); `.env` framework collision (low, repo is toolkit); `remote_config_summary.py` unaffected (reads `remote.json` names, not `.env` values — AC-10 PASS); template `.env.example` divergence if `*Env` fields change.
+  - **(7) `remote_config_summary.py` AC-10**: script reads `remote.json`, not `.env`. No changes needed. Tests remain PASS.
+  - **`DEC-0038`** tuple in **`docs/engineering/state.md`**; backlog **`research_notes`** updated; **`handoffs/resume_brief.md`** → **`/architecture`**.
+- **Prior historical extension (2026-04-12T23:15:00Z, tech-lead, US-0088 context)**: R-0071 findings; preserved for lineage.
+- **Discovery extension (2026-04-12T22:00:00Z, PO, `orchestrator_run_id=auto-20260405-01`, `fresh_context_marker=po-US0088-discovery-20260412T220000Z-fresh`)** — survey anchor (historical):
+  - **Normative vs practice**: **Step 5** describes **per-phase subagent** iteration inside **one** orchestrated **`/auto`** run until a deterministic stop; common failure mode = **single spawn** then **orchestrator turn ends** despite “continue” policy — enumerate doc/command sentences that imply multi-phase loop vs single-phase.
+  - **Quiet + cost**: Merged scratchpad **`TOKEN_PROFILE=balanced`**, **`EARLY_RESEARCH=1`**, **`INTAKE_GUIDED_MODE=1`**; **`AC-2`** must pick/document **`AUTO_QUIET`** and/or composition with **`TOKEN_PROFILE` / `PHASE_MODE`** without hiding **decision_gate** or mandatory evidence paths.
+  - **Drain reliability**: Under **`AUTO_BACKLOG_DRAIN=1`**, prove **phase depth** and **story cursor** advance per **US-0044** / **DEC-0022**; align **`state.md` / `resume_brief`** fields with **US-0037** / **DEC-0069** so continuous runs do not false-**`RESUME_BRIEF_STALE`** mid-segment.
+  - **Test targets**: **`tests/auto_command_contract_test.py`** (or successor) — negative/positive cases for “does not stop after first spawn when policy says continue”; parity **active + `template/`** for any new scratchpad keys (**AC-5**).
+  - **Mutex**: **US-0088** stays **story-centric**; **US-0087** bug-queue + **`AUTO_SCHEDULER_CONFLICT`** remains architecture-locked — research cites **R-0070** / **`# US-0087`** for boundary only.
+
+## R-0073 — US-0089 / US-0090: external Caveman pattern vs its-magic integration
+
+- **Date**: 2026-04-14
+- **Topic**: **US-0089** / **US-0090** — Caveman-style terse responses and optional **input** compression; Cursor-only; scratchpad-configured; default off
+- **Query**: What from the public **JuliusBrussee/caveman** project is **portable** into this repo as **rules/skills/docs** (no mandatory plugin install), and what must stay **out of scope** to preserve gates, **US-0078** evidence integrity, and **US-0085** secret handling?
+- **Sources**:
+  - External: **`https://github.com/JuliusBrussee/caveman`** (README — levels **lite/full/ultra**, optional **Wenyan** modes, **`caveman-compress`** with **original backup** pattern, Cursor install via **`npx skills add … -a cursor`**, “compress touches prose not code blocks” claim).
+  - Internal: **`US-0053`**, **`US-0080`**, **`TOKEN_PROFILE`** scratchpad contract; **`.cursor/rules/`**; **`.cursor/skills/`**; **`US-0085`** **`.env`** / **`.cursorignore`**; **`DEC-0060`** **`ie:`** intake bundles under **`handoffs/intake_evidence/`**; **`BUG-0007`** truthfulness constraints on intake evidence.
+- **Findings** (intake survey — extend in **`/discovery`**):
+  - **Response-side (US-0089)**: Replicate **intent** (terse, imperative, drop filler) via **Cursor rules** and/or a **small skill**; map **levels** to documented scratchpad enum; **do not** claim vendor token percentages — cite **“directionally similar goal to US-0080”** instead of external benchmarks inside normative docs.
+  - **Input-side (US-0090)**: External **compress** keeps a **human original** sidecar — **good pattern** for this kit’s **loss-avoidance** priority; **default deny** for **canonical product/engineering artifacts**, **intake evidence JSON**, and **any gitignored secret path** aligns with **US-0085** and **DEC-0060**.
+  - **Composition**: **`TOKEN_PROFILE`** remains **context breadth / automation pack size**; **Caveman** is **voice + optional file compression** — architecture should document **non-substitution** (avoid implying **`CAVEMAN_MODE=1`** replaces **`TOKEN_PROFILE=lean`**).
+  - **Install path**: Prefer **in-repo** rules/skill text over requiring **`npx skills add`** for the framework itself (**installer parity** risk if optional); consumer repos may still use upstream skill **if** architecture documents an optional path.
+- **Risks**:
+  - Over-compression of **markdown tables**, **AC checklists**, or **reason-code lists** → **test drift** or **validator false negatives**.
+  - Accidental **rewrite** of **`handoffs/intake_evidence/*.json`** → **US-0078** / **BUG-0007** class regressions.
+  - **Template drift** if only active **`.cursor/`** is updated (**US-0017**).
+- **Next phase pointers (`/discovery`)**:
+  - Lock **exact scratchpad key names**, **default enum**, and **“off means byte-identical behavior”** test strategy for **US-0089**.
+  - Decide **minimal** script API for **US-0090** (**dry-run**, **sidecar naming**, **deny glob list**) before **`/architecture`**.
+- **Linked**: US-0089, US-0090, US-0053, US-0080, US-0085, US-0078, DEC-0060, BUG-0007, US-0017
+- **Confidence**: medium (external README only; no submodule vendoring in this intake)
+- **Status**: open — intake stub for **`/discovery`** / **`US-0089`**

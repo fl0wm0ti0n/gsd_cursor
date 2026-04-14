@@ -819,6 +819,49 @@ Operator troubleshooting:
   - Replace with env-var reference fields (`tokenEnv`, `passwordEnv`,
     `privateKeyPathEnv`, ...).
 
+### Manual vs automation routing (US-0086)
+
+Manual and automation modes are intentionally separate:
+
+- Manual mode (`AUTO_REMOTE_AUTOMATION_PROFILE=off`) keeps local-first behavior.
+  No automatic remote routing is allowed, and `TEST_COMMAND` is never silently
+  rerouted to remote targets.
+- Automation mode (`AUTO_REMOTE_AUTOMATION_PROFILE=deterministic_v1`) may route
+  to Docker/SSH/local targets using deterministic precedence.
+- Explicit NL intent literal is constrained to `start container <target_id>`.
+  Unknown or disabled targets fail closed.
+
+Deterministic fail-closed reason codes:
+
+- `REMOTE_AUTOMATION_MODE_OFF`
+- `REMOTE_TARGET_UNKNOWN`
+- `REMOTE_TARGET_DISABLED`
+- `REMOTE_TARGET_UNROUTABLE`
+
+Security continuity (`US-0085` / `DEC-0071`) remains mandatory in all modes:
+
+- Never read `.env` from agent automation.
+- Never print secret values in command output, logs, handoffs, or state.
+- Names-only evidence format is required (`secret_surface=names_only`).
+
+### Remote-routing evidence tuple (execute/qa/release)
+
+When automation routing is used, include this tuple in handoffs/state artifacts:
+
+- `target_id`
+- `environment_label`
+- `automation_profile`
+- `routing_source` (`explicit_intent|heuristic_fallback|local_default`)
+- `secret_surface=names_only`
+
+If routing is not used (mode off/local default), still record:
+
+- `target_id=local-default`
+- `environment_label=local`
+- `automation_profile=off`
+- `routing_source=local_default`
+- `secret_surface=names_only`
+
 ### Published npm `installer.sh` / POSIX dash (US-0084)
 
 - **Symptom**: `set: Illegal option -` on an early line when running `its-magic` or
@@ -848,6 +891,21 @@ Operator troubleshooting:
   stdout is **names-only** (no secret values). **`DEC-0070`**: when
   **`REMOTE_EXECUTION=0`**, the helper exits **0** and skips validation
   (stderr skip reason).
+
+### Optional deterministic CI routing recipe (US-0086)
+
+Use this only when CI needs explicit remote-target hints; keep it opt-in.
+
+1. Define explicit path filters:
+   - container surfaces: `Dockerfile*`, `docker-compose*.yml`, container scripts
+   - ssh/runtime infra surfaces: deployment ssh scripts, host runtime scripts
+2. Route using explicit matrix labels (`local`, `docker`, `ssh`) with no
+   implicit fallback logic outside documented defaults.
+3. Keep manual mode unchanged: if `AUTO_REMOTE_AUTOMATION_PROFILE=off`, run
+   local path and do not apply remote routing.
+4. Emit names-only evidence (`target_id`, `environment_label`,
+   `automation_profile`, `routing_source`, `secret_surface=names_only`) into
+   CI logs/artifacts.
 
 ## Runtime QA autopilot contract (US-0065 / DEC-0047)
 
@@ -1200,6 +1258,99 @@ scheduler for that run (normative detail: **`docs/engineering/auto-orchestration
 **`AUTO_BUG_TARGET_NOT_OPEN`**, **`AUTO_SCHEDULER_CONFLICT`** — plus spawn-only
 orchestrator rules (**`BUG-0006`**, **`US-0069`**, **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**;
 see **`.cursor/commands/auto.md`**).
+
+## Continuous `/auto` + backlog drain (US-0088)
+
+**Goal:** a single `/auto` run (or documented equivalent outer driver) advances
+through all intersected lifecycle phases until a deterministic stop, and
+`AUTO_BACKLOG_DRAIN=1` can continue across multiple OPEN stories without routine
+operator chatter.
+
+### Quick start
+
+```
+/auto                                       # full lifecycle, single story
+/auto start-from=execute                    # resume from execute phase
+```
+
+With backlog drain enabled (`.cursor/scratchpad.md`):
+
+```
+AUTO_BACKLOG_DRAIN=1
+AUTO_BACKLOG_MAX_STORIES=5
+AUTO_BACKLOG_ON_BLOCK=stop
+```
+
+### Normative reference
+
+Multi-phase iteration lives in
+**`docs/engineering/auto-orchestration-reference.md`** **`## Steps`** item 5
+(cross-anchor: **"reference Step 5"**). The compact steps in
+**`.cursor/commands/auto.md`** point to that block unambiguously.
+
+### Caps and safety guards
+
+| Control | Default | Purpose |
+|---------|---------|---------|
+| `AUTO_BACKLOG_MAX_STORIES` | `1` | Max stories per drain run |
+| `AUTO_LOOP_MAX_CYCLES` | `5` | Max execute-QA cycles per story |
+| `AUTO_PAUSE_REQUEST` | `0` | Set to `1` to request graceful stop at next safe boundary |
+| `AUTO_PAUSE_POLICY` | `after_phase` | Stop boundary granularity |
+
+### Decision gates
+
+Decision gates are **never** suppressed — even when `AUTO_QUIET=1`. When a gate
+fires, the run stops and waits for operator resolution before continuing.
+
+### `AUTO_QUIET` (default off)
+
+Set `AUTO_QUIET=1` in `.cursor/scratchpad.md` to suppress **routine** per-phase
+success chatter. Non-suppressible notifications:
+
+- `decision_gate`
+- Errors / `missing_input`
+- `pause_request`
+- `loop_max`
+- `blocked`
+- Segment handoff / drain advance
+
+`AUTO_QUIET` is **orthogonal** to `TOKEN_PROFILE` (**DEC-0035** / **US-0080**):
+`TOKEN_PROFILE` controls context breadth and token cost, not notification policy.
+
+### Outer-driver equivalence (AC-1, Option B)
+
+When a single Cursor `/auto` invocation cannot schedule multiple subagent turns,
+operators may use an outer driver (script or manual re-invocation with
+`start-from` / refreshed `resume_brief`). This is deterministically equivalent
+when: same phase order, same isolation + strict-proof per phase, same stop
+reasons, same `resume_brief` + `state.md` refresh at every boundary.
+
+### Drain advance behavior
+
+When `AUTO_BACKLOG_DRAIN=1` and a story reaches its terminal boundary:
+
+1. Orchestrator reloads merged scratchpad phase-selection inputs.
+2. Orchestrator recomputes the materialized phase plan for the next story.
+3. Selects the next eligible OPEN story per `AUTO_STORY_SELECTION`.
+4. Runs the full resolved lifecycle for that story until stop or cap.
+
+Notify operator on segment handoff (non-routine, non-suppressible).
+
+### Stop reasons
+
+`completed`, `decision_gate`, `missing_input`, `pause_request`, `loop_max`,
+`error`, `blocked`. See the **Deterministic stop matrix** in
+**`docs/engineering/auto-orchestration-reference.md`** §
+**Continuous multi-phase execution (US-0088)**.
+
+### Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| Run stops after one phase | Older `/auto` text without continuous semantics | Update to latest; verify **reference Step 5** anchor exists |
+| `RESUME_BRIEF_STALE` mid-run | Brief not refreshed at phase boundary | Ensure paired `resume_brief` + `state.md` refresh per DEC-0069 |
+| `AUTO_SCHEDULER_CONFLICT` | Both `AUTO_BACKLOG_DRAIN=1` and `AUTO_BUG_QUEUE=1` without `bug-target=` argv | Supply explicit `bug-target=` or disable one scheduler |
+| `BACKLOG_MAX_STORIES_REACHED` | Drain cap hit | Increase `AUTO_BACKLOG_MAX_STORIES` or run another `/auto` |
 
 ## Explicit bulk sprint planning mode (US-0046)
 
@@ -1586,6 +1737,31 @@ Single-writer drift safety:
 - **Prepublish:** `npm run prepublishOnly` (runs **`guard:installer`**).
 - **Publish:** `npm publish` — set **`RELEASE_PUBLISH_MODE`** to **`confirm`** or **`auto`** when ready; no inline registry secrets in docs.
 - **Debian global E2E (optional follow-up):** **`DEFERRED_DEBIAN_E2E_NO_RUNTIME`** was waived for the release cycle — when a Debian/SSH target exists (**US-0086**), run `npm install -g its-magic@0.1.2-41` (or equivalent), `cat -A` on installed `template/docs/engineering/context/installer-owned-paths.manifest` (no `^M$`), then `its-magic --target <repo> --mode missing` without `[INSTALL_MANIFEST_ERROR]`.
+
+## Operator `.env` setup (US-0085 / DEC-0071)
+
+### Quick start
+
+1. Copy the committed template: `cp .env.example .env`
+2. Fill in values for each variable relevant to your environment.
+3. Source before remote, SSH, or release operations:
+   - **Bash/Zsh**: `source .env` or `set -a; source .env; set +a`
+   - **PowerShell**: `Get-Content .env | ForEach-Object { if ($_ -match '^([^#]\S+?)=(.*)$') { [Environment]::SetEnvironmentVariable($Matches[1], $Matches[2], 'Process') } }`
+4. Run `python scripts/print_remote_env_hint.py` to verify parity between
+   `.env.example` and the `*Env` fields in JSON configs.
+
+### Forbidden
+
+- **Committing `.env`**: `.env` is gitignored; never add it to version control.
+- **Agents reading `.env`**: AI agents must not open, attach, read, search
+  inside, or index `.env` or `.env.*` files (enforced via `.cursorignore` and
+  Cursor rules). Use env var **names** in prose only.
+
+### Allowed
+
+- Running `ssh`, `docker`, `python scripts/remote_config_summary.py` after
+  sourcing `.env` — the process inherits normal environment variables.
+- Referencing env var **names** (not values) in documentation and handoffs.
 
 ## Project run steps
 

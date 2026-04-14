@@ -46,6 +46,12 @@ MAGIC_BENCH_SESSION=
 # - AUTO_BUG_TARGET: all-open|BUG-#### (required when AUTO_BUG_QUEUE=1 unless bug-target= argv supplies target)
 # - AUTO_BUG_MAX_ITEMS: non-negative integer (0 or unset = no cap for all-open queue per run)
 # - AUTO_BUG_ON_BLOCK: stop|skip (bug segment pause/stop boundary)
+# Quiet mode (US-0088) — suppress routine per-phase success chatter only
+# - AUTO_QUIET: 0|1 (default 0; 1 = quiet routine notifications)
+#   Non-suppressible: decision_gate, errors, pause, loop_max, blocked, missing inputs.
+#   Orthogonal to TOKEN_PROFILE (DEC-0035 / US-0080) — TOKEN_PROFILE controls
+#   context breadth / token cost, not notification policy.
+AUTO_QUIET=1
 AUTO_FLOW_MODE=auto_until_decision
 PHASE_MODE=auto
 PERMISSION_MODE=auto
@@ -110,15 +116,21 @@ SPRINT_BULK_MAX_STORIES=5
 SPRINT_BULK_MAX_SPRINTS=3
 SPRINT_BULK_SELECTION=priority_then_backlog_order
 #
-# Remote execution (US-0084 / US-0064)
+# Remote execution (US-0086 / US-0084 / US-0064)
 # - REMOTE_EXECUTION: 0|1 — 0 skips remote.json validation (zero overhead; DEC-0070).
 # - REMOTE_CONFIG: path to dev/Cursor remote JSON (default .cursor/remote.json).
+# - AUTO_REMOTE_AUTOMATION_PROFILE: off|deterministic_v1 (default off; manual
+#   mode remains unchanged unless explicitly enabled for automation workflows).
+# - AUTO_REMOTE_ENVIRONMENT_LABEL: local|docker|ssh (names-only evidence label
+#   for execute/qa/release handoffs when automation routing is used).
 #   Release/QA SSH/Docker connectivity fields live in docs/engineering/release-targets.json
 #   (ssh-server, dockerOverSsh); map WSL vs SSH vs Docker-over-SSH in
 #   docs/engineering/runtime-connectivity.md and docs/engineering/us-0084-remote-e2e.md.
 # - Summary helper (names-only stdout): python scripts/remote_config_summary.py
-REMOTE_EXECUTION=1
+REMOTE_EXECUTION=0
 REMOTE_CONFIG=.cursor/remote.json
+AUTO_REMOTE_AUTOMATION_PROFILE=off
+AUTO_REMOTE_ENVIRONMENT_LABEL=local
 #
 # Sync policy
 # - SYNC_POLICY_MODE: disabled|manual|by_phase|by_milestone|custom_phase_list

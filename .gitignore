@@ -28,3 +28,9 @@ benchmarks/runs/
 
 # Homebrew tap clone (used during release)
 homebrew-tap/
+
+# Operator-local secrets (US-0085 / DEC-0071)
+.env
+.env.local
+.env.*
+!.env.example

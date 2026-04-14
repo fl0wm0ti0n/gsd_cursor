@@ -47,6 +47,7 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Security-aware**: optional compliance review (GDPR, SOC2, HIPAA, PCI-DSS, ISO27001) at design and code level — zero overhead when disabled.
 - **Knowledge-first decisions**: PO and architect research external docs, APIs, and best practices before deciding — curated knowledge persists across sessions and agents.
 - **Adaptive intake depth**: guided intake can proactively ask clarifying questions and suggest options, or run low-touch mode via a switch when teams prefer direct capture.
+- **Optional Caveman voice (Cursor)**: teams can enable a terse, token-efficient assistant style via scratchpad flags (**default off**) without losing workflow gates; an optional follow-on path can add **safe, reversible** file compression for agent-read scope only when explicitly enabled.
 
 ## Look and Feel
 - CLI-first: ASCII banner, clean terminal output.
@@ -932,3 +933,53 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Scope**: Truthful asked-vs-covered intake evidence accounting (`asked_topics`, `topic_coverage`) with fail-closed handling when required topics are not actually collected.
 - **Evidence**: **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`** and user-provided example **`handoffs/intake_evidence/BUG-0006-intake-20260403.json`**.
 - **Intake closure (2026-04-03, PO, manual run)**: Canonical **`BUG-0007`** filed as **OPEN**; next workflow phase **`/discovery`** (TL).
+
+## Discovery Notes — US-0085
+
+- **`.env`-as-secret-carrier pattern** is well-established in the Node/Python ecosystem
+  (`.env` in `.gitignore`, `.env.example` committed). In AI coding assistant contexts
+  (Cursor, Claude Code, Copilot, Aider) the pattern requires an **additional exclusion
+  layer**: agents can read any file the developer can, so `.gitignore` alone is
+  insufficient. Market practice (2026) includes:
+  - **`.cursorignore`** / custom agent exclusion rules to prevent IDE file-context
+    ingestion of `.env`.
+  - **Instruction-based guardrails** (`AGENTS.md`, `.cursorrules`, Cursor rules)
+    telling agents explicitly: "do not open, search, or attach `.env`."
+  - **Defense-in-depth**: zero-disk secret management (Doppler, Infisical, 1Password CLI
+    `op run`, `dotenvx`) is preferred in teams; repo-level `.env` remains common for
+    solo/small-team operator flows.
+- **Kit-specific scope**: US-0085 stays within the **operator-local `.env`** pattern
+  (gitignored, agent-excluded, operator-sourced); `.env.example` committed with
+  **names only**; no inline secrets in tracked JSON (`release-targets.json`,
+  `remote.json`). Agents may run commands (`ssh`, `python scripts/remote_config_summary.py`)
+  when the operator has already exported env vars into the shell.
+- **Template parity**: `.env.example`, `.gitignore` entries, `.cursorignore` (or
+  equivalent), runbook procedure, `runtime-connectivity.md` addendum, `us-0084-remote-e2e.md`
+  references, and agent/rule text must ship in both active and `template/` copies.
+- **AC-8 helper decision**: Architecture may choose a small deterministic
+  `scripts/print_remote_env_hint.py` (names-only, no values) or document shell-only
+  sourcing with no helper — either is acceptable per acceptance.
+- **Security posture**: No credentials in git; `.env` loading is operator-controlled;
+  agents never read `.env`; SSH keys/passwords via agent/env references only.
+
+## Discovery Notes — US-0086
+
+- **Automation-only targeting**: Remote target selection is an explicit automation capability for dev/CI/DI/QA/release, not a default manual workflow requirement.
+- **Manual default remains local-first**: When automation profile is off, operators keep existing local behavior with zero new mandatory remote setup overhead.
+- **Deterministic intent routing**: Explicit operator phrase "start container `<target_id>`" should resolve to canonical `targets[].id` with fail-closed unknown-target diagnostics.
+- **Security continuity with US-0085**: Automation can use env already loaded into shell but must never read `.env` directly and must never emit secret values in logs/handoffs.
+- **Research lock needed next**: `/research` should finalize routing heuristics (changed files + explicit intent), evidence fields for handoffs, and reason-code taxonomy before `/architecture`.
+
+## Intake notes — US-0088
+
+- **Intent**: **`/auto`** should run **all scheduled phases** until a **user story** or **sprint segment** is **done**, with **`AUTO_BACKLOG_DRAIN=1`** continuing across stories **quietly** except **gates**, **errors**, **missing inputs**, **pause**, and **loop max** — closing the gap where implementations often **stop after one phase** and drain is **unreliable**.
+- **Scope**: Normative alignment to **`docs/engineering/auto-orchestration-reference.md`** **Step 5** (**US-0080 / DEC-0062** umbrella), contract tests, runbook + template parity, optional **`AUTO_QUIET`** (or profile composition).
+- **Evidence**: **`handoffs/intake_evidence/US-0088-intake-20260407.json`**; research stub **`R-0071`**.
+- **Intake closure (2026-04-12, PO, Cursor)**: Backlog **`US-0088`** **OPEN**; next workflow phase **`/discovery`** (TL).
+
+## Intake Notes — US-0089 / US-0090
+
+- **Intent**: Bring **Caveman-style** terse communication (see external pattern **`JuliusBrussee/caveman`**) into **Cursor** usage of this kit — **best effort** alignment, **scratchpad-configured**, **default off**, **no regression** in existing automation when disabled. Optional **second story** explores **input-side** file compression with **original preserved** and **hard deny** for canonical/evidence artifacts.
+- **Split**: **US-0089** = response style + scratchpad + rules/skill + tests + architecture; **US-0090** = optional compression scripts + guards + runbook — **gated** after **US-0089**.
+- **Evidence**: **`handoffs/intake_evidence/US-0089-intake-20260414.json`** (**`[INTAKE_EVIDENCE_VALIDATION_OK]`**); research stub **`R-0073`**.
+- **Intake closure (2026-04-14, PO, Cursor)**: Backlog **`US-0089`**, **`US-0090`** **OPEN**; next **`/discovery`** for **`US-0089`** (then **`US-0090`**).

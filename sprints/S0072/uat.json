@@ -1,0 +1,78 @@
+{
+  "sprint_id": "S0072",
+  "story_ids": ["US-0088"],
+  "orchestrator_run_id": "auto-20260405-01",
+  "status": "PASS",
+  "result": "pass",
+  "checked_at": "2026-04-13T01:00:00Z",
+  "checked_by_role": "qa",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Verify continuous /auto semantics: `.cursor/commands/auto.md` and `docs/engineering/auto-orchestration-reference.md` define continuous multi-phase execution (US-0088), deterministic stop matrix, reference Step 5 anchor, stop_reason vocabulary, and documented outer-driver equivalence (Option B).",
+      "result": "pass",
+      "notes": "Section `## Continuous multi-phase execution (US-0088)` present in both auto.md and reference doc. Stop matrix with 8 conditions present. `stop_reason` vocabulary: completed, decision_gate, missing_input, pause_request, loop_max, error, blocked. Reference Step 5 anchor `(reference Step 5 — continuous multi-phase spawn)` present.",
+      "evidence": [".cursor/commands/auto.md", "docs/engineering/auto-orchestration-reference.md"]
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "Verify AUTO_QUIET scratchpad key: `.cursor/scratchpad.md` and `.cursor/scratchpad.local.example.md` include `AUTO_QUIET=0` (default-off) with non-suppressible notification documentation and TOKEN_PROFILE orthogonality.",
+      "result": "pass",
+      "notes": "AUTO_QUIET=0 present in both active scratchpad and example. Non-suppressible list (decision_gate, errors, pause, loop_max, blocked, missing inputs) documented. TOKEN_PROFILE orthogonality (DEC-0035 / US-0080) stated. Reference doc contains AUTO_QUIET column in stop matrix.",
+      "evidence": [".cursor/scratchpad.md", ".cursor/scratchpad.local.example.md", "docs/engineering/auto-orchestration-reference.md"]
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Verify backlog drain prose: reference doc describes multi-phase advance per story, recompute at story boundary, next eligible OPEN story selection under AUTO_BACKLOG_DRAIN=1.",
+      "result": "pass",
+      "notes": "Reference doc drain section includes: `next eligible OPEN story`, `recompute the materialized phase plan`, `reloading merged`, `story boundary`, `BACKLOG_MAX_STORIES_REACHED`. Step 5 drain iteration documented. auto.md compact step 5 references drain advance and recompute.",
+      "evidence": ["docs/engineering/auto-orchestration-reference.md", ".cursor/commands/auto.md"]
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Verify contract tests: `tests/auto_command_contract_test.py` includes tests asserting 'does not stop after first spawn when policy says continue' with reference Step 5 markers, drain advance markers, AUTO_QUIET markers, and spawn-only regression.",
+      "result": "pass",
+      "notes": "10 new test methods found: test_slim_auto_references_step5_and_continuation, test_reference_step5_continuation_markers, test_reference_drain_advance_markers, test_reference_auto_quiet_markers, test_slim_auto_spawn_only_regression, test_active_scratchpad_documents_auto_quiet, test_template_scratchpad_example_documents_auto_quiet, test_template_runbook_literal_parity_active, test_template_scratchpad_baseline_literal_parity_active, test_template_scratchpad_example_literal_parity_active. QA confirmed 17/17 pass, 66 subtests pass.",
+      "evidence": ["tests/auto_command_contract_test.py", "sprints/S0072/qa-findings.md"]
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Verify template parity: template/ mirrors exist for all touched active paths (auto.md, auto-orchestration-reference.md, runbook.md, scratchpad.md, scratchpad.local.example.md).",
+      "result": "pass",
+      "notes": "Contract tests test_template_auto_literal_parity_active, test_template_auto_orchestration_reference_literal_parity_active, test_template_runbook_literal_parity_active, test_template_scratchpad_baseline_literal_parity_active, test_template_scratchpad_example_literal_parity_active all PASS — byte-for-byte parity confirmed.",
+      "evidence": ["tests/auto_command_contract_test.py", "template/.cursor/commands/auto.md", "template/docs/engineering/auto-orchestration-reference.md", "template/docs/engineering/runbook.md", "template/.cursor/scratchpad.md", "template/.cursor/scratchpad.local.example.md"]
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "Verify architecture.md # US-0088 section: stop matrix, quiet policy, US-0044 drain interaction, US-0087 mutex, US-0037 resume, BUG-0006 spawn-only (unchanged).",
+      "result": "pass",
+      "notes": "Section `# US-0088: /auto continuous multi-phase loop + quiet backlog drain` present at line 3412 of architecture.md. Dev handoff confirms reconciliation — no drift vs shipped text.",
+      "evidence": ["docs/engineering/architecture.md", "handoffs/dev_to_qa.md"]
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "Verify runbook operator subsection: `## Continuous /auto + backlog drain (US-0088)` with quick start, caps, pause, decision gates, AUTO_QUIET, outer-driver equivalence, drain advance, troubleshooting.",
+      "result": "pass",
+      "notes": "Section `## Continuous /auto + backlog drain (US-0088)` present at line 1204 of runbook.md. Contains caps, decision gates, AUTO_QUIET subsection, troubleshooting table, pointer to reference Step 5. stop_reason vocabulary listed.",
+      "evidence": ["docs/engineering/runbook.md"]
+    }
+  ],
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "total": 7
+  },
+  "notes": [
+    "All US-0088 acceptance criteria (AC-1..AC-7) verified PASS.",
+    "QA prior verdict: PASS (788/6, 4 pre-existing, 2 cosmetic step-label mismatches — non-blocking).",
+    "Contract tests 17/17, 66 subtests. Scratchpad parity OK. Metadata OK. Bug validation OK.",
+    "US-0088 remains OPEN in docs/product/backlog.md until /release (US-0045)."
+  ]
+}

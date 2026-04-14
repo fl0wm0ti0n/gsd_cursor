@@ -13,10 +13,54 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0070`
-- **Latest canonical notes:** `handoffs/releases/S0070-release-notes.md`
-- **Latest release date:** 2026-04-05
-- **Latest release work item:** BUG-0008
+- **Latest released sprint:** `S0074`
+- **Latest canonical notes:** `handoffs/releases/S0074-release-notes.md`
+- **Latest release date:** 2026-04-13
+- **Latest release work item:** US-0086
+
+## Release finalized note (S0074)
+
+- Sprint: `S0074`
+- Story: `US-0086` (automation-driven remote execution selection)
+- Release: **finalized** (`2026-04-13T22:30:00Z`, `orchestrator_run_id=auto-20260405-01`, strict proof `proof_hash=3bc64c2345bb8861075d957ae665280da80f41d0ce21ba4caa6e55e865b96153`)
+- Queue: **`handoffs/release_queue.md`** row **`S0074`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> **`tests/report.md`**; see **`handoffs/releases/S0074-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** - **no** automated publish without explicit operator confirmation
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** -> **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (unless scratchpad overrides)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (next OPEN story per backlog drain)
+
+## Release finalized note (S0073)
+
+- Sprint: `S0073`
+- Story: `US-0085` (Gitignored `.env` for remote and release connectivity — no AI read)
+- Release: **finalized** (`2026-04-13T17:00:00Z`, `orchestrator_run_id=auto-20260405-01`, strict proof `proof_hash=201375708766b544b12a336534d09e5a8c69369bf18e10c8ea8ac76717dcfb75`)
+- Queue: **`handoffs/release_queue.md`** row **`S0073`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0073-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (unless scratchpad overrides)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (next OPEN story per backlog drain)
+
+## Release finalized note (S0072)
+
+- Sprint: `S0072`
+- Story: `US-0088` (`/auto` continuous multi-phase loop + quiet backlog drain)
+- Release: **finalized** (`2026-04-13T01:15:00Z`, `orchestrator_run_id=auto-20260405-01`, strict proof `proof_hash=a1c18a2b7e8a8f83687ca47ad29c0764b0a5867e4098e8e1c1a20314ffe68bbd`)
+- Queue: **`handoffs/release_queue.md`** row **`S0072`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0072-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (unless scratchpad overrides)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (next OPEN story per backlog drain)
+
+## Release finalized note (S0071)
+
+- Sprint: `S0071`
+- Story: `US-0087` (**`/auto`** explicit bug targeting / bug-queue mode)
+- Release: **finalized** (`2026-04-12T19:05:00Z`, `orchestrator_run_id=auto-20260405-01`, strict proof `proof_hash=b453b8901b083fb927dc73cfea54655f4e4ea1a703c4f1ea3e5cb420e6c4b215`)
+- Queue: **`handoffs/release_queue.md`** row **`S0071`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0071-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=0`** → **`push_decision=not_eligible`**, **`reason_code=MANUAL_MODE_NO_AUTO`** (unless scratchpad overrides)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (**US-0088** intake already in **`resume_brief`**)
 
 ## Release finalized note (S0070)
 
@@ -144,19 +188,24 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0069`**: refer to `## Run` in
-  `handoffs/releases/S0069-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0074`**: refer to `## Run` in
+  `handoffs/releases/S0074-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0069-release-notes.md`.
+  `handoffs/releases/S0074-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0069-release-notes.md`.
+  `handoffs/releases/S0074-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0069-release-notes.md` (env-ref only).
+  `handoffs/releases/S0074-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0069-release-notes.md`.
+  `handoffs/releases/S0074-release-notes.md`.
 
 ## Historical references
 
+- `S0074`: `handoffs/releases/S0074-release-notes.md`
+- `S0073`: `handoffs/releases/S0073-release-notes.md`
+- `S0072`: `handoffs/releases/S0072-release-notes.md`
+- `S0071`: `handoffs/releases/S0071-release-notes.md`
+- `S0070`: `handoffs/releases/S0070-release-notes.md`
 - `S0069`: `handoffs/releases/S0069-release-notes.md`
 - `S0068`: `handoffs/releases/S0068-release-notes.md`
 - `S0067`: `handoffs/releases/S0067-release-notes.md`

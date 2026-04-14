@@ -41,11 +41,6 @@ MAGIC_BENCH_SESSION=
 # - AUTO_EXECUTE_ON_BLOCK: stop|skip (behavior when a planned item blocks)
 # - AUTO_EXECUTE_SELECTION: planned_then_priority
 # - AUTO_TEAM_SCOPE_ENFORCE: 0|1 (when TEAM_MODE=1, enforce TEAM_MEMBER + ACTIVE_TASK_IDS)
-# Optional bug-queue mode (US-0087) — default-off when absent/unset after merge
-# - AUTO_BUG_QUEUE: 0|1 (1 = enable bug-targeted /auto; mutex vs AUTO_BACKLOG_DRAIN without bug-target argv)
-# - AUTO_BUG_TARGET: all-open|BUG-#### (required when AUTO_BUG_QUEUE=1 unless bug-target= argv supplies target)
-# - AUTO_BUG_MAX_ITEMS: non-negative integer (0 or unset = no cap for all-open queue per run)
-# - AUTO_BUG_ON_BLOCK: stop|skip (bug segment pause/stop boundary)
 AUTO_FLOW_MODE=auto_until_decision
 PHASE_MODE=interactive
 PERMISSION_MODE=interactive
@@ -60,10 +55,6 @@ AUTO_EXECUTE_MAX_ITEMS=1
 AUTO_EXECUTE_ON_BLOCK=stop
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
-AUTO_BUG_QUEUE=0
-AUTO_BUG_TARGET=
-AUTO_BUG_MAX_ITEMS=0
-AUTO_BUG_ON_BLOCK=stop
 #
 # `/auto` phase role policy (US-0069 / DEC-0051)
 # - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
@@ -110,7 +101,7 @@ SPRINT_BULK_MAX_STORIES=5
 SPRINT_BULK_MAX_SPRINTS=3
 SPRINT_BULK_SELECTION=priority_then_backlog_order
 #
-# Remote execution (US-0084 / US-0064)
+# Remote execution
 # - REMOTE_EXECUTION: 0|1
 # - REMOTE_CONFIG: path to remote config
 REMOTE_EXECUTION=0

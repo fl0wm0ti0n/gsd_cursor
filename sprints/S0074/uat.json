@@ -1,0 +1,100 @@
+{
+  "sprint_id": "S0074",
+  "story_ids": ["US-0086"],
+  "orchestrator_run_id": "auto-20260405-01",
+  "status": "PASS",
+  "result": "pass",
+  "checked_at": "2026-04-13T22:10:00Z",
+  "checked_by_role": "qa",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Verify automation profile gate and manual-default behavior.",
+      "result": "pass",
+      "notes": "Automation profile keys are present in active/template scratchpad surfaces with default-off posture.",
+      "evidence": [".cursor/scratchpad.md", ".cursor/scratchpad.local.example.md", "template/.cursor/scratchpad.md", "template/.cursor/scratchpad.local.example.md"]
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "Verify manual vs automation documentation in runbook (active + template).",
+      "result": "pass",
+      "notes": "Manual/automation mode split and operator-safe behavior are documented in both runbook copies.",
+      "evidence": ["docs/engineering/runbook.md", "template/docs/engineering/runbook.md"]
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Verify deterministic mode-on routing guidance and mode-off no-reroute behavior.",
+      "result": "pass",
+      "notes": "Routing guidance and mode-off no-reroute contract are present in command/reference docs.",
+      "evidence": [".cursor/commands/auto.md", "docs/engineering/auto-orchestration-reference.md", "template/.cursor/commands/auto.md", "template/docs/engineering/auto-orchestration-reference.md"]
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Verify explicit `start container <target_id>` resolution and fail-closed unknown/disabled behavior.",
+      "result": "pass",
+      "notes": "Intent literal and fail-closed reason codes are explicitly present in active/template command surfaces.",
+      "evidence": [".cursor/commands/auto.md", "template/.cursor/commands/auto.md", "docs/engineering/auto-orchestration-reference.md", "template/docs/engineering/auto-orchestration-reference.md"]
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Verify handoff evidence tuple includes target/environment/profile when remote used.",
+      "result": "pass",
+      "notes": "Names-only routing tuple fields are documented for QA handoff and local-default fallback values.",
+      "evidence": ["handoffs/dev_to_qa.md", "handoffs/qa_to_verify_work.md", "docs/engineering/runbook.md"]
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "Verify deterministic CI recipe documentation for remote-capable routing.",
+      "result": "pass",
+      "notes": "Deterministic CI routing guidance is documented without changing default local behavior.",
+      "evidence": ["docs/engineering/runbook.md", "template/docs/engineering/runbook.md", "docs/engineering/runtime-connectivity.md", "template/docs/engineering/runtime-connectivity.md"]
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "Verify security contract (no .env reads, names-only evidence).",
+      "result": "pass",
+      "notes": "Security continuity remains aligned with names-only secret surface and no .env-read posture.",
+      "evidence": [".cursor/rules/coding-standards.mdc", "template/.cursor/rules/coding-standards.mdc", "docs/engineering/runbook.md"]
+    },
+    {
+      "id": "UAT-8",
+      "ac": "AC-8",
+      "description": "Verify target-resolution pass/fail tests and mode-off non-regression.",
+      "result": "pass",
+      "notes": "Contract tests pass with no regressions.",
+      "evidence": ["tests/auto_command_contract_test.py", "sprints/S0074/qa-findings.md"]
+    },
+    {
+      "id": "UAT-9",
+      "ac": "AC-9",
+      "description": "Verify architecture lock consistency for reason codes, key names, and compatibility.",
+      "result": "pass",
+      "notes": "Architecture/decision lock remains consistent with US-0086 contracts and reason-code vocabulary.",
+      "evidence": ["docs/engineering/architecture.md", "docs/engineering/decisions.md", "sprints/S0074/qa-findings.md"]
+    },
+    {
+      "id": "UAT-10",
+      "ac": "AC-10",
+      "description": "Verify active/template parity for all touched surfaces.",
+      "result": "pass",
+      "notes": "Active/template parity remains intact across touched command/docs/rules/scratchpad surfaces.",
+      "evidence": ["sprints/S0074/summary.md", "handoffs/dev_to_qa.md", "tests/auto_command_contract_test.py"]
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "notes": [
+    "All US-0086 acceptance criteria AC-1..AC-10 verified PASS at verify-work.",
+    "Story remains OPEN in docs/product/backlog.md until release per US-0045."
+  ]
+}

@@ -1,0 +1,82 @@
+{
+  "sprint_id": "S0073",
+  "story_refs": ["US-0085"],
+  "verified_at": "2026-04-13T16:00:00Z",
+  "verified_by": "qa",
+  "orchestrator_run_id": "auto-20260405-01",
+  "passed": 10,
+  "failed": 0,
+  "verdict": "PASS",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": "AC-1",
+      "description": ".gitignore (active + template/) lists .env, .env.local, .env.* patterns with !.env.example negation so git never tracks secret files",
+      "result": "pass",
+      "evidence": ".gitignore and template/.gitignore contain correct patterns; git check-ignore .env returns exit 0; git check-ignore .env.example returns exit 1"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": "AC-2",
+      "description": ".cursorignore (active + template/) excludes .env* from agent/IDE file context with !.env.example negation",
+      "result": "pass",
+      "evidence": ".cursorignore and template/.cursorignore exist with .env* patterns referencing DEC-0071"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": "AC-3",
+      "description": ".env.example (active + template/) committed with only 20 variable names grouped by source — no secret-shaped literals",
+      "result": "pass",
+      "evidence": "20 names grouped by source (3 remote.json, 17 release-targets.json); no secret values; section comments present"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": "AC-4",
+      "description": "docs/engineering/runbook.md (+ template/) documents copy .env.example -> .env, fill locally, source before remote; forbidden/allowed guidance present",
+      "result": "pass",
+      "evidence": "Operator .env setup section present in both active and template runbook with Bash + PowerShell source commands"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": "AC-5",
+      "description": "docs/engineering/runtime-connectivity.md (+ template/) states operators may populate *Env variables from sourced .env",
+      "result": "pass",
+      "evidence": "Sourcing paragraph present in both active and template runtime-connectivity.md"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": "AC-6",
+      "description": "docs/engineering/us-0084-remote-e2e.md (+ template/) references .env/.env.example in Path B and Path C",
+      "result": "pass",
+      "evidence": "Path B and C both reference .env.example copy and .env sourcing in both active and template"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": "AC-7",
+      "description": ".cursor/rules/coding-standards.mdc (+ template/) has explicit .env exclusion rule after DEC-0016 bullet",
+      "result": "pass",
+      "evidence": "Exclusion bullet present after DEC-0016 bullet in both active and template coding-standards.mdc"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": "AC-8",
+      "description": "scripts/print_remote_env_hint.py prints names only with parity check; never prints secret values; exit 0 on aligned",
+      "result": "pass",
+      "evidence": "20 names printed alphabetically; Parity PASS 20/20; exit 0; never reads .env"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": "AC-9",
+      "description": "tests/test_env_gitignore.py regression tests prove .env is gitignored and .env.example is not ignored",
+      "result": "pass",
+      "evidence": "4/4 tests pass: git check-ignore .env exit 0, git check-ignore .env.example exit 1, .cursorignore exists with pattern, .env.example has 20 names"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": "AC-10",
+      "description": "remote_config_summary.py and existing remote_config_summary tests remain PASS; US-0064 JSON contract unchanged",
+      "result": "pass",
+      "evidence": "Script exit 0 (REMOTE_EXECUTION!=1 skip mode); full suite 56/0 pass/fail; no regression"
+    }
+  ]
+}

@@ -38,6 +38,39 @@ description: "its-magic auto: deterministic continuation orchestrator."
   (wrong writer / isolation break) and **`RUNTIME_PROOF_*`** / **`PHASE_ROLE_*`**
   families—do not overload those codes for a missing-spawn violation.
 
+## Continuous multi-phase execution (US-0088)
+
+A single `/auto` orchestrated run advances through **all phases** in the
+**intersected resolved schedule** (reference **Step 5**) until a
+**deterministic stop condition** fires. The orchestrator does **not** stop after
+spawning one phase unless the stop matrix requires it.
+
+**Outer-driver equivalence (AC-1, Option B)**: When a single Cursor `/auto`
+invocation cannot schedule multiple fresh subagent turns (product/runtime
+constraint), a **documented outer driver** (operator script or manual
+re-invocation with `start-from` / refreshed `resume_brief`) is
+**deterministically equivalent** provided: same intersected phase order, same
+isolation + strict-proof attestation per phase (**DEC-0038**), same stop
+reasons, and same `resume_brief` + `state.md` refresh at every boundary.
+Operators must follow the runbook recipe
+(**`docs/engineering/runbook.md`** § Continuous `/auto` + backlog drain).
+
+**Deterministic stop matrix** (see also architecture `# US-0088`):
+
+| Condition | Behavior |
+|-----------|----------|
+| Next phase exists, no hard stop | **Continue** — preflight US-0069, spawn next phase |
+| `decision_gate` | **Stop** (non-suppressible) |
+| `error` / missing critical input | **Stop** (non-suppressible) |
+| `AUTO_PAUSE_REQUEST` / `pause` | **Stop** at safe boundary (non-suppressible) |
+| `AUTO_LOOP_MAX_CYCLES` / `loop_max` | **Stop** (non-suppressible) |
+| `blocked` (sync/scope gate) | **Stop** (non-suppressible) |
+| US lifecycle DONE / sprint segment complete | **Stop** segment; `AUTO_BACKLOG_DRAIN=1` may advance to next OPEN story (recompute phase plan — **reference Step 5**) |
+| `BACKLOG_MAX_STORIES_REACHED` | **Stop** (non-suppressible) |
+
+`stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
+`pause_request`, `loop_max`, `error`, `blocked`.
+
 ## Full specification (US-0080 / DEC-0062)
 
 Long prose, expanded mode semantics, and **Steps 1–13** detail live in
@@ -121,6 +154,22 @@ optional `start-from=<phase>`, optional **`bug-target=BUG-####`** or
 **`bug-target=all-open`**, optional `--execute-bulk`, `handoffs/resume_brief.md`,
 `docs/engineering/state.md`.
 
+## Automation remote routing contract (US-0086)
+
+- Automation-only gate: `AUTO_REMOTE_AUTOMATION_PROFILE=deterministic_v1` enables
+  target routing; `off` keeps manual/local behavior unchanged.
+- Explicit intent literal is constrained to: `start container <target_id>`.
+- Deterministic precedence when profile is enabled:
+  1. explicit intent target id resolution,
+  2. canonical target validation (`targets[].id` exists and is enabled),
+  3. documented heuristic fallback,
+  4. local default when no remote target is selected.
+- Fail-closed reason codes (do not overload):
+  `REMOTE_AUTOMATION_MODE_OFF`, `REMOTE_TARGET_UNKNOWN`,
+  `REMOTE_TARGET_DISABLED`, `REMOTE_TARGET_UNROUTABLE`.
+- Mode-off guardrail: never silently reroute `TEST_COMMAND` to remote when
+  automation profile is disabled.
+
 ## Canonical status contract (US-0045)
 
 Story status authority: `docs/product/backlog.md` only; do not infer readiness from
@@ -134,14 +183,18 @@ QA loop handoffs when applicable, continuation breadcrumbs including `resolution
 
 ## Stop conditions
 
-Decision gate, missing critical input, `AUTO_PAUSE_REQUEST` at safe boundary,
-`AUTO_LOOP_MAX_CYCLES` with unresolved defects.
+Deterministic stop reasons (see **Stop matrix** in `## Continuous multi-phase
+execution (US-0088)` above): `completed`, `decision_gate`, `missing_input`,
+`pause_request`, `loop_max`, `error`, `blocked`.
 
 ## Optional backlog-drain mode (US-0044 / DEC-0022)
 
 Canonical controls: `AUTO_BACKLOG_DRAIN`, `AUTO_BACKLOG_MAX_STORIES`, `AUTO_BACKLOG_ON_BLOCK`,
-`AUTO_STORY_SELECTION`. Reason codes include `BACKLOG_MAX_STORIES_REACHED`. Full semantics:
-reference.
+`AUTO_STORY_SELECTION`. When `AUTO_BACKLOG_DRAIN=1`, each story advances through
+**multiple phases** until its terminal boundary (**reference Step 5**); the
+orchestrator **recomputes** the materialized phase plan at each **story boundary**
+and selects the **next eligible OPEN story** per `AUTO_STORY_SELECTION`.
+Reason codes include `BACKLOG_MAX_STORIES_REACHED`. Full semantics: reference.
 
 ## Optional bug-queue mode (US-0087)
 
@@ -238,13 +291,23 @@ used for resume/materialization failures):
 3. Record continuation metadata (`invocation_mode=auto`, `requested_start_from`,
    `resolved_start_phase`, `resolution_source`, `resolution_status`, `timestamp`).
 4. Spawn fresh subagents per intersected schedule; enforce **US-0069** preflight/post checks.
-5. Implementation loop, pause, stop breadcrumbs (`stop_reason` such as `completed|decision_gate|missing_input|pause_request|loop_max`, `stop_phase`, `timestamp`), `resume_brief` updates — reference.
-6. 11a. Isolation evidence verification at each boundary.
-7. 11b. At each phase boundary, verify strict runtime attestation tuple exists
+5. **Multi-phase continuation** (normative detail: **reference Step 5** in
+   **`docs/engineering/auto-orchestration-reference.md`** `## Steps` item 5):
+   advance through **all remaining phases** in the intersected resolved schedule
+   order until a **deterministic stop condition** fires (see **Stop matrix** in
+   `## Continuous multi-phase execution (US-0088)` above). When
+   `AUTO_BACKLOG_DRAIN=1`, repeat the story lifecycle for the next eligible OPEN
+   story, **reloading** scratchpad and **recomputing** the materialized phase
+   plan at each story boundary. Outer-driver equivalence applies when a single
+   invocation cannot schedule multiple subagent turns (**AC-1 Option B**).
+   `stop_reason`: `completed|decision_gate|missing_input|pause_request|loop_max|error|blocked`.
+6. Isolation evidence verification at each boundary (**reference** step 11a).
+7. At each phase boundary, verify strict runtime attestation tuple exists
    and is valid for the completed phase (`orchestrator_run_id`, `runtime_proof_id`,
-   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`).
-8. Sync verdict recording when eligible — reference.
-9. Backlog-drain / bulk per-item summaries when enabled — reference.
+   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`)
+   (**reference** step 11b).
+8. Sync verdict recording when eligible — reference step 12.
+9. Backlog-drain / bulk per-item summaries when enabled — reference step 13.
 
 ## Backward compatibility
 

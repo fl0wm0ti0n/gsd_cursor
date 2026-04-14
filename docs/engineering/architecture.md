@@ -8,396 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0046: Explicit `/sprint-plan --bulk` Mode
-
-## Overview
-
-US-0046 adds an explicit bulk planning mode for `/sprint-plan` so multiple OPEN
-stories can be planned in one bounded run. The architecture keeps current
-single-scope behavior as default and adds deterministic selection/grouping rules
-only when bulk mode is explicitly enabled.
-
-## Assumption challenge and alternatives
-
-### Option A: Keep current `/sprint-plan` behavior only
-
-Pros:
-- No command contract changes.
-- Lowest implementation complexity.
-
-Cons:
-- Does not satisfy the requirement for explicit multi-story planning throughput.
-- Forces repetitive manual planning runs for large backlogs.
-
-### Option B: Implicitly auto-bulk whenever many OPEN stories exist
-
-Pros:
-- Minimal user input.
-- High throughput potential.
-
-Cons:
-- Ambiguous operator intent.
-- High risk of surprising large planning mutations.
-- Harder to audit and bound safely.
-
-### Option C: Explicit bulk planning trigger with bounded deterministic policy (chosen)
-
-Pros:
-- Clear operator intent and safer defaults.
-- Deterministic selection/grouping output.
-- Predictable bounded behavior with explicit stop reasons.
-
-Cons:
-- Adds policy controls and additional regression surface.
-
-## Minimal architecture
-
-### 1) Explicit mode trigger and defaults
-
-- Add an explicit trigger for bulk planning in `/sprint-plan` (flag/argument).
-- Default behavior without trigger remains current non-bulk planning.
-- Invalid or ambiguous bulk arguments fail safe with actionable guidance.
-
-### 2) Deterministic story selection policy
-
-Selection order:
-1. Story priority (highest first)
-2. Backlog order (stable tie-breaker)
-
-Policy requirements:
-- Stable ordering for reproducibility.
-- No hidden randomness.
-- Story selection evidence logged in planning breadcrumbs.
-
-### 3) Bounded planning controls
-
-Required controls:
-- max stories per bulk run
-- max generated sprints per run
-
-Stop outcomes must be deterministic and recorded:
-- reached max stories
-- reached max generated sprints
-- no eligible OPEN stories
-- blocked by missing/ambiguous acceptance
-
-### 4) Grouping and splitting contract
-
-Bulk planning uses deterministic grouping:
-- prefer single-story sprints by default,
-- allow multi-story grouping only when estimated task count remains within
-  `SPRINT_MAX_TASKS`,
-- if estimated size exceeds threshold and `SPRINT_AUTO_SPLIT=1`, split and
-  continue within run bounds.
-
-No grouping rule may bypass sizing safety controls.
-
-### 5) Artifact completeness and traceability
-
-For each generated sprint, planning output must be complete:
-- `sprint.md`
-- `tasks.md`
-- `progress.md`
-- UAT placeholders
-- `plan-verify` readiness contract
-
-Traceability updates in `state.md` must remain deterministic and non-duplicative.
-
-### 6) Risk model
-
-| Risk | Mitigation |
-|------|------------|
-| Bulk run plans too much at once | bounded max stories/sprints controls + explicit stop reasons |
-| Story starvation in repeated bulk runs | deterministic priority ordering with stable backlog tie-break and periodic fairness review |
-| Incomplete generated artifacts | enforce per-sprint completeness checklist before moving to next item |
-| Confusing behavior change for current users | explicit mode trigger; default non-bulk behavior unchanged |
-
-## Decision linkage
-
-- Research basis: `R-0010`, `R-0011`, `R-0013`
-- Decision: `DEC-0023`
-
----
-
-# US-0047: Explicit Bulk Execute Orchestration Mode
-
-## Overview
-
-US-0047 introduces explicit bulk execution orchestration that processes planned
-sprints/stories continuously while preserving strict fresh-context isolation,
-execute↔QA loop controls, and deterministic stop/skip behavior. In team mode,
-execution must be scoped to member-owned tasks only.
-
-## Assumption challenge and alternatives
-
-### Option A: Rely only on existing `/auto` flag combinations
-
-Pros:
-- Reuses current functionality.
-- No new command-level contract.
-
-Cons:
-- Operator intent remains implicit and easier to misconfigure.
-- Team-member task scoping is not explicit in execution contract.
-- Harder to communicate/verify bounded behavior per run.
-
-### Option B: Global bulk execute without team-scope enforcement
-
-Pros:
-- Maximum throughput in single-user scenarios.
-
-Cons:
-- Unsafe for concurrent team members.
-- High duplicate-work and task-collision risk.
-
-### Option C: Explicit bulk execute mode with team-scoped guardrails (chosen)
-
-Pros:
-- Clear activation semantics and safer defaults.
-- Enforces member/task scope in team mode.
-- Keeps bounded and auditable behavior.
-
-Cons:
-- Requires additional scope-check logic and reason-code coverage.
-
-## Minimal architecture
-
-### 1) Explicit mode trigger and defaults
-
-- Define explicit bulk execute mode (new command or explicit mode argument).
-- Without explicit trigger, keep current non-bulk execution behavior.
-- Invalid/ambiguous trigger input fails safe with remediation.
-
-### 2) Work-item selection and breadcrumbs
-
-Selection policy must be deterministic and logged:
-- selected sprint/story id
-- selection policy source
-- team-context snapshot (when enabled):
-  `TEAM_MODE`, `TEAM_MEMBER`, `ACTIVE_TASK_IDS`
-
-### 3) Isolation and loop contract
-
-- Fresh subagent context is mandatory per phase for each item.
-- Fresh subagent context is mandatory for each execute↔QA loop cycle.
-- Loop bounds (`AUTO_IMPLEMENTATION_LOOP`, max cycles) apply per item.
-
-### 4) Team-scope enforcement model
-
-When `TEAM_MODE=1`:
-- only tasks in `ACTIVE_TASK_IDS` for the current `TEAM_MEMBER` are executable,
-- pre-mutation scope validation is mandatory before task execution writes,
-- out-of-scope tasks must be handled deterministically:
-  - `skip` with reason code, or
-  - `block` with reason code based on configured policy,
-- no writes are allowed for out-of-scope tasks.
-
-### 5) Bounded controls and stop policy
-
-Required bounded controls:
-- max items per run
-- block handling policy (`stop` or `skip`)
-
-Deterministic stop/skip outcomes:
-- max items reached
-- blocked item stop
-- blocked item skipped
-- no eligible scoped items
-- decision gate pause
-
-### 6) Resume semantics
-
-Interrupted bulk runs require deterministic checkpoint fields:
-- last completed item
-- next candidate item
-- stop reason
-- stop phase
-- team-context snapshot (if team mode)
-
-Resume must continue safely from recorded checkpoint state.
-
-### 7) Risk model
-
-| Risk | Mitigation |
-|------|------------|
-| Duplicate or conflicting team execution | member-scope filter + no-write rule for out-of-scope tasks |
-| Long unattended runs hide failures | bounded controls + deterministic reason-code breadcrumbs |
-| Context bleed between items | fresh subagent per phase and per execute↔QA cycle |
-| Ambiguous resume after interruption | explicit checkpoint schema with next-item and stop metadata |
-
-## Decision linkage
-
-- Research basis: `R-0010`, `R-0012`, `R-0013`
-- Decision: `DEC-0024`
-
----
-
-# US-0048: Enforced Per-Phase Subagent Isolation with Audit Gate
-
-## Overview
-
-US-0048 makes per-phase subagent isolation a hard-enforced workflow contract with
-auditable evidence and fail-closed gates. Policy text already mandates isolation
-(DEC-0007, US-0023); this story adds mandatory evidence writing, deterministic
-reason codes, and blocking behavior at progression and release when evidence is
-missing or violated.
-
-Scope: workflow contract enforcement, evidence schema, gates, reason codes,
-regression coverage. Out of scope: runtime product feature changes, external
-orchestration platform migration.
-
-## Assumption challenge and alternatives
-
-### Option A: Advisory-only (logging deviation, no gates)
-
-- **Pros**: Low effort; no blocking.
-- **Cons**: Does not close recurrence risk; user reported breach was execution
-  in one context instead of fresh subagent per phase. Rejected as insufficient.
-
-### Option B: Hard enforcement + auditable evidence + fail-closed gates (chosen)
-
-- **Pros**: Closes compliance gap; deterministic detection and blocking;
-  operator gets explicit diagnostics (reason code, phase, evidence ref,
-  remediation). Aligns with PO recommendation and vision discovery notes.
-- **Cons**: Higher effort; evidence write discipline required; possible friction
-  if evidence writes are inconsistent. Mitigated by clear schema, remediation
-  guidance, and bounded migration for legacy artifacts.
-
-## Minimal architecture
-
-### 1) Components and data flow for isolation evidence
-
-- **Orchestrator** (`/auto`): Must not execute phase work in-process; must
-  spawn/trigger fresh subagent context per phase and per execute↔QA cycle.
-  Reads handoffs and state; writes phase-boundary breadcrumbs and delegates
-  phase execution to a new context.
-- **Phase executors** (each phase command run in its role): On phase start/completion,
-  write **isolation evidence** to canonical locations (see below). Evidence is
-  the only cross-phase proof of fresh-context execution.
-- **Gate evaluators** (`/verify-work`, `/release`): Before allowing progression
-  or release finalization, read canonical isolation evidence for the current
-  sprint/phase span; if required evidence is missing or invalid, block with
-  deterministic reason code and remediation.
-- **Canonical evidence store**: Single authoritative place where isolation
-  evidence is written and read for gates. Recommended: a dedicated section in
-  `docs/engineering/state.md` and/or phase-scoped footers in handoffs, plus
-  optional append-only `docs/engineering/isolation-evidence.log` or equivalent
-  for machine-checkable audit. Schema below.
-
-Data flow:
-
-1. Phase N starts in a **new** subagent context → executor writes isolation
-   evidence (phase_id, role, fresh_context_marker, timestamp, evidence_ref).
-2. Phase N completes → handoff written; evidence may be appended/updated for
-   phase N completion.
-3. Before phase N+1 or before verify-work/release, gate evaluator reads
-   evidence for completed phases in scope; if any required row is missing or
-   invalid → fail closed, emit reason code and remediation.
-4. Pause/resume: resume checkpoint carries isolation provenance (last phase
-   with valid evidence, evidence_ref) so continuation does not silently reuse
-   context.
-
-### 2) Isolation evidence schema (minimal)
-
-Required fields (per phase boundary):
-
-- `phase_id`: canonical phase identifier (e.g. intake, discovery, architecture,
-  sprint-plan, execute, qa, verify-work, release, refresh-context).
-- `role`: agent role that executed the phase (po, tech-lead, dev, qa, release,
-  curator).
-- `fresh_context_marker`: value attesting new context (e.g. session id or
-  explicit "fresh" token; format defined in runbook).
-- `timestamp`: ISO 8601.
-- `evidence_ref`: pointer to this evidence record (e.g. state.md section id or
-  log line id).
-
-Optional for resume provenance:
-
-- `session_id`, `parent_phase` (for chained continuation).
-
-Canonical locations:
-
-- Primary: `docs/engineering/state.md` — dedicated "Isolation evidence" section
-  with one block per phase transition (sprint/phase scoped).
-- Alternative/append: handoff footers or `docs/engineering/isolation-evidence.log`
-  (append-only) for gate scripts to parse. Runbook documents where gates read
-  from.
-
-### 3) Reason-code taxonomy (isolation violations)
-
-Deterministic codes for gate output and remediation:
-
-| Code | Meaning | Remediation |
-|------|---------|-------------|
-| `PHASE_CONTEXT_ISOLATION_MISSING` | Required isolation evidence for one or more phases is absent | Run the missing phase(s) in a fresh subagent context and ensure evidence is written; re-run gate. |
-| `PHASE_CONTEXT_ISOLATION_VIOLATION` | Evidence indicates reused context (e.g. same session across phases) or invalid role/phase mapping | Re-run affected phase(s) in a fresh context; correct role/phase mapping in commands. |
-| `ISOLATION_EVIDENCE_STALE` | Evidence timestamp or scope does not match current sprint/phase span | Re-run phase(s) or refresh evidence; ensure state/handoffs are current. |
-| `ISOLATION_EVIDENCE_INVALID` | Schema violation (missing required field, malformed) | Fix evidence schema in artifact or in writer (command/agent); re-run phase. |
-
-Remediation guidance must be explicit in gate output (reason code, phase id,
-evidence ref, suggested next action).
-
-### 4) Verify-work and release gate placement and precedence
-
-- **Verify-work**: Before marking verify-work as PASS, run an **isolation-compliance
-  gate**: for the current sprint, all phases that should have been executed
-  (from sprint start through execute and QA) must have valid isolation evidence.
-  If not, verify-work outcome is BLOCKED; output includes reason code and
-  remediation. Order: other verify-work checks (e.g. UAT) may run first or in
-  parallel; isolation gate must pass before verify-work is considered complete.
-- **Release**: Before release finalization, run the same **isolation-compliance
-  gate** for the sprint being released. If isolation evidence is missing or
-  invalid, release is blocked; release command output includes reason code,
-  phase(s) affected, evidence ref, remediation. Gate order: check-in test →
-  QA → UAT → **isolation compliance** → release notes/queue update. Isolation
-  gate does not replace other gates; it is an additional mandatory gate.
-
-Precedence: Isolation gate is mandatory and fail-closed. No bypass in default
-configuration; any override requires explicit decision gate and documented
-rationale (same pattern as US-0039 release overrides).
-
-### 5) Pause/resume provenance behavior
-
-- On **pause**: Persist current phase, last completed phase, and evidence_ref
-  (or equivalent) for the last phase with valid isolation evidence in
-  `handoffs/resume_brief.md` and/or `docs/engineering/state.md`.
-- On **resume**: Resolver uses resume checkpoint; continuation must not assume
-  the same context is still valid. Next phase must run in a **new** subagent
-  context and write new isolation evidence. Breadcrumbs must record
-  `resolved_start_phase`, `isolation_evidence_ref_at_resume`, and
-  `continuation_fresh_context_required=true` so that gate evaluators can require
-  evidence for the resumed phase and subsequent phases.
-- Isolation evidence must **survive** pause/resume: evidence written before
-  pause remains valid for gate checks after resume; no ambiguity that "resumed"
-  implies reuse of pre-pause context for new work.
-
-### 6) Active/template parity requirements
-
-- Command contracts (`/auto`, `/execute`, `/qa`, `/verify-work`, `/release`)
-  that define isolation semantics, evidence-writing steps, and gate behavior
-  must be updated in both active repo and `template/` so that new installs
-  get the same enforcement.
-- Runbook and README must document: isolation evidence schema, canonical
-  locations, reason-code list, and remediation guidance. Parity required for
-  active and template copies.
-- Regression coverage (positive: valid evidence allows progression; negative:
-  missing evidence, reused context, invalid role/phase) must be reflected in
-  test/QA guidance in both active and template where applicable.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Over-strict validation blocks runs when evidence writes are incomplete | Clear schema and runbook steps; remediation guidance; optional bounded migration or legacy handling for repos without prior evidence. |
-| Backward compatibility: existing artifacts lack new evidence fields | Gates apply to "required evidence for phases in scope"; legacy runs can define grace period or one-time migration that backfills or waives for pre-US-0048 sprints (documented). |
-| Operator friction on first failure | Deterministic reason codes and explicit remediation (phase, evidence ref, next action) so operators can fix without guesswork. |
-| Resume ambiguity | Provenance in resume checkpoint (evidence ref at resume, continuation requires fresh context) and documentation that resumed phase writes new evidence. |
-
-## Decision linkage
-
-- Research basis: `R-0018`, `R-0019`
-- Decision: `DEC-0029`
-
 # US-0050: Clean Install Hygiene and Complete Clean-Repo Coverage
 
 ## Context and scope
@@ -3406,3 +3016,363 @@ In addition to existing **`orchestrator_run_id`**, **`phase_boundary`**, **`next
 
 - Research: **`R-0070`**
 - Related: **`US-0044`**, **`DEC-0022`**, **`DEC-0069`**, **`BUG-0005`**, **`US-0070`**, **`DEC-0052`**, **`US-0079`**, **`DEC-0061`**, **`BUG-0006`**, **`US-0069`**, **`US-0080`**, **`DEC-0062`**
+
+---
+
+# US-0088: `/auto` continuous multi-phase loop + quiet backlog drain
+
+## Overview
+
+**`US-0088`** hardens **story-centric** **`/auto`** so a **single orchestrated run** (or a **documented equivalent outer driver** — see **AC-1 equivalence** below) advances through **all intersected lifecycle phases** in order until a **deterministic stop**, while **`AUTO_BACKLOG_DRAIN=1`** (**`US-0044`** / **`DEC-0022`**) can advance **OPEN** stories **without routine operator chatter** except where **AC-2** requires visibility. Normative multi-phase iteration lives in **`docs/engineering/auto-orchestration-reference.md`** **`## Steps`** item **5** (cross-anchor: **“reference Step 5”**); **`.cursor/commands/auto.md`** compact steps **must** point to that block unambiguously so **“Step 5”** cannot be confused with compact step numbering (**per `R-0071`**).
+
+**Spawn-only** (**`BUG-0006`** / **`US-0069`** / **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**) is **unchanged**: the orchestrator **never** substitutes for a phase-role subagent.
+
+**`US-0087`** bug-queue scheduler, argv literals, **`AUTO_SCHEDULER_CONFLICT`**, and **AC-10** bug tuple fields remain **architecture-locked** in **`# US-0087`** only — **no duplicate** bug-queue semantics here.
+
+## Assumption challenge and alternatives (AC-1)
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Single Cursor `/auto` invocation** schedules **N** fresh subagent turns until stop | **Preferred default** when product/runtime allows — matches reference Step 5 literally. |
+| B | **Documented outer driver** (operator or script re-invokes **`/auto`** with **`start-from`** / refreshed **`resume_brief`**) | **Allowed** only if **deterministically equivalent**: same phase order, same isolation + **DEC-0038** proofs per phase, same stop reasons — must be **named explicitly** in **`auto.md`**, reference, and runbook (**AC-1** / **AC-7**). |
+| C | Rely on **`TOKEN_PROFILE=lean`** alone for “quiet” | **Rejected** — **`TOKEN_PROFILE`** is **context breadth / token-cost** (**`DEC-0035`** / **`US-0080`**), **not** notification policy (**per `R-0071`**). |
+
+## Stop matrix (deterministic)
+
+| Condition | Stop / advance | Operator notify (**AC-2**) |
+|-----------|----------------|---------------------------|
+| **Intersected plan** has **next** phase and no hard stop | **Continue** → preflight **US-0069** → spawn next phase subagent | **Quiet OK** when **`AUTO_QUIET=1`** (no routine “phase done” chatter). |
+| **`decision_gate`** | **Stop** until resolved | **Always** (non-suppressible). |
+| **`error`**, **missing critical input** | **Stop** | **Always**. |
+| **`AUTO_PAUSE_REQUEST`** / **`pause`** | **Stop** at safe boundary | **Always**. |
+| **`AUTO_LOOP_MAX_CYCLES`** / **`loop_max`** | **Stop** | **Always**. |
+| **`blocked`** (e.g. sync/scope gate) | **Stop** | **Always**. |
+| **US** lifecycle **DONE** boundary / **sprint segment** complete under active policy | **Stop** this segment; **`AUTO_BACKLOG_DRAIN=1`** may **advance** to **next eligible OPEN story** per **`DEC-0022`** (recompute materialized phase plan) | **Notify** on segment handoff / drain advance (counts as **non-routine**). |
+| **`BACKLOG_MAX_STORIES_REACHED`** / drain cap | **Stop** | **Always**. |
+
+**`stop_reason`** vocabulary stays **fixed**; continuous runs only **clarify** which reason fired after **which** phase depth.
+
+## Quiet policy: **`AUTO_QUIET`** vs **`TOKEN_PROFILE`**
+
+| Key | Values | Role |
+|-----|--------|------|
+| **`AUTO_QUIET`** | **`0`** \| **`1`** (**default `0`**) | **`1`** = suppress **routine** per-phase success chatter only; **must not** hide **`decision_gate`**, **errors**, **pause**, **`loop_max`**, **`blocked`**, or **missing inputs** (**backlog AC-2**). |
+| **`TOKEN_PROFILE`** | **`lean`** \| **`balanced`** \| **`full`** | Unchanged — **DEC-0035** / **`US-0080`**; **orthogonal** to **`AUTO_QUIET`**. |
+
+**Composition**: **`PHASE_MODE`** / **`PERMISSION_MODE`** remain **orthogonal** unless a future **DEC** documents an explicit matrix. **`template/`** + scratchpad example parity required when **`AUTO_QUIET`** ships (**AC-5**).
+
+## **`DEC-0069` / resume pairing** (**`US-0037`**)
+
+- At **every** materialized phase boundary in a **continuous** or **drain** run, **`handoffs/resume_brief.md`** **Latest** pointer and **`docs/engineering/state.md`** append must **mirror** the same tuple: **`intended_resume_phase`** / **`next_scheduled_phase`**, **`story_id`**, **`orchestrator_run_id`**, **`backlog_drain_stories_remaining_budget`** (when drain active), plus **`US-0087`** segment fields when applicable (**`# US-0087`**).
+- **No weakening** of **`RESUME_BRIEF_STALE`** / unparseable fail-fast — fix is **deterministic refresh** at boundaries (**`DEC-0069`** / **`BUG-0005`** lineage), including reconciliation when a **new** story’s brief row could disagree with **`state.md`** mid-segment (**per `R-0071`** lesson).
+
+## Interaction with **`US-0044`** backlog drain
+
+- When **`AUTO_BACKLOG_DRAIN=1`**, after a **story** reaches its terminal boundary (**`refresh-context`** completion or policy stop), the orchestrator **reloads** backlog selection and **recomputes** the materialized phase plan for the **next** story (**reference Step 5**).
+- **`backlog_drain_stories_remaining_budget`** (and **`AUTO_BACKLOG_MAX_STORIES`**) remain the **bounded** counters — **US-0088** does not remove caps.
+
+## Contract-test expectations (**AC-4**, **`tests/auto_command_contract_test.py`**)
+
+- **Positive (reference)**: Assert normative phrases for (1) **intersected resolved schedule order**, (2) **`AUTO_BACKLOG_DRAIN=1`** + **next eligible OPEN story** / **repeat**, (3) **recompute** / **reload** phase plan at **story boundary** — substring set **locked** in execute to avoid brittle noise (**per `R-0071`**).
+- **Positive (command)**: Compact **`auto.md`** step that maps to **multi-phase spawn** must **explicitly** reference **reference Step 5** (or stable anchor text agreed in execute).
+- **Negative**: Retain / extend **spawn-only** tests — no wording that implies the orchestrator may run **`execute`**, **`qa`**, etc. **in-turn** (**`BUG-0006`**).
+- **Limitation**: Static tests prove **repo text**; they do not prove Cursor schedules **multiple** subagent turns — runbook (**AC-7**) states **operator** obligation when **outer driver** is used.
+
+## Surfaces (execute phase)
+
+| Path | Change |
+|------|--------|
+| **`.cursor/commands/auto.md`** | Cross-anchors to **reference Step 5**; **`AUTO_QUIET`**; stop matrix pointer; drain + resume pairing. |
+| **`docs/engineering/auto-orchestration-reference.md`** | Step 5 ↔ compact step equivalence; continuous vs outer-driver; **AC-2** / **AC-10** tuple. |
+| **`template/`** | Parity for command + reference + scratchpad keys. |
+| **`tests/auto_command_contract_test.py`** | Continuation + drain substrings; spawn-only regression. |
+| **`docs/engineering/runbook.md`** | **AC-7** recipe: caps, pause, gates, quiet. |
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **Step numbering drift** reintroduces **one-phase-stop** | Stable **“reference Step 5”** anchor + contract tests. |
+| **`AUTO_QUIET=1`** hides **decision_gate** | **Non-suppressible** channel rules in **AC-2** + stop matrix. |
+| **False `RESUME_BRIEF_STALE`** mid-run | **Paired** **`resume_brief`** + **`state.md`** refresh (**`DEC-0069`**). |
+| **Double scheduler** with bug queue | **`# US-0087`** mutex only — **`AUTO_SCHEDULER_CONFLICT`**. |
+
+## Decision linkage
+
+- Research: **`R-0071`**
+- Related: **`US-0044`**, **`DEC-0022`**, **`US-0037`**, **`DEC-0069`**, **`BUG-0005`**, **`US-0087`**, **`R-0070`**, **`BUG-0006`**, **`US-0069`**, **`US-0080`**, **`DEC-0062`**, **`DEC-0035`**
+
+---
+
+# US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
+
+## Overview
+
+**US-0085** standardizes a repo-root **`.env`** (gitignored) holding **values** for
+the 20 `*Env` environment variables referenced by **`.cursor/remote.json`** and
+**`docs/engineering/release-targets.json`** (**US-0064**), alongside a committed
+**`.env.example`** with **names only**. Agents **must not read `.env`**; operators
+source it outside agent context so SSH/Docker/remote helpers see normal process env.
+
+The architecture locks a **4-layer defense-in-depth** contract (**DEC-0071**):
+`.gitignore` (git tracking) + `.cursorignore` (agent file tools) + Cursor rules
+(behavioral) + operator discipline (don't open `.env` in editor).
+
+## Assumption challenge and alternatives
+
+| # | Question | Options | Verdict |
+|---|----------|---------|---------|
+| 1 | **Secret carrier format** | A: repo-root `.env` (standard) / B: `secrets.json` / C: OS keyring | **A** — `.env` is universal, works with `source`, `dotenv`, and shell `export`; B/C add vendor deps with no benefit for local dev. |
+| 2 | **Agent exclusion layers** | A: `.gitignore` only / B: `.gitignore` + `.cursorignore` / C: `.gitignore` + `.cursorignore` + rules + operator discipline (4-layer) | **C** — `.gitignore` alone is insufficient (agents have filesystem access beyond git); `.cursorignore` blocks agent file tools but not terminal/MCP; rules add behavioral guard; operator discipline covers open-tab leak. Formalized as **DEC-0071**. |
+| 3 | **AC-8 helper** | A: `scripts/print_remote_env_hint.py` (names-only, validates parity with `*Env` fields) / B: documented shell recipe (`source .env && env \| grep`) / C: deliberate omission | **A** — cross-platform, deterministic, validates parity, never touches `.env` values; B is POSIX-only and leaks values to stdout; C loses parity enforcement. |
+| 4 | **Template `.gitignore`** | A: create `template/.gitignore` with `.env` entry / B: document that template users add their own | **A** — this repo ships a template; shipped templates should include `.env` in `.gitignore` so new projects inherit gitignore safety from day one. |
+| 5 | **Agent rule placement** | A: extend `.cursor/rules/coding-standards.mdc` / B: new dedicated rule file | **A** — existing `coding-standards.mdc` already has the **DEC-0016** remote config security bullet; one additional bullet is simpler than a new file. Template parity via `template/.cursor/rules/coding-standards.mdc`. |
+
+## File layout (locked)
+
+| Path | Status | Content |
+|------|--------|---------|
+| **`.env`** | gitignored, cursorignored, **never committed** | Operator-local values for 20 `*Env` variables |
+| **`.env.example`** | committed (active + `template/`) | Names only, grouped by source config, with comments |
+| **`.gitignore`** | updated (active + `template/`) | Add `.env` and `.env.local` patterns |
+| **`.cursorignore`** | **new** (active + `template/`) | `.env`, `.env.local`, `.env.*` exclusion patterns |
+| **`.cursor/rules/coding-standards.mdc`** | updated (active + `template/`) | Add `.env` exclusion rule bullet |
+| **`scripts/print_remote_env_hint.py`** | **new** (active only) | Names-only parity helper (AC-8) |
+| **`docs/engineering/runbook.md`** | updated (active + `template/`) | `.env` copy/source recipe |
+| **`docs/engineering/runtime-connectivity.md`** | updated (active + `template/`) | `*Env` sourcing from `.env` |
+| **`docs/engineering/us-0084-remote-e2e.md`** | updated (active + `template/`) | `.env` / `.env.example` refs in Path B/C |
+| **`tests/test_env_gitignore.py`** | **new** (active only) | AC-9 regression: `git check-ignore` assertions |
+
+## `.env.example` content contract
+
+Names grouped by source — **no values, no secret-shaped literals**.
+
+### From `template/.cursor/remote.json` (3 names)
+
+```
+REMOTE_DOCKER_TOKEN
+REMOTE_SSH_USER
+REMOTE_SSH_KEY_PATH
+```
+
+### From `docs/engineering/release-targets.json` (17 names)
+
+```
+PUBLIC_DOMAIN
+CHOCO_API_KEY
+GITHUB_TOKEN
+DOCKER_TOKEN
+DOCKER_RUNTIME_HOST
+AWS_PROFILE
+APP_DOMAIN
+APP_IP
+CUSTOM_DOMAIN
+CUSTOM_IP
+SSH_HOST
+SSH_USER
+SSH_PRIVATE_KEY
+RUNTIME_DOMAIN
+RUNTIME_IP
+DOCKER_HOST
+DOCKER_CONTEXT
+```
+
+Total: **20 unique `*Env` names**. `.env.example` must list all 20 with section
+comments indicating which config file references each group. The helper script
+(**AC-8**) validates this set against the JSON source files at runtime.
+
+## `.cursorignore` contract
+
+```
+# Agent exclusion — secrets must not be ingested by AI tools (US-0085 / DEC-0071)
+.env
+.env.local
+.env.*
+```
+
+Semantics per Cursor documentation: `.gitignore` syntax; blocks agent file tools
+(`read_file`, `grep`, `@` mentions); does **not** block terminal commands or MCP
+tools. Open-tab caveat: files open in editor may still leak to context.
+
+## Agent rule text (`.cursor/rules/coding-standards.mdc`)
+
+Append after existing DEC-0016 remote config bullet:
+
+```
+- `.env` exclusion (DEC-0071 / US-0085): do not open, attach, read, search
+  inside, or index `.env` or `.env.*` files. Use environment variable names
+  in prose only. Operators source `.env` outside agent context.
+```
+
+## `scripts/print_remote_env_hint.py` contract (AC-8)
+
+- **Input**: reads `.env.example` for names; reads `template/.cursor/remote.json`
+  and `docs/engineering/release-targets.json` for `*Env` field inventory.
+- **Output**: prints required env var names to stdout (one per line, grouped).
+- **Parity check**: reports any name in JSON `*Env` fields not in `.env.example`
+  (exit 1 with `ENV_EXAMPLE_PARITY_MISMATCH`), and any name in `.env.example`
+  not in JSON sources (warning, exit 0).
+- **Safety**: **never** opens, reads, or prints from `.env` — values stay local.
+- **Exit codes**: 0 = PASS / parity ok; 1 = parity mismatch (missing names).
+
+## Test approach (AC-9)
+
+`tests/test_env_gitignore.py` using `subprocess.run`:
+
+1. `git check-ignore .env` → exit code 0 (`.env` is gitignored).
+2. `git check-ignore .env.example` → exit code 1 (`.env.example` is NOT ignored).
+3. Optional: assert `.cursorignore` file exists and contains `.env` pattern.
+
+## Template parity plan (7 touchpoints)
+
+| # | Active path | Template path | Action |
+|---|-------------|---------------|--------|
+| 1 | `.gitignore` | `template/.gitignore` (**new**) | Create with `.env`/`.env.local` entries |
+| 2 | `.cursorignore` (**new**) | `template/.cursorignore` (**new**) | Create with `.env*` patterns |
+| 3 | `.env.example` (**new**) | `template/.env.example` (**new**) | Identical content (20 names) |
+| 4 | `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` | Add `.env` copy/source recipe section |
+| 5 | `docs/engineering/runtime-connectivity.md` | `template/docs/engineering/runtime-connectivity.md` | Add `*Env` sourcing note |
+| 6 | `docs/engineering/us-0084-remote-e2e.md` | `template/docs/engineering/us-0084-remote-e2e.md` | Add `.env`/`.env.example` refs |
+| 7 | `.cursor/rules/coding-standards.mdc` | `template/.cursor/rules/coding-standards.mdc` | Add `.env` exclusion bullet |
+
+Scripts (`print_remote_env_hint.py`) and tests (`test_env_gitignore.py`) are
+**active-only** (not shipped in template — template users write their own).
+
+## Interaction with related stories
+
+| Story | Interaction |
+|-------|-------------|
+| **US-0064** (DONE) | `release-targets.json` contract **unchanged** — still `*Env` name references only; `.env` supplies **values** locally. |
+| **US-0084** (DONE) | `remote_config_summary.py` reads `remote.json` names, **not** `.env` values — **AC-10 PASS** guaranteed. `us-0084-remote-e2e.md` updated to mention `.env` sourcing pattern. |
+| **US-0086** (OPEN) | Automation profile must **compose** with `.env` — automation may **use** env already set; **must not** read `.env` (inherits **DEC-0071** contract). |
+
+## Defense-in-depth layering (**DEC-0071**)
+
+| Layer | Mechanism | Blocks | Does NOT block |
+|-------|-----------|--------|----------------|
+| 1. `.gitignore` | Git tracking exclusion | Commit/push of `.env` | Agent filesystem reads |
+| 2. `.cursorignore` | Cursor file-tool exclusion | `read_file`, `grep`, `@` mentions | Terminal commands, MCP tools |
+| 3. Cursor rules | Behavioral instruction | Agent intent to open/search `.env` | Operator or terminal bypass |
+| 4. Operator discipline | Human practice | Opening `.env` in editor (context leak) | Nothing (last resort) |
+
+**Residual risk**: An operator who opens `.env` in the editor tab may leak it to
+agent context. Mitigation: runbook warns explicitly; `.cursorignore` still blocks
+proactive agent file-tool access.
+
+## Risks
+
+| Risk | Severity | Mitigation |
+|------|----------|------------|
+| Terminal bypass (agent runs `cat .env`) | Medium | Cursor rules instruct agents not to; `.cursorignore` blocks file tools; runbook warns operators. Cannot be fully prevented at framework level. |
+| Open-tab leak (`.env` open in editor) | Low | Runbook + rules warn; `.cursorignore` blocks proactive agent reads. |
+| `.env` framework collision (e.g. Node dotenv auto-loads) | Low | This repo is a toolkit, not a Node app; document in `.env.example` header. |
+| Template `.env.example` divergence when `*Env` fields change | Low | `print_remote_env_hint.py` parity check catches drift; run in CI or pre-release. |
+| `remote_config_summary.py` regression | Low | AC-10 explicitly requires existing tests PASS; script reads `remote.json`, not `.env`. |
+
+## Decision linkage
+
+- Decision: **`DEC-0071`** — 4-layer defense-in-depth `.env` exclusion contract
+- Research: **`R-0072`**
+- Related: **`US-0064`**, **`DEC-0070`**, **`US-0084`**, **`US-0086`**, **`DEC-0016`**, **`R-0067`**, **`R-0068`**
+
+---
+
+# US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
+
+## Overview
+
+**`US-0086`** adds a deterministic, **automation-only** remote target-routing
+contract that composes with **`US-0064`** and **`US-0085`**: when automation
+profile is enabled, workflows may resolve Docker/SSH/local execution targets
+from canonical config and explicit operator intent; when disabled, default
+manual behavior remains local-first with zero new remote overhead.
+
+Research basis: **`R-0068`** (routing precedence, reason-code candidates,
+evidence tuple, and external references).
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | Always-on remote routing for all runs | Rejected - violates manual-first default and adds unwanted remote dependencies to daily local use. |
+| B | Implicit heuristic-only routing (no explicit intent phrase) | Rejected - ambiguous behavior and harder operator debugging. |
+| C | Automation-profile gate + explicit NL intent + deterministic fallback matrix (chosen) | Chosen - simplest model that satisfies AC-1..AC-10 while preserving fail-closed behavior. |
+
+## Architecture-locked contracts
+
+### 1) Automation profile gate
+
+- **Mode off**: emit deterministic skip posture (`REMOTE_AUTOMATION_MODE_OFF`)
+  and continue local/default execution path.
+- **Mode on**: routing policy may select remote targets for execute/qa/release
+  and related automation surfaces.
+- Manual operator workflows remain unchanged unless profile is explicitly
+  enabled.
+
+### 2) Deterministic routing precedence
+
+1. **Explicit NL intent**: `start container <target_id>` resolves first.
+2. **Target validation**: `target_id` must map to canonical enabled
+   `targets[].id`; unknown/disabled targets fail closed.
+3. **Heuristic fallback** (automation mode only): apply documented file-class
+   matrix (Docker-oriented changes -> container-capable target; SSH/runtime
+   infra changes -> ssh-capable target; else local/default).
+4. **No silent reroute when mode off**.
+
+### 3) Reason-code vocabulary (locked)
+
+| Code | When |
+|------|------|
+| `REMOTE_AUTOMATION_MODE_OFF` | Automation routing requested while profile is disabled. |
+| `REMOTE_TARGET_UNKNOWN` | Explicit target id does not exist in canonical config. |
+| `REMOTE_TARGET_DISABLED` | Target id exists but is disabled/unavailable by config. |
+| `REMOTE_TARGET_UNROUTABLE` | Mode on, routing attempted, but no deterministic target can satisfy policy. |
+
+### 4) Evidence tuple contract (handoffs/state)
+
+When remote automation routing is used, phase evidence must include:
+
+- `target_id`
+- `environment_label`
+- `automation_profile`
+- `routing_source` (`explicit_intent|heuristic_fallback`)
+- `secret_surface=names_only`
+
+No secret values may appear in state/handoffs.
+
+### 5) Security continuity with US-0085
+
+- Automation may use already-exported environment variables.
+- Automation must not read `.env` directly.
+- Logs and handoffs remain names-only for secret references.
+
+### 6) Compatibility boundaries
+
+- **US-0064/DEC-0070** schema remains unchanged; this story adds routing policy,
+  not new canonical remote schema.
+- **US-0084** tooling stays valid; routing composes with existing
+  `remote_config_summary` and runtime-connectivity docs.
+
+## Delivery surfaces (execute phase)
+
+| Path class | Scope |
+|------------|-------|
+| `.cursor/scratchpad*` (+ `template/`) | Automation-profile literals and defaults. |
+| `.cursor/commands/*` + orchestration reference | Routing contract, reason codes, NL intent literals, mode-on/off behavior. |
+| Agent rules (`.cursor/rules/*` + `template/`) | Deterministic routing guidance and no-reroute-on-off guardrails. |
+| Runbook/docs (`docs/engineering/*` + `template/`) | Manual vs automation split and CI recipe notes. |
+| Tests (`tests/*`) | Target resolution pass/fail fixtures and non-regression for mode-off behavior. |
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| Ambiguous intent parsing for free-form NL | Keep v1 literal constrained to `start container <target_id>`; aliases require explicit architecture update. |
+| Hidden remote reroute surprises | Enforce mode gate + explicit reason codes + runbook/manual-vs-automation split. |
+| Secret leakage in evidence | Inherit US-0085 names-only contract; no `.env` reads and no value logging. |
+| Target drift across active/template/docs | AC-10 parity checks on command/rule/scratchpad surfaces. |
+
+## Decision linkage
+
+- Research: **`R-0068`**
+- Related: **`US-0064`**, **`US-0084`**, **`US-0085`**, **`DEC-0070`**, **`DEC-0071`**
