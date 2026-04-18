@@ -779,6 +779,33 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 | `AUTO_QUIET` | `0` \| `1` (default `0`) | `1` = suppress routine per-phase success chatter; must **not** suppress `decision_gate`, errors, pause, `loop_max`, `blocked`, or missing inputs. |
 | `TOKEN_PROFILE` | `lean` \| `balanced` \| `full` | Unchanged — **DEC-0035** / **US-0080**; **orthogonal** to `AUTO_QUIET`. |
 
+### `TOKEN_PROFILE` × `CAVEMAN_MODE` non-substitution (US-0089 / DEC-0072 §1)
+
+`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply voice. Neither substitutes for the other; setting one does not change the other. Combine freely.
+
+`CAVEMAN_MODE` and `CAVEMAN_LEVEL` live in `.cursor/scratchpad.md` (default
+`CAVEMAN_MODE=0`, `CAVEMAN_LEVEL=` empty). `CAVEMAN_COMPRESS_INPUT` and
+`CAVEMAN_FILE_SCOPE` are reserved for **US-0090** and remain **documented
+no-ops** in US-0089. The literal-region invariant, the five canonical
+operator toggle phrases (`caveman on`, `caveman off`, `stop caveman`,
+`normal mode`, `caveman: lite|full|ultra`), and the `CAVEMAN_LEVEL_UNKNOWN`
+fail-closed contract live in `.cursor/rules/caveman.mdc`. Default-off is
+enforced by the `test_caveman_default_off_*` subtests in
+`tests/auto_command_contract_test.py` (**DEC-0072** §6).
+
+### `TOKEN_PROFILE` × `CAVEMAN_MODE` × `CAVEMAN_COMPRESS_INPUT` non-substitution (US-0090 / DEC-0073 §1)
+
+`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply voice. `CAVEMAN_COMPRESS_INPUT` controls input-side file compression. All three axes are orthogonal: setting one does not change the others, and none substitutes for another.
+
+`CAVEMAN_COMPRESS_INPUT` and `CAVEMAN_FILE_SCOPE` live in
+`.cursor/scratchpad.md` (defaults: `CAVEMAN_COMPRESS_INPUT=0`,
+`CAVEMAN_FILE_SCOPE=` empty). Activation also requires the operator to
+invoke `scripts/caveman_compress_input.py --write`; absent any of the three
+conditions the script is a no-op and the fail-closed reason codes from
+**DEC-0073** §7 apply. Default-off is enforced by the
+`test_caveman_compress_input_*` subtests in
+`tests/auto_command_contract_test.py` (**DEC-0073** §11).
+
 ## Steps
 1. Read automation flags from merged scratchpad and **materialize the resolved
    phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**:

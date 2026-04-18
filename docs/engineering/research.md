@@ -2791,4 +2791,367 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
   - Decide **minimal** script API for **US-0090** (**dry-run**, **sidecar naming**, **deny glob list**) before **`/architecture`**.
 - **Linked**: US-0089, US-0090, US-0053, US-0080, US-0085, US-0078, DEC-0060, BUG-0007, US-0017
 - **Confidence**: medium (external README only; no submodule vendoring in this intake)
-- **Status**: open — intake stub for **`/discovery`** / **`US-0089`**
+- **Status**: open — extended at **`/discovery`** (**2026-04-18**, **US-0089**); remains stub-appropriate for **`/research`** (tech-lead) to deepen
+
+### Discovery extension (2026-04-18, PO, `auto-20260418-01`)
+
+- **Focus**: **US-0089** response-side only; **US-0090** compression remains out of scope for this discovery segment.
+- **External reference pattern notes** (reference only, MIT — do **not** vendor):
+  - **JuliusBrussee/caveman** README defines levels **`lite`** / **`full`** / **`ultra`** and an optional "Wenyan" mode; the value transferable to this kit is the **level taxonomy** and the **"compress prose, not code blocks"** discipline. Exact enum values and any "Wenyan"-style extras are **architecture-locked** under **`# US-0089`**, not promised here.
+  - README claims vendor token savings per level — **do not quote** inside normative kit docs (no vendor benchmarks in `architecture.md` / `runbook.md`); at most, cite as **"directionally similar intent to US-0080 outcomes"**.
+  - Upstream install path uses **`npx skills add … -a cursor`**; for this kit's framework surface, prefer **in-repo** rules / `.cursor/skills/` text over mandatory external install. Consumer repos may optionally layer the upstream skill **after** kit rules load.
+- **Cursor rule / skill composition notes** (research asks for `/research`, tech-lead):
+  - Minimal-surface option: **rule-only** under **`.cursor/rules/`** (voice + "literal-preserved regions" + gate-language passthrough), no new skill.
+  - Expanded option: **rule + focused skill** under **`.cursor/skills/its-magic-caveman/`** composed with existing `its-magic/SKILL.md` — prefer **composition** over replacement (skill does **not** override its-magic workflow or gate artifacts).
+  - In either option: Caveman behavior must be **gated on `CAVEMAN_MODE`** at rule/skill read time; when unset / `0`, the rule's additional directives must be **inert** (no behavioral drift).
+- **"Default-off byte-equivalence" test strategy** (for `/research` → `/architecture` lock):
+  - Extend **`tests/auto_command_contract_test.py`** (or add a focused module) to assert that with **`CAVEMAN_MODE=0`** (or absent), the set of normative contract strings (reason codes, AC checklists, gate messages, command output markers like `[BUG_VALIDATION_OK]`) remains **unchanged**.
+  - Regression-lock **scratchpad key documentation markers** (active + **`template/.cursor/scratchpad.md`**) and **`.cursor/scratchpad.local.example.md`** parity so a future edit cannot silently drop the new keys.
+- **Interaction with `TOKEN_PROFILE` (US-0080 / DEC-0062)**: research must produce a **precedence matrix** (or declare them fully orthogonal) for publication in **`docs/engineering/auto-orchestration-reference.md`** and/or **`runbook.md`**; **no silent override** in either direction.
+- **Operator control phrasing (research asks)**: shortlist of candidate phrases + deterministic mapping to session toggle — architecture will pick a single documented set.
+- **Non-goals carried into research**: no input-side file compression work (US-0090); no changes to intake evidence schema (**US-0078 / DEC-0060**); no edits to strict-proof / isolation evidence wording (**US-0056 / DEC-0038** / **US-0048 / DEC-0029**).
+- **Discovery outcome**: confidence raised on boundary clarity; **`R-0073`** remains **open** for `/research` (tech-lead) deepening — no DEC yet.
+
+### Research extension (2026-04-18, TL, `auto-20260418-01`)
+
+> Scope: deepen **R-0073** with implementation anchors, risks, and mitigations for the **US-0089** response-side Caveman mode. **No architecture decision authored here** — options are laid out for **`/architecture`** to lock under `DEC-xxxx` and `docs/engineering/architecture.md` `# US-0089`. US-0090 (input-side compression) stays out of scope; research only notes the shared scratchpad-vocabulary seam.
+
+- **Q1 — TOKEN_PROFILE × CAVEMAN precedence** (AC-4):
+  - **Option A (recommended baseline — orthogonal)**: `TOKEN_PROFILE=lean|balanced|full` controls **context breadth / automation pack size** (US-0080 / DEC-0062); `CAVEMAN_MODE`/`CAVEMAN_LEVEL` control **reply voice** only. Neither substitutes for the other. Published as an explicit non-substitution line in `docs/engineering/auto-orchestration-reference.md` and `docs/engineering/runbook.md`. Minimal doc delta; zero behavior change when Caveman off.
+  - **Option B (explicit precedence matrix)**: Publish a small table `{TOKEN_PROFILE} × {CAVEMAN_MODE}` enumerating voice + context pack per cell. Higher doc cost; useful only if architecture decides one profile must dominate (no current evidence it should).
+  - **Option C (collapse into TOKEN_PROFILE)**: Add a new profile value (e.g. `lean-caveman`). **Rejected for research recommendation** — breaks US-0080 token-profile semantics, hides voice behind context-breadth control, and forces every TOKEN_PROFILE consumer to care about voice.
+  - **Risks**: silent override either direction (operators reading `CAVEMAN_MODE=1` as "lean equivalent"); TOKEN_PROFILE doc drift; conflicting examples in runbook vs auto-reference.
+  - **Mitigations**: single non-substitution sentence anchored by fixture test asserting both `docs/engineering/auto-orchestration-reference.md` and `docs/engineering/runbook.md` contain the phrase; template parity extends to both; architecture picks A (default) or B.
+  - **Anchors**: `docs/engineering/auto-orchestration-reference.md` (§`AUTO_QUIET` / TOKEN_PROFILE), `docs/engineering/runbook.md`, `.cursor/scratchpad.md` header comments.
+  - **Open ask for `/architecture`**: lock Option A (recommended) or Option B; publish precedence paragraph verbatim in active + `template/` reference + runbook.
+
+- **Q2 — Rule-only vs rule+skill composition** (AC-3):
+  - **Option A (rule-only, minimal)**: add `.cursor/rules/caveman.mdc` (with `globs: ["**/*"]` scope matching existing `core.mdc`) gated at read-time on `CAVEMAN_MODE`. Pros: single surface, lowest maintenance, easiest default-off byte-equivalence test. Cons: less discoverable as a named "skill"; harder for consumer repos to layer optional upstream Caveman skill.
+  - **Option B (rule + focused skill)**: add `.cursor/rules/caveman.mdc` (gate + literal-preservation invariants) **plus** `.cursor/skills/its-magic-caveman/SKILL.md` (voice text + level mapping + operator phrasing catalog) composed with existing `.cursor/skills/its-magic/SKILL.md` (no override). Pros: discoverable, mirrors JuliusBrussee/caveman skill posture without vendoring, separates concerns (invariants vs voice). Cons: two surfaces to keep in sync; template parity duplicated.
+  - **Option C (skill-only)**: rely on a skill without a rule. **Not recommended** — rules are always-on context for Cursor agents; skills are invoked/read contextually. Literal-region invariants must live in rules to be reliably enforced on every turn.
+  - **Tradeoffs table anchor (architecture use)**: maintenance (A < B ≪ C), discoverability (B ≫ A > C), template parity cost (A < B; A=2 files, B=4 files incl. template mirrors), default-off regression surface (A < B).
+  - **Risks**: rule drift vs skill drift; gate missed on one surface; consumer upstream Caveman install conflicting with in-repo rule.
+  - **Mitigations**: pick Option A if maintenance wins; pick Option B only if discoverability justifies the extra surface; either way, put the **non-suppressible gate list** (decision_gate, error, pause, loop_max, blocked, missing-input; carry from US-0088) **inside the rule** so skills never override it; add a contract test asserting gate-marker preservation under `CAVEMAN_MODE=1`.
+  - **Anchors**: `.cursor/rules/core.mdc`, `.cursor/rules/quality.mdc`, `.cursor/rules/coding-standards.mdc`, `.cursor/skills/its-magic/SKILL.md`, `template/.cursor/rules/*`, `template/.cursor/skills/its-magic/SKILL.md`.
+  - **Open ask for `/architecture`**: select Option A or B; lock rule filename; if Option B, lock skill folder name (candidate `.cursor/skills/its-magic-caveman/`).
+
+- **Q3 — Default-off invariant testing** (AC-2 / AC-6):
+  - **Primary strategy**: extend `tests/auto_command_contract_test.py` with a new block of subtests `test_caveman_default_off_*` asserting:
+    1. `.cursor/scratchpad.md` contains key lines `CAVEMAN_MODE=0` (or `CAVEMAN_MODE=` with documented default-0 comment) and `CAVEMAN_LEVEL=` — architecture locks exact spelling.
+    2. `template/.cursor/scratchpad.local.example.md` documents the same keys (parity — mirror assertion).
+    3. Existing `required` token list (spawn-only contract, reason codes, `# US-0086` tokens, `AUTO_QUIET`) remains **unchanged and intact** after US-0089 ships — regression guard on Caveman not suppressing any existing contract strings.
+    4. New assertion: `auto.md` + reference doc still contain **non-suppressible gate vocabulary** (`decision_gate`, `missing input`, `pause`, `loop_max`, `blocked`, `[BUG_VALIDATION_OK]`, `[INTAKE_EVIDENCE_VALIDATION_OK]`) — Caveman MUST NOT remove these.
+    5. Active/template parity: `test_template_runbook_literal_parity_active` style check extended to cover any new runbook section added for Caveman (architecture decides whether to add a section or a single paragraph).
+  - **Secondary (optional focused module)**: `tests/caveman_defaults_test.py` if the caveman assertions grow past ~10 subtests (architecture choice).
+  - **What we are NOT testing in US-0089**: behavioral differences under `CAVEMAN_MODE=1` (voice is a qualitative property enforced by rules, not easily asserted in unit tests); out-of-scope for AC-6. Architecture may add a smoke-level "rule file contains Caveman directive markers" assertion but cannot unit-test an LLM's voice deterministically.
+  - **Risks**: test-over-reach that forces voice quality into CI; false green when rule file exists but is not loaded by Cursor.
+  - **Mitigations**: keep tests file-presence + token-presence only; rely on manual operator verification for voice quality; architecture notes this limitation in `# US-0089`.
+  - **Anchors**: `tests/auto_command_contract_test.py` (existing patterns for scratchpad/template parity), `.cursor/scratchpad.md`, `template/.cursor/scratchpad.local.example.md`.
+  - **Open ask for `/architecture`**: confirm extension-in-place vs new module; lock the exact scratchpad key spelling (for test string match).
+
+- **Q4 — Operator toggle vocabulary** (AC-5):
+  - **Candidate phrase set (shortlist for architecture)**: `caveman on` / `caveman off` (symmetric, short); `stop caveman` / `normal mode` (aligns with upstream README discourse); `caveman: lite|full|ultra` (level-setter without a mode flip). Architecture locks **one canonical set** published in runbook.
+  - **Determinism under mid-session toggles**: Cursor operator speech is free-form; the rule must specify that **only the last explicit toggle in the current conversation wins**, and on new subagent spawn the **scratchpad value** (`CAVEMAN_MODE`) is authoritative (session toggle is an overlay, not a persistent state). This matches US-0069 / DEC-0051 phase-boundary semantics — no hidden state crosses a subagent boundary.
+  - **Risks**: ambiguous phrasing (`quiet caveman`, `be caveman-lite`) matching unintentionally; mid-session toggle masking a gate message (e.g. operator says "normal" mid-error flow and the agent drops a reason code by mistake).
+  - **Mitigations**: rule lists exact recognized phrases (literal regex-ish catalog); toggle MUST NOT suppress non-suppressible gate surfaces for that turn; architecture documents "toggle applies to next turn onward; current-turn gate artifacts remain literal".
+  - **Anchors**: `.cursor/rules/core.mdc` (pattern for documented directive lists), `docs/engineering/runbook.md`, `.cursor/scratchpad.md` (comment line pointing at runbook operator phrases section).
+  - **Open ask for `/architecture`**: pick the canonical phrase set; publish in runbook + (optional) skill.
+
+- **Q5 — Machine-verifiable artifact preservation (literal regions)** (AC-3):
+  - **Protected output zones** (architecture locks as rule directives, verbatim):
+    1. Fenced code blocks (``` … ``` and CODE REFERENCE blocks with `startLine:endLine:filepath`).
+    2. File/path strings (anything matching `\`[\w./-]+\.(md|py|ps1|sh|json|mdc)\``).
+    3. AC checklist bullets (`- [ ]` / `- [x]`) and their full ACn text.
+    4. Reason codes — ALL_CAPS_WITH_UNDERSCORES tokens (explicit examples: `PHASE_CONTEXT_ISOLATION_VIOLATION`, `RUNTIME_PROOF_MISSING`, `AUTO_RESUME_ERROR`, `AUTO_SCHEDULER_CONFLICT`, `REMOTE_TARGET_UNKNOWN`, …).
+    5. IDs — `US-xxxx`, `DEC-xxxx`, `R-xxxx`, `BUG-####`, `S0xxx`, `T-xxx`.
+    6. Contract markers — `[BUG_VALIDATION_OK]`, `[INTAKE_EVIDENCE_VALIDATION_OK]`, `[SCRATCHPAD_PAIR_OK]`, `[ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS]` and siblings.
+    7. Strict-proof tuple fields (`orchestrator_run_id`, `runtime_proof_id`, `proof_hash`, `proof_issued_at`, `proof_ttl_seconds`, `phase_id`, `role`).
+    8. Isolation evidence fields (`fresh_context_marker`, `evidence_ref`, `timestamp`).
+    9. Commit messages and git refs when quoted (`git commit`, `HEAD`, branch names).
+  - **Garbling examples to forbid** (rule text): dropping `US-` prefix, rendering reason codes in lowercase prose, collapsing fenced code into a bullet list, truncating path strings mid-filename.
+  - **Risks**: Caveman voice enthusiastically compressing a path or reason code; rule interpreted as "best effort" rather than hard invariant.
+  - **Mitigations**: rule phrased as "MUST keep literal" (not "SHOULD"); test Q3/#4 asserts gate vocabulary remains present in auto.md + reference after any Caveman-related doc edits; architecture reiterates this list in `# US-0089` under a "Literal regions (hard invariant)" heading.
+  - **Anchors**: `.cursor/rules/core.mdc`, `.cursor/rules/quality.mdc` (existing literal-region discipline patterns), `docs/engineering/artifact-ordering-policy.md`.
+  - **Open ask for `/architecture`**: accept the nine-zone list verbatim or narrow it; publish as canonical in `# US-0089`.
+
+- **Q6 — External pattern portability (JuliusBrussee/caveman, MIT)** (reference only):
+  - **Portable concepts**: level taxonomy (`lite|full|ultra`); "compress touches prose, not code blocks" discipline; symmetric operator toggle phrasing.
+  - **Non-portable (kept out of scope)**: `npx skills add … -a cursor` vendor install path (our framework ships in-repo rules/skill); vendor token-savings claims (no benchmarks in normative kit docs per US-0080 rigor); Wenyan-mode linguistic extras (cultural-specific — not required for terseness).
+  - **Attribution**: architecture may add a single "Inspired by JuliusBrussee/caveman (MIT)" line in `# US-0089` and in any new skill file; no vendored code or README text.
+  - **Risks**: accidental vendor-install instructions leaking into runbook; citing vendor token percentages as if they were kit benchmarks.
+  - **Mitigations**: rule forbids vendor benchmark claims in normative docs; runbook Caveman section reviewed for zero `npx` references.
+  - **Anchors**: `https://github.com/JuliusBrussee/caveman` (README, MIT) — **external reference only, do not vendor**.
+  - **Open ask for `/architecture`**: decide attribution placement (single line vs section); confirm no vendor install instruction in runbook.
+
+- **Q7 — Scratchpad key naming** (AC-1):
+  - **Recommended enum (for architecture to lock)**:
+    - `CAVEMAN_MODE=0|1` — default **0** (off). Semantics: 0 means byte-equivalent pre-US-0089 behavior; 1 means voice rule active.
+    - `CAVEMAN_LEVEL=lite|full|ultra` — default empty (meaning "use default level = `full`" per rule, OR "inert when MODE=0" — architecture picks). Three-value enum matches external reference; future extension possible but not required.
+  - **Alternatives considered**:
+    - `CAVEMAN=off|lite|full|ultra` (single key). **Rejected for research recommendation** — collides with our existing 0|1 convention (`AUTO_QUIET`, `AUTO_BACKLOG_DRAIN`, …) and couples enable-flag with level.
+    - `CAVEMAN_VOICE` instead of `CAVEMAN_MODE`. Acceptable naming variant; architecture picks. Research recommendation: `CAVEMAN_MODE` matches verb-pattern of `TOKEN_PROFILE`, `AUTO_FLOW_MODE`.
+  - **Reserved-for-US-0090 keys (documented no-ops in US-0089)**: `CAVEMAN_COMPRESS_INPUT=0|1` (default **0**), `CAVEMAN_FILE_SCOPE=` (empty default). Comments in `.cursor/scratchpad.md` must state "reserved for US-0090; inert in US-0089 ship — no behavior until compression story lands".
+  - **Risks**: operators reading the reserved keys and expecting behavior in US-0089; key rename churn if architecture picks a different spelling after tests lock strings.
+  - **Mitigations**: explicit "reserved for US-0090, no-op" comment; contract-test string assertions deferred until architecture locks names (tech-lead writes test string values into `# US-0089` decision record so dev phase picks up the locked spelling).
+  - **Anchors**: `.cursor/scratchpad.md` (lines ~148–180 — knowledge-curation and TOKEN_PROFILE block for visual placement), `template/.cursor/scratchpad.local.example.md`, `.cursor/scratchpad.local.example.md`.
+  - **Open ask for `/architecture`**: lock the four key names + defaults; confirm US-0090 reserved keys stay no-ops until that story ships.
+
+- **Q8 — Template parity touchpoints** (AC-8):
+  - **Inventory (active → template mirror expectation)**:
+    1. `.cursor/scratchpad.md` → `template/.cursor/scratchpad.md` (if template carries an active baseline; currently template-side equivalent is the `.example.md` helper — architecture confirms).
+    2. `.cursor/scratchpad.local.example.md` → `template/.cursor/scratchpad.local.example.md` (already literally mirrored per existing `test_template_scratchpad_baseline_literal_parity_active` pattern).
+    3. New `.cursor/rules/caveman.mdc` (if Option A or B for Q2) → `template/.cursor/rules/caveman.mdc`.
+    4. Optional new `.cursor/skills/its-magic-caveman/SKILL.md` (if Option B for Q2) → `template/.cursor/skills/its-magic-caveman/SKILL.md`.
+    5. `docs/engineering/auto-orchestration-reference.md` → `template/docs/engineering/auto-orchestration-reference.md` (if TOKEN_PROFILE precedence paragraph added).
+    6. `docs/engineering/runbook.md` → `template/docs/engineering/runbook.md` (operator-phrase catalog and non-substitution paragraph).
+    7. `docs/engineering/architecture.md` — active only (no template mirror for story-scoped architecture sections per existing pattern).
+    8. `tests/auto_command_contract_test.py` — active only (tests do not mirror to `template/`).
+    9. `.cursor/skills/its-magic/SKILL.md` — touched only if architecture decides to add a cross-link to Caveman skill (Option B); mirror under `template/` as usual.
+  - **Risks**: partial mirror (rule added active-side but not template-side); US-0017 parity test regression.
+  - **Mitigations**: contract-test subtests for each new template file presence; architecture lists every new file path in `# US-0089` under a "Template parity files" heading so dev phase has a checklist.
+  - **Anchors**: `template/.cursor/rules/*`, `template/.cursor/skills/its-magic/SKILL.md`, existing parity subtests in `tests/auto_command_contract_test.py`.
+  - **Open ask for `/architecture`**: lock the full parity inventory (A- or B-path) before sprint-plan atomizes tasks.
+
+- **US-0090 boundary note** (non-scope, forward-link only): US-0089 establishes `CAVEMAN_MODE` + `CAVEMAN_LEVEL` vocabulary; US-0090 later gates `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` on top of that. Research makes **no** input-side recommendations here; `R-0073` remains the shared anchor but US-0090 will extend it in its own discovery/research cycle.
+
+- **Summary architecture asks (for `/architecture`, DEC-xxxx hints)**:
+  - `DEC-xxxx` (TOKEN_PROFILE × CAVEMAN): adopt Option A (orthogonal, non-substitution paragraph) unless explicit evidence prefers a matrix.
+  - `DEC-xxxx` (rule vs rule+skill): pick Option A (rule-only) for minimal surface OR Option B (rule + focused skill) for discoverability.
+  - `DEC-xxxx` (default-off test module): extend `tests/auto_command_contract_test.py` in place; lock exact scratchpad key strings before dev writes tests.
+  - `DEC-xxxx` (literal regions invariant): publish the 9-zone list verbatim in `# US-0089`.
+  - `DEC-xxxx` (operator phrases): pick one symmetric set; document in runbook + (optional) skill.
+
+- **Research closure**: **R-0073** research-phase extension complete (2026-04-18, TL, `auto-20260418-01`); **no DEC-xxxx authored** (architecture owns decisions); **no architecture section** authored; story **US-0089** remains **OPEN** per **US-0045**. Next: **`/architecture`** (fresh **tech-lead**) — lock DEC(s) and write `# US-0089`.
+
+- **Delivery closure (US-0089, curator `/refresh-context`, 2026-04-18T20:00:00Z, `auto-20260418-01`)**: **R-0073** marked **delivered / resolved** for the **US-0089** response-side Caveman-mode surface. Evidence: sprint **`S0075`** released `2026-04-18T19:00:00Z` via **`handoffs/releases/S0075-release-notes.md`**; governance locked in **`decisions/DEC-0072.md`** + **`docs/engineering/architecture.md`** **`# US-0089`**; scratchpad contract + rule surface + default-off invariant shipped in **`.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`** (+ `template/`), **`.cursor/rules/caveman.mdc`** (active + `template/`), **`docs/engineering/auto-orchestration-reference.md`** (+ `template/`), **`docs/engineering/runbook.md`** (+ `template/`); regression coverage in **`tests/auto_command_contract_test.py`** (8 `test_caveman_default_off_*` subtests + 3 supplemental caveman subtests, 11 total caveman subtests, 119 subtest invocations, 0 failures). Backlog **`docs/product/backlog.md`** **US-0089** `Status: DONE`; AC-1..AC-8 `[x]`. **R-0073** remains the **shared anchor** for **US-0090** (input-side / file-compression vertical); US-0090 will extend R-0073 in its own discovery/research cycle (see `## US-0090` in `docs/product/backlog.md`). Status: **delivered (US-0089); open for US-0090 extension**.
+
+### Discovery extension (2026-04-18, PO, `auto-20260418-01`, US-0090 input-side)
+
+> Scope: extend **R-0073** with **input-side compression** anchors for **US-0090** built on top of the **US-0089** shipped surface (DEC-0072). No architecture decision authored here; options are laid out for the next phase `/research` (fresh **tech-lead**) to deepen and `/architecture` to lock under a new `DEC-xxxx` + `# US-0090`.
+
+- **Context & dependency on US-0089's shipped surface**:
+  - Scratchpad keys `CAVEMAN_COMPRESS_INPUT=0|1` (default **0**) and `CAVEMAN_FILE_SCOPE=` (default empty) are already declared as **documented no-ops** in `.cursor/scratchpad.md` and `.cursor/scratchpad.local.example.md` (+ `template/` mirror) per **DEC-0072** §3. **US-0090** activates them; it does **not** rename them.
+  - The **9-zone literal-region invariant** (DEC-0072 §4) is the authoritative source of truth for byte-preserved regions. **US-0090** reuses this list verbatim for the file-compression path — architecture MUST NOT narrow it, may extend only with explicit DEC.
+  - **TOKEN_PROFILE × CAVEMAN_MODE non-substitution** (DEC-0072 §1) is response-side. **US-0090** adds a **third** independent axis (`CAVEMAN_COMPRESS_INPUT`). Research ask: publish a three-axis non-substitution paragraph (or compact table) in `docs/engineering/auto-orchestration-reference.md` + `docs/engineering/runbook.md` (+ `template/`).
+  - The `.cursor/rules/caveman.mdc` rule body is **untouched by US-0090** unless architecture opts to add a single "Input-side extension (US-0090)" subsection pointing at the script + deny-list; rule changes are otherwise out of scope.
+
+- **Input-side compression anchors (open options for `/research` tech-lead)**:
+  - **Q9 — Compression algorithm choice (input-side)**:
+    - Option A (recommended baseline): **whitespace-collapse + filler-word strip + markdown-structure-preserving** prose rewrite; fenced code blocks, tables, AC checklists, reason codes, IDs skipped by the zone matcher.
+    - Option B: **line-level deterministic minifier** (collapse duplicate blank lines, trim trailing whitespace, no semantic rewrite). Minimal token savings; highest safety.
+    - Option C: **LLM-assisted prose compression** via a deterministic prompt. **Not recommended** — introduces non-determinism, violates idempotency AC-6, and couples compression to vendor availability.
+    - Research to decide whether to publish a single algorithm or a `--mode=safe|aggressive` switch with named profiles.
+  - **Q10 — Sidecar original naming**:
+    - Option A: **sibling dotfile** `.<name>.caveman-original.<ext>` next to the compressed file. Pros: trivial pairing; visible in the same directory. Cons: `.gitignore` hygiene per folder.
+    - Option B: **parallel tree** under `docs/.caveman-originals/<relative/path>/<file>`. Pros: single `.gitignore` anchor; no per-folder hygiene. Cons: requires relative-path reconstruction.
+    - Option C: **in-repo sidecar with hash suffix** `<name>.<sha1>.caveman-original.<ext>`. Pros: collision-safe on re-runs. Cons: less human-readable.
+    - Research recommendation: Option B (parallel tree) for `.gitignore` simplicity and safe publish hygiene; architecture locks the final pattern.
+  - **Q11 — Deny-list source of truth**:
+    - Option A: **hard-coded constants** in the compression script (fastest, deterministic; matches the PO baseline list in backlog `## US-0090` discovery_notes).
+    - Option B: **`.cursorignore` / `.gitignore` aware** (respect repo ignore files automatically).
+    - Option C: **hybrid** (hard-coded baseline + merge with `.cursorignore` patterns) — recommended for defense in depth.
+    - Deny list MUST include at minimum: `.env`, `.env.*`, `**/*intake_evidence*/**`, `docs/product/backlog.md`, `docs/product/acceptance.md`, `docs/engineering/state.md`, `docs/engineering/decisions.md`, `decisions/DEC-*.md`, `sprints/*/plan-verify.json`, `sprints/*/uat.json`, `sprints/*/summary.md`, `sprints/*/release-findings.md`, `package.json`, `package-lock.json`, `installer.*`, `.github/workflows/*.yml`, `.cursor/hooks/*.py`, `.cursor/rules/*.mdc`, `.cursor/commands/*.md`, `.cursor/skills/**/SKILL.md`, binaries (`.png`, `.jpg`, `.pdf`, `.zip`, …).
+  - **Q12 — Allow-list grammar for `CAVEMAN_FILE_SCOPE`**:
+    - Option A: **comma-separated globs** (e.g. `CAVEMAN_FILE_SCOPE=docs/user-guides/**/*.md,docs/engineering/runbook.md`).
+    - Option B: **named profiles** (e.g. `CAVEMAN_FILE_SCOPE=docs-prose-only` resolves to a locked glob set; `CAVEMAN_FILE_SCOPE=custom:<csv-globs>` for custom).
+    - Option C: **both** (named profiles + raw globs, profile wins if listed first).
+    - Deny-list MUST always be evaluated **after** allow-list expansion and **wins** on any conflict. Empty `CAVEMAN_FILE_SCOPE` (default) MUST evaluate to "no files in scope" — operator must opt in explicitly.
+  - **Q13 — `dry-run` vs `write` UX**:
+    - Primary entrypoint under `scripts/` (exact filename architecture-locked; candidate `scripts/caveman_compress_input.py`). Required modes: `--dry-run` (default when invoked without mode), `--write`, `--verify-originals`, `--report` (emit diff summary to stdout / JSON). Exit code **non-zero on any deny-list hit, scope violation, literal-region damage, or idempotency break** with deterministic reason code.
+  - **Q14 — Idempotency test strategy (AC-6)**:
+    - Fixture files under `tests/fixtures/caveman_compress/` with paired inputs + expected compressed outputs + sidecar originals; test runs compression twice and asserts byte-equality on the second run (idempotency invariant).
+    - Literal-region fixtures: input containing fenced code, AC checklists, reason codes, IDs, and contract markers — test asserts 9-zone regions are byte-identical to input.
+    - Deny-list fixtures: simulated path inputs for every deny-list entry — test asserts script refuses and emits `CAVEMAN_COMPRESS_DENY_HIT` (final reason-code name architecture-locked).
+  - **Q15 — Reason-code vocabulary (architecture to lock verbatim)**:
+    - Candidate codes (all `ALL_CAPS_WITH_UNDERSCORES`, same convention as existing repo vocabulary): `CAVEMAN_COMPRESS_SCOPE_VIOLATION`, `CAVEMAN_COMPRESS_DENY_HIT`, `CAVEMAN_COMPRESS_NOT_IDEMPOTENT`, `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED`, `CAVEMAN_COMPRESS_ORIGINAL_MISSING`, `CAVEMAN_COMPRESS_MODE_DISABLED` (when `CAVEMAN_COMPRESS_INPUT=0`), `CAVEMAN_COMPRESS_SCOPE_EMPTY` (when allow-list empty).
+    - Architecture publishes the final list in `# US-0090` and `.cursor/rules/caveman.mdc` (if the rule gains a subsection).
+  - **Q16 — Three-axis non-substitution documentation** (AC-4 equivalent):
+    - TOKEN_PROFILE (context breadth) × CAVEMAN_MODE (voice) × CAVEMAN_COMPRESS_INPUT (file mutation) are three **independent** axes. Research ask: pick a publication form (parallel paragraphs vs compact 2x2x2 table vs matrix) for `docs/engineering/auto-orchestration-reference.md` + `docs/engineering/runbook.md`.
+  - **Q17 — Template parity touchpoints (AC-8 equivalent)**:
+    - Active/template pairs in scope for US-0090 (exact list architecture-locked): `scripts/caveman_compress_input.py` (active + `template/scripts/` mirror per **US-0017**), `docs/engineering/runbook.md` (operator section active + `template/`), `docs/engineering/auto-orchestration-reference.md` (three-axis paragraph active + `template/`), `tests/fixtures/caveman_compress/` (active only; tests do not mirror), `tests/auto_command_contract_test.py` (extended in place; active only), `.cursorignore` (operator-owned; architecture confirms kit-level changes or leaves to operator), `.gitignore` (for sidecar tree, per Q10 Option B).
+  - **Q18 — Security / compliance boundary**:
+    - MUST respect **US-0085** `.env` / secrets prohibition; deny-list entry for `.env*` is non-negotiable.
+    - MUST respect **US-0078** / **DEC-0060** intake evidence integrity; `handoffs/intake_evidence/*.json` is deny-listed.
+    - MUST respect **US-0045** backlog status authority; `docs/product/backlog.md` + `docs/product/acceptance.md` are deny-listed.
+    - MUST respect **DEC-0040** artifact ordering; `docs/engineering/state.md` is deny-listed.
+    - MUST NOT leak `npx skills add …` install instructions anywhere in the kit (carry DEC-0072 §8 ban forward).
+  - **Q19 — Installer / publish surface**:
+    - **US-0017** parity: if script ships under `template/scripts/`, installer payload copies it (operator-verifiable via existing parity tests).
+    - Publish surface: no new `package.json` runtime dep; no `npm` script registration required unless architecture decides to expose a convenience command. PO recommendation: no npm script in US-0090; operator invokes Python directly.
+
+- **Updated architecture asks (for `/architecture`, DEC-xxxx hints, building on DEC-0072)**:
+  - `DEC-xxxx` (input-side gate semantics): define exact activation rule for `CAVEMAN_COMPRESS_INPUT=1` + required-with-scope semantics for `CAVEMAN_FILE_SCOPE`.
+  - `DEC-xxxx` (sidecar original policy): lock Q10 choice; specify path pattern and `.gitignore` stance.
+  - `DEC-xxxx` (deny-list source of truth): lock Q11 choice; freeze deny-list contents with DEC revision policy.
+  - `DEC-xxxx` (allow-list grammar): lock Q12 choice; specify empty-default = no-op.
+  - `DEC-xxxx` (compression algorithm): lock Q9 choice; reference idempotency test strategy.
+  - `DEC-xxxx` (reason-code vocabulary): lock Q15 final list verbatim.
+  - `DEC-xxxx` (three-axis non-substitution): lock Q16 publication form; extend DEC-0072 §1 OR author a companion section in the new DEC.
+
+- **Risks carried into research**:
+  - (R1) Deny-list drift: hard-coded list falls behind repo reality if new canonical artifacts are added later without DEC update — mitigation: contract test listing every deny-list entry and asserting presence in the script.
+  - (R2) Sidecar tree bloat: parallel-tree choice accumulates compressed-original pairs over time — mitigation: `--verify-originals --purge-orphans` subcommand (out of scope for MVP; research to flag).
+  - (R3) Idempotency regression if prose rewrite is non-deterministic (e.g. ordering of filler-word strip) — mitigation: algorithm MUST be pure-deterministic (sorted, hash-stable); unit test enforces re-run equality.
+  - (R4) Literal-region matcher misses a new zone introduced by a future DEC — mitigation: matcher reads the canonical 9-zone list from a single shared constant; extension requires DEC + test update; script emits `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED` when any zone region differs post-write.
+
+- **Non-goals carried into research**:
+  - No change to **`TOKEN_PROFILE`** semantics (US-0080 / DEC-0062) — three-axis doc only.
+  - No change to **US-0089** voice rule body except an optional "Input-side extension (US-0090)" subsection.
+  - No rewrite of **DEC-0072**; US-0090 authors a companion DEC that **extends** DEC-0072 via §-references.
+  - No vendor install path (`npx skills add …`) anywhere in the kit.
+  - No change to strict-proof / isolation evidence wording (US-0056 / DEC-0038 / US-0048 / DEC-0029).
+  - No mandatory auto-compress step in `/auto` pipeline.
+  - No tokenizer change to Cursor itself.
+
+- **Discovery outcome (US-0090)**: confidence raised on boundary clarity; the dependency graph on US-0089's shipped surface (scratchpad keys, literal-region invariant, non-substitution contract) is now explicit, and the deny-list + sidecar-originals + idempotency contract are scoped. **`R-0073`** remains **open** for `/research` (tech-lead) deepening on Q9–Q19 — no DEC yet. No new `R-` id allocated (shared anchor per DEC-0011 precedent and the US-0089 intake bundle plan_area_coverage).
+- **Status authority**: **US-0090** remains **OPEN** in `docs/product/backlog.md` per **US-0045**; no acceptance rows checked in this phase. Next: **`/research`** (fresh **tech-lead**) for **US-0090**.
+
+### Research phase resolution pass (2026-04-18, TL, `auto-20260418-01`, US-0090 input-side)
+
+> Scope: resolve Q9–Q19 surfaced in the second Discovery extension above. Research phase deepens options and flags what must be locked by `/architecture` under a companion DEC to **`DEC-0072`** + `docs/engineering/architecture.md` **`# US-0090`**. **No DEC authored here.** **No architecture section authored here.** **No `R-xxxx` id allocated** — extension remains under the shared **`R-0073`** anchor (**DEC-0011** precedent; US-0089 intake bundle `plan_area_coverage` maps both stories). `fresh_context_marker=tl-US0090-research-20260418T210000Z-fresh`.
+
+- **Scope re-confirmation**: Research authored **without rewriting** `DEC-0072`, `.cursor/rules/caveman.mdc` (active + `template/` verified byte-identical, SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`), or any architecture section. Canonical artifacts (`docs/product/backlog.md`, `docs/product/acceptance.md`, `docs/engineering/state.md`, `handoffs/intake_evidence/*.json`, `decisions/DEC-*.md`) are untouched outside the specified append points. No sprint tasks seeded.
+
+- **Resolution matrix (Q9–Q19)**: eleven questions, zero still-open, two fully resolved as facts (architecture ratifies), nine narrowed with explicit `defer_to=architecture` decisions (options laid out; no lock attempted in research).
+
+  - **Q9 — Compression algorithm choice** — `status=deferred_to_architecture`; `research_recommendation=hybrid two-tier`.
+    - Option A (whitespace-collapse + filler-word strip + markdown-structure-preserving prose rewrite) is deterministic **only if** the filler-word list is a frozen sorted constant and every regex pass runs in fixed order. Fenced code, AC checklists, reason codes, IDs, and contract markers are skipped by the 9-zone matcher (reused verbatim from **`DEC-0072`** §4).
+    - Option B (line-level minifier — collapse duplicate blank lines, trim trailing whitespace, normalize EOL to LF) is strictly deterministic by construction; minimal token savings but zero idempotency risk.
+    - Option C (LLM-assisted compression) remains **rejected** (non-determinism violates **AC-6**; vendor coupling).
+    - Research recommendation: architecture lock **Option B as the default** (`--mode=safe`) and offer **Option A layered under `--mode=aggressive`** for operators who accept the larger deny-list / regression-test surface. Rationale: keeps default operator experience inside the proven-idempotent envelope; aggressive mode is a named opt-in, not a silent upgrade. `defer_to=architecture`: final `--mode` grammar, whether aggressive mode ships in v1 or deferred to a follow-on story, and exact filler-word list contents.
+    - Evidence refs: `docs/product/backlog.md` `## US-0090` discovery_notes (R3 idempotency risk); R-0073 second Discovery extension Q9; external anchor (not vendored): JuliusBrussee/caveman README discipline "compress touches prose, not code blocks" (cited in R-0073 intake extension).
+
+  - **Q10 — Sidecar original naming** — `status=deferred_to_architecture`; `research_recommendation=Option B (parallel tree)`.
+    - Option A (sibling dotfile `.<name>.caveman-original.<ext>`) scatters sidecars across every folder that holds a compressed file; per-folder `.gitignore` hygiene; high visibility but high maintenance.
+    - Option B (parallel tree under `docs/.caveman-originals/<relative/path>/<file>`) needs a single repo-root `.gitignore` anchor (`docs/.caveman-originals/`); clean separation; requires relative-path reconstruction inside the script.
+    - Option C (hash-suffix `<name>.<sha1>.caveman-original.<ext>`) is collision-safe but less human-readable and complicates `--verify-originals`.
+    - Research recommendation: **Option B**. Rationale: one ignore anchor, mirrors the US-0085 philosophy of "one place, one repo-root `.gitignore` entry, no per-folder drift" (R-0072 finding), and keeps the sidecar tree inspectable via a single directory listing. `defer_to=architecture`: exact root path (candidate `docs/.caveman-originals/`), whether the root ships with a `.gitkeep` marker, and whether `.cursorignore` gains a parity entry or stays operator-owned per US-0085.
+    - Evidence refs: R-0073 second Discovery extension Q10; R-0072 (US-0085 `.cursorignore` / `.gitignore` defense-in-depth) — `docs/engineering/research.md` **`R-0072`**; `docs/product/backlog.md` `## US-0090` discovery_notes (R6 secret leakage mitigation).
+
+  - **Q11 — Deny-list source of truth** — `status=deferred_to_architecture`; `research_recommendation=Option C (hybrid, hard-coded baseline + `.gitignore` secret merge)`.
+    - Option A (hard-coded constants): fastest and DEC-lockable but drifts if new canonical artifacts are added later without DEC update (R1 risk from the Discovery extension).
+    - Option B (`.cursorignore` / `.gitignore` aware alone): insufficient — `.cursorignore` targets **agent file-context** exclusion, not script mutation (R-0072); `.gitignore` will not list DEC / backlog / state (they are **committed**, not ignored).
+    - Option C (hybrid: hard-coded baseline **plus** `.gitignore` secret-pattern merge; optional `.cursorignore` overlay for operators who already maintain it): defense in depth, single DEC-revision policy for the canonical baseline, automatic tracking of `.env*` and other ignored secret patterns.
+    - Research recommendation: Option C. The hard-coded baseline is **the backlog `## US-0090` discovery_notes hard deny-list** (enumerated below under Q18) lifted into a single Python constant; `.gitignore` merge covers repo-specific secret paths without manual DEC updates. `defer_to=architecture`: DEC-revision policy ("who can amend the hard-coded baseline, and through which DEC"), whether `.cursorignore` is merged by default or behind an opt-in flag, and how merge order is enforced (hard-coded **wins** over allow-list; ignore merges **add** denies but never remove).
+    - Evidence refs: R-0073 second Discovery extension Q11; R-0072 (`.cursorignore` agent-exclusion semantics); `docs/product/backlog.md` `## US-0090` hard deny-list enumeration.
+
+  - **Q12 — Allow-list grammar for `CAVEMAN_FILE_SCOPE`** — `status=deferred_to_architecture`; `research_recommendation=Option C (named profiles + raw globs)`.
+    - Option A (comma-separated globs): flexible; no curated opinion; every operator writes their own glob set.
+    - Option B (named profiles): curated, auditable, but limited unless a custom path exists.
+    - Option C (hybrid: profile name **or** raw CSV globs **or** `profile:<name>;globs:<csv>` hybrid form): strictly more expressive than A or B; named profiles are reviewable defaults, raw globs escape-hatch for one-off operator scope.
+    - Empty `CAVEMAN_FILE_SCOPE` (default) **must** evaluate to "no files in scope" (pure opt-in — confirmed by discovery R-0073 extension, DEC-0072 §3 documented-no-op semantics, and the **US-0045** status-authority principle).
+    - Research recommendation: **Option C with a minimal v1 profile set** — single named profile `docs-prose-only` resolving to a frozen glob set (candidate: `docs/user-guides/**/*.md`, `docs/engineering/runbook.md`, `docs/engineering/state-archive/**/*.md`, `handoffs/archive/*.md`). Custom profiles added in future stories via DEC revision. `defer_to=architecture`: exact profile membership, precedence rules when profile + raw globs are both supplied, and what happens on unknown profile (research recommendation: fail closed with `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE` candidate reason code under the Q15 vocabulary).
+    - Evidence refs: R-0073 second Discovery extension Q12; `docs/product/backlog.md` `## US-0090` allow-list candidates section.
+
+  - **Q13 — `dry-run` vs `write` UX** — `status=resolved` (concrete) **with** `defer_to=architecture` on flag conflict precedence.
+    - Primary entrypoint: `scripts/caveman_compress_input.py` (candidate; final filename architecture-locked per Q17/Q19). Active + `template/scripts/` mirror per **US-0017**.
+    - Required modes (all deterministic): `--dry-run` (default when invoked without a mutation mode; prints inventory + diff summary + deny-hits + literal-region sanity to stdout), `--write` (performs mutation; creates/updates sidecar), `--verify-originals` (no mutation; checks every compressed file has a valid sidecar per Q10 pattern), `--report` (emits JSON inventory to stdout; useful for CI gates).
+    - Non-zero exit contract: **any** deny-list hit, scope violation, literal-region damage, idempotency break, or missing original (when `--verify-originals`) fails closed with the relevant reason code from the Q15 vocabulary. Exit code `0` only when **zero** violations and **zero** unresolved parity asserts.
+    - Mode orthogonality: `--mode=safe|aggressive` (per Q9) applies to all mutation modes; `--dry-run --mode=aggressive` previews aggressive compression without writing. `--verify-originals` is mode-independent.
+    - `defer_to=architecture`: flag conflict precedence (e.g. `--dry-run --write` simultaneously — research recommends fail-closed with `CAVEMAN_COMPRESS_FLAG_CONFLICT` candidate reason code; architecture ratifies), whether `--purge-orphans` ships in v1 or stays deferred (research recommends deferred — out-of-scope MVP per R-0073 R2), and whether `--report` supports multiple output formats.
+    - Evidence refs: R-0073 second Discovery extension Q13; `docs/product/backlog.md` `## US-0090` UX flow bullet.
+
+  - **Q14 — Idempotency test strategy (AC-6)** — `status=resolved` (concrete).
+    - Fixture directory: `tests/fixtures/caveman_compress/` (active only; tests do not mirror to `template/` per existing US-0017 policy). Each fixture pairs `<name>.input.md` + `<name>.expected.md` + `<name>.sidecar.md` (reflecting the Q10 Option B path pattern relative to a fixture-root).
+    - Required fixture classes (locked minimum set — architecture may **add** but must not **narrow**):
+      1. **Whitespace baseline** — multi-blank-line collapse + trailing-whitespace trim + LF normalization (covers Option B safe-mode).
+      2. **Filler-word strip** (aggressive only) — deterministic filler set removed; byte-equal on second run.
+      3. **Literal-region preservation** — one fixture per 9-zone region (9 total): fenced code, file paths, AC checklists, reason codes (`ALL_CAPS_WITH_UNDERSCORES`), IDs (`US-xxxx` / `DEC-xxxx` / `R-xxxx` / `BUG-####` / `S0xxx` / `T-xxx`), contract markers (`[BUG_VALIDATION_OK]` / `[INTAKE_EVIDENCE_VALIDATION_OK]` / `[SCRATCHPAD_PAIR_OK]` / `[ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS]` / `[CODEBASE_MAP_OK]`), strict-proof tuple fields, isolation evidence fields, git/commit refs. Each fixture asserts byte-for-byte parity between input literal regions and output literal regions.
+      4. **Deny-list refusal** — one fixture per deny-list entry class (enumerated under Q18): secret paths (`.env*`), intake evidence, canonical product/engineering docs, DEC files, sprint lifecycle evidence, binaries, installer/workflow/hook/rule/command/skill files. Each asserts the script exits non-zero with `CAVEMAN_COMPRESS_DENY_HIT` **before** any mutation.
+      5. **Scope violation** — allow-list empty (default) → `CAVEMAN_COMPRESS_SCOPE_EMPTY`; glob outside allow-list → `CAVEMAN_COMPRESS_SCOPE_VIOLATION`.
+      6. **Idempotency** — compress once, compress again, assert byte-equal (the canonical AC-6 fixture). Run under both safe and aggressive modes.
+      7. **Mode-disabled** — `CAVEMAN_COMPRESS_INPUT=0` → script fails closed with `CAVEMAN_COMPRESS_MODE_DISABLED` without touching any file.
+      8. **Original-missing** — `--verify-originals` on a compressed file whose sidecar is absent → `CAVEMAN_COMPRESS_ORIGINAL_MISSING`.
+    - Test harness wiring: extend `tests/auto_command_contract_test.py` **in place** with a `test_caveman_compress_input_*` prefix **only after US-0090 ships** (US-0089 contract test set **unchanged** — `DEC-0072` §6 row 6 invariant preserved; new tests are **additions**, never modifications of existing `test_caveman_default_off_*` subtests). Add a new `run-tests` section (candidate `§26S` — architecture locks the number to match sprint-plan numbering convention).
+    - Research recommendation stance: **concrete and implementation-ready**; architecture ratifies the fixture taxonomy + `run-tests` section number without decision tradeoffs.
+    - Evidence refs: R-0073 second Discovery extension Q14; `docs/product/backlog.md` `## US-0090` AC-6 wording; `DEC-0072` §4 9-zone literal-region list; `DEC-0072` §6 `test_caveman_default_off_*` invariant.
+
+  - **Q15 — Reason-code vocabulary** — `status=deferred_to_architecture`; `research_recommendation=adopt candidate set verbatim + two additions from Q12/Q13`.
+    - Candidate set from R-0073 Discovery extension + `docs/product/backlog.md` `## US-0090` (7 canonical candidates):
+      - `CAVEMAN_COMPRESS_SCOPE_VIOLATION` — allow-list glob resolved, but target path is outside resolved scope (post allow-list expansion).
+      - `CAVEMAN_COMPRESS_DENY_HIT` — target path matches hard deny-list; deny wins over allow.
+      - `CAVEMAN_COMPRESS_NOT_IDEMPOTENT` — second-run byte comparison fails; script refuses to overwrite.
+      - `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED` — 9-zone region differs post-write; script refuses to commit mutation.
+      - `CAVEMAN_COMPRESS_ORIGINAL_MISSING` — `--verify-originals` or pre-write check found no sidecar for a compressed file.
+      - `CAVEMAN_COMPRESS_MODE_DISABLED` — `CAVEMAN_COMPRESS_INPUT=0` (default) or unset; script refuses to run.
+      - `CAVEMAN_COMPRESS_SCOPE_EMPTY` — `CAVEMAN_FILE_SCOPE=` empty (default); pure opt-in invariant violated.
+    - Research adds two candidates for Q12 / Q13 gaps:
+      - `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE` — named profile referenced in `CAVEMAN_FILE_SCOPE` is not in the locked profile table (Q12 fail-closed).
+      - `CAVEMAN_COMPRESS_FLAG_CONFLICT` — conflicting CLI flags (e.g. `--dry-run --write`; Q13).
+    - All names match repo vocabulary (`ALL_CAPS_WITH_UNDERSCORES`, `CAVEMAN_COMPRESS_*` prefix, DEC-0038 / US-0088 style). All fit zone 4 of the `DEC-0072` §4 literal-region invariant automatically. All are **pre-write** or **during-write** fail-closed — no post-write reason codes proposed (a post-write failure would already be caught by `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED` + `CAVEMAN_COMPRESS_NOT_IDEMPOTENT` ahead of commit).
+    - `defer_to=architecture`: verbatim vocabulary lock in `docs/engineering/architecture.md` `# US-0090` + the companion DEC to **`DEC-0072`**; optional sync into `.cursor/rules/caveman.mdc` if Q17 adds a "Input-side extension (US-0090)" subsection.
+    - Evidence refs: R-0073 second Discovery extension Q15; `docs/product/backlog.md` `## US-0090` reason-code candidates.
+
+  - **Q16 — Three-axis non-substitution documentation form** — `status=deferred_to_architecture`; `research_recommendation=three parallel sentences (extend DEC-0072 §1 paragraph form)`.
+    - Candidate forms: (A) parallel paragraphs, one per axis; (B) compact 2x2x2 table (`TOKEN_PROFILE × CAVEMAN_MODE × CAVEMAN_COMPRESS_INPUT`, 8 cells); (C) matrix with per-cell semantics.
+    - Readability and maintenance: 2x2x2 is 8 dense cells and visually harder to scan; matrix is heaviest. DEC-0072 §1 already chose a 2D table for TOKEN_PROFILE × CAVEMAN_MODE; adding a third axis as a third table is symmetrically consistent **or** three sentences extending the existing non-substitution paragraph is even simpler and mirrors the `AUTO_QUIET` orthogonality precedent already in the runbook.
+    - Research recommendation: **three parallel sentences** published verbatim in `docs/engineering/auto-orchestration-reference.md` and `docs/engineering/runbook.md` (active + `template/` mirrors). Draft (architecture ratifies exact wording):
+      > "`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply voice. `CAVEMAN_COMPRESS_INPUT` controls input-side file mutation. None substitutes for another; setting one does not change the others. Combine freely."
+    - Architecture option B fallback: if architecture prefers a 2x2x2 table for auditability, the table lives alongside (not replacing) the three-sentence paragraph. Architecture option C (matrix) is **not** recommended — adds doc surface for no semantic gain.
+    - `defer_to=architecture`: exact wording, whether the table accompanies the sentences, and whether to extend `DEC-0072` §1 in the companion DEC or author a fresh §1 in that DEC that forward-links to `DEC-0072` §1.
+    - Evidence refs: R-0073 second Discovery extension Q16; `DEC-0072` §1 non-substitution paragraph; `docs/engineering/auto-orchestration-reference.md` §TOKEN_PROFILE × CAVEMAN paragraph (already published).
+
+  - **Q17 — Template parity touchpoints (AC-8 equivalent)** — `status=deferred_to_architecture`; `research_recommendation=8-row inventory below`.
+    - Active/template pairs (exact list architecture-locked; research provides the baseline):
+      1. `scripts/caveman_compress_input.py` (**new**) + `template/scripts/caveman_compress_input.py` (**new**) — byte-identical per US-0017.
+      2. `docs/engineering/runbook.md` (operator UX section **addition** — dry-run → verify → write procedure; deny-list summary; `.gitignore` note for sidecar tree) + `template/docs/engineering/runbook.md` (mirror).
+      3. `docs/engineering/auto-orchestration-reference.md` (three-axis non-substitution sentence **addition** per Q16) + `template/docs/engineering/auto-orchestration-reference.md` (mirror).
+      4. `docs/engineering/architecture.md` `# US-0090` (**new section**; active only — story-scoped architecture sections do not mirror to `template/`, per existing DEC-0072 §7 row 6 pattern).
+      5. `tests/auto_command_contract_test.py` (extended **in place** with `test_caveman_compress_input_*` subtests; active only — tests do not mirror).
+      6. `tests/fixtures/caveman_compress/` (**new directory**; active only — fixtures do not mirror).
+      7. `.gitignore` (add `docs/.caveman-originals/` anchor if Q10 Option B locked; active only — `.gitignore` is repo-scoped, not installed; kit installer does not own repo `.gitignore`).
+      8. `.cursor/rules/caveman.mdc` optional "Input-side extension (US-0090)" subsection — **only if architecture decides** to surface the input-side deny-list + script pointer in the rule. If added, active + `template/` must stay byte-identical (research-verified current baseline SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`). If not added, rule is unchanged and the negative-parity row is tracked in sprint-plan.
+    - Explicitly **NOT** touched by US-0090: `.cursorignore` (operator-owned per US-0085 architecture, unless architecture explicitly decides otherwise — research recommends leaving operator-owned and documenting in runbook), `package.json` (no new runtime dep per DEC-0072 §8 + discovery Non-goals), `.cursor/commands/*.md` (contract surfaces — deny-listed anyway), `docs/product/backlog.md` beyond the `## US-0090` research_notes + architecture_notes appendices, `docs/product/acceptance.md` (portfolio row stays unchecked until `/release`), `docs/engineering/state.md` (checkpoint appends only), `handoffs/intake_evidence/*.json`, `decisions/DEC-*.md` (new companion DEC is **added**, not "touched" in the parity sense), and `installer*` / `.github/workflows/*.yml` / `.cursor/hooks/*.py` / `.cursor/skills/**/SKILL.md`.
+    - `defer_to=architecture`: final inventory lock in `# US-0090` + companion DEC §7 (mirror of `DEC-0072` §7), `.cursorignore` decision, rule-subsection decision, `.gitignore` exact anchor path (tied to Q10 Option B lock), and `run-tests` section number.
+    - Evidence refs: R-0073 second Discovery extension Q17; `DEC-0072` §7 parity table (precedent); US-0017 parity policy.
+
+  - **Q18 — Security / compliance boundary reaffirmation** — `status=resolved` (concrete; architecture ratifies verbatim).
+    - **Non-negotiable** deny-list (hard-coded baseline per Q11 Option C):
+      - Secrets: `.env`, `.env.*`, `**/.env`, `**/.env.*` (per **US-0085** / **R-0072**).
+      - Intake evidence: `handoffs/intake_evidence/*.json`, `handoffs/intake_evidence/**/*.json` (per **US-0078** / **DEC-0060**; BUG-0007 class risk).
+      - Canonical product authority: `docs/product/backlog.md`, `docs/product/acceptance.md` (per **US-0045** status authority).
+      - Canonical engineering authority: `docs/engineering/state.md` (per **DEC-0040** artifact ordering), `docs/engineering/decisions.md`, `decisions/DEC-*.md` (canonical decision records; companion DEC for US-0090 is **added** not rewritten).
+      - Sprint lifecycle evidence: `sprints/*/plan-verify.json`, `sprints/*/uat.json`, `sprints/*/summary.md`, `sprints/*/release-findings.md`, `sprints/*/qa-findings.md`, `sprints/*/tasks.md`, `sprints/*/sprint.md`.
+      - Publish / runtime / install surfaces: `package.json`, `package-lock.json`, `installer.*` (all forms: `.sh`, `.ps1`, `.py`, `.js`, `.cmd`, `.bat`), `.github/workflows/*.yml`, `.cursor/hooks/*.py`, `bin/its-magic.js`, `packaging/homebrew/*.rb`.
+      - Contract surfaces: `.cursor/rules/*.mdc`, `.cursor/commands/*.md`, `.cursor/skills/**/SKILL.md` (Caveman voice composes with them; compression must never rewrite them).
+      - Manifest / parity sources: `docs/engineering/context/installer-owned-paths.manifest`, `docs/engineering/release-targets.json`, `docs/engineering/token-cost-parity-manifest.md`.
+      - Binaries: `**/*.png`, `**/*.jpg`, `**/*.jpeg`, `**/*.gif`, `**/*.webp`, `**/*.pdf`, `**/*.zip`, `**/*.tar`, `**/*.tar.gz`, `**/*.tgz`, `**/*.ico`, `**/*.woff`, `**/*.woff2`, `**/*.ttf`, `**/*.eot`, `**/*.otf`, `**/*.mp3`, `**/*.mp4`, `**/*.mov`, `**/*.wav`, `**/*.bin`, `**/*.exe`, `**/*.dll`.
+      - Vendor-install leak prevention: rule and runbook MUST NOT surface `npx skills add …` anywhere (carried forward from **`DEC-0072`** §8).
+    - Deny always wins over allow — architecture-ratified ordering: **(1) evaluate hard deny-list → (2) evaluate `.gitignore` secret-pattern merge → (3) optional `.cursorignore` overlay → (4) only then evaluate `CAVEMAN_FILE_SCOPE` allow-list → (5) only then perform literal-region pre-write scan → (6) only then write + sidecar**. Any violation at any stage fails closed with the corresponding Q15 reason code.
+    - Research stance: **resolved**; no architecture tradeoff remains on the baseline deny-list membership or ordering. Architecture ratifies verbatim in `# US-0090` + companion DEC.
+    - Evidence refs: R-0073 second Discovery extension Q18; `docs/product/backlog.md` `## US-0090` discovery_notes hard deny-list; R-0072 (`.cursorignore` / `.gitignore` defense-in-depth); DEC-0072 §8 vendor-install ban; US-0085 `.env` deny anchor; US-0078 / DEC-0060 intake evidence integrity; US-0045 status authority; DEC-0040 artifact ordering.
+
+  - **Q19 — Installer / publish surface** — `status=deferred_to_architecture`; `research_recommendation=manifest entry + no new npm script + optional parity script`.
+    - `scripts/caveman_compress_input.py` must ship under `template/scripts/caveman_compress_input.py` per **US-0017** (Q17 row 1).
+    - `docs/engineering/context/installer-owned-paths.manifest` (active + `template/`) must gain a `template/scripts/caveman_compress_input.py` entry under `install_include_paths` so `missing` / `upgrade` install modes both deliver the script (**BUG-0003** class risk — research explicitly flags this to avoid a repeat of the enforce-triad-hot-surface.py omission).
+    - `package.json` `files` field already includes `template/` — no additional entry needed for the script itself. No new `package.json` runtime or dev dependency (per DEC-0072 §8 vendor-install ban and discovery Non-goals).
+    - No new `npm` script registration. Operator invokes via `python scripts/caveman_compress_input.py --dry-run ...`. If architecture wants a convenience alias, it can add it in a future story without breaking US-0090 contracts.
+    - Parity test: **two credible options** — (A) extend `scripts/check_intake_template_parity.py` with a `--scope=caveman-compress` mode; (B) add a focused `scripts/check_caveman_template_parity.py`. Research prefers **Option A** (extend existing script) to avoid script proliferation and match the BUG-0001 / BUG-0003 install-completeness pattern. `defer_to=architecture`: Option A vs B, exact CLI grammar for the extended script.
+    - Publish smoke: recommend adding a single `installer_caveman_completeness_test.py` fixture (or extending the existing `installer_completeness_bug0003_test.py`) so `--mode missing` / `--mode upgrade` deliver `template/scripts/caveman_compress_input.py` to the target repo. Architecture locks the test surface.
+    - `defer_to=architecture`: manifest entry placement (under `install_include_paths` vs a new caveman section), parity-test script choice (A vs B above), and install-completeness fixture strategy.
+    - Evidence refs: R-0073 second Discovery extension Q19; `docs/engineering/context/installer-owned-paths.manifest`; BUG-0001 research closure (`R-0058`); BUG-0003 research closure (`R-0061`); US-0017 parity policy; DEC-0072 §8.
+
+- **Unresolved / still-open**: **none**. Every Q9–Q19 has a concrete research stance with explicit `status=resolved` or `status=deferred_to_architecture`. Research does **not** claim any architectural decision authority.
+
+- **Risks surfaced during resolution (carry to architecture / sprint-plan)**:
+  - (R8) Q9 aggressive-mode filler-word list: if the list changes between releases, every previously-compressed-with-aggressive file risks becoming non-byte-equal on re-run — mitigation: architecture locks a DEC-revision policy for the list; `--mode=aggressive` emits the list hash in `--report` so operators can detect drift.
+  - (R9) Q15 reason-code proliferation: the 9-code vocabulary (7 baseline + 2 additions) is at the upper edge of what fits on one reason-code page in the rule file. Mitigation: group into three families (scope, integrity, gating) in the architecture section + companion DEC; avoid further proliferation without DEC.
+  - (R10) Q17 rule-subsection risk: if architecture adds a subsection to `.cursor/rules/caveman.mdc`, active + `template/` must stay byte-identical (US-0017); current research-verified SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE` is the pre-US-0090 baseline and must be recomputed post-edit in the sprint-plan task acceptance evidence.
+  - (R11) Q19 publish smoke omission: omitting the install-completeness fixture would reintroduce the exact defect class BUG-0003 fixed. Architecture must not ship US-0090 without this fixture even if sprint size pressure suggests it.
+
+- **Architecture asks (updated; to be locked by /architecture under a companion DEC to `DEC-0072`)**:
+  1. `DEC-xxxx` §1 — **Three-axis non-substitution**: exact wording (Q16); whether `DEC-0072` §1 is extended or §1 is authored fresh with a forward-link.
+  2. `DEC-xxxx` §2 — **Input-side activation gate**: exact `CAVEMAN_COMPRESS_INPUT=1` + non-empty `CAVEMAN_FILE_SCOPE` activation semantics; empty-scope default fails closed with `CAVEMAN_COMPRESS_SCOPE_EMPTY`.
+  3. `DEC-xxxx` §3 — **Sidecar original policy**: lock Q10 Option B path pattern + `.gitignore` anchor.
+  4. `DEC-xxxx` §4 — **Deny-list source of truth**: lock Q11 Option C hybrid + DEC-revision policy for the hard-coded baseline.
+  5. `DEC-xxxx` §5 — **Allow-list grammar**: lock Q12 Option C + v1 profile set membership + unknown-profile fail-closed behavior.
+  6. `DEC-xxxx` §6 — **Compression algorithm**: lock Q9 hybrid tiering + filler-word list contents + `--mode` grammar.
+  7. `DEC-xxxx` §7 — **Reason-code vocabulary**: lock Q15 9-code set verbatim; forbid post-write codes.
+  8. `DEC-xxxx` §8 — **CLI contract**: lock Q13 flag grammar + conflict precedence + `--purge-orphans` deferral.
+  9. `DEC-xxxx` §9 — **Template parity**: lock Q17 inventory + `.cursorignore` decision + rule-subsection decision.
+  10. `DEC-xxxx` §10 — **Installer / publish**: lock Q19 manifest entry + parity-test strategy + install-completeness fixture.
+  11. `DEC-xxxx` §11 — **Non-goals** (explicit forward-link to `DEC-0072` §8; reaffirm the carried bans).
+
+- **Non-goals carried from discovery (unchanged)**: no `TOKEN_PROFILE` change, no rewrite of `DEC-0072`, no vendor install path, no strict-proof / isolation-evidence wording change, no mandatory auto-compress in `/auto`, no Cursor tokenizer change, no npm / pip runtime dep (stdlib-only Python), no canonical-artifact rewrites.
+
+- **Research phase closure (US-0090)**: **PASS**. `R-0073` remains the shared anchor (US-0089 delivered; US-0090 research-phase extension appended). No new `R-xxxx` id allocated. Story **US-0090** remains **OPEN** in `docs/product/backlog.md` per **US-0045**; no acceptance rows checked. **Next**: **`/architecture`** (fresh **tech-lead**) — lock DEC-xxxx companion to `DEC-0072` + write `docs/engineering/architecture.md` `# US-0090`.

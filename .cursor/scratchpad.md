@@ -230,3 +230,21 @@ USER_GUIDE_MODE=0
 DOC_AUDIENCE_PROFILE=both
 DOC_DETAIL_LEVEL=balanced
 
+#
+# ## Caveman mode (US-0089)
+# Response-side voice toggle. Default off. Composition is orthogonal to
+# TOKEN_PROFILE (DEC-0035 / US-0080) and AUTO_QUIET (US-0088) --
+# TOKEN_PROFILE controls context breadth, CAVEMAN_MODE controls reply voice;
+# neither substitutes for the other.
+# - CAVEMAN_MODE: 0|1 (default 0; absence = 0)
+# - CAVEMAN_LEVEL: lite|full|ultra (empty; with MODE=1 empty -> treat as full;
+#   unknown value -> CAVEMAN_LEVEL_UNKNOWN and fall back to pre-US-0089 voice)
+# - CAVEMAN_COMPRESS_INPUT: 0|1 -- reserved for US-0090; inert in US-0089;
+#   no behavior until compression story ships
+# - CAVEMAN_FILE_SCOPE: string -- reserved for US-0090; inert in US-0089;
+#   no behavior until compression story ships
+CAVEMAN_MODE=0
+CAVEMAN_LEVEL=
+CAVEMAN_COMPRESS_INPUT=0
+CAVEMAN_FILE_SCOPE=
+

@@ -1,0 +1,5 @@
+# Zone 6 — contract markers
+
+`[BUG_VALIDATION_OK]`
+`[INTAKE_EVIDENCE_VALIDATION_OK]`
+`[SCRATCHPAD_PAIR_OK]`

@@ -1317,6 +1317,172 @@ success chatter. Non-suppressible notifications:
 `AUTO_QUIET` is **orthogonal** to `TOKEN_PROFILE` (**DEC-0035** / **US-0080**):
 `TOKEN_PROFILE` controls context breadth and token cost, not notification policy.
 
+### Caveman mode (US-0089)
+
+Optional response-side terse / imperative assistant voice. **Default off.**
+When `CAVEMAN_MODE=0` (or absent), this mode adds **zero** behavioral change
+and the assistant responds exactly as it did pre-US-0089. Full contract:
+**DEC-0072** + `docs/engineering/architecture.md` `# US-0089` +
+`.cursor/rules/caveman.mdc`.
+
+Non-substitution with `TOKEN_PROFILE`:
+
+`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply voice. Neither substitutes for the other; setting one does not change the other. Combine freely.
+
+#### Scratchpad keys
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `CAVEMAN_MODE` | `0` \| `1` | `0` | `0` = pre-US-0089 behavior. `1` = voice rule active. Absence = `0`. |
+| `CAVEMAN_LEVEL` | `lite` \| `full` \| `ultra` or empty | empty | With `MODE=0`: inert. With `MODE=1` and empty: treat as `full`. Unknown value → `CAVEMAN_LEVEL_UNKNOWN` (fail closed; fall back to pre-US-0089 voice while continuing the turn). |
+| `CAVEMAN_COMPRESS_INPUT` | `0` \| `1` | `0` | **Reserved for US-0090.** Documented no-op in US-0089. |
+| `CAVEMAN_FILE_SCOPE` | string | empty | **Reserved for US-0090.** Documented no-op in US-0089. |
+
+#### Canonical operator toggle phrases
+
+| Phrase | Effect |
+|--------|--------|
+| `caveman on` | Enable Caveman voice for the session (overlay). Effective from the next assistant turn. |
+| `caveman off` | Disable Caveman voice for the session (overlay). Effective from the next assistant turn. |
+| `stop caveman` | Alias for `caveman off`. |
+| `normal mode` | Alias for `caveman off`. |
+| `caveman: lite|full|ultra` | Set level for the session (implies `caveman on`). Effective from the next assistant turn. Accepts the three literal tokens `caveman: lite`, `caveman: full`, `caveman: ultra`. |
+
+#### Determinism semantics
+
+- Scratchpad `CAVEMAN_MODE` / `CAVEMAN_LEVEL` are **authoritative across
+  subagent spawns**; session toggle phrases are overlays for the current
+  conversation only and do NOT persist across a fresh subagent context.
+- Session toggle phrases apply **as an overlay for the next assistant
+  turn**; they never rewrite the current turn's machine-verifiable
+  artifacts (gate messages, reason codes, strict-proof tuples, isolation
+  evidence fields).
+- Within a session, the **last explicit toggle wins**. Ambiguous phrases
+  are **not** recognized — only the literal matches in the table above.
+
+#### Literal-region invariant (rule-enforced)
+
+Under `CAVEMAN_MODE=1`, the 9 literal regions enumerated in
+`.cursor/rules/caveman.mdc` (fenced code, paths, AC checklists, reason
+codes, IDs, contract markers, strict-proof tuple fields, isolation
+evidence fields, git refs) render byte-literal. The non-suppressible gate
+vocabulary inherited from **US-0088** (`decision_gate`, `error`, `pause`,
+`loop_max`, `blocked`, `missing input`, `[BUG_VALIDATION_OK]`,
+`[INTAKE_EVIDENCE_VALIDATION_OK]`, `[SCRATCHPAD_PAIR_OK]`) also renders
+byte-literal even at `CAVEMAN_LEVEL=ultra`.
+
+### Caveman input compression (US-0090)
+
+Optional **input-side** file compression. **Default off.** Operator-initiated,
+script-invoked only. Never fires autonomously. Full contract:
+**DEC-0073** + `docs/engineering/architecture.md` `# US-0090` +
+`scripts/caveman_compress_input.py`.
+
+Non-substitution with `TOKEN_PROFILE` and `CAVEMAN_MODE`:
+
+`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply voice. `CAVEMAN_COMPRESS_INPUT` controls input-side file compression. All three axes are orthogonal: setting one does not change the others, and none substitutes for another.
+
+#### Activation gate (DEC-0073 §2)
+
+All three conditions must hold before any mutation occurs:
+
+1. `CAVEMAN_COMPRESS_INPUT=1` in `.cursor/scratchpad.md`.
+2. `CAVEMAN_FILE_SCOPE` non-empty.
+3. CLI invoked with `--write`.
+
+Any failing condition short-circuits with a reason code from §7 and exit `2`.
+Default / unset / partial state = no-op.
+
+#### Sidecar originals (DEC-0073 §3)
+
+Before mutating any file, the script writes the pre-mutation bytes to
+`docs/.caveman-originals/<relative/path>/<filename>`. Atomic order: sidecar
+first (temp + replace), then target (temp + replace). The tree is anchored
+by `docs/.caveman-originals/.gitkeep` and excluded from VCS by the repo-root
+`.gitignore` anchor for US-0090.
+
+#### Deny-list policy (DEC-0073 §4)
+
+Layered, read in this order (**deny always wins**):
+
+1. Hard-coded baseline in `scripts/caveman_compress_input.py` (`DENY_BASELINE`).
+2. Merged secret-like patterns from repo-root `.gitignore` (`.env*`, `*secret*`,
+   `*credential*`, `*token*`, `*private*`).
+3. Optional `.cursorignore` overlay when
+   `CAVEMAN_COMPRESS_INGEST_CURSORIGNORE=1` in scratchpad.
+
+Deny-list baseline is versioned via `deny_list_version` (SHA-256 of sorted
+canonical JSON) and reported by `--report`.
+
+#### Allow-list grammar (DEC-0073 §5)
+
+Three forms in `CAVEMAN_FILE_SCOPE`:
+
+| Form | Example | Notes |
+|------|---------|-------|
+| Named profile | `docs-prose-only` | Frozen v1 table; new profiles require subsequent DEC. |
+| Raw CSV globs | `docs/user-guides/**/*.md,handoffs/archive/*.md` | Forward slashes only. |
+| Hybrid | `profile:docs-prose-only;globs:handoffs/archive/*.md` | One profile per scope; unknown tokens fail closed. |
+
+#### Safe-mode minifier (DEC-0073 §6)
+
+Four-step, strictly idempotent pipeline:
+
+1. Collapse two-or-more consecutive blank lines into a single blank line
+   (outside fenced code).
+2. Trim trailing whitespace on non-fence lines.
+3. Normalize `CRLF` / `CR` → `LF`.
+4. Preserve the source file's EOF-newline status.
+
+Aggressive mode is **deferred**; v1 ships safe-mode only. All safe-mode
+transformations keep the 9 DEC-0072 §4 literal regions byte-identical; any
+drift is fail-closed with `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED`.
+
+#### Reason-code vocabulary (DEC-0073 §7)
+
+Nine codes in three families. No post-write codes.
+
+| Family | Code |
+|--------|------|
+| Gating | `CAVEMAN_COMPRESS_MODE_DISABLED` |
+| Gating | `CAVEMAN_COMPRESS_FLAG_CONFLICT` |
+| Scope | `CAVEMAN_COMPRESS_SCOPE_EMPTY` |
+| Scope | `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE` |
+| Scope | `CAVEMAN_COMPRESS_SCOPE_VIOLATION` |
+| Integrity | `CAVEMAN_COMPRESS_DENY_HIT` |
+| Integrity | `CAVEMAN_COMPRESS_NOT_IDEMPOTENT` |
+| Integrity | `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED` |
+| Integrity | `CAVEMAN_COMPRESS_ORIGINAL_MISSING` |
+
+Additions require a subsequent DEC amending §7.
+
+#### CLI contract (DEC-0073 §8)
+
+| Flag | Semantics |
+|------|-----------|
+| `--dry-run` | (default) inventory + diff summary to stdout; no mutation. |
+| `--write` | Perform sidecar + target mutation on eligible files (sidecar first). |
+| `--verify-originals` | Walk sidecar tree; verify bidirectional presence; fail closed with `CAVEMAN_COMPRESS_ORIGINAL_MISSING` on orphan. |
+| `--report` | Emit canonical JSON report on stdout (incompatible with `--write`). |
+
+#### Scratchpad keys (US-0090 additions)
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `CAVEMAN_COMPRESS_INPUT` | `0` \| `1` | `0` | Activation gate bit (DEC-0073 §2). |
+| `CAVEMAN_FILE_SCOPE` | string | empty | Profile name, CSV globs, or hybrid (§5). |
+| `CAVEMAN_COMPRESS_INGEST_CURSORIGNORE` | `0` \| `1` | `0` | Optional overlay (§4). |
+
+#### Template parity (DEC-0073 §10)
+
+The following pairs are byte-identical between active and template copies and
+installer-owned (BUG-0003 / DEC-0066): `scripts/caveman_compress_input.py`,
+`docs/engineering/context/installer-owned-paths.manifest`,
+`docs/engineering/runbook.md`, `docs/engineering/auto-orchestration-reference.md`.
+Verify with `python scripts/check_intake_template_parity.py --scope=caveman-compress`.
+Negative parity (must NOT track): `.cursor/rules/caveman.mdc` (US-0089
+rule-set; US-0090 adds no new Cursor rule).
+
 ### Outer-driver equivalence (AC-1, Option B)
 
 When a single Cursor `/auto` invocation cannot schedule multiple subagent turns,

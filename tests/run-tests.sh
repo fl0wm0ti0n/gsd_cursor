@@ -84,7 +84,7 @@ cmd_count=$(ls "$TPL/.cursor/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 rule_count=$(ls "$TPL/.cursor/rules"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
 agent_count=$(ls "$TPL/.cursor/agents"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
 assert_true "23 commands exist" "[ $cmd_count -eq 23 ]"
-assert_true "5 rules exist" "[ $rule_count -eq 5 ]"
+assert_true "6 rules exist" "[ $rule_count -eq 6 ]"
 assert_true "7 agents exist" "[ $agent_count -eq 7 ]"
 
 for file in "$TPL/.cursor/commands"/*.md; do
@@ -1314,6 +1314,25 @@ set +e
 REMOTE_SUMMARY_PY=$?
 set -e
 assert_true "US-0084 H3-H5 remote_config_summary fixtures pass" "[ \"$REMOTE_SUMMARY_PY\" -eq 0 ]"
+
+# 26T) US-0090 / DEC-0073 — Caveman input-compression contract + installer completeness + parity
+CAVEMAN_SCRIPT="$ROOT/scripts/caveman_compress_input.py"
+assert_true "caveman_compress_input.py exists (active)" "[ -f \"$CAVEMAN_SCRIPT\" ]"
+assert_true "caveman_compress_input.py exists (template)" "[ -f \"$TPL/scripts/caveman_compress_input.py\" ]"
+set +e
+"$PY" "$CAVEMAN_SCRIPT" --help >/dev/null 2>&1
+CAVEMAN_HELP_RC=$?
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=caveman-compress >/dev/null 2>&1
+CAVEMAN_PARITY_RC=$?
+"$PY" -m pytest "$ROOT/tests/auto_command_contract_test.py" -q -k "caveman_compress_input" >/dev/null 2>&1
+CAVEMAN_CONTRACT_RC=$?
+"$PY" -m pytest "$ROOT/tests/installer_completeness_bug0003_test.py" -q -k "caveman_compress_input_shipped_by_installer" >/dev/null 2>&1
+CAVEMAN_INSTALLER_RC=$?
+set -e
+assert_true "caveman_compress_input.py --help exits 0" "[ \"$CAVEMAN_HELP_RC\" -eq 0 ]"
+assert_true "check_intake_template_parity --scope=caveman-compress passes" "[ \"$CAVEMAN_PARITY_RC\" -eq 0 ]"
+assert_true "US-0090 caveman-compress contract subtests pass" "[ \"$CAVEMAN_CONTRACT_RC\" -eq 0 ]"
+assert_true "US-0090 installer-completeness subtest passes" "[ \"$CAVEMAN_INSTALLER_RC\" -eq 0 ]"
 
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 INTAKE_RESUME_BRIEF_TEST="$ROOT/tests/intake_bug_resume_brief_bug0005_test.py"

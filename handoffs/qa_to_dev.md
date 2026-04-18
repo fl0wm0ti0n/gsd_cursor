@@ -1,12 +1,163 @@
-# QA -> Dev Handoff — Sprint S0071 (US-0087)
+# QA -> Dev Handoff -- Sprint S0075 (US-0089) -- 2026-04-18
 
-## Status: **SUPERSEDED** — S0071 QA **PASS** (`2026-04-07T21:07:00Z`)
+## Status: FAIL -- blocking remediation required before /verify-work
 
-Fresh **`/qa`** re-run after dev remediation + **DEC-0054** triad rollover (**`state-pack-20260407-b.md`**) → **`TEST_COMMAND`** **PASS** (**794**/0). See **`sprints/S0071/qa-findings.md`** (current). **Next**: **`/verify-work`**. The **FAIL** stanza below is **historical** only.
+Fresh `/qa` for **S0075 / US-0089** (`orchestrator_run_id=auto-20260418-01`, fresh qa subagent, `2026-04-18T15:00:00Z`) records **FAIL** in `sprints/S0075/qa-findings.md`. Story remains **OPEN** per US-0045.
+
+## Verification completed
+
+- Canonical: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` exit 1, `tests/report.md` (`Timestamp=2026-04-18T12:09:41Z`, Pass=782, Fail=12). Baseline US-0086: Pass=788 / Fail=6.
+- Targeted caveman: `python -m pytest tests/auto_command_contract_test.py -q -k caveman` exit 0 (11 passed / 19 deselected / 119 subtests / 0 failed).
+- Full contract module: `python -m pytest tests/auto_command_contract_test.py -q` exit 1 (27 passed / 24 failed / 192 subtests). The 24 failures are pre-existing drift (dev stash-baseline confirmed).
+- Full pytest: `python -m pytest -q` exit 1 (66 passed / 24 failed / 4 skipped / 192 subtests).
+- Remote config: `python -m pytest tests/remote_config_summary_test.py -q` exit 0 (4 passed).
+- Bug validator: ``[BUG_VALIDATION_OK]`` (exit 0).
+- Metadata guard: `python scripts/check-user-visible-metadata.py` exit 0 (PASS).
+- AC-1..AC-8 per-AC: ALL PASS.
+- Default-off invariant: UPHELD byte-for-byte.
+- Template parity (DEC-0072 section 7 rows 2-5 + row 8): UPHELD (byte-identical SHA-256 for `.cursor/rules/caveman.mdc`, `docs/engineering/auto-orchestration-reference.md`, `docs/engineering/runbook.md`; negative parity row 8).
+
+## Blocking finding (must fix before /verify-work)
+
+1. **`tests/run-tests.ps1` rule-count assertion stale** -- asserts `"5 rules exist"` / `-eq 5`. US-0089 / DEC-0072 section 7 row 3 adds `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc`, so count is now 6. Sole NEW failure on US-0089 surface.
+   - Fix: bump to `"6 rules exist"` / `-eq 6` in `tests/run-tests.ps1`; audit `tests/run-tests.sh` for symmetric assertion and bump.
+   - Post-fix expectation: `tests/run-tests.ps1` Pass=783 / Fail=11 (remaining 11 are pre-existing drift, observational).
+
+## Observations (non-blocking, out of US-0089 scope)
+
+- 11 pre-existing `run-tests.ps1` failures: Homebrew formula drift x2, installer/CLI TEST_COMMAND drift x2, `.cursor/commands/auto.md` US-0087/88 drift x5, triad hot-surface x2, scratchpad-pair x1 (sanctioned CAVEMAN_* additive + pre-existing drift).
+- 24 pre-existing pytest failures: token-drift / template-literal-parity on `.cursor/commands/auto.md` + `template/.cursor/scratchpad.local.example.md`.
+- ``SCRATCHPAD_PAIR_ERROR`` observational for US-0089 (DEC-0072 section 7 row 1 / DEC-0055 carveout); recommend BUG issue to encode carveout into parity script.
+- `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` reserved for US-0090.
+
+## Required next step
+
+- **`/execute`** (fresh dev) for S0075 / US-0089 -- apply 1-char rule-count bump in `tests/run-tests.ps1` (+ `tests/run-tests.sh` if symmetric), rerun `tests/run-tests.ps1` + targeted caveman pytest, hand back to `/qa`.
+
+## Strict runtime proof (DEC-0038)
+
+- `orchestrator_run_id=auto-20260418-01`
+- `runtime_proof_id=rp-auto-20260418-01-qa-qa-20260418T150000Z-S0075-US0089`
+- `phase_id=qa`, `role=qa`
+- `proof_issued_at=2026-04-18T15:00:00Z`, `proof_ttl_seconds=3600`
+- `proof_hash=3bef1259f94c6c5d79cf30a45efbbd28765da263a6ef6ef4918010992fc809ca`
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=qa`, `role=qa`, `fresh_context_marker=qa-S0075-US0089-qa-20260418T150000Z-fresh`, `timestamp=2026-04-18T15:00:00Z`, `evidence_ref=sprints/S0075/qa-findings.md,handoffs/qa_to_dev.md,handoffs/resume_brief.md,docs/engineering/state.md,tests/report.md`.
+
+---
+# QA -> Dev Handoff -- Sprint S0075 (US-0089) -- 2026-04-18
+
+## Status: **FAIL** -- blocking remediation required before `/verify-work`
+
+Fresh `/qa` for **`S0075`** / **US-0089** (`orchestrator_run_id=auto-20260418-01`, fresh qa subagent, `2026-04-18T15:00:00Z`) records **FAIL** in `sprints/S0075/qa-findings.md`. Story remains **OPEN** per **US-0045**.
+
+## Verification completed
+
+- Canonical check-in: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> exit **1**, `tests/report.md` (`Timestamp=2026-04-18T12:09:41Z`, **Pass=782**, **Fail=12**). Baseline US-0086 QA: Pass=788 / Fail=6.
+- Targeted US-0089: `python -m pytest tests/auto_command_contract_test.py -q -k caveman` -> exit **0** (**11 passed**, **19 deselected**, **119 subtests passed**, **0 failed**).
+- Full contract module: `python -m pytest tests/auto_command_contract_test.py -q` -> exit **1** (**27 passed**, **24 failed**, 192 subtests passed). The 24 failures are pre-existing drift confirmed by dev stash-baseline (disjoint from US-0089).
+- Full pytest suite: `python -m pytest -q` -> exit **1** (**66 passed**, **24 failed**, **4 skipped**, 192 subtests passed).
+- Remote config regression: `python -m pytest tests/remote_config_summary_test.py -q` -> exit **0** (**4 passed**).
+- Bug validator: `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` -> **`[BUG_VALIDATION_OK]`** (exit 0).
+- User-visible metadata guard: `python scripts/check-user-visible-metadata.py` -> exit 0 (PASS).
+- AC-1..AC-8 per-AC verification: **ALL PASS** (see `sprints/S0075/qa-findings.md` Per-AC table).
+- Default-off invariant: **UPHELD byte-for-byte**.
+- Template parity (DEC-0072 section 7 rows 2-5 + row 8): **UPHELD** (byte-identical SHA-256 for `.cursor/rules/caveman.mdc`, `docs/engineering/auto-orchestration-reference.md`, `docs/engineering/runbook.md`; negative parity row 8).
+
+## Blocking finding (must fix before `/verify-work`)
+
+1. **`tests/run-tests.ps1` rule-count assertion stale** -- line 77 asserts `"5 rules exist"` via `(Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 5`. US-0089 / DEC-0072 section 7 row 3 legitimately adds `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc`, so the count is now 6 and the assertion flips PASS -> FAIL. This is the sole **NEW failure on the US-0089 surface** introduced by this sprint.
+   - Fix: bump the assertion to `"6 rules exist"` / `-eq 6` in `tests/run-tests.ps1` (1-char change); also audit `tests/run-tests.sh` for an analogous rule-count assertion and bump symmetrically if present to preserve Linux / POSIX check-in parity.
+   - Post-fix expectation: `tests/run-tests.ps1` reports **Pass=783 / Fail=11**; the 11 remaining failures are pre-existing drift (US-0086 / US-0087 / US-0088) and are **observational**, not blocking US-0089.
+
+## Observations (non-blocking, out of US-0089 scope)
+
+- 11 pre-existing `run-tests.ps1` failures: Homebrew formula version drift (x2, new since US-0086), installer stack-detection TEST_COMMAND drift (x2, pre-existing), `.cursor/commands/auto.md` US-0087 / US-0088 drift surfaced via auto-precedence / strict-proof-boundary / token-cost-parity / slim-auto-contract markers (x5), triad hot-surface oversize (x2), `scratchpad-pair` parity (x1, multi-cause; the US-0089 `template_pair` CAVEMAN_* component is architecturally sanctioned by DEC-0072 section 7 row 1 / DEC-0055 -- example-only install).
+- 24 pre-existing pytest failures: token-drift / template-literal-parity on `.cursor/commands/auto.md` + `template/.cursor/scratchpad.local.example.md` from US-0086 / US-0087 / US-0088.
+- `SCRATCHPAD_PAIR_ERROR` from `scripts/check-scratchpad-pair-parity.py` is **observational** for US-0089 (sanctioned CAVEMAN-key additive component + pre-existing drift). Recommend a dedicated BUG issue to encode the DEC-0055 carveout in the parity script.
+- `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` remain documented no-ops reserved for US-0090 (architecture-bottom-appended).
+
+## Required next step
+
+- **`/execute`** (fresh **dev**) for **S0075 / US-0089** -- apply the 1-char rule-count bump in `tests/run-tests.ps1` (and `tests/run-tests.sh` if symmetric), rerun `tests/run-tests.ps1` + targeted caveman pytest, and hand back to `/qa` for re-verification. No DEC / architecture change required; story stays OPEN.
+
+## Strict runtime proof (DEC-0038)
+
+- `orchestrator_run_id=auto-20260418-01`
+- `runtime_proof_id=rp-auto-20260418-01-qa-qa-20260418T150000Z-S0075-US0089`
+- `phase_id=qa`, `role=qa`
+- `proof_issued_at=2026-04-18T15:00:00Z`, `proof_ttl_seconds=3600`
+- `proof_hash=3bef1259f94c6c5d79cf30a45efbbd28765da263a6ef6ef4918010992fc809ca`
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=qa`, `role=qa`, `fresh_context_marker=qa-S0075-US0089-qa-20260418T150000Z-fresh`, `timestamp=2026-04-18T15:00:00Z`, `evidence_ref=sprints/S0075/qa-findings.md,handoffs/qa_to_dev.md,handoffs/resume_brief.md,docs/engineering/state.md,tests/report.md`.
 
 ---
 
-## Historical: **FAIL** — blocking remediation required (2026-04-07 pre-remediation)
+# QA -> Dev Handoff -- Sprint S0075 (US-0089) -- 2026-04-18
+
+## Status: FAIL -- blocking remediation required before /verify-work
+
+Fresh `/qa` for **S0075 / US-0089** (`orchestrator_run_id=auto-20260418-01`, fresh qa subagent, `2026-04-18T15:00:00Z`) records **FAIL** in `sprints/S0075/qa-findings.md`. Story remains **OPEN** per US-0045.
+
+## Verification completed
+
+- Canonical: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` exit 1, `tests/report.md` (`Timestamp=2026-04-18T12:09:41Z`, Pass=782, Fail=12). Baseline US-0086: Pass=788 / Fail=6.
+- Targeted caveman: `python -m pytest tests/auto_command_contract_test.py -q -k caveman` exit 0 (11 passed / 19 deselected / 119 subtests / 0 failed).
+- Full contract module: `python -m pytest tests/auto_command_contract_test.py -q` exit 1 (27 passed / 24 failed / 192 subtests). The 24 failures are pre-existing drift (dev stash-baseline).
+- Full pytest: `python -m pytest -q` exit 1 (66 passed / 24 failed / 4 skipped / 192 subtests).
+- Remote config: `python -m pytest tests/remote_config_summary_test.py -q` exit 0 (4 passed).
+- Bug validator: `[BUG_VALIDATION_OK]` (exit 0).
+- Metadata guard: `python scripts/check-user-visible-metadata.py` exit 0 (PASS).
+- AC-1..AC-8 per-AC: ALL PASS.
+- Default-off invariant: UPHELD byte-for-byte.
+- Template parity (DEC-0072 section 7 rows 2-5 + row 8): UPHELD (byte-identical SHA-256 for `.cursor/rules/caveman.mdc`, `docs/engineering/auto-orchestration-reference.md`, `docs/engineering/runbook.md`; negative parity row 8).
+
+## Blocking finding (must fix before /verify-work)
+
+1. **`tests/run-tests.ps1` rule-count assertion stale** -- asserts `"5 rules exist"` / `-eq 5`. US-0089 / DEC-0072 section 7 row 3 adds `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc`, so count is now 6. Sole NEW failure on US-0089 surface.
+   - Fix: bump to `"6 rules exist"` / `-eq 6` in `tests/run-tests.ps1`; audit `tests/run-tests.sh` for symmetric assertion and bump.
+   - Post-fix expectation: `tests/run-tests.ps1` Pass=783 / Fail=11 (remaining 11 are pre-existing drift, observational).
+
+## Observations (non-blocking, out of US-0089 scope)
+
+- 11 pre-existing `run-tests.ps1` failures: Homebrew formula drift x2, installer/CLI TEST_COMMAND drift x2, `.cursor/commands/auto.md` US-0087/88 drift x5, triad hot-surface x2, scratchpad-pair x1 (sanctioned CAVEMAN_* additive + pre-existing drift).
+- 24 pre-existing pytest failures: token-drift / template-literal-parity on `.cursor/commands/auto.md` + `template/.cursor/scratchpad.local.example.md`.
+- `SCRATCHPAD_PAIR_ERROR` observational for US-0089 (DEC-0072 section 7 row 1 / DEC-0055 carveout); recommend BUG issue to encode carveout into parity script.
+- `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` reserved for US-0090.
+
+## Required next step
+
+- **`/execute`** (fresh dev) for S0075 / US-0089 -- apply 1-char rule-count bump in `tests/run-tests.ps1` (+ `tests/run-tests.sh` if symmetric), rerun `tests/run-tests.ps1` + targeted caveman pytest, hand back to `/qa`.
+
+## Strict runtime proof (DEC-0038)
+
+- `orchestrator_run_id=auto-20260418-01`
+- `runtime_proof_id=rp-auto-20260418-01-qa-qa-20260418T150000Z-S0075-US0089`
+- `phase_id=qa`, `role=qa`
+- `proof_issued_at=2026-04-18T15:00:00Z`, `proof_ttl_seconds=3600`
+- `proof_hash=3bef1259f94c6c5d79cf30a45efbbd28765da263a6ef6ef4918010992fc809ca`
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=qa`, `role=qa`, `fresh_context_marker=qa-S0075-US0089-qa-20260418T150000Z-fresh`, `timestamp=2026-04-18T15:00:00Z`, `evidence_ref=sprints/S0075/qa-findings.md,handoffs/qa_to_dev.md,handoffs/resume_brief.md,docs/engineering/state.md,tests/report.md`.
+
+---
+
+SENTINEL-S0075-QA-FAIL
+
+# QA -> Dev Handoff â€” Sprint S0071 (US-0087)
+
+## Status: **SUPERSEDED** â€” S0071 QA **PASS** (`2026-04-07T21:07:00Z`)
+
+Fresh **`/qa`** re-run after dev remediation + **DEC-0054** triad rollover (**`state-pack-20260407-b.md`**) â†’ **`TEST_COMMAND`** **PASS** (**794**/0). See **`sprints/S0071/qa-findings.md`** (current). **Next**: **`/verify-work`**. The **FAIL** stanza below is **historical** only.
+
+---
+
+## Historical: **FAIL** â€” blocking remediation required (2026-04-07 pre-remediation)
 
 Fresh **`/qa`** for **`S0071`** / **`US-0087`** (`orchestrator_run_id=auto-20260405-01`) recorded **FAIL** in **`sprints/S0071/qa-findings.md`** (superseded revision).
 
@@ -18,9 +169,9 @@ Fresh **`/qa`** for **`S0071`** / **`US-0087`** (`orchestrator_run_id=auto-20260
 
 ## Blocking findings (must fix before `/verify-work`)
 
-1. **Harness substring drift**: **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** assert **`Resolve start phase in strict order:`** in **`auto.md`**; US-0087 text uses **`Resolve nominal start phase and scheduler inputs in strict order`** — update harness or restore anchor phrase (active + template).
-2. **`RELEASE_PUBLISH_MODE`**: Harness expects **`RELEASE_PUBLISH_MODE=confirm`** in **`.cursor/scratchpad.md`**; repo has **`disabled`** — align materialized baseline or relax test to documented key presence.
-3. **Scratchpad pair parity (US-0075 AC-11)**: **`AUTO_BUG_*`** + **`# Optional bug-queue mode (US-0087)`** block missing from **active** **`.cursor/scratchpad.local.example.md`**; **`template/`** baseline vs example pair also drifts — sync keys + catalog headers across **`.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`**, **`template/.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.local.example.md`**.
+1. **Harness substring drift**: **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** assert **`Resolve start phase in strict order:`** in **`auto.md`**; US-0087 text uses **`Resolve nominal start phase and scheduler inputs in strict order`** â€” update harness or restore anchor phrase (active + template).
+2. **`RELEASE_PUBLISH_MODE`**: Harness expects **`RELEASE_PUBLISH_MODE=confirm`** in **`.cursor/scratchpad.md`**; repo has **`disabled`** â€” align materialized baseline or relax test to documented key presence.
+3. **Scratchpad pair parity (US-0075 AC-11)**: **`AUTO_BUG_*`** + **`# Optional bug-queue mode (US-0087)`** block missing from **active** **`.cursor/scratchpad.local.example.md`**; **`template/`** baseline vs example pair also drifts â€” sync keys + catalog headers across **`.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`**, **`template/.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.local.example.md`**.
 
 ## Required next step
 
@@ -46,7 +197,7 @@ sanitization guard). No blocking findings for in-scope acceptance.
 - US-0071 AC-1..AC-10 and section **26e** regression strings: PASS per
   `sprints/S0050/qa-findings.md`.
 - Out-of-scope failures: Homebrew formula/npm sync (2), installer/CLI
-  `TEST_COMMAND` bootstrap (2) — documented as non-blocking for this story.
+  `TEST_COMMAND` bootstrap (2) â€” documented as non-blocking for this story.
 
 ## Findings
 
@@ -75,7 +226,7 @@ phase selection policy). No blocking findings for in-scope acceptance.
 - US-0070 AC-1..AC-10 and section **26d** regression strings: PASS per
   `sprints/S0049/qa-findings.md`.
 - Out-of-scope failures: Homebrew formula/npm sync (2), installer/CLI
-  `TEST_COMMAND` bootstrap (2) — documented as non-blocking for this story.
+  `TEST_COMMAND` bootstrap (2) â€” documented as non-blocking for this story.
 
 ## Findings
 
@@ -127,7 +278,7 @@ verified; all AC-1..AC-10 PASS.
 
 ## Verification completed
 
-- UAT: `sprints/S0033/uat.json`, `sprints/S0033/uat.md` — 10/10 steps PASS
+- UAT: `sprints/S0033/uat.json`, `sprints/S0033/uat.md` â€” 10/10 steps PASS
   (passed=10, failed=0).
 - Baseline evidence: `tests/report.md` (Timestamp: 2026-03-13T17:09:21Z,
   Pass: 476, Fail: 0).
@@ -186,7 +337,7 @@ PASS.
 
 ## Verification completed
 
-- UAT: `sprints/S0034/uat.json`, `sprints/S0034/uat.md` — 10/10 steps PASS
+- UAT: `sprints/S0034/uat.json`, `sprints/S0034/uat.md` â€” 10/10 steps PASS
   (passed=10, failed=0).
 - Baseline evidence: `tests/report.md` (Fail: 0 on current run).
 - QA completion evidence already PASS: `sprints/S0034/qa-findings.md`.
@@ -250,7 +401,7 @@ verified; all AC-1..AC-10 PASS.
 
 ## Verification completed
 
-- UAT: `sprints/S0032/uat.json`, `sprints/S0032/uat.md` — 10/10 steps PASS
+- UAT: `sprints/S0032/uat.json`, `sprints/S0032/uat.md` â€” 10/10 steps PASS
   (passed=10, failed=0).
 - Baseline evidence: `tests/report.md` (Timestamp: 2026-03-13T09:46:51Z,
   Pass: 459, Fail: 0).
@@ -308,7 +459,7 @@ ID Namespace Bootstrap). UAT and traceability verified; all AC-1..AC-8 PASS.
 
 ## Verification completed
 
-- UAT: `sprints/S0031/uat.json`, `sprints/S0031/uat.md` — 8/8 steps PASS
+- UAT: `sprints/S0031/uat.json`, `sprints/S0031/uat.md` â€” 8/8 steps PASS
   (passed=8, failed=0).
 - Baseline evidence: `tests/report.md` (Timestamp: 2026-03-12T20:06:45Z,
   Pass: 440, Fail: 0).
@@ -367,7 +518,7 @@ all AC-1..AC-10 PASS.
 
 ## Verification completed
 
-- UAT: `sprints/S0030/uat.json`, `sprints/S0030/uat.md` — 10/10 steps PASS
+- UAT: `sprints/S0030/uat.json`, `sprints/S0030/uat.md` â€” 10/10 steps PASS
   (passed=10, failed=0).
 - Baseline evidence: `tests/report.md` (Timestamp: 2026-03-12T17:58:01Z,
   Pass: 422, Fail: 0).
@@ -424,7 +575,7 @@ Fresh `/verify-work` completed for Sprint **S0029** (US-0050 Clean Install Hygie
 
 ## Verification completed
 
-- UAT: `sprints/S0029/uat.json`, `sprints/S0029/uat.md` — 9/9 steps PASS (passed=9, failed=0).
+- UAT: `sprints/S0029/uat.json`, `sprints/S0029/uat.md` â€” 9/9 steps PASS (passed=9, failed=0).
 - Baseline evidence: `tests/report.md` (Timestamp: 2026-03-11T22:12:04Z, Pass: 404, Fail: 0).
 - QA completion evidence already PASS: `sprints/S0029/qa-findings.md`.
 - Isolation compliance gate PASS for target lifecycle evidence (execute, qa, verify-work) in `docs/engineering/state.md`.
@@ -511,7 +662,7 @@ Fresh `/verify-work` completed for Sprint **S0028** (US-0049 Legacy DONE-Story A
 - Regression suite: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`
 - Evidence: `tests/report.md` (Pass: 397, Fail: 0)
 - US-0049 block #27: all 14 assertions PASS (canonical audit path, runbook section, reason codes, release step 3e, template parity).
-- UAT: `sprints/S0028/uat.json`, `sprints/S0028/uat.md` — 8/8 steps PASS (passed=8, failed=0).
+- UAT: `sprints/S0028/uat.json`, `sprints/S0028/uat.md` â€” 8/8 steps PASS (passed=8, failed=0).
 - Artifacts: `docs/engineering/legacy-drift-audit.md` (active + template) with schema; runbook "Legacy DONE-story drift detection and guard (US-0049)"; release step 3e and three reason codes in fail-safe list.
 
 ## Findings
@@ -521,7 +672,7 @@ Fresh `/verify-work` completed for Sprint **S0028** (US-0049 Legacy DONE-Story A
 
 ## Required next step
 
-- Proceed to **`/release`** for S0028. Run release gates (check-in test → QA → UAT completeness → legacy drift guard 3e → finalize notes, queue, backlog/acceptance sync).
+- Proceed to **`/release`** for S0028. Run release gates (check-in test â†’ QA â†’ UAT completeness â†’ legacy drift guard 3e â†’ finalize notes, queue, backlog/acceptance sync).
 
 ---
 
@@ -535,7 +686,7 @@ Fresh `/verify-work` completed for Sprint **S0027** (US-0032 Optional Feature Us
 
 - Regression suite: `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"`
 - Evidence: `tests/report.md` (Timestamp: 2026-03-02T19:50:27Z, Pass: 383, Fail: 0)
-- UAT: `sprints/S0027/uat.json`, `sprints/S0027/uat.md` — 8/8 steps PASS (passed=8, failed=0).
+- UAT: `sprints/S0027/uat.json`, `sprints/S0027/uat.md` â€” 8/8 steps PASS (passed=8, failed=0).
 - US-0032 AC-1..AC-8 verified: USER_GUIDE_MODE flag, zero-overhead when disabled, canonical path and schema, release gate 3d and USER_GUIDE_INCOMPLETE, traceability, US-0031 boundary, template parity.
 
 ## Findings
@@ -545,7 +696,7 @@ Fresh `/verify-work` completed for Sprint **S0027** (US-0032 Optional Feature Us
 
 ## Required next step
 
-- Proceed to **`/release`** for S0027. Run release gates (check-in test → QA → UAT completeness → finalize notes, queue, backlog/acceptance sync).
+- Proceed to **`/release`** for S0027. Run release gates (check-in test â†’ QA â†’ UAT completeness â†’ finalize notes, queue, backlog/acceptance sync).
 
 ---
 
@@ -561,7 +712,7 @@ contract (`US-0048` / `DEC-0029`).
 - Regression suite run: `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1`
 - Evidence: `tests/report.md` (Timestamp: `2026-03-02T18:34:48Z`, Pass: `371`, Fail: `0`)
 - US-0048 AC-1..AC-10 contracts verified (fail-closed isolation evidence model,
-  execute↔QA loop fresh markers, verify-work and release isolation compliance gates,
+  executeâ†”QA loop fresh markers, verify-work and release isolation compliance gates,
   pause/resume provenance validation, deterministic reason codes).
 - Active/template parity spot-check completed for the primary US-0048 touchpoints:
   `.cursor/commands/{auto,execute,qa,verify-work,release,pause,resume}.md`,
@@ -577,7 +728,7 @@ contract (`US-0048` / `DEC-0029`).
 - Proceed to **`/release`** for `S0025`.
 
 Verify-work completion evidence:
-- UAT: `sprints/S0025/uat.json`, `sprints/S0025/uat.md` — 10/10 steps PASS (passed=10, failed=0).
+- UAT: `sprints/S0025/uat.json`, `sprints/S0025/uat.md` â€” 10/10 steps PASS (passed=10, failed=0).
 - Regression evidence: `tests/report.md` (Timestamp: `2026-03-02T18:38:10Z`, Pass: `371`, Fail: `0`).
 
 ---
@@ -586,12 +737,12 @@ Verify-work completion evidence:
 
 ## Status: PASS - no fixes required
 
-`/verify-work` completed for Sprint S0011 (Release Gate Tightening — US-0039). QA and UAT both PASS.
+`/verify-work` completed for Sprint S0011 (Release Gate Tightening â€” US-0039). QA and UAT both PASS.
 
 ## Verification completed
 
 - Regression suite: `tests/report.md` (Pass: 349, Fail: 0).
-- UAT: `sprints/S0011/uat.json`, `sprints/S0011/uat.md` — 10/10 steps PASS (passed=10, failed=0).
+- UAT: `sprints/S0011/uat.json`, `sprints/S0011/uat.md` â€” 10/10 steps PASS (passed=10, failed=0).
 - US-0039 AC-1..AC-10 covered by UAT steps; traceability row in state.md set to PASS with evidence refs.
 
 ## Findings
@@ -601,7 +752,7 @@ Verify-work completion evidence:
 
 ## Required next step
 
-- Proceed to **`/release`** for S0011. Run release gates (check-in test → QA → UAT completeness → finalize notes, queue, backlog/acceptance sync).
+- Proceed to **`/release`** for S0011. Run release gates (check-in test â†’ QA â†’ UAT completeness â†’ finalize notes, queue, backlog/acceptance sync).
 
 ---
 

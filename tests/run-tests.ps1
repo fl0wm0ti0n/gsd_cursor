@@ -74,7 +74,7 @@ Assert-True "Workflows folder exists" (Test-Path (Join-Path $tpl ".github\workfl
 
 # 2) Command/rule counts
 Assert-True "23 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 23)
-Assert-True "5 rules exist" ((Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 5)
+Assert-True "6 rules exist" ((Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 6)
 Assert-True "7 agents exist" ((Count-Files (Join-Path $tpl ".cursor\agents") "*.mdc") -eq 7)
 
 # 3) Command content sections
@@ -1495,6 +1495,19 @@ $remoteSummaryTest = Join-Path $root "tests\remote_config_summary_test.py"
 Assert-True "remote_config_summary_test.py exists" (Test-Path $remoteSummaryTest -PathType Leaf)
 $remoteSummaryRun = Start-Process python -ArgumentList @($remoteSummaryTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0084 H3-H5 remote_config_summary fixtures pass" ($remoteSummaryRun.ExitCode -eq 0)
+
+# 26T) US-0090 / DEC-0073 — Caveman input-compression contract + installer completeness + parity
+$cavemanScript = Join-Path $root "scripts\caveman_compress_input.py"
+Assert-True "caveman_compress_input.py exists (active)" (Test-Path $cavemanScript -PathType Leaf)
+Assert-True "caveman_compress_input.py exists (template)" (Test-Path (Join-Path $tpl "scripts\caveman_compress_input.py") -PathType Leaf)
+$cavemanHelp = Start-Process python -ArgumentList @($cavemanScript, "--help") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "caveman_compress_input.py --help exits 0" ($cavemanHelp.ExitCode -eq 0)
+$cavemanParityProc = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=caveman-compress") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=caveman-compress passes" ($cavemanParityProc.ExitCode -eq 0)
+$cavemanContractRun = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "caveman_compress_input") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0090 caveman-compress contract subtests pass" ($cavemanContractRun.ExitCode -eq 0)
+$cavemanInstallerRun = Start-Process python -ArgumentList @("-m", "pytest", "tests\installer_completeness_bug0003_test.py", "-q", "-k", "caveman_compress_input_shipped_by_installer") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0090 installer-completeness subtest passes" ($cavemanInstallerRun.ExitCode -eq 0)
 
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 $intakeResumeBriefTest = Join-Path $root "tests\intake_bug_resume_brief_bug0005_test.py"

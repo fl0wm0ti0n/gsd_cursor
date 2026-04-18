@@ -1,5 +1,72 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0076` / `US-0090`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0076/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-04-18T22:45:00Z`, **qa**, `orchestrator_run_id=auto-20260418-01`, `fresh_context_marker=qa-S0076-US0090-plan-verify-20260418T224500Z-fresh`); all 8 ACs (AC-1..AC-8) covered (surjective, not strict bijection — T-001/T-005/T-009 multi-AC by Architecture Addendum design); `plan_integrity` confirmed (`task_count=10`, `ac_count=8`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`); governance anchors validated: **`DEC-0073`** (§1–§11), **`DEC-0072`** (substrate, forward-linked, not rewritten), **`docs/engineering/architecture.md`** **`# US-0090`**, **`R-0073`**. **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Multi-AC scrutiny** (primary focus — T-001 at 5 ACs):
+  - **T-001 (AC-1..AC-5)** — **ACCEPTED**: Architecture Addendum seed 1 ("script is the CLI contract; five ACs land inside one binary by design"). `scripts/caveman_compress_input.py` concentrates DEC-0073 §2 (activation gate) + §3 (sidecar atomic-write order) + §4 (deny-list layered SoT) + §5 (allow-list grammar) + §8 (CLI contract). Splitting would force cross-file state threading without increasing atomicity. `acceptance_check` enumerates nine distinct assertions (SHA-256 parity, --help exit 0, MODE_DISABLED / SCOPE_EMPTY / FLAG_CONFLICT fail-closed, deny_list_version SHA-256, DENY_HIT on baseline, stdlib-only imports) — atomic per compilation unit.
+  - **T-005 (AC-6 + AC-8)** — **ACCEPTED**: Addendum seeds 5+7 grouped to minimize test-file churn; both extend `tests/auto_command_contract_test.py`. R10 rule SHA-256 guard adjacent to contract subtests. Eleven distinct subtest assertions.
+  - **T-009 (AC-6 + AC-8)** — **ACCEPTED**: Addendum seed 10 — install-completeness fixture is simultaneously a test (AC-6) and an installer surface (AC-8). Splitting would duplicate fixture setup. R11 non-negotiable per DEC-0073 §10.
+- **Findings summary** (gates_passed = 13):
+  - **AC_COVERAGE_SURJECTIVE**: AC-1..AC-8 all ≥1 task; no `PLAN_AC_COVERAGE_GAP`.
+  - **TASK_ATOMICITY**: T-001/T-005/T-009 multi-AC scopes justified by Addendum; accepted as architectural cohesion, not violations.
+  - **DEC_ANCHORING**: every task cites DEC-0073 §N; §11 cross-cutting absorbed per task.
+  - **ACCEPTANCE_CHECKS_TESTABLE**: each task has concrete, testable bullets (SHA-256 equality, CLI exit codes, JSON field presence, stderr reason-code, byte-identity).
+  - **PARITY_TOUCHPOINTS_EXPLICIT**: positive-parity rows 1/2/3/8/9 + active-only rows 4/5/6/7/10 per DEC-0073 §9.
+  - **TASK_COUNT_WITHIN_LIMIT**: 10 ≤ 12; SPRINT_AUTO_SPLIT not triggered.
+  - **ORDERING_NO_CYCLES**: tests (T-005/T-006/T-009/T-010) depend on implementation (T-001/T-002/T-003/T-004/T-007/T-008); no cycles.
+  - **NON_GOALS_PRESERVED**: all DEC-0073 §11 + DEC-0072 §8 carried items enumerated.
+  - **TEST_STRATEGY_ALIGNED**: T-005 11 subtests match DEC-0073 §6/§7/§9; T-006 8 fixture classes; R9 cardinality + R10 rule byte-identity + deny_list_version guards all planned.
+  - **RELEASE_GATES_PRESENT**: install-completeness fixture (T-009 / R11), installer manifest entry (T-007), parity-script extension (T-008) seeded; BUG-0003 class guard active.
+  - **GOVERNANCE_ANCHORS_VALID**: DEC-0073 §1-§11 per task; DEC-0072 forward-link (no rewrite); R-0073 anchor; architecture `# US-0090` linkage assertion in T-010.
+  - **STATUS_AUTHORITY_PRESERVED**: US-0090 stays OPEN (US-0045).
+  - **BUG_VALIDATION_OK**: `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → `[BUG_VALIDATION_OK]`.
+- **Non-goals confirmed**: v1 safe-mode only (no aggressive); no DEC-0072/DEC-0073 rewrite; no `.cursor/rules/caveman.mdc` edit (R10 baseline `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE` preserved); no `.cursor/scratchpad*` edit; no `.cursor/skills/its-magic/SKILL.md` edit; no existing `test_caveman_default_off_*` subtest mutation (additions only); no new reason codes / CLI flags / profiles; no `.cursorignore` mutation; no new runtime deps; no `npx skills add` leak; no mandatory auto-compress in `/auto`; no `TOKEN_PROFILE` change.
+- **Artifacts**: **`sprints/S0076/plan-verify.json`** (PASS update), **`sprints/S0076/summary.md`** (plan-verify checkpoint + next-phase flip), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0090`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260418-01-plan-verify-qa-20260418T224500Z-S0076-US0090`**, **`proof_hash=5320ccf2ccdc292d62f784a8ade9b4cc37dd9b4aeba376131678b726f1a0614b`**, **`proof_issued_at=2026-04-18T22:45:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260418-01-sprint-plan-tech-lead-20260418T223000Z-US0090`**, **`proof_hash=df27d039db0eb77e35ae140483338045c8a5a980f866b68ff683aa80bc3e8197`**.
+- **Decision-gate posture**: **none** — plan satisfies DEC-0073 contracts; `/execute` unblocked.
+- **Canonical status**: **`US-0090`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**) through plan-verify / execute / qa / verify-work; closure at `/release`.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0076`** / **`US-0090`**.
+- **Plan integrity** (pre-verify):
+  - `task_count=10`, `ac_count=8`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`.
+  - Per-AC surjective (every AC has ≥1 task). **Not** a strict bijection: T-001 covers AC-1..AC-5 (single CLI binary — DEC-0073 §2/§3/§4/§5/§8), T-005 covers AC-6+AC-8 (Addendum seeds 5+7 grouped — same test file), T-009 covers AC-6+AC-8 (Addendum seed 10 — fixture is also installer surface). All multi-AC rows cite the Architecture Addendum in `handoffs/po_to_tl.md` (`## Architecture Addendum — US-0090`).
+- **AC → Task map** (locked in `sprints/S0076/tasks.md` + `sprints/S0076/plan-verify.json`):
+  - **AC-1 → T-001** (activation gate / DEC-0073 §2 + §7 reason codes).
+  - **AC-2 → T-001 + T-004** (sidecar atomic-write order in script; sidecar tree anchor in repo).
+  - **AC-3 → T-001** (deny-list layered source of truth / DEC-0073 §4 + §4.1).
+  - **AC-4 → T-001** (allow-list grammar / DEC-0073 §5 + §5.1).
+  - **AC-5 → T-001 + T-002** (CLI contract + runbook subsection).
+  - **AC-6 → T-005 + T-006 + T-009** (contract tests / fixture tree / install-completeness class).
+  - **AC-7 → T-003 + T-010** (three-sentence reference paragraph + architecture linkage assert-only).
+  - **AC-8 → T-005 + T-007 + T-008** (rule SHA-256 + deny_list_version guards / installer manifest / parity-script `--scope=caveman-compress`).
+- **Governance anchors to verify**: **`DEC-0073`** (§1–§11), **`DEC-0072`** (substrate — forward-linked, not rewritten), `docs/engineering/architecture.md` `# US-0090`, `docs/engineering/research.md` `R-0073`.
+- **Non-goals to confirm preserved**: v1 safe-mode only (no aggressive mode); no DEC-0072 / DEC-0073 rewrite; no `.cursor/rules/caveman.mdc` edit (R10 — baseline SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`); no `.cursor/scratchpad*` edit (reserved no-op keys preserved); no `.cursor/skills/its-magic/SKILL.md` edit (DEC-0072 §7 row 9); no existing `test_caveman_default_off_*` subtest modification (DEC-0072 §6 row 6 invariant; additions only); no new reason codes beyond 9 / no new CLI flags / no new profiles; no `.cursorignore` mutation; no new runtime deps; no `npx skills add` leak; no mandatory auto-compress in `/auto`.
+- **Artifacts to review**: **`sprints/S0076/sprint.md`**, **`sprints/S0076/tasks.md`**, **`sprints/S0076/plan-verify.json`** (flip `PENDING` → `PASS`), **`sprints/S0076/summary.md`** (stub), **`docs/product/backlog.md`** **`## US-0090`** `sprint_plan_notes`, **`handoffs/tl_to_dev.md`** **`## Sprint Plan — S0076 / US-0090`**, **`docs/engineering/state.md`** **Sprint-plan checkpoint (2026-04-18) — US-0090 / S0076 / `auto-20260418-01`**.
+- **Strict proof** (sprint-plan phase — prior): **`runtime_proof_id=rp-auto-20260418-01-sprint-plan-tech-lead-20260418T223000Z-US0090`**, **`proof_hash=df27d039db0eb77e35ae140483338045c8a5a980f866b68ff683aa80bc3e8197`**.
+- **Canonical status**: **`US-0090`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**) through plan-verify / execute / qa / verify-work; closure at `/release`.
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0076`** / **`US-0090`**.
+
+## Next — **`S0075` / `US-0089`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0075/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-04-18T13:00:00Z`, **qa**, `orchestrator_run_id=auto-20260418-01`, `fresh_context_marker=qa-S0075-US0089-plan-verify-20260418T130000Z-fresh`); **AC-1..AC-8** map **1:1** to **T-001..T-008** with all coverage rows `verified=true`; plan integrity confirmed (`task_count=8`, `ac_count=8`, `task_ac_bijection=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`); governance anchors validated: **`DEC-0072`**, **`docs/engineering/architecture.md`** **`# US-0089`**, **`docs/engineering/research.md`** **`R-0073`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — scratchpad key contract (4 locked lines + comment block) across active + example + template-example surfaces per DEC-0072 §3.
+  - **AC-2 / T-002**: PASS — default-off invariant subtests 6-8 (existing `required` tokens intact, AUTO_QUIET gate vocab preserved, no `npx skills add` leak) scoped to `tests/auto_command_contract_test.py` per DEC-0072 §6.
+  - **AC-3 / T-003**: PASS — new `.cursor/rules/caveman.mdc` (active + `template/`, byte-identical) with CAVEMAN_MODE gate, 9-zone literal-region invariant (hard MUST), 5 canonical phrases, non-suppressible gate list per DEC-0072 §2/§4/§5.
+  - **AC-4 / T-004**: PASS — verbatim non-substitution paragraph in `docs/engineering/auto-orchestration-reference.md` (active + `template/`) per DEC-0072 §1.
+  - **AC-5 / T-005**: PASS — `### Caveman mode (US-0089)` runbook subsection (active + `template/`) with key table, 5 phrases, non-substitution paragraph, scratchpad-authoritative-across-spawn semantics per DEC-0072 §5.
+  - **AC-6 / T-006**: PASS — remaining 5 `test_caveman_default_off_*` subtests (items 1-5 of DEC-0072 §6); combined with T-002 (items 6-8) totals 8 subtests matching DEC-0072 §6 cardinality exactly.
+  - **AC-7 / T-007**: PASS — architecture linkage/append-bottom integrity (assertion-only) for `# US-0089` + decisions.md DEC-0072 index/context pack + backlog.md `## US-0089` `architecture_notes`. No rewrite.
+  - **AC-8 / T-008**: PASS — template parity sweep across DEC-0072 §7 8-row inventory; rows 2-5 byte-parity, rows 1/6/7 documented non-parity, row 8 negative-parity (`.cursor/skills/its-magic/SKILL.md` + template mirror untouched).
+- **Non-goals confirmed**: no input-side compression (US-0090 deferred); no `TOKEN_PROFILE` / US-0080 semantic change; no canonical artifact rewrites; no new deps; no `npx skills add` token; no edit of `.cursor/skills/its-magic/SKILL.md`; no change to spawn-only (US-0048/DEC-0029/BUG-0006) / strict proof (DEC-0038) / AUTO_QUIET (US-0088) / US-0071 contracts; no voice-quality unit test.
+- **Artifacts**: **`sprints/S0075/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0089`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer -> `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260418-01-plan-verify-qa-20260418T130000Z-S0075-US0089`**, **`proof_hash=454a90ed6117490ccdb6e7a9ce603681c68e5cf36fef89c94947c3d7649bf480`**, **`proof_issued_at=2026-04-18T13:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260418-01-sprint-plan-tech-lead-20260418T124500Z-US0089-S0075`**, **`proof_hash=9837d899f11b198de97b16b07497000dcb1603f9104ba799c501d8d8c9e158d7`**.
+- **Decision-gate posture**: **none** — plan satisfies DEC-0072 contracts; `/execute` unblocked.
+- **Canonical status**: **`US-0089`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); acceptance portfolio row unchanged; closure at `/verify-work`.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0075`** / **`US-0089`**.
+
 ## Next — **`S0074` / `US-0086`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0074/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-04-13T20:05:00Z`, **qa**, `orchestrator_run_id=auto-20260405-01`); AC-1..AC-10 map 1:1 to T-001..T-010 with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `within_limit=true`); governance anchors validated: **`architecture.md`** `# US-0086`, **`research.md`** `R-0068`, **US-0064/DEC-0070**, **US-0085/DEC-0071`.

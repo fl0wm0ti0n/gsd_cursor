@@ -113,8 +113,8 @@
 - [x] US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
 - [x] US-0087: `/auto` explicit bug targeting (fix all OPEN bugs / fix `BUG-####`)
 - [x] US-0088: `/auto` continuous multi-phase loop + quiet backlog drain (close one-phase-stop gap)
-- [ ] US-0089: Cursor Caveman mode (scratchpad-configurable terse responses; default off; parity + tests)
-- [ ] US-0090: Optional Caveman-style input compression (safe file scope, originals preserved, gated after US-0089)
+- [x] US-0089: Cursor Caveman mode (scratchpad-configurable terse responses; default off; parity + tests)
+- [x] US-0090: Optional Caveman-style input compression (safe file scope, originals preserved, gated after US-0089)
 
 ## Bug acceptance (canonical)
 

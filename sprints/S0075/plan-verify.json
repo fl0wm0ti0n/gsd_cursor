@@ -1,0 +1,91 @@
+{
+  "sprint_id": "S0075",
+  "story_refs": ["US-0089"],
+  "status": "PASS",
+  "reason": null,
+  "verdict_reason_codes": [],
+  "plan_verified_at": "2026-04-18T13:00:00Z",
+  "role_verified": "qa",
+  "verified_by": {"role": "qa", "orchestrator_run_id": "auto-20260418-01"},
+  "orchestrator_run_id": "auto-20260418-01",
+  "ac_coverage": [
+    {"ac": "AC-1", "task": "T-001", "verified": true, "notes": "Scratchpad key contract (CAVEMAN_MODE=0, CAVEMAN_LEVEL=, CAVEMAN_COMPRESS_INPUT=0, CAVEMAN_FILE_SCOPE=) + ## Caveman mode (US-0089) comment block across .cursor/scratchpad.md, .cursor/scratchpad.local.example.md, template/.cursor/scratchpad.local.example.md per DEC-0072 §3."},
+    {"ac": "AC-2", "task": "T-002", "verified": true, "notes": "Default-off invariant subtests 6-8 (existing required tokens intact, AUTO_QUIET non-suppressible gate vocab preserved, no npx skills add leak) added in place to tests/auto_command_contract_test.py per DEC-0072 §6."},
+    {"ac": "AC-3", "task": "T-003", "verified": true, "notes": "New .cursor/rules/caveman.mdc (active + template mirror, byte-identical) hosts CAVEMAN_MODE gate, 9-zone literal-region invariant (hard MUST), 5 canonical phrases, non-suppressible gate list per DEC-0072 §2/§4/§5."},
+    {"ac": "AC-4", "task": "T-004", "verified": true, "notes": "Verbatim non-substitution paragraph published in docs/engineering/auto-orchestration-reference.md + template mirror per DEC-0072 §1 Option A (orthogonal TOKEN_PROFILE × CAVEMAN)."},
+    {"ac": "AC-5", "task": "T-005", "verified": true, "notes": "### Caveman mode (US-0089) runbook subsection (active + template) with key table, 5 canonical operator phrases, non-substitution paragraph, scratchpad-authoritative-across-spawn semantics per DEC-0072 §5."},
+    {"ac": "AC-6", "task": "T-006", "verified": true, "notes": "Remaining 5 test_caveman_default_off_* subtests (items 1-5 of DEC-0072 §6) extending tests/auto_command_contract_test.py in place; combined with T-002 subtests 6-8 totals 8 subtests matching DEC-0072 §6 cardinality."},
+    {"ac": "AC-7", "task": "T-007", "verified": true, "notes": "Architecture linkage/append-bottom integrity (assertion-only) for docs/engineering/architecture.md `# US-0089` (already written at /architecture), decisions.md DEC-0072 index + context pack, backlog.md ## US-0089 architecture_notes. No rewrite."},
+    {"ac": "AC-8", "task": "T-008", "verified": true, "notes": "Template parity sweep across DEC-0072 §7 8-row inventory; rows 2-5 byte-parity, rows 1/6/7 documented non-parity, row 8 negative-parity (.cursor/skills/its-magic/SKILL.md + template/.cursor/skills/its-magic/SKILL.md unchanged)."}
+  ],
+  "coverage": [
+    {"ac": "AC-1", "task": "T-001", "verified": true},
+    {"ac": "AC-2", "task": "T-002", "verified": true},
+    {"ac": "AC-3", "task": "T-003", "verified": true},
+    {"ac": "AC-4", "task": "T-004", "verified": true},
+    {"ac": "AC-5", "task": "T-005", "verified": true},
+    {"ac": "AC-6", "task": "T-006", "verified": true},
+    {"ac": "AC-7", "task": "T-007", "verified": true},
+    {"ac": "AC-8", "task": "T-008", "verified": true}
+  ],
+  "plan_integrity": {
+    "task_count": 8,
+    "ac_count": 8,
+    "task_ac_bijection": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false
+  },
+  "governance_alignment": {
+    "decision_ref": "DEC-0072",
+    "architecture_anchor": "docs/engineering/architecture.md#US-0089",
+    "research_anchor": "R-0073",
+    "out_of_scope_guard": "US-0090 input-side compression deferred; CAVEMAN_COMPRESS_INPUT and CAVEMAN_FILE_SCOPE remain documented no-ops in S0075 (verified: no task includes scripts/installer/mutator work).",
+    "non_goals_respected": [
+      "no input-side file compression (US-0090 deferred)",
+      "no TOKEN_PROFILE / US-0080 semantic changes",
+      "no rewrite of canonical artifacts (backlog.md outside architecture_notes/sprint_plan_notes/plan_verify_notes appends, acceptance.md, state.md schema, handoffs/intake_evidence/*.json, DEC files)",
+      "no new dependencies (package.json untouched)",
+      "no `npx skills add` token in normative docs/rules",
+      "no edit of .cursor/skills/its-magic/SKILL.md (row 8 negative-parity)",
+      "no change to spawn-only orchestration (US-0048 / DEC-0029 / BUG-0006), strict runtime proof (DEC-0038), AUTO_QUIET non-suppressible list (US-0088), or US-0071 visible-metadata rules",
+      "no unit-test of voice quality under CAVEMAN_MODE=1"
+    ]
+  },
+  "checks_performed": [
+    "Sprint-plan authored in fresh tech-lead context (auto-20260418-01, 2026-04-18T12:45:00Z)",
+    "AC-to-task mapping is deterministic and 1:1 (AC-1..AC-8 <-> T-001..T-008)",
+    "Scope aligns with architecture.md#US-0089 and DEC-0072 (scratchpad contract, composition surface, default-off invariant)",
+    "Template parity inventory locked per DEC-0072 section 7 (8 rows; rows 2-5 byte-parity, rows 6-7 active-only, row 8 negative-parity)",
+    "Non-goals preserved: no input-side compression, no TOKEN_PROFILE change, no canonical artifact rewrites, no new deps, no vendor install leak",
+    "Task count 8 within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered",
+    "Plan-verify authored in fresh qa context (auto-20260418-01, 2026-04-18T13:00:00Z, fresh_context_marker=qa-S0075-US0089-plan-verify-20260418T130000Z-fresh)",
+    "DEC-0072 §6 eight-subtest cardinality split between T-002 (items 6-8) and T-006 (items 1-5) verified coherent and complete",
+    "US-0090 scope (input-side compression) explicitly absent from S0075 tasks (verified by description review of T-001..T-008)",
+    "Bug validator `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` -> [BUG_VALIDATION_OK]",
+    "Canonical status US-0089 remains OPEN per US-0045 through plan-verify"
+  ],
+  "governance_refs": [
+    "DEC-0072",
+    "architecture.md#US-0089",
+    "R-0073",
+    "US-0017",
+    "US-0021",
+    "US-0045",
+    "US-0048",
+    "DEC-0029",
+    "US-0056",
+    "DEC-0038",
+    "US-0058",
+    "DEC-0040",
+    "US-0069",
+    "DEC-0051",
+    "US-0071",
+    "US-0080",
+    "DEC-0062",
+    "US-0085",
+    "DEC-0071",
+    "US-0088",
+    "BUG-0006"
+  ]
+}

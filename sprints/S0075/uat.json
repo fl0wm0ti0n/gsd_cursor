@@ -1,0 +1,127 @@
+{
+  "story_id": "US-0089",
+  "sprint_id": "S0075",
+  "orchestrator_run_id": "auto-20260418-01",
+  "status": "PASS",
+  "reason": "VERIFY_WORK_UAT_COMPLETE",
+  "uat_completed_at": "2026-04-18T18:00:00Z",
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260418-01"
+  },
+  "steps": [
+    {
+      "step_id": "UAT-1",
+      "ac_id": "AC-1",
+      "task_id": "T-001",
+      "description": "Operator confirms that the four locked Caveman scratchpad keys (CAVEMAN_MODE=0, CAVEMAN_LEVEL=, CAVEMAN_COMPRESS_INPUT=0, CAVEMAN_FILE_SCOPE=) plus the '## Caveman mode (US-0089)' comment block are present byte-for-byte in the active baseline scratchpad, the active example scratchpad, and the template example scratchpad -- so a fresh install surfaces the contract with default-off semantics.",
+      "evidence_ref": ".cursor/scratchpad.md (L234, L246-L249); .cursor/scratchpad.local.example.md (L209, L221-L224); template/.cursor/scratchpad.local.example.md (L228, L240-L243); subtests test_caveman_default_off_scratchpad_keys_active + test_caveman_default_off_scratchpad_keys_example_parity PASS (cycle 2)",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-2",
+      "ac_id": "AC-2",
+      "task_id": "T-002",
+      "description": "Operator confirms default-off parity: with CAVEMAN_MODE=0 (or absent), no normative command string, gate ordering, spawn-only language (BUG-0006), AUTO_QUIET non-suppressible gate vocabulary, or existing contract token changes beyond additive -- and no vendor install leak (no 'npx skills add' in runbook or Caveman rule file).",
+      "evidence_ref": "tests/auto_command_contract_test.py subtests test_caveman_default_off_existing_contract_tokens_intact, test_caveman_default_off_non_suppressible_gate_vocab_preserved, test_caveman_default_off_no_vendor_install_leak (DEC-0072 section 6 items 6-8) PASS cycle 2; sprints/S0075/qa-findings.md cycle-2 per-AC table AC-2 PASS",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-3",
+      "ac_id": "AC-3",
+      "task_id": "T-003",
+      "description": "Operator confirms the Cursor behavior pack: .cursor/rules/caveman.mdc exists (active) and is byte-identical to template/.cursor/rules/caveman.mdc, carrying the scratchpad gate contract, the 9-zone literal-region invariant (fenced code, paths, AC checklists, reason codes, IDs, contract markers, strict-proof fields, isolation-evidence fields, git/commit refs), AUTO_QUIET non-suppressible gate vocabulary, the five canonical operator phrases (caveman on / caveman off / stop caveman / normal mode / caveman: lite|full|ultra), non-substitution paragraph, default-off invariant, and DEC-0072 section 8 non-goals.",
+      "evidence_ref": ".cursor/rules/caveman.mdc + template/.cursor/rules/caveman.mdc (SHA-256 MATCH E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE per qa-findings cycle 2); subtest test_caveman_default_off_rule_file_present_active_template PASS; tests/run-tests.ps1 '[PASS] 6 rules exist' confirms rule-file count",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-4",
+      "ac_id": "AC-4",
+      "task_id": "T-004",
+      "description": "Operator confirms TOKEN_PROFILE x CAVEMAN_MODE non-substitution paragraph is published byte-identically in docs/engineering/auto-orchestration-reference.md and its template/ mirror, so operators cannot misread CAVEMAN_MODE=1 as a lean TOKEN_PROFILE equivalent.",
+      "evidence_ref": "docs/engineering/auto-orchestration-reference.md L784 + template/docs/engineering/auto-orchestration-reference.md L784 (active=template SHA-256 MATCH per qa-findings cycle 2); subtest test_caveman_default_off_reference_non_substitution_paragraph PASS",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-5",
+      "ac_id": "AC-5",
+      "task_id": "T-005",
+      "description": "Operator confirms '### Caveman mode (US-0089)' runbook subsection is present byte-identically in docs/engineering/runbook.md and its template/ mirror, with non-substitution paragraph, scratchpad keys table, 5-phrase operator toggle catalog, determinism semantics, and a pointer to the 9-zone literal-region invariant -- giving operators a single canonical how-to-enable/disable reference.",
+      "evidence_ref": "docs/engineering/runbook.md L1330+ + template/docs/engineering/runbook.md (active=template SHA-256 MATCH per qa-findings cycle 2); subtest test_caveman_default_off_runbook_operator_phrases PASS",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-6",
+      "ac_id": "AC-6",
+      "task_id": "T-006",
+      "description": "Operator confirms regression lock: tests/auto_command_contract_test.py carries all 8 test_caveman_default_off_* subtests (items 1-5 from T-006 + items 6-8 from T-002, matching DEC-0072 section 6 cardinality) plus the 3 supplemental Caveman subtests -- so the default-off invariant and key documentation markers are wired into the contract suite.",
+      "evidence_ref": "python -m pytest tests/auto_command_contract_test.py -q -k caveman -> 11 passed / 19 deselected / 119 subtests / 0 failed cycle 2 (sprints/S0075/qa-findings.md section '2. Targeted US-0089 subtests'); 8 test_caveman_default_off_* all green",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-7",
+      "ac_id": "AC-7",
+      "task_id": "T-007",
+      "description": "Operator confirms docs/engineering/architecture.md carries a '# US-0089' section bottom-appended (no later # US-xxxx / ## US-xxxx heading follows) and is linked from docs/product/backlog.md (## US-0089 row) and docs/engineering/decisions.md (DEC-0072 entry + index pointer) -- preserving the append-bottom canonical discipline and story linkage.",
+      "evidence_ref": "docs/engineering/architecture.md L3239 '# US-0089'; docs/product/backlog.md ## US-0089 L2227 (architecture_notes pointer); docs/engineering/decisions.md DEC-0072 entry L134 + index L307-L316; subtest test_caveman_architecture_section_bottom_appended_and_linked PASS",
+      "verdict": "pass"
+    },
+    {
+      "step_id": "UAT-8",
+      "ac_id": "AC-8",
+      "task_id": "T-008",
+      "description": "Operator confirms template parity across the four US-0089-touched .cursor/ and docs/engineering/ surfaces (rule file, reference doc, runbook, scratchpad example for the locked key region) and zero Caveman token leak in the .cursor/skills/its-magic/SKILL.md negative-parity surface -- per US-0017 + DEC-0072 section 7 rows 2-5 + row 8.",
+      "evidence_ref": "SHA-256 active=template MATCH recomputed cycle 2 for .cursor/rules/caveman.mdc, docs/engineering/auto-orchestration-reference.md, docs/engineering/runbook.md; .cursor/skills/its-magic/SKILL.md + template mirror zero CAVEMAN_*/US-0089/operator-phrase tokens; subtests test_caveman_template_parity_sweep + test_caveman_skill_file_negative_parity PASS",
+      "verdict": "pass"
+    }
+  ],
+  "summary": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0,
+    "ratio": "8/8"
+  },
+  "isolation_compliance": {
+    "status": "PASS",
+    "per_phase_proof_ids": [
+      {"phase_id": "discovery", "role": "po", "runtime_proof_id": "rp-auto-20260418-01-discovery-po-20260418T120500Z-US0089", "proof_hash": "d9cddea7b36a663a10dcebc9c25b1aed5db8509fce47f31d5fa573efc210d40c", "fresh_context_marker": "po-US0089-discovery-20260418T120500Z-fresh"},
+      {"phase_id": "research", "role": "tech-lead", "runtime_proof_id": "rp-auto-20260418-01-research-tech-lead-20260418T121500Z-US0089", "proof_hash": "bf62cc661618dd6c6ad12b5d1af3888d5b9efa1e92f71592906066208987e8d5", "fresh_context_marker": "tl-US0089-research-20260418T121500Z-fresh"},
+      {"phase_id": "architecture", "role": "tech-lead", "runtime_proof_id": "rp-auto-20260418-01-architecture-tech-lead-20260418T123000Z-US0089", "proof_hash": "3fad7c97b67e3014806b8e712ce4f024597c11a9f9e717dab7b5050c4468cc82", "fresh_context_marker": "tl-US0089-architecture-20260418T123000Z-fresh"},
+      {"phase_id": "sprint-plan", "role": "tech-lead", "runtime_proof_id": "rp-auto-20260418-01-sprint-plan-tech-lead-20260418T124500Z-US0089-S0075", "proof_hash": "9837d899f11b198de97b16b07497000dcb1603f9104ba799c501d8d8c9e158d7", "fresh_context_marker": "tl-US0089-sprint-plan-20260418T124500Z-fresh"},
+      {"phase_id": "plan-verify", "role": "qa", "runtime_proof_id": "rp-auto-20260418-01-plan-verify-qa-20260418T130000Z-S0075-US0089", "proof_hash": "454a90ed6117490ccdb6e7a9ce603681c68e5cf36fef89c94947c3d7649bf480", "fresh_context_marker": "qa-S0075-US0089-plan-verify-20260418T130000Z-fresh"},
+      {"phase_id": "execute", "role": "dev", "cycle": 1, "runtime_proof_id": "rp-auto-20260418-01-execute-dev-20260418T140000Z-S0075-US0089", "proof_hash": "8a9f9ecc8dce7e31806f5dad53d205e40d9e5e325ecd7ce74b0a64ec42262482", "fresh_context_marker": "dev-US0089-execute-20260418T140000Z-S0075-fresh"},
+      {"phase_id": "qa", "role": "qa", "cycle": 1, "runtime_proof_id": "rp-auto-20260418-01-qa-qa-20260418T150000Z-S0075-US0089", "proof_hash": "3bef1259f94c6c5d79cf30a45efbbd28765da263a6ef6ef4918010992fc809ca", "fresh_context_marker": "qa-S0075-US0089-qa-20260418T150000Z-fresh"},
+      {"phase_id": "execute", "role": "dev", "cycle": 2, "runtime_proof_id": "rp-auto-20260418-01-execute-dev-20260418T160000Z-S0075-US0089-loop2", "proof_hash": "c43fc4471e31d838f492fcd4054fedd80d11300588290f51801189cb0654e937", "fresh_context_marker": "dev-US0089-execute-20260418T160000Z-S0075-loop2-fresh"},
+      {"phase_id": "qa", "role": "qa", "cycle": 2, "runtime_proof_id": "rp-auto-20260418-01-qa-qa-20260418T170000Z-S0075-US0089-loop2", "proof_hash": "5910d19fa6c14b94089b378d1c4552263c377b02ff9d18a0dea2511de9cebc05", "fresh_context_marker": "qa-S0075-US0089-qa-20260418T170000Z-loop2-fresh"},
+      {"phase_id": "verify-work", "role": "qa", "runtime_proof_id": "rp-auto-20260418-01-verify-work-qa-20260418T180000Z-S0075-US0089", "proof_hash": "e1f0d305b11cbbe68b2487a1ffe2b6d20d7ca6900c08ff460ea1d23c831e7a6a", "fresh_context_marker": "qa-S0075-US0089-verify-work-20260418T180000Z-fresh"}
+    ],
+    "notes": "All 10 completed phases (discovery, research, architecture, sprint-plan, plan-verify, execute cycle 1, qa cycle 1, execute cycle 2, qa cycle 2, verify-work) carry valid isolation evidence in docs/engineering/state.md per US-0048 / DEC-0029. Each fresh_context_marker is distinct; no reuse across phases or cycles."
+  },
+  "strict_proof_compliance": {
+    "status": "PASS",
+    "distinct_proof_id_count": 10,
+    "total_phase_count": 10,
+    "distinct": true,
+    "notes": "Each completed phase (including both QA-loop cycles of execute + qa) carries a distinct runtime_proof_id hashed as SHA-256 of sorted-key JSON over the canonical tuple per DEC-0038. No RUNTIME_PROOF_REUSED / RUNTIME_PROOF_MISSING / RUNTIME_PROOF_INVALID / RUNTIME_PROOF_STALE / RUNTIME_PROOF_AMBIGUOUS_LINK observed."
+  },
+  "runtime_proof": {
+    "orchestrator_run_id": "auto-20260418-01",
+    "runtime_proof_id": "rp-auto-20260418-01-verify-work-qa-20260418T180000Z-S0075-US0089",
+    "phase_id": "verify-work",
+    "role": "qa",
+    "proof_issued_at": "2026-04-18T18:00:00Z",
+    "proof_ttl_seconds": 3600,
+    "proof_hash": "e1f0d305b11cbbe68b2487a1ffe2b6d20d7ca6900c08ff460ea1d23c831e7a6a"
+  },
+  "isolation_evidence": {
+    "phase_id": "verify-work",
+    "role": "qa",
+    "fresh_context_marker": "qa-S0075-US0089-verify-work-20260418T180000Z-fresh",
+    "timestamp": "2026-04-18T18:00:00Z",
+    "evidence_ref": "sprints/S0075/uat.json,sprints/S0075/uat.md,handoffs/qa_to_release.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/state.md"
+  },
+  "story_status_after_verify_work": "OPEN",
+  "status_authority_note": "docs/product/backlog.md remains authoritative per US-0045; US-0089 flips to DONE only at /release.",
+  "decision_gate_posture": "none",
+  "next_phase": "release"
+}

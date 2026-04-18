@@ -13,10 +13,33 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0074`
-- **Latest canonical notes:** `handoffs/releases/S0074-release-notes.md`
-- **Latest release date:** 2026-04-13
-- **Latest release work item:** US-0086
+- **Latest released sprint:** `S0076`
+- **Latest canonical notes:** `handoffs/releases/S0076-release-notes.md`
+- **Latest release date:** 2026-04-19
+- **Latest release work item:** US-0090
+
+## Release finalized note (S0076)
+
+- Sprint: `S0076`
+- Story: `US-0090` (Caveman input compression — operator-gated, sidecar-first, default-off CLI + installer surface; DEC-0073)
+- Release: **finalized** (`2026-04-19T00:05:00Z`, `orchestrator_run_id=auto-20260418-01`, strict proof `proof_hash=0126c54efd3cc8158d9d0a687a66e9bce8f4eeefb89522993bb5ce805bb87e40`)
+- Queue: **`handoffs/release_queue.md`** row **`S0076`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> **`tests/report.md`**; see **`handoffs/releases/S0076-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** - **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (9 pre-existing disjoint failures block push gate even though release-gate classification tolerates them)
+- Carried-forward non-blocking observations: (1) `PARTIAL_VERBATIM` on DEC-0073 §1 publication (architecture verbatim; reference + runbook paraphrase; DEC-0072 §6 row 6 pinned test preserved byte-unchanged); (2) UAT-3 `--dry-run` vs `--write` narration variance (AC-4 fail-closed intent satisfied via `--write` evidence).
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (next OPEN story per backlog drain; budget remaining = 4)
+
+## Release finalized note (S0075)
+
+- Sprint: `S0075`
+- Story: `US-0089` (Cursor Caveman mode — scratchpad-configurable terse responses)
+- Release: **finalized** (`2026-04-18T19:00:00Z`, `orchestrator_run_id=auto-20260418-01`, strict proof `proof_hash=2f7351477332235595f379aae04d3830a0efc33f9a9cef887822999bcc9839b3`)
+- Queue: **`handoffs/release_queue.md`** row **`S0075`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> **`tests/report.md`**; see **`handoffs/releases/S0075-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** - **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (11 pre-existing disjoint failures block push gate even though release-gate classification tolerates them)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (next OPEN story per backlog drain)
 
 ## Release finalized note (S0074)
 
@@ -188,19 +211,20 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0074`**: refer to `## Run` in
-  `handoffs/releases/S0074-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0075`**: refer to `## Run` in
+  `handoffs/releases/S0075-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0074-release-notes.md`.
+  `handoffs/releases/S0075-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0074-release-notes.md`.
+  `handoffs/releases/S0075-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0074-release-notes.md` (env-ref only).
+  `handoffs/releases/S0075-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0074-release-notes.md`.
+  `handoffs/releases/S0075-release-notes.md`.
 
 ## Historical references
 
+- `S0075`: `handoffs/releases/S0075-release-notes.md`
 - `S0074`: `handoffs/releases/S0074-release-notes.md`
 - `S0073`: `handoffs/releases/S0073-release-notes.md`
 - `S0072`: `handoffs/releases/S0072-release-notes.md`

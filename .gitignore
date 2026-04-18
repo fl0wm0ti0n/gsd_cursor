@@ -34,3 +34,7 @@ homebrew-tap/
 .env.local
 .env.*
 !.env.example
+
+# US-0090 Caveman input sidecar originals (DEC-0073 §3)
+docs/.caveman-originals/**
+!docs/.caveman-originals/.gitkeep

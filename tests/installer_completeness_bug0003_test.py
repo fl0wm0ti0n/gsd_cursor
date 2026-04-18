@@ -103,6 +103,40 @@ class InstallerCompletenessBug0003Test(unittest.TestCase):
             for rel in required:
                 self.assertTrue((target / rel).is_file(), f"upgrade omitted required path: {rel}")
 
+    def test_caveman_compress_input_shipped_by_installer(self) -> None:
+        """US-0090 / DEC-0073 §10: installer delivers template/scripts/caveman_compress_input.py."""
+        script_rel = "scripts/caveman_compress_input.py"
+        sections = parse_manifest_sections(ACTIVE_MANIFEST)
+        self.assertIn(script_rel, sections[REQUIRED_SECTION],
+                      "caveman compressor must be listed in required_install_script_paths")
+        self.assertIn(script_rel, sections["install_include_paths"])
+        self.assertIn(script_rel, sections["clean_paths"])
+
+        active_script = ROOT / script_rel
+        template_script = ROOT / "template" / script_rel
+        self.assertTrue(active_script.is_file())
+        self.assertTrue(template_script.is_file())
+        self.assertEqual(active_script.read_bytes(), template_script.read_bytes(),
+                         "active/template caveman compressor bytes must match")
+
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td)
+            write_bootstrap_package_json(target)
+            for mode in ("missing", "upgrade"):
+                if mode == "missing":
+                    r = self.run_installer(
+                        "--target", str(target), "--mode", mode, "--create",
+                    )
+                else:
+                    r = self.run_installer(
+                        "--target", str(target), "--mode", mode,
+                    )
+                self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+                self.assertTrue(
+                    (target / script_rel).is_file(),
+                    f"installer --mode={mode} must deliver {script_rel}",
+                )
+
     def test_negative_missing_required_script_fails_deterministically(self) -> None:
         with tempfile.TemporaryDirectory() as sd, tempfile.TemporaryDirectory() as td:
             source_root = Path(sd) / "template"

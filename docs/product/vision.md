@@ -983,3 +983,14 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Split**: **US-0089** = response style + scratchpad + rules/skill + tests + architecture; **US-0090** = optional compression scripts + guards + runbook — **gated** after **US-0089**.
 - **Evidence**: **`handoffs/intake_evidence/US-0089-intake-20260414.json`** (**`[INTAKE_EVIDENCE_VALIDATION_OK]`**); research stub **`R-0073`**.
 - **Intake closure (2026-04-14, PO, Cursor)**: Backlog **`US-0089`**, **`US-0090`** **OPEN**; next **`/discovery`** for **`US-0089`** (then **`US-0090`**).
+
+## Discovery Notes — US-0089
+
+- **Operator value proposition**: Operator-configurable terse assistant voice (Caveman-style) **reduces response-side token cost and cognitive clutter** in Cursor chats while preserving **all** machine-verifiable substance (reason codes, AC checklists, paths, IDs). The feature is **default off** — zero change for operators who do not opt in — and **toggleable in-session** via documented phrases so an operator can shift voice without editing the scratchpad mid-task.
+- **Product-facing messaging constraints**:
+  - **No hidden internal IDs in user channels** (reaffirm **US-0071**): Caveman voice **must not** drop visible **`US-xxxx`** / **`DEC-xxxx`** / **`R-xxxx`** / **`BUG-####`** / **`S-xxxx`** references that operators rely on. Terseness applies to **prose**, not to traceable identifiers or reason codes.
+  - **Default-off guarantee**: with **`CAVEMAN_MODE=0`** (or key absent), normative command strings, gate ordering, spawn-only language (**BUG-0006**), and existing contract tests remain **byte-compatible**. Opt-in is explicit.
+  - **Non-substitution of `TOKEN_PROFILE`**: Caveman is a **voice** layer; **`TOKEN_PROFILE`** (**US-0080**) is a **context-breadth** layer. Docs must state these are **orthogonal**, and `CAVEMAN_MODE=1` does **not** imply `TOKEN_PROFILE=lean`.
+  - **Gate language preserved**: decision gates, errors, `[BUG_VALIDATION_OK]`, `[INTAKE_EVIDENCE_VALIDATION_OK]`, `blocked`, `missing input`, `pause`, and `loop_max` notifications remain **verbatim** even when Caveman is on (carryover from **US-0088 / `AUTO_QUIET`** non-suppressible list).
+  - **Operator control phrasing**: documented, deterministic phrases (e.g. "enable caveman" / "disable caveman" / "stop caveman" / "normal mode") map to session toggles with predictable behavior; exact wording will be architecture-locked in **`# US-0089`**.
+- **Scope boundary for messaging**: the **output-style** contract lives entirely in this story. Optional **input-side** compression (file reads, sidecar originals, deny lists) is deferred to **US-0090** and **must not** be surfaced as a Caveman capability in user-facing docs until that story ships.

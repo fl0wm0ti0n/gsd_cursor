@@ -1,277 +1,3 @@
-## Discovery Addendum — US-0076
-
-> Placement: **tail** hot copy after **DEC-0054** rollover archived an earlier **prepend** into
-> `handoffs/archive/po-to-tl-pack-20260327-a.md` (same wording).
-
-- **Scope**: Executable merged-scratchpad wiring for **`SYNC_*`**, **`ALLOW_AUTO_PUSH`**, and
-  **`AUTO_PUSH_BRANCH_ALLOWLIST`** so opt-in push honors the **US-0038** gate chain with
-  deterministic reason codes; **no** behavior change when auto-push is off.
-- **Conclusions**: Gap validated (**R-0053**): **`validate-and-push`** currently does not enforce
-  scratchpad merge inputs. **PO** recommends extending **`validate-and-push`** (PS1/SH parity) over
-  new entrypoints unless architecture mandates a split. **`by_phase`**/**`by_milestone`** need an
-  explicit boundary signal at invocation (not implicit Cursor phase). **AC-5** QA blocking rule
-  must be architecture-bounded (sprint artifact contract).
-- **Next recommendation**: Proceed with **`/research`** ( **`R-0053`** current) then **`/architecture`**
-  to lock phase-boundary input, QA scan rule, installer/Python merge reuse vs duplicate, and
-  **DEC-0058** / **DEC-0018** amendment plan.
-- **Artifacts**: `docs/product/vision.md` (Discovery Notes — US-0076), `docs/product/backlog.md`
-  (US-0076 discovery refinements), `docs/engineering/research.md` (**R-0053**).
-
----
-
-## Research Addendum — US-0076 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0076**). `orchestrator_run_id=auto-20260327-01`.
-
-- **Closure**: **`/research`** (TL) complete for **US-0076**; **`R-0053`** extended with implementation anchors + mitigations.
-- **Anchors**: **`validate-and-push.ps1`/`.sh`** — merged scratchpad gate before push; prefer **`installer.py`** `merge_scratchpad_layers` / `parse_scratchpad_file`; runbook remains command source only.
-- **Boundaries**: **`by_phase`** default = invocation as boundary unless architecture fixes **`state.md`/env/CLI**; **AC-5** = bounded **`qa-findings.md`** scan + sprint path in architecture.
-- **Next**: **`/architecture`** — **DEC-0058** (or **DEC-0018** amendment), QA glob, dry-run/exit codes, **AC-8** tests.
-
----
-
-## Architecture Addendum — US-0076 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0076**). `orchestrator_run_id=auto-20260327-01`.
-
-- **Decision**: **`decisions/DEC-0058.md`** accepted — executable scratchpad → **validate-and-push**; **`DEC-0018`** policy authority retained.
-- **AC-5**: **`sprints/S*/qa-findings.md`** bounded scan per **DEC-0058** §6.
-- **Phase signal**: default **invocation**; optional **`SYNC_PHASE_BOUNDARY`** env.
-- **Next**: **`/sprint-plan`**.
-
----
-
-## Discovery Addendum — US-0077 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Discovery Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
-
-- **Scope**: Documentation audience/depth profiles + dual README strategy; preserve **US-0030** / **US-0031** / **US-0032** / **US-0071**; anchor **R-0054**.
-- **Conclusions**: Ownership matrix + bounded sections/split preferred; profile validation with deterministic reason codes; **US-0071** on user-visible outputs.
-- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**).
-- **Decision gate before research** (historical): **none**.
-- **Artifacts**: `docs/product/vision.md`, `docs/product/backlog.md`, `handoffs/po_to_tl.md`, `docs/engineering/state.md`, `docs/engineering/research.md` (**R-0054**).
-
----
-
-## Research Addendum — US-0077 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
-
-- **Closure**: **`/research`** (TL) complete; **`R-0054`** — profile matrix + validation tiers + reason-code draft.
-- **Next**: **`/sprint-plan`** — **`/architecture`** complete (**`DEC-0059`**).
-- **Decision gate before architecture**: **none** (closed).
-
----
-
-## Architecture Addendum — US-0077 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0077**). `orchestrator_run_id=auto-20260327-02`.
-
-- **Decision**: **`decisions/DEC-0059.md`** — dual README (**`USER_*`** / **`DEV_*`**), validator **`scripts/validate_doc_profile.py`**, tiered **AC-8**, **`US-0030`** parity + manifest path for **`docs/developer/README.md`**.
-- **Next**: **`/sprint-plan`**.
-- **Decision gate before sprint-plan**: **none**.
-
----
-
-## Discovery Addendum — US-0078 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with archived **Discovery Addendum — US-0078** in **`handoffs/archive/po-to-tl-pack-20260328-b.md`**). `orchestrator_run_id=auto-20260328-01`.
-
-- **Scope**: Runtime intake question-pack **evidence** before persistence (**US-0068** / **DEC-0050**); per-topic **`answer_ref`** or explicit assumption-confirmation ref; reject unverifiable **`assumptions_confirmed`**.
-- **Conclusions**: Persist **`asked_topics`** vs answered/coverage evidence; **guided** and **low-touch** both **fail closed** without proof; extend **`R-0055`** then **DEC** for schema + migration.
-- **Next**: **`/architecture`** for **`US-0078`** (**`/research`** complete; **`R-0055`** refined).
-- **Decision gate before research** (historical): **none**.
-
----
-
-## Research Addendum — US-0078 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Research Addendum — US-0078**, archived to **`handoffs/archive/po-to-tl-pack-20260328-d.md`** on post-research triad rollover). `orchestrator_run_id=auto-20260328-01`.
-
-- **Closure**: **`/research`** (**tech-lead**) complete; **`R-0055`** — schema, rules, **AC-8** tiers.
-- **Next**: **`/architecture`** — **DEC-0050** / DEC for **`ref`** format + migration.
-- **Decision gate before architecture**: **none**.
-
----
-
-## Architecture Addendum — US-0078 (tail mirror)
-
-> Placement: **tail** hot copy for TL read model (substance aligned with prepended **Architecture Addendum — US-0078**). `orchestrator_run_id=auto-20260328-01`.
-
-- **Decision**: **`decisions/DEC-0060.md`** — **`ie:`** **`ref`** binding; extends **`DEC-0050`**; grandfather migration until next intake mutation.
-- **Architecture**: **`docs/engineering/architecture.md`** **`# US-0078`**.
-- **Next**: **`/sprint-plan`**.
-- **Decision gate before sprint-plan**: **none**.
-
----
-
-## PO → TL Handoff — US-0080 (Intake)
-
-- **Orchestrator**: **`auto-20260329-02`** — intake complete in fresh **PO** context.
-- **Evidence**: **`handoffs/intake_evidence/US-0080-intake-20260329.json`** — **`[INTAKE_EVIDENCE_VALIDATION_OK]`** (`small-intake-pack`, **`ie:`** per **DEC-0060**).
-- **Research anchor**: **`R-0057`** (current) — structural levers (command/context slimming, comparable-run measurement); **`TOKEN_PROFILE=lean`** alone insufficient.
-- **Alternatives**: **(1)** status quo pricing tolerance — rejected; **(2)** profile-only — rejected; **(3)** slimming + bounded phase-context + auditable metrics — **recommended** (aligned with backlog).
-- **Artifacts**: **`docs/product/backlog.md`** (US-0080 intake closure + topic_coverage), **`docs/product/vision.md`** (intake closure line), **`handoffs/resume_brief.md`** → **`/discovery`**, **`docs/engineering/state.md`** (isolation + strict proof + phase boundary; triad rollover **`docs/engineering/state-archive/state-pack-20260329-m.md`**).
-- **Next**: **`/discovery`** for **`US-0080`**, then **`/research`** / **`/architecture`** to lock metric definitions and **DEC** for **AC-10** trade-offs.
-- **Decision gate before discovery**: **none** (intake evidence satisfied).
-
----
-
-## PO → TL Handoff — US-0080 (Discovery)
-
-- **Orchestrator**: **`auto-20260329-02`** — discovery complete in fresh **PO** context.
-- **Evidence**: **`docs/product/backlog.md`** (US-0080 discovery notes), **`docs/product/vision.md`** (**Discovery Notes — US-0080**), **`docs/engineering/state.md`** (Discovery checkpoint + strict proof); research anchor remains **`R-0057`** (current).
-- **Findings**: Dominant lever is **structural** — reduce repeated large command/policy prefixes and tighten **per-phase context packs** while preserving mandatory gates; **`TOKEN_PROFILE=lean`** alone insufficient.
-- **Research asks**: Deterministic **run-class/baseline** for AC-1/AC-2; **metric/evidence** placement contract; **active/template** parity list for slimmed orchestration surfaces.
-- **Risks**: Over-slimming obscuring policy; baseline drift enabling metric gaming; template divergence.
-- **Artifacts**: **`handoffs/resume_brief.md`** → **`/research`** for **`US-0080`**.
-- **Next**: **`/research`** (then **`/architecture`**) to lock metric definitions and **DEC** for **AC-10** trade-offs.
-- **Decision gate before research**: **none** (discovery satisfied).
-
----
-
-## PO → TL Handoff — US-0080 (Research)
-
-- **Orchestrator**: **`auto-20260329-02`** — research complete in fresh **tech-lead** context.
-- **Evidence**: **`docs/engineering/research.md`** **`R-0057`** (extension + research closure line);
-  **`docs/product/backlog.md`** / **`docs/product/vision.md`** (research closure notes);
-  **`docs/engineering/state.md`** (Research checkpoint + strict proof; triad rollover
-  **`docs/engineering/state-archive/state-pack-20260329-o.md`**).
-- **Findings**: **Run-class tuple** frozen for AC-1/AC-2 comparability; **append-only in-repo metric
-  records** + **`state.md`** pointer for AC-6; **explicit parity manifest** for `.cursor/commands/`,
-  `.cursor/rules/`, `template/` mirrors (AC-3/AC-9); vendor **`cache_read_input_tokens`** semantics
-  as conceptual anchor for metric naming in upcoming **DEC**.
-- **Artifacts**: **`handoffs/resume_brief.md`** → **`/architecture`** for **`US-0080`**.
-- **Next**: **`/architecture`** to lock **`architecture.md`** story section + **DEC** for AC-10.
-- **Decision gate before architecture**: **none** (research satisfied; story **OPEN**).
-
----
-
-## Architecture Addendum — US-0080 (tail mirror)
-
-- **Orchestrator**: **`auto-20260329-02`** — architecture complete in fresh **tech-lead** context.
-- **Evidence**: **`decisions/DEC-0062.md`**; **`docs/engineering/architecture.md`** **`# US-0080`**;
-  **`docs/engineering/decisions.md`** (context pack + **`DEC-0062`** index); **`docs/engineering/research.md`**
-  **`R-0057`** architecture closure line; **`docs/engineering/state.md`** (Architecture checkpoint + strict
-  proof; triad rollover if hot-surface enforcement runs post-append).
-- **Decision**: **`DEC-0062`** — metric fields, **`run_class_hash`**, **`handoffs/token_cost_runs/`** channel,
-  **`token_cost_evidence_ref`**, parity manifest, AC-10 trade-offs / phase boundary visibility.
-- **Artifacts**: **`docs/product/backlog.md`**, **`docs/product/vision.md`** (architecture closure),
-  **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`** → **`/sprint-plan`**.
-- **Next (historical)**: **`/sprint-plan`** — satisfied by **Sprint-plan Addendum** below.
-- **Decision gate before sprint-plan**: **none** (architecture satisfied).
-
----
-
-## Sprint-plan Addendum — US-0080 / S0059 (tail mirror)
-
-- **Orchestrator**: **`auto-20260329-02`** — sprint-plan complete in fresh **tech-lead** context.
-- **Evidence**: **`sprints/S0059/sprint.md`**, **`sprints/S0059/tasks.md`**, **`sprints/S0059/plan-verify.json`** (**PENDING**); **`docs/engineering/state.md`** (Sprint-plan checkpoint + strict proof); **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`handoffs/qa_plan_verify.md`**.
-- **Sprint**: **`S0059`** — **T-001..T-010** ↔ **AC-1..AC-10**; governance **`DEC-0062`**, **`# US-0080`**, **`R-0057`**.
-- **Next**: **`/plan-verify`** for **`S0059`** / **`US-0080`** (story **OPEN**).
-- **Decision gate before plan-verify**: **none** (sprint artifacts materialized).
-
----
-
-## Plan-verify Addendum — US-0080 / S0059 (tail)
-
-- **Orchestrator**: **`auto-20260329-02`** — plan-verify **PASS** in fresh **qa** context (**`2026-03-29T21:00:00Z`**).
-- **Evidence**: **`sprints/S0059/plan-verify.json`** (**PASS**); **`docs/engineering/state.md`** (plan-verify checkpoint + strict proof); **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`handoffs/qa_plan_verify.md`**.
-- **Sprint**: **`S0059`** — story **`US-0080`** **OPEN** (**US-0045**).
-- **Next**: **`/execute`** for **`S0059`** / **`US-0080`**.
-- **Decision gate before execute**: **none** (plan-verify satisfied).
-
----
-
-## Execute Addendum — US-0080 / S0059 (tail)
-
-- **Orchestrator**: **`auto-20260329-02`** — **`/execute`** complete in fresh **dev** context (**`2026-03-29T22:15:00Z`**).
-- **Evidence**: **`sprints/S0059/summary.md`**, **`sprints/S0059/tasks.md`** (**T-001..T-010** **done**), **`handoffs/dev_to_qa.md`**, **`handoffs/token_cost_runs/auto-20260329-02.md`**, **`docs/engineering/token-cost-parity-manifest.md`**, **`docs/engineering/state.md`** (execute checkpoint + strict proof); reduced-length **`/auto`** + **`docs/engineering/auto-orchestration-reference.md`**.
-- **Governance**: **`DEC-0062`** (**§6** trade-offs), **`architecture.md`** **`# US-0080`**, **`R-0057`** — story **`OPEN`** (**US-0045**).
-- **Next**: **`/qa`** for **`S0059`** / **`US-0080`**.
-- **Decision gate before qa**: **none** (execute satisfied for dev scope).
-
----
-
-## Discovery Addendum — US-0081
-
-- **Orchestrator**: **`auto-20260331-01`** — discovery complete in fresh **PO** context.
-- **Evidence**: **`docs/product/backlog.md`** (US-0081 discovery checkpoint note), **`docs/engineering/state.md`** (discovery checkpoint + strict proof), **`handoffs/resume_brief.md`** (resume target set to research).
-- **Findings**: First/new/broad intake must produce deterministic complete-plan accounting before persistence. Discovery defines required mapping contract for research: normalized `plan_area_inventory`; coverage binding `plan_area_id -> story_id[] | deferred_ref`; fail-closed gap handling via `INTAKE_PLAN_COVERAGE_MISSING` under `INTAKE_PERSISTENCE_BLOCKED`; bounded decomposition allowed but no silent omission of major plan areas.
-- **Research handoff scope**: finalize machine-verifiable schema fields and validator behavior, lock deterministic diagnostics/remediation text, and define parity/test matrix for active + `template/` intake surfaces.
-- **Status authority**: story remains **`OPEN`** in **`docs/product/backlog.md`** per **US-0045**.
-- **Next**: **`/research`** for **`US-0081`**.
-- **Decision gate before research**: **none** (discovery checkpoint satisfied).
-
----
-
-## Research Addendum — US-0081 (tail)
-
-- **Orchestrator**: **`auto-20260331-01`** — research complete in fresh **tech-lead** context.
-- **Evidence**: **`docs/engineering/research.md`** (**`R-0059`**), **`docs/product/backlog.md`** (US-0081 research closure line, status still **OPEN**), **`docs/engineering/state.md`** (research checkpoint + strict proof), **`handoffs/resume_brief.md`** (resume target set to architecture).
-- **Findings**: Lock deterministic first-intake coverage gate pattern: normalize `plan_area_inventory`; require total `plan_area_id -> story_id[] | deferred_ref` coverage; fail closed on unmapped major areas with `INTAKE_PLAN_COVERAGE_MISSING` under `INTAKE_PERSISTENCE_BLOCKED`; preserve backlog status authority (US-0045). Regression scope: pass/fail/defer matrix + active/template parity checks.
-- **Next**: **`/architecture`** for **`US-0081`**.
-- **Decision gate before architecture**: **none** (research checkpoint satisfied; story remains **OPEN**).
-
----
-
-## Architecture Addendum — US-0081 (tail)
-
-- **Orchestrator**: **`auto-20260331-01`** — architecture complete in fresh **tech-lead** context.
-- **Evidence**: **`decisions/DEC-0064.md`**; **`docs/engineering/architecture.md`** **`# US-0081`**; **`docs/product/backlog.md`** (`architecture_notes`, status still **OPEN**); **`docs/engineering/decisions.md`** (index update); **`docs/engineering/state.md`** (architecture checkpoint + strict proof); **`handoffs/tl_to_dev.md`**; **`handoffs/resume_brief.md`**.
-- **Decision**: **`DEC-0064`** — deterministic first/new/broad intake coverage gate: normalized `plan_area_inventory`, total `plan_area_id -> story_ids[] | deferred_ref` contract, fail-closed `INTAKE_PERSISTENCE_BLOCKED` subcodes, and pass/fail/defer verification + active/template parity requirements.
-- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
-- **Next**: **`/sprint-plan`** for **`US-0081`**.
-- **Decision gate before sprint-plan**: **none** (architecture satisfied).
-
----
-
-## Sprint-plan Addendum — US-0081 / S0061 (tail)
-
-- **Orchestrator**: **`auto-20260331-01`** — sprint-plan complete in fresh **tech-lead** context.
-- **Evidence**: **`sprints/S0061/sprint.md`**, **`sprints/S0061/tasks.md`**, **`sprints/S0061/plan-verify.json`** (**PENDING**), **`sprints/S0061/summary.md`**, **`sprints/S0061/qa-findings.md`**, **`sprints/S0061/uat.json`**, **`sprints/S0061/uat.md`**, **`sprints/S0061/release-findings.md`**; **`docs/product/backlog.md`** (`sprint_plan_notes`, status still **OPEN**); **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** sprint-plan checkpoint + strict proof.
-- **Sprint**: **`S0061`** — deterministic mapping **AC-1..AC-10** ↔ **T-001..T-010**.
-- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
-- **Next**: **`/plan-verify`** for **`S0061`** / **`US-0081`**.
-- **Decision gate before plan-verify**: **none** (sprint artifacts materialized; QA verification pending).
-
----
-
-## Plan-verify Addendum — US-0081 / S0061 (tail)
-
-- **Orchestrator**: **`auto-20260331-01`** — plan-verify **PASS** in fresh **qa** context (**`2026-03-31T12:15:00Z`**).
-- **Evidence**: **`sprints/S0061/plan-verify.json`** (**PASS**), **`sprints/S0061/sprint.md`**, **`sprints/S0061/summary.md`**, **`docs/product/backlog.md`** (`plan_verify_notes`, status still **OPEN**), **`docs/engineering/state.md`** (plan-verify checkpoint + isolation + strict proof), **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`**.
-- **Verdict**: Deterministic AC-to-task coverage verified (**AC-1..AC-10** ↔ **T-001..T-010**, no gaps) and governance alignment confirmed against **`DEC-0064`**, **`architecture.md`** **`# US-0081`**, and **`R-0059`**.
-- **Status authority**: **`docs/product/backlog.md`** remains canonical; **`US-0081`** stays **OPEN** (**US-0045**).
-- **Next**: **`/execute`** for **`S0061`** / **`US-0081`**.
-- **Decision gate before execute**: **none** (plan-verify satisfied).
-
----
-
-## Orchestrated intake handoff — US-0082 / auto-20260331-02
-
-### Target
-
-- `story_id=US-0082`
-- `orchestrator_run_id=auto-20260331-02`
-- phase completed: **`intake`** (**`po`**)
-- `next_scheduled_phase=discovery`
-
-### Summary
-
-- Prior **`small-intake-pack`** evidence remains authoritative: **`handoffs/intake_evidence/US-0082-intake-20260331.json`** (`intake_run_id=manual-20260331-US0082-intake`). This run records the formal **`/auto`** intake boundary in **`docs/engineering/state.md`** only.
-- Canonical backlog **Status** stays **OPEN** (**US-0045**); acceptance portfolio row for **US-0082** stays unchecked.
-- Next: **`/discovery`** — refine lifecycle touchpoints for **`docs/engineering/codebase-map.md`**, ownership-safe triggers, **`/map-codebase`** manual path, diagnostics, and active/template parity scope already listed in **AC-1..AC-10**.
-
-### Evidence refs
-
-- `docs/product/backlog.md` (**`## US-0082`**)
-- `docs/product/vision.md` (**Intake Notes — US-0082**)
-- `handoffs/intake_evidence/US-0082-intake-20260331.json`
-- `docs/engineering/state.md` (**Intake checkpoint (2026-03-31) — US-0082 / auto-20260331-02**)
-
----
-
 ## Orchestrated discovery handoff — US-0082 / auto-20260331-02
 
 ### Target
@@ -798,3 +524,256 @@ Operator wants **Caveman-style** terse communication (**JuliusBrussee/caveman**-
 ### Recommendation
 
 **`/discovery`** (**US-0089** first) → **`/research`** (**`R-0073`**) → **`/architecture`** → **`/sprint-plan`** (**US-0089** before **US-0090**).
+
+---
+
+## Discovery Addendum — US-0089 (tail mirror)
+
+- **Orchestrator**: **`auto-20260418-01`** — **`/discovery`** complete in fresh **PO** context (**`2026-04-18T12:05:00Z`**).
+- **`fresh_context_marker=po-US0089-discovery-20260418T120500Z-fresh`**
+- **Scope closure**: Response-side (voice) only; input-side file compression stays fully out of scope (explicit handoff to **US-0090**). Confirmed in-scope surfaces = scratchpad keys (**`CAVEMAN_MODE`** default **0**, **`CAVEMAN_LEVEL`** enum reserved — exact values architecture-locked), Cursor rules and/or focused skill composing with existing **`.cursor/skills/its-magic/SKILL.md`**, operator control phrasing contract, tests (default-off byte-equivalence + scratchpad doc markers), **`# US-0089`** architecture section, and **`template/`** parity for all touched `.cursor/` + `docs/engineering/` surfaces.
+- **Risks flagged for research/architecture**: (1) Caveman voice vs **US-0021** anti-fluff + **US-0088 `AUTO_QUIET`** non-suppressible gate list — gate language, reason codes, `[BUG_VALIDATION_OK]`, `[INTAKE_EVIDENCE_VALIDATION_OK]`, `blocked`, `missing input`, `pause`, `loop_max` must stay verbatim; (2) **US-0071** — terseness does not license dropping visible **`US-xxxx`** / **`DEC-xxxx`** / **`R-xxxx`** / **`BUG-####`** IDs or reason codes from user-facing output; (3) **US-0080 / `TOKEN_PROFILE`** composition — orthogonal by default; docs must publish precedence matrix or explicit non-substitution statement (no silent override either direction); (4) literal-region preservation rule (fenced code, paths, AC checklists, filenames) as machine-verifiable invariant; (5) template parity drift if only active **`.cursor/`** is updated (**US-0017**).
+- **Decision gate posture**: **none** — discovery satisfied; no DEC requested at this boundary. Story remains **OPEN** in **`docs/product/backlog.md`** per **US-0045**.
+- **Next phase**: **`/research`** (fresh **tech-lead**) extending **`R-0073`** — lock composition contract options, default-off byte-equivalence test strategy, operator control phrasing shortlist, and TOKEN_PROFILE precedence matrix. No architecture/sprint artifacts authored in this PO discovery segment.
+- **Artifact refs**:
+  - **`docs/product/backlog.md`** — **`## US-0089`** `discovery_notes` (2026-04-18, PO, `auto-20260418-01`)
+  - **`docs/product/vision.md`** — **Discovery Notes — US-0089**
+  - **`docs/engineering/research.md`** — **`R-0073`** Discovery extension (2026-04-18)
+  - **`handoffs/resume_brief.md`** — new top pointer post-`/discovery` US-0089
+  - **`docs/engineering/state.md`** — Discovery checkpoint (2026-04-18) — US-0089 / `auto-20260418-01` (isolation + DEC-0038 strict proof + phase boundary block + AC-10 line + preflight for `/research`)
+
+---
+
+## Research Addendum — US-0089 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model. `orchestrator_run_id=auto-20260418-01`. Research-phase extension of **`R-0073`** completed in fresh **tech-lead** context (**`2026-04-18T12:15:00Z`**, `fresh_context_marker=tl-US0089-research-20260418T121500Z-fresh`).
+
+- **Closure**: **`/research`** (**tech-lead**) **PASS** for **US-0089**. **`R-0073`** extended with eight implementation anchors, risks, and mitigations; **no DEC authored** (architecture owns decisions); **no architecture section** authored.
+- **Anchors (summary)**:
+  1. **TOKEN_PROFILE × CAVEMAN**: recommend **Option A (orthogonal, non-substitution)** — `TOKEN_PROFILE` owns context-breadth (**US-0080** / **DEC-0062**), `CAVEMAN_*` owns voice; publish a single non-substitution paragraph in `docs/engineering/auto-orchestration-reference.md` + `docs/engineering/runbook.md` (+ `template/` mirrors). Option B (explicit precedence matrix) is the architecture-fallback; Option C (collapse) rejected.
+  2. **Rule vs rule+skill**: Option A = `.cursor/rules/caveman.mdc` only (minimal surface); Option B = rule + `.cursor/skills/its-magic-caveman/SKILL.md` (discoverability). Skill-only rejected. Non-suppressible gate list stays in the rule either way.
+  3. **Default-off tests**: extend **`tests/auto_command_contract_test.py`** in place with `test_caveman_default_off_*` subtests (scratchpad key presence active + `template/`, existing `required` token list intact, non-suppressible gate vocabulary preserved). Voice quality **not** unit-tested.
+  4. **Operator toggle vocabulary**: shortlist `caveman on|off`, `stop caveman` / `normal mode`, `caveman: lite|full|ultra`. Scratchpad is authoritative across subagent spawns; session toggle = overlay for next turn; current-turn gate artifacts remain literal.
+  5. **Literal-region invariant**: 9-zone protected set (fenced code, paths, AC checklists, ALL_CAPS reason codes, IDs `US-xxxx`/`DEC-xxxx`/`R-xxxx`/`BUG-####`/`S0xxx`/`T-xxx`, contract markers `[BUG_VALIDATION_OK]`/`[INTAKE_EVIDENCE_VALIDATION_OK]`, strict-proof tuple fields, isolation-evidence fields, commit/git refs). Rule MUST, not SHOULD.
+  6. **External pattern (JuliusBrussee/caveman, MIT)**: portable concepts only (levels, "compress prose not code"); vendor install path (`npx skills add`) and token-savings claims stay **out** of normative kit docs; single-line attribution acceptable.
+  7. **Scratchpad key naming**: recommend `CAVEMAN_MODE=0|1` default **0**, `CAVEMAN_LEVEL=lite|full|ultra` default empty; reserved-for-US-0090 keys `CAVEMAN_COMPRESS_INPUT=0|1` (default **0**) and `CAVEMAN_FILE_SCOPE=` (empty) as documented **no-ops** until US-0090.
+  8. **Template parity inventory**: 9-item file list for **`/sprint-plan`** to atomize (scratchpad active + template, scratchpad example active + template, new rule active + template, optional new skill active + template, reference + runbook + template mirrors, architecture + tests active-only).
+- **Architecture asks (DEC-xxxx hints)**:
+  - `DEC-xxxx` — TOKEN_PROFILE × CAVEMAN precedence (**Option A** recommended; Option B fallback).
+  - `DEC-xxxx` — rule-only (Option A) vs rule + focused skill (Option B).
+  - `DEC-xxxx` — scratchpad key spellings locked **before** contract tests reference them.
+  - `DEC-xxxx` — 9-zone literal-region invariant published in `# US-0089`.
+  - `DEC-xxxx` — canonical operator phrase set + runbook publication location.
+- **Status authority**: **US-0089** stays **OPEN** in **`docs/product/backlog.md`** per **US-0045**.
+- **Next phase**: **`/architecture`** (fresh **tech-lead**) for **US-0089** — lock DEC(s) + write `docs/engineering/architecture.md` `# US-0089`.
+- **Decision-gate posture**: **none** expected at pre-architecture boundary (architecture asks are routine, not gate-blocking).
+- **Artifact refs**:
+  - **`docs/engineering/research.md`** — **`R-0073`** Research extension (2026-04-18, TL, `auto-20260418-01`)
+  - **`docs/product/backlog.md`** — **`## US-0089`** `research_notes` (2026-04-18, TL, `auto-20260418-01`)
+  - **`handoffs/resume_brief.md`** — new top pointer post-`/research` US-0089
+  - **`docs/engineering/state.md`** — Research checkpoint (2026-04-18) — US-0089 / `auto-20260418-01` (isolation + DEC-0038 strict proof + phase boundary block + AC-10 line + preflight for `/architecture`)
+
+---
+
+## Architecture Addendum — US-0089 (tail mirror)
+
+> Placement: **tail** hot copy for TL read model. `orchestrator_run_id=auto-20260418-01`. Architecture-phase lock completed in fresh **tech-lead** context (**`2026-04-18T12:30:00Z`**, `fresh_context_marker=tl-US0089-architecture-20260418T123000Z-fresh`).
+
+- **Closure**: **`/architecture`** (**tech-lead**) **PASS** for **US-0089**. **`DEC-0072`** authored and accepted; **`docs/engineering/architecture.md`** **`# US-0089`** written; **`docs/engineering/decisions.md`** (index + canonical record) updated.
+- **DEC ref**: **`DEC-0072`** — *Caveman mode scratchpad contract, composition surface, and default-off invariant*. Status **Accepted** 2026-04-18.
+- **Locked decisions (summary)**:
+  1. **TOKEN_PROFILE × CAVEMAN precedence** = **Option A (orthogonal, non-substitution)**. Verbatim non-substitution paragraph in `docs/engineering/auto-orchestration-reference.md` + `docs/engineering/runbook.md` (active + `template/`).
+  2. **Composition surface** = **Option A (rule-only)**. New `.cursor/rules/caveman.mdc` active + `template/.cursor/rules/caveman.mdc`. **No new skill** in US-0089; `.cursor/skills/its-magic/SKILL.md` unchanged.
+  3. **Scratchpad keys**: `CAVEMAN_MODE=0|1` default **`0`**; `CAVEMAN_LEVEL=lite|full|ultra` default empty (fallback `full` when MODE=1; unknown value -> `CAVEMAN_LEVEL_UNKNOWN`). Reserved-for-US-0090 no-ops `CAVEMAN_COMPRESS_INPUT=0|1` default **`0`** and `CAVEMAN_FILE_SCOPE=` empty (documented no-ops with explicit "inert in US-0089" comments).
+  4. **9-zone literal-region invariant** (hard **MUST**): fenced code, file paths, AC checklists, reason codes (`ALL_CAPS_WITH_UNDERSCORES`), IDs (`US-xxxx`/`DEC-xxxx`/`R-xxxx`/`BUG-####`/`S0xxx`/`T-xxx`), contract markers (`[BUG_VALIDATION_OK]`/`[INTAKE_EVIDENCE_VALIDATION_OK]`/siblings), strict-proof tuple fields (DEC-0038), isolation evidence fields (DEC-0029), git/commit refs.
+  5. **Canonical operator phrases**: `caveman on`, `caveman off`, `stop caveman`, `normal mode`, `caveman: lite|full|ultra`. Scratchpad authoritative across subagent spawns; session toggles are next-turn overlays only; current-turn gate artifacts remain literal.
+  6. **Default-off tests**: extend `tests/auto_command_contract_test.py` **in place** with **8** `test_caveman_default_off_*` subtests (exact byte strings locked in DEC-0072 §3 / §6).
+  7. **Template parity inventory** — 8 rows locked in architecture `# US-0089` §7 + DEC-0072 §7; includes negative-parity row for `.cursor/skills/its-magic/SKILL.md` (no change).
+  8. **Non-goals (hard)**: no input-side compression (US-0090 only), no `TOKEN_PROFILE` change, no canonical artifact rewrites, no new npm/python deps, no `npx skills add` leak, no voice-quality unit test.
+- **Next phase**: **`/sprint-plan`** (fresh **tech-lead**) for **US-0089** — atomize DEC-0072 §7 parity inventory into tasks against **AC-1..AC-8** (within `SPRINT_MAX_TASKS=12`).
+- **Decision-gate posture**: **none** expected before **`/sprint-plan`**.
+- **Status authority**: **US-0089** stays **OPEN** in **`docs/product/backlog.md`** per **US-0045**.
+- **Artifact refs**:
+  - **`decisions/DEC-0072.md`**
+  - **`docs/engineering/architecture.md`** **`# US-0089`**
+  - **`docs/engineering/decisions.md`** (index + context pack; canonical full-record entry)
+  - **`docs/product/backlog.md`** — **`## US-0089`** `architecture_notes` (2026-04-18, TL, `auto-20260418-01`)
+  - **`handoffs/tl_to_dev.md`** — **US-0089** pre-sprint architecture handoff (top of file)
+  - **`handoffs/resume_brief.md`** — new top pointer post-`/architecture` US-0089 (prior post-`/research` US-0089 marked superseded)
+  - **`docs/engineering/state.md`** — Architecture checkpoint (2026-04-18) — US-0089 / `auto-20260418-01` (isolation + DEC-0038 strict proof + phase boundary block + AC-10 line + preflight for `/sprint-plan`)
+
+## Research → Architecture handoff — US-0090 (input-side Caveman-style compression)
+
+- **From**: **tech-lead** (**`/research`** phase for US-0090, `auto-20260418-01`, `fresh_context_marker=tl-US0090-research-20260418T210000Z-fresh`)
+- **To**: **tech-lead** (fresh **`/architecture`** subagent, next phase; **do not reuse this phase's context**)
+- **Research anchor**: **`R-0073`** (extended under shared anchor — **no** new `R-xxxx` allocated; US-0089 intake bundle `plan_area_coverage` maps both stories; DEC-0011 precedent).
+- **Research closure**: **PASS**. Eleven questions **Q9–Q19** resolved — **Q13 / Q14 / Q18** `status=resolved` (concrete; architecture ratifies verbatim); **Q9 / Q10 / Q11 / Q12 / Q15 / Q16 / Q17 / Q19** `status=deferred_to_architecture` with explicit research recommendations; **zero** `still-open`.
+- **Evidence (read these first, in order)**:
+  1. `docs/engineering/research.md` **`R-0073`** "Research phase resolution pass (2026-04-18, TL, `auto-20260418-01`, US-0090 input-side)" — authoritative Q9–Q19 resolution matrix, option tradeoffs, and risk catalog (R8–R11).
+  2. `docs/product/backlog.md` `## US-0090` `research_notes (2026-04-18, TL, ...)` — condensed summary; backlog status **OPEN** (US-0045).
+  3. `decisions/DEC-0072.md` — the **binding** contract US-0090 extends (do **NOT** rewrite; extend under a new companion DEC).
+  4. `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc` — byte-identical; SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE` at research time.
+  5. `docs/engineering/architecture.md` `# US-0089` — substrate; new `# US-0090` section is an **addition**, not a replacement.
+  6. `docs/engineering/runbook.md` Caveman subsection + `docs/engineering/auto-orchestration-reference.md` `TOKEN_PROFILE × CAVEMAN_MODE` paragraph — extension points for Q16 three-axis publication.
+  7. `handoffs/intake_evidence/US-0089-intake-20260418.json` — intake bundle; `plan_area_coverage` includes US-0090 under the shared `R-0073` anchor.
+
+- **What architecture MUST decide (eleven sections, candidate companion DEC §1–§11)**:
+  1. **§1 — Three-axis non-substitution** (Q16): exact wording for the `TOKEN_PROFILE` vs `CAVEMAN_MODE` vs `CAVEMAN_COMPRESS_INPUT` orthogonality paragraph in `docs/engineering/auto-orchestration-reference.md` + `docs/engineering/runbook.md` (active + `template/`); decide three parallel sentences (research recommended) vs 2x2x2 table fallback; decide whether `DEC-0072` §1 is extended in-place or §1 of the companion DEC forward-links to `DEC-0072` §1.
+  2. **§2 — Activation gate** (Q13): exact `CAVEMAN_COMPRESS_INPUT=1` + non-empty `CAVEMAN_FILE_SCOPE` activation semantics; empty-scope default = pure opt-in (no files in scope; fails closed with `CAVEMAN_COMPRESS_SCOPE_EMPTY`); decide flag-conflict precedence rules (e.g. `--dry-run --write` simultaneously — research recommends fail-closed with `CAVEMAN_COMPRESS_FLAG_CONFLICT`); lock whether `--purge-orphans` ships in v1 (research recommends **deferred**).
+  3. **§3 — Sidecar original policy** (Q10): lock Option B parallel-tree path pattern `docs/.caveman-originals/<relative/path>/<file>`; decide `.gitkeep` presence; decide whether `.cursorignore` receives a parity entry (research recommends leaving operator-owned per **US-0085**).
+  4. **§4 — Deny-list source of truth** (Q11): lock Option C hybrid (hard-coded baseline + `.gitignore` secret-pattern merge + optional `.cursorignore` overlay); decide DEC-revision policy for the hard-coded baseline ("who can amend and through which DEC"); decide evaluation order — research recommends **deny-hard → ignore-merge → cursorignore overlay → allow-list → literal-region scan → write**.
+  5. **§5 — Allow-list grammar** (Q12): lock Option C hybrid (named profile + raw globs + `profile:<name>;globs:<csv>` hybrid form); lock v1 profile set membership — candidate `docs-prose-only` → `docs/user-guides/**/*.md`, `docs/engineering/runbook.md`, `docs/engineering/state-archive/**/*.md`, `handoffs/archive/*.md`; decide unknown-profile behavior (research recommends fail-closed with `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE`).
+  6. **§6 — Compression algorithm** (Q9): lock hybrid tiering — `--mode=safe` default (line-level minifier: duplicate-blank-line collapse + trailing-whitespace trim + LF normalization) and `--mode=aggressive` opt-in (whitespace-collapse + frozen filler-word list + markdown-structure-preservation); decide whether aggressive mode ships in v1 or defers; lock exact `--mode` grammar and filler-word list contents (if aggressive ships); LLM-assisted compression **rejected** — architecture must not reopen.
+  7. **§7 — Reason-code vocabulary** (Q15): lock 9-code set verbatim: `CAVEMAN_COMPRESS_SCOPE_VIOLATION`, `CAVEMAN_COMPRESS_DENY_HIT`, `CAVEMAN_COMPRESS_NOT_IDEMPOTENT`, `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED`, `CAVEMAN_COMPRESS_ORIGINAL_MISSING`, `CAVEMAN_COMPRESS_MODE_DISABLED`, `CAVEMAN_COMPRESS_SCOPE_EMPTY`, `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE`, `CAVEMAN_COMPRESS_FLAG_CONFLICT`; forbid post-write reason codes (all must be pre-write / during-write); group into three families (scope, integrity, gating) to control proliferation risk (R9).
+  8. **§8 — CLI contract** (Q13): lock entrypoint name `scripts/caveman_compress_input.py`; lock modes `--dry-run` (default when no mutation mode), `--write`, `--verify-originals`, `--report`; lock exit-code contract (non-zero on any violation; `0` only when zero violations and zero unresolved parity asserts); `--mode=safe|aggressive` orthogonal to mutation mode.
+  9. **§9 — Template parity** (Q17): lock 8-row inventory — (a) `scripts/caveman_compress_input.py` + `template/scripts/caveman_compress_input.py` byte-identical; (b) `docs/engineering/runbook.md` operator-UX section + mirror; (c) `docs/engineering/auto-orchestration-reference.md` three-axis paragraph + mirror; (d) `docs/engineering/architecture.md` `# US-0090` active-only; (e) `tests/auto_command_contract_test.py` extension **active-only**; (f) `tests/fixtures/caveman_compress/` active-only; (g) `.gitignore` `docs/.caveman-originals/` anchor; (h) optional `.cursor/rules/caveman.mdc` "Input-side extension (US-0090)" subsection — decide yes/no; if yes, active + `template/` must stay byte-identical (US-0017, risk R10).
+  10. **§10 — Installer / publish surface** (Q19): lock `docs/engineering/context/installer-owned-paths.manifest` entry for `template/scripts/caveman_compress_input.py` under `install_include_paths` (defense against BUG-0003 regression class — risk R11); no new npm script; no new runtime dep per **`DEC-0072`** §8; decide parity-test strategy — (A) extend `scripts/check_intake_template_parity.py --scope=caveman-compress` (research recommended) vs (B) new `scripts/check_caveman_template_parity.py`; decide install-completeness fixture — extend `tests/installer_completeness_bug0003_test.py` vs new `tests/installer_caveman_completeness_test.py`.
+  11. **§11 — Non-goals** (forward-link to `DEC-0072` §8; reaffirm carried bans): no `TOKEN_PROFILE` change, no `DEC-0072` rewrite, no vendor install path (no `npx skills add …`), no strict-proof / isolation-evidence wording change, no mandatory auto-compress in `/auto`, no tokenizer change, no npm / pip runtime dep (stdlib-only Python), no canonical-artifact rewrites (backlog / acceptance / state / intake-evidence / DEC-* / sprint-* / contract surfaces).
+
+- **Mandatory architecture artifacts** (architecture phase must produce):
+  1. **Companion DEC** (next available `DEC-xxxx` after current max) with §1–§11 above; forward-links (not rewrites) to `DEC-0072`.
+  2. `docs/engineering/architecture.md` **`# US-0090`** section (active-only; does **not** mirror to `template/` per existing DEC-0072 §7 row 6 pattern) linking `# US-0089`, **US-0053**, **US-0085**, **US-0078** / **DEC-0060**, and explicitly enumerating forbidden surfaces (Q18 deny-list).
+  3. `docs/engineering/decisions.md` index + full-record entry for the companion DEC (canonical context pack).
+  4. `handoffs/tl_to_dev.md` pre-sprint architecture handoff prepended at top; preserve prior US-0089 stanza as superseded (lineage).
+  5. `handoffs/resume_brief.md` new top pointer post-`/architecture` for US-0090 (mark prior post-`/research` US-0090 pointer superseded).
+  6. `docs/engineering/state.md` Architecture checkpoint (2026-04-18) — US-0090 / `auto-20260418-01` (isolation + DEC-0038 strict proof + phase boundary block + AC-10 line + preflight for `/sprint-plan`).
+
+- **Risks carried to architecture** (from research resolution pass):
+  - **R8** (Q9): aggressive-mode filler-word list drift → mitigation = architecture locks DEC-revision policy + `--report` emits list hash for operator drift detection.
+  - **R9** (Q15): reason-code proliferation at 9 codes — upper edge for single rule-file page. Mitigation = group into three families; forbid further proliferation without DEC.
+  - **R10** (Q17): if architecture adds a `caveman.mdc` subsection, active + `template/` byte-identity must hold (US-0017); sprint-plan task acceptance evidence must recompute SHA-256 post-edit; pre-US-0090 baseline `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`.
+  - **R11** (Q19): omitting install-completeness fixture would reintroduce the exact defect class **BUG-0003** fixed. Architecture must not ship US-0090 without this fixture even under sprint-size pressure.
+
+- **Scope guards for architecture** (non-negotiables; do not cross):
+  - **Do not rewrite** `DEC-0072` — write a new companion DEC that extends via §-references.
+  - **Do not change** `.cursor/rules/caveman.mdc` without mirroring in `template/` byte-identically (US-0017).
+  - **Do not change** `TOKEN_PROFILE` / `CAVEMAN_MODE` semantics (US-0080, DEC-0062, DEC-0072 §1 orthogonality).
+  - **Do not change** strict-proof / isolation-evidence wording (US-0056 / DEC-0038, US-0048 / DEC-0029) or AC-10 phase-boundary block contract.
+  - **Do not change** `AUTO_QUIET` non-suppressible list (US-0088), spawn-only / phase-role (US-0069 / DEC-0051 / BUG-0006), or user-visible metadata policy (US-0071).
+  - **Do not alter** `docs/product/backlog.md` status for US-0090 (stays **OPEN** — US-0045 status authority; closure at `/release`).
+  - **Do not** seed sprint tasks — that is `/sprint-plan`'s job after `/architecture` lands the companion DEC.
+
+- **Next phase**: **`/architecture`** (fresh **tech-lead**) for **US-0090** — lock companion DEC §1–§11 (as above) + write `# US-0090` architecture section.
+- **Decision-gate posture**: **none** expected before `/architecture` produces the companion DEC; architecture phase **is itself** the decision gate.
+- **Status authority**: **US-0090** stays **OPEN** per **US-0045**. No acceptance rows checked by research.
+- **Artifact refs**:
+  - `docs/engineering/research.md` **`R-0073`** "Research phase resolution pass (2026-04-18 ...)" (appended this phase)
+  - `docs/product/backlog.md` **`## US-0090`** `research_notes (2026-04-18, TL, auto-20260418-01)` (appended this phase)
+  - `docs/engineering/state.md` — Research checkpoint (2026-04-18) — US-0090 / `auto-20260418-01` (isolation + DEC-0038 strict proof + phase boundary block + AC-10 line + preflight for `/architecture`)
+  - `handoffs/resume_brief.md` — new top pointer post-`/research` US-0090 (prior post-`/discovery` US-0090 pointer marked superseded)
+  - `decisions/DEC-0072.md` (binding substrate; architecture extends via companion DEC)
+  - `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc` (byte-identical research-verified baseline)
+  - `docs/engineering/architecture.md` **`# US-0089`** (substrate for new `# US-0090` section)
+
+## Architecture Addendum — US-0090 (companion DEC authored; ready for `/sprint-plan`)
+
+- **From**: **tech-lead** (**`/architecture`** phase for US-0090, `auto-20260418-01`, `fresh_context_marker=tl-US0090-architecture-20260418T220000Z-fresh`)
+- **To**: **tech-lead** (fresh **`/sprint-plan`** subagent, next phase; **do not reuse this phase's context**). Parallel handoff at top of `handoffs/tl_to_dev.md` (`## TL -> Dev Handoff — US-0090 (post-architecture)`).
+- **Binding decision**: **`DEC-0073`** (**composes on** **`DEC-0072`** via forward-link; does **NOT** rewrite `DEC-0072`). `§1`–`§11` map 1:1 to the eleven research-phase architecture-asks above.
+- **Architecture section**: **`docs/engineering/architecture.md`** **`# US-0090`** appended (active-only — story-scoped architecture sections do not mirror to `template/`; DEC-0072 §7 row 6 precedent).
+- **Research closure**: all eight deferred questions resolved (Q9 — safe-mode minifier only / aggressive deferred; Q10 — Option B parallel tree; Q11 — Option C hybrid; Q12 — Option C hybrid with frozen `docs-prose-only` profile; Q15 — 9-code vocab grouped in three families; Q16 — three parallel sentences extending DEC-0072 §1 in place; Q17 — 8-row parity inventory + rule-subsection decided **NO** in v1; Q19 — manifest entry + extend existing parity script + extend existing completeness test). Three concrete questions (Q13/Q14/Q18) ratified verbatim. Four risks (R8/R9/R10/R11) resolved by architectural means.
+
+### Atomic task seeds (one per AC; `/sprint-plan` converts to `T-xxx` and may split/group)
+
+| # | Seed | AC | DEC-0073 § | Active surface(s) | Template surface(s) |
+|---|------|----|-----------|-------------------|---------------------|
+| 1 | **`scripts/caveman_compress_input.py`** — implement CLI (`--dry-run` default, `--write`, `--verify-originals`, `--report`), activation gate (§2), deny-list layered eval (§4), allow-list grammar (§5), safe-mode minifier (§6), reason-code emission (§7), atomic sidecar write order (§3). Stdlib Python only. | AC-1, AC-2, AC-3, AC-4, AC-5 (CLI) | §2, §3, §4, §5, §6, §7, §8 | `scripts/caveman_compress_input.py` | `template/scripts/caveman_compress_input.py` (byte-identical) |
+| 2 | **Runbook subsection** — `### Caveman input compression (US-0090)` with 3-step dry-run → verify → write procedure, deny summary, `.cursorignore` operator-owned note, sidecar explanation. | AC-5, AC-7 | §1 three-sentence paragraph + §9 row 2 | `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` |
+| 3 | **Three-axis non-substitution paragraph** — replace DEC-0072 §1 paragraph with three parallel sentences (`TOKEN_PROFILE` / `CAVEMAN_MODE` / `CAVEMAN_COMPRESS_INPUT`). | AC-7 | §1 + §9 row 3 | `docs/engineering/auto-orchestration-reference.md` | `template/docs/engineering/auto-orchestration-reference.md` |
+| 4 | **Sidecar tree anchor** — `docs/.caveman-originals/.gitkeep` (new; empty file) + repo-root `.gitignore` anchor `docs/.caveman-originals/`. | AC-2 | §3 + §9 rows 7 & 8 | `.gitignore`, `docs/.caveman-originals/.gitkeep` | n/a (installer does not own repo `.gitignore`; sidecar root is repo-local state) |
+| 5 | **Contract-test extension** — extend `tests/auto_command_contract_test.py` in place with `test_caveman_compress_input_*` prefix. **Must not** modify existing `test_caveman_default_off_*` subtests (DEC-0072 §6 row 6 invariant). | AC-6 | §9 test strategy | `tests/auto_command_contract_test.py` | n/a (tests do not mirror) |
+| 6 | **Fixture directory** — `tests/fixtures/caveman_compress/` with 8 fixture classes (whitespace / literal-region / deny-list / scope / idempotency / mode-disabled / original-missing / flag-conflict). | AC-6 | §9 test strategy classes 1–8 | `tests/fixtures/caveman_compress/` | n/a |
+| 7 | **Rule byte-identity guard + deny-list version guard** — add two subtests under (5): (a) SHA-256 equality of `.cursor/rules/caveman.mdc` active vs `template/`; (b) stable `--report deny_list_version` hash. | AC-6, AC-8 | §9 test strategy + §4.2 | `tests/auto_command_contract_test.py` (same file as seed 5) | n/a |
+| 8 | **Installer manifest entry** — add `template/scripts/caveman_compress_input.py` under `install_include_paths` (active + `template/`). | AC-8 | §10 | `docs/engineering/context/installer-owned-paths.manifest` | `template/docs/engineering/context/installer-owned-paths.manifest` |
+| 9 | **Parity-test extension** — extend `scripts/check_intake_template_parity.py` with `--scope=caveman-compress` mode asserting script byte-identity. | AC-8 | §10 Option A | `scripts/check_intake_template_parity.py` | `template/scripts/check_intake_template_parity.py` |
+| 10 | **Install-completeness fixture extension** — extend `tests/installer_completeness_bug0003_test.py` to verify `--mode missing` + `--mode upgrade` deliver `template/scripts/caveman_compress_input.py` across all three installer entrypoints (`installer.sh`, `installer.ps1`, `installer.py`). Add new `run-tests` section (candidate `§26S`; sprint-plan locks exact number) in `tests/run-tests.ps1` + `tests/run-tests.sh`. | AC-8, AC-6 | §10 Option A + §9 test strategy | `tests/installer_completeness_bug0003_test.py`, `tests/run-tests.ps1`, `tests/run-tests.sh` | n/a (tests + harness active-only) |
+| 11 | **Architecture section linkage check** — assert-only task verifying `docs/engineering/architecture.md` **`# US-0090`** references `# US-0089`, US-0053, US-0085, US-0078 / DEC-0060 and enumerates forbidden surfaces. No rewrite. | AC-7 | §9 row 4 | `docs/engineering/architecture.md` (read-only check) | n/a |
+
+**Task count**: 11 candidate seeds. `SPRINT_MAX_TASKS=12` (default). Sprint-plan may group seeds 5 & 7 (same test file) and/or 1 & 4 (one commit pair) to land at `T-001..T-009` or `T-001..T-010`. `SPRINT_AUTO_SPLIT` NOT expected to trigger.
+
+### Test surfaces (no implementation here; sprint-plan + execute own code)
+
+- **`tests/auto_command_contract_test.py`** — extend **in place** with `test_caveman_compress_input_*` subtests (mandatory). Existing `test_caveman_default_off_*` UNCHANGED byte-for-byte (DEC-0072 §6 row 6 invariant).
+- **`tests/fixtures/caveman_compress/`** — 8 fixture classes (see DEC-0073 §9).
+- **`tests/installer_completeness_bug0003_test.py`** — extend with caveman-script delivery assertion (R11; non-negotiable).
+- **`tests/run-tests.ps1` + `tests/run-tests.sh`** — new section (candidate `§26S`; sprint-plan locks).
+- **No new pytest module** in v1 (follow DEC-0072 / US-0089 precedent — in-place extension).
+
+### Template parity touchpoints (8-row positive + 4-class negative)
+
+**Positive parity (active + `template/` byte-identical)**:
+
+1. `scripts/caveman_compress_input.py` ↔ `template/scripts/caveman_compress_input.py`
+2. `docs/engineering/runbook.md` ↔ `template/docs/engineering/runbook.md` (caveman-compression subsection)
+3. `docs/engineering/auto-orchestration-reference.md` ↔ `template/docs/engineering/auto-orchestration-reference.md` (three-sentence paragraph)
+4. `docs/engineering/context/installer-owned-paths.manifest` ↔ `template/docs/engineering/context/installer-owned-paths.manifest` (caveman script entry)
+5. `scripts/check_intake_template_parity.py` ↔ `template/scripts/check_intake_template_parity.py` (scope extension)
+
+**Active-only (no mirror; per DEC-0072 §7 precedent)**:
+
+6. `docs/engineering/architecture.md` `# US-0090` section
+7. `tests/auto_command_contract_test.py` + `tests/fixtures/caveman_compress/`
+8. `.gitignore` + `docs/.caveman-originals/.gitkeep`
+
+**NEGATIVE parity (MUST NOT be edited in v1)**:
+
+- `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc` (SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE` preserved; rule byte-identity guard subtest enforces).
+- `.cursor/scratchpad.md`, `.cursor/scratchpad.local.example.md`, `template/.cursor/scratchpad.local.example.md` (key byte-strings from DEC-0072 §3 preserved; semantics activate without rename).
+- `.cursor/skills/its-magic/SKILL.md` + mirror (DEC-0072 §7 row 9 preserved).
+- `.cursorignore` (operator-owned per US-0085 / DEC-0071).
+- All canonical-artifact / contract-surface files listed in DEC-0073 §4.1.
+
+### Release / verify gates
+
+- **`/plan-verify`**: AC-1..AC-8 ↔ `T-xxx` 1:1 bijection; governance anchors verified (`DEC-0073`, `DEC-0072` composition, `# US-0090`, `R-0073`).
+- **`/execute`**: dev MUST commit active + `template/` pairs atomically for parity rows 1–5; MUST NOT edit any NEGATIVE-parity file; MUST keep `test_caveman_default_off_*` byte-unchanged.
+- **`/qa`**: canonical `tests/run-tests.ps1` (+ `run-tests.sh`) green for the new `§26S` + all existing sections; targeted pytest — all `test_caveman_compress_input_*` + `test_caveman_default_off_*` pass; `bug_issue_validate.py` `[BUG_VALIDATION_OK]`; rule byte-identity guard green; deny-list version guard green; install-completeness fixture green for `--mode missing` + `--mode upgrade` across all three entrypoints.
+- **`/verify-work`**: UAT 8/8 on AC-1..AC-8; isolation evidence + strict-proof tuples present for every phase in `docs/engineering/state.md`; `handoffs/release_queue.md` → `ready`.
+- **`/release`**: flip backlog `OPEN` → `DONE`; check AC-1..AC-8 in `docs/product/backlog.md` + portfolio row in `docs/product/acceptance.md`; author `sprints/SXXXX/release-findings.md` + `handoffs/releases/SXXXX-release-notes.md`; release-queue `ready` → `released`; publish mode: per existing `RELEASE_PUBLISH_MODE` operator default (no new publish flag).
+
+### Risks carried (architecture-resolved; sprint-plan should preserve mitigations)
+
+- **R8** — filler-word drift → neutralized in v1 by **deferring aggressive mode** (DEC-0073 §6). Sprint-plan must NOT reopen.
+- **R9** — reason-code proliferation → locked 9-code set grouped into three families (DEC-0073 §7). Sprint-plan must NOT add codes.
+- **R10** — rule-subsection byte-identity → **no rule edit in v1** (DEC-0073 §9 NEGATIVE parity). Sprint-plan must NOT seed a rule-subsection task. Byte-identity guard subtest (seed 7) is a hard requirement.
+- **R11** — install-completeness omission (BUG-0003 class) → install-completeness fixture extension (seed 10) is **non-negotiable**. Sprint-plan MUST seed it regardless of sprint-size pressure. `/release` MUST NOT ship without it.
+
+### Scope guards for `/sprint-plan` (non-negotiables; do not cross)
+
+- **Do not re-open** any architecture-locked decision in DEC-0073 §§1–11.
+- **Do not rewrite** `DEC-0072` or `DEC-0073`. Sprint-plan authors `sprints/SXXXX/*`, not DECs.
+- **Do not edit** `.cursor/rules/caveman.mdc` (byte-identity preserved — seed 7 guard asserts).
+- **Do not add** new reason codes, new CLI flags (e.g. `--mode`, `--purge-orphans`), new profiles, new fixture classes beyond §9, or new deny-list entries without a subsequent DEC.
+- **Do not change** `TOKEN_PROFILE` / `CAVEMAN_MODE` / strict-proof (DEC-0038) / isolation-evidence (DEC-0029) / `AUTO_QUIET` (US-0088) / US-0071 contracts.
+- **Do not advance** backlog status. US-0090 stays **OPEN** per **US-0045** (closure at `/release`).
+- **Do not seed tasks** outside the 11 seeds above without explicit justification tied to a specific AC.
+
+### Mandatory `/sprint-plan` deliverables (next phase)
+
+1. `sprints/SXXXX/sprint.md` with summary, AC table, locked DEC anchors (`DEC-0073` + `DEC-0072` composition), research anchor (`R-0073`), success gate.
+2. `sprints/SXXXX/tasks.md` with `T-001..T-Nxx` atomic tasks + AC map + DEC-0073 § locks per row.
+3. `sprints/SXXXX/plan-verify.json` `status=PENDING`, `reason=AWAITING_QA_PLAN_VERIFY`.
+4. Empty-stub scaffold: `sprints/SXXXX/summary.md`, `sprints/SXXXX/qa-findings.md`, `sprints/SXXXX/uat.json`, `sprints/SXXXX/uat.md`, `sprints/SXXXX/release-findings.md`.
+5. `handoffs/tl_to_dev.md` sprint-plan stanza prepended; prior architecture stanza preserved as lineage.
+6. `handoffs/qa_plan_verify.md` QA entrypoint pointer.
+7. `handoffs/resume_brief.md` new top pointer post-`/sprint-plan`; intended_resume_phase=`plan-verify`.
+8. `docs/engineering/state.md` Sprint-plan checkpoint (isolation + strict proof + phase boundary block + AC-10 compact line + `[BUG_VALIDATION_OK]`).
+9. `docs/product/backlog.md` **`## US-0090`** `sprint_plan_notes` appended (US-0090 remains **OPEN** per **US-0045**).
+
+### Artifact refs (architecture phase materializations)
+
+- `decisions/DEC-0073.md` (new; composes on `DEC-0072`).
+- `docs/engineering/decisions.md` — `## Current context pack` header refreshed + `DEC-0073` entry appended to "Compact decision index".
+- `docs/engineering/architecture.md` `# US-0090` (new section appended at bottom).
+- `docs/product/backlog.md` `## US-0090` `architecture_notes (2026-04-18, TL, auto-20260418-01)` appended.
+- `docs/engineering/state.md` — Architecture checkpoint (2026-04-18) — US-0090 / `auto-20260418-01` (isolation + strict proof + phase boundary block + AC-10 line).
+- `handoffs/tl_to_dev.md` — **US-0090 architecture** stanza prepended at top; prior US-0089 stanza preserved.
+- `handoffs/resume_brief.md` — new top pointer post-`/architecture` US-0090 (prior post-`/research` US-0090 pointer marked superseded).
+- `handoffs/po_to_tl.md` — this `## Architecture Addendum — US-0090` section appended.
+
+### Next phase
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **US-0090** — seed `sprints/SXXXX/*` from the 11 task seeds above + the AC ↔ § map.
+- **Decision-gate posture**: **none** expected — architecture phase IS the decision gate; sprint-plan translates decisions into atomic tasks.
+- **Status authority**: **US-0090** stays **OPEN** per **US-0045**. No acceptance rows checked by architecture.
+
