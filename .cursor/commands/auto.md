@@ -19,6 +19,11 @@ description: "its-magic auto: deterministic continuation orchestrator."
 - Phase context transfer happens only through artifacts and handoff files.
 - Scope is process/workflow orchestration only. Do not claim runtime product
   orchestration changes.
+- **Bug-queue mode** (**`US-0087`**) uses the same **spawn-only** contract: the
+  orchestrator schedules materialization and spawns phase-role subagents per
+  bug segment—it **must not** run **`execute`**, **`qa`**, or other lifecycle
+  phases in the orchestrator turn. Violations → **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**
+  (**`BUG-0006`**, **`US-0069`**, **`DEC-0051`**).
 
 ## Spawn-boundary integrity (BUG-0006)
 
@@ -32,6 +37,39 @@ description: "its-magic auto: deterministic continuation orchestrator."
   orchestrator turns. **Distinct from** **`PHASE_CONTEXT_ISOLATION_VIOLATION`**
   (wrong writer / isolation break) and **`RUNTIME_PROOF_*`** / **`PHASE_ROLE_*`**
   families—do not overload those codes for a missing-spawn violation.
+
+## Continuous multi-phase execution (US-0088)
+
+A single `/auto` orchestrated run advances through **all phases** in the
+**intersected resolved schedule** (reference **Step 5**) until a
+**deterministic stop condition** fires. The orchestrator does **not** stop after
+spawning one phase unless the stop matrix requires it.
+
+**Outer-driver equivalence (AC-1, Option B)**: When a single Cursor `/auto`
+invocation cannot schedule multiple fresh subagent turns (product/runtime
+constraint), a **documented outer driver** (operator script or manual
+re-invocation with `start-from` / refreshed `resume_brief`) is
+**deterministically equivalent** provided: same intersected phase order, same
+isolation + strict-proof attestation per phase (**DEC-0038**), same stop
+reasons, and same `resume_brief` + `state.md` refresh at every boundary.
+Operators must follow the runbook recipe
+(**`docs/engineering/runbook.md`** § Continuous `/auto` + backlog drain).
+
+**Deterministic stop matrix** (see also architecture `# US-0088`):
+
+| Condition | Behavior |
+|-----------|----------|
+| Next phase exists, no hard stop | **Continue** — preflight US-0069, spawn next phase |
+| `decision_gate` | **Stop** (non-suppressible) |
+| `error` / missing critical input | **Stop** (non-suppressible) |
+| `AUTO_PAUSE_REQUEST` / `pause` | **Stop** at safe boundary (non-suppressible) |
+| `AUTO_LOOP_MAX_CYCLES` / `loop_max` | **Stop** (non-suppressible) |
+| `blocked` (sync/scope gate) | **Stop** (non-suppressible) |
+| US lifecycle DONE / sprint segment complete | **Stop** segment; `AUTO_BACKLOG_DRAIN=1` may advance to next OPEN story (recompute phase plan — **reference Step 5**) |
+| `BACKLOG_MAX_STORIES_REACHED` | **Stop** (non-suppressible) |
+
+`stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
+`pause_request`, `loop_max`, `error`, `blocked`.
 
 ## Full specification (US-0080 / DEC-0062)
 
@@ -101,15 +139,36 @@ Selectors and reinstatement: see reference. Phase-plan reason codes include
 `PHASE_POLICY_CONFLICT`, `PHASE_PLAN_UNKNOWN_PHASE`, `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`.
 
 Phase boundary visibility (**AC-10**): record `resolved_phase_plan` snapshot,
-`skipped_phases`, `phase_boundary`, `next_scheduled_phase` on `state.md`.
+`skipped_phases`, `phase_boundary`, `next_scheduled_phase` on `state.md`. For
+bug-queue segments, also record **`segment_work_item_kind`**, **`active_bug_id`**,
+**`bug_queue_position`**, **`bug_queue_remaining`**, **`backlog_drain_active`**,
+**`bug_queue_active`** per **`docs/engineering/architecture.md`** **`# US-0087`**
+and **`docs/engineering/auto-orchestration-reference.md`**.
 
 ## Inputs
 
 Merged scratchpad (**US-0073** / **DEC-0055**), automation flags (`AUTO_*`, `SECURITY_REVIEW`,
 `TEAM_*`), phase-plan keys `AUTO_PHASE_PLAN`, `AUTO_PHASE_EXCLUDE`, `AUTO_PHASE_INCLUDE`,
 `AUTO_PHASE_PROFILE`, `AUTO_PHASE_HIGH_RISK_ACK`, product/engineering docs,
-optional `start-from=<phase>`, optional `--execute-bulk`, `handoffs/resume_brief.md`,
+optional `start-from=<phase>`, optional **`bug-target=BUG-####`** or
+**`bug-target=all-open`**, optional `--execute-bulk`, `handoffs/resume_brief.md`,
 `docs/engineering/state.md`.
+
+## Automation remote routing contract (US-0086)
+
+- Automation-only gate: `AUTO_REMOTE_AUTOMATION_PROFILE=deterministic_v1` enables
+  target routing; `off` keeps manual/local behavior unchanged.
+- Explicit intent literal is constrained to: `start container <target_id>`.
+- Deterministic precedence when profile is enabled:
+  1. explicit intent target id resolution,
+  2. canonical target validation (`targets[].id` exists and is enabled),
+  3. documented heuristic fallback,
+  4. local default when no remote target is selected.
+- Fail-closed reason codes (do not overload):
+  `REMOTE_AUTOMATION_MODE_OFF`, `REMOTE_TARGET_UNKNOWN`,
+  `REMOTE_TARGET_DISABLED`, `REMOTE_TARGET_UNROUTABLE`.
+- Mode-off guardrail: never silently reroute `TEST_COMMAND` to remote when
+  automation profile is disabled.
 
 ## Canonical status contract (US-0045)
 
@@ -124,14 +183,43 @@ QA loop handoffs when applicable, continuation breadcrumbs including `resolution
 
 ## Stop conditions
 
-Decision gate, missing critical input, `AUTO_PAUSE_REQUEST` at safe boundary,
-`AUTO_LOOP_MAX_CYCLES` with unresolved defects.
+Deterministic stop reasons (see **Stop matrix** in `## Continuous multi-phase
+execution (US-0088)` above): `completed`, `decision_gate`, `missing_input`,
+`pause_request`, `loop_max`, `error`, `blocked`.
 
 ## Optional backlog-drain mode (US-0044 / DEC-0022)
 
 Canonical controls: `AUTO_BACKLOG_DRAIN`, `AUTO_BACKLOG_MAX_STORIES`, `AUTO_BACKLOG_ON_BLOCK`,
-`AUTO_STORY_SELECTION`. Reason codes include `BACKLOG_MAX_STORIES_REACHED`. Full semantics:
-reference.
+`AUTO_STORY_SELECTION`. When `AUTO_BACKLOG_DRAIN=1`, each story advances through
+**multiple phases** until its terminal boundary (**reference Step 5**); the
+orchestrator **recomputes** the materialized phase plan at each **story boundary**
+and selects the **next eligible OPEN story** per `AUTO_STORY_SELECTION`.
+Reason codes include `BACKLOG_MAX_STORIES_REACHED`. Full semantics: reference.
+
+## Optional bug-queue mode (US-0087)
+
+Canonical **argv** literals (exact strings; **no aliases** in v1):
+- **`bug-target=BUG-####`** (example: **`bug-target=BUG-0007`**) — single defect from
+  **`docs/product/backlog.md`** **`## Bug issues (canonical)`** with status **OPEN**.
+- **`bug-target=all-open`** — deterministic **OPEN**-only queue, ascending **numeric**
+  **`BUG-####`** sort, optional cap **`AUTO_BUG_MAX_ITEMS`** (see reference).
+
+Scratchpad keys (**default-off**): **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**,
+**`AUTO_BUG_MAX_ITEMS`**, **`AUTO_BUG_ON_BLOCK`** — full semantics: reference +
+**`architecture.md`** **`# US-0087`**.
+
+**Scheduler mutex**: if merged scratchpad has **`AUTO_BACKLOG_DRAIN=1`** **and**
+**`AUTO_BUG_QUEUE=1`** **and** this invocation has **no** explicit **`bug-target=`**
+argv token → fail closed with **`AUTO_SCHEDULER_CONFLICT`** (use
+**`[AUTO_RESUME_ERROR] AUTO_SCHEDULER_CONFLICT: ...`** form per reference). When
+**`bug-target=`** argv is present, it **selects** the bug scheduler for this run;
+**`AUTO_BACKLOG_DRAIN`** must **not** also drive story selection for that same
+materialized run.
+
+Fail-closed codes (orthogonal to existing resume/phase codes; do **not** overload):
+- **`AUTO_BUG_QUEUE_EMPTY`** — **`all-open`** (or equivalent) and zero **OPEN** bugs.
+- **`AUTO_BUG_TARGET_UNKNOWN`** — malformed id, wrong pattern, or id missing from canonical bug section.
+- **`AUTO_BUG_TARGET_NOT_OPEN`** — known id exists but status is not **OPEN** (e.g. **DONE**).
 
 ## Optional bulk execute mode (US-0047 / DEC-0024)
 
@@ -152,12 +240,19 @@ Phase-completion boundary evaluation only. **Guarded auto-push eligibility chain
 
 ## Deterministic resume-source precedence
 
-Resolve start phase in strict order:
+Resolve nominal start phase and scheduler inputs in strict order (**`US-0087`**
+extends scratchpad vs **`resume_brief`** ordering — full matrix: reference):
 
 1. Explicit `/auto start-from=<phase>`
-2. `handoffs/resume_brief.md`
-3. Conservative `docs/engineering/state.md` fallback
-4. Fail fast on ambiguity/conflict/unrecoverable inputs
+2. Explicit **`bug-target=`** argv token when present (parsed **before** merged
+   scratchpad scheduler keys; selects bug scheduler for this run).
+3. Merged scratchpad (**`US-0073`** / **`DEC-0055`**) — including **`AUTO_BACKLOG_DRAIN`**,
+   **`AUTO_BUG_QUEUE`**, **`AUTO_BUG_TARGET`**, etc.
+4. `handoffs/resume_brief.md`
+5. Conservative `docs/engineering/state.md` fallback
+6. Fail fast on ambiguity/conflict/unrecoverable inputs (including
+   **`AUTO_SCHEDULER_CONFLICT`** when both schedulers are enabled in scratchpad
+   without **`bug-target=`** argv resolution).
 
 If `resume_brief.md` is present but stale or unparseable, fail fast instead
 of silently falling back.
@@ -177,22 +272,42 @@ Required codes:
 - `STATE_PHASE_AMBIGUOUS`
 - `STATE_PHASE_UNRECOVERABLE`
 
+Bug-queue extensions (**`US-0087`**; same **`[AUTO_RESUME_ERROR]`** envelope when
+used for resume/materialization failures):
+
+- `AUTO_SCHEDULER_CONFLICT`
+- `AUTO_BUG_QUEUE_EMPTY`
+- `AUTO_BUG_TARGET_UNKNOWN`
+- `AUTO_BUG_TARGET_NOT_OPEN`
+
 ## Steps (compact; full detail in reference)
 
 1. Read automation flags from merged scratchpad and **materialize the resolved
    phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**; append
    plan breadcrumbs to `docs/engineering/state.md` **before** first spawn.
-2. Parse `start-from` / `--execute-bulk`; resolve nominal start phase; intersect with plan.
+2. Parse `start-from` / **`bug-target=`** / `--execute-bulk`; resolve scheduler
+   mutex (**`AUTO_SCHEDULER_CONFLICT`** when applicable); resolve nominal start phase;
+   intersect with plan.
 3. Record continuation metadata (`invocation_mode=auto`, `requested_start_from`,
    `resolved_start_phase`, `resolution_source`, `resolution_status`, `timestamp`).
 4. Spawn fresh subagents per intersected schedule; enforce **US-0069** preflight/post checks.
-5. Implementation loop, pause, stop breadcrumbs (`stop_reason` such as `completed|decision_gate|missing_input|pause_request|loop_max`, `stop_phase`, `timestamp`), `resume_brief` updates — reference.
-6. 11a. Isolation evidence verification at each boundary.
-7. 11b. At each phase boundary, verify strict runtime attestation tuple exists
+5. **Multi-phase continuation** (normative detail: **reference Step 5** in
+   **`docs/engineering/auto-orchestration-reference.md`** `## Steps` item 5):
+   advance through **all remaining phases** in the intersected resolved schedule
+   order until a **deterministic stop condition** fires (see **Stop matrix** in
+   `## Continuous multi-phase execution (US-0088)` above). When
+   `AUTO_BACKLOG_DRAIN=1`, repeat the story lifecycle for the next eligible OPEN
+   story, **reloading** scratchpad and **recomputing** the materialized phase
+   plan at each story boundary. Outer-driver equivalence applies when a single
+   invocation cannot schedule multiple subagent turns (**AC-1 Option B**).
+   `stop_reason`: `completed|decision_gate|missing_input|pause_request|loop_max|error|blocked`.
+6. Isolation evidence verification at each boundary (**reference** step 11a).
+7. At each phase boundary, verify strict runtime attestation tuple exists
    and is valid for the completed phase (`orchestrator_run_id`, `runtime_proof_id`,
-   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`).
-8. Sync verdict recording when eligible — reference.
-9. Backlog-drain / bulk per-item summaries when enabled — reference.
+   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`)
+   (**reference** step 11b).
+8. Sync verdict recording when eligible — reference step 12.
+9. Backlog-drain / bulk per-item summaries when enabled — reference step 13.
 
 ## Backward compatibility
 
