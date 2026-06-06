@@ -507,6 +507,153 @@ class AutoCommandContractTest(unittest.TestCase):
                     ),
                 )
 
+    # --- BUG-0011 / DEC-0077: voice-compression rule markers (9 subtests) ---
+
+    _CAVEMAN_VOICE_SECTION_HEADING = (
+        "## Voice compression (when CAVEMAN_MODE=1)"
+    )
+
+    def _caveman_rule_texts(self) -> tuple[str, str]:
+        root = Path(__file__).resolve().parents[1]
+        active = (root / ".cursor" / "rules" / "caveman.mdc").read_text(
+            encoding="utf-8"
+        )
+        template = (
+            root / "template" / ".cursor" / "rules" / "caveman.mdc"
+        ).read_text(encoding="utf-8")
+        return active, template
+
+    def test_caveman_voice_section_heading_present(self) -> None:
+        """DEC-0077 §5: exact voice section heading in caveman.mdc."""
+        active, template = self._caveman_rule_texts()
+        for label, text in (("active", active), ("template", template)):
+            with self.subTest(file=label):
+                self.assertIn(self._CAVEMAN_VOICE_SECTION_HEADING, text)
+
+    def test_caveman_voice_level_table_markers(self) -> None:
+        """DEC-0077 §5: lite, full, ultra level markers in rule body."""
+        active, _ = self._caveman_rule_texts()
+        for level in ("lite", "full", "ultra"):
+            with self.subTest(level=level):
+                self.assertIn(level, active)
+
+    def test_caveman_voice_drop_filler_directive(self) -> None:
+        """DEC-0077 §5: drop + filler/hedging/pleasantries directive present."""
+        active, _ = self._caveman_rule_texts()
+        self.assertIn("drop", active.lower())
+        self.assertTrue(
+            any(token in active.lower() for token in ("filler", "hedging", "pleasantries")),
+            "voice section must mention filler, hedging, or pleasantries",
+        )
+
+    def test_caveman_voice_fragment_permission(self) -> None:
+        """DEC-0077 §5: fragments OK permission in voice section."""
+        active, _ = self._caveman_rule_texts()
+        self.assertIn("fragments", active.lower())
+        self.assertIn("OK", active)
+
+    def test_caveman_voice_auto_clarity_exceptions(self) -> None:
+        """DEC-0077 §5: Auto-Clarity pause for security/destructive/ambiguous."""
+        active, _ = self._caveman_rule_texts()
+        lower = active.lower()
+        self.assertIn("auto-clarity", lower)
+        self.assertTrue(
+            any(token in lower for token in ("security", "destructive", "ambiguous")),
+            "Auto-Clarity must cite security, destructive, or ambiguous cases",
+        )
+
+    def test_caveman_voice_persistence_directive(self) -> None:
+        """DEC-0077 §5: every response persistence while mode on."""
+        active, _ = self._caveman_rule_texts()
+        self.assertIn("every response", active.lower())
+
+    def test_caveman_voice_user_rule_precedence(self) -> None:
+        """DEC-0077 §5: user-rule precedence when CAVEMAN_MODE=1."""
+        active, _ = self._caveman_rule_texts()
+        lower = active.lower()
+        self.assertIn("user rule", lower)
+        self.assertIn("CAVEMAN_MODE=1", active)
+
+    def test_caveman_voice_ultra_prose_only_boundary(self) -> None:
+        """DEC-0077 §5: ultra defers to 9-zone; reason codes stay literal."""
+        active, _ = self._caveman_rule_texts()
+        self.assertIn("ultra", active.lower())
+        self.assertTrue(
+            "reason code" in active.lower() or "reason codes" in active.lower()
+        )
+        self.assertIn("9-zone", active.lower())
+
+    def test_caveman_voice_template_parity(self) -> None:
+        """DEC-0077 §5: active and template caveman.mdc byte-identical."""
+        active, template = self._caveman_rule_texts()
+        self.assertEqual(active, template)
+
+    # --- BUG-0011 / DEC-0077 §4: DEC-0072 §6 default-off body regression guard ---
+
+    _CAVEMAN_DEFAULT_OFF_BODY_SHA256: dict[str, str] = {
+        "test_caveman_default_off_scratchpad_keys_active": (
+            "BA1A852531D65A68E61077F9AF9B99F3CF97E6BE2FD4ADAC90DC7B5F603B628A"
+        ),
+        "test_caveman_default_off_scratchpad_keys_example_parity": (
+            "1CAF18B93BD0551F76E4AD2BF4C26D6DA42930C06356B2FF3A883447B7CF22C5"
+        ),
+        "test_caveman_default_off_rule_file_present_active_template": (
+            "DF095E85CF0704511C23DCCD065D5E97483F767CD3C9C22AF7AE6EB470882CEF"
+        ),
+        "test_caveman_default_off_reference_non_substitution_paragraph": (
+            "4611DF21DC9E4D7ECF6C52D8A08FD5A32B37064A5E6C61B41202C64E401D1710"
+        ),
+        "test_caveman_default_off_runbook_operator_phrases": (
+            "39B640498E79FD0F1D48B256FA2D78AADA81B0FC2D01D01988C576BC570367B9"
+        ),
+        "test_caveman_default_off_existing_contract_tokens_intact": (
+            "5DDC89FA50CE71134AD17BD56A061EB644D6FD7C6D0168E0DA5E088EE692810E"
+        ),
+        "test_caveman_default_off_non_suppressible_gate_vocab_preserved": (
+            "3092A1117A145318F78A37F145CA1609B9CA4D47E99B454ADDA2D8B87F7555C8"
+        ),
+        "test_caveman_default_off_no_vendor_install_leak": (
+            "1CD3F742B66D9DB259E0E680FBFD029A4134B431D8FCBF36BC445B9996C37248"
+        ),
+    }
+
+    def test_caveman_default_off_bodies_regression_guard(self) -> None:
+        """T-006 / AC-7: DEC-0072 §6 pinned test_caveman_default_off_* bodies unchanged."""
+        import ast
+        import hashlib
+
+        path = Path(__file__).resolve()
+        src = path.read_text(encoding="utf-8")
+        tree = ast.parse(src)
+        for node in tree.body:
+            if not isinstance(node, ast.ClassDef):
+                continue
+            if node.name != "AutoCommandContractTest":
+                continue
+            for item in node.body:
+                if not isinstance(item, ast.FunctionDef):
+                    continue
+                if item.name not in self._CAVEMAN_DEFAULT_OFF_BODY_SHA256:
+                    continue
+                segment = ast.get_source_segment(src, item)
+                self.assertIsNotNone(segment, msg=f"missing source for {item.name}")
+                digest = hashlib.sha256(segment.encode()).hexdigest().upper()
+                with self.subTest(test=item.name):
+                    self.assertEqual(
+                        digest,
+                        self._CAVEMAN_DEFAULT_OFF_BODY_SHA256[item.name],
+                        f"{item.name} body drifted from DEC-0072 §6 pinned baseline",
+                    )
+        self.assertEqual(
+            self._CAVEMAN_NON_SUBSTITUTION_SENTENCE,
+            (
+                "`TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls "
+                "reply voice. Neither substitutes for the other; setting one does "
+                "not change the other. Combine freely."
+            ),
+            "pinned non-substitution sentence must remain byte-unchanged",
+        )
+
     # --- T-007 / AC-7: architecture.md `# US-0089` bottom-appended, linked -----
 
     def test_caveman_architecture_section_bottom_appended_and_linked(self) -> None:
@@ -662,7 +809,7 @@ class AutoCommandContractTest(unittest.TestCase):
     _CAVEMAN_COMPRESS_SCRIPT_TPL = "template/scripts/caveman_compress_input.py"
     _CAVEMAN_RULE_REL = ".cursor/rules/caveman.mdc"
     _CAVEMAN_RULE_BASELINE_SHA256 = (
-        "E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE"
+        "C7AAC699C5CDF732BD029FA8C431B2A4D0B5A3A1B91E49D80C19C11C9748BC4D"
     )
     _CAVEMAN_COMPRESS_REASON_CODES = (
         "CAVEMAN_COMPRESS_MODE_DISABLED",
@@ -947,6 +1094,516 @@ class AutoCommandContractTest(unittest.TestCase):
                 text = (root / rel).read_text(encoding="utf-8")
                 self.assertIn(sentence, text,
                               f"{rel} must carry DEC-0073 §1 3-axis paragraph")
+
+    _BUG0009_REMEDIATION_BLURB = (
+        "**CI still runs its-magic packaging jobs?** Your project received a pre-fix workflow.\n"
+        "Run **`its-magic --target <repo> --mode upgrade`** (or **`--mode clean`** then reinstall)\n"
+        "to refresh `.github/workflows/ci.yml` from the corrected template. After upgrade, GitHub\n"
+        "Actions should show only **`checks`** and **`auto-fix`** jobs — not `npm-test`,\n"
+        "`brew-test`, or `choco-test`."
+    )
+    _BUG0009_REQUIRED_ACTIVE_JOBS = frozenset(
+        {"checks", "auto-fix", "npm-test", "brew-test", "choco-test"}
+    )
+    _BUG0009_FORBIDDEN_TEMPLATE_PATTERNS = (
+        "npm-test",
+        "brew-test",
+        "choco-test",
+        "npm pack",
+        "installer.sh",
+        "packaging/chocolatey",
+    )
+
+    def test_bug0009_template_ci_forbidden_patterns_absent(self) -> None:
+        """T-005 / AC-3: template ci.yml must not contain kit packaging markers."""
+        root = Path(__file__).resolve().parents[1]
+        template_ci = (root / "template" / ".github" / "workflows" / "ci.yml").read_text(
+            encoding="utf-8"
+        )
+        for pattern in self._BUG0009_FORBIDDEN_TEMPLATE_PATTERNS:
+            with self.subTest(pattern=pattern):
+                self.assertNotIn(
+                    pattern,
+                    template_ci,
+                    f"template ci.yml must not contain forbidden pattern {pattern!r}",
+                )
+
+    def test_bug0009_template_active_ci_negative_parity_sha256(self) -> None:
+        """T-005 / AC-7: template and active ci.yml must differ (US-0017 negative parity)."""
+        import hashlib
+
+        root = Path(__file__).resolve().parents[1]
+        template_bytes = (root / "template" / ".github" / "workflows" / "ci.yml").read_bytes()
+        active_bytes = (root / ".github" / "workflows" / "ci.yml").read_bytes()
+        self.assertNotEqual(
+            hashlib.sha256(template_bytes).digest(),
+            hashlib.sha256(active_bytes).digest(),
+            "template and active ci.yml must not byte-match after BUG-0009 fix",
+        )
+
+    def test_bug0009_active_ci_five_job_inventory(self) -> None:
+        """T-005 / AC-2: active ci.yml retains all five required job ids."""
+        import sys as _sys
+
+        root = Path(__file__).resolve().parents[1]
+        _sys.path.insert(0, str(root / "scripts"))
+        try:
+            import downstream_ci_guard_lib as dci
+        finally:
+            _sys.path.pop(0)
+        active_text = (root / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+        job_keys = set(dci.extract_job_keys(active_text))
+        self.assertEqual(
+            self._BUG0009_REQUIRED_ACTIVE_JOBS,
+            job_keys,
+            "active ci.yml must retain checks, auto-fix, npm-test, brew-test, choco-test",
+        )
+
+    def test_bug0009_guard_report_inventory_fields(self) -> None:
+        """T-005 / AC-3: guard --report exposes template/active job inventories."""
+        import json as _json
+        import subprocess
+        import sys as _sys
+
+        root = Path(__file__).resolve().parents[1]
+        proc = subprocess.run(
+            [
+                _sys.executable,
+                str(root / "scripts" / "check_downstream_ci_guard.py"),
+                "--repo",
+                str(root),
+                "--report",
+            ],
+            capture_output=True,
+            text=True,
+            cwd=str(root),
+            timeout=30,
+        )
+        self.assertEqual(proc.returncode, 0, msg=proc.stderr)
+        payload = _json.loads(proc.stdout)
+        self.assertIn("template_job_keys", payload)
+        self.assertIn("active_job_keys", payload)
+        self.assertIn("forbidden_hits", payload)
+        self.assertEqual(payload["forbidden_hits"], [])
+        self.assertEqual(set(payload["template_job_keys"]), {"checks", "auto-fix"})
+        self.assertEqual(set(payload["active_job_keys"]), self._BUG0009_REQUIRED_ACTIVE_JOBS)
+        self.assertTrue(payload["ok"])
+
+    def test_bug0009_runbook_remediation_parity(self) -> None:
+        """T-009 / AC-8: active/template runbook remediation blurb byte-identical."""
+        root = Path(__file__).resolve().parents[1]
+        active = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        template = (root / "template" / "docs" / "engineering" / "runbook.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(self._BUG0009_REMEDIATION_BLURB, active)
+        self.assertIn(self._BUG0009_REMEDIATION_BLURB, template)
+
+    def test_bug0009_architecture_linkage(self) -> None:
+        """T-010 / AC-7: architecture # BUG-0009 links required peers (assert-only)."""
+        root = Path(__file__).resolve().parents[1]
+        dec_path = root / "decisions" / "DEC-0075.md"
+        self.assertTrue(dec_path.is_file(), "decisions/DEC-0075.md must exist")
+        dec_text = dec_path.read_text(encoding="utf-8")
+        self.assertIn("Accepted", dec_text, "DEC-0075 must be Accepted")
+
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(encoding="utf-8")
+        self.assertIn("# BUG-0009", arch)
+        bug_section = arch[arch.find("# BUG-0009") :]
+        required = (
+            "DEC-0075",
+            "US-0008",
+            "US-0017",
+            "US-0018",
+            "US-0063",
+            "BUG-0003",
+            "R-0075",
+            "negative-parity",
+            "ci-downstream",
+        )
+        for token in required:
+            with self.subTest(token=token):
+                self.assertIn(token, bug_section, f"# BUG-0009 must reference {token!r}")
+
+    _BUG0010_REMEDIATION_BLURB = (
+        "**Architecture file blocked on rollover?** If story sections use legacy H2 `## US-xxxx`\n"
+        "headings, the archiver now recognizes them for rollover after **BUG-0010**. For new work,\n"
+        "`/architecture` must append H1 `# US-xxxx` (or `# BUG-xxxx` for defects). To converge an\n"
+        "existing repo, optionally normalize `## US-xxxx` → `# US-xxxx` manually (count decrease is\n"
+        "allowed; adding new `## US-` story headings is blocked)."
+    )
+
+    def test_bug0010_architecture_command_h1_mandate(self) -> None:
+        """T-005 / AC-5: architecture command mandates H1 for story and bug sections."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/architecture.md",
+            "template/.cursor/commands/architecture.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("H1 `# US-xxxx`", text)
+                self.assertIn("H1 `# BUG-xxxx`", text)
+                self.assertIn("not `## US-`", text)
+
+    def test_bug0010_architecture_command_policy_stop_token(self) -> None:
+        """T-005 / AC-5: ARCH_STORY_HEADING_LEVEL_INVALID is a non-suppressible stop token."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/architecture.md",
+            "template/.cursor/commands/architecture.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("ARCH_STORY_HEADING_LEVEL_INVALID", text)
+                self.assertIn("non-suppressible", text)
+
+    def test_bug0010_architecture_command_baseline_policy_step(self) -> None:
+        """T-005 / AC-4: step 9 documents baseline capture and heading policy check."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/architecture.md",
+            "template/.cursor/commands/architecture.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("baseline_h2_count", text)
+                self.assertIn("--check-arch-heading-policy", text)
+                self.assertIn("--baseline-h2-count", text)
+
+    def test_bug0010_script_template_parity_sha256(self) -> None:
+        """T-001 / AC-7: active and template enforce-triad-hot-surface.py byte-identical."""
+        import hashlib
+
+        root = Path(__file__).resolve().parents[1]
+        active = (root / "scripts" / "enforce-triad-hot-surface.py").read_bytes()
+        template = (root / "template" / "scripts" / "enforce-triad-hot-surface.py").read_bytes()
+        self.assertEqual(
+            hashlib.sha256(active).digest(),
+            hashlib.sha256(template).digest(),
+            "enforce-triad-hot-surface.py must byte-match template mirror",
+        )
+
+    def test_bug0010_triad_arch_headings_fixtures(self) -> None:
+        """T-007 / AC-1, AC-3: fixture files exercise H2-only and mixed H1-wins paths."""
+        import importlib.util
+
+        root = Path(__file__).resolve().parents[1]
+        spec = importlib.util.spec_from_file_location(
+            "enforce_triad_hot_surface",
+            root / "scripts" / "enforce-triad-hot-surface.py",
+        )
+        assert spec and spec.loader
+        eths = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(eths)
+
+        h2_fixture = (
+            root / "tests" / "fixtures" / "triad_arch_headings" / "h2_only_multi.md"
+        ).read_text(encoding="utf-8")
+        _, h2_stories = eths.split_arch_stories(h2_fixture)
+        self.assertEqual(4, len(h2_stories), "H2-only fixture should yield four boundaries")
+
+        mixed_fixture = (
+            root / "tests" / "fixtures" / "triad_arch_headings" / "mixed_h1_h2_same_id.md"
+        ).read_text(encoding="utf-8")
+        _, mixed_stories = eths.split_arch_stories(mixed_fixture)
+        self.assertEqual(2, len(mixed_stories), "mixed fixture should yield two blocks (H1-wins)")
+        self.assertTrue(mixed_stories[0].startswith("# US-0067"))
+
+    def test_bug0010_runbook_remediation_parity(self) -> None:
+        """T-008 / AC-8: active/template runbook remediation blurb present."""
+        root = Path(__file__).resolve().parents[1]
+        active = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        template = (root / "template" / "docs" / "engineering" / "runbook.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn(self._BUG0010_REMEDIATION_BLURB, active)
+        self.assertIn(self._BUG0010_REMEDIATION_BLURB, template)
+
+    def test_bug0010_architecture_linkage(self) -> None:
+        """T-009 / AC-5: architecture # BUG-0010 links required peers (assert-only)."""
+        root = Path(__file__).resolve().parents[1]
+        dec_path = root / "decisions" / "DEC-0076.md"
+        self.assertTrue(dec_path.is_file(), "decisions/DEC-0076.md must exist")
+        dec_text = dec_path.read_text(encoding="utf-8")
+        self.assertIn("Accepted", dec_text, "DEC-0076 must be Accepted")
+
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(encoding="utf-8")
+        self.assertIn("# BUG-0010", arch)
+        bug_section = arch[arch.find("# BUG-0010") :]
+        required = (
+            "DEC-0076",
+            "DEC-0054",
+            "DEC-0043",
+            "US-0017",
+            "US-0072",
+            "R-0076",
+            "H1-wins",
+            "ARCH_STORY_HEADING_LEVEL_INVALID",
+            "Dual-track",
+            "Template parity inventory",
+        )
+        for token in required:
+            with self.subTest(token=token):
+                self.assertIn(token, bug_section, f"# BUG-0010 must reference {token!r}")
+
+    # --- US-0092: full_autonomy, outer driver, TOKEN_PROFILE orthogonality ---
+
+    def test_us0092_scratchpad_full_autonomy_literal(self) -> None:
+        """US-0092 / AC-1: AUTO_FLOW_MODE=full_autonomy literal in scratchpad comment block."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/scratchpad.md",
+            "template/.cursor/scratchpad.md",
+            ".cursor/scratchpad.local.example.md",
+            "template/.cursor/scratchpad.local.example.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("AUTO_FLOW_MODE=full_autonomy", text)
+                self.assertIn("AUTO_BLOCK_RETRY_MAX", text)
+                self.assertIn("AUTO_OUTER_DRIVER_TIMEOUT_SECONDS", text)
+
+    def test_us0092_token_profile_orthogonality_string(self) -> None:
+        """US-0092 / AC-6: normative TOKEN_PROFILE orthogonality marker."""
+        root = Path(__file__).resolve().parents[1]
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("TOKEN_PROFILE controls context breadth / token cost only", ref)
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("TOKEN_PROFILE controls context breadth / token cost only", runbook)
+
+    def test_us0092_runbook_no_automation_breadth_conflict(self) -> None:
+        """US-0092 / AC-6 negative: runbook must not contain forbidden conflict string."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertNotIn("lowers default automation breadth", text)
+
+    def test_us0092_drain_advance_without_operator_phrases(self) -> None:
+        """US-0092 / AC-5: drain-advance-without-operator phrases in auto surfaces."""
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        for token in (
+            "Drain-advance-without-pause",
+            "immediately",
+            "without operator re-`/auto`",
+        ):
+            with self.subTest(token=token, surface="auto.md"):
+                self.assertIn(token, auto)
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Drain-advance-without-pause", ref)
+
+    def test_us0092_outer_driver_script_exists(self) -> None:
+        """US-0092 / AC-2: scripts/auto_outer_driver.py exists active + template."""
+        root = Path(__file__).resolve().parents[1]
+        active = root / "scripts" / "auto_outer_driver.py"
+        template = root / "template" / "scripts" / "auto_outer_driver.py"
+        self.assertTrue(active.is_file())
+        self.assertTrue(template.is_file())
+        self.assertEqual(active.read_bytes(), template.read_bytes())
+
+    def test_us0092_uat_probe_lib_exists(self) -> None:
+        """US-0092 / AC-3: scripts/uat_probe_lib.py exists active + template."""
+        root = Path(__file__).resolve().parents[1]
+        active = root / "scripts" / "uat_probe_lib.py"
+        template = root / "template" / "scripts" / "uat_probe_lib.py"
+        self.assertTrue(active.is_file())
+        self.assertTrue(template.is_file())
+        self.assertEqual(active.read_bytes(), template.read_bytes())
+
+    def test_us0092_runbook_outer_driver_heading(self) -> None:
+        """US-0092 / AC-10: runbook Full-autonomy outer driver subsection."""
+        root = Path(__file__).resolve().parents[1]
+        heading = "### Full-autonomy outer driver (US-0092)"
+        active = (root / "docs" / "engineering" / "runbook.md").read_text(
+            encoding="utf-8"
+        )
+        template = (
+            root / "template" / "docs" / "engineering" / "runbook.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn(heading, active)
+        self.assertIn(heading, template)
+        idx = active.find(heading)
+        section = active[idx : idx + 2500]
+        for token in (".env", "RELEASE_PUBLISH_MODE=auto", "auto_block_retry"):
+            with self.subTest(token=token):
+                self.assertIn(token, section)
+
+    def test_us0092_auto_stop_matrix_markers(self) -> None:
+        """US-0092 / AC-7: full_autonomy stop matrix in auto.md + reference."""
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "Full-autonomy stop matrix (US-0092)",
+            "full_autonomy` delta",
+            "BLOCK_RETRY_CAP_EXHAUSTED",
+            "RELEASE_PUBLISH_MODE=auto",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, auto)
+                self.assertIn(token, ref)
+
+    def test_us0092_verify_work_qa_self_verify_excerpt(self) -> None:
+        """US-0092 / AC-3: verify-work and qa cite uat_probe_lib."""
+        root = Path(__file__).resolve().parents[1]
+        for cmd in ("verify-work.md", "qa.md"):
+            with self.subTest(cmd=cmd):
+                active = (root / ".cursor" / "commands" / cmd).read_text(
+                    encoding="utf-8"
+                )
+                template = (
+                    root / "template" / ".cursor" / "commands" / cmd
+                ).read_text(encoding="utf-8")
+                self.assertEqual(active, template)
+                self.assertIn("scripts/uat_probe_lib.py", active)
+                self.assertIn("UAT_PROBE_UNRESOLVED", active)
+
+    # --- US-0093: browser UAT two-tier, evidence schema, reason codes ---
+
+    def test_us0093_scratchpad_browser_probe_mode_keys(self) -> None:
+        """US-0093 / AC-1: UAT_BROWSER_PROBE_MODE literals in scratchpad family."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/scratchpad.md",
+            "template/.cursor/scratchpad.md",
+            ".cursor/scratchpad.local.example.md",
+            "template/.cursor/scratchpad.local.example.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("UAT_BROWSER_PROBE_MODE=cursor", text)
+                self.assertIn("http_fallback", text)
+                self.assertIn("playwright_fallback", text)
+                self.assertIn("UAT_BROWSER_FALLBACK_CHAIN=1", text)
+                self.assertIn("UAT_PROCESS_HEALTH_POLL_SECONDS=60", text)
+                self.assertIn("PERMISSION_MODE", text)
+
+    def test_us0093_browser_evidence_refs_in_commands(self) -> None:
+        """US-0093 / AC-5: browser_evidence_refs in verify-work + qa excerpts."""
+        root = Path(__file__).resolve().parents[1]
+        for cmd in ("verify-work.md", "qa.md"):
+            with self.subTest(cmd=cmd):
+                active = (root / ".cursor" / "commands" / cmd).read_text(
+                    encoding="utf-8"
+                )
+                template = (
+                    root / "template" / ".cursor" / "commands" / cmd
+                ).read_text(encoding="utf-8")
+                self.assertEqual(active, template)
+                self.assertIn("browser_evidence_refs", active)
+                self.assertIn("### Browser UAT self-test (US-0093)", active)
+
+    def test_us0093_browser_reason_codes_in_lib_and_docs(self) -> None:
+        """US-0093 / AC-6: UAT_BROWSER_* codes in lib + command docs."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "uat_probe_lib.py").read_text(encoding="utf-8")
+        for code in (
+            "UAT_BROWSER_UNAVAILABLE",
+            "UAT_BROWSER_PROBE_FAILED",
+            "UAT_BROWSER_PROBE_TIMEOUT",
+        ):
+            with self.subTest(code=code):
+                self.assertIn(code, lib)
+        vw = (root / ".cursor" / "commands" / "verify-work.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("UAT_BROWSER_UNAVAILABLE", vw)
+
+    def test_us0093_no_silent_pass_cursor_browser_smoke(self) -> None:
+        """US-0093 / AC-9 negative: docs must not imply stdlib PASS without evidence."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/verify-work.md",
+            ".cursor/commands/qa.md",
+            "template/.cursor/commands/verify-work.md",
+            "template/.cursor/commands/qa.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("No silent PASS", text)
+                self.assertIn("browser_evidence_refs", text)
+                self.assertNotIn("stdlib alone PASSes browser_smoke", text)
+
+    def test_us0093_uat_probe_lib_parity_and_self_test(self) -> None:
+        """US-0093 / AC-2: uat_probe_lib active/template parity + --merge-result."""
+        root = Path(__file__).resolve().parents[1]
+        active = root / "scripts" / "uat_probe_lib.py"
+        template = root / "template" / "scripts" / "uat_probe_lib.py"
+        self.assertEqual(active.read_bytes(), template.read_bytes())
+        text = active.read_text(encoding="utf-8")
+        self.assertIn("--merge-result", text)
+        self.assertIn("execution_tier", text)
+
+    def test_us0093_architecture_linkage(self) -> None:
+        """US-0093 / AC-10: architecture # US-0093 + DEC-0079 compose-on linkage."""
+        root = Path(__file__).resolve().parents[1]
+        dec_path = root / "decisions" / "DEC-0079.md"
+        self.assertTrue(dec_path.is_file())
+        dec_text = dec_path.read_text(encoding="utf-8")
+        self.assertIn("Accepted", dec_text)
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("# US-0093", arch)
+        section = arch[arch.find("# US-0093") :]
+        for token in (
+            "DEC-0079",
+            "US-0092",
+            "DEC-0078",
+            "US-0065",
+            "R-0041",
+            "browser_evidence_refs",
+            "UAT_BROWSER_PROBE_MODE",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, section)
+
+    def test_bug0011_architecture_linkage(self) -> None:
+        """T-008 / AC-1: architecture # BUG-0011 + DEC-0077 linkage (assert-only)."""
+        root = Path(__file__).resolve().parents[1]
+        dec_path = root / "decisions" / "DEC-0077.md"
+        self.assertTrue(dec_path.is_file(), "decisions/DEC-0077.md must exist")
+        dec_text = dec_path.read_text(encoding="utf-8")
+        self.assertIn("Accepted", dec_text, "DEC-0077 must be Accepted")
+
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("# BUG-0011", arch)
+        bug_section = arch[arch.find("# BUG-0011") :]
+        required_bug = (
+            "DEC-0077",
+            "DEC-0072",
+            "R-0077",
+            "## Voice compression (when CAVEMAN_MODE=1)",
+            "§30A",
+            "test_caveman_voice_*",
+            "AC traceability",
+        )
+        for token in required_bug:
+            with self.subTest(token=token, section="BUG-0011"):
+                self.assertIn(token, bug_section, f"# BUG-0011 must reference {token!r}")
+
+        us0089_idx = arch.find("# US-0089")
+        self.assertNotEqual(us0089_idx, -1, "architecture.md must have # US-0089")
+        us0089_section = arch[us0089_idx : arch.find("\n# ", us0089_idx + 1)]
+        for token in ("BUG-0011", "DEC-0077"):
+            with self.subTest(token=token, section="US-0089"):
+                self.assertIn(
+                    token,
+                    us0089_section,
+                    f"# US-0089 §6 must forward-link {token!r}",
+                )
 
 
 if __name__ == "__main__":

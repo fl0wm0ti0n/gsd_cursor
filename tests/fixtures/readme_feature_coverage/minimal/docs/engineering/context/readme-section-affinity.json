@@ -1,0 +1,10 @@
+{
+  "affinity_version": 1,
+  "rules": [
+    {
+      "dev_h2": "Workflow",
+      "root_h2": "Commands and workflow",
+      "tag": "slash_command"
+    }
+  ]
+}

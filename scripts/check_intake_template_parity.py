@@ -4,7 +4,11 @@
 Scoped modes (DEC-0073 §10 / US-0090):
   --scope=intake          (default) DEC-0063 intake pair table.
   --scope=caveman-compress DEC-0073 caveman input-compression pair table.
-  --scope=all              union of both tables.
+  --scope=readme-feature-coverage DEC-0074 README feature-coverage pair table.
+  --scope=downstream-ci-guard   DEC-0075 downstream CI guard script pair table.
+  --scope=us-0092               DEC-0078 full-autonomy outer driver + probe surfaces.
+  --scope=us-0093               DEC-0079 browser UAT probe surfaces.
+  --scope=all              union of all tables.
 """
 
 from __future__ import annotations
@@ -33,10 +37,94 @@ CAVEMAN_COMPRESS_PAIRS: tuple[tuple[str, str], ...] = (
      "template/docs/engineering/auto-orchestration-reference.md"),
 )
 
+README_FEATURE_COVERAGE_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/validate_readme_feature_coverage.py",
+        "template/scripts/validate_readme_feature_coverage.py",
+    ),
+    (
+        "scripts/readme_feature_coverage_lib.py",
+        "template/scripts/readme_feature_coverage_lib.py",
+    ),
+    (
+        "docs/engineering/context/readme-section-affinity.json",
+        "template/docs/engineering/context/readme-section-affinity.json",
+    ),
+    (".cursor/commands/release.md", "template/.cursor/commands/release.md"),
+    ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"),
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
+US0092_PAIRS: tuple[tuple[str, str], ...] = (
+    ("scripts/auto_outer_driver.py", "template/scripts/auto_outer_driver.py"),
+    ("scripts/uat_probe_lib.py", "template/scripts/uat_probe_lib.py"),
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+    (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+    (".cursor/commands/verify-work.md", "template/.cursor/commands/verify-work.md"),
+    (".cursor/commands/qa.md", "template/.cursor/commands/qa.md"),
+    (
+        "docs/engineering/auto-orchestration-reference.md",
+        "template/docs/engineering/auto-orchestration-reference.md",
+    ),
+    ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"),
+)
+
+US0093_PAIRS: tuple[tuple[str, str], ...] = (
+    ("scripts/uat_probe_lib.py", "template/scripts/uat_probe_lib.py"),
+    (".cursor/commands/verify-work.md", "template/.cursor/commands/verify-work.md"),
+    (".cursor/commands/qa.md", "template/.cursor/commands/qa.md"),
+    (".cursor/commands/execute.md", "template/.cursor/commands/execute.md"),
+    (
+        ".cursor/scratchpad.local.example.md",
+        "template/.cursor/scratchpad.local.example.md",
+    ),
+    ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"),
+    (
+        "docs/engineering/auto-orchestration-reference.md",
+        "template/docs/engineering/auto-orchestration-reference.md",
+    ),
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+)
+
+DOWNSTREAM_CI_GUARD_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/check_downstream_ci_guard.py",
+        "template/scripts/check_downstream_ci_guard.py",
+    ),
+    (
+        "scripts/downstream_ci_guard_lib.py",
+        "template/scripts/downstream_ci_guard_lib.py",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
-    "all": INTAKE_TEMPLATE_PAIRS + CAVEMAN_COMPRESS_PAIRS,
+    "readme-feature-coverage": README_FEATURE_COVERAGE_PAIRS,
+    "downstream-ci-guard": DOWNSTREAM_CI_GUARD_PAIRS,
+    "us-0092": US0092_PAIRS,
+    "us-0093": US0093_PAIRS,
+    "all": (
+        INTAKE_TEMPLATE_PAIRS
+        + CAVEMAN_COMPRESS_PAIRS
+        + README_FEATURE_COVERAGE_PAIRS
+        + DOWNSTREAM_CI_GUARD_PAIRS
+        + US0092_PAIRS
+        + US0093_PAIRS
+    ),
 }
 
 

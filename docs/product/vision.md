@@ -994,3 +994,141 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   - **Gate language preserved**: decision gates, errors, `[BUG_VALIDATION_OK]`, `[INTAKE_EVIDENCE_VALIDATION_OK]`, `blocked`, `missing input`, `pause`, and `loop_max` notifications remain **verbatim** even when Caveman is on (carryover from **US-0088 / `AUTO_QUIET`** non-suppressible list).
   - **Operator control phrasing**: documented, deterministic phrases (e.g. "enable caveman" / "disable caveman" / "stop caveman" / "normal mode") map to session toggles with predictable behavior; exact wording will be architecture-locked in **`# US-0089`**.
 - **Scope boundary for messaging**: the **output-style** contract lives entirely in this story. Optional **input-side** compression (file reads, sidecar originals, deny lists) is deferred to **US-0090** and **must not** be surfaced as a Caveman capability in user-facing docs until that story ships.
+
+## Intake Notes — US-0091
+
+- **Problem**: Root `README.md` and the developer shard can lag behind shipped user-visible capabilities even when `US-0030` passes — the delta gate only fires when commands/flags **change**, not when a feature shipped without an initial README blurb.
+- **Intent**: One-time audit + backfill across root `README.md`, `template/README.md`, and `docs/developer/README.md`, then a **blocking** static-coverage validator composed into `/release` so drift cannot recur.
+- **Operator scope (2026-05-10)**: `scope_files=both`, `audience_focus=both_profiles`, `feature_set=user_visible`, `drift_guard=blocking`, `story_split=single`, `priority=P1`.
+- **Evidence**: `handoffs/intake_evidence/US-0091-intake-20260510.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research anchor **`R-0074`**.
+- **Intake closure (2026-05-10, PO)**: Backlog **`US-0091`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0091
+
+- **Operator value proposition**: Operators and downstream kit consumers see a **complete, trustworthy catalog** of what its-magic can do — commands, flags, scratchpad modes, and operator-affecting fixes — without hunting backlog prose. After backfill, `/release` **fails closed** when a shipped user-visible item lacks a README-family description, so documentation debt cannot silently accumulate again.
+- **Product-facing messaging constraints**:
+  - **Dual-audience split preserved** (**DEC-0059**): operator blurbs stay in root `README.md` under existing H2 vocabulary (`Features`, `Commands and workflow`, `Other useful capabilities`, etc.); developer traceability rows stay in `docs/developer/README.md` under `DEV_*` H2 literals — **no new H2s** for backfill (section budgets via `validate_doc_profile.py` remain authoritative).
+  - **Terseness over encyclopedic guides**: backfill is **1–2 sentences per feature** plus optional command/flag tokens — not per-feature user guides (`USER_GUIDE_MODE` / **US-0032** remain orthogonal).
+  - **Traceability without internal jargon** (**US-0071**): root blurbs stay operator-readable; DEV shard rows may cite `US-xxxx` / `DEC-xxxx` / scratchpad keys for implementers. No planning tokens (`orchestrator_run_id`, `fresh_context_marker`, etc.) in operator blurbs.
+  - **Remediation vocabulary**: blocking failures use umbrella **`README_FEATURE_COVERAGE_BLOCKED`** with deterministic sub-codes (`README_FEATURE_COVERAGE_GAP:<US-xxxx|BUG-xxxx>`, parity/profile/input variants per acceptance) and point to the missing audience surface (root bullet vs DEV row).
+  - **Grandfathering contract**: first activation of the blocking gate ships **in the same sprint** as the backfill — no retroactive `/release` block on currently DONE items until the catalog is populated (**AC-10**).
+- **Predicate contract (discovery-locked for `/research`)**:
+  - **Canonical input**: optional backlog block field **`user_visible: true|false`** per `## US-xxxx` / `### BUG-####` (validator reads backlog, not acceptance prose).
+  - **In-scope when**: status **DONE** and `user_visible: true` (explicit) — or, during one-time migration only, unset field passes a bounded heuristic (slash-command / scratchpad-key / CLI-flag / runbook operator-action signals in backlog summary or acceptance title).
+  - **Out-of-scope when**: `user_visible: false` or pure-internal invariant surface (template parity guards, archiver mechanics, schema-only validators with no operator action).
+  - **Ambiguous** unset + heuristic tie → **`README_FEATURE_COVERAGE_INPUT_INVALID`** (fail closed).
+  - **Acceptance row**: optional human suffix `(user_visible)` allowed for portfolio scan; **not** parsed by the validator.
+- **Coverage anchor contract**: each in-scope item must be detectable in the README family — root bullet or sub-entry naming the command/flag/capability **or** containing the `US-xxxx`/`BUG-xxxx` id; DEV shard row linking id + relevant scratchpad flags. Placement follows **section affinity** (commands → `Commands and workflow`; modes/flags → `Commands and workflow` or `Other useful capabilities`; install/distribution → `Features`; dev governance → `Workflow` / `Quality gates` / `Engineering decisions`).
+- **Composition boundaries**: **`US-0030`** delta gate unchanged; **`US-0091`** adds a **second static-coverage check** in the same `/release` doc-gate surface. **`US-0017`** owns byte parity; **`US-0077`** owns profile cells — this story **populates** them only.
+- **Research asks**: finalize migration heuristic table, validator CLI/`--report` schema, release-gate wiring point, grandfathering toggle, and section-affinity manifest before **`/architecture`** locks **`DEC-xxxx`** companion.
+
+## Intake notes — BUG-0009
+
+- **Problem**: its-magic copies its **own** self-packaging GitHub Actions CI into every generated repo, so `npm-test`/`brew-test`/`choco-test` fail in downstream projects that lack `package.json`, `installer.sh`, and `packaging/chocolatey`.
+- **Operator scope (2026-06-06)**: fix new installs/upgrades; existing repos heal on next upgrade; also harden generic `checks` for fresh projects with no real tests yet.
+- **Evidence**: `handoffs/intake_evidence/BUG-0009-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); operator CI logs from `finance_goblin`.
+- **Intake closure (2026-06-06, PO)**: Backlog **`BUG-0009`** **OPEN**; next **`/discovery`**.
+
+## Intake notes — BUG-0010
+
+- **Problem**: Triad archiver (`enforce-triad-hot-surface.py`) only recognizes H1 `# US-xxxx` story boundaries; repos with H2 `## US-xxxx` sections cannot auto-archive when `architecture.md` exceeds `ARCH_HOT_MAX_LINES` — `/auto` stops with `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`.
+- **Operator scope (2026-06-06)**: **both** fixes — backward-compat archiver for `## US-xxxx` rollover **and** forward enforcement of H1 `# US-xxxx` for new `/architecture` writes.
+- **Evidence**: `handoffs/intake_evidence/BUG-0010-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); operator `/ask` report (discovery PASS then triad gate fail at 3021/3000 lines).
+- **Intake closure (2026-06-06, PO)**: Backlog **`BUG-0010`** **OPEN**; next **`/discovery`**.
+
+## Intake notes — BUG-0011
+
+- **Problem**: **US-0089** shipped Caveman gates, literal invariants, and scratchpad toggles but `.cursor/rules/caveman.mdc` lacks upstream voice-compression rules — with **`CAVEMAN_MODE=1`** replies stay verbose (full sentences, filler, hedging).
+- **Operator scope (2026-06-06)**: add upstream-aligned voice section (lite/full/ultra, drop filler, fragments, auto-clarity exceptions); preserve **DEC-0072** 9-zone literal invariant and **US-0090** input-compression orthogonality; no Wenyan / vendor install.
+- **Evidence**: `handoffs/intake_evidence/BUG-0011-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); operator `/ask` comparing local `caveman.mdc` vs JuliusBrussee/caveman `SKILL.md`.
+- **Intake closure (2026-06-06, PO)**: Backlog **`BUG-0011`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — BUG-0011
+
+- **Operator value proposition**: When **`CAVEMAN_MODE=1`**, operators expect **visibly shorter assistant prose** (fewer output tokens, full technical accuracy) — matching the upstream Caveman intent documented in **`R-0073`**. The fix completes the **response-side voice vertical** that **US-0089** scaffolded but did not ship; it is **orthogonal** to **US-0090** input-side file compression (already **DONE**).
+- **Product-facing messaging constraints**:
+  - **Token savings, not roleplay**: voice rules target terse/imperative prose and dropped filler — not stereotypical "cave man" speech or Wenyan modes.
+  - **Literal safety preserved**: all nine **DEC-0072** literal regions (code blocks, paths, reason codes, IDs, proof tuples, etc.) remain byte-literal under every level including **`ultra`**.
+  - **User-rule precedence**: when Caveman mode is on, voice compression wins over conflicting user rules that demand "complete sentences" or high prose quality — explicit precedence paragraph required in the rule.
+  - **Default-off unchanged**: **`CAVEMAN_MODE=0`** (or absent) adds zero behavioral change; existing contract tests under **`test_caveman_default_off_*`** must stay green.
+- **Discovery-locked contract (rule-only per DEC-0072)**:
+  - **Voice section** in `.cursor/rules/caveman.mdc` + template mirror: lite/full/ultra table, drop rules, auto-clarity exceptions, persistence.
+  - **Runbook extension**: level table + operator examples under **`### Caveman mode (US-0089)`**.
+  - **Contract tests**: additive **`test_caveman_voice_*`** markers; update US-0090 SHA-256 baseline intentionally after rule edit.
+  - **Negative scope**: no Wenyan; no vendor token-percent claims; no `npx skills add`; no changes to **`CAVEMAN_COMPRESS_INPUT`** / **`scripts/caveman_compress_input.py`**.
+- **Research asks**: SHA-256 strategy, level-table wording, precedence placement, architecture surface — see **`R-0077`** before **`/architecture`**.
+
+## Discovery Notes — BUG-0010
+
+- **Operator value proposition**: Long-running its-magic projects must **auto-unblock** when `architecture.md` grows past hot-surface caps — regardless of whether historical agents wrote story sections as H1 or H2. After the fix ships, `/auto` must not halt on pre-existing `## US-` repos; new architecture work must converge on the canonical H1 `# US-xxxx` contract (**DEC-0054** §2) so future rollovers stay predictable.
+- **Product-facing messaging constraints**:
+  - **One-time remediation**: operators with `##`-only architecture files can either wait for the archiver fix (preferred) or manually normalize headings / run manual archive — no forced bulk rewrite in this bug scope.
+  - **Fail-closed vocabulary preserved**: `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS` remains for genuinely unsliceable oversize files (no story headings at either level); fix narrows the failure mode to true ambiguity, not heading-level blindness.
+  - **Template parity**: active + `template/` command contracts and triad script must stay aligned (**US-0017**).
+- **Dual-track contract (discovery-locked)**:
+  - **Track A (rollover)**: `## US-xxxx` counts as a story-section boundary for archival slicing (same oldest-first semantics as H1).
+  - **Track B (authoring)**: `/architecture` phase blocks new `## US-xxxx` story sections; mandates H1 `# US-xxxx` (and existing `# BUG-xxxx` pattern for defects).
+- **Research asks**: regex/precedence table, validator placement, enforcement gate severity, self-test matrix — see **`R-0076`** before **`/architecture`**.
+
+## Discovery Notes — BUG-0009
+
+- **Operator value proposition**: Every its-magic-created project gets **green-by-default CI** that runs only project-agnostic checks (`checks` + optional `auto-fix` from runbook keys). Self-distribution validation (`npm pack`, Homebrew formula, Chocolatey pack) stays on the **its-magic kit repo** only — never shipped into consumer repos.
+- **Product-facing messaging constraints**:
+  - **Upgrade remediation**: operators with already-broken repos must run an its-magic **upgrade** (or `clean` + reinstall) to receive the corrected `ci.yml` — not a manual GitHub edit. Release notes and runbook must state this plainly.
+  - **Fresh-project clarity**: when no test/lint/typecheck commands are configured, CI summary must say **no tests configured yet** and pass — not `Tests or lint failed`.
+  - **No regression to kit self-CI**: its-magic's own repo keeps full packaging job coverage for npm/Homebrew/Chocolatey release confidence (**US-0007** / **US-0009**).
+- **Decoupling contract (discovery-locked)**: `template/.github/workflows/ci.yml` ≠ `.github/workflows/ci.yml` after fix — explicit **`US-0017` exception** for this path; drift guard prevents re-leak.
+- **Research asks**: template CI shape, drift-guard mechanism, runbook bootstrap defaults, parity exception policy, install/upgrade smoke — see **`R-0075`** before **`/architecture`**.
+
+## Intake Notes — US-0092
+
+- **Problem**: **US-0088** documents continuous `/auto` and backlog drain, but operators still manually re-invoke after every phase or segment — scratchpad auto flags alone do not sustain multi-turn orchestration in Cursor.
+- **Intent**: Opt-in **`AUTO_FLOW_MODE=full_autonomy`** (default-off; **`auto_until_decision`** unchanged) with a **shipped stdlib outer-driver script**, self-verify UAT/QA via build/test/API/browser, bounded block auto-resolve, and drain-without-pause between OPEN items.
+- **Operator constraint (hard)**: **`TOKEN_PROFILE`** affects **token cost / context breadth only** — not automation level, phase depth, drain behavior, or outer-driver invocation.
+- **Evidence**: `handoffs/intake_evidence/US-0092-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research anchor **`R-0078`**.
+- **Intake closure (2026-06-06, PO)**: Backlog **`US-0092`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0092
+
+- **Operator value proposition**: Downstream its-magic consumers enable **`AUTO_FLOW_MODE=full_autonomy`**, run the outer driver **once**, and receive end-to-end delivery — implementation, self-verified UAT, bounded block remediation, and automatic advance to the next OPEN story/bug — without babysitting each Cursor turn.
+- **Product-facing messaging constraints**:
+  - **Default-off safety**: **`manual`** and **`auto_until_decision`** remain unchanged; full autonomy is explicit opt-in only.
+  - **TOKEN_PROFILE orthogonality**: docs and scratchpad comments must never imply **`lean`** = less automation or **`full`** = more phases — only context breadth / token cost (**US-0080** / **DEC-0062** composition).
+  - **Publish boundary**: **`RELEASE_PUBLISH_MODE=auto`** stays explicit opt-in; full_autonomy does not auto-publish.
+  - **Security posture**: no auto-read **`.env`**, no intake-evidence mutation, attempt ledgers names-only (**AC-10**).
+  - **Spawn-only preserved**: fresh subagent per phase (**US-0048** / **BUG-0006**) — outer driver loops **invocations**, not in-chat multi-role stacking.
+- **Six-step operator flow (discovery-locked)**:
+  1. Set **`AUTO_FLOW_MODE=full_autonomy`** (+ optional drain/bug-queue flags).
+  2. Run shipped outer-driver script once.
+  3. Inner `/auto` executes lifecycle with self-verify QA/verify-work.
+  4. Recoverable blocks retry within caps.
+  5. Segment completion triggers immediate next-item scheduling (drain-without-pause).
+  6. Driver exits on cap, hard gate, or empty portfolio.
+- **Composition boundaries**: extends **US-0088** (continuous policy) + **US-0044** (drain switches) + **US-0065/66** (runtime probes) + **US-0087** (bug-queue mutex); does not weaken isolation (**US-0048**) or strict proof (**US-0056**).
+- **Research asks**: outer-driver model, stop matrix vs **US-0088**, UAT probe catalog, block-retry ledger, TOKEN_PROFILE audit scope — see **`R-0078`** before **`/architecture`**.
+
+## Intake Notes — US-0093
+
+- **Problem**: **US-0092** / **DEC-0078** shipped the UAT probe catalog and fail-closed vocabulary, but **`browser_smoke`**, **`process_health`**, and **`cli_smoke`** still return **`UAT_PROBE_UNRESOLVED`** without execution; **`manual_operator`** UI steps are classified but never auto-run.
+- **Intent**: Wire **Cursor built-in browser** (navigate, click, type, scroll, screenshot, console/network evidence) as the **primary** web self-test path for **`/verify-work`**, **`/qa`**, and **`/execute`**; deterministic **HTTP / Playwright subprocess fallback** when browser MCP is unavailable; complete remaining probe stubs; record evidence in **`uat.json`** `probe_results[]`.
+- **Operator constraint (hard)**: fail closed — no silent PASS when browser and fallback both fail; respect Cursor browser approval settings and **`PERMISSION_MODE`**; never auto-read **`.env`** or submit credentials.
+- **Evidence**: `handoffs/intake_evidence/US-0093-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research anchor **`R-0079`**.
+- **Intake closure (2026-06-06, PO)**: Backlog **`US-0093`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0093
+
+- **Operator value proposition**: Webapp and full-stack its-magic consumers get **real browser UAT** during **`/qa`** and **`/verify-work`** — not probe-catalog stubs. Operators enable browser self-test once via scratchpad; agents navigate the running dev server, capture screenshots and console/network summaries, and write path-ref evidence operators can inspect without re-running manual checklists.
+- **Product-facing messaging constraints**:
+  - **Default-on when resolvable**: when web stack + health URL or dev-server port resolves, **`browser_smoke`** runs automatically — operators are not asked to install Playwright unless fallback mode is selected or MCP is unavailable.
+  - **Approval posture**: Cursor browser tools require approval by default (manual, allow-list, or auto-run per Cursor Settings). Docs must state that **`UAT_BROWSER_PROBE_MODE=cursor`** composes with operator approval settings — its-magic does not bypass browser security guardrails without explicit scratchpad opt-in.
+  - **Human judgment preserved**: steps requiring aesthetic judgment, subjective UX review, or explicit operator sign-off remain **`manual_operator`** with **`UAT_PROBE_UNRESOLVED`** (fail closed, documented).
+  - **Spawn-only preserved**: browser MCP execution stays in fresh QA/verify-work/execute subagent contexts (**US-0048** / **BUG-0006**); stdlib lib classifies and records — it does not pretend to drive MCP from Python alone.
+- **Two-tier execution contract (discovery-locked)**:
+  1. **Stdlib tier** (`scripts/uat_probe_lib.py`): classify step → probe kind; resolve stack profile, health URL, dev-server port; run **HTTP** or **Playwright subprocess** when mode is fallback or MCP unavailable; execute **`process_health`** / **`cli_smoke`** via bounded subprocess; emit reason codes; never silent PASS.
+  2. **Agent tier** (`.cursor/commands/verify-work.md`, **`qa.md`**, **`execute.md`**): when **`UAT_BROWSER_PROBE_MODE=cursor`** (default) and probe kind is **`browser_smoke`** or automatable **`manual_operator`**, subagent invokes Cursor browser tools (navigate → interact → screenshot → console/network read) per documented step plan; writes **`browser_evidence_refs`** into **`uat.json`** `probe_results[]` and mirrors fields in **`qa-findings.md`**.
+- **Browser automation scope (reference: [Cursor Browser tools](https://cursor.com/docs/agent/tools/browser))**:
+  - **In scope**: Navigate, click, type, scroll, screenshot, console output, network traffic monitoring; dev-server awareness (detect running ports from **`runtime-connectivity.md`** / scratchpad); **`@browser`** operator override for manual rescue.
+  - **Out of scope**: visual-regression pixel-diff infrastructure; design-sidebar visual editing as UAT evidence; auto-bypass of enterprise origin allowlists; vendor guarantees beyond documented MCP surface.
+- **`manual_operator` routing (discovery stub)**: reclassify steps with UI/workflow verbs (**click**, **fill**, **navigate**, **smoke**, **form**, **submit**, **login page**, **dashboard**) to browser probe plans when no explicit human-judgment signal (**visually**, **aesthetically**, **operator confirms**, **subjective**); judgment-only steps stay **`manual_operator`**.
+- **Composition boundaries**: extends **US-0092** / **DEC-0078** probe catalog; delivers **R-0041** browser integration promise; composes **US-0065** runtime QA fields; does not weaken security deny-list or full_autonomy false-PASS guards.
+- **Research asks**: agent-browser command contract, verb routing table, fallback selection, stub resolution rules, evidence schema, contract-test inventory — see **`R-0079`** before **`/architecture`**.

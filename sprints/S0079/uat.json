@@ -1,0 +1,140 @@
+{
+  "sprint_id": "S0079",
+  "bug_ids": ["BUG-0010"],
+  "bug_id": "BUG-0010",
+  "dec_id": "DEC-0076",
+  "author": "qa",
+  "timestamp": "2026-06-06T16:33:28Z",
+  "orchestrator_run_id": "auto-20260606-02",
+  "fresh_context_marker": "qa-S0079-BUG0010-qa-20260606T143218Z-fresh",
+  "verify_work_executed_at": "2026-06-06T16:33:28Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0079-BUG0010-verify-work-20260606T163328Z-fresh",
+  "verify_work_verdict": "PASS",
+  "status": "populated",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "total": 8,
+  "qa_verdict_reference": "sprints/S0079/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Zero blocking findings; harness §29A green (5/5); +5 pass vs S0078 QA baseline; Fail=14 disjoint from DEC-0076.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "Merged DEC-0076 execute deliverables on branch",
+    "enforce-triad-hot-surface.py present (active + template mirrors)"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "dec_ref": ["DEC-0076 §1", "DEC-0076 §2", "DEC-0076 §5"],
+      "commands": [
+        "python scripts/enforce-triad-hot-surface.py --self-test",
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_bug0010_triad_arch_headings_fixtures"
+      ],
+      "expected": "H2-only `## US-xxxx` boundaries recognized for rollover; h2_only_multi fixture present",
+      "result": "pass",
+      "evidence_ref": "--self-test exit 0 (H2-only rollover class); test_bug0010_triad_arch_headings_fixtures PASS; fixtures/tests/fixtures/triad_arch_headings/h2_only_multi.md",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "dec_ref": ["DEC-0076 §1", "DEC-0076 §5"],
+      "command": "python scripts/enforce-triad-hot-surface.py --self-test",
+      "expected": "Existing `# US-0001`/`# US-0002` H1 non-regression fixture unchanged; exit 0",
+      "result": "pass",
+      "evidence_ref": "--self-test exit 0; H1 non-regression class green per self-test harness",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "dec_ref": ["DEC-0076 §2", "DEC-0076 §5"],
+      "commands": [
+        "python scripts/enforce-triad-hot-surface.py --self-test",
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_bug0010_triad_arch_headings_fixtures"
+      ],
+      "expected": "Mixed file: H1-wins when same id has both `# US-` and `## US-`",
+      "result": "pass",
+      "evidence_ref": "--self-test mixed H1-wins class exit 0; mixed_h1_h2_same_id.md fixture PASS via contract subtest",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "dec_ref": ["DEC-0076 §3", "DEC-0076 §4"],
+      "commands": [
+        "python scripts/enforce-triad-hot-surface.py --check-arch-heading-policy --baseline-h2-count 5",
+        "python scripts/enforce-triad-hot-surface.py --self-test"
+      ],
+      "expected": "Policy check exit 0 at current baseline; enforcement-delta self-test returns ARCH_STORY_HEADING_LEVEL_INVALID on H2 increase",
+      "result": "pass",
+      "evidence_ref": "--check-arch-heading-policy --baseline-h2-count 5 exit 0; self-test policy-delta class PASS",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "dec_ref": ["DEC-0076 §3", "DEC-0076 §6"],
+      "commands": [
+        "python -m pytest tests/auto_command_contract_test.py -q -k \"test_bug0010_architecture_command_h1_mandate or test_bug0010_architecture_command_policy_stop_token or test_bug0010_architecture_command_baseline_policy_step\""
+      ],
+      "expected": "Architecture command step 9 documents H1 mandate, baseline capture, ARCH_STORY_HEADING_LEVEL_INVALID stop token; active/template byte-identical",
+      "result": "pass",
+      "evidence_ref": "3 architecture-command contract subtests PASS; active/template architecture.md SHA-256 match",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "dec_ref": ["DEC-0076 §5"],
+      "commands": [
+        "python scripts/enforce-triad-hot-surface.py --self-test",
+        "python -m pytest tests/auto_command_contract_test.py -q -k bug0010"
+      ],
+      "expected": "--self-test exit 0; 7 contract subtests PASS; harness §29A 5/5 PASS per qa-findings",
+      "result": "pass",
+      "evidence_ref": "--self-test exit 0; pytest -k bug0010 → 7 passed, 16 subtests; tests/report.md lines 816-820 all [PASS]",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "dec_ref": ["DEC-0076 §1", "DEC-0076 §6"],
+      "commands": [
+        "python -c \"import hashlib; from pathlib import Path; a=Path('scripts/enforce-triad-hot-surface.py').read_bytes(); t=Path('template/scripts/enforce-triad-hot-surface.py').read_bytes(); print(hashlib.sha256(a).hexdigest()==hashlib.sha256(t).hexdigest())\"",
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_bug0010_script_template_parity_sha256"
+      ],
+      "expected": "STORY_HEADING_H1 includes `# BUG-`; active/template script byte-identical",
+      "result": "pass",
+      "evidence_ref": "script_match True; test_bug0010_script_template_parity_sha256 PASS",
+      "verified_at": "2026-06-06T16:33:28Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "dec_ref": ["DEC-0076 §7"],
+      "commands": [
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_bug0010_runbook_remediation_parity"
+      ],
+      "expected": "Verbatim DEC-0076 §7 remediation blurb in runbook triad subsection (active + template)",
+      "result": "pass",
+      "evidence_ref": "test_bug0010_runbook_remediation_parity PASS; runbook.md + template runbook.md line 506 blurb present",
+      "verified_at": "2026-06-06T16:33:28Z"
+    }
+  ],
+  "summary": {
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "acceptance": "UAT passes when all 8 UAT steps (AC-1..AC-8) meet expected outcomes.",
+  "verify_work_result": "8/8 PASS; 0 FAIL; 0 SKIP; verdict=PASS",
+  "closure_preflight": {
+    "verdict": "PASS",
+    "gates_passed": 9,
+    "gates_total": 9
+  }
+}

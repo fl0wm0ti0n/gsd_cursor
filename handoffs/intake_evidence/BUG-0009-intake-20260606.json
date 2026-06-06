@@ -1,0 +1,61 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260606-BUG0009-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "das ci in github hat in allen mit its magic erstellten repos noch fehler.. koennen wir das fixen? allgemein? bzw wenn da individuell sein muss fuer neue projekte, das so vorbereiten, dass its-magic das automatisch korrekt macht und bedenkt.",
+      "intake_run_id": "cursor-20260606-BUG0009-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260606-BUG0009-intake:0:617de06c2c455b7f"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "CI logs name its-magic self-packaging jobs that fail in a downstream repo (finance_goblin): npm pack -> ENOENT package.json; sh installer.sh -> No such file; Push-Location packaging/chocolatey -> path not found.",
+      "intake_run_id": "cursor-20260606-BUG0009-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260606-BUG0009-intake:1:f0ee925c95f83502",
+      "delegation_scope": "template/.github/workflows/ci.yml (npm-test, brew-test, choco-test jobs); docs/engineering/context/installer-owned-paths.manifest (.github/workflows copy entries); installer.ps1/installer.sh/installer.py workflow copy; template parity vs root .github/workflows/ci.yml",
+      "delegation_rationale": "Operator supplied raw GitHub Actions failure logs; PO derived the impacted component set from those logs plus repo inspection rather than asking the operator to enumerate internals.",
+      "delegation_confidence": "high"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "New installs/upgrades only (existing repos get fixed automatically next time they run an its-magic upgrade).",
+      "intake_run_id": "cursor-20260606-BUG0009-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260606-BUG0009-intake:2:f52aae78574afeaf"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "PO proposes: regression that fails if template CI references its-magic self-packaging paths (npm pack its-magic, installer.sh, packaging/chocolatey, packaging/homebrew), plus install/upgrade smoke that the copied ci.yml contains only generic runbook-driven jobs.",
+      "intake_run_id": "cursor-20260606-BUG0009-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260606-BUG0009-intake:3:612404ff2bfb9871",
+      "delegation_scope": "new drift/guard test under tests/ + wiring into run-tests.{sh,ps1}; reuse of bug_issue_validate and installer completeness checks",
+      "delegation_rationale": "Concrete test/acceptance design is engineering scope for discovery/architecture; PO delegates exact mechanism while fixing the intent (prevent self-packaging CI leak + regression lock).",
+      "delegation_confidence": "medium"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Include: also make the generated checks job more tolerant/clear when a fresh project has no real tests yet.",
+      "intake_run_id": "cursor-20260606-BUG0009-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260606-BUG0009-intake:4:66f79f22aa3c438e"
+    }
+  ]
+}

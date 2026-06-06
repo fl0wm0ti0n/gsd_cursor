@@ -1,0 +1,202 @@
+{
+  "sprint_id": "S0081",
+  "story_ids": ["US-0092"],
+  "story_id": "US-0092",
+  "dec_id": "DEC-0078",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-06T22:00:00Z",
+  "orchestrator_run_id": "auto-20260606-03",
+  "fresh_context_marker": "qa-S0081-US0092-qa-20260606T213000Z-fresh",
+  "verify_work_executed_at": "2026-06-06T22:00:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0081-US0092-verify-work-20260606T220000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "total": 10,
+  "qa_verdict_reference": "sprints/S0081/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Verify-work independent re-runs green; AC-1..AC-10 closure preflight PASS; US-0092 remains OPEN per US-0045.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0078 execute deliverables merged (outer driver, UAT probe lib, stop matrix, contract tests)",
+    "scripts/auto_outer_driver.py + scripts/uat_probe_lib.py present active + template mirrors"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "dec_ref": ["DEC-0078 §1"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0092_scratchpad_full_autonomy_literal",
+      "expected": "full_autonomy enum literal; AUTO_BLOCK_RETRY_MAX=3; AUTO_OUTER_DRIVER_TIMEOUT_SECONDS documented; template + local-example parity",
+      "result": "pass",
+      "evidence_ref": "test_us0092_scratchpad_full_autonomy_literal PASS; .cursor/scratchpad.md documents manual|auto_until_decision|full_autonomy + interaction bullets",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "dec_ref": ["DEC-0078 §2"],
+      "commands": [
+        "python scripts/auto_outer_driver.py --self-test",
+        "python scripts/auto_outer_driver.py --repo . --dry-run"
+      ],
+      "expected": "[AUTO_OUTER_DRIVER_SELF_TEST_OK]; default scratchpad dry-run exit 2 AUTO_FLOW_MODE_NOT_FULL_AUTONOMY",
+      "result": "pass",
+      "evidence_ref": "[AUTO_OUTER_DRIVER_SELF_TEST_OK]; dry-run exit 2 AUTO_FLOW_MODE_NOT_FULL_AUTONOMY; test_us0092_outer_driver_script_exists PASS",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "dec_ref": ["DEC-0078 §3"],
+      "commands": [
+        "python scripts/uat_probe_lib.py --self-test",
+        "python scripts/uat_probe_lib.py --repo . --step \"read secrets from .env file\" --report"
+      ],
+      "expected": "[UAT_PROBE_LIB_SELF_TEST_OK]; fail-closed reason codes (UAT_PROBE_FORBIDDEN, UAT_PROBE_UNRESOLVED) — no silent PASS",
+      "result": "pass",
+      "evidence_ref": "[UAT_PROBE_LIB_SELF_TEST_OK]; forbidden .env step → UAT_PROBE_FORBIDDEN; verify-work + qa command excerpts present; test_us0092_verify_work_qa_self_verify_excerpt PASS",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "dec_ref": ["DEC-0078 §4"],
+      "commands": [
+        "python scripts/auto_outer_driver.py --self-test",
+        "test -d handoffs/auto_block_retry"
+      ],
+      "expected": "handoffs/auto_block_retry/ ledger; BLOCK_RETRY_CAP_EXHAUSTED exit 6 in self-test + runbook exit table",
+      "result": "pass",
+      "evidence_ref": "block-retry ledger directory present; [AUTO_OUTER_DRIVER_SELF_TEST_OK] covers cap exit; auto-orchestration-reference.md ledger docs",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "dec_ref": ["DEC-0078 §5"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0092_drain_advance_without_operator_phrases",
+      "expected": "drain-advance without operator pause phrases; BACKLOG_MAX_STORIES_REACHED exit 4 in exit table",
+      "result": "pass",
+      "evidence_ref": "test_us0092_drain_advance_without_operator_phrases PASS; runbook dry-run drain-advance note",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "dec_ref": ["DEC-0078 §6"],
+      "commands": [
+        "python -m pytest tests/auto_command_contract_test.py -q -k \"test_us0092_token_profile_orthogonality_string or test_us0092_runbook_no_automation_breadth_conflict\""
+      ],
+      "expected": "TOKEN_PROFILE orthogonality string present; no runbook automation-breadth conflict",
+      "result": "pass",
+      "evidence_ref": "test_us0092_token_profile_orthogonality_string PASS; test_us0092_runbook_no_automation_breadth_conflict PASS; normative sentence in auto-orchestration-reference.md + runbook",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "dec_ref": ["DEC-0078 §7"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0092_auto_stop_matrix_markers",
+      "expected": "### Full-autonomy stop matrix (US-0092) in auto.md; RELEASE_PUBLISH_MODE=auto explicit opt-in documented",
+      "result": "pass",
+      "evidence_ref": "test_us0092_auto_stop_matrix_markers PASS; stop matrix in auto.md + auto-orchestration-reference.md",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "dec_ref": ["DEC-0078 §8"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k us0092",
+      "expected": "nine test_us0092_* subtests PASS; US-0088 markers not weakened",
+      "result": "pass",
+      "evidence_ref": "pytest -k us0092 → 9 passed, 18 subtests (verify-work independent re-run)",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "dec_ref": ["DEC-0078 §9"],
+      "command": "python scripts/check_intake_template_parity.py --repo . --scope=us-0092",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK]; installer-owned-paths.manifest lists new scripts",
+      "result": "pass",
+      "evidence_ref": "[INTAKE_TEMPLATE_PARITY_OK] scope=us-0092; auto_outer_driver.py + uat_probe_lib.py active/template SHA-256 match per qa-findings",
+      "verified_at": "2026-06-06T22:00:00Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "dec_ref": ["DEC-0078 §10"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0092_runbook_outer_driver_heading",
+      "expected": "### Full-autonomy outer driver (US-0092) runbook subsection; security deny-list (no .env, no intake mutation, no publish without RELEASE_PUBLISH_MODE=auto)",
+      "result": "pass",
+      "evidence_ref": "test_us0092_runbook_outer_driver_heading PASS; runbook subsection + security callout active + template",
+      "verified_at": "2026-06-06T22:00:00Z"
+    }
+  ],
+  "probe_results": [
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "run unit tests",
+      "probe_kind": "test",
+      "reason_code": "UAT_PROBE_FAILED",
+      "passed": false,
+      "stack_profile": "node",
+      "note": "Harness exit 1 (pre-existing disjoint failures); fail-closed — not silent PASS"
+    },
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "operator manually verifies UI color scheme",
+      "probe_kind": "manual_operator",
+      "reason_code": "UAT_PROBE_UNRESOLVED",
+      "passed": false,
+      "stack_profile": "node",
+      "note": "Fail-closed per DEC-0078 — deferred to verify-work operator UAT"
+    },
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "read secrets from .env file",
+      "probe_kind": null,
+      "reason_code": "UAT_PROBE_FORBIDDEN",
+      "passed": false,
+      "note": "Security deny-list enforced"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "read secrets from .env file",
+      "probe_kind": null,
+      "reason_code": "UAT_PROBE_FORBIDDEN",
+      "passed": false,
+      "note": "Verify-work re-run confirms security deny-list (expected fail-closed)"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "run pytest contract tests for us0092",
+      "probe_kind": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "pytest -k us0092 → 9 passed"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "acceptance": "UAT passes when all 10 UAT steps (AC-1..AC-10) meet expected outcomes.",
+  "verify_work_result": "10/10 PASS; 0 FAIL; 0 SKIP; verdict=PASS",
+  "closure_preflight": {
+    "verdict": "PASS",
+    "gates_passed": 9,
+    "gates_total": 9
+  }
+}

@@ -48,6 +48,32 @@ as stale isolation evidence).
 
 Release gate semantics (US-0039): mandatory gates (check-in test, QA, UAT) and no-bypass/override contract are enforced at `/release`; see `.cursor/commands/release.md` and `.cursor/commands/qa.md`.
 
+### Browser UAT self-test (US-0093)
+
+When **`UAT_BROWSER_PROBE_MODE=cursor`** (default) and acceptance steps classify as **`browser_smoke`**
+(or automatable **`manual_operator`** re-routed per **DEC-0079** §4), execute the **Cursor browser MCP**
+sequence during `/execute` when web UI verification applies (**BUG-0006**: **`scripts/uat_probe_lib.py`**
+never invokes MCP — subagent only):
+
+1. **Resolve target URL** — `docs/engineering/runtime-connectivity.md` first `http(s)://`; else
+   `package.json` dev/start + **`DEV_SERVER_PORT`** scratchpad override.
+2. **`browser_navigate`** — load URL; respect enterprise origin allowlist.
+3. **Step plan** — map automatable verbs to **`browser_click`** / **`browser_type`** / **`browser_scroll`**;
+   **never** fill password/credential fields; **never** read **`.env`** paths.
+4. **`browser_screenshot`** — write to **`sprints/Sxxxx/evidence/browser/<probe_id>-<seq>.png`** (max **5**).
+5. **Console + network evidence** — counts + summary path refs only (no inline secrets).
+6. **Verdict** — set **`passed`**, **`reason_code`**, **`browser_evidence_refs`** on the matching
+   **`probe_results[]`** row in **`uat.json`**. **`passed=true`** in **`cursor`** mode requires
+   non-empty **`navigation_url`** + at least one screenshot or console/network summary path — else
+   downgrade to **`UAT_BROWSER_PROBE_FAILED`**.
+7. **Fallback trigger** — MCP unavailable → record **`UAT_BROWSER_UNAVAILABLE`**; when
+   **`UAT_BROWSER_FALLBACK_CHAIN=1`**, stdlib HTTP/Playwright fallback runs via **`uat_probe_lib.py`**.
+   Both fail → **`UAT_BROWSER_PROBE_FAILED`** (no silent PASS).
+
+Optional validation: **`python scripts/uat_probe_lib.py --merge-result <fragment.json>`** —
+evidence-required-on-PASS in **`cursor`** mode. No auto-read **`.env`**, no credential auto-fill,
+no intake evidence mutation.
+
 ## Intake evidence tooling reference (US-0078 / DEC-0060)
 
 Stories that harden intake persistence ship **`scripts/intake_evidence_lib.py`**,
@@ -76,6 +102,29 @@ parity for listed paths: **`python scripts/check_token_cost_parity.py --repo .`*
   must not be treated as canonical readiness sources when contradictory.
 - `/execute` must not start/continue implementation solely based on
   non-canonical status evidence.
+
+## Browser UAT self-test (US-0093)
+
+When acceptance steps classify as **`browser_smoke`** (or automatable **`manual_operator`**
+reclassified per **DEC-0079** §4) and **`UAT_BROWSER_PROBE_MODE=cursor`**, execute the **Cursor
+browser MCP** sequence during execute-phase verification — **lib never calls MCP directly**
+(**BUG-0006**):
+
+1. **Resolve target URL** — `docs/engineering/runtime-connectivity.md` first `http(s)://`; else
+   dev-server port from `package.json` + scratchpad **`DEV_SERVER_PORT`**.
+2. **`browser_navigate`** — respect origin allowlist.
+3. **Step plan** — **`browser_click`** / **`browser_type`** / **`browser_scroll`** when
+   automatable; **never** fill password/credential fields or read **`.env`**.
+4. **`browser_screenshot`** → **`sprints/Sxxxx/evidence/browser/<probe_id>-<seq>.png`** (max **5**).
+5. Console + network summary path refs only (no inline secrets).
+6. Write **`browser_evidence_refs`** to **`uat.json`** `probe_results[]`; mirror
+   **Runtime browser evidence** in **`qa-findings.md`**.
+7. MCP unavailable → **`UAT_BROWSER_UNAVAILABLE`** + stdlib fallback when
+   **`UAT_BROWSER_FALLBACK_CHAIN=1`**; validate with
+   **`python scripts/uat_probe_lib.py --merge-result <fragment.json>`**.
+
+Reason codes: **`UAT_BROWSER_UNAVAILABLE`**, **`UAT_BROWSER_PROBE_FAILED`**,
+**`UAT_BROWSER_PROBE_TIMEOUT`**. **No silent PASS** without agent evidence in **`cursor`** mode.
 
 ## Steps
 1. Implement one task at a time.

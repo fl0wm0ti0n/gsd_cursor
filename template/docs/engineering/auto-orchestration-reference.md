@@ -772,12 +772,73 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 `stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
 `pause_request`, `loop_max`, `error`, `blocked`.
 
+### Full-autonomy stop matrix (US-0092)
+
+**`AUTO_FLOW_MODE=full_autonomy`** enables **`scripts/auto_outer_driver.py`**
+(spawn-only outer driver). **TOKEN_PROFILE controls context breadth / token cost only**
+— never automation level, drain, or outer-driver invocation.
+
+| Condition | US-0088 | `full_autonomy` delta | Operator notify |
+|-----------|---------|------------------------|-----------------|
+| Next phase, no hard stop | Continue inner `/auto` | Outer driver **re-invokes** when Cursor ends turn early | Quiet OK when `AUTO_QUIET=1` |
+| `decision_gate` | Hard stop | **No change — hard** | Always |
+| Unrecoverable `error` | Hard stop | **No change — hard** | Always |
+| Critical `missing_input` | Hard stop | **No change — hard** | Always |
+| Transient `missing_input` (recoverable) | Hard stop | **Relaxable** — bounded block-retry | Notify on cap |
+| `pause_request` | Hard stop | **No change — hard** | Always |
+| `loop_max` | Hard stop | **No change — hard** | Always |
+| `blocked` — transient/sync | Hard stop | **Relaxable** when recoverable | Notify on cap |
+| `blocked` — isolation/strict-proof/ownership | Hard stop | **No change — hard** | Always |
+| UAT/QA fail | Hard stop (operator) | **Relaxable** when `AUTO_IMPLEMENTATION_LOOP=1` | Notify on cap |
+| Segment complete + `AUTO_BACKLOG_DRAIN=1` | Advance (may need manual re-`/auto`) | **Drain-advance-without-pause** — immediate next item | Segment handoff notify |
+| `BACKLOG_MAX_STORIES_REACHED` | Hard stop | **No change — hard** | Always |
+| `AUTO_SCHEDULER_CONFLICT` | Hard stop | **No change — hard** | Always |
+| `RELEASE_PUBLISH_MODE=auto` | Explicit opt-in | **No change — hard default-off** | Always on publish |
+| Security deny (`.env`, intake mutation) | Hard deny | **No change — hard** | Always |
+
+**Drain-advance-without-pause**: outer driver schedules next OPEN story/bug immediately;
+paired **`resume_brief`** + **`state.md`** refresh per **DEC-0069** at every boundary.
+
+### Block-retry ledger + cap interaction (US-0092)
+
+Append-only **`handoffs/auto_block_retry/<orchestrator_run_id>.jsonl`** — names-only;
+no secrets. Cap interaction:
+
+| Cap | Scope |
+|-----|-------|
+| `AUTO_LOOP_MAX_CYCLES` | Outer-driver `/auto` invocations (incl. drain advances) |
+| `AUTO_IMPLEMENTATION_LOOP` | Inner `execute`↔`qa`↔`verify-work` when `1` |
+| `AUTO_BLOCK_RETRY_MAX` | Per `(story_id, stop_reason)` recoverable retries |
+| `AUTO_BACKLOG_MAX_STORIES` | Drain breadth — outer driver exit **4** |
+
+Cap exhaustion → exit **6** `BLOCK_RETRY_CAP_EXHAUSTED`. Ordering: outer driver checks
+`AUTO_LOOP_MAX_CYCLES` first; orchestrator checks `AUTO_IMPLEMENTATION_LOOP` +
+`AUTO_BLOCK_RETRY_MAX` before scheduling remediation.
+
+### Browser UAT self-test (US-0093)
+
+Two-tier browser UAT: **`scripts/uat_probe_lib.py`** classifies and completes subprocess probes;
+phase subagents (**`/verify-work`**, **`/qa`**, **`/execute`**) own Cursor browser MCP when
+**`UAT_BROWSER_PROBE_MODE=cursor`** (default). Lib **never** invokes browser MCP (**BUG-0006**).
+
+| Key | Role |
+|-----|------|
+| `UAT_BROWSER_PROBE_MODE` | `cursor` \| `http_fallback` \| `playwright_fallback` |
+| `UAT_BROWSER_FALLBACK_CHAIN` | HTTP → Playwright after **`UAT_BROWSER_UNAVAILABLE`** |
+| `UAT_PROCESS_HEALTH_POLL_SECONDS` / `UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS` | `process_health` readiness |
+| `DEV_SERVER_PORT` / `DEV_SERVER_COMMAND` | Dev-server inference overrides |
+
+CI: set **`UAT_BROWSER_PROBE_MODE=http_fallback`**. Evidence:
+**`sprints/Sxxxx/evidence/browser/`** + **`browser_evidence_refs`** in **`uat.json`**.
+Validate: **`python scripts/uat_probe_lib.py --merge-result <fragment.json>`**.
+Manual override: **`@browser`** in Agent panel. Orthogonal to **`PERMISSION_MODE`** and browser
+approval modes.
 ### `AUTO_QUIET` vs `TOKEN_PROFILE` (US-0088 / AC-2)
 
 | Key | Values | Role |
 |-----|--------|------|
 | `AUTO_QUIET` | `0` \| `1` (default `0`) | `1` = suppress routine per-phase success chatter; must **not** suppress `decision_gate`, errors, pause, `loop_max`, `blocked`, or missing inputs. |
-| `TOKEN_PROFILE` | `lean` \| `balanced` \| `full` | Unchanged — **DEC-0035** / **US-0080**; **orthogonal** to `AUTO_QUIET`. |
+| `TOKEN_PROFILE` | `lean` \| `balanced` \| `full` | **TOKEN_PROFILE controls context breadth / token cost only** — **DEC-0035** / **US-0080** / **US-0092**; **orthogonal** to `AUTO_QUIET`, drain, and outer-driver invocation. |
 
 ### `TOKEN_PROFILE` × `CAVEMAN_MODE` non-substitution (US-0089 / DEC-0072 §1)
 

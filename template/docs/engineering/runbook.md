@@ -125,6 +125,48 @@ after template upgrades if needed.
 
 Normative H2 titles and matrix: `docs/engineering/architecture.md` (`# US-0077`).
 
+## README feature coverage validation (US-0091 / DEC-0074)
+
+**Goal:** ensure every DONE user-visible backlog item (`US-xxxx` / `BUG-xxxx` with
+`user_visible: true`) has operator blurbs in root `README.md` and traceability rows in
+`docs/developer/README.md`, without inventing new `USER_*` / `DEV_*` H2 literals
+(**DEC-0059** composes; **US-0030** delta gate unchanged).
+
+### Delta vs static doc gates
+
+| Gate | Question | Remediation |
+|------|----------|-------------|
+| **US-0030** (delta) | Did this sprint change commands/flags without README/runbook updates? | Update command docs for changed surfaces; agent checklist in `/release` step 3 family. |
+| **US-0091** (static) | Is every DONE user-visible item documented in the README family? | Backfill root + DEV shard; set `user_visible:` marker; run validator `--report`. |
+
+### Scratchpad key
+
+- `README_FEATURE_COVERAGE_ENFORCE`: `0` \| `1` (default `0` until backfill completes).
+- When `0`: `/release` step **3f** records `skipped` evidence; migration heuristic H1–H8
+  may classify unset `user_visible` during backfill.
+- When `1`: explicit `user_visible:` required on all DONE items; heuristic disabled;
+  `/release` runs blocking validator.
+
+**Activation (same commit as backfill):** complete audit + three-file backfill → explicit
+`user_visible:` markers → verify `--report` shows `coverage_missing: []` → flip `0` → `1`.
+
+### Commands
+
+```bash
+python scripts/validate_readme_feature_coverage.py --self-test
+python scripts/validate_readme_feature_coverage.py --repo . --report
+python scripts/validate_readme_feature_coverage.py --repo . --audit-out docs/engineering/context/readme-feature-coverage-audit.json
+python scripts/validate_readme_feature_coverage.py --repo . --enforce
+python scripts/check_intake_template_parity.py --scope=readme-feature-coverage
+```
+
+Reason codes: `README_FEATURE_COVERAGE_BLOCKED`, `README_FEATURE_COVERAGE_GAP:<id>`,
+`README_FEATURE_COVERAGE_PARITY_FAIL`, `README_FEATURE_COVERAGE_INPUT_INVALID`,
+`README_FEATURE_COVERAGE_PROFILE_VIOLATION`.
+
+Normative predicate + affinity manifest: `decisions/DEC-0074.md`,
+`docs/engineering/context/readme-section-affinity.json`.
+
 ## User-visible internal metadata guard (US-0071 / DEC-0053)
 
 **Goal:** keep planning-shaped identifiers out of **operator-visible software
@@ -380,11 +422,10 @@ Tiered token-cost control is explicit and defaulted in `.cursor/scratchpad.md`:
 
 Deterministic profile semantics:
 
-- `lean`: reduce non-critical overhead defaults (for example aggressive research,
-  autonomous loops, broad-context retrieval), while preserving mandatory
+- `lean`: lowest context breadth / token cost defaults while preserving mandatory
   quality/release gates.
-- `balanced`: preserve current capability profile with moderate overhead.
-- `full`: maximize context breadth and autonomy for complex/high-uncertainty work.
+- `balanced`: moderate context breadth / token cost.
+- `full`: highest context breadth / token cost for complex/high-uncertainty work.
 
 Manual override precedence:
 
@@ -399,7 +440,8 @@ Manual override precedence:
   reasoning as phase input.
 - **`start-from`**: use **`/auto start-from=<canonical_phase_id>`** when resuming so the
   schedule intersection matches materialized **`resolved_phase_plan`** (**`DEC-0052`**).
-- **`TOKEN_PROFILE`**: `lean` lowers default automation breadth; does **not** remove
+- **`TOKEN_PROFILE`**: **TOKEN_PROFILE controls context breadth / token cost only**;
+  does **not** change automation level, drain, outer-driver invocation, or remove
   isolation, strict-proof, role, or release gates.
 - **Metrics**: append-only **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** (or
   **`.jsonl`**); copy path into **`token_cost_evidence_ref`** on **`state.md`** checkpoints.
@@ -458,7 +500,14 @@ Rollover fail-safe reason codes:
 - `STATE_ARCHIVE_VERIFICATION_FAILED`
 - `STATE_ARCHIVE_REQUIRED`
 - `ARTIFACT_HOT_SURFACE_OVERSIZE`
+- `ARCH_STORY_HEADING_LEVEL_INVALID`
 - `CONTEXT_BUDGET_EXCEEDED`
+
+**Architecture file blocked on rollover?** If story sections use legacy H2 `## US-xxxx`
+headings, the archiver now recognizes them for rollover after **BUG-0010**. For new work,
+`/architecture` must append H1 `# US-xxxx` (or `# BUG-xxxx` for defects). To converge an
+existing repo, optionally normalize `## US-xxxx` → `# US-xxxx` manually (count decrease is
+allowed; adding new `## US-` story headings is blocked).
 
 ### Minimal-read defaults by phase (bounded escalation)
 
@@ -1317,6 +1366,79 @@ success chatter. Non-suppressible notifications:
 `AUTO_QUIET` is **orthogonal** to `TOKEN_PROFILE` (**DEC-0035** / **US-0080**):
 `TOKEN_PROFILE` controls context breadth and token cost, not notification policy.
 
+### Full-autonomy outer driver (US-0092)
+
+Opt-in **`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) enables the
+shipped stdlib outer driver. Spawn-only preserved — the driver loops hook
+invocations; it never performs phase-role work.
+
+#### Enable and run (once per portfolio segment)
+
+1. Set in merged scratchpad (`.cursor/scratchpad.md` + optional local overrides):
+   - `AUTO_FLOW_MODE=full_autonomy`
+   - Optional: `AUTO_BACKLOG_DRAIN=1`, `AUTO_BUG_QUEUE=1` (scheduler mutex per US-0087)
+   - Caps: `AUTO_LOOP_MAX_CYCLES`, `AUTO_BACKLOG_MAX_STORIES`, `AUTO_BLOCK_RETRY_MAX` (default `3`)
+   - Optional: `AUTO_OUTER_DRIVER_TIMEOUT_SECONDS` (unset = no timeout)
+2. Run once: `python scripts/auto_outer_driver.py --repo .`
+3. Interpret exit code (driver prints reason tokens on stderr):
+
+| Exit | Meaning |
+|------|---------|
+| **0** | `completed` — segment/portfolio terminal per policy |
+| **1** | Hard stop — `decision_gate`, unrecoverable `error`, isolation/strict-proof, security deny |
+| **2** | Configuration — `AUTO_FLOW_MODE` not `full_autonomy` (`AUTO_FLOW_MODE_NOT_FULL_AUTONOMY`) |
+| **3** | `loop_max` — `AUTO_LOOP_MAX_CYCLES` exhausted |
+| **4** | `BACKLOG_MAX_STORIES_REACHED` / drain cap |
+| **5** | `pause_request` / `AUTO_PAUSE_REQUEST` |
+| **6** | `BLOCK_RETRY_CAP_EXHAUSTED` |
+| **124** | Hook/subprocess timeout |
+
+`--dry-run` emits planned `/auto` hook invocations and drain-advance scheduling
+without side effects. `--invoke-cmd` overrides the default normative `/auto …` line.
+
+#### Security (US-0092 / DEC-0078)
+
+- **No** auto-read **`.env`** or secret paths.
+- **No** intake evidence mutation under automation.
+- **No** publish without **`RELEASE_PUBLISH_MODE=auto`** (explicit opt-in; default-off).
+- Block-retry ledger **`handoffs/auto_block_retry/<orchestrator_run_id>.jsonl`** is
+  names-only — no secrets, no file contents.
+
+UAT self-verify: **`scripts/uat_probe_lib.py`** shared by **`/verify-work`** and **`/qa`**.
+
+### Browser UAT self-test (US-0093)
+
+Enable Cursor browser-integrated UAT probes for web acceptance steps (**DEC-0079**).
+
+#### Scratchpad keys
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `UAT_BROWSER_PROBE_MODE` | `cursor` \| `http_fallback` \| `playwright_fallback` | `cursor` | Primary probe path |
+| `UAT_BROWSER_FALLBACK_CHAIN` | `0` \| `1` | `1` | HTTP → Playwright after MCP unavailable |
+| `UAT_PROCESS_HEALTH_POLL_SECONDS` | int | `60` | Readiness poll cap |
+| `UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS` | int | `2` | Poll interval |
+| `DEV_SERVER_PORT` | int | unset | Port override |
+| `DEV_SERVER_COMMAND` | command | unset | Startup override |
+
+Orthogonal to **`PERMISSION_MODE`** and Cursor browser approval modes. Health URLs from
+**`docs/engineering/runtime-connectivity.md`** first.
+
+#### CI recipe
+
+Set **`UAT_BROWSER_PROBE_MODE=http_fallback`** in CI — never false PASS without agent evidence.
+
+#### Evidence layout
+
+Binary artifacts under **`sprints/Sxxxx/evidence/browser/`** (gitignored OK). JSON carries path
+refs only. Validate agent write-back:
+`python scripts/uat_probe_lib.py --merge-result sprints/Sxxxx/evidence/browser/fragment.json`.
+
+#### Manual override
+
+Use **`@browser`** in Agent panel or invoke browser tools manually when MCP sequence needs operator
+approval for production-like targets.
+
 ### Caveman mode (US-0089)
 
 Optional response-side terse / imperative assistant voice. **Default off.**
@@ -1370,6 +1492,19 @@ vocabulary inherited from **US-0088** (`decision_gate`, `error`, `pause`,
 `loop_max`, `blocked`, `missing input`, `[BUG_VALIDATION_OK]`,
 `[INTAKE_EVIDENCE_VALIDATION_OK]`, `[SCRATCHPAD_PAIR_OK]`) also renders
 byte-literal even at `CAVEMAN_LEVEL=ultra`.
+
+#### Voice compression levels
+
+Compact before/after examples (full contract: `.cursor/rules/caveman.mdc`):
+
+| Scenario | Level | Before | After |
+|----------|-------|--------|-------|
+| Technical explain | `full` | "The spawn-only orchestrator must dispatch a fresh subagent for each phase." | "Spawn-only orchestrator dispatches fresh subagent per phase. Next: run `/execute`." |
+| Destructive warning (auto-clarity break) | (pause) | "I will run `git push --force` to fix the remote." | "Destructive: `git push --force` rewrites remote history. Confirm branch and remote before proceeding." |
+
+Normative voice-compression contract (precedence, drop rules, persistence,
+9-zone deferral): **`.cursor/rules/caveman.mdc`** — `## Voice compression
+(when CAVEMAN_MODE=1)`.
 
 ### Caveman input compression (US-0090)
 
@@ -1517,6 +1652,17 @@ Notify operator on segment handoff (non-routine, non-suppressible).
 | `RESUME_BRIEF_STALE` mid-run | Brief not refreshed at phase boundary | Ensure paired `resume_brief` + `state.md` refresh per DEC-0069 |
 | `AUTO_SCHEDULER_CONFLICT` | Both `AUTO_BACKLOG_DRAIN=1` and `AUTO_BUG_QUEUE=1` without `bug-target=` argv | Supply explicit `bug-target=` or disable one scheduler |
 | `BACKLOG_MAX_STORIES_REACHED` | Drain cap hit | Increase `AUTO_BACKLOG_MAX_STORIES` or run another `/auto` |
+
+### Downstream CI packaging job leak (BUG-0009 / DEC-0075)
+
+**CI still runs its-magic packaging jobs?** Your project received a pre-fix workflow.
+Run **`its-magic --target <repo> --mode upgrade`** (or **`--mode clean`** then reinstall)
+to refresh `.github/workflows/ci.yml` from the corrected template. After upgrade, GitHub
+Actions should show only **`checks`** and **`auto-fix`** jobs — not `npm-test`,
+`brew-test`, or `choco-test`.
+
+Scope reminder: fix applies to **new installs/upgrades**; stale repos heal on next upgrade
+(**US-0018**).
 
 ## Explicit bulk sprint planning mode (US-0046)
 

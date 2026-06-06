@@ -1,0 +1,120 @@
+{
+  "sprint_id": "S0080",
+  "bug_refs": ["BUG-0011"],
+  "status": "PASS",
+  "reason": null,
+  "verdict_reason_codes": [],
+  "planned_at": "2026-06-06T16:43:29Z",
+  "plan_verified_at": "2026-06-06T14:46:04Z",
+  "role_planned": "tech-lead",
+  "role_verified": "qa",
+  "planned_by": {
+    "role": "tech-lead",
+    "orchestrator_run_id": "auto-20260606-02",
+    "fresh_context_marker": "tl-S0080-BUG0011-sprint-plan-20260606T164329Z-fresh"
+  },
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260606-02",
+    "fresh_context_marker": "qa-S0080-BUG0011-plan-verify-20260606T144604Z-fresh"
+  },
+  "verification_proof_ref": "rp-auto-20260606-02-plan-verify-qa-20260606T144604Z-S0080-BUG0011",
+  "verification_proof_hash": "f33352078fc4ea47f49af1012b2956e5268598c672e41eadc0e3776d15d0c279",
+  "orchestrator_run_id": "auto-20260606-02",
+  "dec_id": "DEC-0077",
+  "research_anchor": "R-0077",
+  "architecture_anchor": "docs/engineering/architecture.md#BUG-0011",
+  "acs_covered": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "ac_coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-008"], "verified": true, "notes": "Voice section outline in caveman.mdc — six subsections per DEC-0077 §2–§3; linkage assert T-008."},
+    {"ac": "AC-2", "tasks": ["T-001"], "verified": true, "notes": "Template byte parity — active/template caveman.mdc byte-identical post voice append per DEC-0077 §1, §9."},
+    {"ac": "AC-3", "tasks": ["T-001"], "verified": true, "notes": "User-rule ### Precedence subsection — voice overrides prose-style user rules when CAVEMAN_MODE=1 per DEC-0077 §2 row 1."},
+    {"ac": "AC-4", "tasks": ["T-001"], "verified": true, "notes": "Ultra/literal deferral stub — pointer to 9-zone MUST without duplicate list per DEC-0077 §2 row 6."},
+    {"ac": "AC-5", "tasks": ["T-003", "T-004"], "verified": true, "notes": "Nine test_caveman_voice_* subtests + intentional SHA baseline bump per DEC-0077 §4–§5."},
+    {"ac": "AC-6", "tasks": ["T-002"], "verified": true, "notes": "Runbook #### Voice compression levels — 2-row table; US-0090 subsection untouched per DEC-0077 §7."},
+    {"ac": "AC-7", "tasks": ["T-006"], "verified": true, "notes": "test_caveman_default_off_* bodies preserved — DEC-0072 §6 pinned subtests frozen per DEC-0077 §4 invariants."},
+    {"ac": "AC-8", "tasks": ["T-005", "T-007"], "verified": true, "notes": "Harness §30A + operator voice UAT spot-check; qualitative brevity operator-verified per DEC-0077 §6, §10."}
+  ],
+  "coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-008"], "verified": true},
+    {"ac": "AC-2", "tasks": ["T-001"], "verified": true},
+    {"ac": "AC-3", "tasks": ["T-001"], "verified": true},
+    {"ac": "AC-4", "tasks": ["T-001"], "verified": true},
+    {"ac": "AC-5", "tasks": ["T-003", "T-004"], "verified": true},
+    {"ac": "AC-6", "tasks": ["T-002"], "verified": true},
+    {"ac": "AC-7", "tasks": ["T-006"], "verified": true},
+    {"ac": "AC-8", "tasks": ["T-005", "T-007"], "verified": true}
+  ],
+  "plan_integrity": {
+    "task_count": 8,
+    "ac_count": 8,
+    "task_ac_bijection": false,
+    "ac_coverage_surjective": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false
+  },
+  "governance_alignment": {
+    "decision_ref": "DEC-0077",
+    "architecture_anchor": "docs/engineering/architecture.md#BUG-0011",
+    "research_anchor": "R-0077",
+    "out_of_scope_guard": "Voice rule append + contract markers + SHA bump only; no scratchpad key changes; no US-0090 input compression changes; no LLM voice quality CI.",
+    "non_goals_respected": [
+      "no Wenyan modes or vendor token-percent claims",
+      "no npx skills add install path",
+      "no new skill under .cursor/skills/",
+      "no scratchpad key rename or new keys",
+      "no weakening of DEC-0072 nine-zone literal invariant",
+      "no change to CAVEMAN_COMPRESS_INPUT or caveman_compress_input.py",
+      "no modification of test_caveman_default_off_* assertion bodies",
+      "no CI unit test of LLM voice quality",
+      "no new check_intake_template_parity.py scope"
+    ]
+  },
+  "gates_passed": [
+    "AC_COVERAGE_SURJECTIVE: AC-1..AC-8 all ≥1 task via T-001..T-008; no PLAN_AC_COVERAGE_GAP",
+    "TASK_ATOMICITY: T-001/T-003+T-004/T-005+T-007 multi-AC scopes accepted per architecture # BUG-0011 § Atomic task seeds (not PLAN_AC_ATOMICITY_VIOLATION)",
+    "DEC_ANCHORING: every task cites DEC-0077 §N matching §AC-Traceability table",
+    "ACCEPTANCE_CHECKS_TESTABLE: every task has concrete acceptance_check bullets (voice section tokens, SHA bump, harness §30A, default-off guard, UAT scenario, linkage assert)",
+    "PARITY_TOUCHPOINTS_EXPLICIT: DEC-0077 §9 inventory rows 1–2 positive parity mapped per task parity_touchpoints; active-only surfaces documented",
+    "TASK_COUNT_WITHIN_LIMIT: task_count=8 <= sprint_max_tasks=12; SPRINT_AUTO_SPLIT not triggered",
+    "ORDERING_NO_CYCLES: recommended /execute ordering T-001→T-002→T-004→T-003→T-006→T-005→T-008→T-007 has no circular dependencies",
+    "NON_GOALS_PRESERVED: all DEC-0077 §10 hard non-goals enumerated in sprint.md and governance_alignment.non_goals_respected",
+    "TEST_STRATEGY_ALIGNED: nine test_caveman_voice_* (T-003), SHA bump (T-004), default-off guard (T-006), harness §30A (T-005), operator UAT (T-007) match sprint.md test strategy",
+    "GOVERNANCE_ANCHORS_VALID: DEC-0077 §1–§10 per task; DEC-0072 forward-link (no rewrite); R-0077; architecture # BUG-0011; US-0090 orthogonality",
+    "STATUS_AUTHORITY_PRESERVED: BUG-0011 stays OPEN in docs/product/backlog.md through plan-verify (US-0045; closure at /release)",
+    "BUG_VALIDATION_OK: python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance -> [BUG_VALIDATION_OK]"
+  ],
+  "checks_performed": [
+    "Sprint-plan authored in fresh tech-lead context (auto-20260606-02, 2026-06-06T16:43:29Z, fresh_context_marker=tl-S0080-BUG0011-sprint-plan-20260606T164329Z-fresh); plan-verify authored in fresh qa context (auto-20260606-02, 2026-06-06T14:46:04Z, fresh_context_marker=qa-S0080-BUG0011-plan-verify-20260606T144604Z-fresh)",
+    "AC-to-task mapping surjective (AC-1..AC-8 covered by T-001..T-008); multi-AC tasks T-001/T-003+T-004/T-005+T-007 justified per architecture # BUG-0011 § Atomic task seeds",
+    "DEC-0077 §AC-Traceability cross-checked against tasks.md acceptance_check bullets and sprint.md AC coverage table",
+    "Scope aligns with docs/engineering/architecture.md#BUG-0011 and DEC-0077 (voice section append, dual-layer SHA/markers, harness §30A, runbook compact table, US-0090 orthogonality)",
+    "Template parity inventory locked per DEC-0077 §9 (2 positive rows + active-only surfaces + negative-parity constraints documented)",
+    "Non-goals preserved: no Wenyan; no scratchpad key changes; no US-0090 input compression changes; no test_caveman_default_off_* body edits; no new parity scope; no LLM voice quality CI",
+    "Task count 8 within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered",
+    "Recommended /execute ordering verified acyclic (voice rule → runbook → SHA bump → contract tests → default-off guard → harness → linkage → UAT docs)",
+    "Bug validator python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance -> [BUG_VALIDATION_OK] (pre- and post-plan-verify write)",
+    "Canonical status BUG-0011 remains OPEN per US-0045 through plan-verify / execute / qa / verify-work; closure at /release only"
+  ],
+  "gates_failed": [],
+  "remediation_required": [],
+  "governance_refs": [
+    "DEC-0077",
+    "DEC-0072",
+    "DEC-0073",
+    "architecture.md#BUG-0011",
+    "architecture.md#US-0089",
+    "R-0077",
+    "US-0089",
+    "US-0090",
+    "US-0017",
+    "US-0088",
+    "US-0045",
+    "US-0048",
+    "DEC-0029",
+    "US-0056",
+    "DEC-0038"
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260606-US0092-intake",
+  "candidate_story_ids": ["US-0092"],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "full-autonomy-flow-mode",
+      "title": "New opt-in AUTO_FLOW_MODE=full_autonomy (or equivalent) beyond auto_until_decision — minimize operator waits while preserving auditable safety caps"
+    },
+    {
+      "plan_area_id": "outer-driver-script",
+      "title": "Shipped outer-driver that re-invokes /auto until deterministic stop — closes Cursor single-turn limitation documented in US-0088 / R-0071"
+    },
+    {
+      "plan_area_id": "self-verify-uat-runtime",
+      "title": "Expand verify-work/QA to self-execute UAT and manual steps via build, tests, API, browser, or stack-appropriate probes — not operator handoff"
+    },
+    {
+      "plan_area_id": "block-auto-resolve",
+      "title": "When blocked, auto-remediate and retry within bounded caps instead of stopping for operator unless hard gate"
+    },
+    {
+      "plan_area_id": "drain-without-pause",
+      "title": "After US or bug segment completes, immediately advance to next OPEN item without waiting for operator re-run"
+    },
+    {
+      "plan_area_id": "token-profile-orthogonality",
+      "title": "TOKEN_PROFILE controls context breadth / token cost only — must not change automation level; audit and remove any drift implying otherwise"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "auto.md, auto-orchestration-reference, runbook, scratchpad keys, contract tests, template parity"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "full-autonomy-flow-mode",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "outer-driver-script",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "self-verify-uat-runtime",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "block-auto-resolve",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "drain-without-pause",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "token-profile-orthogonality",
+      "story_ids": ["US-0092"]
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "story_ids": ["US-0092"]
+    }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "In downstream repos /auto stops after every US or bug despite scratchpad on auto; operator wants stronger automation — build software, run manual UAT steps via API or any method, auto-resolve blocks until green, and jump to the next OPEN US/bug without waiting.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260606-US0092-intake:0:7cae49485010dd88"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Cursor IDE its-magic orchestration across installed kit repos; merged .cursor/scratchpad.md; handoffs/resume_brief.md; normative docs/engineering/auto-orchestration-reference.md; optional local/remote runtime per US-0065/US-0086.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260606-US0092-intake:1:bd0710fdd719ee7a"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Markdown command specs, Python stdlib scripts for outer driver and verification helpers, contract tests in tests/auto_command_contract_test.py; compose on existing US-0065 runtime QA autopilot and US-0066 generated-test scaffold.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260606-US0092-intake:2:f263c98a5497da7d"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Extend US-0088 continuous /auto and US-0044 backlog drain with opt-in full_autonomy flow mode, shipped outer-driver equivalence (not operator-only manual re-invoke), bounded retry caps, spawn-only subagents unchanged (BUG-0006 / US-0069).",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260606-US0092-intake:3:c7e8073b846dd928"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Default-off opt-in via scratchpad; when enabled, silent continuation across phases and backlog items; notify only on cap exhaustion, unrecoverable error, or explicit operator-configured hard gates — orthogonal to AUTO_QUIET and TOKEN_PROFILE.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260606-US0092-intake:4:f53a4c61c8a07e6e"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Full autonomy must not bypass secrets paths, .env, intake evidence integrity, or publish-to-production without explicit RELEASE_PUBLISH_MODE=auto; auto-remediation bounded and auditable with reason codes and attempt ledgers.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260606-US0092-intake:5:c3aea9e440239cac"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Reliability first: contract tests for outer-driver loop, drain advance without operator tick, TOKEN_PROFILE automation orthogonality audit; reuse AUTO_LOOP_MAX_CYCLES and AUTO_BACKLOG_MAX_STORIES as safety caps.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260606-US0092-intake:6:ad67604116f42cbf"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0092 closes the gap left by US-0088 outer-driver-as-documentation-only; operator explicitly requires TOKEN_PROFILE must affect token usage only, not automation level — audit and fix any conflicting docs.",
+      "intake_run_id": "cursor-20260606-US0092-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260606-US0092-intake:7:8735e3155d3b9683"
+    }
+  ]
+}

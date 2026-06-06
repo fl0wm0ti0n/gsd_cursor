@@ -1,0 +1,64 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260606-BUG0010-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Intake bug from chat: triad archiver cannot rollover docs/engineering/architecture.md when it exceeds ARCH_HOT_MAX_LINES but story sections use ## US-xxxx instead of # US-xxxx — STATE_ARCHIVE_BOUNDARY_AMBIGUOUS blocks /auto at triad gate.",
+      "intake_run_id": "cursor-20260606-BUG0010-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260606-BUG0010-intake:0:a907263dc9652747"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "scripts/enforce-triad-hot-surface.py (STORY_HEADING regex + split_arch_stories); decisions/DEC-0054.md; docs/engineering/runbook.md triad section; .cursor/commands/architecture.md (+ template/); optional new heading validator under scripts/; tests/run-tests.{sh,ps1}.",
+      "intake_run_id": "cursor-20260606-BUG0010-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260606-BUG0010-intake:1:7750da300b7d85d4",
+      "delegation_scope": "enforce-triad-hot-surface.py STORY_HEADING + rollover_architecture; DEC-0054 semantics; architecture.md command contract; template parity",
+      "delegation_rationale": "PO derived impacted surfaces from operator /ask diagnosis and repo inspection of enforce-triad-hot-surface.py line 48 STORY_HEADING regex.",
+      "delegation_confidence": "high"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Both: extend archiver to treat ## US-xxxx as story-section boundaries for backward-compatible rollover AND add enforcement so /architecture writes use H1 # US-xxxx per DEC-0054.",
+      "intake_run_id": "cursor-20260606-BUG0010-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260606-BUG0010-intake:2:1182d3715f93541a"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "Regression: fixture architecture.md with only ## US-xxxx sections can rollover when over cap; fixture with # US-xxxx unchanged; new validator or contract test fails when architecture adds ## US-xxxx story headings; enforce-triad-hot-surface.py --self-test extended.",
+      "intake_run_id": "cursor-20260606-BUG0010-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260606-BUG0010-intake:3:f89c0eea4f76f20b",
+      "delegation_scope": "tests for ##-only rollover, # US- non-regression, heading enforcement; run-tests harness wiring",
+      "delegation_rationale": "Test matrix is engineering-owned; PO sets intent from operator blocker scenario and DEC-0054 contract.",
+      "delegation_confidence": "medium"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "Shipped fix: downstream repos with ## US- architecture sections can auto-archive on triad rollover; new /architecture writes blocked or warned when using wrong heading level; template + active command parity; sprint release closes BUG-0010 per US-0045.",
+      "intake_run_id": "cursor-20260606-BUG0010-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260606-BUG0010-intake:4:6a9af5d384715612",
+      "delegation_scope": "release closure + acceptance row + operator remediation note in runbook for one-time ##→# normalization",
+      "delegation_rationale": "Done definition combines operator both-fix choice with standard US-0045 bug closure path.",
+      "delegation_confidence": "high"
+    }
+  ]
+}

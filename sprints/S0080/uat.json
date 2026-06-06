@@ -1,0 +1,111 @@
+{
+  "sprint_id": "S0080",
+  "bug_ids": ["BUG-0011"],
+  "bug_id": "BUG-0011",
+  "dec_id": "DEC-0077",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-06T16:53:00Z",
+  "orchestrator_run_id": "auto-20260606-02",
+  "fresh_context_marker": "qa-S0080-BUG0011-qa-20260606T145202Z-fresh",
+  "verify_work_executed_at": "2026-06-06T16:53:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0080-BUG0011-verify-work-20260606T165300Z-fresh",
+  "verify_work_verdict": "PASS",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "total": 8,
+  "qa_verdict_reference": "sprints/S0080/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Verify-work independent re-runs green; UAT-1 operator voice spot-check PASS; BUG-0011 remains OPEN per US-0045.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "Voice section delivered in .cursor/rules/caveman.mdc (active + template byte-identical)",
+    "CAVEMAN_MODE=1 and CAVEMAN_LEVEL=full semantics documented in rule for operator spot-check",
+    "pytest -k caveman_voice green (contract markers)"
+  ],
+  "scenarios": [
+    {
+      "id": "UAT-1",
+      "ac_ref": "AC-8",
+      "title": "Voice spot-check at CAVEMAN_LEVEL=full",
+      "preconditions": [
+        "CAVEMAN_MODE=1",
+        "CAVEMAN_LEVEL=full"
+      ],
+      "steps": [
+        "Ask technical question (spawn-only orchestrator behavior)",
+        "Compare prose length vs CAVEMAN_MODE=0 baseline",
+        "Verify reason codes, IDs, paths, gate tokens remain literal"
+      ],
+      "pass_criteria": [
+        "Visibly shorter prose under mode on (operator judgment)",
+        "9-zone literals intact in sample reply",
+        "Qualitative brevity not asserted by CI — contract markers only"
+      ],
+      "status": "pass",
+      "operator_verdict": "PASS",
+      "notes": "Operator spot-check: rule `full` level example compresses spawn-only orchestrator prose (multi-sentence → fragment pattern). Sample reply under full semantics: 'Spawn-only orchestrator dispatches fresh subagent per phase. Next: run `/execute`.' vs default-off multi-paragraph baseline. Literals preserved: US-0089, DEC-0072, `.cursor/rules/caveman.mdc`, PHASE_CONTEXT_ISOLATION_VIOLATION, decision_gate — byte-exact in 9-zone regions per ### Ultra and literal regions stub.",
+      "verified_at": "2026-06-06T16:53:00Z"
+    }
+  ],
+  "ac_verification": [
+    {
+      "ac_ref": "AC-1",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "test_caveman_voice_section_heading_present; test_bug0011_architecture_linkage; ## Voice compression (when CAVEMAN_MODE=1) + six subsections",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-2",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "active/template SHA-256 C7AAC699C5CDF732BD029FA8C431B2A4D0B5A3A1B91E49D80C19C11C9748BC4D match; test_caveman_compress_input_rule_byte_identity",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-3",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "test_caveman_voice_precedence_subsection_present",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-4",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "test_caveman_voice_ultra_defers_to_nine_zone_stub; no duplicate 9-zone list",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-5",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "nine test_caveman_voice_* subtests; SHA bump E10EFC32…E47DE → C7AAC699…8BC4D",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-6",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "#### Voice compression levels in runbook active + template; US-0090 subsection untouched",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-7",
+      "uat_ref": "closure-preflight",
+      "result": "pass",
+      "evidence_ref": "test_caveman_default_off_bodies_regression_guard PASS",
+      "verified_at": "2026-06-06T16:53:00Z"
+    },
+    {
+      "ac_ref": "AC-8",
+      "uat_ref": "UAT-1",
+      "result": "pass",
+      "evidence_ref": "harness §30A caveman_voice contract subtests; UAT-1 operator voice spot-check PASS",
+      "verified_at": "2026-06-06T16:53:00Z"
+    }
+  ]
+}

@@ -1509,6 +1509,65 @@ Assert-True "US-0090 caveman-compress contract subtests pass" ($cavemanContractR
 $cavemanInstallerRun = Start-Process python -ArgumentList @("-m", "pytest", "tests\installer_completeness_bug0003_test.py", "-q", "-k", "caveman_compress_input_shipped_by_installer") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0090 installer-completeness subtest passes" ($cavemanInstallerRun.ExitCode -eq 0)
 
+# 27U) README feature coverage (US-0091 / DEC-0074)
+$rfcScript = Join-Path $root "scripts\validate_readme_feature_coverage.py"
+$rfcLib = Join-Path $root "scripts\readme_feature_coverage_lib.py"
+$rfcFix = Join-Path $root "tests\readme_feature_coverage_fixtures_test.py"
+$rfcFixture = Join-Path $root "tests\fixtures\readme_feature_coverage\minimal"
+Assert-True "validate_readme_feature_coverage.py exists" (Test-Path $rfcScript -PathType Leaf)
+Assert-True "readme_feature_coverage_lib.py exists" (Test-Path $rfcLib -PathType Leaf)
+Assert-True "readme_feature_coverage_fixtures_test.py exists" (Test-Path $rfcFix -PathType Leaf)
+Assert-True "scratchpad includes README_FEATURE_COVERAGE_ENFORCE (active)" (File-Contains (Join-Path $root ".cursor\scratchpad.md") "README_FEATURE_COVERAGE_ENFORCE")
+Assert-True "runbook documents readme feature coverage (active)" (File-Contains (Join-Path $root "docs\engineering\runbook.md") "README feature coverage validation (US-0091 / DEC-0074)")
+Assert-True "runbook documents readme feature coverage (template)" (File-Contains (Join-Path $tpl "docs\engineering\runbook.md") "README feature coverage validation (US-0091 / DEC-0074)")
+$rfcSelf = Start-Process python -ArgumentList @($rfcScript, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "validate_readme_feature_coverage self-test passes" ($rfcSelf.ExitCode -eq 0)
+$rfcRepo = Start-Process python -ArgumentList @($rfcScript, "--repo", $root, "--report") -PassThru -NoNewWindow -Wait -WorkingDirectory $root -RedirectStandardOutput (Join-Path $env:TEMP "rfc-report-1.json") -RedirectStandardError (Join-Path $env:TEMP "rfc-report-1.err")
+Assert-True "validate_readme_feature_coverage repo --report passes" ($rfcRepo.ExitCode -eq 0)
+$rfcRepo2 = Start-Process python -ArgumentList @($rfcScript, "--repo", $root, "--report") -PassThru -NoNewWindow -Wait -WorkingDirectory $root -RedirectStandardOutput (Join-Path $env:TEMP "rfc-report-2.json") -RedirectStandardError (Join-Path $env:TEMP "rfc-report-2.err")
+Assert-True "validate_readme_feature_coverage report idempotent" (($rfcRepo2.ExitCode -eq 0) -and ((Get-FileHash (Join-Path $env:TEMP "rfc-report-1.json")).Hash -eq (Get-FileHash (Join-Path $env:TEMP "rfc-report-2.json")).Hash))
+$rfcParity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=readme-feature-coverage") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=readme-feature-coverage passes" ($rfcParity.ExitCode -eq 0)
+$rfcFixRun = Start-Process python -ArgumentList @($rfcFix) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "readme_feature_coverage fixtures pass" ($rfcFixRun.ExitCode -eq 0)
+
+# 29A) Dual-level architecture story headings (BUG-0010 / DEC-0076)
+$triadBug0010Script = Join-Path $root "scripts\enforce-triad-hot-surface.py"
+$triadBug0010Tpl = Join-Path $tpl "scripts\enforce-triad-hot-surface.py"
+Assert-True "enforce-triad-hot-surface.py exists (BUG-0010)" (Test-Path $triadBug0010Script -PathType Leaf)
+Assert-True "enforce-triad-hot-surface.py template mirror exists" (Test-Path $triadBug0010Tpl -PathType Leaf)
+$activeTriadHash = (Get-FileHash $triadBug0010Script -Algorithm SHA256).Hash
+$templateTriadHash = (Get-FileHash $triadBug0010Tpl -Algorithm SHA256).Hash
+Assert-True "enforce-triad-hot-surface active/template SHA-256 match" ($activeTriadHash -eq $templateTriadHash)
+$triadBug0010Self = Start-Process python -ArgumentList @($triadBug0010Script, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "enforce-triad-hot-surface self-test passes (BUG-0010 dual-level)" ($triadBug0010Self.ExitCode -eq 0)
+$triadBug0010Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "bug0010") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "BUG-0010 contract subtests pass" ($triadBug0010Contract.ExitCode -eq 0)
+
+# 30A) Voice compression rule markers (BUG-0011 / DEC-0077)
+$cavemanVoiceContract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "caveman_voice") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "BUG-0011 caveman_voice contract subtests pass" ($cavemanVoiceContract.ExitCode -eq 0)
+
+# 28B) Downstream CI drift guard (BUG-0009 / DEC-0075)
+$dciScript = Join-Path $root "scripts\check_downstream_ci_guard.py"
+$dciLib = Join-Path $root "scripts\downstream_ci_guard_lib.py"
+Assert-True "check_downstream_ci_guard.py exists" (Test-Path $dciScript -PathType Leaf)
+Assert-True "downstream_ci_guard_lib.py exists" (Test-Path $dciLib -PathType Leaf)
+$dciSelf = Start-Process python -ArgumentList @($dciScript, "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_downstream_ci_guard self-test passes" ($dciSelf.ExitCode -eq 0)
+$dciParity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=downstream-ci-guard") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=downstream-ci-guard passes" ($dciParity.ExitCode -eq 0)
+$dciContractRun = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "bug0009") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "BUG-0009 contract subtests pass" ($dciContractRun.ExitCode -eq 0)
+
+# 32) Browser UAT probe contract (US-0093 / DEC-0079)
+$uatProbeSelf = Start-Process python -ArgumentList @((Join-Path $root "scripts\uat_probe_lib.py"), "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "uat_probe_lib self-test passes (US-0093)" ($uatProbeSelf.ExitCode -eq 0)
+$uatProbeParity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=us-0093") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=us-0093 passes" ($uatProbeParity.ExitCode -eq 0)
+$us0093Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0093") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0093 contract subtests pass" ($us0093Contract.ExitCode -eq 0)
+
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 $intakeResumeBriefTest = Join-Path $root "tests\intake_bug_resume_brief_bug0005_test.py"
 Assert-True "intake_bug_resume_brief_bug0005_test.py exists" (Test-Path $intakeResumeBriefTest -PathType Leaf)

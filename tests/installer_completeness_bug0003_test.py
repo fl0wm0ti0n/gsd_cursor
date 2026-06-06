@@ -161,6 +161,52 @@ class InstallerCompletenessBug0003Test(unittest.TestCase):
             self.assertIn("INSTALL_COMPLETENESS_FAILED", merged)
             self.assertIn(f"INSTALL_REQUIRED_SCRIPT_MISSING:{TRIAD_SCRIPT}", merged)
 
+    def _extract_ci_job_keys(self, ci_yml_path: Path) -> set[str]:
+        import sys as _sys
+
+        _sys.path.insert(0, str(ROOT / "scripts"))
+        try:
+            import downstream_ci_guard_lib as dci
+        finally:
+            _sys.path.pop(0)
+        return set(dci.extract_job_keys(ci_yml_path.read_text(encoding="utf-8")))
+
+    def _assert_downstream_safe_ci_inventory(self, target: Path) -> None:
+        ci_path = target / ".github" / "workflows" / "ci.yml"
+        self.assertTrue(ci_path.is_file(), "installed ci.yml must exist")
+        job_keys = self._extract_ci_job_keys(ci_path)
+        self.assertLessEqual(job_keys, {"checks", "auto-fix"},
+                             f"installed ci.yml job keys must be downstream-safe; got {job_keys}")
+        for forbidden in ("npm-test", "brew-test", "choco-test"):
+            self.assertNotIn(forbidden, job_keys, f"packaging job {forbidden} must not leak")
+
+    def test_downstream_ci_yml_job_inventory_missing_mode(self) -> None:
+        """BUG-0009 / DEC-0075 §7: missing install ships checks+auto-fix only."""
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td)
+            write_bootstrap_package_json(target)
+            r = self.run_installer("--target", str(target), "--mode", "missing", "--create")
+            self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+            self._assert_downstream_safe_ci_inventory(target)
+
+    def test_downstream_ci_yml_job_inventory_upgrade_mode(self) -> None:
+        """BUG-0009 / DEC-0075 §7: upgrade refresh keeps downstream-safe ci.yml."""
+        with tempfile.TemporaryDirectory() as td:
+            target = Path(td)
+            write_bootstrap_package_json(target)
+            r_missing = self.run_installer(
+                "--target", str(target), "--mode", "missing", "--create",
+            )
+            self.assertEqual(0, r_missing.returncode, r_missing.stdout + r_missing.stderr)
+            stale_ci = target / ".github" / "workflows" / "ci.yml"
+            stale_ci.write_text(
+                stale_ci.read_text(encoding="utf-8") + "\n  npm-test:\n    runs-on: ubuntu-latest\n",
+                encoding="utf-8",
+            )
+            r_upgrade = self.run_installer("--target", str(target), "--mode", "upgrade")
+            self.assertEqual(0, r_upgrade.returncode, r_upgrade.stdout + r_upgrade.stderr)
+            self._assert_downstream_safe_ci_inventory(target)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260510-US0091-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Audit and backfill: README.md must mirror all user-visible features, commands, and flags currently in docs/product/backlog.md and docs/product/acceptance.md, then keep it from drifting via a blocking release-gate extension on top of US-0030.",
+      "intake_run_id": "cursor-20260510-US0091-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260510-US0091-intake:0:0414147af6f87768"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Both root README.md and template/README.md (parity per US-0030 / US-0077) plus docs/developer/README.md for DEV_* developer-profile rows; documentation validator script and release-gate logic that consumes the validator.",
+      "intake_run_id": "cursor-20260510-US0091-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260510-US0091-intake:1:cab72e646971c7ab"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Preserve US-0077 audience profiles (USER_* / DEV_* H2 vocabulary), US-0030 README / runbook parity, US-0071 user-visible metadata sanitization, US-0017 template-drift parity, and DEC-0040 artifact ordering. Skip pure-internal guards / refactors that have no user-visible surface.",
+      "intake_run_id": "cursor-20260510-US0091-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260510-US0091-intake:2:350a62afcda67c7f"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "New feature-coverage validator with self-test plus regression test; extend release doc-delta gate so missing user-visible feature descriptions in the README family block /release with a deterministic reason code; keep scripts/check-user-visible-metadata.py and scripts/validate_doc_profile.py green; preserve template parity tests.",
+      "intake_run_id": "cursor-20260510-US0091-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260510-US0091-intake:3:c9f25ccdde5c33d8"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single P1 story: one-time README backfill across root README.md, template/README.md, and docs/developer/README.md, plus shipped blocking drift guard with deterministic reason codes wired into /release; release of the corresponding sprint flips US-0091 to DONE per US-0045.",
+      "intake_run_id": "cursor-20260510-US0091-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260510-US0091-intake:4:828b29149587741f"
+    }
+  ]
+}

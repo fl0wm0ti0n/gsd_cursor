@@ -1,0 +1,148 @@
+{
+  "sprint_id": "S0077",
+  "story_ids": ["US-0091"],
+  "story_id": "US-0091",
+  "dec_id": "DEC-0074",
+  "author": "qa",
+  "timestamp": "2026-06-06T13:45:00Z",
+  "orchestrator_run_id": "auto-20260606-01",
+  "fresh_context_marker": "qa-S0077-US0091-qa-20260606T134500Z-fresh",
+  "verify_work_executed_at": "2026-06-06T13:40:48Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0077-US0091-verify-work-20260606T134048Z-fresh",
+  "verify_work_verdict": "PASS",
+  "status": "populated",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "total": 10,
+  "qa_verdict_reference": "sprints/S0077/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Zero blocking findings; canonical check-in Pass=802/Fail=9 (+11 pass vs US-0090 QA baseline); all 9 failures pre-existing drift disjoint from US-0091.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "Merged scratchpad README_FEATURE_COVERAGE_ENFORCE=1 post-backfill",
+    "docs/engineering/context/readme-feature-coverage-audit.json present"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "dec_ref": ["DEC-0074 §1", "DEC-0074 §2"],
+      "command": "python scripts/validate_readme_feature_coverage.py --self-test",
+      "expected": "exit 0; stdout contains [README_FEATURE_COVERAGE_SELF_TEST_OK]; H1–H8 predicate matrix green",
+      "result": "pass",
+      "evidence_ref": "[README_FEATURE_COVERAGE_SELF_TEST_OK] exit 0; lib + template mirror implement canonical user_visible: field + migration heuristic",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "dec_ref": ["DEC-0074 §5"],
+      "commands": [
+        "test -f docs/engineering/context/readme-feature-coverage-audit.json",
+        "python scripts/validate_readme_feature_coverage.py --repo . --report"
+      ],
+      "expected": "audit artifact present; --report status=PASS with gaps=[]",
+      "result": "pass",
+      "evidence_ref": "readme-feature-coverage-audit.json present; --report coverage_total=98, coverage_missing=[], gaps=[]",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "dec_ref": ["DEC-0074 §3"],
+      "command": "python scripts/validate_readme_feature_coverage.py --repo . --report",
+      "expected": "coverage_missing=[] across 98 in-scope DONE items; three-file README family populated",
+      "result": "pass",
+      "evidence_ref": "coverage_present lists 98 ids (BUG-0001..0008, US-0001..0090); coverage_missing=[]; root README + docs/developer/README.md + template parity per US-0017",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "dec_ref": ["DEC-0074 §3", "DEC-0074 §4", "DEC-0074 §6"],
+      "commands": [
+        "test -f docs/engineering/context/readme-section-affinity.json",
+        "python scripts/validate_doc_profile.py --repo ."
+      ],
+      "expected": "affinity manifest affinity_version=1 with five locked rules; doc profile PASS; no new H2 literals",
+      "result": "pass",
+      "evidence_ref": "readme-section-affinity.json present (active + template mirror); validate_doc_profile PASS per dev/qa handoff; PROFILE_VIOLATION sub-code wired in validator",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "dec_ref": ["DEC-0074 §5", "DEC-0074 §6"],
+      "commands": [
+        "python scripts/validate_readme_feature_coverage.py --self-test",
+        "python scripts/validate_readme_feature_coverage.py --repo . --enforce"
+      ],
+      "expected": "[README_FEATURE_COVERAGE_SELF_TEST_OK]; --enforce emits [README_FEATURE_COVERAGE_VALIDATE_OK]",
+      "result": "pass",
+      "evidence_ref": "self-test OK; enforce OK; reason-code vocabulary includes GAP, PARITY_FAIL, INPUT_INVALID, PROFILE_VIOLATION under README_FEATURE_COVERAGE_BLOCKED umbrella",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "dec_ref": ["DEC-0074 §7"],
+      "command": "rg -n \"3f\\. README feature coverage gate\" .cursor/commands/release.md template/.cursor/commands/release.md",
+      "expected": "release step 3f documents README_FEATURE_COVERAGE_ENFORCE skip/enforce semantics; composes on US-0030",
+      "result": "pass",
+      "evidence_ref": "release.md step 3f at line 244; skip when enforce=0, run validator when enforce=1; runbook delta-vs-static remediation table present",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "dec_ref": ["DEC-0074 §5"],
+      "command": "two consecutive python scripts/validate_readme_feature_coverage.py --repo . --report",
+      "expected": "byte-identical stdout JSON; report_schema_version=1; sorted keys",
+      "result": "pass",
+      "evidence_ref": "idempotent=PASS (byte-identical consecutive runs); report_schema_version=1; harness §27U idempotence + fixtures test 3 passed",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "dec_ref": ["DEC-0074 §3"],
+      "command": "python scripts/check-user-visible-metadata.py --repo .",
+      "expected": "exit 0 on README family surfaces",
+      "result": "pass",
+      "evidence_ref": "metadata_exit=0; no internal planning token leakage in backfilled blurbs",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "dec_ref": ["DEC-0074 §9"],
+      "command": "python scripts/check_intake_template_parity.py --scope=readme-feature-coverage",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK] exit 0",
+      "result": "pass",
+      "evidence_ref": "[INTAKE_TEMPLATE_PARITY_OK] scope=readme-feature-coverage; installer-owned-paths.manifest lists both new scripts",
+      "verified_at": "2026-06-06T13:40:48Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "dec_ref": ["DEC-0074 §8", "DEC-0074 §AC-Traceability"],
+      "commands": [
+        "rg -n \"^README_FEATURE_COVERAGE_ENFORCE=1\" .cursor/scratchpad.md",
+        "test -f decisions/DEC-0074.md"
+      ],
+      "expected": "README_FEATURE_COVERAGE_ENFORCE=1 post-backfill; DEC-0074 documents predicate, US-0030 composition, grandfathering",
+      "result": "pass",
+      "evidence_ref": "scratchpad line 236 README_FEATURE_COVERAGE_ENFORCE=1; decisions/DEC-0074.md accepted 2026-06-06; linkage subtest in fixtures asserts DEC-0074, US-0030, DEC-0059, US-0017, US-0071",
+      "verified_at": "2026-06-06T13:40:48Z"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "acceptance": "UAT passes when all 10 UAT steps (AC-1..AC-10) meet expected outcomes.",
+  "verify_work_result": "10/10 PASS; 0 FAIL; 0 SKIP; verdict=PASS"
+}

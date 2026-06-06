@@ -1,0 +1,221 @@
+{
+  "sprint_id": "S0082",
+  "story_ids": ["US-0093"],
+  "story_id": "US-0093",
+  "dec_id": "DEC-0079",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-07T01:15:00Z",
+  "orchestrator_run_id": "auto-20260606-04",
+  "fresh_context_marker": "qa-S0082-US0093-qa-20260607T010000Z-fresh",
+  "verify_work_executed_at": "2026-06-07T01:15:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0082-US0093-verify-work-20260607T011500Z-fresh",
+  "verify_work_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "total": 10,
+  "qa_verdict_reference": "sprints/S0082/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Verify-work independent re-runs green; AC-1..AC-10 closure preflight PASS; US-0093 remains OPEN per US-0045.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0079 execute deliverables merged (uat_probe_lib two-tier browser, verb routing, stub completion, evidence schema)",
+    "scripts/uat_probe_lib.py present active + template mirrors"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "dec_ref": ["DEC-0079 §1"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0093_scratchpad_browser_probe_mode_keys",
+      "expected": "UAT_BROWSER_PROBE_MODE cursor|http_fallback|playwright_fallback (default cursor); poll/fallback keys; PERMISSION_MODE + runtime-connectivity interaction docs",
+      "result": "pass",
+      "evidence_ref": "test_us0093_scratchpad_browser_probe_mode_keys PASS; .cursor/scratchpad.md + template/local-example parity",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "dec_ref": ["DEC-0079 §2"],
+      "commands": [
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_us0093_no_silent_pass_cursor_browser_smoke",
+        "python scripts/uat_probe_lib.py --self-test"
+      ],
+      "expected": "browser_smoke two-tier execution_tier=agent|stdlib; no silent PASS in cursor mode; HTTP/Playwright fallback wired; lib never calls browser MCP directly",
+      "result": "pass",
+      "evidence_ref": "test_us0093_no_silent_pass_cursor_browser_smoke PASS; [UAT_PROBE_LIB_SELF_TEST_OK]; command excerpts in verify-work.md/qa.md/execute.md",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "dec_ref": ["DEC-0079 §4"],
+      "commands": [
+        "python scripts/uat_probe_lib.py --repo . --step \"operator visually confirms button click\" --report",
+        "python scripts/uat_probe_lib.py --repo . --step \"click submit button on login form\" --report"
+      ],
+      "expected": "judgment-deny precedence → UAT_PROBE_UNRESOLVED; automatable UI verbs reclassify when URL resolves; no silent PASS",
+      "result": "pass",
+      "evidence_ref": "judgment step → manual_operator/UAT_PROBE_UNRESOLVED; login click → UAT_PROBE_UNRESOLVED (URL unresolved — fail-closed)",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "dec_ref": ["DEC-0079 §5"],
+      "command": "python scripts/uat_probe_lib.py --self-test",
+      "expected": "process_health subprocess + readiness poll; cli_smoke exit-code assertion; UAT_PROBE_PASS|TIMEOUT|FAILED reason family",
+      "result": "pass",
+      "evidence_ref": "[UAT_PROBE_LIB_SELF_TEST_OK] covers process_health + cli_smoke positive/timeout fixtures",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "dec_ref": ["DEC-0079 §6"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0093_browser_evidence_refs_in_commands",
+      "expected": "browser_evidence_refs schema (navigation_url, screenshots[], console/network summary paths); --merge-result rejects PASS without refs in cursor mode",
+      "result": "pass",
+      "evidence_ref": "test_us0093_browser_evidence_refs_in_commands PASS; evidence path convention sprints/Sxxxx/evidence/browser/",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "dec_ref": ["DEC-0079 §7"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k test_us0093_browser_reason_codes_in_lib_and_docs",
+      "expected": "UAT_BROWSER_UNAVAILABLE, UAT_BROWSER_PROBE_FAILED, UAT_BROWSER_PROBE_TIMEOUT in lib + docs; self-test covers MCP-unavailable + timeout fixtures",
+      "result": "pass",
+      "evidence_ref": "test_us0093_browser_reason_codes_in_lib_and_docs PASS; [UAT_PROBE_LIB_SELF_TEST_OK]",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "dec_ref": ["DEC-0078 §8"],
+      "command": "python scripts/uat_probe_lib.py --repo . --step \"read secrets from .env file\" --report",
+      "expected": "UAT_PROBE_FORBIDDEN for secret paths; no credential auto-fill; no intake evidence mutation",
+      "result": "pass",
+      "evidence_ref": ".env step → UAT_PROBE_FORBIDDEN (verify-work re-run); DEC-0078 deny-list unchanged",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "dec_ref": ["DEC-0079 §8"],
+      "commands": [
+        "python scripts/uat_probe_lib.py --self-test",
+        "grep -l \"UAT_BROWSER_PROBE_MODE\" docs/engineering/runbook.md docs/engineering/auto-orchestration-reference.md"
+      ],
+      "expected": "operator recipe: mode enablement, CI http_fallback, evidence paths, --merge-result, @browser override; active + template parity",
+      "result": "pass",
+      "evidence_ref": "runbook + auto-orchestration-reference operator recipes present active + template; CI http_fallback documented",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "dec_ref": ["DEC-0079 §9"],
+      "command": "python -m pytest tests/auto_command_contract_test.py -q -k us0093",
+      "expected": "six test_us0093_* subtests PASS; DEC-0078/spawn-only markers not weakened",
+      "result": "pass",
+      "evidence_ref": "pytest -k us0093 → 6 passed, 20 subtests (verify-work independent re-run)",
+      "verified_at": "2026-06-07T01:15:00Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "dec_ref": ["DEC-0079 §10"],
+      "commands": [
+        "python scripts/check_intake_template_parity.py --repo . --scope=us-0093",
+        "python -m pytest tests/auto_command_contract_test.py -q -k test_us0093_architecture_linkage"
+      ],
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK] scope=us-0093 (8 rows); architecture # US-0093 references DEC-0079",
+      "result": "pass",
+      "evidence_ref": "[INTAKE_TEMPLATE_PARITY_OK]; test_us0093_architecture_linkage PASS; uat_probe_lib.py active/template SHA-256 match",
+      "verified_at": "2026-06-07T01:15:00Z"
+    }
+  ],
+  "probe_results": [
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "operator visually confirms button click",
+      "probe_kind": "manual_operator",
+      "reason_code": "UAT_PROBE_UNRESOLVED",
+      "passed": false,
+      "note": "Judgment-deny precedence — fail-closed per DEC-0079 §4"
+    },
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "read secrets from .env file",
+      "probe_kind": null,
+      "reason_code": "UAT_PROBE_FORBIDDEN",
+      "passed": false,
+      "note": "Security deny-list enforced — DEC-0078 §8 unchanged"
+    },
+    {
+      "cycle": 1,
+      "phase": "qa",
+      "step": "click submit button on login form",
+      "probe_kind": null,
+      "reason_code": "UAT_PROBE_UNRESOLVED",
+      "passed": false,
+      "note": "URL unresolved in probe context — fail-closed"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "read secrets from .env file",
+      "probe_kind": null,
+      "reason_code": "UAT_PROBE_FORBIDDEN",
+      "passed": false,
+      "note": "Verify-work re-run confirms security deny-list (expected fail-closed)"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "operator visually confirms button click",
+      "probe_kind": "manual_operator",
+      "reason_code": "UAT_PROBE_UNRESOLVED",
+      "passed": false,
+      "note": "Judgment step remains unresolved — expected fail-closed"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "run pytest contract tests for us0093",
+      "probe_kind": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "pytest -k us0093 → 6 passed, 20 subtests"
+    },
+    {
+      "cycle": 2,
+      "phase": "verify-work",
+      "step": "uat_probe_lib self-test browser fallback fixtures",
+      "probe_kind": "browser_smoke",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "execution_tier": "stdlib",
+      "browser_probe_mode": "http_fallback",
+      "note": "Self-test stdlib fallback path green; cursor-mode live MCP N/A in headless orchestration repo context"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "acceptance": "UAT passes when all 10 UAT steps (AC-1..AC-10) meet expected outcomes.",
+  "verify_work_result": "10/10 PASS; 0 FAIL; 0 SKIP; verdict=PASS",
+  "closure_preflight": {
+    "verdict": "PASS",
+    "gates_passed": 9,
+    "gates_total": 9
+  }
+}

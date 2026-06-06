@@ -1,0 +1,117 @@
+{
+  "sprint_id": "S0079",
+  "bug_refs": ["BUG-0010"],
+  "status": "PASS",
+  "reason": null,
+  "verdict_reason_codes": [],
+  "planned_at": "2026-06-06T17:00:00Z",
+  "plan_verified_at": "2026-06-06T14:26:51Z",
+  "role_planned": "tech-lead",
+  "role_verified": "qa",
+  "planned_by": {
+    "role": "tech-lead",
+    "orchestrator_run_id": "auto-20260606-02",
+    "fresh_context_marker": "tl-S0079-BUG0010-sprint-plan-20260606T170000Z-fresh"
+  },
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260606-02",
+    "fresh_context_marker": "qa-S0079-BUG0010-plan-verify-20260606T142651Z-fresh"
+  },
+  "verification_proof_ref": "rp-auto-20260606-02-plan-verify-qa-20260606T142651Z-S0079-BUG0010",
+  "verification_proof_hash": "3597c96a39105c8ffb3f6c7ce5e17901ac0d8a29cd64dc9086b95352cd377a9c",
+  "orchestrator_run_id": "auto-20260606-02",
+  "dec_id": "DEC-0076",
+  "research_anchor": "R-0076",
+  "architecture_anchor": "docs/engineering/architecture.md#BUG-0010",
+  "acs_covered": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "ac_coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-003", "T-007"], "verified": true, "notes": "`## US-` backward-compat rollover — dual-level `STORY_HEADING_H1`/`H2` + H1-wins merge + self-test/fixtures per DEC-0076 §1, §2, §5."},
+    {"ac": "AC-2", "tasks": ["T-001", "T-003"], "verified": true, "notes": "H1 `# US-` non-regression — existing `# US-0001`/`# US-0002` self-test fixture unchanged per DEC-0076 §5."},
+    {"ac": "AC-3", "tasks": ["T-001", "T-003", "T-007"], "verified": true, "notes": "Mixed-file H1-wins precedence — kit 26×H1 + 5×H2 regression anchor per DEC-0076 §2."},
+    {"ac": "AC-4", "tasks": ["T-002", "T-004"], "verified": true, "notes": "Diff-gated `ARCH_STORY_HEADING_LEVEL_INVALID` — `count_h2` increase hard-fail; command step 9 policy check per DEC-0076 §3, §4."},
+    {"ac": "AC-5", "tasks": ["T-004", "T-005", "T-009"], "verified": true, "notes": "`/architecture` command H1 mandate + template parity + linkage assert per DEC-0076 §3, §6."},
+    {"ac": "AC-6", "tasks": ["T-003", "T-005", "T-006"], "verified": true, "notes": "Extended `--self-test` + `test_bug0010_*` + harness §29A per DEC-0076 §5."},
+    {"ac": "AC-7", "tasks": ["T-001"], "verified": true, "notes": "`# BUG-` H1 rollover parity + script template byte-identity per DEC-0076 §1, §6."},
+    {"ac": "AC-8", "tasks": ["T-008"], "verified": true, "notes": "Operator runbook remediation blurb (verbatim DEC-0076 §7) in triad subsection."}
+  ],
+  "coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-003", "T-007"], "verified": true},
+    {"ac": "AC-2", "tasks": ["T-001", "T-003"], "verified": true},
+    {"ac": "AC-3", "tasks": ["T-001", "T-003", "T-007"], "verified": true},
+    {"ac": "AC-4", "tasks": ["T-002", "T-004"], "verified": true},
+    {"ac": "AC-5", "tasks": ["T-004", "T-005", "T-009"], "verified": true},
+    {"ac": "AC-6", "tasks": ["T-003", "T-005", "T-006"], "verified": true},
+    {"ac": "AC-7", "tasks": ["T-001"], "verified": true},
+    {"ac": "AC-8", "tasks": ["T-008"], "verified": true}
+  ],
+  "plan_integrity": {
+    "task_count": 9,
+    "ac_count": 8,
+    "task_ac_bijection": false,
+    "ac_coverage_surjective": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false
+  },
+  "governance_alignment": {
+    "decision_ref": "DEC-0076",
+    "architecture_anchor": "docs/engineering/architecture.md#BUG-0010",
+    "research_anchor": "R-0076",
+    "out_of_scope_guard": "Dual-level archiver + diff-gated H1 enforcement only; no new validator script; no static fail on grandfathered ## US-.",
+    "non_goals_respected": [
+      "no standalone validate_architecture_headings.py",
+      "no static fail on pre-existing ## US- sections",
+      "no ## BUG- pattern in v1",
+      "no global markdownlint MD025 on architecture.md",
+      "no state.md or po_to_tl.md rollover semantic changes",
+      "no ARCH_HOT_MAX_LINES threshold key changes",
+      "no new check_intake_template_parity.py scope",
+      "no mandatory bulk ## to # normalization in kit repo"
+    ]
+  },
+  "gates_passed": [
+    "AC_COVERAGE_SURJECTIVE: AC-1..AC-8 all ≥1 task via T-001..T-009; no PLAN_AC_COVERAGE_GAP",
+    "TASK_ATOMICITY: T-001/T-003/T-004/T-005/T-007 multi-AC scopes accepted per architecture # BUG-0010 § Atomic task seeds (not PLAN_AC_ATOMICITY_VIOLATION)",
+    "DEC_ANCHORING: every task cites DEC-0076 §N matching §AC-Traceability table",
+    "ACCEPTANCE_CHECKS_TESTABLE: every task has concrete acceptance_check bullets (rollover fixtures, policy reason codes, CLI hooks, harness §29A, byte-identity parity)",
+    "PARITY_TOUCHPOINTS_EXPLICIT: DEC-0076 §6 inventory rows 1–3 mapped per task parity_touchpoints; active-only surfaces documented",
+    "TASK_COUNT_WITHIN_LIMIT: task_count=9 <= sprint_max_tasks=12; SPRINT_AUTO_SPLIT not triggered",
+    "ORDERING_NO_CYCLES: recommended /execute ordering T-001→T-002→T-003→T-004→T-007→T-005→T-006→T-008→T-009 has no circular dependencies",
+    "NON_GOALS_PRESERVED: all DEC-0076 §9 hard non-goals enumerated in sprint.md and governance_alignment.non_goals_respected",
+    "TEST_STRATEGY_ALIGNED: extended self-test (T-003), contract tests (T-005), harness §29A (T-006), optional fixtures (T-007) match sprint.md test strategy",
+    "GOVERNANCE_ANCHORS_VALID: DEC-0076 §1–§9 per task; R-0076; architecture # BUG-0010; DEC-0054 doc-only amendment; US-0017 script mirror",
+    "STATUS_AUTHORITY_PRESERVED: BUG-0010 stays OPEN in docs/product/backlog.md through plan-verify (US-0045; closure at /release)",
+    "BUG_VALIDATION_OK: python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance -> [BUG_VALIDATION_OK]"
+  ],
+  "checks_performed": [
+    "Sprint-plan authored in fresh tech-lead context (auto-20260606-02, 2026-06-06T17:00:00Z, fresh_context_marker=tl-S0079-BUG0010-sprint-plan-20260606T170000Z-fresh); plan-verify authored in fresh qa context (auto-20260606-02, 2026-06-06T14:26:51Z, fresh_context_marker=qa-S0079-BUG0010-plan-verify-20260606T142651Z-fresh)",
+    "AC-to-task mapping surjective (AC-1..AC-8 covered by T-001..T-009); multi-AC tasks T-001/T-003/T-004/T-005/T-007 justified per architecture # BUG-0010 § Atomic task seeds",
+    "DEC-0076 §AC-Traceability cross-checked against tasks.md acceptance_check bullets and sprint.md AC coverage table",
+    "Scope aligns with docs/engineering/architecture.md#BUG-0010 and DEC-0076 (dual-level archiver H1-wins, diff-gated ARCH_STORY_HEADING_LEVEL_INVALID, in-place enforce-triad-hot-surface.py extension, harness §29A)",
+    "Template parity inventory locked per DEC-0076 §6 (3 positive rows + active-only surfaces + negative-parity constraints documented)",
+    "Non-goals preserved: no standalone validator; no static fail on grandfathered ## US-; no new parity scope; no threshold key changes",
+    "Task count 9 within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered",
+    "Recommended /execute ordering verified acyclic (archiver core → policy → self-test → command → fixtures → contracts → harness → runbook → linkage)",
+    "Bug validator python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance -> [BUG_VALIDATION_OK] (pre- and post-plan-verify write)",
+    "Canonical status BUG-0010 remains OPEN per US-0045 through plan-verify / execute / qa / verify-work; closure at /release only"
+  ],
+  "gates_failed": [],
+  "remediation_required": [],
+  "governance_refs": [
+    "DEC-0076",
+    "DEC-0054",
+    "DEC-0043",
+    "architecture.md#BUG-0010",
+    "R-0076",
+    "US-0072",
+    "US-0017",
+    "US-0061",
+    "US-0045",
+    "US-0048",
+    "DEC-0029",
+    "US-0056",
+    "DEC-0038"
+  ]
+}

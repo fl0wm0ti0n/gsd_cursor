@@ -115,6 +115,9 @@
 - [x] US-0088: `/auto` continuous multi-phase loop + quiet backlog drain (close one-phase-stop gap)
 - [x] US-0089: Cursor Caveman mode (scratchpad-configurable terse responses; default off; parity + tests)
 - [x] US-0090: Optional Caveman-style input compression (safe file scope, originals preserved, gated after US-0089)
+- [x] US-0091: README ↔ backlog/acceptance feature coverage backfill across root README.md, template/README.md, and docs/developer/README.md, plus blocking release-gate extension composing on US-0030 (10 ACs)
+- [x] US-0092: Full-autonomy `/auto` mode — shipped outer driver, self-build/self-test UAT, block auto-resolve, drain-without-pause, TOKEN_PROFILE token-cost-only orthogonality (10 ACs) (UAT closure: `sprints/S0081/uat.json`, `sprints/S0081/uat.md`, verify-work **2026-06-06T22:00:00Z** / `orchestrator_run_id=auto-20260606-03`; release **2026-06-06T22:30:00Z** / `handoffs/releases/S0081-release-notes.md`, queue **`S0081`** → **`released`**)
+- [x] US-0093: Cursor browser-integrated UAT self-test — execute browser_smoke/manual UI probes, complete process_health/cli_smoke stubs, evidence in uat.json (10 ACs)
 
 ## Bug acceptance (canonical)
 
@@ -128,5 +131,8 @@ Per **`DEC-0061`** §8 / **`US-0079`**: portfolio checkbox rows **`- [ ]` / `- [
 - [x] BUG-0006: `/auto` executes phases without spawning required subagents (UAT closure: `sprints/S0067/uat.json`, `sprints/S0067/uat.md`, verify-work **2026-04-04T08:30:00Z** / `orchestrator_run_id=auto-20260403-03`)
 - [x] BUG-0007: intake evidence records asked questions that were never asked (UAT closure: `sprints/S0068/uat.json`, `sprints/S0068/uat.md`, verify-work **2026-04-04T23:45:00Z** / `orchestrator_run_id=auto-20260404-01`; release notes `handoffs/releases/S0068-release-notes.md`, queue **`S0068`** → **`ready`**)
 - [x] BUG-0008: Global Linux install fails when installer manifest is CRLF (empty `install_include_paths` parse)
+- [x] BUG-0009: its-magic ships its own packaging CI (npm/installer.sh/chocolatey jobs) into generated repos, breaking CI in every created project (UAT closure: `sprints/S0078/uat.json`, `sprints/S0078/uat.md`, verify-work **2026-06-06T16:10:30Z** / `orchestrator_run_id=auto-20260606-02`; release notes `handoffs/releases/S0078-release-notes.md`, queue **`S0078`** → **`released`**)
+- [x] BUG-0010: Architecture triad archiver ignores `## US-xxxx` headings — `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS` blocks `/auto` when architecture.md exceeds cap (UAT closure: `sprints/S0079/uat.json`, `sprints/S0079/uat.md`, verify-work **2026-06-06T16:33:28Z** / `orchestrator_run_id=auto-20260606-02`; release notes `handoffs/releases/S0079-release-notes.md`, queue **`S0079`** → **`released`**)
+- [x] BUG-0011: Caveman mode missing voice compression rules — `CAVEMAN_MODE=1` does not produce terse replies (US-0089 incomplete delivery) (UAT closure: `sprints/S0080/uat.json`, `sprints/S0080/uat.md`, verify-work **2026-06-06T16:53:00Z** / `orchestrator_run_id=auto-20260606-02`; release notes `handoffs/releases/S0080-release-notes.md`, queue **`S0080`** → **`released`**)
 
 Validator (backlog bugs + optional drift vs this section): `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`.

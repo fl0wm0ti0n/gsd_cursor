@@ -79,12 +79,15 @@ jobs:
 
       - name: No commands set
         if: ${{ steps.runbook.outputs.TEST_COMMAND == '' && steps.runbook.outputs.LINT_COMMAND == '' && steps.runbook.outputs.TYPECHECK_COMMAND == '' }}
-        run: echo "No runbook commands set."
+        run: echo "no tests configured yet"
 
       - name: Summarise results
         if: always()
         run: |
           echo "### CI Results" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.runbook.outputs.TEST_COMMAND }}" = "" ] && [ "${{ steps.runbook.outputs.LINT_COMMAND }}" = "" ] && [ "${{ steps.runbook.outputs.TYPECHECK_COMMAND }}" = "" ]; then
+            echo "**no tests configured yet**" >> "$GITHUB_STEP_SUMMARY"
+          fi
           echo "| Step | Result |" >> "$GITHUB_STEP_SUMMARY"
           echo "|------|--------|" >> "$GITHUB_STEP_SUMMARY"
           echo "| Test | ${{ steps.test.outcome || 'skipped' }} |" >> "$GITHUB_STEP_SUMMARY"

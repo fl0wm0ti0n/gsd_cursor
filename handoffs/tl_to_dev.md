@@ -1,3 +1,403 @@
+## Sprint Plan — **S0082** / **US-0093** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
+
+> **2026-06-07T00:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-04`, `fresh_context_marker=tl-S0082-US0093-sprint-plan-20260607T000000Z-fresh`, `runtime_proof_id=rp-auto-20260606-04-sprint-plan-tech-lead-20260607T000000Z-S0082-US0093`, `proof_hash=b1511e92b1cd8e38b3b91fd3d8e685e8736712b1883d3cfd748f2196c6d744c0`). Sprint **`S0082`** created; **AC-1..AC-10 ↔ T-001..T-010** strict bijection; `task_count=10`, `within_limit=true`. Story **`US-0093`** remains **OPEN** (**US-0045**). Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0082/sprint.md`
+- **Atomic tasks**: `sprints/S0082/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0082/plan-verify.json` (`status=PENDING`)
+- **Summary**: `sprints/S0082/summary.md`
+- **Binding decision**: `decisions/DEC-0079.md` (§1–§11)
+- **Architecture**: `docs/engineering/architecture.md` `# US-0093`
+- **Research**: `docs/engineering/research.md` `R-0079`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1 | Scratchpad `UAT_BROWSER_PROBE_MODE` + poll/fallback keys |
+| T-002 | AC-2 | Browser two-tier execution + MCP command excerpts + fallback |
+| T-003 | AC-3 | `manual_operator` verb routing |
+| T-004 | AC-4 | `process_health` / `cli_smoke` stub completion |
+| T-005 | AC-5 | `browser_evidence_refs` evidence schema + `--merge-result` |
+| T-006 | AC-6 | `UAT_BROWSER_*` reason codes + `--self-test` |
+| T-007 | AC-7 | Security deny-list unchanged |
+| T-008 | AC-8 | Runbook + auto-orchestration-reference operator recipe |
+| T-009 | AC-9 | Contract tests `test_us0093_*` + harness §32 |
+| T-010 | AC-10 | Template parity `--scope=us-0093` + linkage assert |
+
+### Recommended /execute ordering
+
+1. T-001 → T-003 ∥ T-004 → T-002 → T-005 → T-006 → T-007 → T-008 → T-009 → T-010
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not re-open** DEC-0079 §§1–11.
+- **Do not** invoke browser MCP from **`uat_probe_lib.py`** (**BUG-0006** spawn-only).
+- **Do not** fabricate **`browser_evidence_refs`** or silent PASS in **`cursor`** mode.
+- **Do not** auto-read `.env`, fill credentials, or mutate intake evidence.
+- **Commit** active + `template/` pairs atomically for parity rows.
+
+### Next
+
+- **`/plan-verify`** (fresh **qa**) for **`S0082`** / **`US-0093`**
+
+---
+
+## Sprint Plan — **S0081** / **US-0092** — post-**`/plan-verify`** → **`/execute`** (**dev**)
+
+> **2026-06-06T20:15:00Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260606-03`, `fresh_context_marker=qa-S0081-US0092-plan-verify-20260606T201500Z-fresh`, `runtime_proof_id=rp-auto-20260606-03-plan-verify-qa-20260606T201500Z-S0081-US0092`, `proof_hash=6ce05a35c16e560e34c9a19c73297df5a731c4832a3f1aef83b0d41770664fb4`). **AC-1..AC-10 ↔ T-001..T-010** strict bijection verified; `sprints/S0081/plan-verify.json` **PASS**. Story **`US-0092`** remains **OPEN** (**US-0045**). Next phase is **`/execute`** (fresh **dev**).
+
+> **2026-06-06T20:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`fresh_context_marker=tl-S0081-US0092-sprint-plan-20260606T200000Z-fresh`, `runtime_proof_id=rp-auto-20260606-03-sprint-plan-tech-lead-20260606T200000Z-S0081-US0092`, `proof_hash=fdc8e72253d4d875598e3dc24dadf245e0b9420cdfb6642f0886dde7fe8b8862`). Sprint **`S0081`** created; `task_count=10`, `within_limit=true`.
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0081/sprint.md`
+- **Atomic tasks**: `sprints/S0081/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0081/plan-verify.json` (`status=PASS`)
+- **Summary**: `sprints/S0081/summary.md`
+- **Binding decision**: `decisions/DEC-0078.md` (§1–§11)
+- **Architecture**: `docs/engineering/architecture.md` `# US-0092`
+- **Research**: `docs/engineering/research.md` `R-0078`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1 | Scratchpad `full_autonomy` enum + new keys |
+| T-002 | AC-2 | `scripts/auto_outer_driver.py` |
+| T-003 | AC-3 | `uat_probe_lib.py` + verify-work/qa excerpts |
+| T-004 | AC-4 | Block-retry ledger + caps |
+| T-005 | AC-5 | Drain-without-pause + DEC-0069 refresh |
+| T-006 | AC-6 | TOKEN_PROFILE orthography audit |
+| T-007 | AC-7 | Stop matrix docs |
+| T-008 | AC-8 | Contract tests |
+| T-009 | AC-9 | Template parity + installer manifest |
+| T-010 | AC-10 | Runbook + security deny-list |
+
+### Recommended /execute ordering
+
+1. T-001 → T-002 → T-003 (parallel OK) → T-004 → T-005 → T-006 ∥ T-007 → T-008 → T-009 → T-010
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not re-open** DEC-0078 §§1–11.
+- **Do not weaken** spawn-only (**BUG-0006**) or isolation/strict-proof gates.
+- **Do not** auto-read `.env`, mutate intake evidence, or publish without `RELEASE_PUBLISH_MODE=auto`.
+- **Commit** active + `template/` pairs atomically for parity rows.
+
+### Next
+
+- **`/execute`** (fresh **dev**) for **`S0081`** / **`US-0092`**
+
+---
+
+## Sprint Plan — **S0080** / **BUG-0011** — post-**`/plan-verify`** → **`/execute`** (**dev**)
+
+> **2026-06-06T14:46:04Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=qa-S0080-BUG0011-plan-verify-20260606T144604Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-plan-verify-qa-20260606T144604Z-S0080-BUG0011`, `proof_hash=f33352078fc4ea47f49af1012b2956e5268598c672e41eadc0e3776d15d0c279`). **`sprints/S0080/plan-verify.json`** **`status=PASS`**; **AC-1..AC-8** surjective via **T-001..T-008** (12 gates green). Bug **`BUG-0011`** remains **OPEN** (**US-0045**). Next phase is **`/execute`** (fresh **dev**).
+
+> **2026-06-06T16:43:29Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=tl-S0080-BUG0011-sprint-plan-20260606T164329Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-sprint-plan-tech-lead-20260606T164329Z-S0080-BUG0011`, `proof_hash=5759c41dd84ae77757dac24fa0b8c675133326b666ebf74acf8e139451d4ca88`). Sprint **`S0080`** created; **AC-1..AC-8** surjective via **T-001..T-008**; `task_count=8`, `within_limit=true`.
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0080/sprint.md`
+- **Atomic tasks**: `sprints/S0080/tasks.md` (T-001..T-008)
+- **Plan-verify (qa)**: `sprints/S0080/plan-verify.json` (`status=PASS`)
+- **Summary**: `sprints/S0080/summary.md`
+- **QA findings**: `sprints/S0080/qa-findings.md` (plan-verify PASS)
+- **Binding decision**: `decisions/DEC-0077.md` (§1–§10)
+- **Architecture**: `docs/engineering/architecture.md` `# BUG-0011`
+- **Research**: `docs/engineering/research.md` `R-0077`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1, AC-2, AC-3, AC-4 | Voice section append to `caveman.mdc` (+ template mirror) |
+| T-002 | AC-6 | Runbook `#### Voice compression levels` |
+| T-003 | AC-5 | Nine `test_caveman_voice_*` subtests |
+| T-004 | AC-5 | SHA baseline bump (`_CAVEMAN_RULE_BASELINE_SHA256`) |
+| T-005 | AC-8 | Harness **§30A** |
+| T-006 | AC-7 | `test_caveman_default_off_*` regression guard |
+| T-007 | AC-8 | Operator voice UAT spot-check |
+| T-008 | AC-1 | Architecture + DEC linkage assert |
+
+### Recommended /execute ordering
+
+1. T-001 → T-002 (parallel OK) → T-004 → T-003 → T-006 → T-005 → T-008 → T-007 (UAT docs at verify-work)
+
+### Scope guards for `/execute`
+
+- **Do not re-open** DEC-0077 §§1–10.
+- **Do not modify** `test_caveman_default_off_*` assertion bodies.
+- **Do not change** `CAVEMAN_COMPRESS_INPUT` / `scripts/caveman_compress_input.py`.
+- **Do not duplicate** 9-zone literal list in voice section (pointer stub only).
+- **Commit** active + `template/` pairs atomically for parity rows 1–2.
+
+### Next
+
+- **`/execute`** (fresh **dev**) for **`S0080`** / **`BUG-0011`**
+
+---
+
+## Sprint Plan — **S0080** / **BUG-0011** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**) — superseded
+
+> **2026-06-06T16:43:29Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=tl-S0080-BUG0011-sprint-plan-20260606T164329Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-sprint-plan-tech-lead-20260606T164329Z-S0080-BUG0011`, `proof_hash=5759c41dd84ae77757dac24fa0b8c675133326b666ebf74acf8e139451d4ca88`). Sprint **`S0080`** created; **AC-1..AC-8** surjective via **T-001..T-008**; `task_count=8`, `within_limit=true`. Bug **`BUG-0011`** remains **OPEN** (**US-0045**). Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0080/sprint.md`
+- **Atomic tasks**: `sprints/S0080/tasks.md` (T-001..T-008)
+- **Plan-verify (qa)**: `sprints/S0080/plan-verify.json` (`status=PENDING`)
+- **Summary**: `sprints/S0080/summary.md`
+- **Binding decision**: `decisions/DEC-0077.md` (§1–§10)
+- **Architecture**: `docs/engineering/architecture.md` `# BUG-0011`
+- **Research**: `docs/engineering/research.md` `R-0077`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1, AC-2, AC-3, AC-4 | Voice section append to `caveman.mdc` (+ template mirror) |
+| T-002 | AC-6 | Runbook `#### Voice compression levels` |
+| T-003 | AC-5 | Nine `test_caveman_voice_*` subtests |
+| T-004 | AC-5 | SHA baseline bump (`_CAVEMAN_RULE_BASELINE_SHA256`) |
+| T-005 | AC-8 | Harness **§30A** |
+| T-006 | AC-7 | `test_caveman_default_off_*` regression guard |
+| T-007 | AC-8 | Operator voice UAT spot-check |
+| T-008 | AC-1 | Architecture + DEC linkage assert |
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not re-open** DEC-0077 §§1–10.
+- **Do not modify** `test_caveman_default_off_*` assertion bodies.
+- **Do not change** `CAVEMAN_COMPRESS_INPUT` / `scripts/caveman_compress_input.py`.
+- **Do not duplicate** 9-zone literal list in voice section (pointer stub only).
+- **Commit** active + `template/` pairs atomically for parity rows 1–2.
+
+### Next
+
+- **`/plan-verify`** (fresh **qa**) for **`S0080`** / **`BUG-0011`**
+
+---
+
+## Sprint Plan — **S0079** / **BUG-0010** — post-**`/plan-verify`** → **`/execute`** (**dev**)
+
+> **2026-06-06T14:26:51Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=qa-S0079-BUG0010-plan-verify-20260606T142651Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-plan-verify-qa-20260606T142651Z-S0079-BUG0010`, `proof_hash=3597c96a39105c8ffb3f6c7ce5e17901ac0d8a29cd64dc9086b95352cd377a9c`). **`sprints/S0079/plan-verify.json`** **`status=PASS`**; **AC-1..AC-8** surjective via **T-001..T-009** (12 gates green). Bug **`BUG-0010`** remains **OPEN** (**US-0045**). Next phase is **`/execute`** (fresh **dev**).
+
+> **2026-06-06T17:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=tl-S0079-BUG0010-sprint-plan-20260606T170000Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-sprint-plan-tech-lead-20260606T170000Z-S0079-BUG0010`, `proof_hash=2f11f1ef33664c971f80af8d98e89a9e6ef5c71d637761d1814edf1d0131edeb`). Sprint **`S0079`** created; **AC-1..AC-8** surjective via **T-001..T-009**; `task_count=9`, `within_limit=true`.
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0079/sprint.md`
+- **Atomic tasks**: `sprints/S0079/tasks.md` (T-001..T-009)
+- **Plan-verify (qa)**: `sprints/S0079/plan-verify.json` (`status=PASS`)
+- **Summary**: `sprints/S0079/summary.md`
+- **Binding decision**: `decisions/DEC-0076.md` (§1–§9)
+- **Architecture**: `docs/engineering/architecture.md` `# BUG-0010`
+- **Research**: `docs/engineering/research.md` `R-0076`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1, AC-2, AC-3, AC-7 | Dual-level archiver + H1-wins merge (+ template mirror) |
+| T-002 | AC-4 | `count_h2_story_headings` + `check_arch_heading_policy` + CLI |
+| T-003 | AC-1, AC-2, AC-3, AC-6 | Extended `--self-test` fixture classes |
+| T-004 | AC-4, AC-5 | Architecture command H1 mandate + policy step |
+| T-005 | AC-5, AC-6 | Contract tests `test_bug0010_*` |
+| T-006 | AC-6 | Harness **§29A** |
+| T-007 | AC-1, AC-3 | Optional `triad_arch_headings/` fixtures |
+| T-008 | AC-8 | Runbook legacy `## US-` remediation blurb |
+| T-009 | AC-5 | Architecture + DEC linkage assert |
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not re-open** DEC-0076 §§1–9.
+- **Do not add** standalone `validate_architecture_headings.py`.
+- **Do not static-fail** on grandfathered `## US-` sections.
+- **Do not add** new `check_intake_template_parity.py` scope.
+- **Commit** active + `template/` pairs atomically for parity rows 1–3.
+
+### Next
+
+- **`/execute`** (fresh **dev**) for **`S0079`** / **`BUG-0010`**
+
+---
+
+## TL → Dev Handoff — **BUG-0010** (post-architecture) → **`/sprint-plan`** — **superseded** by **S0079** sprint plan above
+
+> **2026-06-06T14:22:42Z** — **`/architecture`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=tl-BUG0010-architecture-20260606T142242Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-architecture-tl-20260606T142242Z-BUG0010`, `proof_hash=a3a709c179134f8ac44c89cd05f5b99e132b72f5c06b8224f027131853b48f42`). Binding decision **`DEC-0076`** authored; **`docs/engineering/architecture.md`** **`# BUG-0010`** appended. Bug **`BUG-0010`** remains **OPEN** (**US-0045**). No execution started — next phase is **`/sprint-plan`** (fresh **tech-lead**).
+
+### Architecture anchor
+
+- **Binding decision**: `decisions/DEC-0076.md` (§1–§9)
+- **Architecture**: `docs/engineering/architecture.md` **`# BUG-0010`**
+- **Research**: `docs/engineering/research.md` **`R-0076`**
+- **State checkpoint**: `docs/engineering/state.md` — **Architecture checkpoint (2026-06-06) — BUG-0010 / auto-20260606-02**
+
+### Locked decisions (DEC-0076 summary)
+
+1. **Dual-level archiver** — `STORY_HEADING_H1` + `STORY_HEADING_H2`; H1-wins precedence filter in `split_arch_stories`.
+2. **Forward enforcement** — diff-gated `count_h2_story_headings` / `check_arch_heading_policy`; hard fail on `ARCH_STORY_HEADING_LEVEL_INVALID`.
+3. **In-place extension** — `enforce-triad-hot-surface.py` only (no new validator script); active + `template/` byte-identical.
+4. **Command contract** — `.cursor/commands/architecture.md` mandates H1 `# US-xxxx` / `# BUG-xxxx`; baseline capture in triad step 9.
+5. **Regression** — extended `--self-test` + `test_bug0010_*` + harness **§29A**.
+6. **Template parity** — script + architecture command + runbook triad subsection (no new parity scope).
+7. **Operator docs** — legacy `## US-` rollover note + optional `##`→`#` remediation (DEC-0076 §7).
+
+### Atomic task seeds (9; `/sprint-plan` converts to T-xxx)
+
+See **`docs/engineering/architecture.md`** **`# BUG-0010`** § Atomic task seeds.
+
+### Scope guards for `/sprint-plan`
+
+- **Do not re-open** DEC-0076 §§1–9.
+- **Do not add** standalone `validate_architecture_headings.py`.
+- **Do not static-fail** on pre-existing `## US-` sections (diff-gated only).
+- **Do not add** `check_intake_template_parity.py` new scope.
+- **Do not advance** backlog status (**OPEN** until `/release`).
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **`BUG-0010`**
+
+---
+
+## Sprint Plan — **S0078** / **BUG-0009** — post-**`/plan-verify`** → **`/execute`** (**dev**)
+
+> **2026-06-06T14:03:00Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=qa-S0078-BUG0009-plan-verify-20260606T140300Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-plan-verify-qa-20260606T140300Z-S0078-BUG0009`, `proof_hash=2b11ce38142dc8608181ba9fef4ccd8c2b3da76002c4dfa90734f1fd33cea379`). **`sprints/S0078/plan-verify.json`** flipped **PENDING → PASS**; **AC-1..AC-8** surjective via **T-001..T-010** verified. Bug **`BUG-0009`** remains **OPEN** (**US-0045**). **`/execute`** unblocked — next phase is **`/execute`** (fresh **dev**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0078/sprint.md`
+- **Atomic tasks**: `sprints/S0078/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0078/plan-verify.json` (`status=PASS`)
+- **Summary**: `sprints/S0078/summary.md`
+- **Binding decision**: `decisions/DEC-0075.md` (§1–§10)
+- **Architecture**: `docs/engineering/architecture.md` `# BUG-0009`
+- **Research**: `docs/engineering/research.md` `R-0075`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1, AC-4 | Template `ci.yml` downstream-safe + checks hardening |
+| T-002 | AC-2, AC-4 | Active `ci.yml` checks hardening; five jobs preserved |
+| T-003 | AC-5 | Template runbook empty `TEST_COMMAND:` |
+| T-004 | AC-3, AC-7 | Drift guard lib + CLI (+ template mirrors) |
+| T-005 | AC-3, AC-7 | Contract tests `test_bug0009_*` |
+| T-006 | AC-3 | Harness **§28B** |
+| T-007 | AC-6 | Install-completeness job-inventory smoke |
+| T-008 | AC-6, AC-7 | Installer manifest + parity `--scope=downstream-ci-guard` |
+| T-009 | AC-8 | Operator upgrade remediation docs |
+| T-010 | AC-7 | Architecture + DEC linkage assert |
+
+### Scope guards for `/execute` (after plan-verify PASS)
+
+- **Do not re-open** DEC-0075 §§1–10.
+- **Do not strip** packaging jobs from **active** CI.
+- **Do not byte-match** template and active `ci.yml`.
+- **Do not add** `--scope=ci-downstream` to parity script.
+- **Commit** active + `template/` pairs atomically for parity rows.
+
+### Next
+
+- **`/execute`** (fresh **dev**) for **`S0078`** / **`BUG-0009`**
+
+---
+
+## TL → Dev Handoff — **BUG-0009** (post-architecture) → **`/sprint-plan`** — **superseded** by **S0078** sprint plan above
+
+> **2026-06-06T16:00:00Z** — **`/architecture`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-02`, `fresh_context_marker=tl-BUG0009-architecture-20260606T160000Z-fresh`, `runtime_proof_id=rp-auto-20260606-02-architecture-tl-20260606T160000Z-BUG0009`, `proof_hash=47027c0a605d7150e949cd8d6fc7ad3f30280aca4cbb0462427721e2a57b0805`). Binding decision **`DEC-0075`** authored; **`docs/engineering/architecture.md`** **`# BUG-0009`** appended. Bug **`BUG-0009`** remains **OPEN** (**US-0045**). No execution started — next phase is **`/sprint-plan`** (fresh **tech-lead**).
+
+### Architecture anchor
+
+- **Binding decision**: `decisions/DEC-0075.md` (§1–§10)
+- **Architecture**: `docs/engineering/architecture.md` **`# BUG-0009`**
+- **Research**: `docs/engineering/research.md` **`R-0075`**
+- **State checkpoint**: `docs/engineering/state.md` — **Architecture checkpoint (2026-06-06) — BUG-0009 / auto-20260606-02**
+
+### Locked decisions (DEC-0075 summary)
+
+1. **CI split** — in-place job subtraction in `template/.github/workflows/ci.yml` (`checks`+`auto-fix` only); active retains five jobs.
+2. **US-0017 negative parity** — intentional active ≠ template for `ci.yml` + template runbook `TEST_COMMAND:` line; **no** `--scope=ci-downstream` on parity script.
+3. **Drift guard** — `check_downstream_ci_guard.py` + `downstream_ci_guard_lib.py` (lib split); harness **§28B**; contract tests `test_bug0009_*`.
+4. **Forbidden patterns** + reason codes (`DOWNSTREAM_CI_FORBIDDEN_PATTERN`, `DOWNSTREAM_CI_JOB_LEAK`, `KIT_CI_PACKAGING_JOBS_MISSING`).
+5. **checks green-by-default** — `no tests configured yet` summary; fail only on configured command failure.
+6. **Empty template TEST_COMMAND** — US-0063 bootstrap preserved; active runbook keeps harness.
+7. **Install smoke** — extend `installer_completeness_bug0003_test.py` job inventory (missing + upgrade).
+8. **Operator docs** — upgrade remediation blurb (verbatim in DEC-0075 §9).
+
+### Atomic task seeds (10; `/sprint-plan` converts to T-xxx)
+
+See **`docs/engineering/architecture.md`** **`# BUG-0009`** § Atomic task seeds.
+
+### Scope guards for `/sprint-plan`
+
+- **Do not re-open** DEC-0075 §§1–10.
+- **Do not strip** packaging jobs from **active** CI.
+- **Do not byte-match** template and active `ci.yml`.
+- **Do not add** `check_intake_template_parity.py --scope=ci-downstream`.
+- **Do not advance** backlog status (**OPEN** until `/release`).
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **`BUG-0009`**
+
+---
+
+## Sprint Plan — **S0077** / **US-0091** — post-**`/plan-verify`** -> **`/execute`** (**dev**)
+
+> **2026-06-06T15:30:00Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260606-01`, `fresh_context_marker=qa-S0077-US0091-plan-verify-20260606T153000Z-fresh`, `runtime_proof_id=rp-auto-20260606-01-plan-verify-qa-20260606T153000Z-S0077-US0091`, `proof_hash=ef8ac907c4334bd149ce026e0ca66da7ab8669173123368690ab0762201e078f`). **`sprints/S0077/plan-verify.json`** flipped **PENDING → PASS**; **AC-1..AC-10 ↔ T-001..T-010** strict bijection verified. Story **`US-0091`** remains **OPEN** (**US-0045**). **`/execute`** unblocked — next phase is **`/execute`** (fresh **dev**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0077/sprint.md`
+- **Atomic tasks**: `sprints/S0077/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0077/plan-verify.json` (`status=PASS`)
+- **Summary**: `sprints/S0077/summary.md`
+- **Binding decision**: `decisions/DEC-0074.md` (§1–§10)
+- **Architecture**: `docs/engineering/architecture.md` **`# US-0091`** (active-only)
+- **Research**: `docs/engineering/research.md` **`R-0074`**
+- **State checkpoint**: `docs/engineering/state.md` — **Sprint-plan checkpoint (2026-06-06) — US-0091 / S0077 / `auto-20260606-01`**
+
+### Task → AC → DEC-0074 § mapping (locked 1:1)
+
+| Task | AC | Summary | DEC-0074 § | Parity |
+|------|----|---------|------------|--------|
+| T-001 | AC-1 | `readme_feature_coverage_lib.py` — predicate H1–H8 + backlog parser | §1, §2 | Positive (script lib) |
+| T-002 | AC-2 | Audit report (`--audit-out`, gap artifact) | §5 | Active-only (audit json) |
+| T-003 | AC-3 | Three-file backfill + `user_visible:` markers | §3 | Root↔template README |
+| T-004 | AC-4 | `readme-section-affinity.json` + audience boundaries | §3, §4, §6 | Positive (manifest) |
+| T-005 | AC-5 | `validate_readme_feature_coverage.py` + reason codes + `--self-test` | §5, §6 | Positive (CLI) |
+| T-006 | AC-6 | Release step **3f** + runbook delta-vs-static | §7 | Positive (release.md + runbook) |
+| T-007 | AC-7 | Idempotent `--report` + fixtures + harness **§27U** | §5 | Active-only |
+| T-008 | AC-8 | US-0071 metadata hygiene on backfilled paths | §3 | Content review |
+| T-009 | AC-9 | Parity script `--scope=readme-feature-coverage` + installer manifest | §9 | Positive |
+| T-010 | AC-10 | `README_FEATURE_COVERAGE_ENFORCE` toggle + activation + DEC linkage assert | §8 | Scratchpad examples |
+
+### Dev entry conditions (satisfied at `/plan-verify`)
+
+- `/plan-verify` flipped `sprints/S0077/plan-verify.json` **`PENDING` → `PASS`** — **`/execute`** unblocked.
+- Fresh **dev** context required (US-0048 / DEC-0029 isolation); strict runtime proof (DEC-0038) at `/execute` entry and exit.
+- Dev MUST edit active + `template/` in the same commit for parity rows per DEC-0074 §9.
+- Dev MUST NOT rewrite **US-0030** delta gate semantics.
+- Dev MUST NOT invent new `USER_*` / `DEV_*` H2 literals (DEC-0059).
+- Dev MUST flip `README_FEATURE_COVERAGE_ENFORCE` **0→1** only in T-010 after `--report` shows `coverage_missing: []`.
+- Dev MUST NOT wire validator into `validate-and-push` (wrong lifecycle per DEC-0074 §7).
+
+### Recommended /execute ordering
+
+1. **T-001** → **T-004** → **T-005** → **T-002** → **T-003** → **T-008** → **T-006** → **T-009** → **T-007** → **T-010**
+
+### Next
+
+- **`/execute`** (fresh **dev**) for **`S0077`** / **US-0091**
+
+---
+
 ## Sprint Plan — **S0076** / **US-0090** — post-**`/sprint-plan`** -> **`/plan-verify`** (**qa**)
 
 > **2026-04-18T22:30:00Z** — **`/sprint-plan`** authored in fresh **tech-lead** context (`orchestrator_run_id=auto-20260418-01`, `fresh_context_marker=tl-US0090-sprint-plan-20260418T223000Z-fresh`, `runtime_proof_id=rp-auto-20260418-01-sprint-plan-tech-lead-20260418T223000Z-US0090`, `proof_hash=df27d039db0eb77e35ae140483338045c8a5a980f866b68ff683aa80bc3e8197`). Sprint **`S0076`** created; binding decision **`DEC-0073`** (composes on **`DEC-0072`** — forward-link, no rewrite). Task count **10 / 12** (`within_limit=true`; `SPRINT_AUTO_SPLIT` not triggered); AC coverage **AC-1..AC-8 all >=1 task** (no `PLAN_AC_COVERAGE_GAP`). Story **`US-0090`** remains **OPEN** (**US-0045**). No execution started yet — next phase is **`/plan-verify`** (fresh **qa**) -> then **`/execute`** (fresh **dev**).

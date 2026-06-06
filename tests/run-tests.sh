@@ -1334,6 +1334,89 @@ assert_true "check_intake_template_parity --scope=caveman-compress passes" "[ \"
 assert_true "US-0090 caveman-compress contract subtests pass" "[ \"$CAVEMAN_CONTRACT_RC\" -eq 0 ]"
 assert_true "US-0090 installer-completeness subtest passes" "[ \"$CAVEMAN_INSTALLER_RC\" -eq 0 ]"
 
+# 27U) README feature coverage (US-0091 / DEC-0074)
+RFC_SCRIPT="$ROOT/scripts/validate_readme_feature_coverage.py"
+RFC_LIB="$ROOT/scripts/readme_feature_coverage_lib.py"
+RFC_FIX="$ROOT/tests/readme_feature_coverage_fixtures_test.py"
+assert_true "validate_readme_feature_coverage.py exists" "[ -f \"$RFC_SCRIPT\" ]"
+assert_true "readme_feature_coverage_lib.py exists" "[ -f \"$RFC_LIB\" ]"
+assert_true "readme_feature_coverage_fixtures_test.py exists" "[ -f \"$RFC_FIX\" ]"
+assert_true "scratchpad includes README_FEATURE_COVERAGE_ENFORCE (active)" "file_contains \"$ROOT/.cursor/scratchpad.md\" \"README_FEATURE_COVERAGE_ENFORCE\""
+assert_true "runbook documents readme feature coverage (active)" "file_contains \"$ROOT/docs/engineering/runbook.md\" \"README feature coverage validation (US-0091 / DEC-0074)\""
+assert_true "runbook documents readme feature coverage (template)" "file_contains \"$TPL/docs/engineering/runbook.md\" \"README feature coverage validation (US-0091 / DEC-0074)\""
+set +e
+"$PY" "$RFC_SCRIPT" --self-test >/dev/null 2>&1
+RFC_SELF=$?
+"$PY" "$RFC_SCRIPT" --repo "$ROOT" --report >/tmp/rfc-report-1.json 2>/tmp/rfc-report-1.err
+RFC_REPO=$?
+"$PY" "$RFC_SCRIPT" --repo "$ROOT" --report >/tmp/rfc-report-2.json 2>/tmp/rfc-report-2.err
+RFC_REPO2=$?
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=readme-feature-coverage >/dev/null 2>&1
+RFC_PARITY=$?
+"$PY" "$RFC_FIX" >/dev/null 2>&1
+RFC_FIX_RC=$?
+set -e
+assert_true "validate_readme_feature_coverage self-test passes" "[ \"$RFC_SELF\" -eq 0 ]"
+assert_true "validate_readme_feature_coverage repo --report passes" "[ \"$RFC_REPO\" -eq 0 ]"
+assert_true "validate_readme_feature_coverage report idempotent" "[ \"$RFC_REPO2\" -eq 0 ] && cmp -s /tmp/rfc-report-1.json /tmp/rfc-report-2.json"
+assert_true "check_intake_template_parity --scope=readme-feature-coverage passes" "[ \"$RFC_PARITY\" -eq 0 ]"
+assert_true "readme_feature_coverage fixtures pass" "[ \"$RFC_FIX_RC\" -eq 0 ]"
+
+# 29A) Dual-level architecture story headings (BUG-0010 / DEC-0076)
+TRIAD_BUG0010_SCRIPT="$ROOT/scripts/enforce-triad-hot-surface.py"
+TRIAD_BUG0010_TPL="$TPL/scripts/enforce-triad-hot-surface.py"
+assert_true "enforce-triad-hot-surface.py exists (BUG-0010)" "[ -f \"$TRIAD_BUG0010_SCRIPT\" ]"
+assert_true "enforce-triad-hot-surface.py template mirror exists" "[ -f \"$TRIAD_BUG0010_TPL\" ]"
+ACTIVE_TRIAD_HASH=$(sha256sum "$TRIAD_BUG0010_SCRIPT" | awk '{print $1}')
+TEMPLATE_TRIAD_HASH=$(sha256sum "$TRIAD_BUG0010_TPL" | awk '{print $1}')
+assert_true "enforce-triad-hot-surface active/template SHA-256 match" "[ \"$ACTIVE_TRIAD_HASH\" = \"$TEMPLATE_TRIAD_HASH\" ]"
+set +e
+"$PY" "$TRIAD_BUG0010_SCRIPT" --self-test >/dev/null 2>&1
+TRIAD_BUG0010_SELF=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k bug0010 >/dev/null 2>&1
+TRIAD_BUG0010_CONTRACT=$?
+set -e
+assert_true "enforce-triad-hot-surface self-test passes (BUG-0010 dual-level)" "[ \"$TRIAD_BUG0010_SELF\" -eq 0 ]"
+assert_true "BUG-0010 contract subtests pass" "[ \"$TRIAD_BUG0010_CONTRACT\" -eq 0 ]"
+
+# 30A) Voice compression rule markers (BUG-0011 / DEC-0077)
+set +e
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k caveman_voice >/dev/null 2>&1
+CAVEMAN_VOICE_CONTRACT=$?
+set -e
+assert_true "BUG-0011 caveman_voice contract subtests pass" "[ \"$CAVEMAN_VOICE_CONTRACT\" -eq 0 ]"
+
+# 28B) Downstream CI drift guard (BUG-0009 / DEC-0075)
+DCI_SCRIPT="$ROOT/scripts/check_downstream_ci_guard.py"
+DCI_LIB="$ROOT/scripts/downstream_ci_guard_lib.py"
+assert_true "check_downstream_ci_guard.py exists" "[ -f \"$DCI_SCRIPT\" ]"
+assert_true "downstream_ci_guard_lib.py exists" "[ -f \"$DCI_LIB\" ]"
+set +e
+"$PY" "$DCI_SCRIPT" --self-test >/dev/null 2>&1
+DCI_SELF=$?
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=downstream-ci-guard >/dev/null 2>&1
+DCI_PARITY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k bug0009 >/dev/null 2>&1
+DCI_CONTRACT=$?
+set -e
+assert_true "check_downstream_ci_guard self-test passes" "[ \"$DCI_SELF\" -eq 0 ]"
+assert_true "check_intake_template_parity --scope=downstream-ci-guard passes" "[ \"$DCI_PARITY\" -eq 0 ]"
+assert_true "BUG-0009 contract subtests pass" "[ \"$DCI_CONTRACT\" -eq 0 ]"
+
+# 32) Browser UAT probe contract (US-0093 / DEC-0079)
+UAT_PROBE_SCRIPT="$ROOT/scripts/uat_probe_lib.py"
+set +e
+"$PY" "$UAT_PROBE_SCRIPT" --self-test >/dev/null 2>&1
+UAT_PROBE_SELF=$?
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=us-0093 >/dev/null 2>&1
+UAT_PROBE_PARITY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0093 >/dev/null 2>&1
+US0093_CONTRACT=$?
+set -e
+assert_true "uat_probe_lib self-test passes (US-0093)" "[ \"$UAT_PROBE_SELF\" -eq 0 ]"
+assert_true "check_intake_template_parity --scope=us-0093 passes" "[ \"$UAT_PROBE_PARITY\" -eq 0 ]"
+assert_true "US-0093 contract subtests pass" "[ \"$US0093_CONTRACT\" -eq 0 ]"
+
 # 26Q) Bug-intake resume_brief refresh contract (BUG-0005 / DEC-0069)
 INTAKE_RESUME_BRIEF_TEST="$ROOT/tests/intake_bug_resume_brief_bug0005_test.py"
 assert_true "intake_bug_resume_brief_bug0005_test.py exists" "[ -f \"$INTAKE_RESUME_BRIEF_TEST\" ]"

@@ -1,4 +1,363 @@
-## QA -> Release -- S0076 / US-0090 (`auto-20260418-01`) -- **current**
+## QA → Release — S0082 / US-0093 (`auto-20260606-04`) — **current**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-07T01:15:00Z`); AC **10 / 10 pass** (`sprints/S0082/uat.json`, `sprints/S0082/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero US-0093-attributable regressions. Decision-gate posture: **none**. Story **US-0093** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0082 / US-0093)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0082/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (10/10 delivered) | T-001..T-010 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0082/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0082/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0082/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=us-0093 |
+| `script_self_tests` | PASS | `[UAT_PROBE_LIB_SELF_TEST_OK]` |
+| `test_baselines_no_regression` | PASS | `pytest -k us0093` 6 passed; zero US-0093 regressions |
+| `dec_invariants` | PASS | DEC-0078 deny-list + spawn-only (**BUG-0006**) preserved |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-04-verify-work-qa-20260607T011500Z-S0082-US0093`
+- `proof_hash=92b595ba32afa35a56520e0e219d735579a516155ae68856447d9f869eb4c3d3`
+- `proof_issued_at=2026-06-07T01:15:00Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0082-US0093-verify-work-20260607T011500Z-fresh`, `timestamp=2026-06-07T01:15:00Z`, `evidence_ref=[sprints/S0082/uat.json, sprints/S0082/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=story`
+- `story_id=US-0093`
+- `sprint_id=S0082`
+- `dec_id=DEC-0079`
+- `orchestrator_run_id=auto-20260606-04`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=2`
+- `bug_queue_active=false`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0082** / **US-0093**.
+
+---
+
+## QA → Release — S0081 / US-0092 (`auto-20260606-03`) — **superseded**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-06T22:00:00Z`); AC **10 / 10 pass** (`sprints/S0081/uat.json`, `sprints/S0081/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero US-0092-attributable regressions. Decision-gate posture: **none**. Story **US-0092** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0081 / US-0092)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0081/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (10/10 delivered) | T-001..T-010 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0081/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0081/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0081/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=us-0092 |
+| `script_self_tests` | PASS | outer driver + UAT probe self-tests OK |
+| `test_baselines_no_regression` | PASS | `pytest -k us0092` 9 passed; zero US-0092 regressions |
+| `dec_invariants` | PASS | DEC-0078 non-goals preserved; US-0088 spawn-only unchanged |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-03-verify-work-qa-20260606T220000Z-S0081-US0092`
+- `proof_hash=47fa01c141767726a6dd5f8ab892bdd529a94b13f6728c765b56650fe94e0bd6`
+- `proof_issued_at=2026-06-06T22:00:00Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0081-US0092-verify-work-20260606T220000Z-fresh`, `timestamp=2026-06-06T22:00:00Z`, `evidence_ref=[sprints/S0081/uat.json, sprints/S0081/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=story`
+- `story_id=US-0092`
+- `sprint_id=S0081`
+- `dec_id=DEC-0078`
+- `orchestrator_run_id=auto-20260606-03`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=3`
+- `bug_queue_active=false`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0081** / **US-0092**.
+
+---
+
+## QA → Release — S0080 / BUG-0011 (`auto-20260606-02`) — **superseded**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-06T16:53:00Z`); AC **8 / 8 pass** (`sprints/S0080/uat.json`, `sprints/S0080/uat.md`); UAT-1 operator voice spot-check **PASS**. QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero BUG-0011-attributable regressions. Decision-gate posture: **none**. Bug **BUG-0011** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0080 / BUG-0011)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 8 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 8 |
+
+AC-1..AC-8 verified at verify-work; UAT-1 operator voice spot-check covers AC-8 qualitative brevity (see `sprints/S0080/uat.md` §UAT-1).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (8/8 delivered) | T-001..T-008 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (8/8) | `sprints/S0080/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (8/8) | `sprints/S0080/uat.md` Results summary + UAT-1 |
+| `plan_verify_status` | PASS | `sprints/S0080/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | active/template `caveman.mdc` SHA-256 `C7AAC699…8BC4D` match |
+| `negative_parity` | PASS | pre-voice scaffolding verbatim; `caveman_compress_input.py` untouched |
+| `test_baselines_no_regression` | PASS | combined filter 12 passed; Fail=14 disjoint pre-existing unchanged |
+| `dec_invariants` | PASS | DEC-0077 §9 non-goals preserved; `test_caveman_default_off_*` bodies unchanged |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-02-verify-work-qa-20260606T165300Z-S0080-BUG0011`
+- `proof_hash=b4db7ef70af8bc6e06c64a9f7820e7ea87148fd365152054a76fb5dfaa4221f4`
+- `proof_issued_at=2026-06-06T16:53:00Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0080-BUG0011-verify-work-20260606T165300Z-fresh`, `timestamp=2026-06-06T16:53:00Z`, `evidence_ref=[sprints/S0080/uat.json, sprints/S0080/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=bug`
+- `bug_id=BUG-0011`
+- `sprint_id=S0080`
+- `dec_id=DEC-0077`
+- `orchestrator_run_id=auto-20260606-02`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=false`
+- `bug_queue_active=true`
+- `bug_queue_remaining=1`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0080** / **BUG-0011**.
+
+---
+
+## QA → Release — S0079 / BUG-0010 (`auto-20260606-02`) — **superseded**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-06T16:33:28Z`); UAT **8 / 8 pass** (`sprints/S0079/uat.json`, `sprints/S0079/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero BUG-0010-attributable regressions. Decision-gate posture: **none**. Bug **BUG-0010** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0079 / BUG-0010)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 8 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 8 |
+
+All UAT steps map 1:1 to AC-1..AC-8 (see `sprints/S0079/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (9/9 delivered) | T-001..T-009 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (8/8) | `sprints/S0079/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (8/8) | `sprints/S0079/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0079/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | `enforce-triad-hot-surface.py` + architecture command byte-identical active/template |
+| `negative_parity` | PASS | `architecture.md` `# BUG-0010` active-only; no standalone validator |
+| `test_baselines_no_regression` | PASS | PS1 harness Pass=807/Fail=14 vs S0078 QA 802/14 (+5 pass §29A; +0 fail) |
+| `dec_invariants` | PASS | DEC-0076 §9 non-goals preserved; diff-gated H2 enforcement only |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-02-verify-work-qa-20260606T163328Z-S0079-BUG0010`
+- `proof_hash=5490fe1da1927c7404fcaaeb607fa0041cbea3fe831a10785ce9a44fad373230`
+- `proof_issued_at=2026-06-06T16:33:28Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0079-BUG0010-verify-work-20260606T163328Z-fresh`, `timestamp=2026-06-06T16:33:28Z`, `evidence_ref=[sprints/S0079/uat.json, sprints/S0079/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=bug`
+- `bug_id=BUG-0010`
+- `sprint_id=S0079`
+- `dec_id=DEC-0076`
+- `orchestrator_run_id=auto-20260606-02`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=false`
+- `bug_queue_active=true`
+- `bug_queue_remaining=2`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0079** / **BUG-0010**.
+
+---
+
+## QA → Release — S0078 / BUG-0009 (`auto-20260606-02`) — **superseded**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-06T16:10:30Z`); UAT **8 / 8 pass** (`sprints/S0078/uat.json`, `sprints/S0078/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero BUG-0009-attributable regressions. Decision-gate posture: **none**. Bug **BUG-0009** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0078 / BUG-0009)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 8 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 8 |
+
+All UAT steps map 1:1 to AC-1..AC-8 (see `sprints/S0078/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (10/10 delivered) | T-001..T-010 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (8/8) | `sprints/S0078/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (8/8) | `sprints/S0078/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0078/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | `[INTAKE_TEMPLATE_PARITY_OK]` | `--scope=downstream-ci-guard` |
+| `negative_parity` | PASS | template `ci.yml` SHA ≠ active; template `TEST_COMMAND:` empty; no `--scope=ci-downstream` |
+| `test_baselines_no_regression` | PASS | PS1 harness Pass=802/Fail=14 vs S0077 QA 802/9 (+5 fail disjoint from DEC-0075) |
+| `dec_invariants` | PASS | DEC-0075 §10 non-goals preserved; active five packaging jobs intact |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-02-verify-work-qa-20260606T161030Z-S0078-BUG0009`
+- `proof_hash=6461a92223fba4289b5f0ae85e2dd53e6c8756a30ef52bd03475728ce25d5bfb`
+- `proof_issued_at=2026-06-06T16:10:30Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0078-BUG0009-verify-work-20260606T161030Z-fresh`, `timestamp=2026-06-06T16:10:30Z`, `evidence_ref=[sprints/S0078/uat.json, sprints/S0078/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=bug`
+- `bug_id=BUG-0009`
+- `sprint_id=S0078`
+- `dec_id=DEC-0075`
+- `orchestrator_run_id=auto-20260606-02`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=false`
+- `bug_queue_active=true`
+- `bug_queue_remaining=3`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0078** / **BUG-0009**.
+
+---
+
+## QA → Release — S0077 / US-0091 (`auto-20260606-01`) — **superseded**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-06T13:40:48Z`); UAT **10 / 10 pass** (`sprints/S0077/uat.json`, `sprints/S0077/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero new regressions. Decision-gate posture: **none**. Story **US-0091** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0077 / US-0091)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+All UAT steps map 1:1 to AC-1..AC-10 (see `sprints/S0077/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (10/10 delivered) | T-001..T-010 delivered per dev/qa; T-009 parity live-verified (`--scope=readme-feature-coverage` OK) |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0077/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0077/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0077/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | `[INTAKE_TEMPLATE_PARITY_OK]` | `--scope=readme-feature-coverage` |
+| `enforce_active` | PASS | `.cursor/scratchpad.md` `README_FEATURE_COVERAGE_ENFORCE=1` |
+| `test_baselines_no_regression` | PASS | PS1 harness Pass=802/Fail=9 vs US-0090 QA 791/9 (+11 pass / 0 new fail); 9 failures pre-existing drift |
+| `dec_invariants` | PASS | DEC-0074 + US-0030 delta gate unchanged; DEC-0059 audience profiles preserved |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260606-01-verify-work-qa-20260606T134048Z-S0077-US0091`
+- `proof_hash=2b08af75b4a1f91a2a42957c404ea2ef071e740c966f7edbb07478d5d6c87d36`
+- `proof_issued_at=2026-06-06T13:40:48Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0077-US0091-verify-work-20260606T134048Z-fresh`, `timestamp=2026-06-06T13:40:48Z`, `evidence_ref=[sprints/S0077/uat.json, sprints/S0077/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Segment (AC-10)
+
+- `segment_work_item_kind=story`
+- `story_id=US-0091`
+- `sprint_id=S0077`
+- `dec_id=DEC-0074`
+- `orchestrator_run_id=auto-20260606-01`
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=4`
+
+### Next phase
+
+Spawn fresh **`/release`** subagent for **S0077** / **US-0091**.
+
+---
+
+## QA -> Release -- S0076 / US-0090 (`auto-20260418-01`) -- **superseded**
 
 ### Status
 

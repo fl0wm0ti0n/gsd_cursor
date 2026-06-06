@@ -13,10 +13,76 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0076`
-- **Latest canonical notes:** `handoffs/releases/S0076-release-notes.md`
-- **Latest release date:** 2026-04-19
-- **Latest release work item:** US-0090
+- **Latest released sprint:** `S0082`
+- **Latest canonical notes:** `handoffs/releases/S0082-release-notes.md`
+- **Latest release date:** 2026-06-07
+- **Latest release work item:** US-0093
+
+## Release finalized note (S0082)
+
+- Sprint: `S0082`
+- Story: `US-0093` (Cursor browser-integrated UAT self-test — DEC-0079)
+- Release: **finalized** (`2026-06-07T01:30:00Z`, `orchestrator_run_id=auto-20260606-04`, strict proof `proof_hash=57e939f5220447bd9a4697146f6a78fb5fbe6d92005eeafcd354e34c8d7c8ab0`)
+- Queue: **`handoffs/release_queue.md`** row **`S0082`** = **`released`**
+- **Run / verify:** `pytest -k us0093` → 6 passed; `python scripts/uat_probe_lib.py --self-test` → `[UAT_PROBE_LIB_SELF_TEST_OK]`; see **`handoffs/releases/S0082-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **1** remaining
+
+## Release finalized note (S0081)
+
+- Sprint: `S0081`
+- Story: `US-0092` (Full-autonomy `/auto` mode + outer driver + self-verification — DEC-0078)
+- Release: **finalized** (`2026-06-06T22:30:00Z`, `orchestrator_run_id=auto-20260606-03`, strict proof `proof_hash=c090713e2791b75a697db7e09c9a874a257e3d79b742436837b6d84d2d1d0c78`)
+- Queue: **`handoffs/release_queue.md`** row **`S0081`** = **`released`**
+- **Run / verify:** `pytest -k us0092` → 9 passed; `python scripts/auto_outer_driver.py --self-test` → `[AUTO_OUTER_DRIVER_SELF_TEST_OK]`; `python scripts/uat_probe_lib.py --self-test` → `[UAT_PROBE_LIB_SELF_TEST_OK]`; see **`handoffs/releases/S0081-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **2** remaining
+
+## Release finalized note (S0080)
+
+- Sprint: `S0080`
+- Bug: `BUG-0011` (Caveman voice compression rules — DEC-0077)
+- Release: **finalized** (`2026-06-06T17:00:00Z`, `orchestrator_run_id=auto-20260606-02`, strict proof `proof_hash=06b929b4b97c50dfb4012154443764c17e2958c409d4df9d0b16dda5b39825fc`)
+- Queue: **`handoffs/release_queue.md`** row **`S0080`** = **`released`**
+- **Run / verify:** `pytest -k caveman_voice` → 9 passed; `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`** (808/14); see **`handoffs/releases/S0080-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; bug queue **empty**
+
+## Release finalized note (S0079)
+
+- Sprint: `S0079`
+- Bug: `BUG-0010` (triad archiver dual-level heading fix — DEC-0076)
+- Release: **finalized** (`2026-06-06T16:36:00Z`, `orchestrator_run_id=auto-20260606-02`, strict proof `proof_hash=185901a6d7b195ae6ab54f9221953ba4311a955d70d62b76c69ca1c351ac4b14`)
+- Queue: **`handoffs/release_queue.md`** row **`S0079`** = **`released`**
+- **Run / verify:** `python scripts/enforce-triad-hot-surface.py --self-test` → exit 0; `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0079-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** for **`BUG-0011`** (bug queue remaining = 1)
+
+## Release finalized note (S0078)
+
+- Sprint: `S0078`
+- Bug: `BUG-0009` (downstream CI packaging job leak — DEC-0075)
+- Release: **finalized** (`2026-06-06T16:15:00Z`, `orchestrator_run_id=auto-20260606-02`, strict proof `proof_hash=ca36057ca8aff89ceee48d2474bf84c5533f777c9f9cd194a1c18ef8425484bc`)
+- Queue: **`handoffs/release_queue.md`** row **`S0078`** = **`released`**
+- **Run / verify:** `python scripts/check_downstream_ci_guard.py --repo . --report` → `ok=true`; `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → **`tests/report.md`**; see **`handoffs/releases/S0078-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** for **`BUG-0010`** (bug queue remaining = 2)
+
+## Release finalized note (S0077)
+
+- Sprint: `S0077`
+- Story: `US-0091` (README feature coverage backfill + blocking drift gate — DEC-0074)
+- Release: **finalized** (`2026-06-06T13:43:20Z`, `orchestrator_run_id=auto-20260606-01`, strict proof `proof_hash=cbfc031254b549dfef27f12c4a6d5acb51b528835180b60252e54b44d238bd47`)
+- Queue: **`handoffs/release_queue.md`** row **`S0077`** = **`released`**
+- **Run / verify:** `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` -> **`tests/report.md`**; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` -> **`[README_FEATURE_COVERAGE_VALIDATE_OK]`**; see **`handoffs/releases/S0077-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** - **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (9 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout, then **`/auto`** / portfolio (backlog drain budget remaining = 3; OPEN bugs `BUG-0009..BUG-0011` on bug queue)
 
 ## Release finalized note (S0076)
 

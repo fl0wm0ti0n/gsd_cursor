@@ -1,0 +1,64 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260606-BUG0011-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Fix upgrade caveman: US-0089 ships gates and literal invariants but missing voice compression. With CAVEMAN_MODE=1 replies stay verbose. Need upstream-aligned terse prose (drop filler, fragments, lite/full/ultra levels) — token savings, not stereotypical caveman speech.",
+      "intake_run_id": "cursor-20260606-BUG0011-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260606-BUG0011-intake:0:677dca80f9972823"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "Primary: .cursor/rules/caveman.mdc + template/.cursor/rules/caveman.mdc. Secondary: docs/engineering/runbook.md Caveman subsection, docs/engineering/architecture.md # BUG-0011, tests/auto_command_contract_test.py additive voice-rule markers. Reference: JuliusBrussee/caveman skills/caveman/SKILL.md (MIT, not vendored).",
+      "intake_run_id": "cursor-20260606-BUG0011-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260606-BUG0011-intake:1:c746ad48be52102d",
+      "delegation_scope": "caveman.mdc rule body, template parity, runbook operator docs, contract-test extensions",
+      "delegation_rationale": "PO derived surfaces from /ask diagnosis comparing local caveman.mdc vs upstream SKILL.md and DEC-0072 delivery scope.",
+      "delegation_confidence": "high"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Must preserve DEC-0072 9-zone literal invariant and US-0088 non-suppressible gate vocabulary. Default-off unchanged when CAVEMAN_MODE=0. No vendor npx install. Wenyan modes out of scope. Voice rules must win over conflicting user-rule prose when CAVEMAN_MODE=1. Do not break US-0090 input compression or TOKEN_PROFILE orthogonality.",
+      "intake_run_id": "cursor-20260606-BUG0011-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260606-BUG0011-intake:2:fa7df3810f901c66"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "Add contract subtests that caveman.mdc contains lite/full/ultra voice semantics and drop-filler/fragment directives. Keep existing test_caveman_default_off_* and test_caveman_compress_input_* green. Template byte parity for caveman.mdc. Operator qualitative check: CAVEMAN_MODE=1 produces visibly shorter prose with literals intact.",
+      "intake_run_id": "cursor-20260606-BUG0011-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260606-BUG0011-intake:3:e5f88a6fe0fb25b9",
+      "delegation_scope": "auto_command_contract_test.py voice-marker assertions; template parity; UAT voice spot-check",
+      "delegation_rationale": "Test matrix follows DEC-0072 pattern (file-presence + token-presence); voice quality remains operator-verified per architecture # US-0089 explicit non-goal.",
+      "delegation_confidence": "high"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "delegation_ref",
+      "quoted_user_text": "Shipped: caveman.mdc includes actionable voice compression rules for lite/full/ultra; runbook documents levels; contract tests lock new markers; template parity; sprint release closes BUG-0011 per US-0045 with acceptance row checked.",
+      "intake_run_id": "cursor-20260606-BUG0011-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260606-BUG0011-intake:4:385b5ab1131e5ab4",
+      "delegation_scope": "US-0045 bug closure path; acceptance.md BUG-0011 row; release queue",
+      "delegation_rationale": "Standard bug done definition aligned with prior BUG-0008..BUG-0010 intake pattern.",
+      "delegation_confidence": "high"
+    }
+  ]
+}

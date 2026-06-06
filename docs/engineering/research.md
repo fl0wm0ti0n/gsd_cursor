@@ -3170,3 +3170,1244 @@ Minimal persisted shape (implementation may serialize as markdown bullets or str
 - **Evidence refs (US-0090 delivery)**: `sprints/S0076/release-findings.md` (PASS); `handoffs/releases/S0076-release-notes.md`; `sprints/S0076/uat.md` (15/15 PASS); `sprints/S0076/uat.json`; `sprints/S0076/qa-findings.md` (PASS cycle 1); `sprints/S0076/summary.md` (with Release phase + Refresh-context blocks); `sprints/S0076/plan-verify.json` (PASS); `decisions/DEC-0073.md`; `docs/engineering/architecture.md` `# US-0090`; `docs/product/backlog.md` `## US-0090` (DONE + AC-1..AC-8 `[x]` + `release_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (US-0090 row `[x]`); `docs/engineering/status-normalization-report.md` (delta row); `handoffs/release_queue.md` (`S0076=released`); `handoffs/release_notes.md`; `docs/engineering/state.md` (Release + Refresh-context checkpoints).
 - **Drain closure signal**: with US-0090 closed, `docs/product/backlog.md` now contains **zero** OPEN stories and **zero** OPEN bugs. The `/auto` orchestrator's backlog-drain segment closes here; the portfolio queue resumes at `/intake` on the next operator-initiated `/auto` invocation (no fresh drain candidate; `drain_terminated=true` with reason `no_open_stories`; `backlog_drain_stories_remaining_budget=4` of `10` left unused).
 - **Open R-xxxx anchors status (post-closure)**: R-0073 **delivered** (this trailer). No `R-xxxx` currently `open`. Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new story is intake'd.
+
+### Post-delivery gap extension (2026-06-06, PO, `cursor-20260606-BUG0011-intake`)
+
+- **Trigger**: operator `/ask` diagnosed **BUG-0011** — **US-0089** shipped Caveman gates/literals/toggles but `.cursor/rules/caveman.mdc` lacks upstream voice-compression rules (drop filler, fragments, lite/full/ultra semantics).
+- **Upstream reference** (JuliusBrussee/caveman `skills/caveman/SKILL.md`, MIT): portable concepts remain **lite|full|ultra** level table, drop articles/filler/hedging/pleasantries, fragment OK at full/ultra, auto-clarity exceptions for security/destructive/ambiguous compression, pattern `[thing] [action] [reason]`.
+- **Non-portable / out of scope for BUG-0011**: Wenyan modes; vendor token-percent claims; `npx skills add` install path.
+- **Fix hypothesis for `/discovery`**: extend rule-only surface per **DEC-0072** Option A — add **Voice compression (when `CAVEMAN_MODE=1`)** section to `.cursor/rules/caveman.mdc` + runbook level table; additive contract-test token markers; template parity; precedence clause when **`CAVEMAN_MODE=1`** vs user-rule “complete sentences”.
+- **Risk**: editing `caveman.mdc` changes SHA-256 pinned by **US-0090** negative-parity tests — sprint must update pinned hash intentionally or scope assertions to preserved substrings only (**TL** decision at **`/architecture`**).
+- **Linked**: **BUG-0011**, **US-0089**, **DEC-0072**, **US-0090** (input compression orthogonal).
+
+## R-0074 — US-0091: README ↔ backlog/acceptance feature coverage backfill + blocking drift gate
+
+- **Date**: 2026-05-10
+- **Topic**: **US-0091** — one-time audit of `README.md` against `docs/product/backlog.md` + `docs/product/acceptance.md` to identify and backfill missing **user-visible** feature descriptions, then add a **blocking** release-gate extension so feature coverage cannot drift again.
+- **Query**: How does this kit currently keep `README.md` aligned with shipped user-visible features and flags, and what is the minimum surface needed to detect and prevent feature-coverage drift without duplicating `US-0030` (command/flag delta) or `US-0077` (audience profile)?
+- **Sources**:
+  - Internal: `docs/product/backlog.md` `US-0030` (release gate for command/flag documentation delta), `US-0077` (`DEC-0059` dual-README strategy), `US-0017` (template-drift guard), `US-0071` (user-visible metadata sanitization), `DEC-0040` (artifact ordering policy).
+  - Internal: `README.md` (active, 1440 lines), `template/README.md` (mirror, 1440 lines), `docs/developer/README.md` (DEV shard per `US-0077`), `docs/engineering/runbook.md`.
+  - Internal: `scripts/check-user-visible-metadata.py`, `scripts/validate_doc_profile.py`, `scripts/check_intake_template_parity.py` (existing validator patterns to compose with).
+- **Findings (intake survey — extend in `/discovery` and `/research`)**:
+  - **Adjacent gates**: `US-0030` already fires when commands/flags **change** without a corresponding README/runbook update. It does **not** assert that the *initial* description for an existing user-visible feature exists — so a feature shipped before `US-0030` was wired (or accepted under a path that did not flag a delta) can remain undocumented forever. `US-0091` closes this static-coverage gap.
+  - **Audience boundaries**: `US-0077` / `DEC-0059` lock the dual-README strategy. The audit must respect existing `USER_*` H2s in root `README.md` and `DEV_*` H2s in `docs/developer/README.md` and **not** invent new section names; backfilled blurbs land in the appropriate H2 per `DOC_AUDIENCE_PROFILE` semantics.
+  - **User-visible scope**: Per the operator's intake answer (`feature_set=user_visible`), pure-internal guards / invariant tests / refactors are out of scope (they should not appear in the user-facing surface anyway per `US-0071`). The audit's **input set** is therefore stories whose acceptance demonstrably surfaces a command, flag, file, or operator action.
+  - **Parity surface**: `US-0017` template-drift guard already enforces `README.md` ↔ `template/README.md` parity; the new validator must reuse this rather than duplicate it.
+  - **Validator pattern**: `scripts/validate_doc_profile.py` is the closest existing precedent for a deterministic README-section validator; the feature-coverage validator should follow the same stdlib-only Python posture and emit deterministic reason codes (e.g. `README_FEATURE_COVERAGE_GAP:<US-xxxx>`, `README_FEATURE_COVERAGE_PARITY_FAIL`, `README_FEATURE_COVERAGE_INPUT_INVALID`) under an umbrella `README_FEATURE_COVERAGE_BLOCKED`.
+  - **Release-gate composition**: `US-0030` defines the existing release doc-delta gate. The `US-0091` blocking gate composes **as an extension** — `US-0091` adds a new check inside `/release`, and a single deterministic reason code surface for both static coverage and delta cases keeps remediation guidance unified.
+- **Risks**:
+  - **False positives** if "user-visible" is not bounded deterministically — the validator may flag DONE stories that legitimately have no user-facing surface. Mitigation: explicit per-story `user_visible: true|false` marker (or default-true with deny-list) authored into the story acceptance schema during sprint planning, with validator fail-closed on ambiguous input.
+  - **One-time-vs-permanent drift** — backfilling 90+ stories in one sprint risks README bloat and audience-profile contradiction (`US-0077`). Mitigation: short blurbs (1-2 sentences per feature) bound to a single per-profile section budget; `validate_doc_profile.py` already enforces section budgets per audience cell.
+  - **Template/dev-shard parity drift** — three target files (root `README.md`, `template/README.md`, `docs/developer/README.md`) means three places to keep in sync; mitigation: extend `US-0017` parity check or add a dedicated parity scope.
+  - **Pre-existing release lock-in** — composing with `US-0030` means a future operator running `/release` after `US-0091` ships could be blocked retroactively. Mitigation: a one-time grandfathering or initial-population gate in the same sprint that delivers the blocking validator (architecture decision).
+- **Next phase pointers (`/discovery` → `/research` → `/architecture`)**:
+  - `/discovery`: deterministic "user-visible feature" predicate; section budget per audience profile; agree per-story marker location (acceptance.md row vs backlog block field).
+  - `/research`: validator placement (`scripts/validate_readme_feature_coverage.py` candidate); reason-code vocabulary; release-gate wiring point (active and `template/`); migration / grandfathering options for existing DONE stories with no current README blurb.
+  - `/architecture`: lock companion DEC composing on `DEC-0030` (US-0030 release gate) and `DEC-0059` (US-0077 audience profiles); sidecar migration plan; template parity inventory.
+- **Linked**: US-0091, US-0030, US-0077, US-0017, US-0071, DEC-0040, DEC-0059
+- **Confidence**: medium (intake survey only; `/research` will deepen)
+- **Status**: open — `/discovery` (PO) extends boundary, then `/research` (tech-lead) deepens before `/architecture`
+
+### Discovery extension (2026-06-06, PO, `orchestrator_run_id=auto-20260606-01`, `fresh_context_marker=po-US0091-discovery-20260606T132027Z-fresh`)
+
+- **Predicate lock**: backlog block field **`user_visible: true|false`** is canonical validator input; acceptance.md optional `(user_visible)` suffix is human-scan only. In-scope = **DONE** + explicit `true` or migration-heuristic pass for unset; out-of-scope = explicit `false` or pure-internal invariant surface. Ambiguous → **`README_FEATURE_COVERAGE_INPUT_INVALID`**.
+- **Migration heuristic (one-time, unset fields only)** — candidate signals for `/research` to normative-lock:
+  1. Backlog summary or acceptance title references a slash-command (`/intake`, `/auto`, etc.).
+  2. Backlog or acceptance mentions a scratchpad key pattern (`KEY=value` or documented flag name).
+  3. Backlog cites operator CLI invocation (`python scripts/...` with user-facing purpose).
+  4. DONE bug with `expected`/`actual` describing changed operator behavior → default **in-scope** unless `user_visible: false`.
+  5. Pure-internal keywords (`archiver`, `template parity guard`, `intake evidence schema`, `hot-surface rollover`) without operator action → default **out-of-scope**.
+- **Coverage anchor**: detectable mention required in README family — root bullet/sub-entry (command/flag/capability name or `US-xxxx`/`BUG-xxxx` id) + DEV shard row (id + scratchpad flags). **No new H2s**; section affinity per `doc_profile_lib.py` / **DEC-0059** (commands → `Commands and workflow`; modes → `Commands and workflow` or `Other useful capabilities`; distribution → `Features`; dev governance → DEV `Workflow` / `Quality gates` / `Engineering decisions`).
+- **Validator candidate**: `scripts/validate_readme_feature_coverage.py` — stdlib-only, `--self-test`, `--report` with stable JSON counts, umbrella **`README_FEATURE_COVERAGE_BLOCKED`** + sub-codes per acceptance **AC-5**.
+- **Release composition**: second check inside existing `/release` doc-gate surface (**US-0030** unchanged); research must locate exact hook in `validate-and-push` / release command chain (active + `template/`).
+- **Grandfathering**: blocking enablement same commit as backfill merge; pre-backfill DONE items must not block `/release` (**AC-10** architecture decision).
+- **Audit artifact**: deterministic gap report (JSON preferred) listing `coverage_total` / `coverage_present` / `coverage_missing` + per-id anchor target — produced during execute, referenced by validator self-test fixtures.
+- **Research asks (next phase)**: normative heuristic table; CLI/`--report` schema; release wiring point; section-affinity manifest CSV/JSON; grandfathering toggle; template parity extension for new script.
+- **Discovery outcome**: **PASS** — no decision gate; **`/research`** (tech-lead) deepens before **`/architecture`**.
+
+### Research extension (2026-06-06, TL, `orchestrator_run_id=auto-20260606-01`, `fresh_context_marker=tl-US0091-research-20260606T140500Z-fresh`)
+
+- **Closure**: **`/research`** **PASS** for **US-0091**. All six discovery research asks resolved; **no decision gate**; **`/architecture`** next.
+- **Repo survey (2026-06-06)**:
+  - Backlog: ~90 `## US-xxxx` story blocks + 11 `### BUG-xxxx` blocks; **zero** existing `user_visible:` markers — migration heuristic required for first predicate pass.
+  - Root `README.md`: ~52 `US-xxxx`/`BUG-xxxx` token hits (traceability scattered); `Features` / `Commands and workflow` / `Other useful capabilities` H2s present; coverage incomplete vs DONE user-visible inventory.
+  - `docs/developer/README.md`: six `DEV_*` H2s per **DEC-0059**; sparse per-story rows (governance prose only).
+  - `template/README.md`: byte-parity with root per **US-0017** (1440 lines each at intake survey).
+  - **US-0030** doc-delta gate: process-level step in release workflow (command/runbook guidance); **no** dedicated `scripts/*` delta validator today — **US-0091** adds the first **scripted** static-coverage gate composed alongside it.
+  - Precedent validators: `scripts/validate_doc_profile.py` + `doc_profile_lib.py` (profile/section budgets); `scripts/bug_issue_validate.py` + `bug_issue_lib.py` (backlog block parsing); `scripts/check_intake_template_parity.py` (scoped byte-parity tables).
+
+#### 1. User-visible predicate — implementation options
+
+| Option | Mechanism | Pros | Cons | Verdict |
+|--------|-----------|------|------|---------|
+| **A (recommended)** | Backlog block field `user_visible: true\|false`; validator reads **backlog only** | Deterministic, auditable, matches discovery lock; explicit deny-list for internal stories | Requires one-time marker authoring during backfill sprint | **Adopt** |
+| B | Parse `docs/product/acceptance.md` `(user_visible)` suffix | Human-scan alignment | Violates discovery lock; acceptance not canonical for machine gate | **Reject** |
+| C | Heuristic-only (no explicit marker) | No marker migration | Unbounded false positives; blocks `/release` unpredictably | **Reject** |
+| D | Git-diff delta only (extend US-0030) | Reuses existing gate | Does not solve static-coverage gap (AC-2) | **Out of scope** |
+
+**Predicate algorithm (normative sketch for architecture)**:
+
+```
+for each work_item in parse_backlog(backlog.md):
+  if work_item.kind not in {US, BUG}: skip
+  if work_item.status != DONE: skip
+  if work_item.user_visible == false: skip (out-of-scope)
+  if work_item.user_visible == true: in_scope
+  elif work_item.user_visible unset:
+    classify = migration_heuristic(work_item)  # one-time pass only
+    if classify == ambiguous: emit README_FEATURE_COVERAGE_INPUT_INVALID
+    elif classify == in_scope: in_scope
+    else: skip
+  else: README_FEATURE_COVERAGE_INPUT_INVALID  # malformed value
+```
+
+**Migration heuristic table (unset `user_visible` only; architecture locks verbatim)**:
+
+| Signal ID | Pattern (case-sensitive where noted) | Scope | Notes |
+|-----------|--------------------------------------|-------|-------|
+| H1 | `/(?:^|\s)(/[a-z][a-z0-9-]*)/` in summary/title/acceptance bullets | **in** | Slash-commands (`/intake`, `/auto`, `/release`, …) |
+| H2 | Scratchpad key `^[A-Z][A-Z0-9_]+=` or backtick-wrapped key name in summary | **in** | Operator-configurable flags |
+| H3 | `python scripts/[a-z0-9_./-]+\.py` in summary with operator-facing verb | **in** | CLI validators operators run |
+| H4 | BUG `expected`/`actual` fields describe operator-visible behavior change | **in** | Default **in** unless `user_visible: false` |
+| H5 | Keywords `archiver`, `hot-surface rollover`, `intake evidence schema`, `template parity guard`, `triad` without H1–H4 | **out** | Pure-internal invariant surfaces |
+| H6 | Summary contains both H5 **and** H1–H4 | **in** | Operator action wins |
+| H7 | No H1–H6 match on DONE story | **ambiguous** → `README_FEATURE_COVERAGE_INPUT_INVALID` | Forces explicit marker during backfill |
+| H8 | No H1–H6 match on DONE bug | **out** | Bugs default out unless H4 or explicit `user_visible: true` |
+
+Post-backfill: architecture SHOULD require explicit `user_visible:` on all new DONE items; heuristic path disabled when `README_FEATURE_COVERAGE_ENFORCE=1` (see §6).
+
+#### 2. Audit report format (`--report` / gap artifact)
+
+Stable JSON (sorted keys; UTF-8; LF; no timestamps inside report body for idempotence):
+
+```json
+{
+  "coverage_missing": ["US-0048", "BUG-0003"],
+  "coverage_present": ["US-0030", "US-0077"],
+  "coverage_total": 42,
+  "gaps": [
+    {
+      "dev_h2": "Quality gates",
+      "id": "US-0048",
+      "kind": "US",
+      "predicate_source": "heuristic:H1",
+      "root_h2": "Commands and workflow",
+      "user_visible": true
+    }
+  ],
+  "report_schema_version": 1,
+  "repo_root": ".",
+  "status": "FAIL"
+}
+```
+
+- `status`: `PASS` when `coverage_missing` empty and no input/parity/profile violations; else `FAIL`.
+- Gap rows sorted by `id` ascending.
+- Audit artifact path (execute phase): `docs/engineering/context/readme-feature-coverage-audit.json` (active-only snapshot; not mirrored to `template/` — generated evidence per **DEC-0040**).
+- Self-test fixtures: `tests/fixtures/readme_feature_coverage/` (minimal trees).
+
+#### 3. Validator API sketch
+
+**Entrypoint**: `scripts/validate_readme_feature_coverage.py` (stdlib-only; mirrors `validate_doc_profile.py` CLI posture).
+
+**Library** (recommended): `scripts/readme_feature_coverage_lib.py` — predicate, README index builder, affinity resolver, reason-code emitter (same split as `bug_issue_lib` / `doc_profile_lib`).
+
+| Flag | Purpose |
+|------|---------|
+| `--repo PATH` | Target repo root (default: parent of `scripts/`) |
+| `--backlog PATH` | Backlog file (default: `docs/product/backlog.md`) |
+| `--self-test` | Predicate matrix + report schema stability tests → `[README_FEATURE_COVERAGE_SELF_TEST_OK]` |
+| `--report` | Emit stable JSON to stdout (AC-7 idempotence) |
+| `--audit-out PATH` | Write gap artifact (execute/audit mode) |
+| `--enforce` | Blocking mode (default when invoked from `/release`); without: report-only for migration |
+| `--no-template-parity` | Skip active vs `template/` script/README parity sub-check |
+
+**Exit codes**: `0` = pass; `1` = `README_FEATURE_COVERAGE_BLOCKED` (one or more sub-codes on stderr); `2` = invocation/self-test failure.
+
+**Reason codes (umbrella + sub-codes per AC-5)**:
+
+| Code | When |
+|------|------|
+| `README_FEATURE_COVERAGE_BLOCKED` | Umbrella on stderr first line |
+| `README_FEATURE_COVERAGE_GAP:<US-xxxx\|BUG-xxxx>` | In-scope DONE item missing coverage anchor |
+| `README_FEATURE_COVERAGE_PARITY_FAIL` | `README.md` ≠ `template/README.md` or script pair mismatch |
+| `README_FEATURE_COVERAGE_INPUT_INVALID` | Ambiguous predicate / malformed `user_visible` |
+| `README_FEATURE_COVERAGE_PROFILE_VIOLATION` | Backfill would exceed `validate_doc_profile.py` section budget |
+
+**Coverage detection** (per in-scope id):
+
+- **Root**: bullet or sub-entry under expected `root_h2` containing (a) slash-command token, (b) scratchpad key name, or (c) case-sensitive `\bUS-\d{4}\b` / `\bBUG-\d{4}\b` — root blurbs SHOULD prefer (a)/(b) per **US-0071** (IDs allowed in DEV shard primarily).
+- **DEV shard**: table row or bullet under expected `dev_h2` containing id + at least one scratchpad key or `related_us` pointer.
+- Post-check: invoke `validate_doc_profile.py` logic (import `doc_profile_lib`) for profile budget — map violations to `README_FEATURE_COVERAGE_PROFILE_VIOLATION`.
+
+#### 4. Release-gate composition with US-0030
+
+**US-0030** (delta-driven): release subagent compares command/flag **changes in sprint scope** against README/runbook updates — remains **unchanged** and primarily **process/agent-driven** today.
+
+**US-0091** (static-coverage): **scripted** second check — deterministic inventory of all DONE user-visible items vs README family.
+
+**Recommended wiring (Option A — release command step)**:
+
+| Surface | Change |
+|---------|--------|
+| `.cursor/commands/release.md` | New step **`3f. README feature coverage gate (US-0091)`** after `3e` legacy drift, before step `4` UAT: run `python scripts/validate_readme_feature_coverage.py --repo . --enforce` when `README_FEATURE_COVERAGE_ENFORCE=1` in merged scratchpad; when `0`, skip with `skipped` evidence (grandfathering). Fail → `README_FEATURE_COVERAGE_BLOCKED` + sub-codes in `sprints/Sxxxx/release-findings.md`. |
+| `template/.cursor/commands/release.md` | Byte-identical step **3f** block |
+| `docs/engineering/runbook.md` + `template/...` | Subsection linking US-0030 doc-delta (manual) + US-0091 static coverage (scripted); remediation vocabulary table |
+| `tests/run-tests.ps1` + `tests/run-tests.sh` | New section (candidate `§27`): self-test + report idempotence fixture |
+
+**Rejected alternatives**:
+
+- **Option B** — wire into `validate-and-push` / `sync_push_gates.py`: wrong lifecycle (pre-push ≠ release); would block pushes before backfill sprint completes.
+- **Option C** — fold into `validate_doc_profile.py`: conflates audience profile budgets with feature inventory coverage; separate reason-code families required.
+
+**Gate order within doc-gate family**: US-0030 doc-delta (agent checklist) → US-0091 static coverage (script) → both recorded in `release-findings.md` § doc gates.
+
+#### 5. Section-affinity manifest
+
+Ship as `docs/engineering/context/readme-section-affinity.json` (active + `template/` mirror per **US-0017**):
+
+```json
+{
+  "affinity_version": 1,
+  "rules": [
+    {"tag": "slash_command", "root_h2": "Commands and workflow", "dev_h2": "Workflow"},
+    {"tag": "scratchpad_mode", "root_h2": "Other useful capabilities", "dev_h2": "Quality gates"},
+    {"tag": "distribution", "root_h2": "Features", "dev_h2": "Architecture notes"},
+    {"tag": "release_gate", "root_h2": "Commands and workflow", "dev_h2": "Quality gates"},
+    {"tag": "governance", "root_h2": "Other useful capabilities", "dev_h2": "Engineering decisions"}
+  ]
+}
+```
+
+Classifier picks first matching tag from backlog `Summary` keywords / slash-command presence; default fallback: `slash_command` when H1 matches else `governance`. Architecture locks tag→H2 mapping; **no new H2 literals**.
+
+#### 6. Grandfathering / first-activation toggle (AC-10)
+
+| Option | Mechanism | Verdict |
+|--------|-----------|---------|
+| **A (recommended)** | Scratchpad key `README_FEATURE_COVERAGE_ENFORCE=0\|1` (default **`0`**). Validator `--enforce` no-op when `0` (exit 0, print `skipped`). Flip to **`1`** in same commit as backfill merge + runbook note. | **Adopt** — matches **DEC-0058** merged-scratchpad gate pattern |
+| B | Baseline manifest listing covered ids at activation | Auditable but duplicates backlog predicate; drift if manifest stale |
+| C | Time-boxed env var | Not scratchpad-visible; poor operator UX |
+
+Architecture companion **DEC-xxxx** MUST document: predicate rules, composition with **DEC-0030**/**US-0030** + **DEC-0059**, grandfathering flip procedure, heuristic disablement when enforce=1.
+
+#### 7. Template parity inventory (US-0017 / AC-9)
+
+Extend `scripts/check_intake_template_parity.py` with `--scope=readme-feature-coverage`:
+
+| Active | Template |
+|--------|----------|
+| `scripts/validate_readme_feature_coverage.py` | `template/scripts/validate_readme_feature_coverage.py` |
+| `scripts/readme_feature_coverage_lib.py` | `template/scripts/readme_feature_coverage_lib.py` |
+| `docs/engineering/context/readme-section-affinity.json` | `template/docs/engineering/context/readme-section-affinity.json` |
+| `.cursor/commands/release.md` (step 3f hunk only — or full-file parity per existing US-0017 policy) | `template/.cursor/commands/release.md` |
+| `docs/engineering/runbook.md` (feature-coverage subsection) | `template/docs/engineering/runbook.md` |
+| `docs/engineering/context/installer-owned-paths.manifest` (new script paths) | `template/.../installer-owned-paths.manifest` |
+
+Compose with existing **US-0017** README byte-parity guard (do not duplicate root↔template README diff logic inside new validator — call parity check or rely on dedicated guard).
+
+#### 8. External references (EARLY_RESEARCH=1)
+
+| Ref | Takeaway for US-0091 |
+|-----|---------------------|
+| [borghei/Claude-Skills doc-drift-detector](https://github.com/borghei/Claude-Skills/blob/main/engineering/doc-drift-detector/SKILL.md) | Stdlib-only CLI scoring README completeness; `--threshold` CI gate pattern — adopt idempotence + JSON report shape, reject AST/doc-code coupling (we trace backlog ids not Python symbols) |
+| [pytreqt](https://github.com/joernpreuss/pytreqt) | Requirement-id ↔ test traceability matrix — adopt sorted gap report + bidirectional id vocabulary (`US-xxxx`/`BUG-xxxx`) |
+| [Fiberplane drift](https://fiberplane.com/blog/drift-documentation-linter/) | Anchor/provenance model for staleness — informative only; US-0091 uses backlog predicate not git provenance |
+| [ryanwaits/drift](https://github.com/ryanwaits/drift) | `drift ci --min N` coverage floor — adopt blocking CI/release gate posture, not npm coupling |
+
+#### 9. Risks (carried to architecture)
+
+| ID | Risk | Mitigation |
+|----|------|------------|
+| R1 | False positives block `/release` | Explicit `user_visible:` markers + H7 fail-closed → forces resolution at backfill |
+| R2 | README bloat (~90 items) | 1–2 sentence blurbs; `validate_doc_profile.py` budget check maps to `README_FEATURE_COVERAGE_PROFILE_VIOLATION` |
+| R3 | Three-file parity drift | US-0017 README guard + scoped parity script; `README_FEATURE_COVERAGE_PARITY_FAIL` |
+| R4 | Retroactive lock-in | `README_FEATURE_COVERAGE_ENFORCE=0` until backfill merges (same sprint) |
+| R5 | US-0071 leakage in root blurbs | Prefer command/flag tokens in root; IDs in DEV shard; run `check-user-visible-metadata.py` on changed paths |
+| R6 | Heuristic ambiguity at scale | H7 forces explicit marker; execute sprint authors `user_visible:` for all DONE stories |
+| R7 | US-0030 / US-0091 operator confusion | Runbook subsection: delta=changes this sprint; static=all DONE user-visible inventory |
+
+#### 10. Architecture asks (no DEC authored in research)
+
+1. Lock companion **DEC-xxxx** §§: predicate + heuristic table + enforce key + reason codes + US-0030/US-0091 composition diagram.
+2. Confirm `readme_feature_coverage_lib.py` split vs monolithic script.
+3. Lock `§27` (or next) run-tests section id.
+4. Decide whether step **3f** uses merged scratchpad `README_FEATURE_COVERAGE_ENFORCE` only or also accepts `--enforce` CLI override for CI fixtures.
+
+- **Research outcome**: **PASS** — no decision gate; **`/architecture`** (tech-lead) locks **DEC-xxxx** + `architecture.md` `# US-0091`.
+- **Confidence**: high (predicate + wiring + parity inventory resolved; architecture owns DEC wording)
+- **Status**: open for architecture closure — do not flip **US-0091** to DONE until `/release`
+
+### Delivery closure (R-0074 — US-0091, 2026-06-06, curator, auto-20260606-01)
+
+> Append-only closure trailer for R-0074. US-0091 shipped with S0077 released on 2026-06-06T13:43:20Z; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of DEC-0074 or architecture `# US-0091`. `fresh_context_marker=curator-S0077-US0091-refresh-context-20260606T135000Z-fresh`.
+
+- **Anchor status**: `R-0074.status=delivered` (US-0091 **delivered** @ 2026-06-06T13:50:00Z curator refresh). Single-story anchor; no shared-anchor split required (distinct from R-0073 precedent).
+- **US-0091 delivery coordinates**: sprint `S0077`; binding decision `DEC-0074` (composes on `DEC-0059`; extends US-0030 release doc-gate family without rewrite); architecture section `docs/engineering/architecture.md` `# US-0091`; release runtime proof `rp-auto-20260606-01-release-release-20260606T134320Z-S0077-US0091` / `proof_hash=cbfc031254b549dfef27f12c4a6d5acb51b528835180b60252e54b44d238bd47`; refresh-context runtime proof `rp-auto-20260606-01-refresh-context-curator-20260606T135000Z-S0077-US0091` / `proof_hash=1fe3a39c7fd03d128b3b61e68b9a07593739bd0bd290c7b109f4e23269aff1e9`; AC-1..AC-10 all `[x]` in `docs/product/backlog.md` `## US-0091`.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Predicate Option A (`user_visible:` + H1–H8 heuristic) shipped; validator lib split shipped; release step **3f** composed on US-0030; three-file README backfill complete (`coverage_missing=[]`, `coverage_total=98`); `README_FEATURE_COVERAGE_ENFORCE=1` post-backfill; harness **§27U** green; template parity `--scope=readme-feature-coverage` PASS.
+- **Risk resolution**: R1 (false positives) — mitigated by explicit `user_visible:` markers + H7 fail-closed on ambiguity. R2 (README bloat) — mitigated by short blurbs within existing H2 budgets per DEC-0059. R3 (three-file parity) — mitigated by US-0017 guard + scoped parity script. R4 (retroactive lock-in) — mitigated by same-sprint backfill + enforce flip. R5 (US-0071 leakage) — mitigated by metadata scan PASS on changed paths. R6 (heuristic ambiguity) — mitigated by execute-time marker authoring. R7 (US-0030/US-0091 confusion) — mitigated by runbook subsection (delta vs static inventory).
+- **Evidence refs (US-0091 delivery)**: `sprints/S0077/release-findings.md` (PASS); `handoffs/releases/S0077-release-notes.md`; `sprints/S0077/uat.md` (10/10 PASS); `sprints/S0077/uat.json`; `sprints/S0077/qa-findings.md` (PASS cycle 1); `sprints/S0077/summary.md` (Release + Refresh-context blocks); `sprints/S0077/plan-verify.json` (PASS); `decisions/DEC-0074.md`; `docs/engineering/architecture.md` `# US-0091`; `docs/product/backlog.md` `## US-0091` (DONE + AC-1..AC-10 `[x]` + `release_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (US-0091 row `[x]`); `handoffs/release_queue.md` (`S0077=released`); `docs/engineering/state.md` (Release + Refresh-context checkpoints).
+- **Drain closure signal**: with US-0091 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **three** OPEN bugs (`BUG-0009..BUG-0011`). Story-drain segment closes here; bug queue resumes at `/discovery` for `BUG-0009` on next `/auto` invocation (`drain_terminated=false`; `backlog_drain_stories_remaining_budget=3`).
+- **Open R-xxxx anchors status (post-closure)**: R-0074 **delivered** (this trailer). No `R-xxxx` currently `open` for active story work. Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new story or bug segment begins.
+
+## R-0075 — BUG-0009: downstream-safe template CI vs kit-internal self-packaging CI
+
+- **Anchor**: `bug_id=BUG-0009`; intake evidence `handoffs/intake_evidence/BUG-0009-intake-20260606.json`; related **US-0007**, **US-0008**, **US-0017**, **US-0018**, **US-0063**.
+- **Status**: `delivered` (delivery closure trailer below; curator refresh **2026-06-06T16:20:00Z**).
+
+### Discovery extension (2026-06-06, PO, `auto-20260606-02`, `fresh_context_marker=po-BUG0009-discovery-20260606T141500Z-fresh`)
+
+#### 1. Confirmed defect mechanics
+
+- `template/.github/workflows/ci.yml` and `.github/workflows/ci.yml` are **byte-identical** today (SHA-256 `e51d2cb100e8821cd1b34fae68a6e973617858aece04aa4441fb2785b5319891`).
+- Installer manifest copies `.github/workflows` as a directory; all three entrypoints (`installer.ps1`, `installer.sh`, `installer.py`) hydrate from `template/`.
+- Leaked jobs reference kit-only paths: `npm pack` / `its-magic-*.tgz`, `sh installer.sh`, `packaging/chocolatey`, `packaging/homebrew` (`brew style packaging/homebrew/its-magic.rb`).
+- `template/.github/workflows/deploy.yml` is already downstream-safe (runbook-driven `workflow_dispatch` only) — **no change**.
+
+#### 2. Discovery-locked fix boundary
+
+| Surface | After fix | Rationale |
+|---------|-----------|-----------|
+| `template/.github/workflows/ci.yml` | `checks` + `auto-fix` only | Downstream-safe generic CI |
+| `.github/workflows/ci.yml` (active) | All five jobs retained | Kit self-distribution validation |
+| `US-0017` byte parity | **Exception** for `ci.yml` | Intentional divergence; negative-parity + drift guard |
+
+#### 3. checks empty-project semantics (operator-locked)
+
+- When all runbook command keys are empty/skipped → job **PASS** + explicit summary (`no tests configured yet`).
+- `Fail if tests or lint failed` fires only when a **configured** test/lint step returns `failure`.
+- Open tension: template `runbook.md` ships non-empty `TEST_COMMAND` (powershell harness) while **DEC-0056** documents blank-until-bootstrap — research must recommend fresh-install default.
+
+#### 4. Research questions (for `/research` tech-lead)
+
+1. **Template CI shape**: subtract jobs in-place vs separate `ci-downstream.yml` filename (manifest/installer implications).
+2. **Drift guard**: dedicated `scripts/check_downstream_ci_guard.py` vs extend `tests/auto_command_contract_test.py`; forbidden pattern list; harness section id.
+3. **Runbook bootstrap**: interaction between **US-0063** stack-aware bootstrap and downstream `checks` green-by-default on day zero.
+4. **Parity policy**: `check_intake_template_parity.py --scope=ci-downstream` vs negative-parity contract test only.
+5. **Install/upgrade smoke**: assert post-install `ci.yml` job inventory (`checks`, `auto-fix` present; `npm-test`/`brew-test`/`choco-test` absent).
+6. **Release/docs**: upgrade remediation wording for operators with pre-fix `ci.yml`.
+
+#### 5. Risks
+
+- **R1**: Strip packaging jobs from active CI by mistake — mitigation: drift guard targets **template only**; active CI contract test asserts five jobs remain.
+- **R2**: Stale broken repos until upgrade — accepted scope; docs must be explicit.
+- **R3**: False-green if installer copies wrong workflow file — mitigation: install-completeness fixture (BUG-0003 class).
+
+- **Discovery outcome**: **PASS** — no decision gate; **`/research`** (tech-lead) resolves Q1–Q6 before **`/architecture`**.
+- **Confidence**: high (root cause confirmed; boundary locked; implementation details deferred)
+
+### Research extension (2026-06-06, tech-lead, `auto-20260606-02`, `fresh_context_marker=tl-BUG0009-research-20260606T155605Z-fresh`)
+
+#### External references (EARLY_RESEARCH=1)
+
+- **Workflow templates vs reusable workflows** ([Zenn — reusable workflows basics](https://zenn.dev/atsushifx/articles/ci-gha-reusable-workflows-01-basics?locale=en)): starter/workflow **templates are copied** into each repo and do **not** auto-update; reusable workflows require a **caller `uses:` ref** to an external repo. its-magic's installer model is template-copy (**US-0008**), so decoupling belongs in the **shipped `template/.github/workflows/ci.yml` artifact**, not a cross-repo reusable workflow.
+- **Enterprise reuse guidance** ([GitHub Well-Architected — scaling Actions reusability](https://wellarchitected.github.com/library/collaboration/recommendations/scaling-actions-reusability/)): provide `.github` directory templates for onboarding; keep templates focused per purpose. Supports **checks+auto-fix only** in downstream template vs full packaging in kit-internal CI.
+- **Implication**: a separate downstream filename only helps if the installer still materializes **`.github/workflows/ci.yml`** (GitHub's conventional entrypoint). Renaming without installer mapping adds complexity with no benefit over in-place job subtraction.
+
+#### Q1 — Template CI YAML shape
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A — In-place job subtraction** | Edit `template/.github/workflows/ci.yml` to retain `checks` + `auto-fix`; delete `npm-test`/`brew-test`/`choco-test` blocks. Manifest `[install_include_paths] .github/workflows` and `[clean_paths] .github/workflows/ci.yml` unchanged. | **Recommended** |
+| B — Separate `ci-downstream.yml` | Second file in template; would still need installer/manifest policy to copy or symlink as `ci.yml`, or downstream repos would not auto-run the workflow. | Rejected — extra manifest/installer surface, same outcome |
+| C — Reusable workflow `uses:` kit repo | Centralized workflow in its-magic repo; downstream calls `uses: org/its-magic/.github/workflows/ci.yml@ref`. | Rejected — breaks offline install, pins consumers to kit repo network + versioning |
+
+**Resolution**: **Option A**. Keep filename `ci.yml` on both surfaces; intentional **byte mismatch** after fix (US-0017 exception). `deploy.yml` unchanged.
+
+#### Q2 — Drift guard mechanism and harness wiring
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Dedicated script only | New `scripts/check_downstream_ci_guard.py` (+ `template/` parity). | Partial |
+| B — Contract test only | Extend `tests/auto_command_contract_test.py` with forbidden-pattern subtests. | Partial |
+| **C — Script + contract markers + harness** | Script owns forbidden-pattern scan (template) + positive inventory (active); contract test asserts stable markers; `tests/run-tests.ps1` / `.sh` new section **§28B**. | **Recommended** |
+
+**Forbidden pattern list** (template `ci.yml` must **not** match; case-sensitive substring / job-id scan):
+
+- Job ids: `npm-test`, `brew-test`, `choco-test`
+- Paths/commands: `npm pack`, `its-magic-*.tgz`, `installer.sh`, `packaging/chocolatey`, `packaging/homebrew`, `choco pack`, `brew style`
+
+**Active positive inventory** (kit `.github/workflows/ci.yml` must contain all five job ids: `checks`, `auto-fix`, `npm-test`, `brew-test`, `choco-test`).
+
+**Reason codes** (architecture-locked): `DOWNSTREAM_CI_FORBIDDEN_PATTERN`, `DOWNSTREAM_CI_JOB_LEAK`, `KIT_CI_PACKAGING_JOBS_MISSING`.
+
+**`check_intake_template_parity.py`**: do **not** add byte-parity `--scope=ci-downstream` — that would contradict the intentional mismatch. Guard script is the correct surface.
+
+#### Q3 — Fresh-project `TEST_COMMAND` / US-0063 bootstrap vs green-by-default `checks`
+
+**Repo fact**: `template/docs/engineering/runbook.md` header currently sets non-empty `TEST_COMMAND: powershell … run-tests.ps1` while § "Intentional empty commands" documents blank-until-bootstrap (**DEC-0056** / **US-0063**) — internal contradiction.
+
+| Surface | `TEST_COMMAND` default | Rationale |
+|---------|------------------------|-----------|
+| `template/docs/engineering/runbook.md` | **Empty** on ship (`TEST_COMMAND:` with no value) | Day-zero `checks` skips test/lint; job passes with explicit summary |
+| Active `docs/engineering/runbook.md` | Keep powershell harness | Kit self-CI must stay green |
+| `checks` workflow (both) | Update "No commands set" step → echo **`no tests configured yet`**; fail step only when `steps.test.outcome == 'failure'` or `steps.lint.outcome == 'failure'` (typecheck failures remain hard-fail when configured) | Discovery-locked semantics |
+
+**US-0063 interaction**: installer stack-aware bootstrap writes `TEST_COMMAND` only when missing/unset in materialized runbook — preserved. Post-bootstrap downstream repos run real tests; pre-bootstrap repos stay green.
+
+**US-0017 note**: `runbook.md` may diverge active vs template for the `TEST_COMMAND` header line only (second intentional exception candidate — architecture confirms in companion DEC).
+
+#### Q4 — US-0017 negative-parity policy
+
+**Recommended policy** (architecture publishes verbatim):
+
+| Path | Parity rule |
+|------|-------------|
+| `template/.github/workflows/ci.yml` | Downstream-safe; **must not** byte-match active |
+| `.github/workflows/ci.yml` (active) | Kit-internal; retains packaging jobs |
+| `template/docs/engineering/runbook.md` | `TEST_COMMAND` empty on ship (likely ≠ active header) |
+| `scripts/check_downstream_ci_guard.py` | Byte-identical active + `template/` per **US-0017** script parity |
+| `check_intake_template_parity.py` | **No** new byte-parity scope for `ci.yml` |
+
+**Contract tests**: `test_bug0009_template_ci_negative_parity` — assert `template/.github/workflows/ci.yml` ≠ `.github/workflows/ci.yml` after fix (SHA-256 differ).
+
+#### Q5 — Install/upgrade smoke (post-copy `ci.yml` job inventory)
+
+**Recommend**: extend `tests/installer_completeness_bug0003_test.py` (BUG-0003 / DEC-0066 class) with:
+
+- `test_downstream_ci_yml_job_inventory_missing_mode` — `--mode missing --create` → parse installed `.github/workflows/ci.yml` job keys ⊆ `{checks, auto-fix}`; forbidden jobs absent.
+- `test_downstream_ci_yml_job_inventory_upgrade_mode` — same after `--mode upgrade` overwrites framework `ci.yml`.
+
+**Parser**: lightweight regex `^\s{2}(\w[\w-]*):` job-key scan (stdlib; no PyYAML dep) or shared helper in new `scripts/downstream_ci_guard_lib.py` if architecture prefers lib split.
+
+**Manifest**: no change required (`install_include_paths` already lists `.github/workflows`).
+
+#### Q6 — Release-note / docs upgrade remediation wording
+
+**Recommended operator copy** (architecture places in README + release-notes template + runbook troubleshooting):
+
+> **CI still runs its-magic packaging jobs?** Your project received a pre-fix workflow. Run **`its-magic --target <repo> --mode upgrade`** (or **`--mode clean`** then reinstall) to refresh `.github/workflows/ci.yml` from the corrected template. After upgrade, GitHub Actions should show only **`checks`** and **`auto-fix`** jobs — not `npm-test`, `brew-test`, or `choco-test`.
+
+**Scope reminder**: fix applies to **new installs/upgrades**; stale repos heal on next upgrade (**US-0018**).
+
+#### Research resolution matrix
+
+| Q | status | Recommendation |
+|---|--------|----------------|
+| Q1 Template CI shape | **resolved** | In-place job subtraction in `template/.github/workflows/ci.yml` |
+| Q2 Drift guard | **resolved** | `check_downstream_ci_guard.py` + §28B harness + contract subtests |
+| Q3 Runbook bootstrap | **resolved** | Empty template `TEST_COMMAND`; US-0063 fills; checks summary text |
+| Q4 US-0017 policy | **deferred_to_architecture** | Negative-parity table + companion DEC |
+| Q5 Install smoke | **resolved** | Extend `installer_completeness_bug0003_test.py` |
+| Q6 Release/docs | **resolved** | Upgrade remediation blurb (wording above) |
+
+#### Risks (carried to architecture)
+
+- **R1** (active CI strip): guard script **template-only** forbidden scan + **active** five-job positive assert — architecture must not merge the two paths.
+- **R2** (stale repos): accepted; docs + release notes carry remediation (Q6).
+- **R3** (wrong file copied): install-completeness job-inventory tests (Q5) + manifest path unchanged.
+- **R4** (false green after bootstrap): once US-0063 sets `TEST_COMMAND`, real failures must still fail `checks` — no change to fail-step semantics.
+- **R5** (template runbook contradiction): clearing header `TEST_COMMAND` may affect other validators expecting non-empty template runbook — sprint must re-run `validate_doc_profile.py` / push gates.
+
+- **Research outcome**: **PASS** — Q1–Q3, Q5–Q6 **resolved**; Q4 **deferred_to_architecture** with explicit table; **no DEC authored** at research boundary.
+- **Next**: **`/architecture`** (fresh tech-lead) — companion **DEC-xxxx** for US-0017 negative parity + guard contract; `# BUG-0009` architecture section.
+- **Confidence**: high
+
+### Delivery closure (R-0075 — BUG-0009, 2026-06-06, curator, auto-20260606-02)
+
+> Append-only closure trailer for R-0075. BUG-0009 shipped with S0078 released on 2026-06-06T16:15:00Z; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of DEC-0075 or architecture `# BUG-0009`. `fresh_context_marker=curator-S0078-BUG0009-refresh-context-20260606T162000Z-fresh`.
+
+- **Anchor status**: `R-0075.status=delivered` (BUG-0009 **delivered** @ 2026-06-06T16:20:00Z curator refresh). Single-bug anchor; no shared-anchor split required.
+- **BUG-0009 delivery coordinates**: sprint `S0078`; binding decision `DEC-0075` (composes on `US-0017` negative-parity exceptions + `US-0008` installer copy); architecture section `docs/engineering/architecture.md` `# BUG-0009`; release runtime proof `rp-auto-20260606-02-release-release-20260606T161500Z-S0078-BUG0009` / `proof_hash=ca36057ca8aff89ceee48d2474bf84c5533f777c9f9cd194a1c18ef8425484bc`; refresh-context runtime proof `rp-auto-20260606-02-refresh-context-curator-20260606T162000Z-S0078-BUG0009` / `proof_hash=e095e0efe855f7cfb10e9570c464641acbed1ceb04d4a0a588a256c467523705`; AC-1..AC-8 all `[x]` in `docs/product/backlog.md` `### BUG-0009`.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. In-place template job subtraction shipped; drift guard + harness **§28B** green; empty template `TEST_COMMAND` bootstrap; install smoke; operator upgrade remediation docs; template parity `--scope=downstream-ci-guard` PASS; US-0017 negative parity confirmed (template ≠ active `ci.yml`).
+- **Risk resolution**: R1 (active CI strip) — mitigated by template-only forbidden scan + active five-job positive assert. R2 (stale repos) — mitigated by upgrade remediation blurb (Q6). R3 (wrong file copied) — mitigated by install-completeness job-inventory tests. R4 (false green after bootstrap) — mitigated by fail-step semantics unchanged post-bootstrap. R5 (runbook validator side-effects) — mitigated by `validate_doc_profile.py` PASS at execute/QA.
+- **Evidence refs (BUG-0009 delivery)**: `sprints/S0078/release-findings.md` (PASS); `handoffs/releases/S0078-release-notes.md`; `sprints/S0078/uat.md` (8/8 PASS); `sprints/S0078/uat.json`; `sprints/S0078/qa-findings.md` (PASS cycle 1); `sprints/S0078/summary.md` (Release + Refresh-context blocks); `sprints/S0078/plan-verify.json` (PASS); `decisions/DEC-0075.md`; `docs/engineering/architecture.md` `# BUG-0009`; `docs/product/backlog.md` `### BUG-0009` (DONE + `release_closure_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (BUG-0009 row `[x]`); `handoffs/release_queue.md` (`S0078=released`); `docs/engineering/state.md` (Release + Refresh-context checkpoints).
+- **Bug queue closure signal**: with BUG-0009 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **two** OPEN bugs (`BUG-0010`, `BUG-0011`). Bug-queue segment closes here; next `/auto` routes to `/discovery` for `BUG-0010` (`bug_queue_position=2/3`; `bug_queue_remaining=2`).
+- **Open R-xxxx anchors status (post-closure)**: R-0075 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when **BUG-0010** segment begins.
+
+## R-0076 — BUG-0010: architecture triad archiver `## US-xxxx` backward compat + H1 forward enforcement
+
+- **Anchor**: `bug_id=BUG-0010`; intake evidence `handoffs/intake_evidence/BUG-0010-intake-20260606.json`; related **US-0072**, **US-0061**, **DEC-0054**, **DEC-0043**.
+- **Status**: `delivered` (delivery closure trailer below; curator refresh **2026-06-06T16:41:00Z**).
+
+### Discovery extension (2026-06-06, PO, `auto-20260606-02`, `fresh_context_marker=po-BUG0010-discovery-20260606T141701Z-fresh`)
+
+#### 1. Confirmed defect mechanics
+
+- `scripts/enforce-triad-hot-surface.py` `STORY_HEADING` (line 48) matches only `^# US-\d{4}\s*[:\u2014\-].+$`.
+- `split_arch_stories` → `rollover_architecture`: when `stories=[]` and `line_count(text) > ARCH_HOT_MAX_LINES`, raises `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS`.
+- `cmd_self_test` architecture fixtures use only `# US-xxxx` headings — no `##`-only regression today.
+- Kit repo `docs/engineering/architecture.md`: **3495** lines, **26** H1 `# US-`, **5** H2 `## US-` (mixed file). Operator downstream repo: **3021** lines, `##`-only story sections → zero archivable chunks.
+
+#### 2. Discovery-locked fix boundary (operator both-fix)
+
+| Track | Surface | Intent |
+|-------|---------|--------|
+| **A — Backward-compat rollover** | `STORY_HEADING`, `split_arch_stories`, `rollover_architecture`, `--self-test` | Treat `## US-xxxx` as story-section boundaries; oldest-first archive unchanged |
+| **B — Forward enforcement** | `.cursor/commands/architecture.md`, `template/`, optional `scripts/*` validator, contract tests, runbook triad section | New `/architecture` writes must use H1 `# US-xxxx`; fail-closed when new section uses `## US-xxxx` |
+
+**Out of scope**: mandatory bulk `##`→`#` normalization in kit repo (operator may remediate manually).
+
+#### 3. Mixed-file precedence (discovery stub — research must lock)
+
+- When both `# US-0067` and `## US-0067` exist, **H1 must win** (single archival unit; no double-count).
+- Non-story `##` headings inside a `# US-` block must remain **intra-section** content (slice ends at next story boundary at either level).
+- `BUG-xxxx` sections already use H1 `# BUG-xxxx` in kit repo — enforcement should preserve that pattern.
+
+#### 4. Research questions (for `/research` tech-lead)
+
+1. **Dual-level regex**: single combined pattern vs two-pass merge; delimiter parity (`:`, `—`, `-`) for `##`.
+2. **Precedence table**: mixed H1+H2 same id; adjacent `##` without matching H1; preamble handling.
+3. **Validator placement**: extend `enforce-triad-hot-surface.py` vs new `validate_architecture_headings.py` (+ template parity).
+4. **Enforcement severity**: hard fail at `/architecture` completion vs dedicated reason code family (`ARCH_STORY_HEADING_LEVEL_INVALID` candidate).
+5. **Regression matrix**: `##`-only fixture rollover; `# US-` non-regression; mixed kit-shaped fixture; idempotent second rollover; enforcement rejects new `## US-` append.
+6. **Harness wiring**: `tests/run-tests.{sh,ps1}` section id; `check_intake_template_parity.py` scope if validator is new script.
+
+#### 5. Risks
+
+- **R1**: Double-counting `US-xxxx` at H1+H2 — mitigation: deterministic precedence (H1 wins).
+- **R2**: Splitting inside a story block on inner `##` subheadings — mitigation: only `## US-\d{4}` matches story boundary, not generic `##`.
+- **R3**: Enforcement blocks legitimate `##` subheadings under a `# US-` block — mitigation: validator scopes to **new top-level story headings** only.
+- **R4**: Template/installer omits updated script — mitigation: installer-completeness / parity guard per **BUG-0003** class.
+
+- **Discovery outcome**: **PASS** — no decision gate; **`/research`** (tech-lead) resolves Q1–Q6 before **`/architecture`**.
+- **Confidence**: high (root cause confirmed; dual-track boundary locked; implementation details deferred)
+
+### Research extension (2026-06-06, tech-lead, `auto-20260606-02`, `fresh_context_marker=tl-BUG0010-research-20260606T163000Z-fresh`)
+
+#### External references (EARLY_RESEARCH=1)
+
+- **ATX heading hierarchy** ([MarkdownPic — ATX vs Setext](https://markdownpic.com/syntax/markdown-headings-atx-vs-setext/)): ATX `#` headings are the safest default for tooling; **one H1 per document** is the conventional page title; major sections use H2+. Supports enforcing `# US-xxxx` as the canonical story-section boundary for new `/architecture` writes while treating legacy `## US-xxxx` as archival-only backward compat.
+- **Structural heading guidance** ([W3C WAI — headings tutorial](https://www.w3.org/WAI/tutorials/page-structure/headings/)): headings with equal or higher rank start new sections; lower rank starts subsections. Implies generic `## Foo` inside a `# US-xxxx` block is **intra-section** content — archiver must not treat it as a story boundary.
+- **Lint precedent** (markdownlint **MD025** / **MD001**): single-H1 and no-skipped-levels rules are common in doc pipelines. its-magic adopts a **narrower** subset: only `^## US-\d{4}` story-heading lines are forbidden on **new** `/architecture` writes (not global MD025 on the whole file).
+- **Implication**: dual-track fix aligns with markdown best practice (H1 story sections) without breaking repos that historically used H2 — rollover reads both levels; forward path converges on H1.
+
+#### Q1 — Dual-level regex shape and merge algorithm
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Single alternation regex | `^(#{1,2}) (US\|BUG)-\d{4}\s*[:\u2014\-].+$` in one pass | Partial — loses per-id precedence |
+| **B — Two-pattern scan + precedence filter** | `STORY_HEADING_H1` + `STORY_HEADING_H2` share delimiter contract; collect `(line_idx, story_id, level)`; drop H2 rows whose `story_id` has any H1 in file; sort by `line_idx`; slice | **Recommended** |
+| C — Two-pass merge (H1 blocks first, then absorb orphan H2) | Complex; risks wrong ordering in mixed files | Rejected |
+
+**Resolution**: **Option B**. Replace monolithic `STORY_HEADING` with:
+
+```text
+STORY_HEADING_H1 = ^# (?:US|BUG)-\d{4}\s*[:\u2014\-].+$
+STORY_HEADING_H2 = ^## US-\d{4}\s*[:\u2014\-].+$
+```
+
+(`BUG-xxxx` only at H1 today — kit inventory confirms; H2 BUG pattern not required in v1.)
+
+**`split_arch_stories` merge algorithm** (architecture publishes verbatim):
+
+1. Scan all lines; collect boundary candidates `(idx, story_id, level)` where H1 matches `STORY_HEADING_H1` or H2 matches `STORY_HEADING_H2`.
+2. Build `h1_ids = {story_id for candidates with level==1}`.
+3. `boundaries = sorted([c for c in candidates if not (c.level==2 and c.story_id in h1_ids)], key=lambda c: c.idx)`.
+4. Split preamble + contiguous blocks between boundary indices (unchanged rollover loop in `rollover_architecture`).
+
+**Delimiter parity**: H2 uses identical `:`, `—` (U+2014), `-` separator class as H1 (discovery-locked).
+
+#### Q2 — Mixed-file precedence table
+
+| Scenario | Precedence | Archival unit |
+|----------|------------|---------------|
+| `# US-0067` only | H1 boundary | `# US-0067` block → next story boundary |
+| `## US-0067` only (no H1 for 0067) | H2 boundary | `## US-0067` block → next story boundary |
+| Both `# US-0067` and `## US-0067` | **H1 wins** — H2 ignored as boundary | Single unit starting at `# US-0067`; `## US-0067` content stays inside H1 slice |
+| Adjacent `## US-0068` then `## US-0069` (no H1) | Each H2 is boundary | Two units, oldest-first rollover |
+| `### US-0099` or `## Architecture:` | **Not** a story boundary | Intra-section content |
+| `# BUG-0009` | H1 boundary (extend H1 family) | Same as `# US-xxxx` |
+| Preamble before first boundary | Retained in hot file | Never archived alone |
+
+**Kit-repo fixture shape** (research regression anchor): 26× `# US-` + 5× `## US-` (`US-0067`..`0070`, `US-0083` gate) — mixed rollover must not double-count.
+
+#### Q3 — Validator placement and reason-code family
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — New `scripts/validate_architecture_headings.py` | Separate CLI + template parity + installer manifest | Rejected — duplicates regex; BUG-0003 install surface |
+| B — Contract test only | No runtime enforcement | Rejected — fails operator "both" enforcement track |
+| **C — Extend `enforce-triad-hot-surface.py` in place** | Add `count_h2_story_headings(text)` + `--check-arch-heading-policy [--baseline PATH]`; reuse `STORY_HEADING_H2`; template byte-parity via existing `US-0017` script mirror | **Recommended** |
+
+**Forward-enforcement API sketch** (stdlib-only, same file):
+
+- `count_h2_story_headings(text: str) -> int` — count lines matching `STORY_HEADING_H2`.
+- `check_arch_heading_policy(repo, baseline_h2_count: int) -> Optional[str]` — if current count **>** baseline → return `ARCH_STORY_HEADING_LEVEL_INVALID` (new `## US-xxxx` story section added).
+- `/architecture` step 9 (triad gate): capture `baseline_h2_count` **before** mutating `architecture.md`; after append + rollover, run heading policy check.
+
+**Reason codes** (architecture-locked family):
+
+| Code | When |
+|------|------|
+| `ARCH_STORY_HEADING_LEVEL_INVALID` | H2 `## US-xxxx` story-heading count increased during `/architecture` |
+| `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS` | (unchanged) oversize file, zero boundaries after dual-level scan |
+| `ARTIFACT_HOT_SURFACE_OVERSIZE` | (unchanged) single block exceeds cap post-rollover |
+
+**`check_intake_template_parity.py`**: **no** new scope — `enforce-triad-hot-surface.py` already mirrored; extend script in active + `template/` atomically per **US-0017**.
+
+#### Q4 — Block vs warn at `/architecture` completion
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Warn only | Log legacy `## US-` count; allow phase success | Rejected — operator chose enforcement track |
+| B — Static fail on any `## US-` in file | Blocks kit repo with 5 legacy H2 sections | Rejected — false positive on grandfathered content |
+| **C — Diff-gated hard fail** | Fail only when `count_h2_story_headings(after) > count_h2_story_headings(before)` | **Recommended** |
+
+**Resolution**: **Option C** — **hard fail (block)** at `/architecture` completion when the phase **introduces** a new `## US-xxxx` story heading. Grandfathered H2 sections remain rollover-visible but must not grow. Normalizing `##`→`#` (count decrease) is allowed.
+
+**Command contract**: `.cursor/commands/architecture.md` (+ `template/`) step — mandate `# US-xxxx` / `# BUG-xxxx` for appended sections; reference `ARCH_STORY_HEADING_LEVEL_INVALID` stop token.
+
+#### Q5 — Self-test + harness regression matrix
+
+| Fixture class | Assert |
+|---------------|--------|
+| `##`-only rollover | 4× `## US-100x` over `ARCH_HOT_MAX_LINES=12` → rollover moves ≥1; post `--check` exit 0 |
+| `# US-` non-regression | Existing self-test `# US-0001`/`# US-0002` fixture unchanged behavior |
+| Mixed H1+H2 same id | `# US-0067` + `## US-0067` → single boundary at H1; one archival unit |
+| Idempotent second rollover | Second `--rollover` → `None` when within caps |
+| Enforcement delta | `count_h2` increases → `ARCH_STORY_HEADING_LEVEL_INVALID` |
+| Inner `##` subheading | `# US-0001` block containing `## Details` → no extra boundary |
+
+**Harness wiring**:
+
+| Surface | Recommendation |
+|---------|----------------|
+| `enforce-triad-hot-surface.py --self-test` | Extend `cmd_self_test` with classes above (mandatory) |
+| `tests/auto_command_contract_test.py` | Add `test_bug0010_*` prefix subtests (architecture command H1 mandate text; linkage to `# BUG-0010`) |
+| `tests/run-tests.ps1` / `.sh` | New section **§29A** (candidate) for `test_bug0010_*`; existing triad self-test block unchanged |
+| `tests/fixtures/triad_arch_headings/` | Optional minimal `##`-only + mixed markdown fixtures (architecture locks) |
+
+#### Q6 — `BUG-xxxx` H1 parity + installer/template scope
+
+- **Rollover**: extend H1 pattern to `# BUG-\d{4}` (7 existing kit sections) — same archival semantics as `# US-xxxx`.
+- **Forward enforcement**: `/architecture` for **stories** appends `# US-xxxx`; bug fixes append `# BUG-xxxx` (already H1 in practice). H2 enforcement targets **`## US-` only** — no `## BUG-` pattern in v1.
+- **Template parity**: single touchpoint — `scripts/enforce-triad-hot-surface.py` ↔ `template/scripts/enforce-triad-hot-surface.py` (byte-identical post-fix).
+- **Installer manifest**: path already listed — no manifest change expected.
+- **Runbook**: extend triad subsection with (a) legacy `## US-` rollover note, (b) one-time `##`→`#` operator remediation, (c) `ARCH_STORY_HEADING_LEVEL_INVALID` diagnostic.
+
+#### Research resolution matrix
+
+| Q | status | Recommendation |
+|---|--------|----------------|
+| Q1 Dual-level regex | **resolved** | Two-pattern scan + H1-wins precedence filter |
+| Q2 Precedence table | **resolved** | Table above; kit mixed fixture is regression anchor |
+| Q3 Validator placement | **resolved** | In-place `enforce-triad-hot-surface.py`; diff-gated API |
+| Q4 Enforcement severity | **resolved** | Hard fail on H2 story-heading count increase |
+| Q5 Regression matrix | **resolved** | Extended `--self-test` + `test_bug0010_*` + harness **§29A** |
+| Q6 BUG parity / template | **resolved** | H1 `# BUG-` in rollover; US-0017 script mirror only |
+
+#### Risks (carried to architecture)
+
+- **R1** (double-count H1+H2): mitigated by H1-wins filter (Q2).
+- **R2** (split on inner `##`): mitigated by strict `## US-\d{4}` boundary regex only (Q2).
+- **R3** (enforcement blocks legitimate subheadings): mitigated by diff-gated policy — generic `##` inside blocks allowed (Q4).
+- **R4** (template script drift): mitigated by byte-identical active + `template/` commit + existing installer-completeness path (Q6).
+- **R5** (DEC-0054 §2 text says `# US-xxxx` only): architecture companion **DEC-xxxx** amends semantics doc-only — rollover + enforcement table; no threshold key changes.
+
+- **Research outcome**: **PASS** — Q1–Q6 **resolved**; **no DEC authored** at research boundary.
+- **Next**: **`/architecture`** (fresh tech-lead) — companion **DEC-xxxx** composing on **DEC-0054** + **DEC-0043**; `# BUG-0010` architecture section; lock harness **§29A** id.
+- **Confidence**: high
+
+### Delivery closure (R-0076 — BUG-0010, 2026-06-06, curator, auto-20260606-02)
+
+> Append-only closure trailer for R-0076. BUG-0010 shipped with S0079 released on 2026-06-06T16:36:00Z; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of DEC-0076 or architecture `# BUG-0010`. `fresh_context_marker=curator-S0079-BUG0010-refresh-context-20260606T164100Z-fresh`.
+
+- **Anchor status**: `R-0076.status=delivered` (BUG-0010 **delivered** @ 2026-06-06T16:41:00Z curator refresh). Single-bug anchor; no shared-anchor split required.
+- **BUG-0010 delivery coordinates**: sprint `S0079`; binding decision `DEC-0076` (composes on `DEC-0054` + `DEC-0043`); architecture section `docs/engineering/architecture.md` `# BUG-0010`; release runtime proof `rp-auto-20260606-02-release-release-20260606T163600Z-S0079-BUG0010` / `proof_hash=185901a6d7b195ae6ab54f9221953ba4311a955d70d62b76c69ca1c351ac4b14`; refresh-context runtime proof `rp-auto-20260606-02-refresh-context-curator-20260606T164100Z-S0079-BUG0010` / `proof_hash=2b42915c5f8c0ae364f6f232ef1dc8e1e647fc1932593415d264ffcc8b177ef3`; AC-1..AC-8 all `[x]` in `docs/product/backlog.md` `### BUG-0010`.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Dual-level archiver (H1-wins) + diff-gated `ARCH_STORY_HEADING_LEVEL_INVALID` shipped; extended `--self-test` + `test_bug0010_*` + harness **§29A** green; command + runbook template parity PASS.
+- **Risk resolution**: R1 (double-count H1+H2) — mitigated by H1-wins filter (Q2). R2 (split on inner `##`) — mitigated by strict `## US-\d{4}` boundary regex only (Q2). R3 (enforcement blocks legitimate subheadings) — mitigated by diff-gated policy (Q4). R4 (template script drift) — mitigated by byte-identical active + `template/` commit (Q6). R5 (DEC-0054 §2 text drift) — mitigated by doc-only amendment in DEC-0076 §8.
+- **Evidence refs (BUG-0010 delivery)**: `sprints/S0079/release-findings.md` (PASS); `handoffs/releases/S0079-release-notes.md`; `sprints/S0079/uat.md` (8/8 PASS); `sprints/S0079/uat.json`; `sprints/S0079/qa-findings.md` (PASS); `sprints/S0079/summary.md` (Release + Refresh-context blocks); `sprints/S0079/plan-verify.json` (PASS); `decisions/DEC-0076.md`; `docs/engineering/architecture.md` `# BUG-0010`; `docs/product/backlog.md` `### BUG-0010` (DONE + `release_closure_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (BUG-0010 row `[x]`); `handoffs/release_queue.md` (`S0079=released`); `docs/engineering/state.md` (Release + Refresh-context checkpoints).
+- **Bug queue closure signal**: with BUG-0010 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **one** OPEN bug (`BUG-0011`). Bug-queue segment closes here; next `/auto` routes to `/discovery` for `BUG-0011` (`bug_queue_position=3/3`; `bug_queue_remaining=1`).
+- **Open R-xxxx anchors status (post-closure)**: R-0076 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when **BUG-0011** segment begins.
+
+## R-0077 — BUG-0011: Caveman voice compression rules missing from caveman.mdc (US-0089 incomplete delivery)
+
+- **Anchor**: `bug_id=BUG-0011`; intake evidence `handoffs/intake_evidence/BUG-0011-intake-20260606.json`; related **US-0089**, **US-0090**, **DEC-0072**, **R-0073**.
+- **Status**: `delivered` (discovery + research extensions below; Q1–Q7 resolved; delivery closed at curator **`/refresh-context`** **`2026-06-06T14:56:31Z`**).
+
+### Discovery extension (2026-06-06, PO, `auto-20260606-02`, `fresh_context_marker=po-BUG0011-discovery-20260606T163655Z-fresh`)
+
+#### 1. Confirmed defect mechanics
+
+- `.cursor/rules/caveman.mdc` (141 lines active + `template/` mirror) ships **DEC-0072** scaffolding: scratchpad gate, 9-zone literal invariant, non-suppressible gate vocabulary, operator toggle phrases, TOKEN_PROFILE non-substitution, default-off invariant, US-0090 reserved-key no-ops.
+- **Missing**: actionable voice-compression directives — no drop-filler/hedging rules, no lite/full/ultra intensity table, no auto-clarity exceptions, no persistence ("active every response"), no user-rule precedence clause.
+- **DEC-0072** §6 explicitly marks voice quality under `CAVEMAN_MODE=1` as operator-verified only (not CI-testable) — which allowed US-0089 to ship without voice text.
+- Operator repro: `CAVEMAN_MODE=1` + `CAVEMAN_LEVEL=full` in scratchpad → replies remain verbose (full sentences, filler, hedging).
+- **US-0090 orthogonality preserved**: input-side `CAVEMAN_COMPRESS_INPUT` / `scripts/caveman_compress_input.py` are separate vertical; this bug fixes **response-side voice only**.
+
+#### 2. Upstream reference inventory (JuliusBrussee/caveman `skills/caveman/SKILL.md`, MIT, not vendored)
+
+| Upstream section | Portable to its-magic? | Notes |
+|------------------|------------------------|-------|
+| **Rules** (drop articles/filler/hedging/pleasantries; fragments OK; short synonyms; technical terms exact) | **Yes** | Align with **R-0073** intent |
+| **Intensity** (lite/full/ultra table + examples) | **Yes** (lite/full/ultra only) | Wenyan rows **out of scope** |
+| **Auto-Clarity** (security, destructive, ambiguous compression) | **Yes** | Resume caveman after clear part |
+| **Persistence** (active every response; off only via toggles) | **Yes** | Complements scratchpad gate |
+| **Boundaries** (code/commits normal; level persist) | **Partial** | its-magic adds 9-zone literal MUST on top |
+| **Wenyan modes** | **No** | Per intake + **R-0073** |
+| **~75% token savings claim** | **No** | No vendor benchmarks in normative docs |
+| **`npx skills add` install** | **No** | DEC-0072 §2 rejects |
+
+#### 3. Discovery-locked fix boundary (rule-only per DEC-0072 Option A)
+
+| # | Surface | Change |
+|---|---------|--------|
+| 1 | `.cursor/rules/caveman.mdc` + `template/.cursor/rules/caveman.mdc` | Append **`## Voice compression (when CAVEMAN_MODE=1)`** with lite/full/ultra table, drop rules, auto-clarity, persistence, user-rule precedence; **preserve** existing 9-zone literal invariant verbatim |
+| 2 | `docs/engineering/runbook.md` + `template/` | Extend **`### Caveman mode (US-0089)`** with level table + operator examples |
+| 3 | `tests/auto_command_contract_test.py` | Additive **`test_caveman_voice_*`** token-presence subtests; update US-0090 SHA-256 baseline after rule edit |
+| 4 | `docs/engineering/architecture.md` | New **`# BUG-0011`** section (research confirms vs amend `# US-0089`) |
+
+**Negative scope (non-negotiable)**:
+
+- Do **not** weaken DEC-0072 §4 nine-zone literal invariant.
+- Do **not** change `CAVEMAN_COMPRESS_INPUT` semantics, deny-list, or `scripts/caveman_compress_input.py`.
+- Do **not** add Wenyan, vendor benchmarks, new skill, or `npx` install path.
+- Do **not** modify existing **`test_caveman_default_off_*`** subtests (DEC-0072 §6 row 6).
+
+#### 4. US-0090 SHA-256 pin interaction (discovery stub — research must lock)
+
+- `test_caveman_compress_input_rule_byte_identity` pins SHA-256 `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE` (US-0090 R10 negative parity).
+- Rule edit for voice section **will change** this hash — expected, not a regression.
+- **Option A (recommended stub)**: bump `_CAVEMAN_RULE_BASELINE_SHA256` to post-voice SHA after delivery; keep active==template equality assertion.
+- **Option B**: replace SHA pin with substring-presence markers only + active==template parity (loses immutability guard for unrelated edits).
+
+#### 5. Research questions (for `/research` tech-lead)
+
+1. **SHA strategy**: Option A vs B above; whether to add separate `test_caveman_voice_rule_markers_*` instead of single SHA pin.
+2. **Level table wording**: upstream-adapted verbatim vs kit-native examples (React re-render from upstream vs its-magic workflow example).
+3. **User-rule precedence**: exact paragraph placement in always-on rule; interaction with `.cursor/rules/quality.mdc` or user rules.
+4. **Contract marker token list**: minimum viable strings for `test_caveman_voice_*` (e.g. `Voice compression`, `lite`, `full`, `ultra`, `Auto-Clarity`, `drop filler`).
+5. **Runbook examples**: include upstream-style before/after table or link to rule file only.
+6. **Architecture surface**: dedicated `# BUG-0011` vs amend `# US-0089` §6 non-goal removal.
+7. **Ultra vs 9-zone overlap**: confirm ultra prose abbreviations cannot touch reason codes, IDs, paths (reinforce in voice section).
+
+#### 6. Risks
+
+- **R1**: US-0090 SHA pin breaks on rule edit — **expected**; mitigation: intentional baseline bump at execute (Q1).
+- **R2**: Voice rules garble literal regions — mitigation: existing 9-zone MUST + voice section must restate non-garbling (Q7).
+- **R3**: Conflicting user rules ("complete sentences") override voice — mitigation: explicit precedence paragraph (Q3).
+- **R4**: `ultra` abbreviates reason codes or IDs — **forbidden** by existing invariant; voice section must not contradict.
+
+- **Discovery outcome**: **PASS** — no decision gate; **`/research`** (tech-lead) resolves Q1–Q7 before **`/architecture`**.
+- **Confidence**: high (root cause confirmed; upstream diff catalogued; fix boundary locked; US-0090 orthogonality explicit)
+
+### Research extension (2026-06-06, tech-lead, `auto-20260606-02`, `fresh_context_marker=tl-BUG0011-research-20260606T143942Z-fresh`)
+
+#### External references (EARLY_RESEARCH=1)
+
+- **Cursor rule precedence** ([Cursor Docs — Rules](https://cursor.com/docs/rules)): applicable rules merge into model context; on conflict, precedence is **Team Rules → Project Rules → User Rules**. `caveman.mdc` is a project rule (`globs: ["**/*"]`, always-on). Native precedence already favors project rules over user settings, but merged context can still carry contradictory style guidance — an **explicit in-rule precedence paragraph** is required so voice compression wins deterministically when `CAVEMAN_MODE=1` (Q3).
+- **Upstream voice contract** (JuliusBrussee/caveman `skills/caveman/SKILL.md`, MIT, fetched 2026-06-06): portable sections are **Persistence**, **Rules** (drop filler/hedging/pleasantries; fragments OK; technical terms exact), **Intensity** (`lite|full|ultra` rows only), **Auto-Clarity** (security/destructive/ambiguous compression pauses), **Boundaries** (code/commits normal). Wenyan rows, ~75% token claim, and `npx` install remain **out of scope** per **R-0073** / intake.
+- **Implication**: delivery is a **rule-body append** only — no skill, no script, no scratchpad key changes. Preserves **DEC-0072** §2 rule-only composition and **US-0090** orthogonality.
+
+#### Q1 — SHA-256 bump vs substring-only assertion strategy
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A — Dual layer: marker subtests + baseline SHA bump** | Keep `test_caveman_compress_input_rule_byte_identity` (US-0090 R10 pin) but **intentionally bump** `_CAVEMAN_RULE_BASELINE_SHA256` at `/execute` to post-voice digest; add additive `test_caveman_voice_*` token-presence subtests for the new section; retain `test_caveman_template_parity_sweep` locked-string parity for `caveman.mdc`. | **Recommended** |
+| B — Markers only, drop SHA pin | Remove byte-identity guard; rely on substring markers + active==template manual review. | Rejected — loses immutability guard for unrelated future edits to pre-voice scaffolding |
+| C — SHA only, no voice markers | Bump baseline without section markers. | Rejected — cannot detect accidental voice-section deletion without re-reading full file in review |
+
+**Resolution**: **Option A**. At execute:
+
+1. Append voice section to active + `template/.cursor/rules/caveman.mdc` (byte-identical pair).
+2. Recompute SHA-256 of active rule file; update `_CAVEMAN_RULE_BASELINE_SHA256` constant in `test_caveman_compress_input_rule_byte_identity`.
+3. Add `test_caveman_voice_*` subtests (Q4 list) — **additions only**; **do not modify** any `test_caveman_default_off_*` or `test_caveman_compress_input_*` assertion bodies except the single baseline constant in #2.
+4. Document intentional SHA change in sprint UAT + release notes (not a regression).
+
+Pre-voice baseline (recorded): `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`.
+
+#### Q2 — Level table wording (upstream-adapted vs kit-native)
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Upstream examples verbatim (React re-render row) | Copy upstream intensity table examples as-is. | Rejected — examples reference generic React; less aligned with kit operator repro |
+| **B — Kit-native examples, upstream table shape** | Keep upstream **table column semantics** (`lite` = no filler but grammatical; `full` = drop articles + fragments; `ultra` = abbreviate prose words only) but use **its-magic-native before/after pairs**: (1) orchestration gate explanation, (2) auth-middleware bug from intake repro. Include upstream **pattern** line: `` `[thing] [action] [reason]. [next step].` `` | **Recommended** |
+| C — Prose-only levels (no table) | Describe levels in bullets without markdown table. | Rejected — harder to test; upstream parity weaker |
+
+**Resolution**: **Option B**. Rule section includes a markdown intensity table with **lite / full / ultra** rows (no Wenyan). Examples demonstrate **token-saving terse/imperative prose**, explicitly **not** stereotypical caveman roleplay. Runbook carries a shortened 2-row before/after table (Q5); rule file owns normative table.
+
+#### Q3 — User-rule precedence paragraph placement
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Amend `quality.mdc` | Global style rule references Caveman override. | Rejected — spreads voice logic outside DEC-0072 rule-only surface |
+| B — Amend user-facing README only | Document precedence for operators, not agents. | Rejected — does not bind model behavior |
+| **C — Self-contained subsection in `caveman.mdc`** | Under new `## Voice compression (when CAVEMAN_MODE=1)`, add `### Precedence` stating: when `CAVEMAN_MODE=1`, voice-compression directives in **this rule** override conflicting **user-rule** prose-style guidance (e.g. "write complete sentences", "blog-post quality") for **assistant reply voice only**; does **not** override user rules for tool usage, git safety, security, or commit policy. | **Recommended** |
+
+**Resolution**: **Option C**. Place `### Precedence` immediately after the section intro (before intensity table). Contract-test marker: substring `user rule` or `user-rule` + `CAVEMAN_MODE=1` + `complete sentences` (or equivalent kit-native phrasing architecture locks verbatim). Cursor native **Project Rules > User Rules** precedence cited in architecture footnote only — normative agent text lives in `caveman.mdc`.
+
+#### Q4 — Contract test marker token list (`test_caveman_voice_*`)
+
+**Recommended additive subtests** (prefix `test_caveman_voice_`; active + template mirror for each `assertIn`):
+
+| Subtest | Minimum tokens / anchors |
+|---------|--------------------------|
+| `test_caveman_voice_section_heading_present` | Exact heading `## Voice compression (when CAVEMAN_MODE=1)` |
+| `test_caveman_voice_level_table_markers` | `lite`, `full`, `ultra` (all three in rule body) |
+| `test_caveman_voice_drop_filler_directive` | `drop` + (`filler` or `hedging` or `pleasantries`) |
+| `test_caveman_voice_fragment_permission` | `fragments` + `OK` (case as authored) |
+| `test_caveman_voice_auto_clarity_exceptions` | `Auto-Clarity` or `auto-clarity` + (`security` or `destructive` or `ambiguous`) |
+| `test_caveman_voice_persistence_directive` | `every response` or `ACTIVE EVERY RESPONSE` (kit-native casing) |
+| `test_caveman_voice_user_rule_precedence` | `user rule` + `CAVEMAN_MODE=1` |
+| `test_caveman_voice_ultra_prose_only_boundary` | `ultra` + (`reason code` or `reason codes`) + `never abbreviate` or equivalent deferral to 9-zone |
+| `test_caveman_voice_template_parity` | `hashlib` not required — assert active `caveman.mdc` == template `caveman.mdc` **byte-identical** after voice delivery |
+
+**Harness wiring**: new `tests/run-tests.ps1` / `.sh` section **§30A** — `Voice compression rule markers (BUG-0011)` — runs only `test_caveman_voice_*` prefix (candidate; architecture locks section id).
+
+**Invariants preserved**:
+
+- All `test_caveman_default_off_*` bodies **unchanged** (**DEC-0072** §6).
+- All `test_caveman_compress_input_*` bodies **unchanged** except `_CAVEMAN_RULE_BASELINE_SHA256` constant (**US-0090** R10 bump).
+- `test_caveman_default_off_reference_non_substitution_paragraph` pinned sentence **byte-unchanged**.
+
+#### Q5 — Runbook example selection and depth
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Link to rule only | Runbook mentions voice levels exist; no examples. | Rejected — operator discoverability gap persists |
+| **B — Compact before/after table + rule pointer** | Under `### Caveman mode (US-0089)`, add `#### Voice compression levels` with 2-row table: (1) technical explain at `full`, (2) destructive warning at auto-clarity break. Point to `.cursor/rules/caveman.mdc` for full contract. | **Recommended** |
+| C — Duplicate full upstream table in runbook | Full intensity table + 6 examples in runbook. | Rejected — doc drift risk; violates minimal-doc principle |
+
+**Resolution**: **Option B**. Do **not** modify `### Caveman input compression (US-0090)` subsection. Template mirror per **US-0017**.
+
+#### Q6 — Architecture surface (`# BUG-0011` vs amend `# US-0089`)
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A — Amend `# US-0089` only | Extend US-0089 section; no bug section. | Rejected — breaks BUG-0009/BUG-0010 bug-section traceability pattern |
+| **B — Dedicated `# BUG-0011` + cross-link from `# US-0089`** | New `docs/engineering/architecture.md` `# BUG-0011` owns voice-section delivery, AC map, atomic task seeds, SHA bump policy, harness §30A. Add one forward-link from `# US-0089` §6 replacing "Not tested: voice quality" with "voice rules delivered in **BUG-0011**; qualitative brevity remains operator-verified (not CI)". | **Recommended** |
+| C — Companion DEC only | DEC-0077 without architecture section. | Rejected — insufficient execute surface |
+
+**Resolution**: **Option B**; companion **DEC-xxxx** at architecture (likely **DEC-0077** if next id free) composing on **DEC-0072** without rewrite.
+
+#### Q7 — Ultra-level abbreviation vs 9-zone literal overlap
+
+**Analysis**: Upstream `ultra` abbreviates **ordinary prose words** (DB/auth/config/req/res) but forbids abbreviating code symbols, function names, API names, error strings. Local **DEC-0072** §4 nine-zone list is **strict superset** — reason codes, IDs, paths, proof tuples, gate tokens are already byte-literal MUST.
+
+| Risk | Mitigation (voice section text) |
+|------|----------------------------------|
+| Ultra abbreviates `PHASE_CONTEXT_ISOLATION_VIOLATION` | Voice section MUST state: **reason codes** remain byte-literal — defer to `## Literal-region invariant (9-zone hard MUST)`; repeat forbidden garbling examples |
+| Ultra drops `US-` prefix from IDs | Same — cite zone 5 + forbidden example already in rule |
+| Ultra collapses fenced code | Zone 1 MUST unchanged; voice section: "code blocks unchanged" (upstream Rules line) |
+| Ultra abbreviates `decision_gate` token | US-0088 non-suppressible list already byte-literal; voice section cross-refs `## Non-suppressible gate vocabulary` |
+
+**Resolution**: Voice section **must not** weaken or paraphrase the existing 9-zone block. Add one `### Ultra and literal regions` stub under voice compression that **defers** to the existing invariant (no duplicate zone list — pointer only). Contract test `test_caveman_voice_ultra_prose_only_boundary` (Q4) locks the deferral sentence.
+
+#### Research resolution matrix
+
+| Q | status | Recommendation |
+|---|--------|----------------|
+| Q1 SHA strategy | **resolved** | Dual layer: bump `_CAVEMAN_RULE_BASELINE_SHA256` + additive `test_caveman_voice_*` |
+| Q2 Level table wording | **resolved** | Kit-native examples; upstream table semantics; no Wenyan |
+| Q3 User-rule precedence | **resolved** | `### Precedence` subsection in `caveman.mdc` only |
+| Q4 Contract markers | **resolved** | Nine `test_caveman_voice_*` subtests + harness **§30A** candidate |
+| Q5 Runbook examples | **resolved** | Compact 2-row table under Caveman mode; US-0090 subsection untouched |
+| Q6 Architecture surface | **resolved** | Dedicated `# BUG-0011` + `# US-0089` §6 cross-link amendment |
+| Q7 Ultra vs 9-zone | **resolved** | Deferral stub; no duplicate zone list; marker subtest |
+
+#### Risks (carried to architecture)
+
+- **R1** (US-0090 SHA pin break): **expected** at execute; bump baseline + release-note callout (Q1).
+- **R2** (literal garbling): mitigated by unchanged 9-zone MUST + ultra deferral stub (Q7).
+- **R3** (user-rule conflict): mitigated by `### Precedence` paragraph + Cursor project-rule precedence (Q3).
+- **R4** (ultra abbreviates reason codes): **forbidden** by existing invariant; voice section must defer not contradict (Q7).
+- **R5** (doc drift runbook vs rule): runbook carries summary table only; rule owns normative text (Q5).
+- **R6** (accidental edit to DEC-0072 pinned tests): execute must not touch `test_caveman_default_off_*` bodies or non-substitution sentence (Q4 invariants).
+
+- **Research outcome**: **PASS** — Q1–Q7 **resolved**; **no DEC authored** at research boundary.
+- **Next**: **`/architecture`** (fresh tech-lead) — companion **DEC-xxxx** composing on **DEC-0072**; `# BUG-0011` architecture section; voice-section verbatim outline for execute.
+- **Confidence**: high
+
+### Delivery closure (R-0077 — BUG-0011, 2026-06-06, curator, auto-20260606-02)
+
+> Append-only closure trailer for R-0077. BUG-0011 shipped with S0080 released on 2026-06-06T17:00:00Z; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of DEC-0077 or architecture `# BUG-0011`. `fresh_context_marker=curator-S0080-BUG0011-refresh-context-20260606T145631Z-fresh`.
+
+- **Anchor status**: `R-0077.status=delivered` (BUG-0011 **delivered** @ 2026-06-06T14:56:31Z curator refresh). Single-bug anchor; no shared-anchor split required.
+- **BUG-0011 delivery coordinates**: sprint `S0080`; binding decision `DEC-0077` (composes on `DEC-0072`); architecture section `docs/engineering/architecture.md` `# BUG-0011`; release runtime proof `rp-auto-20260606-02-release-release-20260606T170000Z-S0080-BUG0011` / `proof_hash=06b929b4b97c50dfb4012154443764c17e2958c409d4df9d0b16dda5b39825fc`; refresh-context runtime proof `rp-auto-20260606-02-refresh-context-curator-20260606T145631Z-S0080-BUG0011` / `proof_hash=95970384cfd1aa7986f234be6fc8b3f88558ea2a8e10b092a3947d9170fba911`; AC-1..AC-8 all `[x]` in `docs/product/backlog.md` `### BUG-0011`.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Voice section + nine `test_caveman_voice_*` + harness **§30A** + intentional SHA bump `E10EFC32…E47DE` → `C7AAC699…8BC4D` shipped; UAT-1 operator voice spot-check **PASS**.
+- **Risk resolution**: R1 (US-0090 SHA pin break) — mitigated by intentional baseline bump + release-note callout (Q1). R2 (literal garbling) — mitigated by unchanged 9-zone MUST + ultra deferral stub (Q7). R3 (user-rule conflict) — mitigated by `### Precedence` paragraph (Q3). R4 (ultra abbreviates reason codes) — mitigated by existing invariant deferral (Q7). R5 (doc drift runbook vs rule) — mitigated by compact runbook table only (Q5). R6 (accidental DEC-0072 test edit) — mitigated by pinned `test_caveman_default_off_*` bodies unchanged (Q4).
+- **Evidence refs (BUG-0011 delivery)**: `sprints/S0080/release-findings.md` (PASS); `handoffs/releases/S0080-release-notes.md`; `sprints/S0080/uat.md` (8/8 PASS); `sprints/S0080/uat.json`; `sprints/S0080/qa-findings.md` (PASS); `sprints/S0080/summary.md` (Release + Refresh-context blocks); `sprints/S0080/plan-verify.json` (PASS); `decisions/DEC-0077.md`; `docs/engineering/architecture.md` `# BUG-0011`; `docs/product/backlog.md` `### BUG-0011` (DONE + `release_closure_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (BUG-0011 row `[x]`); `handoffs/release_queue.md` (`S0080=released`); `docs/engineering/state.md` (Release + Refresh-context checkpoints).
+- **Portfolio drain closure signal**: with BUG-0011 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Bug-queue segment (`BUG-0009..BUG-0011`) and `auto-20260606-02` orchestrator run close here; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=3` of `10` left unused).
+- **Open R-xxxx anchors status (post-closure)**: R-0077 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.
+
+## R-0078 — US-0092: full-autonomy `/auto`, outer driver, self-verify UAT, TOKEN_PROFILE orthogonality
+
+- **Date**: 2026-06-06
+- **Topic**: Opt-in full-autonomy orchestration beyond **US-0088** documented outer-driver equivalence
+- **Query**: How should **`AUTO_FLOW_MODE=full_autonomy`** compose with **US-0088** stop matrix, ship a stdlib outer-driver script, expand UAT self-verify beyond **US-0065/66** generated-project scope, and audit **`TOKEN_PROFILE`** so it affects token cost only — not automation level?
+- **Status**: `delivered` (discovery + research extensions below; Q1–Q6 resolved; delivery closed at curator **`/refresh-context`** **`2026-06-06T22:45:00Z`**)
+- **Intake plan areas**: `full-autonomy-flow-mode`, `outer-driver-script`, `self-verify-uat-runtime`, `block-auto-resolve`, `drain-without-pause`, `token-profile-orthogonality`, `docs-tests-parity`
+- **Open questions for TL**:
+  1. Outer-driver invocation model (CLI wrapper vs documented Cursor hook vs `/loop` composition)
+  2. Full_autonomy stop matrix — which **US-0088** gates relax vs remain hard
+  3. UAT probe catalog and fail-closed reason codes for unresolvable stacks
+  4. Block-retry ledger schema and cap interaction with **`AUTO_IMPLEMENTATION_LOOP`**
+  5. TOKEN_PROFILE orthogonality audit grep scope (scratchpad comments, auto-orchestration-reference, runbook, README)
+- **Related**: **US-0088**, **US-0044**, **US-0065**, **US-0066**, **US-0080**, **R-0071**
+- **Discovery extension (2026-06-06T18:30:00Z, po, `orchestrator_run_id=auto-20260606-03`, `fresh_context_marker=po-US0092-discovery-20260606T183000Z-fresh`)**:
+  - **Flow-mode contract reaffirmed**: **`AUTO_FLOW_MODE=full_autonomy`** is default-off alongside **`manual`** and **`auto_until_decision`**; discovery locks the six-step operator flow (enable → outer-driver start → inner lifecycle + self-verify → bounded block retry → drain-without-pause → deterministic stop). **`TOKEN_PROFILE`** orthogonality is a hard operator constraint — research must enumerate conflicting prose locations and propose grep + contract-test markers without changing tier semantics.
+  - **Outer-driver research priority**: stdlib **`scripts/`** entrypoint that re-invokes **`/auto`** until stop — not operator-manual-only; must be deterministically equivalent to **US-0088** outer-driver contract. Compare CLI wrapper vs documented Cursor hook vs **`/loop`** composition; lock argv, exit codes, and runbook recipe.
+  - **Stop matrix (discovery ask)**: classify **US-0088** gates into **hard** (isolation, strict-proof, publish, decision_gate, security deny-list) vs **relaxable under full_autonomy** (transient blocked/missing_input, UAT/QA retry under **`AUTO_IMPLEMENTATION_LOOP`**). **`RELEASE_PUBLISH_MODE=auto`** remains explicit opt-in.
+  - **Self-verify expansion**: derive UAT steps from acceptance; probe catalog for build/test/API/browser/health keyed by stack profile; fail closed **`UAT_PROBE_UNRESOLVED`** (name TBD at architecture) — compose **US-0065** / **US-0066** beyond generated-project scope.
+  - **Block-retry ledger**: per-attempt schema (timestamp, stop_reason, remediation_action, outcome); cap interaction with **`AUTO_LOOP_MAX_CYCLES`** and **`AUTO_IMPLEMENTATION_LOOP`**; names-only evidence.
+  - **Drain-without-pause**: segment boundary must refresh **`resume_brief`** + **`state.md`** per **DEC-0069** before outer driver schedules next item; scheduler mutex with **US-0087** unchanged.
+  - **Deliverables for `/research` closure**: normative stop-matrix table, outer-driver sketch, probe catalog draft, ledger schema, TOKEN_PROFILE audit file list, contract-test marker inventory — feed **`/architecture`** **`# US-0092`**.
+
+### Research extension (2026-06-06T19:05:00Z, tech-lead, `orchestrator_run_id=auto-20260606-03`, `fresh_context_marker=tl-US0092-research-20260606T190500Z-fresh`)
+
+- **Status**: **closed for `/research`** — Q1–Q6 resolved; **`/architecture`** next. No new **`R-xxxx`** allocated (extend **`R-0078`** per **DEC-0011** intake anchor).
+- **External (EARLY_RESEARCH)**: Industry outer-loop drivers (Microsoft Conductor script steps with exit-code routing; SREGym `driver_loop`; intellegix `loop_driver.py` exit codes 0=complete / 1=max-iterations / 2=budget / 3=stagnation / 124=timeout) confirm **stdlib subprocess loop + deterministic exit-code vocabulary + resume state file** as the portable pattern — aligns with **US-0088** Option B equivalence without vendor Cursor multi-turn guarantees.
+
+#### Q1 — Outer-driver invocation model (`status=resolved`)
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Shipped stdlib Python script** under **`scripts/`** (recommended name **`auto_outer_driver.py`**) — polls **`resume_brief`** + **`state.md`** phase boundary, re-invokes documented **`/auto`** hook until deterministic stop | **Preferred** — satisfies AC-2 “not operator-manual-only”; active + **`template/`** mirror per **US-0017**. |
+| B | **Documented Cursor hook only** (operator copies `/auto start-from=…` each turn) | **Rejected as sole delivery** — **US-0088** Option B allowed as equivalence class but **US-0092** requires shipped script. |
+| C | **`/loop` command composition** | **Rejected** — **`/loop`** is in-session recurring prompt cadence, not cross-turn lifecycle orchestration with **DEC-0038** / **DEC-0069** boundary refresh. |
+
+**Script sketch (architecture-locks exact names)**:
+
+- **Activation gate**: require merged scratchpad **`AUTO_FLOW_MODE=full_autonomy`** (exact literal); default-off — exit **2** with reason **`AUTO_FLOW_MODE_NOT_FULL_AUTONOMY`** when absent or other mode.
+- **Stdlib-only**: **`argparse`**, **`json`**, **`hashlib`**, **`pathlib`**, **`subprocess`**, **`re`**, **`datetime`** — no third-party deps.
+- **Argv**: `--repo PATH` (default `.`); `--max-cycles INT` (optional override of **`AUTO_LOOP_MAX_CYCLES`**); `--max-stories INT` (optional override of **`AUTO_BACKLOG_MAX_STORIES`**); `--dry-run` (emit planned invocations only); `--invoke-cmd TEXT` (optional shell prefix — e.g. documented Cursor CLI wrapper; default prints normative **`/auto …`** line for operator/agent runner).
+- **Loop body**: (1) read **`handoffs/resume_brief.md`** **`intended_resume_phase`** + **`orchestrator_run_id`**; (2) invoke hook; (3) parse latest **`state.md`** phase-boundary block for **`stop_reason`**, **`next_scheduled_phase`**, drain counters; (4) branch — continue, drain-advance, block-retry, or exit.
+- **Exit codes** (process-level; architecture may add **`stop_reason` stdout token**):
+
+| Code | Meaning |
+|------|---------|
+| **0** | **`completed`** — segment/portfolio terminal per policy (incl. empty backlog when drain enabled). |
+| **1** | Hard stop — **`decision_gate`**, unrecoverable **`error`**, isolation/strict-proof failure, security deny. |
+| **2** | Configuration — **`AUTO_FLOW_MODE`** not **`full_autonomy`**, scratchpad parse failure. |
+| **3** | **`loop_max`** — **`AUTO_LOOP_MAX_CYCLES`** exhausted. |
+| **4** | **`BACKLOG_MAX_STORIES_REACHED`** / drain cap. |
+| **5** | **`pause_request`** / **`AUTO_PAUSE_REQUEST`**. |
+| **6** | Recoverable block retry cap exhausted (**`BLOCK_RETRY_CAP_EXHAUSTED`**). |
+| **124** | Subprocess/hook **timeout** (optional **`AUTO_OUTER_DRIVER_TIMEOUT_SECONDS`**). |
+
+- **Runbook recipe**: new subsection **`### Full-autonomy outer driver (US-0092)`** — enable scratchpad keys → run **`python scripts/auto_outer_driver.py --repo .`** once → interpret exit code table → troubleshooting (stale brief, scheduler mutex, caps).
+- **Spawn-only preserved**: script **loops invocations**, never performs phase-role work (**`BUG-0006`** / **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** unchanged).
+
+#### Q2 — Full_autonomy stop matrix vs **US-0088** (`status=resolved`)
+
+**Invariant**: **`full_autonomy`** relaxes **recoverable transient stops** and **operator re-invocation**, not **governance gates**.
+
+| Condition | **US-0088** (all modes) | **`full_autonomy` delta** | Operator notify |
+|-----------|-------------------------|---------------------------|-----------------|
+| Next phase, no hard stop | Continue inner `/auto` | Same; outer driver **re-invokes** when Cursor ends turn early | Quiet OK if **`AUTO_QUIET=1`** |
+| **`decision_gate`** | Hard stop | **No change — hard** | Always |
+| Unrecoverable **`error`** | Hard stop | **No change — hard** | Always |
+| Critical **`missing_input`** | Hard stop | **No change — hard** | Always |
+| Transient **`missing_input`** (recoverable — e.g. stale brief fixable by refresh) | Hard stop | **Relaxable** — bounded block-retry → remediation phase | Notify on cap |
+| **`pause_request`** / **`AUTO_PAUSE_REQUEST`** | Hard stop | **No change — hard** | Always |
+| **`loop_max`** / **`AUTO_LOOP_MAX_CYCLES`** | Hard stop | **No change — hard** (outer + inner caps) | Always |
+| **`blocked`** — sync/scope/transient | Hard stop | **Relaxable** when ledger classifies recoverable | Notify on cap |
+| **`blocked`** — isolation / strict-proof / ownership | Hard stop | **No change — hard** | Always |
+| UAT/QA fail | Hard stop (operator) | **Relaxable** when **`AUTO_IMPLEMENTATION_LOOP=1`** — retry **`execute`→`qa`→`verify-work`** within caps | Notify on cap |
+| Segment complete + **`AUTO_BACKLOG_DRAIN=1`** | Advance (may need manual re-**`/auto`**) | **Drain-without-pause** — outer driver schedules next item **immediately** | Segment handoff notify |
+| **`BACKLOG_MAX_STORIES_REACHED`** | Hard stop | **No change — hard** | Always |
+| **`AUTO_SCHEDULER_CONFLICT`** | Hard stop | **No change — hard** | Always |
+| **`RELEASE_PUBLISH_MODE=auto`** | Explicit opt-in | **No change — hard default-off** | Always on publish |
+| Security deny (**.env`**, intake evidence mutation) | Hard deny | **No change — hard** | Always |
+
+**Orthogonal keys (unchanged semantics)**: **`TOKEN_PROFILE`**, **`AUTO_QUIET`**, **`PHASE_MODE`**, **`PERMISSION_MODE`** — **`full_autonomy`** does not substitute for any of these.
+
+#### Q3 — UAT probe catalog + fail-closed reason codes (`status=resolved`)
+
+**Scope**: generalize **US-0065** runtime readiness + **US-0066** **`TEST_COMMAND`** beyond generated-project repos when stack profile resolves from repo signals (**`package.json`**, **`pyproject.toml`**, **`go.mod`**, **`pom.xml`**, **`*.csproj`**, scratchpad **`TEST_COMMAND`**, **`docs/engineering/runtime-connectivity.md`**).
+
+**Probe catalog** (acceptance step → probe; architecture locks table in **`# US-0092`**):
+
+| Probe kind | Resolves when | Execution | Evidence surface |
+|------------|---------------|-----------|------------------|
+| **`build`** | Stack profile maps build script (`npm run build`, `cargo build`, `dotnet build`, …) | Subprocess, bounded timeout | **`uat.json`** `probe_results[]`, **`qa-findings.md`** |
+| **`test`** | **`TEST_COMMAND`** non-empty (**US-0063** / **US-0066**) or profile default | Subprocess | Same + command stdout/stderr **path refs** (not inline secrets) |
+| **`api_health`** | **`runtime-connectivity.md`** or acceptance names URL/health path | HTTP GET (stdlib **`urllib`**) | status code + latency |
+| **`process_health`** | Acceptance names startup command (**US-0065** pattern) | Subprocess + readiness poll | retry ledger snippet |
+| **`browser_smoke`** | Web stack + optional **`PLAYWRIGHT_*`** / documented curl fallback | Subprocess or HTTP | screenshot/path ref optional |
+| **`cli_smoke`** | Acceptance names CLI + expected exit/output | Subprocess | exit code + truncated stdout |
+| **`manual_operator`** | Step explicitly requires human judgment | **Not auto-run** | **`UAT_PROBE_UNRESOLVED`** unless operator maps to probe |
+
+**Fail-closed reason codes** (no silent PASS):
+
+| Code | When |
+|------|------|
+| **`UAT_PROBE_UNRESOLVED`** | Acceptance step cannot map to any probe for resolved stack profile |
+| **`UAT_STACK_PROFILE_UNKNOWN`** | No deterministic profile from repo signals |
+| **`UAT_PROBE_TIMEOUT`** | Probe exceeded bounded timeout |
+| **`UAT_PROBE_FAILED`** | Probe ran; assertion failed |
+| **`UAT_PROBE_FORBIDDEN`** | Step would require **`.env`**, gitignored secret path, or intake evidence mutation (**AC-10**) |
+| **`UAT_PROBE_PASS`** | Probe succeeded (evidence recorded) |
+
+**Composition**: **`/verify-work`** and **`/qa`** share probe resolver lib (recommended **`scripts/uat_probe_lib.py`** + **`template/`** mirror); generated-project path remains **US-0065** / **US-0066** fast path when **`stack_profile=generated`**.
+
+#### Q4 — Block-retry ledger schema + **`AUTO_IMPLEMENTATION_LOOP`** cap interaction (`status=resolved`)
+
+**Ledger path**: append-only **`handoffs/auto_block_retry/<orchestrator_run_id>.jsonl`** (names-only; no secrets, no file contents).
+
+**Record schema** (one JSON object per line):
+
+```json
+{
+  "attempt_id": "br-<orchestrator_run_id>-<seq>",
+  "timestamp": "<ISO8601Z>",
+  "orchestrator_run_id": "<id>",
+  "story_id": "US-xxxx|BUG-xxxx|(none)",
+  "stop_reason": "blocked|missing_input|uat_fail|qa_fail",
+  "reason_code": "<optional sub-code>",
+  "remediation_action": "execute|qa|verify-work|refresh-context|outer_reinvoke",
+  "outcome": "retry_scheduled|hard_stop|cap_exhausted",
+  "outer_cycle_index": 1,
+  "implementation_loop_index": 1
+}
+```
+
+**Cap interaction (recommended lock)**:
+
+| Cap | Scope | Interaction |
+|-----|-------|-------------|
+| **`AUTO_LOOP_MAX_CYCLES`** | **Outer-driver `/auto` invocations** (incl. drain advances) | Each outer loop iteration increments; hard stop at cap (**unchanged**). |
+| **`AUTO_IMPLEMENTATION_LOOP`** | **Inner** **`execute`↔`qa`↔`verify-work`** remediation | When **`1`**, UAT/QA fail triggers remediation attempts; each full remediation cycle increments **`implementation_loop_index`**; hard stop when **`implementation_loop_index >= AUTO_LOOP_MAX_CYCLES`** within same story segment. |
+| **`AUTO_BLOCK_RETRY_MAX`** (new scratchpad key, default **3**, architecture-locked) | Per-**`stop_reason`** recoverable retries | Block-retry ledger rows for same **`(story_id, stop_reason)`** ≤ max; exceed → **`BLOCK_RETRY_CAP_EXHAUSTED`** (exit **6**). |
+| **`AUTO_BACKLOG_MAX_STORIES`** | Drain breadth | Unchanged — outer driver exit **4**. |
+
+**Ordering**: outer driver checks **`AUTO_LOOP_MAX_CYCLES`** first; inner orchestrator checks **`AUTO_IMPLEMENTATION_LOOP`** + **`AUTO_BLOCK_RETRY_MAX`** before scheduling remediation; unrecoverable classes bypass ledger.
+
+#### Q5 — **`TOKEN_PROFILE` orthogonality audit (`status=resolved`)
+
+**Hard rule (operator constraint)**: **`TOKEN_PROFILE=lean|balanced|full`** affects **context breadth / token cost only** — never automation level, phase depth, drain, outer-driver invocation, or **`AUTO_FLOW_MODE`**.
+
+**Grep scope** (active + **`template/`** where mirrored):
+
+| Surface | Purpose |
+|---------|---------|
+| **`.cursor/scratchpad.md`**, **`template/.cursor/scratchpad.md`**, **`.cursor/scratchpad.local.example.md`** | Comment blocks |
+| **`docs/engineering/auto-orchestration-reference.md`** | TOKEN_PROFILE tier prose |
+| **`docs/engineering/runbook.md`** | Token-cost section — **known conflict**: both active + template line **`lowers default automation breadth`** (must fix at execute) |
+| **`README.md`**, **`template/README.md`**, **`its_magic/README.md`** | Operator-facing tier docs |
+| **`.cursor/commands/auto.md`** | Cross-refs only (should already be orthogonal post-**US-0088**) |
+
+**Forbidden pattern grep** (CI/contract negative assertions): `automation breadth`, `lowers default automation`, `TOKEN_PROFILE.*drain`, `TOKEN_PROFILE.*outer`, `TOKEN_PROFILE.*full_autonomy`, `lean.*less automation`, `full.*more automation`.
+
+**Contract-test marker strings** (add in **`tests/auto_command_contract_test.py`** at execute):
+
+- Positive: **`TOKEN_PROFILE controls context breadth / token cost only`** (or existing Caveman non-substitution extension).
+- Positive: **`AUTO_FLOW_MODE=full_autonomy`** literal in scratchpad comment block.
+- Negative: runbook must **not** contain **`lowers default automation breadth`** after fix.
+- Positive: **`scripts/auto_outer_driver.py`** exists (post-execute) + doc reference **`Full-autonomy outer driver (US-0092)`**.
+
+#### Q6 — Contract-test + template parity inventory (`status=resolved`)
+
+| # | Surface | Parity |
+|---|---------|--------|
+| 1 | **`scripts/auto_outer_driver.py`** | active + **`template/scripts/`** |
+| 2 | **`scripts/uat_probe_lib.py`** (if split from monolith) | active + template |
+| 3 | Scratchpad keys: **`AUTO_FLOW_MODE`** enum adds **`full_autonomy`**; optional **`AUTO_BLOCK_RETRY_MAX`**, **`AUTO_OUTER_DRIVER_TIMEOUT_SECONDS`** | active + template scratchpad + local example |
+| 4 | **`.cursor/commands/auto.md`**, **`docs/engineering/auto-orchestration-reference.md`** | stop matrix § **US-0092** |
+| 5 | **`.cursor/commands/verify-work.md`**, **`.cursor/commands/qa.md`** | self-verify probe contract excerpt |
+| 6 | **`docs/engineering/runbook.md`** | outer-driver + full_autonomy subsection |
+| 7 | **`docs/engineering/architecture.md`** | **`# US-0092`** (architecture phase) |
+| 8 | **`tests/auto_command_contract_test.py`** | markers per Q5 + outer-driver + drain-advance-without-operator phrases |
+| 9 | **`tests/run-tests.ps1`** / **`.sh`** harness section (candidate **§31**) | optional at architecture |
+
+- **Linked (closure)**: **US-0088**, **US-0044**, **US-0065**, **US-0066**, **US-0080**, **US-0087**, **US-0048**, **US-0056**, **DEC-0069**, **DEC-0038**, **R-0071**, **R-0042**
+- **Confidence**: high (repo inventory + **US-0088** `# US-0088` stop matrix extended; runtime Cursor scheduling remains out of scope)
+- **Next phase pointers (`/architecture`)**: lock companion **`DEC-xxxx`**, **`# US-0092`** section, exact script filename/exit codes, probe lib split, **`AUTO_BLOCK_RETRY_MAX`** default, runbook + orthography fix list.
+
+### Delivery closure (R-0078 — US-0092, 2026-06-06, curator, auto-20260606-03)
+
+> Append-only closure trailer for R-0078. US-0092 shipped with S0081 released on 2026-06-06T22:30:00Z; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of DEC-0078 or architecture `# US-0092`. `fresh_context_marker=curator-S0081-US0092-refresh-context-20260606T224500Z-fresh`.
+
+- **Anchor status**: `R-0078.status=delivered` (US-0092 **delivered** @ 2026-06-06T22:45:00Z curator refresh). Single-story anchor; no shared-anchor split required.
+- **US-0092 delivery coordinates**: sprint `S0081`; binding decision `DEC-0078` (composes on `US-0088`, `DEC-0062`, `DEC-0047`, `DEC-0048`); architecture section `docs/engineering/architecture.md` `# US-0092`; release runtime proof `rp-auto-20260606-03-release-release-20260606T223000Z-S0081-US0092` / `proof_hash=c090713e2791b75a697db7e09c9a874a257e3d79b742436837b6d84d2d1d0c78`; refresh-context runtime proof `rp-auto-20260606-03-refresh-context-curator-20260606T224500Z-S0081-US0092` / `proof_hash=1c258ea1f3e22f19aa5019ca9a7b060da75950ca52c67d0e8b2795ef55d974f9`; AC-1..AC-10 all `[x]` in `docs/product/backlog.md` `## US-0092`.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Outer driver + UAT probe lib + stop matrix + block-retry ledger + TOKEN_PROFILE orthography audit shipped; UAT **10/10** PASS.
+- **Evidence refs (US-0092 delivery)**: `sprints/S0081/release-findings.md` (PASS); `handoffs/releases/S0081-release-notes.md`; `sprints/S0081/uat.md` (10/10 PASS); `sprints/S0081/uat.json`; `sprints/S0081/qa-findings.md` (PASS); `sprints/S0081/summary.md` (Release + Refresh-context blocks); `sprints/S0081/plan-verify.json` (PASS); `decisions/DEC-0078.md`; `docs/engineering/architecture.md` `# US-0092`; `docs/product/backlog.md` `## US-0092` (DONE + `release_notes` + `refresh_context_notes`); `docs/product/acceptance.md` (US-0092 row `[x]`); `handoffs/release_queue.md` (`S0081=released`); `docs/engineering/state.md` (Refresh-context checkpoint); `docs/engineering/state-archive/state-pack-20260606-y.md` (release checkpoint archive).
+- **Portfolio drain closure signal**: with US-0092 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment (`US-0090` → `US-0091` → `US-0092`) on `auto-20260606-03` closes here; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=2` of `10` left unused).
+- **Open R-xxxx anchors status (post-closure)**: R-0078 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.
+
+## R-0079 — US-0093: Cursor browser-integrated UAT self-test
+
+- **Date**: 2026-06-06
+- **Topic**: Cursor built-in browser as primary UAT probe path; manual_operator UI automation; probe stub completion
+- **Query**: How should its-magic wire **DEC-0078** `browser_smoke` / `manual_operator` probes to Cursor browser MCP tools, stdlib fallbacks, and `uat.json` evidence without silent PASS?
+- **Sources**:
+  - https://cursor.com/docs/agent/tools/browser
+  - Internal: `scripts/uat_probe_lib.py`, `decisions/DEC-0078.md`, `.cursor/commands/verify-work.md`, `.cursor/commands/qa.md`, **R-0041**
+- **Findings** (discovery extension 2026-06-06 — **do not close**; research phase owns closure):
+  - **Root cause (confirmed)**: `scripts/uat_probe_lib.py` `execute_probe` returns **`UAT_PROBE_UNRESOLVED`** for **`process_health`**, **`browser_smoke`**, and **`cli_smoke`** (stub branches); **`manual_operator`** always unresolved at execution despite **`classify_step`** routing. **US-0092** / **DEC-0078** delivered catalog + fail-closed vocabulary only — execution gap is intentional deferral now closed by **US-0093**.
+  - **Two-tier execution model (discovery-locked)**:
+    - **Tier 1 — stdlib** (`uat_probe_lib.py`): classify → resolve stack/URL/port; run HTTP GET health or Playwright/curl subprocess when **`UAT_BROWSER_PROBE_MODE`** is fallback or MCP probe signals unavailable; complete **`process_health`** (subprocess + readiness poll) and **`cli_smoke`** (exit-code assertion); emit reason codes; never silent PASS.
+    - **Tier 2 — agent** (`verify-work.md`, `qa.md`, `execute.md`): when mode is **`cursor`** (default) and kind is **`browser_smoke`** or automatable **`manual_operator`**, subagent invokes Cursor browser MCP (navigate, click, type, scroll, screenshot, console/network read per [Cursor Browser docs](https://cursor.com/docs/agent/tools/browser)); writes **`browser_evidence_refs`** to **`uat.json`** `probe_results[]` and **`qa-findings.md`**.
+  - **Scratchpad key (AC-1 stub)**: **`UAT_BROWSER_PROBE_MODE=cursor|http_fallback|playwright_fallback`** (default **`cursor`**); composes with **`PERMISSION_MODE`** and Cursor browser approval settings (manual / allow-list / auto-run).
+  - **`manual_operator` routing (discovery stub)**: reclassify steps with UI/workflow verbs (**click**, **fill**, **navigate**, **smoke**, **form**, **submit**) to browser plans; retain **`manual_operator`** + **`UAT_PROBE_UNRESOLVED`** when judgment signals present (**visually**, **aesthetically**, **operator confirms**, **subjective**).
+  - **New fail-closed codes (minimum)**: **`UAT_BROWSER_UNAVAILABLE`**, **`UAT_BROWSER_PROBE_FAILED`**, **`UAT_BROWSER_PROBE_TIMEOUT`** — applied when cursor path and configured fallback both fail.
+  - **Evidence contract (AC-5 stub)**: `probe_results[]` field **`browser_evidence_refs`** — screenshot paths, console error count/summary, network failure summary (names/paths only, no secrets); aligns with **US-0065** AC-6 mirror fields in **`qa-findings.md`**.
+  - **Security**: no auto-read **`.env`**, no credential auto-fill, **`UAT_PROBE_FORBIDDEN`** unchanged; respect Cursor origin/approval guardrails; enterprise allowlist behavior documented as operator-configured (vendor).
+- **Open questions for `/research` (Q1–Q6)**:
+  1. **Agent-browser command contract** — exact MCP invocation sequence, evidence write-back hook, and failure propagation from agent tier to lib reason codes.
+  2. **Verb routing table** — deterministic automatable vs judgment-only classifier extensions in `classify_step`.
+  3. **Fallback selection** — MCP-unavailable detection heuristic; HTTP vs Playwright precedence; CI/headless behavior.
+  4. **`process_health` / `cli_smoke` parse rules** — acceptance-text → command/expected-output extraction; readiness poll timeout defaults.
+  5. **Evidence schema** — artifact directory layout, field cardinality, console/network summary normalization.
+  6. **Parity inventory** — contract-test markers (`pytest -k us0093`), template mirror list, `check_intake_template_parity.py --scope=us-0093` wiring.
+- **Risks**:
+  - Browser MCP unavailable in CI/headless → **`UAT_BROWSER_UNAVAILABLE`** + fallback modes; must not false PASS.
+  - Over-automation of judgment steps → verb routing table + explicit deny signals.
+  - Dual-tier desync (lib PASS without agent evidence) → evidence-required fields + fail-closed when refs missing.
+  - Secret exposure via browser form fill → hard deny + no credential paths.
+- **Linked**: US-0093, US-0092, US-0065, US-0088, R-0041, DEC-0078
+- **Confidence**: high (Q1–Q6 resolved at research extension below)
+- **Status**: **closed for `/research`** — Q1–Q6 resolved; **`/architecture`** next
+
+### Research extension (2026-06-06T23:15:00Z, tech-lead, `orchestrator_run_id=auto-20260606-04`, `fresh_context_marker=tl-US0093-research-20260606T231500Z-fresh`)
+
+- **Status**: **closed for `/research`** — Q1–Q6 resolved; **`/architecture`** next. No new **`R-xxxx`** allocated (extend **`R-0079`** per **DEC-0011** intake anchor).
+- **External (EARLY_RESEARCH)**: [Cursor Browser docs](https://cursor.com/docs/agent/tools/browser) confirm native MCP tools (**navigate**, **click**, **type**, **scroll**, **screenshot**, **console output**, **network traffic**); dev-server awareness; log files for selective grep; approval modes (manual / allow-list / auto-run); enterprise origin allowlist — aligns with two-tier model where **stdlib cannot invoke MCP** (**BUG-0006** / **US-0048** spawn-only preserved).
+
+#### Q1 — Agent-browser command contract (`status=resolved`)
+
+**Invariant**: **`scripts/uat_probe_lib.py`** never calls Cursor browser MCP directly. When **`UAT_BROWSER_PROBE_MODE=cursor`** (default) and **`classify_step`** yields **`browser_smoke`** or automatable **`manual_operator`**, the lib returns a **probe plan** with **`execution_tier=agent`** and **`reason_code=UAT_PROBE_UNRESOLVED`** until the phase subagent completes browser work — **no silent PASS**.
+
+**Dispatch table**:
+
+| Caller | `execution_tier` | Behavior |
+|--------|------------------|----------|
+| **`uat_probe_lib.py` CLI** (`--report`) | **`stdlib`** or **`agent_deferred`** | In **`cursor`** mode: emit plan + **`UAT_PROBE_UNRESOLVED`** (or configured fallback if **`--allow-fallback`**) — never fabricate **`browser_evidence_refs`**. |
+| **`/verify-work`**, **`/qa`**, **`/execute`** subagent | **`agent`** | Execute MCP sequence below; merge final **`probe_results[]`** row into **`sprints/Sxxxx/uat.json`** + mirror **`qa-findings.md`**. |
+
+**Normative MCP sequence** (architecture locks exact wording in command specs):
+
+1. **Resolve target URL** — read **`docs/engineering/runtime-connectivity.md`** (first `http(s)://`); else infer dev-server port from **`package.json`** `scripts.dev` / `scripts.start` + scratchpad **`DEV_SERVER_PORT`**; prefer existing running server (Cursor dev-server awareness per vendor docs).
+2. **`browser_navigate`** — load health/app URL; respect enterprise origin allowlist (operator-configured).
+3. **Step plan** — map acceptance step verbs to **`browser_click`** / **`browser_type`** / **`browser_scroll`** only when automatable (Q2); **never** fill password/credential fields or read **`.env`** paths.
+4. **`browser_screenshot`** — write to **`sprints/Sxxxx/evidence/browser/<probe_id>-<seq>.png`** (max **5** per probe — Q5).
+5. **Console + network evidence** — read console log file / network summary per Cursor browser tools; emit **counts + summary path refs** only (no inline secrets).
+6. **Verdict** — set **`passed`**, **`reason_code`** (`UAT_PROBE_PASS` | **`UAT_BROWSER_PROBE_FAILED`** | **`UAT_BROWSER_PROBE_TIMEOUT`**), and **`browser_evidence_refs`** (required when **`passed=true`** in **`cursor`** mode).
+7. **Fallback trigger** — if MCP tools unavailable (headless CI, enterprise denylist, subagent tool list lacks browser): record **`UAT_BROWSER_UNAVAILABLE`**, then run stdlib fallback chain (Q3) in same subagent turn when mode allows; if fallback also fails → **`UAT_BROWSER_PROBE_FAILED`** (no PASS).
+
+**Write-back hook** (recommended at architecture):
+
+- Subagent updates **`uat.json`** `probe_results[]` in place (match on **`step`** hash or **`probe_id`** UUID assigned at classify time).
+- Optional lib helper: **`python scripts/uat_probe_lib.py --merge-result <path/to/fragment.json>`** — validates schema, enforces evidence-required-on-PASS for **`cursor`** mode.
+- **`qa-findings.md`** mirror: duplicate **`browser_evidence_refs`** + **`probe_mode`** under runtime browser subsection (**US-0065** AC-6 fields).
+
+**Rejected alternative**: stdlib-only Playwright as primary — rejected; operator intake locks **Cursor browser** as primary path (**R-0041** / discovery contract).
+
+#### Q2 — `manual_operator` verb routing table (`status=resolved`)
+
+**Classifier extension** in **`classify_step`** — **precedence: judgment deny signals win** over automatable UI signals when both appear in one step.
+
+| Signal class | Tokens (case-insensitive substring) | Route | `reason_code` at classify |
+|--------------|-------------------------------------|-------|---------------------------|
+| **Judgment-only** | `visually`, `aesthetically`, `operator confirms`, `subjective`, `human judgment`, `eyeball`, `manually verify appearance`, `approve layout` | **`manual_operator`** | **`UAT_PROBE_UNRESOLVED`** |
+| **Secret/forbidden** | `.env`, `password`, `credential`, `api key`, `intake_evidence` | **`None`** | **`UAT_PROBE_FORBIDDEN`** |
+| **Automatable UI** | `click`, `fill`, `navigate`, `smoke`, `form`, `submit`, `button`, `page load`, `scroll`, `type into`, `select`, `checkbox`, `dropdown`, `ui`, `browser` | **`browser_smoke`** (or **`manual_operator`→`browser_smoke` reclass**) | `""` when URL/stack resolves |
+| **Generic manual** | `manual`, `operator`, `human`, `judgment` (without UI verbs) | **`manual_operator`** | **`UAT_PROBE_UNRESOLVED`** |
+
+**Reclass rule**: when step matches **automatable UI** and **not** judgment-only, override prior **`manual_operator`** classification to **`browser_smoke`** with **`execution_tier=agent`** when **`UAT_BROWSER_PROBE_MODE=cursor`**.
+
+**Self-test fixtures** (execute): mixed-verb step `"operator visually confirms button click"` → **`manual_operator`** + unresolved; `"click submit on login form smoke test"` → **`browser_smoke`** when health URL present.
+
+#### Q3 — Fallback selection (`status=resolved`)
+
+**Scratchpad key** (AC-1): **`UAT_BROWSER_PROBE_MODE=cursor|http_fallback|playwright_fallback`** (default **`cursor`**).
+
+| Mode | Primary | Fallback chain (on failure / MCP unavailable) |
+|------|---------|-----------------------------------------------|
+| **`cursor`** | Agent MCP sequence (Q1) | **`http_fallback`** → optional **`playwright_fallback`** when scratchpad **`UAT_BROWSER_FALLBACK_CHAIN=1`** (default **on** in CI) |
+| **`http_fallback`** | Stdlib **`urllib`** GET to health URL (reuse **`api_health`** logic + optional HTML title sniff) | None — fail **`UAT_BROWSER_PROBE_FAILED`** |
+| **`playwright_fallback`** | Subprocess **`npx playwright screenshot`** or **`python -m playwright`** when **`PLAYWRIGHT_*`** / **`node_modules/@playwright`** detected | **`http_fallback`** if Playwright missing → **`UAT_BROWSER_UNAVAILABLE`** |
+
+**MCP-unavailable heuristic** (deterministic):
+
+1. Environment **`CI=true`** or **`GITHUB_ACTIONS=true`** → skip MCP; enter fallback chain immediately with **`UAT_BROWSER_UNAVAILABLE`** recorded on probe row.
+2. Subagent tool inventory lacks browser MCP → same.
+3. Enterprise origin allowlist blocks target URL → **`UAT_BROWSER_UNAVAILABLE`** + operator message (vendor-configured).
+
+**HTTP vs Playwright precedence**: in **`cursor`** mode fallback, try **HTTP first** (cheaper, stdlib-only), then **Playwright** only when step requires DOM interaction verbs and HTTP returned 200 without sufficient evidence.
+
+**CI/headless**: document **`UAT_BROWSER_PROBE_MODE=http_fallback`** for downstream CI; never false PASS — missing URL → **`UAT_PROBE_UNRESOLVED`**.
+
+#### Q4 — `process_health` / `cli_smoke` parse rules (`status=resolved`)
+
+**`process_health`** (stdlib **`execution_tier=stdlib`** only):
+
+| Source | Extraction rule |
+|--------|-----------------|
+| Acceptance step | Backtick command `` `npm run dev` `` or quoted `"npm start"`; regex `run\s+([^\s;]+)` after startup verbs |
+| **`package.json`** | `scripts.start` / `scripts.dev` when profile **`node`** |
+| Scratchpad | **`DEV_SERVER_COMMAND`** override |
+| Readiness | Poll **`_read_health_url(repo)`** every **`UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS`** (default **2**) until HTTP 2xx or cap **`UAT_PROCESS_HEALTH_POLL_SECONDS`** (default **60**, architecture-locked) |
+| Verdict | Subprocess alive + readiness → **`UAT_PROBE_PASS`**; timeout → **`UAT_PROBE_TIMEOUT`**; non-zero exit → **`UAT_PROBE_FAILED`** |
+
+**`cli_smoke`**:
+
+| Source | Extraction rule |
+|--------|-----------------|
+| Acceptance step | Backtick command; patterns `exit code 0`, `exits successfully`, `run CLI` |
+| Stack default | **`python -m <module> --help`** only when step explicitly says `help` / `version` — else unresolved |
+| Assertion | **`exit_code == 0`** required; optional stdout substring match from `expect "..."` / `output contains "..."` |
+| Verdict | Same reason-code family as **DEC-0078** §4 |
+
+**Rejected alternative**: LLM free-form command inference — rejected; parse rules must be regex/deterministic for contract tests.
+
+#### Q5 — Evidence schema (`status=resolved`)
+
+**Artifact layout**: **`sprints/Sxxxx/evidence/browser/`** (gitignored binary OK; path refs in JSON only).
+
+**`probe_results[]` row** (extends **DEC-0078** schema):
+
+```json
+{
+  "probe_id": "pr-<uuid>",
+  "probe_kind": "browser_smoke",
+  "execution_tier": "agent",
+  "probe_mode": "cursor",
+  "step": "<truncated acceptance step>",
+  "passed": true,
+  "reason_code": "UAT_PROBE_PASS",
+  "browser_evidence_refs": {
+    "navigation_url": "http://localhost:3000/",
+    "screenshots": ["sprints/Sxxxx/evidence/browser/pr-<uuid>-01.png"],
+    "console_summary": {
+      "error_count": 0,
+      "warning_count": 1,
+      "summary_path": "sprints/Sxxxx/evidence/browser/pr-<uuid>-console.txt"
+    },
+    "network_summary": {
+      "failed_request_count": 0,
+      "summary_path": "sprints/Sxxxx/evidence/browser/pr-<uuid>-network.txt"
+    }
+  }
+}
+```
+
+**Cardinality**: max **5** screenshot paths; summary files **names/paths only** in JSON (no secret values). **`passed=true`** in **`cursor`** mode **requires** non-empty **`browser_evidence_refs.navigation_url`** + at least one screenshot or console/network summary path — else downgrade to **`UAT_BROWSER_PROBE_FAILED`**.
+
+**`qa-findings.md` mirror** (**US-0065** AC-6): duplicate **`navigation_url`**, **`console_summary`**, **`network_summary`**, **`probe_mode`** under **Runtime browser evidence** subsection.
+
+#### Q6 — Contract-test + template parity inventory (`status=resolved`)
+
+| # | Surface | Parity |
+|---|---------|--------|
+| 1 | **`scripts/uat_probe_lib.py`** — browser mode keys, verb routing, stub completion, new reason codes, `--self-test` | active + **`template/scripts/`** |
+| 2 | **`.cursor/commands/verify-work.md`**, **`qa.md`**, **`execute.md`** — **Browser UAT self-test (US-0093)** subsection with MCP sequence | active + **`template/.cursor/commands/`** |
+| 3 | Scratchpad: **`UAT_BROWSER_PROBE_MODE`**, optional **`UAT_BROWSER_FALLBACK_CHAIN`**, **`UAT_PROCESS_HEALTH_POLL_SECONDS`** | active + template scratchpad + local example |
+| 4 | **`docs/engineering/runbook.md`**, **`auto-orchestration-reference.md`** | browser self-test operator recipe |
+| 5 | **`docs/engineering/architecture.md`** | **`# US-0093`** (architecture phase) |
+| 6 | **`tests/auto_command_contract_test.py`** | **`test_us0093_*`** markers (mode key, reason codes, `browser_evidence_refs`, command excerpts) |
+| 7 | **`scripts/check_intake_template_parity.py`** | new **`--scope=us-0093`** pair table (extends **us-0092** + execute.md) |
+| 8 | **`tests/run-tests.ps1`** / **`.sh`** | optional harness **§32** at execute |
+
+**Contract-test marker strings** (add at execute):
+
+- Positive: **`UAT_BROWSER_PROBE_MODE`** literal in scratchpad comment block.
+- Positive: **`browser_evidence_refs`** in verify-work + qa command excerpts.
+- Positive: **`UAT_BROWSER_UNAVAILABLE`**, **`UAT_BROWSER_PROBE_FAILED`**, **`UAT_BROWSER_PROBE_TIMEOUT`** in uat_probe_lib + docs.
+- Negative: command docs must **not** imply stdlib alone PASSes **`browser_smoke`** in **`cursor`** mode without evidence refs.
+
+**Parity scope wiring**: **`python scripts/check_intake_template_parity.py --scope=us-0093`** → **`[INTAKE_TEMPLATE_PARITY_OK]`** (table authored at execute).
+
+- **Linked (closure)**: **US-0093**, **US-0092**, **US-0065**, **US-0088**, **R-0041**, **DEC-0078**, **BUG-0006**
+- **Confidence**: high (repo inventory + Cursor browser vendor docs + discovery-locked two-tier contract)
+- **Next phase pointers (`/architecture`)**: lock companion **`DEC-xxxx`**, **`# US-0093`** section, exact lib API (`execution_tier`, `--merge-result`), poll defaults, evidence schema literals, **`us-0093`** parity table, contract-test inventory.
+
+### Delivery closure trailer (2026-06-07T01:30:00Z, release, `orchestrator_run_id=auto-20260606-04`, `fresh_context_marker=release-S0082-US0093-release-20260607T013000Z-fresh`, `sprint_id=S0082`)
+
+- **Status**: **delivered** — Q1–Q6 resolved at `/research`; architecture locked **DEC-0079**; sprint **S0082** executed, QA/verify-work/release **PASS**; **US-0093** **DONE**.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Two-tier browser UAT (stdlib classify + agent Cursor browser MCP + HTTP/Playwright fallback), verb routing table, process_health/cli_smoke stub completion, browser_evidence_refs schema, and UAT_BROWSER_* reason codes shipped; UAT **10/10** PASS.
+- **Evidence refs (US-0093 delivery)**: `sprints/S0082/release-findings.md` (PASS); `handoffs/releases/S0082-release-notes.md`; `sprints/S0082/uat.md` (10/10 PASS); `sprints/S0082/uat.json`; `sprints/S0082/qa-findings.md` (PASS); `sprints/S0082/summary.md`; `sprints/S0082/plan-verify.json` (PASS); `decisions/DEC-0079.md`; `docs/engineering/architecture.md` `# US-0093`; `docs/product/backlog.md` `## US-0093` (DONE + `release_notes`); `docs/product/acceptance.md` (US-0093 row `[x]`); `handoffs/release_queue.md` (`S0082=released`); `docs/engineering/state.md` (Release checkpoint).
+- **Portfolio drain closure signal**: with US-0093 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment (`US-0091` → `US-0092` → `US-0093`) on `auto-20260606-04` closes here; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=1` of `10` left unused).
+- **Open R-xxxx anchors status (post-closure)**: R-0079 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.

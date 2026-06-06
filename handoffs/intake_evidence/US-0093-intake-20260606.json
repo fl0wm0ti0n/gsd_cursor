@@ -1,0 +1,136 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260606-US0093-intake",
+  "candidate_story_ids": ["US-0093"],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "browser-smoke-execution",
+      "title": "Implement browser_smoke probe execution — Cursor built-in browser primary path with HTTP/Playwright fallback when MCP unavailable"
+    },
+    {
+      "plan_area_id": "manual-operator-ui-routing",
+      "title": "Automate UI/workflow manual_operator acceptance steps via browser probe plans where human judgment is not required"
+    },
+    {
+      "plan_area_id": "probe-stub-completion",
+      "title": "Complete US-0092 stubs for process_health and cli_smoke probes with bounded subprocess execution and fail-closed reason codes"
+    },
+    {
+      "plan_area_id": "agent-command-contract",
+      "title": "Wire /verify-work, /qa, and /execute command specs to invoke Cursor browser tools and capture console/network/screenshot evidence"
+    },
+    {
+      "plan_area_id": "evidence-and-reason-codes",
+      "title": "Extend uat.json probe_results schema with browser evidence refs and new fail-closed codes (UAT_BROWSER_UNAVAILABLE, UAT_BROWSER_PROBE_FAILED)"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "Runbook, auto-orchestration-reference, architecture companion DEC, contract tests, template parity US-0017"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "browser-smoke-execution",
+      "story_ids": ["US-0093"]
+    },
+    {
+      "plan_area_id": "manual-operator-ui-routing",
+      "story_ids": ["US-0093"]
+    },
+    {
+      "plan_area_id": "probe-stub-completion",
+      "story_ids": ["US-0093"]
+    },
+    {
+      "plan_area_id": "agent-command-contract",
+      "story_ids": ["US-0093"]
+    },
+    {
+      "plan_area_id": "evidence-and-reason-codes",
+      "story_ids": ["US-0093"]
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "story_ids": ["US-0093"]
+    }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "US-0092 shipped browser_smoke and manual_operator probes but browser_smoke returns UAT_PROBE_UNRESOLVED and manual UI steps are not auto-run; operator wants its-magic to self-test apps using Cursor built-in browser (navigate, click, type, console/network evidence) for maximum automation.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260606-US0093-intake:0:bf15920d65cadba7"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Cursor IDE agent sessions running its-magic /qa and /verify-work in kit and downstream repos; merged scratchpad; optional local dev servers; composes on scripts/uat_probe_lib.py and US-0065 webapp runtime verification.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260606-US0093-intake:1:feeef0e490f1cb7a"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Python stdlib uat_probe_lib extensions plus agent-command contracts in .cursor/commands (verify-work, qa, execute); optional Playwright or HTTP curl fallback subprocess when Cursor browser MCP is unavailable; contract tests in tests/.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260606-US0093-intake:2:03a5214903624847"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Extend DEC-0078 probe catalog without weakening fail-closed semantics: agent-executed Cursor browser path as primary for web stacks; stdlib probe lib records evidence refs and orchestrates fallbacks; spawn-only subagents unchanged.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260606-US0093-intake:3:2862f269e0d0a6ad"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Default-on browser self-test when web stack detected and health URL or dev-server port resolves; operator-visible evidence artifacts (screenshot paths, console error counts) in uat.json; PERMISSION_MODE and browser approval settings respected per Cursor security model.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260606-US0093-intake:4:625bf61c317f5c59"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Browser probes must not auto-read .env or submit secrets; respect Cursor browser approval modes; fail closed UAT_PROBE_FORBIDDEN on secret paths; no silent PASS when browser tools unavailable unless explicit fallback probe succeeds.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260606-US0093-intake:5:1fdaa956a5435480"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Reliability via contract tests and uat_probe_lib --self-test; bounded probe timeouts; deterministic reason codes; template parity US-0017; compose US-0092 full_autonomy self-verify without false PASS on browser steps.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260606-US0093-intake:6:b1403a547081520c"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0093 closes the browser/manual UAT gap from prior /ask thread; deliver browser_smoke execution, automatable manual_operator UI routing, process_health and cli_smoke stub completion, docs and tests in one vertical upgrade.",
+      "intake_run_id": "cursor-20260606-US0093-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260606-US0093-intake:7:1345e2a19143891a"
+    }
+  ]
+}
