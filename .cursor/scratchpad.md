@@ -1,8 +1,8 @@
-# its-magic scratchpad
+# its-magic scratchpad (framework default catalog — Model B / DEC-0055)
 #
-# Shared team defaults live here.
-# Personal developer overrides belong in `.cursor/scratchpad.local.md`
-# (copy from `.cursor/scratchpad.local.example.md`).
+# Copy this file to `.cursor/scratchpad.local.md` for personal overrides (gitignored).
+# Merge precedence: local > materialized `.cursor/scratchpad.md` > this example
+# (installers materialize the baseline from template when missing).
 #
 # Core behavior
 # - MAGIC_CONTEXT_STRICT: 0|1 (require context refresh after code changes)
@@ -60,7 +60,7 @@ MAGIC_BENCH_SESSION=
 #   Orthogonal to TOKEN_PROFILE (DEC-0035 / US-0080) — TOKEN_PROFILE controls
 #   context breadth / token cost, not notification policy.
 AUTO_QUIET=1
-AUTO_FLOW_MODE=auto_until_decision
+AUTO_FLOW_MODE=full_autonomy
 PHASE_MODE=auto
 PERMISSION_MODE=auto
 AUTO_INSTALL_DEPS=1
@@ -78,7 +78,7 @@ AUTO_BUG_QUEUE=0
 AUTO_BUG_TARGET=
 AUTO_BUG_MAX_ITEMS=0
 AUTO_BUG_ON_BLOCK=skip
-AUTO_BLOCK_RETRY_MAX=3
+AUTO_BLOCK_RETRY_MAX=5
 #
 # `/auto` phase role policy (US-0069 / DEC-0051)
 # - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
@@ -126,16 +126,10 @@ SPRINT_BULK_MAX_SPRINTS=3
 SPRINT_BULK_SELECTION=priority_then_backlog_order
 #
 # Remote execution (US-0086 / US-0084 / US-0064)
-# - REMOTE_EXECUTION: 0|1 — 0 skips remote.json validation (zero overhead; DEC-0070).
-# - REMOTE_CONFIG: path to dev/Cursor remote JSON (default .cursor/remote.json).
-# - AUTO_REMOTE_AUTOMATION_PROFILE: off|deterministic_v1 (default off; manual
-#   mode remains unchanged unless explicitly enabled for automation workflows).
-# - AUTO_REMOTE_ENVIRONMENT_LABEL: local|docker|ssh (names-only evidence label
-#   for execute/qa/release handoffs when automation routing is used).
-#   Release/QA SSH/Docker connectivity fields live in docs/engineering/release-targets.json
-#   (ssh-server, dockerOverSsh); map WSL vs SSH vs Docker-over-SSH in
-#   docs/engineering/runtime-connectivity.md and docs/engineering/us-0084-remote-e2e.md.
-# - Summary helper (names-only stdout): python scripts/remote_config_summary.py
+# - REMOTE_EXECUTION: 0|1
+# - REMOTE_CONFIG: path to remote config
+# - AUTO_REMOTE_AUTOMATION_PROFILE: off|deterministic_v1 (default off/manual-safe)
+# - AUTO_REMOTE_ENVIRONMENT_LABEL: local|docker|ssh (names-only evidence label)
 REMOTE_EXECUTION=0
 REMOTE_CONFIG=.cursor/remote.json
 AUTO_REMOTE_AUTOMATION_PROFILE=off
@@ -275,12 +269,19 @@ DEV_SERVER_COMMAND=
 # - CAVEMAN_MODE: 0|1 (default 0; absence = 0)
 # - CAVEMAN_LEVEL: lite|full|ultra (empty; with MODE=1 empty -> treat as full;
 #   unknown value -> CAVEMAN_LEVEL_UNKNOWN and fall back to pre-US-0089 voice)
-# - CAVEMAN_COMPRESS_INPUT: 0|1 -- reserved for US-0090; inert in US-0089;
-#   no behavior until compression story ships
-# - CAVEMAN_FILE_SCOPE: string -- reserved for US-0090; inert in US-0089;
-#   no behavior until compression story ships
+#
+# ## Caveman input compression (US-0090 / DEC-0073)
+# Input-side prose minification via scripts/caveman_compress_input.py. Default off.
+# Orthogonal to CAVEMAN_MODE (reply voice) and TOKEN_PROFILE (context breadth).
+# - CAVEMAN_COMPRESS_INPUT: 0|1 (default 0) -- activation gate; must be 1 for --write
+# - CAVEMAN_FILE_SCOPE: string (empty default) -- allow-list of files eligible for compression:
+#     * empty: no files in scope (fail-closed on --write with CAVEMAN_COMPRESS_SCOPE_EMPTY)
+#     * named profile: e.g. docs-prose-only (user-guides, runbook, state-archive, handoffs/archive)
+#     * raw globs: e.g. docs/user-guides/**/*.md,handoffs/archive/*.md (forward slashes only)
+#     * hybrid: profile:docs-prose-only;globs:handoffs/archive/*.md
+#   Mutation requires COMPRESS_INPUT=1 + non-empty scope + CLI --write; use --dry-run first.
+#   Originals land in docs/.caveman-originals/<path>; deny-list always wins over allow.
 CAVEMAN_MODE=1
 CAVEMAN_LEVEL=full
 CAVEMAN_COMPRESS_INPUT=0
 CAVEMAN_FILE_SCOPE=
-

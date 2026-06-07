@@ -268,10 +268,18 @@ DEV_SERVER_COMMAND=
 # - CAVEMAN_MODE: 0|1 (default 0; absence = 0)
 # - CAVEMAN_LEVEL: lite|full|ultra (empty; with MODE=1 empty -> treat as full;
 #   unknown value -> CAVEMAN_LEVEL_UNKNOWN and fall back to pre-US-0089 voice)
-# - CAVEMAN_COMPRESS_INPUT: 0|1 -- reserved for US-0090; inert in US-0089;
-#   no behavior until compression story ships
-# - CAVEMAN_FILE_SCOPE: string -- reserved for US-0090; inert in US-0089;
-#   no behavior until compression story ships
+#
+# ## Caveman input compression (US-0090 / DEC-0073)
+# Input-side prose minification via scripts/caveman_compress_input.py. Default off.
+# Orthogonal to CAVEMAN_MODE (reply voice) and TOKEN_PROFILE (context breadth).
+# - CAVEMAN_COMPRESS_INPUT: 0|1 (default 0) -- activation gate; must be 1 for --write
+# - CAVEMAN_FILE_SCOPE: string (empty default) -- allow-list of files eligible for compression:
+#     * empty: no files in scope (fail-closed on --write with CAVEMAN_COMPRESS_SCOPE_EMPTY)
+#     * named profile: e.g. docs-prose-only (user-guides, runbook, state-archive, handoffs/archive)
+#     * raw globs: e.g. docs/user-guides/**/*.md,handoffs/archive/*.md (forward slashes only)
+#     * hybrid: profile:docs-prose-only;globs:handoffs/archive/*.md
+#   Mutation requires COMPRESS_INPUT=1 + non-empty scope + CLI --write; use --dry-run first.
+#   Originals land in docs/.caveman-originals/<path>; deny-list always wins over allow.
 CAVEMAN_MODE=0
 CAVEMAN_LEVEL=
 CAVEMAN_COMPRESS_INPUT=0

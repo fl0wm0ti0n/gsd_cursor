@@ -71,19 +71,95 @@ Operators must follow the runbook recipe
 `stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
 `pause_request`, `loop_max`, `error`, `blocked`.
 
+## Native in-chat auto-chain (US-0095 / DEC-0080)
+
+When **`AUTO_FLOW_MODE=full_autonomy`** runs in **Cursor IDE**, the orchestrator
+**self-chains in-chat** across intersected lifecycle phases and backlog-drain
+segment boundaries via a **foreground sequential** Task/subagent loop in the
+**same /auto orchestrator session** — without mandatory outer driver or manual
+re-invocation between segments.
+
+### Activation gate
+
+| # | Condition |
+|---|-----------|
+| 1 | Merged scratchpad **`AUTO_FLOW_MODE=full_autonomy`** (exact literal) |
+| 2 | Invocation context = **Cursor IDE** (default Agent panel `/auto` without `--invoke-cmd`) |
+| 3 | Task tool available for foreground subagent spawn |
+
+Set **`native_chain_active=true`** in `state.md` phase boundary when all hold.
+
+### Continuation loop (reference Step 5 — IDE primary)
+
+1. Resolve next `phase_id` from intersected schedule or drain-advance target.
+2. **US-0069** preflight (role matrix + capability gate).
+3. **Spawn fresh subagent** (Task tool, foreground — blocks until done).
+4. Verify isolation evidence + **DEC-0038** strict-proof tuple in `state.md`.
+5. Increment **`outer_cycle_index`**; check **`AUTO_LOOP_MAX_CYCLES`**.
+6. Branch stop matrix → continue spawn, drain-advance, block-retry, or hard stop.
+
+**Loop invariants** (spawn-only — **BUG-0006** unchanged):
+
+1. Orchestrator **must not** stop after one phase or one story segment solely due to Cursor turn boundaries when continuation is schedulable.
+2. Each phase completes only via **fresh subagent spawn** + artifacts — orchestrator **must not** execute phase-role work in-band (**`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** forbidden).
+3. **`stop_reason=completed (segment exhausted)`** is **invalid** when next phase, drain target, or relaxable retry is schedulable.
+
+Preflight/post checks per **US-0069** / **DEC-0051** at every boundary.
+
+### Fail-closed: `NATIVE_CHAIN_UNAVAILABLE`
+
+Emit when Task tool denied, spawn depth limit hit, or IDE context cannot schedule foreground subagent. Hard stop for native path. Optional fallback hint only: `python scripts/auto_outer_driver.py --repo .` (**optional** / **fallback** for headless/CI). **Non-suppressible** under **`AUTO_QUIET=1`**.
+
+### IDE drain-advance-without-pause
+
+Deterministic **7-step** algorithm when **`full_autonomy`** + drain policy active (**`AUTO_BACKLOG_DRAIN=1`** or bug-queue per **US-0087** mutex).
+
+**Trigger** (all required): `stop_phase=refresh-context`; `stop_reason=completed`; drain enabled; budget remaining.
+
+| Step | Action |
+|------|--------|
+| **1** | **READ** latest phase-boundary block in `docs/engineering/state.md` |
+| **2** | **ASSERT** **DEC-0069** pairing — completed phase refreshed **`resume_brief`** + **`state.md`**; stale → **`RESUME_BRIEF_STALE`** (fail-closed, no advance) |
+| **3** | **SELECT** next work item (story or bug per drain mutex) |
+| **4** | **RELOAD** scratchpad; **MATERIALIZE** `resolved_phase_plan` (**US-0070**) |
+| **5** | **PREPEND** `handoffs/resume_brief.md` with segment pointers |
+| **6** | **APPEND** `state.md` materialization breadcrumb for new segment |
+| **7** | **IMMEDIATELY** spawn first phase subagent — **without operator re-`/auto`**, **no** mandatory outer-driver instruction |
+
+**DEC-0069 pairing mandate**: every phase boundary and drain advance **must** refresh **`resume_brief`** + **`state.md`** before scheduling in-chat continuation. Stale brief → **`RESUME_BRIEF_STALE`** fail-closed (no advance).
+
+### Native-chain stop matrix (US-0095)
+
+Native chain **does not weaken** **DEC-0078** hard gates. Hard stops (no relaxation): **`decision_gate`**, isolation/strict-proof violations, security deny, **`BACKLOG_MAX_STORIES_REACHED`**, **`AUTO_LOOP_MAX_CYCLES`**, unrecoverable **`error`**, **`pause_request`**. Relaxable transient stops per **DEC-0078** when configured.
+
+### `AUTO_QUIET` under native chain (US-0095)
+
+| Event | `AUTO_QUIET=0` | `AUTO_QUIET=1` |
+|-------|----------------|----------------|
+| Routine phase PASS | May notify | **Suppress** |
+| In-chat phase continuation | Compact breadcrumb OK | **Suppress** |
+| Drain advance | Segment notify OK | **Suppress** routine prose; **no** outer-driver wait |
+| Gates, caps, errors, **`NATIVE_CHAIN_UNAVAILABLE`** | **Always** | **Always** |
+
+**Forbidden** in IDE-primary `full_autonomy` prose: mandatory `run the outer driver`; `re-run /auto` between drain segments; `segment exhausted` as terminal when continuation pending; unqualified `python scripts/auto_outer_driver.py`.
+
+Full detail: **`docs/engineering/auto-orchestration-reference.md`**.
+
 ## Full-autonomy mode + outer driver (US-0092 / DEC-0078)
 
-**`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) enables the shipped
-stdlib outer driver **`scripts/auto_outer_driver.py`**. The driver **loops hook
-invocations** — spawn-only preserved (**BUG-0006**); it never performs phase-role work.
+**`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) enables hands-off
+orchestration. **IDE primary path** (US-0095): run **`/auto` once in Cursor** —
+native in-chat auto-chain above. **Optional fallback**: stdlib outer driver
+**`scripts/auto_outer_driver.py`** for headless/CI or when **`NATIVE_CHAIN_UNAVAILABLE`**.
 
-Operator recipe: set scratchpad keys → run
+The driver **loops hook invocations** — spawn-only preserved (**BUG-0006**); it
+never performs phase-role work. Headless/CI recipe: set scratchpad keys → run
 `python scripts/auto_outer_driver.py --repo .` once → interpret exit table in
-**`docs/engineering/runbook.md`** § **Full-autonomy outer driver (US-0092)**.
+**`docs/engineering/runbook.md`** § **Full-autonomy outer driver (US-0092)** (**fallback**).
 
 **Drain-advance-without-pause**: with **`full_autonomy`** + **`AUTO_BACKLOG_DRAIN=1`**
 (or bug-queue policy), segment completion schedules the next OPEN story/bug
-**immediately** without operator re-`/auto`; **`resume_brief`** +
+**immediately** **without operator re-`/auto`**; **`resume_brief`** +
 **`state.md`** refresh per **DEC-0069** at every boundary.
 
 ### Full-autonomy stop matrix (US-0092)

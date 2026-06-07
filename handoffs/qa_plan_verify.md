@@ -1,5 +1,93 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0084` / `US-0095`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0084/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-07T20:30:00Z`, **qa**, `orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=qa-S0084-US0095-plan-verify-20260607T203000Z-fresh`); **AC-1..AC-10** map **1:1** to **T-001..T-010** with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0095`**, **`R-0081`**, **DEC-0080** (binding), **DEC-0078** (composed, not rewritten), **DEC-0069**, **BUG-0006**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — native in-chat auto-chain § + reference Step 5 IDE-primary path literals (`Native in-chat auto-chain`, `foreground sequential`, `NATIVE_CHAIN_UNAVAILABLE`).
+  - **AC-2 / T-002**: PASS — 7-step IDE drain-advance algorithm + literals (`drain-advance-without-pause`, `immediately`, `without operator re-`/auto``).
+  - **AC-3 / T-003**: PASS — spawn-only invariants + BUG-0006 regression guard; US-0069 preflight/post references.
+  - **AC-4 / T-004**: PASS — stop matrix hard gates unchanged (`decision_gate`, isolation/strict-proof, caps, `pause_request`).
+  - **AC-5 / T-005**: PASS — runbook + README outer-driver demotion to optional/fallback; no mandatory outer-driver IDE prose.
+  - **AC-6 / T-006**: PASS — AUTO_QUIET suppression table + forbidden grep patterns for IDE-primary sections.
+  - **AC-7 / T-007**: PASS — DEC-0069 pairing mandate; `RESUME_BRIEF_STALE` fail-closed before in-chat continuation.
+  - **AC-8 / T-008**: PASS — six `test_us0095_*` contract subtests (`pytest -k us0095`).
+  - **AC-9 / T-009**: PASS — template parity 8-surface inventory + `test_us0095_template_parity_auto_surfaces`.
+  - **AC-10 / T-010**: PASS — unified cap/ledger breadcrumbs (`native_chain_active`, `outer_cycle_index`, `implementation_loop_index`) + security deny-list unchanged.
+- **Non-goals confirmed**: no decision-gate removal; no spawn-only weakening; no outer-driver deletion; no auto-read `.env` / intake mutation / auto-publish; documentation + contract-test scope only; no implementation in plan-verify phase.
+- **Artifacts**: **`sprints/S0084/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0095`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`handoffs/tl_to_dev.md`**, **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260607-02-plan-verify-qa-20260607T203000Z-S0084-US0095`**, **`proof_hash=5af5af7dd01dac507562583fb6cbd6bef3b5a75d8a8e4720eb82fb7b72092a41`**, **`proof_issued_at=2026-06-07T20:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260607-02-sprint-plan-tech-lead-20260607T200000Z-S0084-US0095`**, **`proof_hash=88e67cca34c4a7ad46f74c61c04c2c29a7c80a9558851945817cce83c5780edf`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0095` + **DEC-0080** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0095`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0084`** / **`US-0095`**.
+
+## Next — **`S0084` / `US-0095`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0084/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-07T20:00:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=tl-S0084-US0095-sprint-plan-20260607T200000Z-fresh`); **AC-1..AC-10** mapped **1:1** to **T-001..T-010**; plan integrity pre-check (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0095`**, **`R-0081`**, **`DEC-0080`**, **DEC-0078** (composed, not rewritten), **BUG-0006**, **DEC-0069**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001**: Native in-chat auto-chain § + reference Step 5 IDE-primary.
+  - **AC-2 / T-002**: 7-step IDE drain-advance algorithm + literals.
+  - **AC-3 / T-003**: Spawn-only invariants + BUG-0006 regression guard.
+  - **AC-4 / T-004**: Stop matrix hard gates unchanged.
+  - **AC-5 / T-005**: Runbook + README outer-driver demotion.
+  - **AC-6 / T-006**: AUTO_QUIET suppression table + forbidden patterns.
+  - **AC-7 / T-007**: DEC-0069 pairing mandate before continuation.
+  - **AC-8 / T-008**: Six `test_us0095_*` contract subtests.
+  - **AC-9 / T-009**: Template parity (8-surface inventory).
+  - **AC-10 / T-010**: Cap/ledger breadcrumbs + security deny-list.
+- **Non-goals to confirm**: no decision-gate removal; no spawn-only weakening; no outer-driver deletion; no auto-read `.env` / intake mutation / auto-publish; documentation + contract-test scope only.
+- **Artifacts**: **`sprints/S0084/sprint.md`**, **`sprints/S0084/tasks.md`**, **`sprints/S0084/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`** (S0084 handoff), **`docs/product/backlog.md`** (**`## US-0095`** `sprint_plan_notes`), **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260607-02-sprint-plan-tech-lead-20260607T200000Z-S0084-US0095`**, **`proof_hash=88e67cca34c4a7ad46f74c61c04c2c29a7c80a9558851945817cce83c5780edf`**, **`proof_issued_at=2026-06-07T20:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=sprint-plan`**, **`role=tech-lead`**.
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260607-02-architecture-tech-lead-20260607T193000Z-US0095`**, **`proof_hash=ff1b750771d57ce7f753d85f6536b3a3aca19c2be595ddbe059c04a9b44626ad`**.
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0095` + **DEC-0080** contracts.
+- **Canonical status**: **`US-0095`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0084`** / **`US-0095`**.
+
+## Next — **`S0083` / `US-0094`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0083/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-07T14:00:00Z`, **qa**, `orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=qa-S0083-US0094-plan-verify-20260607T140000Z-fresh`); **AC-1..AC-10** map **1:1** to **T-001..T-010** with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0094`**, **`R-0080`**, **DEC-0074** (composed, not amended), **DEC-0059**, **US-0017**, **DEC-0078**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — pre-`## Features` intro (3 ¶, 120–210 soft / 240 hard max, discovery-locked semantics).
+  - **AC-2 / T-002**: PASS — four pillar `###` titles with 3–6 id-free teaser bullets under Features.
+  - **AC-3 / T-003**: PASS — deep body sections preserved below new hierarchy; no silent deletion.
+  - **AC-4 / T-004**: PASS — `validate_readme_feature_coverage.py --report` → `coverage_missing=[]`, `coverage_total=104`.
+  - **AC-5 / T-005**: PASS — root/template README byte-identical copy + identity check (**US-0017**).
+  - **AC-6 / T-006**: PASS — `validate_doc_profile.py` pass; no new `##` H2 literals (**DEC-0059**).
+  - **AC-7 / T-007**: PASS — `check-user-visible-metadata.py` pass on changed README paths (**US-0071**).
+  - **AC-8 / T-008**: PASS — full-autonomy placement audit (intro ¶3 primary + P1 secondary + catalog tertiary; **DEC-0078**).
+  - **AC-9 / T-009**: PASS — US-0017 template-drift + readme-feature-coverage contract tests green.
+  - **AC-10 / T-010**: PASS — `docs/developer/README.md` body unchanged; optional ≤1-sentence intro cross-link only.
+- **Non-goals confirmed**: no **DEC-0074** amendment; no new H2 literals; no catalog cross-H2 moves; no new scripts; no DEV shard body edits; documentation-only scope; no README edits in plan-verify phase.
+- **Artifacts**: **`sprints/S0083/plan-verify.json`** (PASS update), **`sprints/S0083/summary.md`** (plan-verify checkpoint), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0094`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`handoffs/tl_to_dev.md`**, **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260607-01-plan-verify-qa-20260607T140000Z-S0083-US0094`**, **`proof_hash=8b108930ed723d9406bd09a0288892761342ea7fa86bdd990a06531bb7abcf5f`**, **`proof_issued_at=2026-06-07T14:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260607-01-sprint-plan-tech-lead-20260607T133000Z-S0083-US0094`**, **`proof_hash=db8ff920147b25d12d822d32ee21b3695c12ffe0139975502d2daa0822d23efa`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0094` contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0094`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0083`** / **`US-0094`**.
+
+## Next — **`S0083` / `US-0094`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0083/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-07T13:30:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=tl-S0083-US0094-sprint-plan-20260607T133000Z-fresh`); **AC-1..AC-10** mapped **1:1** to **T-001..T-010**; plan integrity pre-check (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0094`**, **`R-0080`**, **DEC-0074** (composed, not amended), **DEC-0059**, **US-0017**, **DEC-0078**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001**: Pre-`## Features` intro (3 ¶, word budget).
+  - **AC-2 / T-002**: Four pillar `###` sections with id-free teaser bullets.
+  - **AC-3 / T-003**: Deep body sections preserved.
+  - **AC-4 / T-004**: Coverage `--report` → zero gaps.
+  - **AC-5 / T-005**: Root/template byte parity (**US-0017**).
+  - **AC-6 / T-006**: `validate_doc_profile.py` pass.
+  - **AC-7 / T-007**: `check-user-visible-metadata.py` pass.
+  - **AC-8 / T-008**: Full-autonomy placement audit (**DEC-0078**).
+  - **AC-9 / T-009**: Regression contract tests green.
+  - **AC-10 / T-010**: DEV shard unchanged.
+- **Non-goals to confirm**: no **DEC-0074** amendment; no new H2 literals; no catalog cross-H2 moves; no new scripts; no DEV shard body edits; documentation-only scope.
+- **Artifacts**: **`sprints/S0083/sprint.md`**, **`sprints/S0083/tasks.md`**, **`sprints/S0083/plan-verify.json`** (PENDING), **`sprints/S0083/summary.md`**, **`handoffs/tl_to_dev.md`** (S0083 handoff), **`docs/product/backlog.md`** (**`## US-0094`** `sprint_plan_notes`), **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260607-01-sprint-plan-tech-lead-20260607T133000Z-S0083-US0094`**, **`proof_hash=db8ff920147b25d12d822d32ee21b3695c12ffe0139975502d2daa0822d23efa`**, **`proof_issued_at=2026-06-07T13:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=sprint-plan`**, **`role=tech-lead`**.
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260607-01-architecture-tech-lead-20260607T130000Z-US0094`**.
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0094` contracts.
+- **Canonical status**: **`US-0094`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0083`** / **`US-0094`**.
+
 ## Next — **`S0082` / `US-0093`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0082/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-07T00:15:00Z`, **qa**, `orchestrator_run_id=auto-20260606-04`, `fresh_context_marker=qa-S0082-US0093-plan-verify-20260607T001500Z-fresh`); **AC-1..AC-10** map **1:1** to **T-001..T-010** with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`DEC-0079`** (§1–§11), **`docs/engineering/architecture.md`** **`# US-0093`**, **`R-0079`**, **DEC-0078** (forward-link, not rewritten), **US-0065**/**US-0066** (evidence mirror), **US-0017** (template parity), **BUG-0006** (spawn-only preserved). **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.

@@ -2,38 +2,78 @@
 
 [GitHub Repository](https://github.com/fl0wm0ti0n/its-magic)
 
-Happy coding! Build something awesome.
+You bring the idea; its-magic is your structured **AI dev team** in Cursor — PO, Tech
+Lead, Dev, QA, Release, and Curator — that turns ideas into shipped software through
+explicit phases and handoff artifacts.
 
-Drop-in template repo that implements a structured its-magic workflow in Cursor:
-intake -> discovery -> architecture -> sprint plan -> execute -> QA -> release,
-with pause/resume, decision gates, and persistent artifacts.
+State lives in repo files (`docs/product`, `handoffs`, `sprints`, `decisions`) — not
+chat-only memory. Run `/intake` with your idea, then follow intake → discovery →
+architecture → sprint plan → execute → QA → release; pause/resume and decision gates
+keep you in control when you want to steer. Implementers: see `docs/developer/README.md`
+for the DEV shard.
+
+When you want hands-off delivery, enable **`AUTO_FLOW_MODE=full_autonomy`**
+(default-off), run **`/auto` once in Cursor**, and let the native in-chat auto-chain
+drain your backlog — self-verify UAT, bounded block retry, and advance to the next OPEN
+story or bug without re-invoking each phase manually. The outer driver is **optional**
+(**fallback** for headless/CI or when native chain is unavailable). Guided and
+decision-gated modes remain the default.
 
 ## Features (what its-magic can do)
 
-- Structured phase workflow with explicit artifacts.
-- Artifact-first memory (state in files, not chat only).
-- Decision gate + escalation (`decisions/DEC-xxxx.md`).
-- Pause/resume with checkpoints (`handoffs/resume_brief.md`).
-- Automated execute/QA loop with safety caps (optional).
-- 3-layer quality chain: AI loop → local validate-and-push → CI auto-fix.
-- User-visible metadata guard for operator-facing scripts/CLI (`US-0071` / `DEC-0053`):
-  `python scripts/check-user-visible-metadata.py` (see `docs/engineering/runbook.md`).
-- CI/CD templates driven by `docs/engineering/runbook.md`.
-- Team-friendly local overrides (`scratchpad.local.md`).
-- Optional remote/docker execution and autonomous installs.
-- Built-in benchmarks (live, prompted, headless).
-- Multiplatform distribution (npm, Chocolatey, Homebrew).
+### Autonomous AI workflow
+
+- Run `/intake` through `/release` with explicit phase handoffs and fresh subagent contexts.
+- Use `/pause` and `/resume` with checkpoints when you want to steer; escalate blocking
+  choices to `decisions/DEC-xxxx.md`.
+- Enable **`AUTO_FLOW_MODE=full_autonomy`** (default-off), run **`/auto` once in Cursor**,
+  and drain backlog in-chat; outer driver is **optional** / **fallback** for headless/CI.
+- Team mode routes work across PO, Tech Lead, Dev, QA, Release, and Curator roles.
+- Backlog and bug drain advance OPEN items without re-invoking each phase manually.
+- See the catalog in **Commands and workflow** for phase commands and orchestration details.
+
+### Quality & verification gates
+
+- 3-layer quality chain: AI execute/QA loop → local `validate-and-push` → CI auto-fix.
+- Phase gates include `/plan-verify`, `/qa`, `/verify-work`, and `/uat` with fail-closed stops.
+- `/acceptance` blocks README ↔ backlog drift; user-visible metadata guard on operator scripts.
+- Browser UAT probes with structured fallback when live browser checks are unavailable.
+- Release gates enforce coverage, parity, and evidence before publish.
+- See the catalog in **Features** (`/acceptance`) and **Commands and workflow** for gate commands.
+
+### Distribution & install
+
+- Global install via npm, npx, Chocolatey, or Homebrew; apply to any repo with
+  `its-magic --target`.
+- Modes: `missing` (safe merge), `overwrite` (+ `--backup`), `upgrade` (framework only),
+  and `--clean-repo`.
+- Lifecycle QA matrix validates fresh install, upgrade, backup, and clean-repo paths.
+- Multi-target release publish with confirmation gates for npm/choco/brew.
+- See the **Feature coverage catalog** below for distribution-tagged items.
+
+### Operator control & ergonomics
+
+- Scratchpad flags and `scratchpad.local.md` tune behavior without rewriting framework files.
+- Guided intake packs structure your first `/intake` conversation.
+- Caveman voice mode and optional input compression for terse operator UX.
+- `TOKEN_PROFILE` cost profiles slim context packs without changing workflow semantics.
+- Voice input shortcuts and permissions/runtime connectivity for remote execution.
+- See the catalog in **Other useful capabilities** for scratchpad and governance flags.
 
 <!-- readme-feature-coverage-catalog -->
 
 ### Feature coverage catalog (US-0091)
 
+- `/acceptance` — README ↔ backlog/acceptance feature coverage backfill + blocking drift gate (`US-0091`).
+- `README.md` — Visionary intro + tiered feature hierarchy (autonomous AI dev team positioning, root/template parity) (`US-0094`).
+- `/auto` — Native in-chat auto-chain + full-autonomy mode (`US-0095`, `US-0092`).
 - `/bin` — POSIX npm installer + Linux remote test targets (WSL / SSH / Docker) (`US-0084`).
 - `/choco` — Configurable Multi-Target Release Publish with Confirmation Gate (`US-0054`).
 - `/devops` — First-Class Bug Issue Workflow (Open/Closed) (`US-0079`).
 - `/engineering` — Agent-Driven Codebase Map Bootstrap (`US-0082`).
 - `/engineering` — Remote Runtime Connectivity Contract for QA/Release/Publish (`US-0064`).
 - `/install` — Template/install payload omits intake gate scripts (`BUG-0001`).
+- `/installed` — its-magic ships its OWN packaging CI into generated repos, breaking CI in every created project (`BUG-0009`).
 - `/intake` — Optional Caveman-style input compression (safe file scope) (`US-0090`).
 - `/lint` — CI/CD Workflows (`US-0007`).
 - `/or` — Cursor Caveman mode (scratchpad-configurable terse responses) (`US-0089`).
@@ -1140,6 +1180,7 @@ workflow stops and points you to `scripts/validate-and-push` for local fixing.
 - `/acceptance` — Mandatory Intake Question Packs for First and Small Intakes (`US-0068`).
 - `/ask` — /ask Command: Context-Aware Questions Without Workflow (`US-0020`).
 - `/ask` — Context Compaction and Tiered Token-Cost Optimization Mode (`US-0053`).
+- `/auto` — Architecture triad archiver ignores `## US-xxxx` headings, blocking `/auto` with `STATE_ARCHIVE_BOUNDARY_AMBIGUOUS` (`BUG-0010`).
 - `/auto` — Configurable Auto Phase Selection Policy (`US-0070`).
 - `/auto` — Continuous `/auto` Backlog-Drain Mode with Fine-Tune Switches (`US-0044`).
 - `/auto` — Fresh Subagent Context Per Phase and /auto Orchestration (`US-0023`).
@@ -1184,6 +1225,7 @@ workflow stops and points you to `scripts/validate-and-push` for local fixing.
 - `/repetitive` — Delegable Intake Clarification Without Hard Blocks (`US-0083`).
 - `/research` — Knowledge Curation & Early Research (`US-0029`).
 - `/risk` — Intelligent Intake Decomposition and Risk-Aware PO Questioning (`US-0051`).
+- `/scratchpad` — Caveman mode missing voice compression rules (US-0089 incomplete delivery) (`BUG-0011`).
 - `/scratchpad` — Executable Scratchpad-Driven Sync and Auto-Push Wiring (`US-0076`).
 - `/scratchpad` — Scratchpad Delivery Simplification (Example-Only Install Policy) (`US-0073`).
 - `/scratchpad` — Upgrade Scratchpad Example–First Refresh (Fix Example Drift vs Materialized Baseline) (`US-0075`).
@@ -1191,6 +1233,7 @@ workflow stops and points you to `scripts/validate-and-push` for local fixing.
 - `/sprint-plan` — Explicit `/sprint-plan --bulk` Mode (`US-0046`).
 - `/sprint-plan` — Sprint Sizing Rules and Configurable Sprint Planning (`US-0022`).
 - `/story` — Optional Feature User Guide Generation (`US-0032`).
+- `/uat` — Cursor browser-integrated UAT self-test (browser_smoke + automatable manual UI) (`US-0093`).
 - `/uat` — UAT Artifact Lifecycle and Ownership (`US-0027`).
 - `SKILL` scratchpad flag — Skill and Templates (`US-0004`).
 - `US-0001` scratchpad flag — Core Workflow Commands (`US-0001`).

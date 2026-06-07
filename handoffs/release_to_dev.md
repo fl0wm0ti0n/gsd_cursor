@@ -1,3 +1,39 @@
+# Release → Dev Handoff — Sprint S0083 (US-0094) — **BLOCKED**
+
+## Status
+
+- Result: **BLOCKED** (`2026-06-07T16:00:00Z`)
+- Sprint: `S0083`
+- Story: `US-0094`
+
+## Blocking reason (active)
+
+- Primary reason codes: **`RELEASE_UAT_INCOMPLETE`**, **`PHASE_CONTEXT_ISOLATION_MISSING`** (verify-work), **`RUNTIME_PROOF_MISSING`** (verify-work)
+- Summary: Mandatory **`/release`** gates failed closed — **`/verify-work`** has not run; UAT artifacts (`sprints/S0083/uat.json`, `sprints/S0083/uat.md`) are still **placeholder** (`steps=[]`, `total=0`). QA **PASS** is not sufficient for release. **`US-0094`** remains **OPEN** (**US-0045**).
+
+## Evidence refs
+
+- `sprints/S0083/release-findings.md`
+- `sprints/S0083/uat.json`, `sprints/S0083/uat.md` (placeholder)
+- `sprints/S0083/qa-findings.md` (PASS)
+- `handoffs/qa_to_verify_work.md`
+- `handoffs/resume_brief.md` (`intended_resume_phase=verify-work`)
+- `docs/engineering/state.md` (post-qa checkpoint; no verify-work isolation)
+
+## Required remediation
+
+1. Run **`/verify-work`** (fresh **qa**) for **`S0083`** / **`US-0094`** — populate UAT with AC-1..AC-10 steps/results; independent re-run of coverage/doc-profile/metadata/parity gates.
+2. On verify-work **PASS**: set `handoffs/release_queue.md` **S0083** → **`ready`**; spawn **`/release`** (fresh **release**).
+3. Do **not** advance backlog status or acceptance row until release gate chain **PASS**.
+
+## Re-run criteria
+
+- `sprints/S0083/uat.json` populated with `passed + failed = total` and no unresolved fail.
+- `docs/engineering/state.md` contains verify-work isolation + strict-proof tuples for `auto-20260607-01`.
+- `sprints/S0083/release-findings.md` shows **PASS** and queue **S0083** may transition **`blocked` → `ready` → `released`**.
+
+---
+
 # Release -> Dev Handoff — Sprint S0070 (BUG-0008) — **BLOCKED**
 
 ## Status
@@ -38,31 +74,3 @@
 ## Status
 
 - Result: RESOLVED
-- Sprint: `S0013`
-- Story: `US-0041`
-
-## Blocking reason (resolved)
-
-- Primary reason code: `RELEASE_TEST_FAILED`
-- Summary: Mandatory baseline test gate failed before release finalization; issue
-  is now remediated and release finalization completed.
-
-## Evidence refs
-
-- `sprints/S0013/release-findings.md`
-- `handoffs/release_queue.md`
-- `tests/report.md`
-- `sprints/S0013/qa-findings.md`
-- `sprints/S0013/uat.json`
-
-## Required remediation
-
-1. Baseline blockers were fixed (`remote.json` schema and validate-and-push
-   text-contract checks).
-2. Mandatory suite rerun is green (`tests/report.md`: `Pass=165`, `Fail=0`).
-
-## Re-run criteria
-
-- `sprints/S0013/release-findings.md` updated to PASS.
-- Queue row is `released` in `handoffs/release_queue.md`.
-- Canonical release notes: `handoffs/releases/S0013-release-notes.md`.

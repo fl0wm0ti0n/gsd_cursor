@@ -13,10 +13,32 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0082`
-- **Latest canonical notes:** `handoffs/releases/S0082-release-notes.md`
+- **Latest released sprint:** `S0084`
+- **Latest canonical notes:** `handoffs/releases/S0084-release-notes.md`
 - **Latest release date:** 2026-06-07
-- **Latest release work item:** US-0093
+- **Latest release work item:** US-0095
+
+## Release finalized note (S0084)
+
+- Sprint: `S0084`
+- Story: `US-0095` (Native in-Cursor `/auto` auto-chaining — DEC-0080 / R-0081)
+- Release: **finalized** (`2026-06-07T23:30:00Z`, `orchestrator_run_id=auto-20260607-02`, strict proof `proof_hash=423dead28ffb878335ae77568a29c357fffc185859bf3d2fb98dd23f4fe3202d`)
+- Queue: **`handoffs/release_queue.md`** row **`S0084`** = **`released`**
+- **Run / verify:** `pytest -k us0095 tests/auto_command_contract_test.py -v` → 7 passed; `python scripts/check_intake_template_parity.py --scope=us-0095` → `[INTAKE_TEMPLATE_PARITY_OK]`; see **`handoffs/releases/S0084-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **9** remaining
+
+## Release finalized note (S0083)
+
+- Sprint: `S0083`
+- Story: `US-0094` (README visionary intro + tiered feature hierarchy — R-0080)
+- Release: **finalized** (`2026-06-07T16:30:00Z`, `orchestrator_run_id=auto-20260607-01`, strict proof `proof_hash=1a245b9025a2d1acf19f5993e4ac7febfb8abc5c1bd75ad88a18e296c7c4dd00`)
+- Queue: **`handoffs/release_queue.md`** row **`S0083`** = **`released`**
+- **Run / verify:** `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]`; `coverage_missing=[]`, `coverage_total=104`; see **`handoffs/releases/S0083-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`ALLOW_AUTO_PUSH=1`**, **branch=main**, **`push_decision=blocked`**, **`reason_code=TEST_FAILED`** (14 pre-existing disjoint harness failures)
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories
 
 ## Release finalized note (S0082)
 
@@ -277,16 +299,16 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0075`**: refer to `## Run` in
-  `handoffs/releases/S0075-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0084`**: refer to `## Run` in
+  `handoffs/releases/S0084-release-notes.md`.
 - **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0075-release-notes.md`.
+  `handoffs/releases/S0084-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0075-release-notes.md`.
+  `handoffs/releases/S0084-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0075-release-notes.md` (env-ref only).
+  `handoffs/releases/S0084-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0075-release-notes.md`.
+  `handoffs/releases/S0084-release-notes.md`.
 
 ## Historical references
 

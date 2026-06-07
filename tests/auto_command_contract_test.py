@@ -1544,6 +1544,143 @@ class AutoCommandContractTest(unittest.TestCase):
         self.assertIn("--merge-result", text)
         self.assertIn("execution_tier", text)
 
+    # --- US-0095: native in-chat auto-chain, drain-advance, outer-driver demotion ---
+
+    def test_us0095_native_in_chat_auto_chain_markers(self) -> None:
+        """US-0095 / AC-1: native in-chat auto-chain literals in auto + reference."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for token in (
+                    "Native in-chat auto-chain",
+                    "foreground sequential",
+                    "same /auto orchestrator session",
+                    "NATIVE_CHAIN_UNAVAILABLE",
+                    "native_chain_active",
+                ):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0095_ide_drain_advance_without_outer_driver(self) -> None:
+        """US-0095 / AC-2: drain-advance literals; no mandatory outer driver in IDE-primary."""
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        for token in (
+            "drain-advance-without-pause",
+            "immediately",
+            "without operator re-`/auto`",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, auto)
+                self.assertIn(token, ref)
+        native_start = auto.find("## Native in-chat auto-chain (US-0095")
+        forbidden_marker = auto.find(
+            "**Forbidden** in IDE-primary", native_start
+        )
+        native_normative = auto[
+            native_start : forbidden_marker if forbidden_marker != -1 else native_start + 4000
+        ]
+        self.assertNotIn("run the outer driver", native_normative.lower())
+
+    def test_us0095_outer_driver_fallback_not_mandatory_ide(self) -> None:
+        """US-0095 / AC-5: optional/fallback outer-driver labeling in README + runbook."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in ("README.md", "docs/engineering/runbook.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("optional", text.lower())
+                self.assertIn("fallback", text.lower())
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("### Native in-chat auto-chain (US-0095)", runbook)
+        self.assertIn("fallback", runbook[runbook.find("Full-autonomy outer driver") :])
+
+    def test_us0095_spawn_only_regression(self) -> None:
+        """US-0095 / AC-3: BUG-0006 spawn-only invariants; no forbidden in-band patterns."""
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        native_start = auto.find("## Native in-chat auto-chain (US-0095")
+        native_end = auto.find("## Full-autonomy mode + outer driver")
+        native_section = auto[native_start:native_end]
+        for token in (
+            "Spawn fresh subagent",
+            "must not",
+            "AUTO_ORCHESTRATOR_PHASE_EXECUTION",
+            "US-0069",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, native_section)
+        forbidden = (
+            "orchestrator executes phase",
+            "in-band phase execution",
+            "orchestrator authors phase deliverables",
+        )
+        for pattern in forbidden:
+            with self.subTest(forbidden=pattern):
+                self.assertNotIn(pattern.lower(), native_section.lower())
+
+    def test_us0095_auto_quiet_no_outer_driver_mandatory(self) -> None:
+        """US-0095 / AC-6: AUTO_QUIET suppression table; gates non-suppressible."""
+        root = Path(__file__).resolve().parents[1]
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        quiet_start = ref.find("### `AUTO_QUIET` under native chain (US-0095)")
+        self.assertNotEqual(quiet_start, -1)
+        quiet_section = ref[quiet_start : quiet_start + 1200]
+        self.assertIn("AUTO_QUIET=1", quiet_section)
+        self.assertIn("NATIVE_CHAIN_UNAVAILABLE", quiet_section)
+        self.assertIn("run the outer driver", quiet_section)
+
+    def test_us0095_resume_brief_pairing_markers(self) -> None:
+        """US-0095 / AC-7: DEC-0069 pairing before in-chat continuation."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("DEC-0069", text)
+                self.assertIn("resume_brief", text)
+                self.assertIn("RESUME_BRIEF_STALE", text)
+                self.assertIn("state.md", text)
+
+    def test_us0095_template_parity_auto_surfaces(self) -> None:
+        """US-0095 / AC-9: active/template byte-identical for touched surfaces."""
+        root = Path(__file__).resolve().parents[1]
+        pairs = (
+            (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+            (
+                "docs/engineering/auto-orchestration-reference.md",
+                "template/docs/engineering/auto-orchestration-reference.md",
+            ),
+            (
+                "docs/engineering/runbook.md",
+                "template/docs/engineering/runbook.md",
+            ),
+            ("README.md", "template/README.md"),
+        )
+        for active_rel, template_rel in pairs:
+            with self.subTest(pair=active_rel):
+                active = root / active_rel
+                template = root / template_rel
+                self.assertTrue(active.is_file(), f"missing {active_rel}")
+                self.assertTrue(template.is_file(), f"missing {template_rel}")
+                self.assertEqual(
+                    active.read_bytes(),
+                    template.read_bytes(),
+                    f"parity mismatch: {active_rel}",
+                )
+
     def test_us0093_architecture_linkage(self) -> None:
         """US-0093 / AC-10: architecture # US-0093 + DEC-0079 compose-on linkage."""
         root = Path(__file__).resolve().parents[1]

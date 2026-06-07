@@ -24,6 +24,28 @@ with pause/resume, decision gates, and persistent artifacts.
 - Built-in benchmarks (live, prompted, headless).
 - Multiplatform distribution (npm, Chocolatey, Homebrew).
 
+<!-- readme-feature-coverage-catalog -->
+
+### Feature coverage catalog (US-0091)
+
+- `/bin` — POSIX npm installer + Linux remote test targets (WSL / SSH / Docker) (`US-0084`).
+- `/choco` — Configurable Multi-Target Release Publish with Confirmation Gate (`US-0054`).
+- `/devops` — First-Class Bug Issue Workflow (Open/Closed) (`US-0079`).
+- `/engineering` — Agent-Driven Codebase Map Bootstrap (`US-0082`).
+- `/engineering` — Remote Runtime Connectivity Contract for QA/Release/Publish (`US-0064`).
+- `/install` — Template/install payload omits intake gate scripts (`BUG-0001`).
+- `/intake` — Optional Caveman-style input compression (safe file scope) (`US-0090`).
+- `/lint` — CI/CD Workflows (`US-0007`).
+- `/or` — Cursor Caveman mode (scratchpad-configurable terse responses) (`US-0089`).
+- `/push` — Multiplatform Distribution (`US-0009`).
+- `/run-tests` — Baseline Regression Cleanup for Installer and Version Sync Checks (`US-0074`).
+- `/template` — End-to-End Lifecycle QA for `its-magic` Install/Upgrade/Clean (`US-0041`).
+- `/upgrade` — Missing scripts still occur on install modes missing/upgrade (`BUG-0003`).
+- `/usr` — Global Linux install fails: empty `install_include_paths` when manifest is CRLF (`BUG-0008`).
+- `/workdir` — installer.sh fails in shell path with `set: Illegal option -` (`BUG-0004`).
+- `MIGRATION` scratchpad flag — Smart Upgrade Mode (`US-0018`).
+- `US-0016` scratchpad flag — Homebrew Version Sync (`US-0016`).
+
 ## Setup
 
 its-magic is an installer you run once per repo. It copies the AI dev team
@@ -947,6 +969,12 @@ Troubleshooting quick guide:
   - Fix JSON syntax and retry.
 - Secret-like inline value detected:
   - Replace literal secret with an env-var reference field.
+- **CI still runs its-magic packaging jobs?** Your project received a pre-fix workflow.
+  Run **`its-magic --target <repo> --mode upgrade`** (or **`--mode clean`** then reinstall)
+  to refresh `.github/workflows/ci.yml` from the corrected template. After upgrade, GitHub
+  Actions should show only **`checks`** and **`auto-fix`** jobs — not `npm-test`,
+  `brew-test`, or `choco-test`. Fix applies to new installs/upgrades; stale repos heal on
+  next upgrade (**US-0018**).
 
 Team/local (recommended in `.cursor/scratchpad.local.md`):
 
@@ -1105,6 +1133,68 @@ push / PR  ──>  checks  ──>  PASS  ──>  done
 Auto-fix commits appear as `ci: auto-fix attempt N/3`. After 3 retries the
 workflow stops and points you to `scripts/validate-and-push` for local fixing.
 
+<!-- readme-feature-coverage-catalog -->
+
+### Feature coverage catalog (US-0091)
+
+- `/acceptance` — Mandatory Intake Question Packs for First and Small Intakes (`US-0068`).
+- `/ask` — /ask Command: Context-Aware Questions Without Workflow (`US-0020`).
+- `/ask` — Context Compaction and Tiered Token-Cost Optimization Mode (`US-0053`).
+- `/auto` — Configurable Auto Phase Selection Policy (`US-0070`).
+- `/auto` — Continuous `/auto` Backlog-Drain Mode with Fine-Tune Switches (`US-0044`).
+- `/auto` — Fresh Subagent Context Per Phase and /auto Orchestration (`US-0023`).
+- `/auto` — Mid-Process `/auto` Continuation with Deterministic Resume Point (`US-0037`).
+- `/auto` — Strict Phase Role Enforcement in /auto Orchestration (`US-0069`).
+- `/auto` — Strict Runtime Proof for Per-Phase Subagent Isolation (`US-0056`).
+- `/auto` — Token-Cost Hardening for Orchestrated Runs (`US-0080`).
+- `/auto` — `/auto` continuous multi-phase loop + quiet drain (close one-phase-stop gap) (`US-0088`).
+- `/auto` — `/auto` executes phases without spawning required subagents (`BUG-0006`).
+- `/auto` — `/auto` explicit bug targeting (fix all OPEN bugs / fix `BUG-####`) (`US-0087`).
+- `/auto` — `/auto` fails with stale resume target after bug intake (`BUG-0005`).
+- `/check` — Optional Documentation Pack (Design Concept, CRS, Technical Spec) (`US-0031`).
+- `/confirmation` — Enforced Interactive Intake Question Evidence (`US-0078`).
+- `/connectivity` — Release Operator Run/Connect/Verify Hints Contract (`US-0067`).
+- `/decision` — Optional Fresh-Project ID Namespace Bootstrap (`US-0052`).
+- `/derived` — Deterministic Status Reconciliation Command (`US-0055`).
+- `/developer-dense` — Documentation Audience Profiles and Dual README Strategy (`US-0077`).
+- `/docs` — Installer-Owned `its_magic/` Folder for Framework Metadata (`US-0062`).
+- `/engineering` — Deterministic Context Slimming and Archive Enforcement Across Core Artifacts (`US-0072`).
+- `/engineering` — Deterministic State Hot-Surface Rollover and Archive Enforcement (`US-0060`).
+- `/engineering` — OS-Aware Runbook Command Auto-Bootstrap with Verified Quality Gates (`US-0063`).
+- `/flag` — Release Gate for Command/Flag Documentation Delta (`US-0030`).
+- `/intake` — Critical Evaluation in Intake and Architecture (`US-0021`).
+- `/intake` — Deterministic Intake Runtime Capability Guard and Single-Writer Drift Safety (`US-0059`).
+- `/intake` — Multi-Repo and Contract Compatibility Observability (`US-0034`).
+- `/intake` — intake evidence records asked questions that were never asked (`BUG-0007`).
+- `/integration` — Generated Test Scaffolding and Auto-Run Contract (`US-0066`).
+- `/managed` — Runtime QA Autopilot for Generated Projects (`US-0065`).
+- `/new` — First-Intake Full-Plan Coverage and Story-Map Gate (`US-0081`).
+- `/order` — Deterministic Artifact Ordering and Write Discipline (`US-0058`).
+- `/phases` — Cross-Phase Artifact Ownership Guard and Deterministic Archive Control (`US-0061`).
+- `/planning` — User-Visible Internal Metadata Sanitization Guard (`US-0071`).
+- `/product` — Backlog Reconciliation Gate for Released Sprints (`US-0043`).
+- `/push` — Phase-Triggered Sync Policy with Guarded Auto-Push (`US-0038`).
+- `/release` — Enforced Per-Phase Subagent Isolation with Audit Gate (`US-0048`).
+- `/release` — Legacy DONE-Story Acceptance/Traceability Backfill Guard (`US-0049`).
+- `/release` — Per-Sprint Release Notes and Release Queue Tracker (`US-0040`).
+- `/release` — Release Findings Artifact and Post-QA Issue Workflow (`US-0042`).
+- `/release` — Release Gate Tightening for Check-In Tests and QA/UAT Completion (`US-0039`).
+- `/remote` — Automation-driven remote execution selection (Docker / SSH / NL container intent) (`US-0086`).
+- `/remote` — Gitignored `.env` for remote and release connectivity (no AI read) (`US-0085`).
+- `/repetitive` — Delegable Intake Clarification Without Hard Blocks (`US-0083`).
+- `/research` — Knowledge Curation & Early Research (`US-0029`).
+- `/risk` — Intelligent Intake Decomposition and Risk-Aware PO Questioning (`US-0051`).
+- `/scratchpad` — Executable Scratchpad-Driven Sync and Auto-Push Wiring (`US-0076`).
+- `/scratchpad` — Scratchpad Delivery Simplification (Example-Only Install Policy) (`US-0073`).
+- `/scratchpad` — Upgrade Scratchpad Example–First Refresh (Fix Example Drift vs Materialized Baseline) (`US-0075`).
+- `/scratchpad` — Upgrade-Safe Scratchpad Example Refresh and Parity (`US-0057`).
+- `/sprint-plan` — Explicit `/sprint-plan --bulk` Mode (`US-0046`).
+- `/sprint-plan` — Sprint Sizing Rules and Configurable Sprint Planning (`US-0022`).
+- `/story` — Optional Feature User Guide Generation (`US-0032`).
+- `/uat` — UAT Artifact Lifecycle and Ownership (`US-0027`).
+- `SKILL` scratchpad flag — Skill and Templates (`US-0004`).
+- `US-0001` scratchpad flag — Core Workflow Commands (`US-0001`).
+
 ## Walkthrough examples
 
 ### Example 1: New feature from idea
@@ -1239,6 +1329,35 @@ Reliable pattern:
 - `handoffs/`: role-to-role transfers.
 - `decisions/`: decision records.
 - `.github/workflows/`: CI/CD templates.
+
+<!-- readme-feature-coverage-catalog -->
+
+### Feature coverage catalog (US-0091)
+
+- `/evidence` — Backlog-to-Sprint Traceability Contract (`US-0025`).
+- `/exit` — Milestone Lifecycle Definition and Exit Criteria (`US-0026`).
+- `/field` — Official Remote Config Template, Docs, and Fail-Fast Validation (`US-0036`).
+- `/installer` — Runbook Completion (`US-0015`).
+- `/intake` — Component-Scoped Execution Mode with Protection Guards (`US-0035`).
+- `/intake` — Configurable Guided Intake Behavior (`US-0033`).
+- `/map-codebase` — map-codebase does not write codebase-map in fresh repos (`BUG-0002`).
+- `/memory-audit` — Memory Drift Audit Command (`US-0024`).
+- `/product` — Canonical Story Status Source + Global Drift Guard (`US-0045`).
+- `/product` — Clean Install Hygiene and Complete Clean-Repo Coverage (`US-0050`).
+- `/security-review` — Security & Compliance Review Agent (`US-0028`).
+- `/skip` — Explicit Bulk Execute Orchestration Mode (`US-0047`).
+- `/strings` — Clean Placeholder Content from Templates and Active Files (`US-0019`).
+- `/write` — Artifact Templates and Starter Docs (`US-0006`).
+- `AUTO_FLOW_MODE` scratchpad flag — Automation Modes (`US-0011`).
+- `README` scratchpad flag — Voice Input Documentation (`US-0010`).
+- `TEAM_MODE` scratchpad flag — Team Mode (`US-0013`).
+- `US-0002` scratchpad flag — AI Behavior Rules (`US-0002`).
+- `US-0003` scratchpad flag — Subagent Definitions (`US-0003`).
+- `US-0005` scratchpad flag — Hook System (`US-0005`).
+- `US-0008` scratchpad flag — CLI Installer (`US-0008`).
+- `US-0012` scratchpad flag — Benchmark Suite (`US-0012`).
+- `US-0014` scratchpad flag — Quality Chain (3-Layer) (`US-0014`).
+- `US-0017` scratchpad flag — Template Drift Guard (`US-0017`).
 
 ## Developer and release deep-dive
 

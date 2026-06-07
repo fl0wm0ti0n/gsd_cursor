@@ -1,4 +1,51 @@
-## QA → Release — S0082 / US-0093 (`auto-20260606-04`) — **current**
+## QA → Release — S0083 / US-0094 (`auto-20260607-01`) — **current**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-07T15:30:00Z`); AC **10 / 10 pass** (`sprints/S0083/uat.json`, `sprints/S0083/uat.md`). QA-loop terminated cleanly at **cycle 1 of 5** with all ACs PASS and zero US-0094-attributable regressions. Decision-gate posture: **none**. Story **US-0094** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0083 / US-0094)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0083/uat.md` Results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (10/10 delivered) | T-001..T-010 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0083/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0083/uat.md` Results summary |
+| `plan_verify_status` | PASS | `sprints/S0083/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | README SHA-256 match + `[INTAKE_TEMPLATE_PARITY_OK]` scope=readme-feature-coverage |
+| `script_self_tests` | PASS | `[README_FEATURE_COVERAGE_SELF_TEST_OK]` |
+| `test_baselines_no_regression` | PASS | `readme_feature_coverage_fixtures_test.py` 3/3 OK; zero US-0094 regressions |
+| `dec_invariants` | PASS | **DEC-0074** not amended; **DEC-0059** H2 budget preserved; **DEC-0078** default-off pairing |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260607-01-verify-work-qa-20260607T153000Z-S0083-US0094`
+- `proof_hash=037fe784cb133f8423fdac15d905686c2cdb8e5bda667ca821fc44835b5f305d`
+- `proof_issued_at=2026-06-07T15:30:00Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0083-US0094-verify-work-20260607T153000Z-fresh`, `timestamp=2026-06-07T15:30:00Z`, `evidence_ref=[sprints/S0083/uat.json, sprints/S0083/uat.md, handoffs/qa_to_release.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Next phase
+
+Spawn **`/release`** (fresh **release**) for **`S0083`** / **`US-0094`**.
+
+---
+
+## QA → Release — S0082 / US-0093 (`auto-20260606-04`) (superseded)
 
 ### Status
 

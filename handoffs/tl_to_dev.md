@@ -1,3 +1,157 @@
+## Sprint Plan — **S0084** / **US-0095** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
+
+> **2026-06-07T20:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=tl-S0084-US0095-sprint-plan-20260607T200000Z-fresh`, `runtime_proof_id=rp-auto-20260607-02-sprint-plan-tech-lead-20260607T200000Z-S0084-US0095`, `proof_hash=88e67cca34c4a7ad46f74c61c04c2c29a7c80a9558851945817cce83c5780edf`). Sprint **`S0084`** created; **AC-1..AC-10 ↔ T-001..T-010** strict bijection; `task_count=10`, `within_limit=true`. Story **`US-0095`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0084/sprint.md`
+- **Atomic tasks**: `sprints/S0084/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0084/plan-verify.json` (`status=PENDING`)
+- **Architecture**: `docs/engineering/architecture.md` `# US-0095`
+- **Decision**: `decisions/DEC-0080.md`
+- **Research**: `docs/engineering/research.md` `R-0081`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1 | Native in-chat auto-chain § + reference Step 5 IDE-primary |
+| T-002 | AC-2 | 7-step IDE drain-advance algorithm + literals |
+| T-003 | AC-3 | Spawn-only invariants + BUG-0006 regression guard |
+| T-004 | AC-4 | Stop matrix hard gates unchanged |
+| T-005 | AC-5 | Runbook + README outer-driver demotion |
+| T-006 | AC-6 | AUTO_QUIET suppression table + forbidden patterns |
+| T-007 | AC-7 | DEC-0069 pairing mandate before continuation |
+| T-008 | AC-8 | Six `test_us0095_*` contract subtests |
+| T-009 | AC-9 | Template parity (8-surface inventory) |
+| T-010 | AC-10 | Cap/ledger breadcrumbs + security deny-list |
+
+### Recommended /execute ordering
+
+1. T-001 → T-003 → T-002 → T-004 → T-007 → T-006 → T-010 → T-005 → T-008 → T-009
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not** weaken spawn-only (**BUG-0006**) or isolation/strict-proof gates.
+- **Do not** delete **`auto_outer_driver.py`** — demote to fallback only.
+- **Do not** mandate outer driver for IDE **`full_autonomy`** primary path.
+- **Do not** fabricate `state.md` checkpoints during doc edits (T-010 comments only).
+
+### Next
+
+- **`/plan-verify`** (fresh **qa**) for **`S0084`** / **`US-0095`**
+
+---
+
+## Architecture — **US-0095** — post-**`/architecture`** → **`/sprint-plan`** (**tech-lead**)
+
+> **2026-06-07T19:30:00Z** — **`/architecture`** **PASS** (`orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=tl-US0095-architecture-20260607T193000Z-fresh`, `runtime_proof_id=rp-auto-20260607-02-architecture-tech-lead-20260607T193000Z-US0095`, `proof_hash=ff1b750771d57ce7f753d85f6536b3a3aca19c2be595ddbe059c04a9b44626ad`). **`DEC-0080`** + **`# US-0095`** locked. Story **`US-0095`** remains **OPEN** (**US-0045**). **Do not execute** in this phase.
+
+### Locked contracts
+
+| Area | Lock |
+|------|------|
+| Native chain | Foreground sequential Task loop; same `/auto` orchestrator session |
+| Drain-advance | 7-step algorithm; `drain-advance-without-pause`; immediate in-chat spawn |
+| Caps/ledger | Unified with **DEC-0078**; `phase_respawn`, `native_chain_continue`, `drain_advance` |
+| Fallback | IDE primary; outer driver optional; **`NATIVE_CHAIN_UNAVAILABLE`** fail-closed |
+| Spawn-only | **BUG-0006** unchanged — orchestrator schedules only |
+| Messaging | **`AUTO_QUIET`** table; forbidden mandatory outer-driver patterns |
+
+### Atomic task seeds
+
+10 seeds in **`docs/engineering/architecture.md`** **`# US-0095`** § Atomic task seeds (AC-1..AC-10 via seeds 1..10).
+
+### Evidence refs
+
+- `decisions/DEC-0080.md`
+- `docs/engineering/architecture.md` (**`# US-0095`**)
+- `docs/engineering/research.md` (**`R-0081`**)
+- `docs/product/backlog.md` (`## US-0095` `architecture_notes`)
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **`US-0095`**
+
+---
+
+## Sprint Plan — **S0083** / **US-0094** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
+
+> **2026-06-07T13:30:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=tl-S0083-US0094-sprint-plan-20260607T133000Z-fresh`, `runtime_proof_id=rp-auto-20260607-01-sprint-plan-tech-lead-20260607T133000Z-S0083-US0094`, `proof_hash=db8ff920147b25d12d822d32ee21b3695c12ffe0139975502d2daa0822d23efa`). Sprint **`S0083`** created; **AC-1..AC-10 ↔ T-001..T-010** strict bijection; `task_count=10`, `within_limit=true`. Story **`US-0094`** remains **OPEN** (**US-0045**). **Do not edit README.md** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint overview**: `sprints/S0083/sprint.md`
+- **Atomic tasks**: `sprints/S0083/tasks.md` (T-001..T-010)
+- **Plan-verify (qa)**: `sprints/S0083/plan-verify.json` (`status=PENDING`)
+- **Summary**: `sprints/S0083/summary.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0094`
+- **Research**: `docs/engineering/research.md` `R-0080`
+
+### AC ↔ Task map (locked)
+
+| Task | AC | Summary |
+|------|-----|---------|
+| T-001 | AC-1 | Replace pre-`## Features` intro (3 ¶, word budget) |
+| T-002 | AC-2 | Four pillar `###` sections with id-free teasers |
+| T-003 | AC-3 | Deep body sections preserved |
+| T-004 | AC-4 | Coverage `--report` → zero gaps |
+| T-005 | AC-5 | Byte-copy root → template + identity check |
+| T-006 | AC-6 | `validate_doc_profile.py` pass |
+| T-007 | AC-7 | `check-user-visible-metadata.py` pass |
+| T-008 | AC-8 | Full-autonomy placement audit |
+| T-009 | AC-9 | Regression contract tests green |
+| T-010 | AC-10 | DEV shard unchanged |
+
+### Recommended /execute ordering
+
+1. T-001 → T-002 → T-003 → T-008 → T-004 → T-006 → T-007 → T-005 → T-009 → T-010
+
+### Scope guards for `/plan-verify` and `/execute`
+
+- **Do not** relocate catalog blocks across H2 affinity homes.
+- **Do not** add new `##` H2 literals or amend **DEC-0074**.
+- **Do not** edit `docs/developer/README.md` body.
+- **Single-source** edit on root `README.md`; byte-copy to `template/` only after gates pass.
+- **Commit** root + template README atomically.
+
+### Next
+
+- **`/plan-verify`** (fresh **qa**) for **`S0083`** / **`US-0094`**
+
+---
+
+## Architecture — **US-0094** — post-**`/architecture`** → **`/sprint-plan`** (**tech-lead**)
+
+> **2026-06-07T13:00:00Z** — **`/architecture`** **PASS** (`orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=tl-US0094-architecture-20260607T130000Z-fresh`). **`# US-0094`** appended to **`docs/engineering/architecture.md`**. Story **`US-0094`** remains **OPEN** (**US-0045**). **Do not edit README.md** in this phase.
+
+### Locked contracts
+
+| Area | Lock |
+|------|------|
+| Intro | 3 ¶ before `## Features`; 120–210 words soft / 240 hard max |
+| Pillars | 4 `###` under Features — exact discovery titles |
+| Catalog | 3 US-0091 blocks — affinity-home H2s immutable |
+| DEC | **None new** — **`DEC-0074`** not amended |
+| Parity | Single-source edit → byte-copy template |
+
+### Atomic task seeds
+
+10 seeds in **`docs/engineering/architecture.md`** **`# US-0094`** § Atomic task seeds (AC-1..AC-10 ↔ seeds 1..10).
+
+### Evidence refs
+
+- `docs/engineering/architecture.md` (**`# US-0094`**)
+- `docs/engineering/research.md` (**`R-0080`**)
+- `docs/product/backlog.md` (`## US-0094` `architecture_notes`)
+- `handoffs/po_to_tl.md` (Orchestrated architecture handoff — US-0094)
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **`US-0094`**
+
+---
+
 ## Sprint Plan — **S0082** / **US-0093** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
 
 > **2026-06-07T00:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260606-04`, `fresh_context_marker=tl-S0082-US0093-sprint-plan-20260607T000000Z-fresh`, `runtime_proof_id=rp-auto-20260606-04-sprint-plan-tech-lead-20260607T000000Z-S0082-US0093`, `proof_hash=b1511e92b1cd8e38b3b91fd3d8e685e8736712b1883d3cfd748f2196c6d744c0`). Sprint **`S0082`** created; **AC-1..AC-10 ↔ T-001..T-010** strict bijection; `task_count=10`, `within_limit=true`. Story **`US-0093`** remains **OPEN** (**US-0045**). Next phase is **`/plan-verify`** (fresh **qa**).
@@ -798,3 +952,28 @@ For each "active + template" row above, parity is asserted via contract subtests
 ### Next
 
 - **`/plan-verify`** (fresh **qa** context) for **`S0073`** / **`US-0085`**, or **`/auto start-from=plan-verify`**.
+
+---
+
+## Research — **US-0094** — post-**`/research`** → **`/architecture`** (**tech-lead**)
+
+> **2026-06-07T12:30:00Z** — **`/research`** **PASS** (`orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=tl-US0094-research-20260607T123000Z-fresh`). Extended **`R-0080`** Q1–Q4. Story **`US-0094`** remains **OPEN** (**US-0045**). **Do not edit README.md** in this phase.
+
+### Research closure summary
+
+| Ask | Resolution |
+|-----|------------|
+| Q1 Pillar-catalog map | Thematic cross-links only — P1 Commands/auto, P2 Commands+Features gates, P3 Features distribution, P4 Other useful capabilities |
+| Q2 Intro budget (`both`×`balanced`) | 3¶, 120–210 words soft / 240 hard; discovery draft 129 words; no new H2 |
+| Q3 DEC-0074 companion | **Not required** — document IA in architecture `# US-0094` |
+| Q4 Diataxis boundaries | Intro=explanation, pillars=summary, catalog=reference, Setup/How-to/walkthroughs preserved |
+
+### Evidence
+
+- `docs/engineering/research.md` (**`R-0080`**)
+- `handoffs/po_to_tl.md` (Orchestrated research handoff — US-0094)
+- `docs/product/backlog.md` (`## US-0094` `research_notes`)
+
+### Next
+
+- **`/architecture`** (fresh **tech-lead**) for **`US-0094`**

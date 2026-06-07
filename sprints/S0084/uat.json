@@ -1,0 +1,169 @@
+{
+  "sprint_id": "S0084",
+  "story_ids": ["US-0095"],
+  "story_id": "US-0095",
+  "dec_id": "DEC-0080",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-07T22:30:00Z",
+  "orchestrator_run_id": "auto-20260607-02",
+  "fresh_context_marker": "qa-S0084-US0095-qa-20260607T220000Z-fresh",
+  "verify_work_executed_at": "2026-06-07T22:30:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0084-US0095-verify-work-20260607T223000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "total": 10,
+  "qa_verdict_reference": "sprints/S0084/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Verify-work independent re-runs green; AC-1..AC-10 closure preflight PASS; US-0095 remains OPEN per US-0045.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0080 execute deliverables merged (native in-chat auto-chain §, drain-advance algorithm, outer-driver demotion, contract tests)",
+    "scripts/auto_outer_driver.py retained (scope guard)"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["DEC-0080", "architecture # US-0095", "R-0081 Q1"],
+      "command": "pytest -k test_us0095_native_in_chat_auto_chain_markers tests/auto_command_contract_test.py -q",
+      "expected": "Native in-chat auto-chain § in auto.md + reference Step 5 IDE-primary; foreground sequential Task loop; NATIVE_CHAIN_UNAVAILABLE fail-closed",
+      "result": "pass",
+      "evidence_ref": "test_us0095_native_in_chat_auto_chain_markers PASS; .cursor/commands/auto.md § Native in-chat auto-chain (US-0095 / DEC-0080)",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0080", "R-0081 Q2"],
+      "command": "pytest -k test_us0095_ide_drain_advance_without_outer_driver tests/auto_command_contract_test.py -q",
+      "expected": "7-step IDE drain-advance algorithm; literals immediately, without operator re-`/auto`; no mandatory outer-driver prose in IDE-primary native §",
+      "result": "pass",
+      "evidence_ref": "test_us0095_ide_drain_advance_without_outer_driver PASS; auto.md § IDE drain-advance-without-pause steps 1–7",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "governance_ref": ["BUG-0006", "US-0069"],
+      "command": "pytest -k test_us0095_spawn_only_regression tests/auto_command_contract_test.py -q",
+      "expected": "Spawn-only loop invariants preserved; US-0069 preflight/post; forbidden in-band patterns absent from native §",
+      "result": "pass",
+      "evidence_ref": "test_us0095_spawn_only_regression PASS; auto.md § Loop invariants (spawn-only — BUG-0006 unchanged)",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "governance_ref": ["DEC-0078", "US-0092"],
+      "check": "manual",
+      "expected": "Stop matrix hard gates unchanged: decision_gate, isolation/strict-proof violations, security deny, BACKLOG_MAX_STORIES_REACHED, AUTO_LOOP_MAX_CYCLES, unrecoverable error, pause_request",
+      "result": "pass",
+      "evidence_ref": "auto.md § stop matrix — hard stops listed; relaxable transient stops per DEC-0078 when configured",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0080", "R-0081 Q4"],
+      "commands": [
+        "pytest -k test_us0095_outer_driver_fallback_not_mandatory_ide tests/auto_command_contract_test.py -q"
+      ],
+      "check": "manual",
+      "expected": "README intro ¶3 + runbook primary/fallback table demote outer driver to optional/fallback; scripts/auto_outer_driver.py retained",
+      "result": "pass",
+      "evidence_ref": "test_us0095_outer_driver_fallback_not_mandatory_ide PASS; README.md L18–19 optional/fallback; runbook § Native in-chat auto-chain (US-0095); scripts/auto_outer_driver.py exists",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0080", "R-0081 Q5"],
+      "command": "pytest -k test_us0095_auto_quiet_no_outer_driver_mandatory tests/auto_command_contract_test.py -q",
+      "expected": "AUTO_QUIET suppression table; forbidden mandatory outer-driver/re-`/auto`/segment-exhausted wait patterns; gates/caps/errors non-suppressible",
+      "result": "pass",
+      "evidence_ref": "test_us0095_auto_quiet_no_outer_driver_mandatory PASS; auto.md § AUTO_QUIET under native chain",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0069"],
+      "command": "pytest -k test_us0095_resume_brief_pairing_markers tests/auto_command_contract_test.py -q",
+      "expected": "DEC-0069 pairing mandate before in-chat continuation; drain-advance step 2 ASSERT pairing; stale brief → RESUME_BRIEF_STALE fail-closed",
+      "result": "pass",
+      "evidence_ref": "test_us0095_resume_brief_pairing_markers PASS; auto.md DEC-0069 pairing mandate + RESUME_BRIEF_STALE",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0080", "R-0081 Q6"],
+      "command": "pytest -k us0095 tests/auto_command_contract_test.py -v",
+      "expected": "Seven test_us0095_* subtests green (30 subtests total)",
+      "result": "pass",
+      "evidence_ref": "verify-work re-run: 7 passed, 30 subtests passed in 0.07s",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["US-0017"],
+      "commands": [
+        "python scripts/check_intake_template_parity.py --scope=us-0095",
+        "pytest -k test_us0095_template_parity_auto_surfaces tests/auto_command_contract_test.py -q"
+      ],
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK]; active + template/ mirrors for auto.md, reference, runbook",
+      "result": "pass",
+      "evidence_ref": "[INTAKE_TEMPLATE_PARITY_OK] scope=us-0095; test_us0095_template_parity_auto_surfaces PASS (verify-work re-run)",
+      "verified_at": "2026-06-07T22:30:00Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["DEC-0078", "US-0056"],
+      "check": "manual",
+      "expected": "Unified cap/ledger: AUTO_LOOP_MAX_CYCLES, AUTO_BACKLOG_MAX_STORIES, AUTO_BLOCK_RETRY_MAX; remediation_action values (phase_respawn, native_chain_continue, drain_advance); breadcrumb fields; security deny-list unchanged (no .env auto-read, no intake evidence mutation, no publish without RELEASE_PUBLISH_MODE=auto)",
+      "result": "pass",
+      "evidence_ref": "auto-orchestration-reference.md § unified cap/ledger + Security deny-list; native_chain_active, outer_cycle_index, implementation_loop_index breadcrumbs documented",
+      "verified_at": "2026-06-07T22:30:00Z"
+    }
+  ],
+  "probe_results": [
+    {
+      "cycle": 1,
+      "phase": "verify-work",
+      "step": "us0095 contract test battery",
+      "probe_kind": "cli_smoke",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "pytest -k us0095 → 7 passed, 30 subtests"
+    },
+    {
+      "cycle": 1,
+      "phase": "verify-work",
+      "step": "template parity us-0095",
+      "probe_kind": "cli_smoke",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "[INTAKE_TEMPLATE_PARITY_OK] scope=us-0095"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "acceptance": "UAT passes when all 10 UAT steps (AC-1..AC-10) meet expected outcomes.",
+  "verify_work_result": "10/10 PASS; 0 FAIL; 0 SKIP; verdict=PASS",
+  "closure_preflight": {
+    "verdict": "PASS",
+    "gates_passed": 9,
+    "gates_total": 9
+  }
+}

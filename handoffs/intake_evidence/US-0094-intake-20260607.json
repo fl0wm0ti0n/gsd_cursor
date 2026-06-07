@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260607-US0094-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Check and update README.md and template/README.md against all features/US/Bugs; rewrite the initial description so the framework leads with fully autonomous AI dev team development where you are the customer and dreamer; structure as main focus first, then main features, then sub-features, with all existing detail sections preserved beneath.",
+      "intake_run_id": "cursor-20260607-US0094-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260607-US0094-intake:0:bd19ceb89fae2c7d"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Root README.md and template/README.md (must be byte-identical per US-0017); existing US-0091 feature coverage catalog and anchors must survive the restructure; docs/developer/README.md stays the DEV shard unless a single cross-link sentence is added in the intro.",
+      "intake_run_id": "cursor-20260607-US0094-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260607-US0094-intake:1:a188810ef40d31c0"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Compose on US-0091 static coverage gate (README_FEATURE_COVERAGE_ENFORCE=1), US-0077 DEC-0059 USER_* H2 vocabulary and section budgets, US-0071 user-visible metadata sanitization, and US-0030 delta gate — restructure must not drop US-xxxx/BUG-xxxx anchors or break validate_readme_feature_coverage.py PASS.",
+      "intake_run_id": "cursor-20260607-US0094-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260607-US0094-intake:2:169ed9190ec12e50"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "python scripts/validate_readme_feature_coverage.py --report must show coverage_missing=[]; byte parity README.md == template/README.md; scripts/check-user-visible-metadata.py and scripts/validate_doc_profile.py green on changed surfaces; existing US-0017 template-drift guard remains green.",
+      "intake_run_id": "cursor-20260607-US0094-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260607-US0094-intake:3:675f9e8a4e70476c"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0094: shipped visionary tiered README intro + hierarchy in both root and template copies with identical bytes, full US/BUG catalog still covered, release flips story to DONE per US-0045.",
+      "intake_run_id": "cursor-20260607-US0094-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260607-US0094-intake:4:ccedf98127381c31"
+    }
+  ]
+}

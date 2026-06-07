@@ -1,0 +1,165 @@
+{
+  "sprint_id": "S0083",
+  "story_ids": ["US-0094"],
+  "story_id": "US-0094",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-07T15:30:00Z",
+  "orchestrator_run_id": "auto-20260607-01",
+  "fresh_context_marker": "qa-S0083-US0094-qa-20260607T150000Z-fresh",
+  "verify_work_executed_at": "2026-06-07T15:30:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0083-US0094-verify-work-20260607T153000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "total": 10,
+  "qa_verdict_reference": "sprints/S0083/qa-findings.md",
+  "qa_verdict": "PASS",
+  "qa_notes": "Verify-work independent re-runs green; AC-1..AC-10 closure preflight PASS; US-0094 remains OPEN per US-0045.",
+  "preconditions": [
+    "Python 3.12+ available",
+    "Execute deliverables merged (README intro + four pillar teasers; root/template byte parity)",
+    "Baseline coverage 104/104 green pre-edit per R-0080"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["architecture # US-0094 § Intro contract", "R-0080 Q2"],
+      "check": "manual",
+      "expected": "Exactly 3 intro paragraphs before ## Features; 120–210 words soft / 240 hard max; dreamer + AI team; artifact-first workflow; full-autonomy opt-in default-off",
+      "result": "pass",
+      "evidence_ref": "README.md L5–18: 3 ¶, 136 words, 14 lines; operator-as-dreamer + role-based team (¶1); /intake→/release + pause/resume/decision gates (¶2); AUTO_FLOW_MODE=full_autonomy default-off + outer driver + /auto drain (¶3)",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["architecture # US-0094 § Pillar contract", "DEC-0059"],
+      "check": "manual",
+      "expected": "Four discovery-locked ### pillars under ## Features with 3–6 id-free teaser bullets each; no encyclopedic catalog duplication",
+      "result": "pass",
+      "evidence_ref": "Autonomous AI workflow | Quality & verification gates | Distribution & install | Operator control & ergonomics — teaser bullets only; three catalog blocks remain reference tier below",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "governance_ref": ["architecture # US-0094 § Detail preservation"],
+      "check": "manual",
+      "expected": "Deep body H2s retained: Setup, How-to, Commands and workflow, walkthroughs, scratchpad reference, contributing, etc.",
+      "result": "pass",
+      "evidence_ref": "Setup (L86), How-to (L234), Commands and workflow (L346), Walkthrough examples (L1238), Other useful capabilities (L1349), Developer and release deep-dive (L1402) present; no silent operator-facing deletion",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "governance_ref": ["DEC-0074", "US-0091"],
+      "command": "python scripts/validate_readme_feature_coverage.py --repo . --report",
+      "expected": "coverage_missing=[]; coverage_total=104; status=PASS; three catalog markers in affinity-home H2s",
+      "result": "pass",
+      "evidence_ref": "verify-work re-run: coverage_missing=[], coverage_total=104, status=PASS; markers at L61, L1173, L1373",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["US-0017"],
+      "command": "python -c \"import hashlib,filecmp; print(hashlib.sha256(open('README.md','rb').read()).hexdigest().upper()); print(filecmp.cmp('README.md','template/README.md'))\"",
+      "expected": "README.md byte-identical to template/README.md",
+      "result": "pass",
+      "evidence_ref": "SHA-256 67EF3482A2D4A6FFDBD054DFA9AA854F76B8A739012E617615D9A51844E75918 both files; filecmp True (verify-work re-run)",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0059"],
+      "command": "python scripts/validate_doc_profile.py",
+      "expected": "[DOC_PROFILE_VALIDATE_OK]; no new USER_* H2 literals; only four new ### under existing Features H2",
+      "result": "pass",
+      "evidence_ref": "[DOC_PROFILE_VALIDATE_OK] (verify-work re-run)",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["US-0071"],
+      "command": "python scripts/check-user-visible-metadata.py --repo .",
+      "expected": "exit 0; no internal planning tokens in intro/pillar blurbs",
+      "result": "pass",
+      "evidence_ref": "metadata scanner exit 0 (verify-work re-run)",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0078", "US-0092"],
+      "check": "manual",
+      "expected": "Full-autonomy primary in intro ¶3; secondary in P1 pillar; tertiary in catalog; default-off opt-in pairing",
+      "result": "pass",
+      "evidence_ref": "intro ¶3 L15–18 AUTO_FLOW_MODE=full_autonomy (default-off); P1 pillar L27–30; catalog L66 US-0092 line; not appendix-only",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["US-0017", "US-0030"],
+      "commands": [
+        "python tests/readme_feature_coverage_fixtures_test.py",
+        "python scripts/check_intake_template_parity.py --scope=readme-feature-coverage"
+      ],
+      "expected": "fixtures 3/3 OK; [INTAKE_TEMPLATE_PARITY_OK]; no US-0030 delta-gate weakening",
+      "result": "pass",
+      "evidence_ref": "readme_feature_coverage_fixtures_test.py 3/3 OK; [INTAKE_TEMPLATE_PARITY_OK] scope=readme-feature-coverage (verify-work re-run)",
+      "verified_at": "2026-06-07T15:30:00Z"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["US-0077", "DEC-0059"],
+      "check": "manual",
+      "expected": "docs/developer/README.md has no US-0094 visionary intro; optional ≤1-sentence root cross-link only",
+      "result": "pass",
+      "evidence_ref": "DEV shard body unchanged; root intro ¶2 L12–13 single-sentence cross-link to docs/developer/README.md only",
+      "verified_at": "2026-06-07T15:30:00Z"
+    }
+  ],
+  "probe_results": [
+    {
+      "cycle": 1,
+      "phase": "verify-work",
+      "step": "validate readme feature coverage report",
+      "probe_kind": "cli_smoke",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "validate_readme_feature_coverage.py --report exit 0; coverage_missing=[]"
+    },
+    {
+      "cycle": 1,
+      "phase": "verify-work",
+      "step": "validate doc profile",
+      "probe_kind": "cli_smoke",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "stack_profile": "python",
+      "note": "[DOC_PROFILE_VALIDATE_OK]"
+    }
+  ],
+  "summary": {
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "acceptance": "UAT passes when all 10 UAT steps (AC-1..AC-10) meet expected outcomes.",
+  "verify_work_result": "10/10 PASS; 0 FAIL; 0 SKIP; verdict=PASS",
+  "closure_preflight": {
+    "verdict": "PASS",
+    "gates_passed": 9,
+    "gates_total": 9
+  }
+}

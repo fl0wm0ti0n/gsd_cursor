@@ -1132,3 +1132,71 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **`manual_operator` routing (discovery stub)**: reclassify steps with UI/workflow verbs (**click**, **fill**, **navigate**, **smoke**, **form**, **submit**, **login page**, **dashboard**) to browser probe plans when no explicit human-judgment signal (**visually**, **aesthetically**, **operator confirms**, **subjective**); judgment-only steps stay **`manual_operator`**.
 - **Composition boundaries**: extends **US-0092** / **DEC-0078** probe catalog; delivers **R-0041** browser integration promise; composes **US-0065** runtime QA fields; does not weaken security deny-list or full_autonomy false-PASS guards.
 - **Research asks**: agent-browser command contract, verb routing table, fallback selection, stub resolution rules, evidence schema, contract-test inventory — see **`R-0079`** before **`/architecture`**.
+
+## Intake Notes — US-0094
+
+- **Problem**: Root `README.md` opens with a generic template tagline and a flat feature bullet list. It does not communicate the core product promise: the operator is the **customer/dreamer** while a structured **AI dev team** can run the full delivery lifecycle — including optional **full autonomy** — with artifact-first memory in the repo.
+- **Intent**: Rewrite the README opening into a clear hierarchy — **framework purpose → main features → sub-features → existing detailed sections** — re-audit all **US-0091** coverage anchors, and keep **`README.md`** and **`template/README.md`** byte-identical.
+- **Operator scope (2026-06-07)**: root + template README only; DEV shard optional cross-link; preserve all deep detail sections below the new intro; foreground **US-0092** full-autonomy value prop.
+- **Evidence**: `handoffs/intake_evidence/US-0094-intake-20260607.json`; research anchor **`R-0080`**.
+- **Intake closure (2026-06-07, PO)**: Backlog **`US-0094`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0094
+
+- **Operator value proposition**: First-time readers immediately understand that **its-magic is an autonomous AI dev team framework** — the operator is the **customer and dreamer**; role-based agents (PO, Tech Lead, Dev, QA, Release, Curator) run intake → release with **artifact-first repo memory**, and optional **full autonomy** is a first-class headline capability (not a footnote in **`Commands and workflow`**).
+- **Information architecture (Diataxis-aligned, per **R-0054** / **R-0080**)**:
+  - **Explanation tier** (new): 2–3 visionary paragraphs **before** `## Features` — product promise and operator role.
+  - **Summary tier** (new): four **main-feature pillars** as `###` subsections under existing `## Features (what its-magic can do)` — concise sub-feature bullets only; no encyclopedic duplication of catalog prose.
+  - **Reference tier** (preserved): three existing `### Feature coverage catalog (US-0091)` blocks stay in their affinity-home H2 sections; all deep body sections (`Setup`, `How-to`, `Commands and workflow`, walkthroughs, `Purpose`…`Contributing`) remain below unchanged in substance.
+- **Intro outline (discovery-locked — execute copies verbatim into both README files)**:
+  1. **Paragraph 1 — Dreamer + team**: You bring the idea; its-magic is your structured **AI dev team** in Cursor — PO, Tech Lead, Dev, QA, Release, and Curator — that turns ideas into shipped software through explicit phases and handoff artifacts.
+  2. **Paragraph 2 — Artifact-first workflow**: State lives in repo files (`docs/product`, `handoffs`, `sprints`, `decisions`) — not chat-only memory. Run `/intake` with your idea, then follow intake → discovery → architecture → sprint plan → execute → QA → release; pause/resume and decision gates keep you in control when you want to steer.
+  3. **Paragraph 3 — Full autonomy headline (**US-0092**)**: When you want hands-off delivery, enable **`AUTO_FLOW_MODE=full_autonomy`** (default-off), run the shipped outer driver once, and let `/auto` drain your backlog — self-verify UAT, bounded block retry, and advance to the next OPEN story or bug without re-invoking each phase manually. Guided and decision-gated modes remain the default.
+  - **Optional single DEV cross-link** (allowed per AC-10): one sentence at end of paragraph 2 or 3 pointing implementers to **`docs/developer/README.md`** — no DEV body duplication in root README.
+- **Main-feature pillars (discovery-locked names and scope)** — all as `###` under `## Features` only; **no new `USER_*` H2 literals** (**DEC-0059**):
+  1. **`### Autonomous AI workflow`** — phased slash commands (`/intake`…`/release`), `/auto` orchestration, pause/resume, decision gates (`DEC-xxxx`), team mode, continuous drain (**US-0088**), full autonomy + outer driver (**US-0092**).
+  2. **`### Quality & verification gates`** — 3-layer quality chain (AI loop → `validate-and-push` → CI auto-fix), release/QA/UAT gates, user-visible metadata guard (**US-0071**), phase isolation proofs (**US-0048** / **US-0056**).
+  3. **`### Distribution & install`** — npm / Chocolatey / Homebrew, `its-magic --target` install modes (missing/overwrite/upgrade/clean), lifecycle QA matrix (**US-0041**), multi-target publish (**US-0054**).
+  4. **`### Operator control & ergonomics`** — scratchpad flags and local overrides, guided intake packs, Caveman voice/compression (**US-0089** / **US-0090**), token-cost profiles (**US-0080**), voice input, permissions/runtime connectivity.
+- **Sub-feature mapping rule**: each pillar gets **3–6 teaser bullets** naming commands, flags, or outcomes in operator language; **must not** repeat the full `US-xxxx`/`BUG-xxxx` catalog lines. The authoritative 104-item index remains the three **`### Feature coverage catalog (US-0091)`** blocks (affinity homes below).
+- **Full-autonomy messaging placement (discovery-locked)**:
+  - **Primary**: intro paragraph 3 (before any H2).
+  - **Secondary**: first or second bullet under **`### Autonomous AI workflow`** pillar (name `/auto`, `AUTO_FLOW_MODE=full_autonomy`, outer driver, drain-without-pause in plain language).
+  - **Tertiary**: existing catalog line for **US-0092** stays in its affinity section — do not remove or demote.
+  - **Forbidden**: burying full-autonomy value prop only under **`Developer and release deep-dive`** or deep **`Commands and workflow`** subsections without intro/pillar mention (**AC-8**).
+- **Coverage-safe move rules (discovery-locked for execute / **DEC-0074** affinity)**:
+  1. **Affinity homes are authoritative** — validator resolves each in-scope DONE item to one root H2 via `readme-section-affinity.json`: slash commands → **`Commands and workflow`**; scratchpad keys → **`Other useful capabilities`**; distribution/npm/choco/brew → **`Features`**; release/UAT gates → **`Commands and workflow`**; governance default → **`Other useful capabilities`**.
+  2. **Three catalog blocks are immutable in parent H2** — markers `<!-- readme-feature-coverage-catalog -->` at Features (~line 27), Commands (~line 1139), and Other useful capabilities (~line 1339): every bullet retaining its `US-xxxx`/`BUG-xxxx` id must stay inside the **same parent H2 body** after restructure; reorder within block allowed; cross-H2 moves forbidden unless affinity tag changes (out of scope).
+  3. **Id-preservation contract** — each catalog bullet line must still contain detectable `US-xxxx` or `BUG-xxxx` (or slash-command / scratchpad key matching `has_root_coverage`); silent deletion forbidden.
+  4. **Pillar teasers are id-free** — new pillar bullets may cite commands/flags by name but must not replace catalog anchors; baseline **`coverage_total=104`**, **`coverage_missing=[]`**.
+  5. **DEV shard untouched** — `docs/developer/README.md` traceability rows unchanged; root moves do not require DEV edits unless a root anchor is accidentally removed.
+  6. **Post-edit gate** — `python scripts/validate_readme_feature_coverage.py --report` must PASS before merge; `validate_doc_profile.py` + `check-user-visible-metadata.py` on changed surfaces.
+- **Parity workflow (discovery-locked)**: single-source edit on `README.md`, then byte-copy to `template/README.md` (or edit one and `diff`/copy); verify with `fc /b` or equivalent; **US-0017** template-drift tests must stay green. Do not edit both files independently.
+- **Section budget**: add only **`###` H3** under existing H2s (primarily Features); do not add new top-level `##` headings; current 13 H2 layout preserved (**DEC-0059** / `validate_doc_profile.py`).
+- **Product-facing messaging constraints**:
+  - No internal planning tokens in operator blurbs (**US-0071**).
+  - Full autonomy always paired with **default-off / opt-in** language — never imply always-on autonomy.
+  - Replace generic "Happy coding! Build something awesome." tagline — not the H1 product name line.
+- **Risks**: **R1** pillar prose duplicates catalog → mitigate teaser-only bullets + catalog unchanged; **R2** cross-H2 catalog move breaks affinity → forbid cross-H2 moves; **R3** intro bloat → cap at 3 short paragraphs; **R4** active/template drift → single-source + byte compare; **R5** overclaiming autonomy → explicit opt-in wording per **US-0092** / **DEC-0078**.
+- **Research asks for **R-0080** extension**: finalize pillar-to-catalog affinity map table, intro word-count budget, and whether **DEC-0074** needs a companion §intro hierarchy lock — see **`/research`** before **`/architecture`**.
+
+## Discovery Notes — US-0095
+
+- **Operator value proposition**: When **`AUTO_FLOW_MODE=full_autonomy`** is enabled in Cursor IDE, operators run **`/auto` once** and expect **hands-off** delivery across **all lifecycle phases** and **backlog-drain segments** — without installing or running **`auto_outer_driver.py`** between stories. **US-0095** closes the product promise gap left by **US-0092** (outer driver as bridge) and **US-0088** Option B equivalence prose.
+- **Primary vs fallback paths (discovery-locked)**:
+  - **Primary (IDE)**: native in-chat auto-chain — orchestrator schedules sequential phase spawns and drain advances within one `/auto` invocation.
+  - **Fallback (headless/CI)**: **`scripts/auto_outer_driver.py`** remains optional — not deleted, not required for IDE **`full_autonomy`**.
+- **Six-step operator flow (IDE, `full_autonomy`)**:
+  1. Set scratchpad keys (`full_autonomy`, optional drain/bug-queue).
+  2. Run **`/auto`** once in Cursor (not outer driver).
+  3. Orchestrator spawns each phase with fresh subagent context; verifies boundaries; chains to next phase in-chat.
+  4. On segment completion, drain policy selects next OPEN item and continues without operator pause.
+  5. Relaxable transient stops retry per **US-0092** matrix; hard governance gates unchanged.
+  6. Exit on cap, hard gate, or empty portfolio.
+- **Product-facing messaging constraints**:
+  - **Default-off safety**: **`manual`** and **`auto_until_decision`** unchanged; native chain applies only under explicit **`full_autonomy`**.
+  - **No false mandatory outer driver**: IDE runbook/README must not imply outer driver is required for drain when **`full_autonomy`** is on (**AC-5** / **AC-6**).
+  - **Spawn-only preserved**: continuation is orchestrator **scheduling**, not in-chat multi-role execution (**BUG-0006**).
+  - **Quiet mode**: **`AUTO_QUIET=1`** suppresses chatter but must not reintroduce outer-driver wait instructions between segments.
+- **Composition boundaries**: extends **US-0092** / **DEC-0078** (stop matrix, caps, block-retry) + **US-0088** (continuous policy) + **US-0044** (drain) + **US-0087** (bug-queue mutex); does not weaken isolation (**US-0048**) or strict proof (**US-0056**).
+- **Research asks**: native continuation model, IDE drain-advance, cap ledger, fallback boundary, operator messaging — see **`R-0081`** before **`/architecture`**.

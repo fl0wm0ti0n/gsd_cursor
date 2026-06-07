@@ -796,24 +796,102 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 | `RELEASE_PUBLISH_MODE=auto` | Explicit opt-in | **No change — hard default-off** | Always on publish |
 | Security deny (`.env`, intake mutation) | Hard deny | **No change — hard** | Always |
 
-**Drain-advance-without-pause**: outer driver schedules next OPEN story/bug immediately;
-paired **`resume_brief`** + **`state.md`** refresh per **DEC-0069** at every boundary.
+**Drain-advance-without-pause**: with **`full_autonomy`** in IDE, native in-chat chain
+schedules next OPEN story/bug **immediately** **without operator re-`/auto`**; outer
+driver is **optional** / **fallback** for headless/CI. Paired **`resume_brief`** +
+**`state.md`** refresh per **DEC-0069** at every boundary.
 
-### Block-retry ledger + cap interaction (US-0092)
+### Native in-chat auto-chain (US-0095 / DEC-0080)
+
+**IDE primary path** when **`AUTO_FLOW_MODE=full_autonomy`** + Cursor IDE + Task tool:
+orchestrator runs a **foreground sequential** spawn loop in the **same /auto orchestrator
+session** (**Native in-chat auto-chain**). Continuation loop: preflight → spawn → await →
+verify → caps → branch. **`NATIVE_CHAIN_UNAVAILABLE`** when Task tool denied or spawn
+depth limit hit — hard stop for native path; suggest outer driver as **optional** fallback.
+
+**Activation gate**: `full_autonomy` + IDE context + Task tool → set **`native_chain_active=true`**
+in `state.md` boundary.
+
+**Spawn-only invariants** (**BUG-0006**): orchestrator schedules phase-role subagents only;
+each phase completes via fresh spawn + artifacts; no in-band phase work.
+
+**Forbidden turn-boundary semantics**: **`stop_reason=completed (segment exhausted)`** is
+**invalid** when next phase, drain target, or relaxable retry is schedulable.
+
+### IDE drain-advance-without-pause algorithm (US-0095)
+
+**Trigger** (all required): `stop_phase=refresh-context`; `stop_reason=completed`; drain
+enabled (**`AUTO_BACKLOG_DRAIN=1`** or bug-queue per **US-0087** mutex); budget remaining.
+
+| Step | Action |
+|------|--------|
+| **1** | **READ** latest phase-boundary block in `docs/engineering/state.md` (`stop_phase`, `stop_reason`, `story_id`, `sprint_id`, `orchestrator_run_id`, `backlog_drain_stories_remaining_budget`, `bug_queue_remaining`) |
+| **2** | **ASSERT** **DEC-0069** pairing — completed phase refreshed **`resume_brief`** + **`state.md`**; stale → **`RESUME_BRIEF_STALE`** (fail-closed, no advance) |
+| **3** | **SELECT** next work item — story: decrement budget, select OPEN story per `AUTO_STORY_SELECTION`; bug: ascending **`BUG-####`** per **US-0087** |
+| **4** | **RELOAD** scratchpad; **MATERIALIZE** `resolved_phase_plan` (**US-0070**); intersect with segment entry phase |
+| **5** | **PREPEND** `handoffs/resume_brief.md` — `story_id`/`bug_id`, `intended_resume_phase`, unchanged `orchestrator_run_id`, drain counters |
+| **6** | **APPEND** `state.md` materialization breadcrumb for new segment |
+| **7** | **IMMEDIATELY** spawn first phase subagent — **without operator re-`/auto`**, **no** mandatory outer-driver instruction |
+
+**DEC-0069 pairing mandate**: every phase boundary and drain advance **must** refresh
+**`resume_brief`** + **`state.md`** before scheduling in-chat continuation.
+
+### Native-chain stop matrix (US-0095)
+
+Native chain **does not weaken** **DEC-0078** hard gates:
+
+| Condition | Native chain behavior |
+|-----------|----------------------|
+| Next intersected phase, no hard stop | **Continue in-chat** — schedule spawn |
+| **`decision_gate`**, isolation/strict-proof, security deny | **Hard stop** — unchanged |
+| **`BACKLOG_MAX_STORIES_REACHED`**, **`loop_max`**, unrecoverable **`error`**, **`pause_request`** | **Hard stop** — unchanged |
+| Relaxable transient stops (**DEC-0078**) | Bounded ledger retry → `phase_respawn` / `native_chain_continue` |
+| Segment complete + drain enabled | **Drain-advance** — immediate in-chat continuation |
+| Task spawn denied | **`NATIVE_CHAIN_UNAVAILABLE`** — hard for native path |
+
+### `AUTO_QUIET` under native chain (US-0095)
+
+| Event | `AUTO_QUIET=0` | `AUTO_QUIET=1` |
+|-------|----------------|----------------|
+| Routine phase PASS | May notify | **Suppress** |
+| Native chain continuing to next phase | Compact breadcrumb OK | **Suppress** |
+| Drain advance to next story/bug | Segment handoff notify OK | **Suppress** routine prose; **no** outer-driver instruction |
+| `decision_gate`, errors, caps, **`NATIVE_CHAIN_UNAVAILABLE`** | **Always** | **Always** |
+| `BACKLOG_MAX_STORIES_REACHED`, `BLOCK_RETRY_CAP_EXHAUSTED` | **Always** | **Always** |
+
+**Forbidden grep patterns** (IDE-primary `full_autonomy` sections): mandatory `run the outer driver`;
+`re-run /auto` between drain segments; `segment exhausted` as terminal when continuation pending;
+unqualified `python scripts/auto_outer_driver.py`.
+
+### Block-retry ledger + unified cap interaction (US-0092 / US-0095)
 
 Append-only **`handoffs/auto_block_retry/<orchestrator_run_id>.jsonl`** — names-only;
-no secrets. Cap interaction:
+no secrets. IDE native chain and outer driver **share one accounting model**:
 
 | Cap | Scope |
 |-----|-------|
-| `AUTO_LOOP_MAX_CYCLES` | Outer-driver `/auto` invocations (incl. drain advances) |
-| `AUTO_IMPLEMENTATION_LOOP` | Inner `execute`↔`qa`↔`verify-work` when `1` |
+| `AUTO_LOOP_MAX_CYCLES` | Each phase spawn + each drain advance = **1** `outer_cycle_index` increment |
+| `AUTO_IMPLEMENTATION_LOOP` | Inner `execute`↔`qa`↔`verify-work` → `implementation_loop_index` |
 | `AUTO_BLOCK_RETRY_MAX` | Per `(story_id, stop_reason)` recoverable retries |
-| `AUTO_BACKLOG_MAX_STORIES` | Drain breadth — outer driver exit **4** |
+| `AUTO_BACKLOG_MAX_STORIES` | `backlog_drain_stories_remaining_budget` decremented at segment advance |
 
-Cap exhaustion → exit **6** `BLOCK_RETRY_CAP_EXHAUSTED`. Ordering: outer driver checks
-`AUTO_LOOP_MAX_CYCLES` first; orchestrator checks `AUTO_IMPLEMENTATION_LOOP` +
-`AUTO_BLOCK_RETRY_MAX` before scheduling remediation.
+**`remediation_action` values**: `phase_respawn`, `native_chain_continue`, `drain_advance`
+(alongside existing `outer_reinvoke`).
+
+**State breadcrumb fields** (each `full_autonomy` phase boundary):
+
+| Field | Semantics |
+|-------|-----------|
+| **`native_chain_active`** | `true` when IDE native chain is driving continuation |
+| **`outer_cycle_index`** | Continuation cycles this run (int ≥ 0) |
+| **`implementation_loop_index`** | Inner remediation cycles for current story segment (int ≥ 0) |
+
+Cap exhaustion → exit **6** `BLOCK_RETRY_CAP_EXHAUSTED`. **Ordering**: check
+**`AUTO_LOOP_MAX_CYCLES`** first; then **`AUTO_IMPLEMENTATION_LOOP`** +
+**`AUTO_BLOCK_RETRY_MAX`** before recoverable retry; unrecoverable classes bypass ledger.
+
+**Security deny-list** (unchanged from **DEC-0078**): no auto-read **`.env`**, no intake
+evidence mutation, no publish without **`RELEASE_PUBLISH_MODE=auto`**.
 
 ### Browser UAT self-test (US-0093)
 
@@ -897,15 +975,19 @@ conditions the script is a no-op and the fail-closed reason codes from
    - `resolution_source` (`argument|resume_brief|state_fallback`)
    - `resolution_status` (`resolved|fail-fast`)
    - `timestamp`
-5. **(reference Step 5 — continuous multi-phase spawn)** Spawn a fresh subagent
-   for each remaining phase in **the intersected resolved schedule order** (not
-   the full canonical list when phases are omitted), starting at
+5. **(reference Step 5 — continuous multi-phase spawn)** **IDE primary path
+   (US-0095)**: when **`AUTO_FLOW_MODE=full_autonomy`** + Cursor IDE + Task tool,
+   orchestrator runs **Native in-chat auto-chain** — **foreground sequential**
+   spawn loop in the **same /auto orchestrator session** until stop matrix fires
+   (see **Native in-chat auto-chain (US-0095)** above). Otherwise spawn a fresh
+   subagent for each remaining phase in **the intersected resolved schedule order**
+   (not the full canonical list when phases are omitted), starting at
    `resolved_start_phase`, and **advance through all subsequent phases** until a
    **deterministic stop condition** fires (see **Deterministic stop matrix
    (US-0088)** above). The orchestrator does **not** stop after a single phase
    spawn unless the stop matrix requires it; outer-driver equivalence applies
-   when a single invocation cannot schedule multiple subagent turns (see
-   **Outer-driver equivalence (AC-1, Option B)** above):
+   when native chain is unavailable or a single invocation cannot schedule
+   multiple subagent turns (see **Outer-driver equivalence (AC-1, Option B)** above):
    default full path:
    intake -> discovery -> research -> architecture -> sprint plan ->
    plan verify -> execute -> QA -> verify work -> release -> refresh context.

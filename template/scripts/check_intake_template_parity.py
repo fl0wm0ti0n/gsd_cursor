@@ -8,6 +8,7 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=downstream-ci-guard   DEC-0075 downstream CI guard script pair table.
   --scope=us-0092               DEC-0078 full-autonomy outer driver + probe surfaces.
   --scope=us-0093               DEC-0079 browser UAT probe surfaces.
+  --scope=us-0095               DEC-0080 native in-chat auto-chain surfaces.
   --scope=all              union of all tables.
 """
 
@@ -99,6 +100,20 @@ US0093_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+US0095_PAIRS: tuple[tuple[str, str], ...] = (
+    (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+    (
+        "docs/engineering/auto-orchestration-reference.md",
+        "template/docs/engineering/auto-orchestration-reference.md",
+    ),
+    ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"),
+    ("README.md", "template/README.md"),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
 DOWNSTREAM_CI_GUARD_PAIRS: tuple[tuple[str, str], ...] = (
     (
         "scripts/check_downstream_ci_guard.py",
@@ -117,6 +132,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "downstream-ci-guard": DOWNSTREAM_CI_GUARD_PAIRS,
     "us-0092": US0092_PAIRS,
     "us-0093": US0093_PAIRS,
+    "us-0095": US0095_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -124,6 +140,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + DOWNSTREAM_CI_GUARD_PAIRS
         + US0092_PAIRS
         + US0093_PAIRS
+        + US0095_PAIRS
     ),
 }
 

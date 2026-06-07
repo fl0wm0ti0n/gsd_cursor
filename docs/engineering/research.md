@@ -4411,3 +4411,302 @@ Pre-voice baseline (recorded): `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFF
 - **Evidence refs (US-0093 delivery)**: `sprints/S0082/release-findings.md` (PASS); `handoffs/releases/S0082-release-notes.md`; `sprints/S0082/uat.md` (10/10 PASS); `sprints/S0082/uat.json`; `sprints/S0082/qa-findings.md` (PASS); `sprints/S0082/summary.md`; `sprints/S0082/plan-verify.json` (PASS); `decisions/DEC-0079.md`; `docs/engineering/architecture.md` `# US-0093`; `docs/product/backlog.md` `## US-0093` (DONE + `release_notes`); `docs/product/acceptance.md` (US-0093 row `[x]`); `handoffs/release_queue.md` (`S0082=released`); `docs/engineering/state.md` (Release checkpoint).
 - **Portfolio drain closure signal**: with US-0093 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment (`US-0091` → `US-0092` → `US-0093`) on `auto-20260606-04` closes here; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=1` of `10` left unused).
 - **Open R-xxxx anchors status (post-closure)**: R-0079 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.
+
+## R-0080 — US-0094: README visionary intro + tiered feature hierarchy
+
+- **Status**: **delivered** (delivery closure trailer below; curator refresh **2026-06-07T17:00:00Z**)
+- **Story**: **US-0094**
+- **Problem**: README opens with generic template copy; product promise (operator as dreamer + autonomous AI dev team) is buried below install instructions and a flat bullet list.
+- **Research questions**:
+  1. **Narrative lead pattern** — recommend a 2–3 paragraph "what this is" block before `## Features`, aligned with **DEC-0059** USER_* cells and **US-0071** metadata hygiene.
+  2. **Main vs sub feature tiers** — pillar grouping for 100+ anchors without duplicating the **US-0091** catalog; use `###` under existing H2s vs a new `## Main capabilities` (architecture must not invent forbidden H2s).
+  3. **Full-autonomy placement** — how to foreground **US-0092** (`AUTO_FLOW_MODE=full_autonomy`, `/auto`, drain) in operator language without contradicting default-off scratchpad contract.
+  4. **Coverage-safe moves** — section-affinity rules when relocating bullets so `validate_readme_feature_coverage.py` stays `coverage_missing=[]`.
+  5. **Parity workflow** — edit-once copy to `template/README.md` vs generate step; **US-0017** byte-identical requirement.
+- **External refs**: Diataxis tutorial/how-to vs reference split (**R-0054**); README best practices for developer product landing pages.
+- **Linked**: **US-0091**, **US-0077**, **US-0092**, **DEC-0074**, **DEC-0059**
+- **Discovery findings (2026-06-07, PO, `auto-20260607-01`)**:
+  - **Q1 narrative lead — RESOLVED at discovery**: 3 paragraphs before `## Features` — (1) dreamer + role-based AI team, (2) artifact-first `/intake`→`/release` workflow + pause/resume/decision gates, (3) opt-in **`AUTO_FLOW_MODE=full_autonomy`** + outer driver + `/auto` drain (**US-0092**, default-off). Replace generic tagline ("Happy coding!…"); keep H1 `# its-magic — AI dev team`. Optional one-sentence link to **`docs/developer/README.md`**.
+  - **Q2 main vs sub tiers — RESOLVED at discovery**: four pillars as **`###` under `## Features (what its-magic can do)`** only — **Autonomous AI workflow**, **Quality & verification gates**, **Distribution & install**, **Operator control & ergonomics**. Each pillar: 3–6 teaser bullets (commands/flags/outcomes). **Rejected**: new `## Main capabilities` H2 (would violate **DEC-0059** budget / USER_* vocabulary). **US-0091 catalog** stays in three affinity-home blocks inside existing H2s (Features chunk, Commands chunk, Other useful capabilities chunk) — pillars do not replace catalog.
+  - **Q3 full-autonomy placement — RESOLVED at discovery**: primary = intro ¶3; secondary = first pillar bullet; tertiary = existing **US-0092** catalog line in Commands affinity section. Mandatory default-off / opt-in pairing per **DEC-0078**.
+  - **Q4 coverage-safe moves — RESOLVED at discovery**: affinity resolver (`readme-section-affinity.json`) is normative — slash_command→Commands, scratchpad_mode→Other useful capabilities, distribution→Features, release_gate→Commands, governance→Other useful capabilities. Catalog bullets with `US-xxxx`/`BUG-xxxx` ids must remain in same parent H2 body; cross-H2 moves forbidden; reorder within block OK. Preserve `<!-- readme-feature-coverage-catalog -->` markers (3 sites). Post-edit `validate_readme_feature_coverage.py --report` gate. Baseline: **104/104 PASS**.
+  - **Q5 parity workflow — RESOLVED at discovery**: edit `README.md` once → byte-copy to `template/README.md`; verify identity before commit; no independent dual edits.
+  - **Open for `/research`**: intro word-count budget for `both`×`balanced` cell; pillar-to-catalog thematic cross-reference table (navigation only, not moves); whether **DEC-0074** needs §intro hierarchy companion or discovery locks suffice for execute.
+
+### Research extension (2026-06-07T12:30:00Z, tech-lead, `orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=tl-US0094-research-20260607T123000Z-fresh`)
+
+- **Status**: **closed for `/research`** — Q1–Q4 resolved; **`/architecture`** next. No new **`R-xxxx`** allocated (extend **`R-0080`** per **DEC-0011** intake anchor).
+- **External (EARLY_RESEARCH=1)**: [Diátaxis map](https://diataxis.fr/map/) — four documentation modes (tutorial, how-to, reference, explanation) are distinct by user need, not a mandatory linear read order; [Diátaxis in complex hierarchies](https://diataxis.fr/complex-hierarchies/) — landing/README pages should read as **overviews** with headings and short intros that orient readers to deeper material without duplicating reference bodies. Confirms discovery tier split: visionary **explanation** (pre-H2 intro) + pillar **summary** (`###` teasers) + preserved **reference** (catalog blocks) + unchanged **how-to/tutorial** (`Setup`, `How-to`, walkthroughs).
+
+#### Q1 — Pillar-to-catalog thematic affinity map (`status=resolved`)
+
+**Normative rule**: this table is for **pillar teaser cross-links only** (e.g. “see catalog in **Commands and workflow**”) — **not** catalog relocations. Structural affinity remains **`readme-section-affinity.json`** + **DEC-0074** §4 (cross-H2 moves forbidden).
+
+| Pillar (`###` under `## Features`) | Primary catalog parent H2 (structural home — immutable) | Thematic cross-link scope (teaser bullets may name) | Representative catalog IDs (remain in home H2) |
+|-----------------------------------|--------------------------------------------------------|-----------------------------------------------------|--------------------------------------------------|
+| **Autonomous AI workflow** | **`Commands and workflow`** (phase/auto/orchestration lines) | `/intake`→`/release` lifecycle, `/auto`, pause/resume, decision gates (`DEC-xxxx`), team mode, backlog/bug drain (**US-0088**), **`AUTO_FLOW_MODE=full_autonomy`** + outer driver (**US-0092**) | `US-0092`, `US-0088`, `US-0044`, `US-0087`, `US-0023`, `US-0037`, `US-0069`, `US-0056`, `US-0070`, `BUG-0006` |
+| **Quality & verification gates** | **`Commands and workflow`** (release/QA/UAT/gate lines) + **`Features`** (`/acceptance` catalog line only) | 3-layer quality chain, `/qa` / `/verify-work` / `/uat`, release gates, plan-verify, metadata guard, browser UAT (**US-0093**) | `US-0091`, `US-0093`, `US-0071`, `US-0039`, `US-0048`, `US-0014`, `US-0065`, `US-0066`, `US-0030` |
+| **Distribution & install** | **`Features`** (distribution-tagged lines — primary) + scattered install/publish lines in **`Commands and workflow`** | npm / npx / Chocolatey / Homebrew, `its-magic --target` modes (missing/overwrite/upgrade/clean), lifecycle QA matrix, multi-target publish | `US-0009`, `US-0041`, `US-0008`, `US-0016`, `US-0054`, `US-0084`, `US-0007`, `BUG-0001`, `BUG-0003`, `BUG-0008`, `BUG-0009` |
+| **Operator control & ergonomics** | **`Other useful capabilities`** (scratchpad/governance lines — primary) | scratchpad flags + `scratchpad.local.md`, guided intake packs, Caveman voice/compression (**US-0089** / **US-0090**), **`TOKEN_PROFILE`** cost profiles (**US-0080**), voice input, permissions/runtime connectivity | `US-0089`, `US-0090`, `US-0080`, `US-0013`, `US-0033`, `US-0035`, `US-0073`, `US-0010`, `US-0012`, `US-0011` |
+
+**Catalog block inventory** (baseline **104/104 PASS**; parent H2 fixed):
+
+| Catalog block marker | Parent H2 | ~item count | Pillar teaser may point here |
+|---------------------|-----------|-------------|------------------------------|
+| `<!-- readme-feature-coverage-catalog -->` (~line 27) | **`Features (what its-magic can do)`** | 20 | **P3** primary; **P2** (`/acceptance`) |
+| same marker (~line 1139) | **`Commands and workflow`** | ~60 | **P1** + **P2** (shared home — teasers split by theme, ids stay) |
+| same marker (~line 1339) | **`Other useful capabilities`** | ~24 | **P4** primary |
+
+**Pillar bullet rules (execute)**:
+
+1. **Id-free teasers** — pillar bullets cite commands/flags/outcomes by name; **must not** copy catalog `US-xxxx`/`BUG-xxxx` lines.
+2. **Optional one-line cross-link** per pillar — plain-language pointer to the catalog block in its parent H2 (no anchor moves).
+3. **Full-autonomy placement unchanged** — intro ¶3 (primary) + **P1** pillar bullet (secondary) + existing **`US-0092`** catalog line (tertiary).
+
+#### Q2 — Intro word/line budget for `both`×`balanced` (`status=resolved`)
+
+**Profile context**: default merged scratchpad resolves **`DOC_AUDIENCE_PROFILE=both`** × **`DOC_DETAIL_LEVEL=balanced`** (**DEC-0059** §6). `validate_doc_profile.py` enforces **H2 count** in root README for required **`USER_*`** keys — **`both`×`balanced` budget = 8 H2** (`doc_profile_lib.ROOT_BUDGET`). **US-0094** adds only **`###` H3** pillars under existing **`## Features`** — **no new `##` H2 literals** — so H2 budget is **unchanged**.
+
+**Intro prose** (lines before first `## Features`) is **pre-H2** and **not** counted by `validate_doc_profile.py`. Budget is a **research/architecture lock** to mitigate risk **R3** (intro bloat).
+
+| Constraint | Soft target | Hard max (execute MUST NOT exceed) |
+|------------|-------------|-------------------------------------|
+| Paragraph count | 3 (discovery lock) | 3 |
+| Words per paragraph | 40–70 | 80 |
+| Total intro words | 120–210 | 240 |
+| Lines per paragraph (≤90 cols wrap) | 2–3 | 4 |
+| Total intro lines (non-blank) | 8–10 | 12 |
+| Optional DEV cross-link (`docs/developer/README.md`) | ≤25 words in ¶2 or ¶3 | 1 sentence only |
+
+**Calibration**: discovery-locked draft (vision **Discovery Notes — US-0094**) measures **129 words** / **3 paragraphs** — within soft target. Execute should replace generic tagline (lines 5–9) with discovery copy ±10% word variance; **do not** add a 4th paragraph or bullet list in the intro zone.
+
+**Validation at execute**: manual AC-1 review + `validate_doc_profile.py` (H2) + `check-user-visible-metadata.py`; no new scripted intro-length gate required for **US-0094** scope.
+
+#### Q3 — Does **DEC-0074** need a §intro hierarchy companion? (`status=resolved`)
+
+**Verdict: No — backlog/vision/discovery locks suffice; do not amend DEC-0074.**
+
+| Factor | Assessment |
+|--------|------------|
+| **DEC-0074 scope** | Predicate, validator, section-affinity manifest, catalog id-preservation, release step **3f** — **static coverage** contract |
+| **US-0094 scope** | Narrative **information architecture** (intro + pillar teasers) atop existing anchors |
+| **Overlap** | Both require **no new USER_* H2 literals** and **no cross-H2 catalog moves** — already locked in **DEC-0074** §3–§4 and discovery |
+| **Gap** | Intro/pillar tier semantics are **product positioning**, not coverage-detection rules |
+
+**Architecture path**: document intro + pillar contract in **`docs/engineering/architecture.md`** **`# US-0094`**; optional companion **`DEC-xxxx`** only if architecture wants a formal IA decision — **not** a **DEC-0074** amendment. Execute cites discovery locks + **`R-0080`** Q1–Q4; re-run **`validate_readme_feature_coverage.py --report`** per **AC-4**.
+
+#### Q4 — Diataxis tier boundary examples (`status=resolved`)
+
+Mapping per **R-0054** / [Diátaxis](https://diataxis.fr/) — README tiers for **US-0094**:
+
+| Diataxis mode | README region | US-0094 action | Boundary example (in vs out) |
+|---------------|---------------|----------------|------------------------------|
+| **Explanation** | 3 intro paragraphs **before** `## Features` | **NEW** — visionary promise, operator-as-dreamer, opt-in autonomy | **In**: “artifact-first memory lives in repo files.” **Out**: install command tables (belong in **Setup**) |
+| **Summary / landing overview** | Four `###` pillars under `## Features` | **NEW** — 3–6 teaser bullets each | **In**: “Run `/auto` to drain your backlog (opt-in full autonomy).” **Out**: full `/auto` flag matrix (stays in **Commands and workflow** body + catalog) |
+| **Reference** | Three `### Feature coverage catalog (US-0091)` blocks | **PRESERVED** — id-indexed 104-item index | **In**: `- \`/auto\` — … (\`US-0092\`).` **Out**: duplicating that line in pillar bullets |
+| **How-to** | `## Setup`, `## How-to` | **PRESERVED** — procedural steps | **In**: `its-magic --target . --mode missing`. **Out**: repeating upgrade steps in **P3** pillar |
+| **Tutorial** | `## Walkthrough examples` | **PRESERVED** — learning-oriented sequences | **In**: numbered phase walkthrough. **Out**: moving walkthrough steps into intro |
+| **Reference (deep)** | `## Commands and workflow` body (below catalog), `## Developer and release deep-dive` | **PRESERVED** | **In**: slash-command reference prose. **Out**: relocating catalog ids to pillars |
+
+**Anti-patterns (execute guards)**:
+
+- Pillar tier must not become a second catalog (encyclopedic `US-xxxx` lists).
+- Intro must not include install/CI procedure steps (violates Diataxis explanation vs how-to boundary).
+- Full-autonomy value prop must not live only in **Developer and release deep-dive** (**AC-8**).
+
+- **Linked (closure)**: **US-0094**, **US-0091**, **DEC-0074**, **DEC-0059**, **US-0092**, **DEC-0078**, **R-0054**
+- **Confidence**: high (repo baseline 104/104 PASS + Diataxis external framing + discovery locks)
+- **Next phase pointers (`/architecture`)**: author **`# US-0094`** section with intro/pillar contract, Q1 affinity table, Q2 budget literals, Diataxis tier map; **no DEC-0074 amendment**; optional **`DEC-xxxx`** only if architecture formalizes IA; execute rewrites intro + pillars without catalog id moves.
+
+### Delivery closure trailer (2026-06-07T16:30:00Z, release, `orchestrator_run_id=auto-20260607-01`, `fresh_context_marker=release-S0083-US0094-release-20260607T163000Z-fresh`, `sprint_id=S0083`)
+
+- **Status**: **delivered** — Q1–Q4 resolved at `/research`; architecture locked **`# US-0094`** (no companion DEC); sprint **S0083** executed, QA/verify-work/release **PASS**; **US-0094** **DONE**.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. README visionary intro (3 ¶, 136 words), four discovery-locked pillar **`###`** sections under **`## Features`**, three catalog blocks preserved in affinity homes, root ↔ **`template/README.md`** byte parity, **`coverage_missing=[]`**, **`coverage_total=104`**; UAT **10/10** PASS.
+- **Evidence refs (US-0094 delivery)**: `sprints/S0083/release-findings.md` (PASS); `handoffs/releases/S0083-release-notes.md`; `sprints/S0083/uat.md` (10/10 PASS); `sprints/S0083/uat.json`; `sprints/S0083/qa-findings.md` (PASS); `sprints/S0083/summary.md`; `sprints/S0083/plan-verify.json` (PASS); `docs/engineering/architecture.md` `# US-0094`; `docs/product/backlog.md` `## US-0094` (DONE + `release_notes`); `docs/product/acceptance.md` (US-0094 row `[x]`); `handoffs/release_queue.md` (`S0083=released`); `README.md`, `template/README.md`; `docs/engineering/state.md` (Release checkpoint).
+- **Portfolio drain closure signal**: with US-0094 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment on `auto-20260607-01` closes here; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=0`).
+- **Open R-xxxx anchors status (post-closure)**: R-0080 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.
+
+## R-0081 — US-0095: Native in-Cursor `/auto` auto-chaining (no outer driver required)
+
+- **Date**: 2026-06-07
+- **Topic**: Native in-chat auto-chain for **`AUTO_FLOW_MODE=full_autonomy`** — phase + drain continuation without mandatory **`auto_outer_driver.py`**
+- **Query**: How should `/auto` orchestrator continue across intersected lifecycle phases and backlog-drain segment boundaries **within one Cursor IDE invocation** while preserving spawn-only (**BUG-0006**), isolation (**US-0048**), strict proof (**US-0056**), and the **US-0092** hard stop matrix — with outer driver demoted to optional headless/CI fallback?
+- **Status**: **delivered** (delivery closure trailer below; curator refresh **2026-06-07T23:45:00Z**)
+- **Story**: **US-0095**
+- **Problem**: **US-0092** / **DEC-0078** shipped **`scripts/auto_outer_driver.py`** as the multi-turn bridge for **`AUTO_FLOW_MODE=full_autonomy`** + backlog drain, but operators running `/auto` inside Cursor IDE still hit **`stop_reason=completed (segment exhausted)`** and are told to re-run `/auto` or the outer driver — contradicting hands-off drain expectations.
+- **Linked**: **US-0092**, **DEC-0078**, **US-0088**, **US-0044**, **US-0087**, **BUG-0006**, **US-0069**, **US-0048**, **US-0056**, **DEC-0069**, **DEC-0038**, **R-0078**
+- **Intake evidence**: `handoffs/intake_evidence/US-0095-intake-20260607.json`
+- **Discovery extension**: `docs/product/backlog.md` `## US-0095` — `discovery_notes`; `docs/product/vision.md` — **Discovery Notes — US-0095**
+
+### Research extension (2026-06-07T19:00:00Z, tech-lead, `orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=tl-US0095-research-20260607T190000Z-fresh`)
+
+- **External (EARLY_RESEARCH)**: [Cursor Subagents docs](https://cursor.com/docs/subagents) confirm the parent agent can delegate via the **Task tool** in **foreground** mode (blocks until subagent completes — sequential chain) or **background** mode (async fleet). Cursor 2.4+ ships default subagents; custom role subagents live under **`.cursor/agents/`**. [Cursor changelog (2026-04-24)](https://cursor.com/changelog/04-24-26) adds **`/multitask`** for async subagent fleets — orthogonal to lifecycle phase ordering (phases remain **strictly sequential** per **reference Step 5**). Community guidance ([forum layering/managing agents](https://forum.cursor.com/t/layering-managing-agents/158222)) notes **hooks** (`subagentStop` → `followup_message`) as an alternate continuation seam — **rejected as primary** for its-magic (non-portable across installs; spawn-only contract already maps cleanly to foreground Task loop). **Conclusion**: normative IDE continuation = orchestrator **foreground sequential Task spawn loop** within one `/auto` session; outer driver remains portable fallback when Task/subagent scheduling is unavailable (headless/CI).
+
+#### Q1 — Native continuation mechanism (`status=resolved`)
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Foreground sequential Task/subagent loop** — orchestrator spawns phase-role subagent → awaits completion → runs US-0069 preflight + DEC-0038 post-check → schedules next spawn **in the same `/auto` orchestrator turn** | **Preferred** — matches Cursor subagent foreground mode; preserves **BUG-0006** (orchestrator schedules only). |
+| B | **Background subagent + poll/`Await`** | **Rejected for phase chain** — nondeterministic boundary ordering; post-check may race artifact writes. |
+| C | **Orchestrator in-band phase execution** | **Rejected** — **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** (**BUG-0006**). |
+| D | **Outer-driver-only continuation** | **Rejected as primary IDE path** — remains fallback per Q4; **US-0095** closes the IDE gap **US-0092** left open. |
+| E | **Cursor hooks (`subagentStop` follow-up)** | **Deferred / non-primary** — useful enhancement later; not required for v1 contract; architecture may note as optional operator overlay. |
+
+**Normative pattern (architecture-locks exact prose tokens)**:
+
+1. **Activation**: merged scratchpad **`AUTO_FLOW_MODE=full_autonomy`** (exact literal) **and** invocation context = Cursor IDE (default when `/auto` runs in Agent panel without `--invoke-cmd`).
+2. **Chain driver**: orchestrator executes **reference Step 5** as a **`while` continuation loop**:
+   - resolve next `phase_id` from intersected schedule **or** drain-advance target (Q2);
+   - **US-0069** preflight (role matrix + capability gate);
+   - **spawn fresh subagent** (`Task` tool, `subagent_type` = canonical role, `readonly` when phase is read-only);
+   - **await** subagent completion (foreground);
+   - verify isolation evidence + strict-proof tuple in `state.md`;
+   - increment continuation counters (Q3);
+   - branch stop matrix → continue spawn, drain-advance, block-retry, or hard stop.
+3. **Forbidden**: orchestrator authors phase deliverables, merges subagent output as phase completion, or skips spawn for any scheduled `phase_id`.
+4. **Turn-boundary semantics**: under native chain, **`stop_reason=completed (segment exhausted)`** is **not** a valid terminal state when (a) next intersected phase exists, (b) drain policy selects another OPEN item, or (c) relaxable stop is within retry budget — orchestrator **must** schedule continuation instead of emitting operator wait instructions.
+5. **Fail-closed when native chain unavailable** (no Task tool, spawn denied, depth limit): stop with candidate reason **`NATIVE_CHAIN_UNAVAILABLE`** + remediation listing headless fallback (`auto_outer_driver.py`) — **not** mandatory for IDE when chain is available.
+
+**Risks**: **R1** Cursor depth/tool-policy blocks nested spawns → document bounds + **`NATIVE_CHAIN_UNAVAILABLE`** fail-closed. **R3** spawn-only violation if orchestrator summarizes phase work in-band → contract tests + **US-0069** post-checks unchanged.
+
+#### Q2 — IDE drain-advance algorithm (`status=resolved`)
+
+Deterministic **drain-advance-without-pause** when **`full_autonomy`** + (**`AUTO_BACKLOG_DRAIN=1`** or bug-queue per **US-0087**). Composes **US-0044**, **US-0087**, **DEC-0069**, **reference Step 5** item 5.
+
+**Trigger** (all must hold):
+
+- Segment terminal phase completed: `stop_phase=refresh-context` (or story terminal boundary when `refresh-context` omitted from plan).
+- `stop_reason=completed` (not hard gate).
+- Drain enabled: `AUTO_BACKLOG_DRAIN=1` (story) **or** bug-queue active with resolved target (**US-0087** mutex unchanged).
+- `backlog_drain_stories_remaining_budget > 0` (story drain) or bug-queue budget not exhausted.
+
+**Algorithm** (orchestrator scheduling — not phase-role work):
+
+```
+1. READ latest phase-boundary block in docs/engineering/state.md
+   (stop_phase, stop_reason, story_id, sprint_id, orchestrator_run_id,
+    backlog_drain_stories_remaining_budget, bug_queue_remaining).
+2. ASSERT DEC-0069 pairing: completed phase refreshed resume_brief + state.md
+   (stale → fail-closed RESUME_BRIEF_STALE; no drain advance).
+3. IF story drain:
+     a. DECREMENT budget counter in state boundary (initial = AUTO_BACKLOG_MAX_STORIES
+        at materialization; minus segments completed this run).
+     b. SELECT next OPEN story from docs/product/backlog.md per AUTO_STORY_SELECTION
+        (priority_then_backlog_order — unchanged).
+     c. IF no eligible OPEN story → set drain_terminated=true,
+        drain_terminated_reason=no_open_stories; STOP chain (completed).
+     d. IF budget == 0 → stop_reason BACKLOG_MAX_STORIES_REACHED (hard).
+   ELSE IF bug-queue (US-0087):
+     a. SELECT next OPEN BUG-#### ascending; respect AUTO_BUG_MAX_ITEMS.
+     b. IF queue empty → AUTO_BUG_QUEUE_EMPTY (hard).
+4. RELOAD merged scratchpad; MATERIALIZE resolved_phase_plan (US-0070);
+   INTERSECT with segment entry phase (typically discovery or intake if skipped).
+5. PREPEND handoffs/resume_brief.md top pointer:
+   story_id|bug_id, intended_resume_phase=<first scheduled phase>,
+   orchestrator_run_id=<unchanged>, backlog_drain_active, budget counters.
+6. APPEND state.md materialization breadcrumb for new segment.
+7. IMMEDIATELY spawn first phase subagent (goto Q1 chain step 2) — no operator
+   re-/auto, no outer-driver instruction under full_autonomy IDE path.
+```
+
+**Scheduler mutex** (**US-0087**): unchanged — `AUTO_SCHEDULER_CONFLICT` when both drain flags set without `bug-target=` argv.
+
+**Risks**: **R4** stale `resume_brief` between advances → **DEC-0069** fail-closed unchanged. **R2** docs claim drain while behavior stops → contract tests (Q6).
+
+#### Q3 — Cap + ledger interaction (`status=resolved`)
+
+**Principle**: IDE native chain and outer driver **share one accounting model** — same scratchpad keys, same ledger path, same counter semantics — so caps cannot desync between paths (**discovery R6**).
+
+| Cap | Scope (unified) | IDE native chain behavior | Outer driver behavior |
+|-----|-----------------|---------------------------|------------------------|
+| **`AUTO_LOOP_MAX_CYCLES`** | **Continuation cycles per `orchestrator_run_id`** — each **phase spawn boundary** after materialization counts **1**; each **drain segment advance** counts **1**; inner `execute`↔`qa` remediation cycles count toward **`implementation_loop_index`** not outer cycle when `AUTO_IMPLEMENTATION_LOOP=1` | Orchestrator increments `outer_cycle_index` in memory + state breadcrumb before each spawn/advance; at cap → `stop_reason=loop_max` (hard) | Same — `scripts/auto_outer_driver.py` already increments `outer_cycle` per hook re-invocation (**R-0078** Q4) |
+| **`AUTO_IMPLEMENTATION_LOOP`** | Inner **`execute`→`qa`→`verify-work`** remediation | When `1`, UAT/QA fail schedules remediation spawns within same story segment; each full cycle increments `implementation_loop_index`; hard stop when `implementation_loop_index >= AUTO_LOOP_MAX_CYCLES` | Unchanged |
+| **`AUTO_BLOCK_RETRY_MAX`** | Per **`(story_id, stop_reason)`** recoverable retries | Before scheduling recoverable retry, orchestrator **reads** ledger; if count ≥ max → `BLOCK_RETRY_CAP_EXHAUSTED` (hard). On retry scheduled, **append** ledger row with `remediation_action=phase_respawn` (not `outer_reinvoke`) | Existing `outer_reinvoke` rows preserved; same ledger file |
+| **`AUTO_BACKLOG_MAX_STORIES`** | Drain breadth per run | Decrement `backlog_drain_stories_remaining_budget` in `state.md` at each segment advance; hard stop at **0** with `BACKLOG_MAX_STORIES_REACHED` | Exit **4** (unchanged) |
+
+**Ledger path** (unchanged): append-only **`handoffs/auto_block_retry/<orchestrator_run_id>.jsonl`**.
+
+**New `remediation_action` values** (architecture ratifies): `phase_respawn`, `native_chain_continue`, `drain_advance` — alongside existing `outer_reinvoke`.
+
+**Ordering** (unchanged from **R-0078** / **DEC-0078**): check **`AUTO_LOOP_MAX_CYCLES`** first; then **`AUTO_IMPLEMENTATION_LOOP`** + **`AUTO_BLOCK_RETRY_MAX`** before recoverable retry; unrecoverable classes bypass ledger.
+
+**State breadcrumb fields** (add at execute): `native_chain_active=true|false`, `outer_cycle_index`, `implementation_loop_index` on each phase boundary when `full_autonomy`.
+
+#### Q4 — Outer driver fallback boundary matrix (`status=resolved`)
+
+| Context | Native in-chat chain | Outer driver (`auto_outer_driver.py`) | Operator messaging |
+|---------|---------------------|----------------------------------------|-------------------|
+| **Cursor IDE + `full_autonomy`** | **Primary** — default hands-off recipe | **Optional fallback** — headless escape hatch, troubleshooting, Task-tool denial | **Must not** state outer driver is **required** for drain |
+| **Headless / CI / scripted runner** | **Unavailable** (no Task tool) | **Recommended** — `python scripts/auto_outer_driver.py --repo . [--invoke-cmd …]` | Runbook labels **headless primary** |
+| **`--invoke-cmd` / external agent runner** | N/A | **Required** bridge | Document in runbook § US-0092 + new § US-0095 |
+| **`manual` / `auto_until_decision`** | **Not required** — single-phase or gate-stop behavior unchanged | Optional | No change |
+| **Native chain fail-closed (`NATIVE_CHAIN_UNAVAILABLE`)** | Stops | **Suggested fallback** (one line, non-mandatory tone) | Non-suppressible error |
+| **Relaxable transient stop exhausted** | Stops in-chat | Operator **may** re-run outer driver | Notify on cap |
+
+**README / runbook demotion wording** (execute applies):
+
+- Replace mandatory phrasing: ~~"run the shipped outer driver once"~~ as **sole** full-autonomy recipe → **"run `/auto` once in Cursor"** (primary); outer driver **"for headless/CI or when native chain is unavailable"**.
+- Preserve **US-0092** autonomy headline — demote, do not delete.
+- **US-0094** intro ¶3 touch: within US-0095 execute scope per discovery.
+
+**Risks**: **R5** dual-path confusion → runbook table (above) + explicit **Primary vs fallback** labels.
+
+#### Q5 — Operator messaging + `AUTO_QUIET` (`status=resolved`)
+
+**Invariant**: Under **`AUTO_FLOW_MODE=full_autonomy`** IDE native chain, segment and phase handoffs **must not** emit **mandatory wait** instructions (`run auto_outer_driver.py`, `re-run /auto`, `segment exhausted — operator action required`) when continuation is schedulable.
+
+| Event | `AUTO_QUIET=0` | `AUTO_QUIET=1` |
+|-------|----------------|----------------|
+| Routine phase PASS | May notify | **Suppress** |
+| Native chain continuing to next phase | Compact breadcrumb OK | **Suppress** (optional one-line `chain_continuing` also suppressible) |
+| Drain advance to next story/bug | Segment handoff notify OK | **Suppress** routine segment prose; **no** outer-driver instruction |
+| `decision_gate`, errors, `loop_max`, `blocked`, missing critical input, pause | **Always** (non-suppressible) | **Always** |
+| `BACKLOG_MAX_STORIES_REACHED`, `BLOCK_RETRY_CAP_EXHAUSTED` | **Always** | **Always** |
+| `NATIVE_CHAIN_UNAVAILABLE` | **Always** + fallback hint | **Always** |
+
+**Forbidden grep patterns** (active `auto.md` + reference `full_autonomy` IDE sections after execute):
+
+- `run the outer driver` (as mandatory IDE step)
+- `re-run /auto` (between segments when drain active + native chain available)
+- `segment exhausted` (as terminal under `full_autonomy` when continuation pending)
+- `python scripts/auto_outer_driver.py` without **optional** / **fallback** qualifier in IDE-primary prose
+
+**Orthogonality**: **`AUTO_QUIET`** unchanged vs **`TOKEN_PROFILE`** (**DEC-0035** / **US-0088**).
+
+#### Q6 — Contract-test + template parity inventory (`status=resolved`)
+
+**Pytest markers** (add class `test_us0095_*` — run `pytest -k us0095 tests/auto_command_contract_test.py`):
+
+| Test | AC | Assertions |
+|------|-----|------------|
+| `test_us0095_native_in_chat_auto_chain_markers` | AC-1 | `auto.md` + reference contain **`Native in-chat auto-chain`**, **`foreground sequential`**, **`same /auto orchestrator session`**, **`NATIVE_CHAIN_UNAVAILABLE`** (or architecture-locked synonym) |
+| `test_us0095_ide_drain_advance_without_outer_driver` | AC-2 | Normative **`drain-advance-without-pause`** + **`immediately`** + **`without operator re-`/auto`**` in IDE-primary section; **no** mandatory outer-driver phrase in that section |
+| `test_us0095_outer_driver_fallback_not_mandatory_ide` | AC-5 | README + runbook: **`optional`** / **`fallback`** adjacent to outer-driver mentions in full-autonomy IDE recipe |
+| `test_us0095_spawn_only_regression` | AC-3 | Reuse **BUG-0006** forbidden orchestrator-phase strings; add **`native chain`** section does not introduce forbidden patterns |
+| `test_us0095_auto_quiet_no_outer_driver_mandatory` | AC-6 | Reference documents quiet suppression + non-suppressible list includes cap/gate errors; negative grep for mandatory outer-driver between segments |
+| `test_us0095_resume_brief_pairing_markers` | AC-7 | `auto.md` or reference cites **DEC-0069** refresh before in-chat continuation |
+| `test_us0095_template_parity_auto_surfaces` | AC-9 | Byte or literal parity active ↔ `template/` for touched `auto.md`, reference excerpts, runbook subsection |
+
+**Touch inventory** (execute):
+
+| # | Surface | Parity |
+|---|---------|--------|
+| 1 | **`.cursor/commands/auto.md`** | active + **`template/.cursor/commands/auto.md`** — new § **Native in-chat auto-chain (US-0095)**; demote outer-driver equivalence to fallback in IDE path |
+| 2 | **`docs/engineering/auto-orchestration-reference.md`** | active + template — Step 5 amendment: IDE primary path; Option B equivalence scoped to fallback |
+| 3 | **`docs/engineering/runbook.md`** | active + template — new **`### Native in-chat auto-chain (US-0095)`** + demote **`### Full-autonomy outer driver (US-0092)`** to fallback |
+| 4 | **`README.md`**, **`template/README.md`** | intro ¶3 + pillar bullet demotion (**US-0094** follow-on) |
+| 5 | **`handoffs/resume_brief.md`** pairing contract | documented in reference (no schema change) |
+| 6 | **`tests/auto_command_contract_test.py`** | markers above |
+| 7 | **`docs/engineering/architecture.md`** | **`# US-0095`** (architecture phase) |
+| 8 | Scratchpad comments | only if new keys required (research: **none** — reuse existing caps) |
+
+- **Confidence**: high on contract shape (repo inventory + Cursor subagent docs); runtime depth limits remain operator-verified at UAT.
+- **Next phase pointers (`/architecture`)**: lock companion **`DEC-xxxx`** (if needed beyond discovery locks), **`# US-0095`**, exact reason codes (`NATIVE_CHAIN_UNAVAILABLE`), state breadcrumb fields, runbook primary/fallback table, contract-test literal strings, README demotion copy.
+
+### Delivery closure trailer (2026-06-07T23:30:00Z, release, `orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=release-S0084-US0095-release-20260607T233000Z-fresh`, `sprint_id=S0084`)
+
+- **Status**: **delivered** — Q1–Q6 resolved at `/research`; architecture locked **`DEC-0080`** + **`# US-0095`**; sprint **S0084** executed, QA/verify-work/release **PASS**; **US-0095** **DONE**.
+- **Resolution matrix outcome**: all discovery/research asks resolved at `/architecture` → `/sprint-plan` and verified through `/execute` → `/qa` → `/verify-work` → `/release`. Native in-chat auto-chain contract shipped in **`auto.md`** + reference; 7-step IDE drain-advance-without-pause; **`NATIVE_CHAIN_UNAVAILABLE`** fail-closed; **`AUTO_QUIET`** forbidden mandatory outer-driver/re-`/auto` patterns; outer driver demoted to optional IDE fallback / headless primary; seven **`test_us0095_*`** contract subtests green; template parity **`--scope=us-0095`**; UAT **10/10** PASS.
+- **Evidence refs (US-0095 delivery)**: `sprints/S0084/release-findings.md` (PASS); `handoffs/releases/S0084-release-notes.md`; `sprints/S0084/uat.md` (10/10 PASS); `sprints/S0084/uat.json`; `sprints/S0084/qa-findings.md` (PASS); `sprints/S0084/summary.md`; `sprints/S0084/plan-verify.json` (PASS); `decisions/DEC-0080.md`; `docs/engineering/architecture.md` `# US-0095`; `docs/product/backlog.md` `## US-0095` (DONE + `release_notes`); `docs/product/acceptance.md` (US-0095 row `[x]`); `handoffs/release_queue.md` (`S0084=released`); `tests/auto_command_contract_test.py` (`test_us0095_*`); `docs/engineering/state.md` (Release checkpoint).
+- **Portfolio drain closure signal**: with US-0095 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment on `auto-20260607-02` closes at **`/refresh-context`**; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=9` unused of initial **10**).
+- **Open R-xxxx anchors status (post-closure)**: R-0081 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.

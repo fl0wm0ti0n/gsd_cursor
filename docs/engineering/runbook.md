@@ -1366,13 +1366,46 @@ success chatter. Non-suppressible notifications:
 `AUTO_QUIET` is **orthogonal** to `TOKEN_PROFILE` (**DEC-0035** / **US-0080**):
 `TOKEN_PROFILE` controls context breadth and token cost, not notification policy.
 
-### Full-autonomy outer driver (US-0092)
+Under **`full_autonomy`** IDE native chain (**US-0095**), drain advance suppresses
+routine prose when **`AUTO_QUIET=1`** but **must not** emit mandatory outer-driver
+wait instructions between segments.
 
-Opt-in **`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) enables the
-shipped stdlib outer driver. Spawn-only preserved — the driver loops hook
-invocations; it never performs phase-role work.
+### Native in-chat auto-chain (US-0095)
 
-#### Enable and run (once per portfolio segment)
+**Primary IDE recipe** for hands-off delivery when **`AUTO_FLOW_MODE=full_autonomy`**
+(default-off): run **`/auto` once in Cursor** — orchestrator self-chains in-chat
+across phases and drain segments via **foreground sequential** Task loop in the
+**same /auto orchestrator session**.
+
+#### Enable and run (IDE primary)
+
+1. Set in merged scratchpad:
+   - `AUTO_FLOW_MODE=full_autonomy`
+   - Optional: `AUTO_BACKLOG_DRAIN=1`, caps (`AUTO_LOOP_MAX_CYCLES`, `AUTO_BACKLOG_MAX_STORIES`, `AUTO_BLOCK_RETRY_MAX`)
+2. Run **`/auto`** once in Cursor Agent panel (no `--invoke-cmd`).
+3. Orchestrator continues in-chat until hard stop, drain budget exhausted, or
+   **`NATIVE_CHAIN_UNAVAILABLE`** (optional fallback: outer driver below).
+
+Normative detail: **`.cursor/commands/auto.md`** § **Native in-chat auto-chain (US-0095)**
+and **`docs/engineering/auto-orchestration-reference.md`** § **Native in-chat auto-chain**.
+
+#### Primary / fallback boundary
+
+| Context | Native in-chat chain | Outer driver | Messaging |
+|---------|---------------------|--------------|-----------|
+| **Cursor IDE + `full_autonomy`** | **Primary** | **Optional fallback** | No mandatory outer-driver drain recipe |
+| **Headless / CI** | Unavailable | **Recommended** | Runbook: headless primary |
+| **`--invoke-cmd`** | N/A | **Required** bridge | Document in runbook |
+| **`NATIVE_CHAIN_UNAVAILABLE`** | Stops | Suggested (**optional** tone) | Non-suppressible |
+
+### Full-autonomy outer driver (US-0092) — fallback
+
+Opt-in **`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) also enables
+the shipped stdlib outer driver as **optional** / **fallback** for headless/CI or
+when native in-chat chain is unavailable. Spawn-only preserved — the driver loops hook
+invocations; it never performs phase-role work. **Not required** for IDE drain.
+
+#### Enable and run (headless/CI fallback)
 
 1. Set in merged scratchpad (`.cursor/scratchpad.md` + optional local overrides):
    - `AUTO_FLOW_MODE=full_autonomy`
