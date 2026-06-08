@@ -36,6 +36,10 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Node 22+ on Windows: trust OS CA store (antivirus/corp TLS inspection). See nodejs.org enterprise-network-configuration.
+if (-not $env:NODE_USE_SYSTEM_CA) { $env:NODE_USE_SYSTEM_CA = '1' }
+
 $repoRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 if (-not (Test-Path (Join-Path $repoRoot 'package.json'))) {
     $repoRoot = Split-Path -Parent $PSScriptRoot

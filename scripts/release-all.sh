@@ -41,6 +41,9 @@ done
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
+# Node 22+: trust OS CA store when TLS inspection adds system CAs (Windows/antivirus/corp proxy).
+export NODE_USE_SYSTEM_CA="${NODE_USE_SYSTEM_CA:-1}"
+
 log()  { echo -e "\033[36m[release]\033[0m $1"; }
 warn() { echo -e "\033[33m[release]\033[0m $1"; }
 err()  { echo -e "\033[31m[release]\033[0m $1"; exit 1; }
