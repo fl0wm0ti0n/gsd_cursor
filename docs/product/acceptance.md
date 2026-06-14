@@ -125,6 +125,7 @@
 - [x] US-0098: Dev environment auto-launch profile — detect/persist dev runtime, bounded rebuild/relaunch after execute changes, operator connection surface; docker-host-local vs remote; default-off scratchpad gate (10 ACs) (UAT closure: `sprints/S0088/uat.json`, `sprints/S0088/uat.md`, verify-work **2026-06-14T12:00:00Z** / `orchestrator_run_id=auto-20260613-01`; release **2026-06-14T12:30:00Z** / `handoffs/releases/S0088-release-notes.md`, queue **`S0088`** → **`released`**)
 - [x] US-0099: Auto-bootstrap dev-environment profile on install/upgrade — non-destructive copy of template example to `.cursor/dev-environment.json` when missing; npm postinstall parity; runbook customize-after-bootstrap (8 ACs) (UAT closure: `sprints/S0089/uat.json`, `sprints/S0089/uat.md`, verify-work **2026-06-14T23:00:00Z** / `orchestrator_run_id=auto-20260614-01`; release **2026-06-14T23:30:00Z** / `handoffs/releases/S0089-release-notes.md`, queue **`S0089`** → **`released`**)
 - [x] US-0100: Version-scoped release changelog — cumulative CHANGELOG with US/BUG summaries per semver, per-version release docs, `/release` derivation + GitHub/git notes attachment composing with US-0040/US-0054 (10 ACs)
+- [ ] US-0101: Per-phase model tier selection for subagents — MODEL_TIER scratchpad (cheap/balanced/strong), stable Cursor aliases, optional local slug catalog, provider-mode runbook; orthogonal to TOKEN_PROFILE (9 ACs)
 
 ## Bug acceptance (canonical)
 

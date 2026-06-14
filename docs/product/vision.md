@@ -1529,3 +1529,17 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Research anchor**: **`R-0087`** — extend at **`/research`** with repo survey closure and Q1–Q5 answers.
 - **Intake evidence**: `handoffs/intake_evidence/US-0100-intake-20260615.json`.
 - **Next**: **`/research`** (fresh **tech-lead**).
+
+## Intake Notes — US-0101
+
+- **Operator request (2026-06-14)**: Per its-magic phase, use cheaper models for light work and strong models for coding — automatically via rules/commands/`/auto`, without brittle hardcoded model IDs; support dynamic local slug catalog; document API-only mode when only BYOK models are active.
+- **Problem framing**: **`TOKEN_PROFILE`** (**US-0080** / **DEC-0062**) reduces context breadth, not LLM choice. Subagent **`model:`** in **`.cursor/agents/`** is the Cursor-native hook, but the framework ships no tier contract, no local catalog, and no provider-mode guidance.
+- **Recommended model (intake-locked)**:
+  - **`MODEL_TIER_<phase>=cheap|balanced|strong`** in scratchpad (local override precedence per **DEC-0055**).
+  - Template agents use **`fast`** / **`inherit`** only; operator slugs in **`.cursor/model-catalog.local.json`** (gitignored).
+  - **`MODEL_PROVIDER_MODE=cursor|api`** documented with subagent BYOK limitations.
+- **Default matrix**: cheap → ask/refresh/memory-audit; balanced → intake/discovery/research/release/plan-verify; strong → architecture/execute/qa/verify-work/security-review.
+- **Decomposition**: **single story** **US-0101**.
+- **Research stub**: **`R-0088`** — materializer design, catalog schema, contract tests, UI precedence.
+- **Intake evidence**: `handoffs/intake_evidence/US-0101-intake-20260614.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`).
+- **Next**: **`/discovery`** (fresh **PO**).

@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260614-US0101-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Per its-magic phase/role, use cheaper models for light work (ask, refresh-context) and strong models for coding/architecture (execute, dev, tech-lead), automatically when /auto spawns subagents — without hardcoding volatile model IDs like composer-2.5 or claude-opus-4-8 in framework template files.",
+      "intake_run_id": "cursor-20260614-US0101-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260614-US0101-intake:0:12e0c3f308662891"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": ".cursor/agents/*.mdc (active + template/), .cursor/scratchpad.md + scratchpad.local.example.md, optional .cursor/model-catalog.local.json (gitignored) + example, docs/engineering/runbook.md, docs/engineering/auto-orchestration-reference.md, scripts/model_tier_lib.py (or equivalent resolver), tests/auto_command_contract_test.py, check_intake_template_parity scope, architecture decision + # US-0101.",
+      "intake_run_id": "cursor-20260614-US0101-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260614-US0101-intake:1:9ba4cb9d2c4d6676"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "MODEL_TIER is orthogonal to TOKEN_PROFILE (DEC-0062 — context breadth only, never model choice). Template ships stable Cursor aliases fast and inherit only; concrete slugs live in operator-local catalog. Document MODEL_PROVIDER_MODE cursor vs api-only BYOK: subagents may not inherit custom API keys (known Cursor limitation). No weakening US-0048/US-0069 spawn-only isolation or mandatory QA/release gates.",
+      "intake_run_id": "cursor-20260614-US0101-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260614-US0101-intake:2:dd7d712c004bd81e"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Contract tests for scratchpad tier keys, default phase-to-tier matrix literals, orthogonality paragraph vs TOKEN_PROFILE, template agent model: fast/inherit markers, local catalog schema validation, MODEL_RESOLVE_FALLBACK reason codes, and check_intake_template_parity --scope=model-tier when surfaces touched.",
+      "intake_run_id": "cursor-20260614-US0101-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260614-US0101-intake:3:fb8510dd872d2063"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0101: operators can configure per-phase model tiers via scratchpad + optional local slug catalog; template agents use stable aliases; runbook documents API-only caveats; release flips DONE per US-0045.",
+      "intake_run_id": "cursor-20260614-US0101-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260614-US0101-intake:4:77ffce6cc49c3dbd"
+    }
+  ]
+}
