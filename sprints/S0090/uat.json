@@ -1,0 +1,143 @@
+{
+  "sprint_id": "S0090",
+  "story_ids": ["US-0100"],
+  "story_id": "US-0100",
+  "dec_id": "DEC-0085",
+  "status": "verified",
+  "author": "qa",
+  "timestamp": "2026-06-15T06:00:00Z",
+  "orchestrator_run_id": "auto-20260615-01",
+  "implementation_loop_index": 0,
+  "fresh_context_marker": "qa-S0090-US0100-qa-20260615T060000Z-fresh",
+  "verify_work_executed_at": "2026-06-15T07:00:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0090-US0100-verify-work-20260615T070000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/regression re-run green; UAT-1..UAT-10 confirmed; US-0100 remains OPEN per US-0045.",
+  "qa_verdict_reference": "sprints/S0090/qa-findings.md",
+  "qa_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 10,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0085 execute deliverables merged (release_changelog_lib.py, validate, backfill, CHANGELOG.md stub, release step 19, release-all.sh -F)",
+    "template/ mirrors for release-changelog parity pairs",
+    "US-0100 remains OPEN in docs/product/backlog.md per US-0045"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["DEC-0085"],
+      "command": "pytest -k us0100_changelog_artifact_paths tests/auto_command_contract_test.py -q",
+      "expected": "CHANGELOG.md Keep a Changelog 1.1.0 + mandatory ## [Unreleased] at top",
+      "result": "pass",
+      "evidence_ref": "CHANGELOG.md + template/CHANGELOG.md stub; test_us0100_changelog_artifact_paths_literals green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0085"],
+      "command": "pytest -k us0100_changelog_artifact_paths tests/auto_command_contract_test.py -q",
+      "expected": "Per-version {semver}-release-notes.md path; example pattern; no overwrite of unrelated version files",
+      "result": "pass",
+      "evidence_ref": "template/handoffs/releases/vX.Y.Z-release-notes.md.example; test_us0100_changelog_artifact_paths_literals + test_us0100_compose_us0040_sprint_notes_unchanged green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "governance_ref": ["DEC-0085"],
+      "command": "pytest -k 'us0100_release_changelog_lib or us0100_unreleased or us0100_release_step19' tests/auto_command_contract_test.py -q",
+      "expected": "/release step 19 derivation + [Unreleased] promotion; idempotent fingerprint",
+      "result": "pass",
+      "evidence_ref": "release_changelog_lib.py API; release.md step 19a-19d; test_us0100_release_changelog_lib_api_surface + test_us0100_unreleased_promotion_literals + test_us0100_release_step19_literals green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "governance_ref": ["DEC-0085", "US-0040"],
+      "command": "pytest -k us0100_derivation_precedence tests/auto_command_contract_test.py -q",
+      "expected": "bind_queue_release_version target-scoped; sprint evidence cross-refs in version doc",
+      "result": "pass",
+      "evidence_ref": "bind_queue_release_version in release_changelog_lib.py; test_us0100_derivation_precedence_literals green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0085", "US-0008"],
+      "command": "pytest -k us0100_release_all_f_replace tests/auto_command_contract_test.py -q",
+      "expected": "release-all.sh gh -F replaces --generate-notes; fail-closed RELEASE_CHANGELOG_VERSION_DOC_MISSING",
+      "result": "pass",
+      "evidence_ref": "scripts/release-all.sh -F path + opt-in --generate-notes gate; test_us0100_release_all_f_replace_literals green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0085", "R-0087"],
+      "command": "pytest -k us0100_backfill_manifest tests/auto_command_contract_test.py -q",
+      "expected": "Three-tier backfill A/B/C; manifest schema_version 1; synthetic 0.0.0-wf.{NNN} tier C",
+      "result": "pass",
+      "evidence_ref": "release_changelog_backfill.py + release-version-backfill.manifest.yaml; test_us0100_backfill_manifest_schema_literals green",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0085"],
+      "command": "pytest -k us0100_reason_code tests/auto_command_contract_test.py -q && python scripts/release_changelog_validate.py --repo .",
+      "expected": "Ten RELEASE_CHANGELOG_* fail codes; validator exit 0 on fresh stub (warn mode)",
+      "result": "pass",
+      "evidence_ref": "release_changelog_validate.py; test_us0100_reason_code_inventory green; QA validate exit 0 with [RELEASE_CHANGELOG_VALIDATE_WARN]",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0085"],
+      "command": "pytest -k us0100_release_step19 tests/auto_command_contract_test.py -q",
+      "expected": "Runbook version-doc workflow + release.md step 19; RELEASE_CHANGELOG_ENFORCE scratchpad key",
+      "result": "pass",
+      "evidence_ref": "docs/engineering/runbook.md § US-0100; release.md step 19; active + template parity OK",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["DEC-0085", "US-0017"],
+      "command": "pytest -k us0100 tests/auto_command_contract_test.py -q && python scripts/check_intake_template_parity.py --scope=release-changelog",
+      "expected": "Ten test_us0100_* green; RELEASE_CHANGELOG_PAIRS parity; harness §26Y",
+      "result": "pass",
+      "evidence_ref": "10 passed / 26 subtests; [INTAKE_TEMPLATE_PARITY_OK] scope=release-changelog; tests/run-tests.ps1 §26Y",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["DEC-0085"],
+      "command": "Manual: confirm DEC-0085 + architecture # US-0100 + plan-verify attestation",
+      "expected": "Decision locks paths, derivation precedence, publish compose; architecture task seeds present",
+      "result": "pass",
+      "evidence_ref": "decisions/DEC-0085.md; docs/engineering/architecture.md # US-0100; sprints/S0090/plan-verify.json AC-10 attestation",
+      "verified_at": "2026-06-15T07:00:00Z",
+      "verified_by": "verify-work"
+    }
+  ],
+  "probe_results": []
+}

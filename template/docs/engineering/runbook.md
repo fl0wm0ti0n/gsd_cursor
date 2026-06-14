@@ -128,16 +128,17 @@ Normative H2 titles and matrix: `docs/engineering/architecture.md` (`# US-0077`)
 ## README feature coverage validation (US-0091 / DEC-0074)
 
 **Goal:** ensure every DONE user-visible backlog item (`US-xxxx` / `BUG-xxxx` with
-`user_visible: true`) has operator blurbs in root `README.md` and traceability rows in
-`docs/developer/README.md`, without inventing new `USER_*` / `DEV_*` H2 literals
-(**DEC-0059** composes; **US-0030** delta gate unchanged).
+`user_visible: true`) has operator blurbs in **`its_magic/README.md`** (framework catalog)
+and traceability rows in `docs/developer/README.md`, without inventing new `USER_*` / `DEV_*`
+H2 literals (**DEC-0059** composes; **US-0030** delta gate unchanged). Consumer root
+`README.md` is **out of scope** for this gate — see **US-0097** / **DEC-0083**.
 
 ### Delta vs static doc gates
 
 | Gate | Question | Remediation |
 |------|----------|-------------|
 | **US-0030** (delta) | Did this sprint change commands/flags without README/runbook updates? | Update command docs for changed surfaces; agent checklist in `/release` step 3 family. |
-| **US-0091** (static) | Is every DONE user-visible item documented in the README family? | Backfill root + DEV shard; set `user_visible:` marker; run validator `--report`. |
+| **US-0091** (static) | Is every DONE user-visible item documented in the framework README family? | Backfill **`its_magic/README.md`** + DEV shard; set `user_visible:` marker; run validator `--report`. |
 
 ### Scratchpad key
 
@@ -166,6 +167,138 @@ Reason codes: `README_FEATURE_COVERAGE_BLOCKED`, `README_FEATURE_COVERAGE_GAP:<i
 
 Normative predicate + affinity manifest: `decisions/DEC-0074.md`,
 `docs/engineering/context/readme-section-affinity.json`.
+
+## Project README coverage validation (US-0097 / DEC-0083)
+
+**Goal:** ensure project-owned root `README.md` has a bootstrap scaffold and growing
+feature catalog under `<!-- project-readme-feature-catalog -->` for every DONE
+`user_visible: true` backlog item. Framework catalog remains in **`its_magic/README.md`**
+(**US-0091** gate **3f** — independent from project gate **3g**).
+
+### Placeholder sentinels S1–S5
+
+| Signal | Detection rule | Verdict |
+|--------|----------------|---------|
+| **S1** | H1 `# its-magic — AI dev team` | placeholder |
+| **S2** | `<!-- readme-feature-coverage-catalog -->` | placeholder |
+| **S3** | Heading `Feature coverage catalog (US-0091)` | placeholder |
+| **S4** | Byte-identical to `template/README.md` | placeholder |
+| **S5** | None of S1–S4 + custom title/purpose | **operator-authored** — preserve |
+
+**Detection order**: `FRAMEWORK_KIT_REPO=1` → S1–S4 → S5. Hybrid roots fail closed with
+`PROJECT_README_MIGRATION_AMBIGUOUS` or `PROJECT_README_SENTINEL_CONFLICT`.
+
+### Migration algorithm M1–M5
+
+| Step | Condition | Action |
+|------|-----------|--------|
+| **M1** | `FRAMEWORK_KIT_REPO=1` | Skip consumer migration |
+| **M2** | Root **S5** | Preserve root; copy to **`its_magic/README.md`** if missing |
+| **M3** | Root **S1–S4**, **`its_magic/`** missing | Lift root → **`its_magic/README.md`** |
+| **M4** | Root **S1–S4** after **M3** | Replace root with project scaffold |
+| **M5** | Hybrid / ambiguous | Fail closed |
+
+### Scratchpad keys
+
+- `PROJECT_README_ENFORCE`: `0` \| `1` (default `1` post-bootstrap).
+- `FRAMEWORK_KIT_REPO`: `0` \| `1` (default `0`; consumer repos never `1`).
+
+**Grandfathering:** set `PROJECT_README_ENFORCE=0` during migration; flip to `1` when
+`validate_project_readme_coverage.py --report` shows `coverage_missing: []`.
+
+### Commands
+
+```bash
+python scripts/validate_project_readme_coverage.py --self-test
+python scripts/validate_project_readme_coverage.py --repo . --report
+python scripts/validate_project_readme_coverage.py --repo . --audit-out docs/engineering/context/project-readme-coverage-audit.json
+python scripts/validate_project_readme_coverage.py --repo . --enforce
+python scripts/check_intake_template_parity.py --scope=project-readme
+```
+
+Reason codes: `PROJECT_README_COVERAGE_BLOCKED`, `PROJECT_README_COVERAGE_GAP:<id>`,
+`PROJECT_README_DELTA_SKIPPED`, `PROJECT_README_BOOTSTRAP_SKIPPED`,
+`PROJECT_README_MIGRATION_AMBIGUOUS`, `PROJECT_README_SENTINEL_CONFLICT`,
+`PROJECT_README_PLACEHOLDER_UNRESOLVED`, `PROJECT_README_ENFORCE_SKIPPED`,
+`PROJECT_README_INPUT_INVALID`.
+
+### Operator recipes (US-0097)
+
+| Scenario | Operator action |
+|----------|-----------------|
+| Fresh consumer repo | First **`/execute`** bootstraps project README; framework catalog in **`its_magic/`** |
+| Legacy framework root README | Run **`upgrade`** — migration **M3**/**M4** lifts to **`its_magic/`** + project scaffold |
+| Operator-authored root (S5) | Migration preserves root; adds **`its_magic/README.md`** if missing |
+| Hybrid / ambiguous root | Fix manually per **`PROJECT_README_MIGRATION_AMBIGUOUS`** — remove mixed sentinel + custom prose |
+| Migration window | Set **`PROJECT_README_ENFORCE=0`**; backfill catalog bullets; flip to **`1`** when **`--report`** clean |
+| Kit repo dogfooding | Set **`FRAMEWORK_KIT_REPO=1`** — skip consumer bootstrap (**23a**/**23b**) and project validator root check |
+
+**Troubleshooting:** `PROJECT_README_COVERAGE_BLOCKED` at release **3g** → run `--report`,
+backfill missing `US-xxxx` bullets under `<!-- project-readme-feature-catalog -->`.
+`PROJECT_README_MIGRATION_AMBIGUOUS` → split framework content to **`its_magic/README.md`**
+manually, then re-run migration. Implementation tranche order: A (installer + migration) →
+B (bootstrap) → C (execute **23** + release **3g** + scratchpad) → D (validators + tests).
+
+Normative contract: `decisions/DEC-0083.md`, `docs/engineering/architecture.md` `# US-0097`.
+
+## Dev environment auto-launch (US-0098 / DEC-0084)
+
+**Goal:** execute-phase bounded rebuild/restart of dev stacks plus **Connect** surfacing after
+implementation changes — distinct from **US-0065** phase QA, **US-0086** test routing, and
+**US-0067** release hints. Default-off scratchpad gate; **no** `.env` reads (**US-0085**).
+
+**Install-time bootstrap (US-0099):** on **`missing`**, **`upgrade`**, and **npm `postinstall`**, the
+framework copies **`template/.cursor/dev-environment.json.example`** → resolved profile path
+(**`.cursor/dev-environment.json`** by default) **only when the target file is absent** — never
+overwrites operator-customized profiles. Customize **after** bootstrap (compose **`service`**, **`*Env`**
+connect refs); manual copy is no longer a prerequisite to enable the gate.
+
+| Before (US-0098) | After (US-0099) |
+|------------------|-----------------|
+| "Seed profile" = manual copy prerequisite | Bootstrap automatic on install/upgrade/postinstall |
+| **`DEV_ENV_PROFILE_MISSING`** → manual copy first | Troubleshooting references auto-bootstrap + customize-after-bootstrap |
+
+### Operator recipes
+
+| Scenario | Operator action |
+|----------|-----------------|
+| Enable dev auto-launch | Set **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`** in scratchpad |
+| Customize profile after bootstrap | Edit **`.cursor/dev-environment.json`** copied from example; set compose **`service`** + **`*Env`** connect refs |
+| Force relaunch | Send exact phrase **`refresh dev environment`** (case-sensitive whole phrase) |
+| Profile off / manual mode | Leave **`DEV_AUTO_LAUNCH_PROFILE=off`** (default) — execute step **24** zero overhead |
+| Ambiguous stack | Fix compose path or seed profile; remediate **`DEV_ENV_DETECT_AMBIGUOUS`** |
+| Remote + local both on | **US-0086** remote wins over **docker-host-local** — see precedence in **`DEC-0084`** §3 |
+| Bind-mount hot reload | Default skip on source-only docker changes; use refresh or **`restart_on_source_change=true`** |
+| Global npm install (no consumer repo) | **`[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected`** — run **`its-magic`** install into target repo |
+
+### Troubleshooting (`DEV_ENV_*` reason codes)
+
+**Bootstrap family (install-time; distinct from runtime profile/relaunch families):**
+**`DEV_ENV_BOOTSTRAP_COPIED`**, **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`**, **`DEV_ENV_BOOTSTRAP_PATH_INVALID`**,
+**`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`**.
+
+**Profile family:** **`DEV_ENV_PROFILE_DISABLED`**, **`DEV_ENV_PROFILE_INVALID`**,
+**`DEV_ENV_PROFILE_MISSING`** (if bootstrap skipped or profile deleted — re-run install/upgrade or
+**`python scripts/dev_environment_lib.py --bootstrap --target <repo>`** then customize),
+**`DEV_ENV_DETECT_AMBIGUOUS`**, **`DEV_ENV_COMPOSE_UNRESOLVED`**, **`DEV_ENV_TARGET_DISABLED`**, **`DEV_ENV_SECRET_SURFACE_VIOLATION`**.
+
+**Relaunch family:** **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`**, **`DEV_ENV_RELAUNCH_SKIPPED_PROFILE_OFF`**,
+**`DEV_ENV_RELAUNCH_FAILED`**, **`DEV_ENV_RELAUNCH_RETRY_EXHAUSTED`**, **`DEV_ENV_RELAUNCH_TIMEOUT`**, **`DEV_ENV_CONNECT_UNAVAILABLE`**.
+
+### Commands
+
+```bash
+python scripts/dev_environment_lib.py --self-test
+python scripts/dev_environment_lib.py --load .cursor/dev-environment.json
+python scripts/dev_environment_lib.py --bootstrap --target .
+python scripts/check_intake_template_parity.py --scope=dev-environment
+pytest -k us0098 tests/auto_command_contract_test.py
+pytest -k us0099 tests/auto_command_contract_test.py
+```
+
+Implementation tranche order: **A** (schema + scratchpad) → **B** (stdlib helper) → **C** (execute step **24** + docs) → **D** (contract tests + parity + harness).
+
+Normative contract: `decisions/DEC-0084.md`, `docs/engineering/architecture.md` `# US-0098`, `# US-0099` (bootstrap posture).
 
 ## User-visible internal metadata guard (US-0071 / DEC-0053)
 
@@ -447,8 +580,75 @@ Manual override precedence:
   **`.jsonl`**); copy path into **`token_cost_evidence_ref`** on **`state.md`** checkpoints.
 - **AC-2**: compare **`cache_read_tokens`** only when **`run_class_hash`** matches; else
   **`TOKEN_COST_RUN_CLASS_MISMATCH`**.
+- **`delivery_mode`** (US-0096 / DEC-0082): required key in sorted JSON run-class object
+  (amends **DEC-0062**). Evidence rows in **`handoffs/token_cost_runs/<orchestrator_run_id>.md`**
+  **must** include **`delivery_mode`** column. **`ultra_lean`** vs **`standard`** on same story →
+  **`TOKEN_COST_RUN_CLASS_MISMATCH`**. Tranche A target: **≥10%** **`cache_read_tokens`** reduction
+  on matched **`standard`** runs vs pre-US-0096 baseline.
 - **CI/repo checks**: `python scripts/check_token_cost_parity.py --repo .` (manifest-listed
   active/`template/` pairs); **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** §26M.
+
+### Delivery modes (US-0096 / DEC-0082)
+
+> **`DELIVERY_MODE`** controls lifecycle shape and artifact surfaces only. **`TOKEN_PROFILE`** controls context breadth / token cost only (**DEC-0062**). **`CAVEMAN_MODE`** controls reply voice only (**DEC-0072**). None substitutes for another.
+
+| Key | Values | Default |
+|-----|--------|---------|
+| **`DELIVERY_MODE`** | `standard` \| `ultra_lean` \| `mega_quick` | `standard` |
+| **`LEAN_MEMORY_READ`** | `0` \| `1` | `1` |
+| **`LEAN_MEMORY_WRITE`** | `0` \| `1` | `1` |
+| **`LEAN_COLD_READ_MAX_SECTIONS`** | int ≥ 1 | `4` |
+| **`LEAN_STATE_INDEX_ROWS`** | int ≥ 30 | `80` |
+| **`AUTO_DELIVERY_ROUTING`** | `scratchpad_only` \| `backlog_then_scratchpad` | `scratchpad_only` |
+
+**Tranche A default hot caps** (example scratchpad; explicit operator values override):
+**`STATE_HOT_MAX_LINES=1000`**, **`PO_TO_TL_HOT_MAX_LINES=650`**, **`ARCH_HOT_MAX_LINES=3000`**.
+
+#### Operator recipes
+
+| Mode | When to use | Avoid when |
+|------|-------------|------------|
+| **`standard`** | Full lifecycle, cross-cutting stories, companion DEC, release gates | N/A (default) |
+| **`ultra_lean`** | P1 stories with clear AC, token budget pressure, institutional memory needed | Mid-story mode switch; no validator/index |
+| **`mega_quick`** | ≤3 AC, single component, docs-only or tiny fix | Architecture-first; existing **`Sxxxx`**; bug segments |
+
+#### Tranche A universal wins (always-on)
+
+1. **Narrow-read** in all phase command **`Inputs`** — cite **`phase-context.md`** + story section
+   anchor; forbid full-file reads when heading exists.
+2. **Delta handoffs** — append delta paragraphs to handoff bodies; no full rewrites of prior content.
+3. **Touch-graph reads** — before **`/execute`**, read **`docs/engineering/codebase-map.md`**
+   component slice + touched paths from sprint/tasks or pack.
+
+#### `ultra_lean` E2E operator recipe (`build+verify`)
+
+1. Set **`DELIVERY_MODE=ultra_lean`**, **`LEAN_MEMORY_READ=1`**, **`LEAN_MEMORY_WRITE=1`**.
+2. Run **`/auto`** — expect four macro-phases: **`spec`**, **`plan`**, **`build+verify`**, **`ship`**.
+3. **`build+verify`** merges execute + qa + verify-work in one spawn; **`AUTO_IMPLEMENTATION_LOOP`**
+   loops inside macro-phase until green or cap.
+4. Warm memory: **`work/<story_id>/pack.json`** (validate with **`scripts/pack_json_validate.py`**).
+5. Hot index: **`handoffs/active-context.md`** (30–80 lines; **not** triad).
+
+#### Layered memory + gates
+
+- active-context.md is NOT a triad member — triad enforcement unchanged (**DEC-0054**).
+- Rollover → **`handoffs/archive/active-context-<story_id>-<utc>.md`** on oversize or segment close.
+- **`LEAN_MEMORY_READ=0`** or **`LEAN_MEMORY_WRITE=0`** on **`ultra_lean`** → **`LEAN_MEMORY_DISABLED`**.
+
+#### Quality floor (all lean modes)
+
+- Tests run before stop.
+- AC traceability in **`pack.json`** or **`task.json`**.
+- New patterns → architecture/decision delta.
+- **`active-context.md`** updated on material learnings.
+- No secrets / publish bypass (**`RELEASE_PUBLISH_MODE`** unchanged).
+
+#### Backlog routing (optional)
+
+When **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**, story row may declare optional
+**`delivery_mode:`** field. Precedence: argv **`delivery-mode=`** → story row → scratchpad → **`standard`**.
+
+**Release status (S0086 / US-0096)**: **`released`** (`2026-06-13T16:00:00Z`); **`US-0096`** **DONE** in canonical backlog. Operator verify: **`handoffs/releases/S0086-release-notes.md`** **## Verify**; publish skipped while **`RELEASE_PUBLISH_MODE=confirm`**.
 
 Context compaction policy:
 
@@ -609,6 +809,59 @@ Fail-closed reason codes:
 - `RELEASE_OPERATOR_HINTS_MISSING`
 - `RELEASE_OPERATOR_HINTS_AMBIGUOUS`
 - `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`
+
+## Version-scoped release docs (US-0100 / DEC-0085)
+
+Cumulative and per-version release documentation compose with **US-0040** sprint
+notes — they do **not** replace `handoffs/releases/Sxxxx-release-notes.md`.
+
+| Artifact | Path | Role |
+|----------|------|------|
+| Cumulative changelog | `CHANGELOG.md` | Keep a Changelog 1.1.0; mandatory top `## [Unreleased]` |
+| Per-version GitHub body | `handoffs/releases/{semver}-release-notes.md` | **`gh -F` SOT** (semver stem without `v`) |
+| Sprint workflow evidence | `handoffs/releases/Sxxxx-release-notes.md` | Unchanged (**US-0040**); derivation input only |
+| Backfill manifest | `docs/engineering/context/release-version-backfill.manifest.yaml` | Tier B operator `sprint_id`→`semver` overrides |
+
+### Operator workflow (deterministic order)
+
+1. **`/release`** (local workflow): after step **9** finalization, step **19**
+   derives work items, writes version docs when semver known, or appends
+   `[Unreleased]` only when semver blank.
+2. **`release-all.sh`** (npm/choco/brew + GitHub): post-`npm version`, ensure
+   `handoffs/releases/${NEW_VERSION}-release-notes.md`, run
+   `release_changelog_validate.py --enforce`, then `gh release create -F`.
+3. **CI tag push** (when **US-0054** publish targets enabled): same `-F` path;
+   confirmation gates unchanged.
+
+### Scratchpad keys
+
+| Key | Default | Role |
+|-----|---------|------|
+| `RELEASE_CHANGELOG_ENFORCE` | `1` | Blocking validator at `/release` step **19d** + `release-all.sh` |
+| `RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES` | `0` | Opt-in `gh --generate-notes` when version doc missing |
+
+### Backfill tiers (one-time / idempotent)
+
+| Tier | Source | Semver |
+|------|--------|--------|
+| A | Queue `release_version` non-empty | As-is |
+| B | `release-version-backfill.manifest.yaml` | Operator map |
+| C | Remaining released rows | Synthetic `0.0.0-wf.{NNN}` (`S0089`→`0.0.0-wf.089`) |
+
+Run: `python scripts/release_changelog_backfill.py --repo .` (idempotent).
+Ambiguous manifest collision → `RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS`.
+
+### Troubleshooting (`RELEASE_CHANGELOG_*`)
+
+| Code | Remediation |
+|------|-------------|
+| `RELEASE_CHANGELOG_VERSION_DOC_MISSING` | Run `build_version_doc` / backfill `--ensure-version` before `gh -F` |
+| `RELEASE_CHANGELOG_UNRELEASED_MISSING` | Add `## [Unreleased]` header to `CHANGELOG.md` |
+| `RELEASE_CHANGELOG_QUEUE_DRIFT` | Re-run `bind_queue_release_version` for target sprints |
+| `RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS` | Fix manifest duplicate semver mapping |
+
+Contract tests: `pytest -k us0100 tests/auto_command_contract_test.py`; parity:
+`python scripts/check_intake_template_parity.py --scope=release-changelog`.
 
 ## Deterministic status reconciliation mode (US-0055 / DEC-0037)
 
@@ -1397,6 +1650,27 @@ and **`docs/engineering/auto-orchestration-reference.md`** § **Native in-chat a
 | **Headless / CI** | Unavailable | **Recommended** | Runbook: headless primary |
 | **`--invoke-cmd`** | N/A | **Required** bridge | Document in runbook |
 | **`NATIVE_CHAIN_UNAVAILABLE`** | Stops | Suggested (**optional** tone) | Non-suppressible |
+
+### BUG-0012 regression verify
+
+Multi-segment operator E2E recipe — validates native-chain orchestrator compliance
+(**DEC-0081**) after **US-0095** contract delivery.
+
+1. **Scratchpad**: set **`AUTO_FLOW_MODE=full_autonomy`**, **`AUTO_BACKLOG_DRAIN=1`**,
+   **`AUTO_BACKLOG_MAX_STORIES≥2`**, **`AUTO_QUIET=1`** in merged `.cursor/scratchpad.md`.
+2. **Backlog**: ensure **≥2 OPEN stories** in `docs/product/backlog.md`.
+3. **Invoke**: run **`/auto`** once in Cursor IDE Agent panel (no `--invoke-cmd`).
+4. **Complete segment A**: let orchestration finish **story A** through **`refresh-context`**.
+5. **Pass criteria**: orchestrator drain-advances to **story B** first phase **without**
+   operator re-**`/auto`** and **without** forbidden terminal prose (no mandatory
+   `re-run /auto`, no mandatory outer driver, no `segment exhausted` terminal when
+   continuation pending).
+6. **Evidence**: `docs/engineering/state.md` segment boundary shows
+   **`drain_advance_action=spawned`**, **`native_chain_continuing=true`**;
+   `handoffs/resume_brief.md` top pointer advances **`story_id`** to story B.
+
+Normative detail: **`.cursor/commands/auto.md`** § **Orchestrator post-subagent continuation
+mandate (BUG-0012)** and architecture **`# BUG-0012`**.
 
 ### Full-autonomy outer driver (US-0092) — fallback
 

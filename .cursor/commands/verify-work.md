@@ -24,6 +24,10 @@ At the end of `/verify-work`, append an isolation evidence entry to
 - `evidence_ref=<primary output ref>` (recommended: `sprints/Sxxxx/uat.json` and `sprints/Sxxxx/uat.md`)
 
 ## Inputs
+
+- **Narrow-read (US-0053 / US-0096 Tranche A)**: Start at docs/engineering/phase-context.md
+  and the story section anchor in vision/architecture/decisions when a heading exists; forbid
+  full-file reads when a section heading exists.
 - `docs/product/acceptance.md`
 - `sprints/S0001/summary.md`
 

@@ -1,0 +1,141 @@
+{
+  "sprint_id": "S0087",
+  "story_ids": ["US-0097"],
+  "story_id": "US-0097",
+  "dec_id": "DEC-0083",
+  "status": "verified",
+  "author": "qa",
+  "timestamp": "2026-06-14T01:00:00Z",
+  "orchestrator_run_id": "auto-20260613-01",
+  "fresh_context_marker": "qa-S0087-US0097-qa-20260614T010000Z-fresh",
+  "verify_work_executed_at": "2026-06-14T02:00:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0087-US0097-verify-work-20260614T020000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/regression re-run green; UAT-1..UAT-10 confirmed; UAT-10 procedural attestation per runbook § Project README coverage validation; US-0097 remains OPEN per US-0045.",
+  "qa_verdict_reference": "sprints/S0087/qa-findings.md",
+  "qa_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 10,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0083 execute deliverables merged (installer boundary, bootstrap, phase wiring, split validators)",
+    "scripts/validate_project_readme_coverage.py present active + template mirrors"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1", "AC-9"],
+      "governance_ref": ["DEC-0083", "DEC-0045"],
+      "command": "pytest -k us0097_installer_manifest tests/auto_command_contract_test.py -q",
+      "expected": "Root README.md excluded from installer manifest; its_magic retained",
+      "result": "pass",
+      "evidence_ref": "test_us0097_installer_manifest_no_root_readme green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0083"],
+      "command": "pytest -k us0097_placeholder tests/auto_command_contract_test.py -q",
+      "expected": "S1–S5 sentinel table + M1–M5 migration reason codes present",
+      "result": "pass",
+      "evidence_ref": "test_us0097_placeholder_sentinel_table green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3", "AC-4", "AC-8"],
+      "governance_ref": ["DEC-0083", "US-0071"],
+      "command": "pytest -k us0097_execute tests/auto_command_contract_test.py -q",
+      "expected": "Execute step 23 (23a bootstrap, 23b delta, 23c metadata hygiene) literals present",
+      "result": "pass",
+      "evidence_ref": "test_us0097_execute_step23_literals green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4", "AC-7"],
+      "governance_ref": ["DEC-0083"],
+      "command": "pytest -k us0097_release tests/auto_command_contract_test.py -q",
+      "expected": "Release step 3g after 3f; PROJECT_README_ENFORCE gate literals",
+      "result": "pass",
+      "evidence_ref": "test_us0097_release_step3g_literals green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5", "AC-6"],
+      "governance_ref": ["DEC-0083", "DEC-0074", "US-0091"],
+      "command": "pytest -k 'us0097_framework or us0097_project_readme_coverage' tests/auto_command_contract_test.py -q",
+      "expected": "Framework validator reframed to its_magic/; project validator contract present",
+      "result": "pass",
+      "evidence_ref": "test_us0097_framework_validator_paths_reframed + test_us0097_project_readme_coverage_validator_contract green",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0083"],
+      "command": "pytest -k us0097_project_readme_enforce tests/auto_command_contract_test.py -q",
+      "expected": "PROJECT_README_ENFORCE + FRAMEWORK_KIT_REPO scratchpad keys documented",
+      "result": "pass",
+      "evidence_ref": "test_us0097_project_readme_enforce_scratchpad_keys green; active FRAMEWORK_KIT_REPO=1, template example =0",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-6", "AC-9"],
+      "governance_ref": ["DEC-0083"],
+      "command": "python scripts/validate_project_readme_coverage.py --self-test",
+      "expected": "[PROJECT_README_COVERAGE_SELF_TEST_OK]",
+      "result": "pass",
+      "evidence_ref": "Project README coverage validator self-test green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["US-0017", "DEC-0083"],
+      "command": "python scripts/check_intake_template_parity.py --scope=project-readme",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK]",
+      "result": "pass",
+      "evidence_ref": "scope=project-readme; PROJECT_README_PAIRS (8 pairs) active/template mirrors",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-6", "AC-9"],
+      "governance_ref": ["US-0091", "DEC-0074"],
+      "command": "pytest -k us0097_us0091 tests/auto_command_contract_test.py -q",
+      "expected": "US-0091 regression guard — release step 3f literals unchanged",
+      "result": "pass",
+      "evidence_ref": "test_us0097_us0091_regression_guard green (QA re-run)",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["DEC-0083", "R-0084"],
+      "command": "Manual: runbook § Project README + architecture # US-0097",
+      "expected": "Operator recipes table + troubleshooting; ownership matrix documented",
+      "result": "pass",
+      "evidence_ref": "runbook § Project README coverage validation (US-0097 / DEC-0083) operator recipes present",
+      "verified_at": "2026-06-14T02:00:00Z",
+      "verified_by": "qa"
+    }
+  ],
+  "probe_results": []
+}

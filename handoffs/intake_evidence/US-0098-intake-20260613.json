@@ -1,0 +1,128 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260613-US0098-intake",
+  "candidate_story_ids": ["US-0098"],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "dev-profile-schema-persistence",
+      "title": "Canonical dev-environment profile schema and persistence (operator-seeded, agent-maintained) with names-only secret refs"
+    },
+    {
+      "plan_area_id": "environment-detection-heuristics",
+      "title": "Deterministic detection of local vs docker-host-local vs remote automation targets; compose with US-0064 / US-0086"
+    },
+    {
+      "plan_area_id": "execute-phase-relaunch-contract",
+      "title": "Execute-phase dev relaunch after implementation changes (bounded triggers; not release-only startup)"
+    },
+    {
+      "plan_area_id": "container-rebuild-orchestration",
+      "title": "Docker / docker compose rebuild-and-up recipes with fail-closed diagnostics when profile or stack unresolved"
+    },
+    {
+      "plan_area_id": "operator-connection-surface",
+      "title": "Operator-visible connection summary after relaunch (URL, port, health, service/container id; no secret values)"
+    },
+    {
+      "plan_area_id": "scratchpad-gates-default-off",
+      "title": "Scratchpad-gated automation profile default-off; manual daily work unchanged when disabled"
+    },
+    {
+      "plan_area_id": "composition-existing-runtime-contracts",
+      "title": "Compose with US-0065 runtime autopilot, US-0086 routing, US-0085 .env exclusion, DEV_SERVER_* scratchpad keys"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "Phase commands, runbook, optional stdlib helper, contract tests, and template parity"
+    }
+  ],
+  "plan_area_coverage": [
+    { "plan_area_id": "dev-profile-schema-persistence", "story_ids": ["US-0098"] },
+    { "plan_area_id": "environment-detection-heuristics", "story_ids": ["US-0098"] },
+    { "plan_area_id": "execute-phase-relaunch-contract", "story_ids": ["US-0098"] },
+    { "plan_area_id": "container-rebuild-orchestration", "story_ids": ["US-0098"] },
+    { "plan_area_id": "operator-connection-surface", "story_ids": ["US-0098"] },
+    { "plan_area_id": "scratchpad-gates-default-off", "story_ids": ["US-0098"] },
+    { "plan_area_id": "composition-existing-runtime-contracts", "story_ids": ["US-0098"] },
+    { "plan_area_id": "docs-tests-parity", "story_ids": ["US-0098"] }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "During development the AI should automatically rebuild and restart the running app after code changes — for example rebuild Docker containers — and show me connection parameters, instead of only validating at QA or release.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260613-US0098-intake:0:605c4004c5d053c0"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "This is dev-loop inside the detected developer environment: when I code on the Docker host itself I use local shell and docker commands, not remote SSH; optional Docker/SSH targets from existing remote config when automation is enabled.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260613-US0098-intake:1:9b55baed31041923"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Build on existing its-magic contracts: Python stdlib helpers, scratchpad keys like DEV_SERVER_COMMAND, .cursor/remote.json, release-targets.json, and stack-aware startup from US-0065 — not a parallel ad-hoc connection string layer.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260613-US0098-intake:2:84ca9e0d6c2f2dc1"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "The agent should detect where development runs, persist a dev-environment profile the operator can seed once with parameters, then reuse automatically; default-off scratchpad gate like AUTO_REMOTE_AUTOMATION_PROFILE so manual daily work stays unchanged.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260613-US0098-intake:3:a1c9b7486d0fd650"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "After relaunch, present operator-ready connection info in chat or handoff output: URL or host:port, health check path, service or container id — secrets as env-var names only, never values.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260613-US0098-intake:4:2147bcb716c16e4b"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Same rules as US-0085: agents must not read .env; persisted dev profile stores env reference names only; no secret literals in git-tracked JSON or handoffs.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260613-US0098-intake:5:c8da6cff2cd3aed8"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Bounded rebuild and restart with fail-closed reason codes, idempotent profile updates, and explicit manual override; avoid infinite watch loops in the first delivery unless architecture proves a safe bounded trigger.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260613-US0098-intake:6:f8f38fe8164a8ee5"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story if sprint sizing allows; clearly distinct from US-0065 phase startup, US-0086 test routing, and US-0067 release Run/Connect hints; trigger at minimum after execute tasks with optional explicit refresh command.",
+      "intake_run_id": "cursor-20260613-US0098-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260613-US0098-intake:7:13c5f92981761235"
+    }
+  ]
+}

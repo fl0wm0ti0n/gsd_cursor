@@ -743,10 +743,13 @@ requires it.
 
 ### Outer-driver equivalence (AC-1, Option B)
 
-When a single Cursor `/auto` invocation cannot schedule multiple fresh subagent
-turns (product/runtime constraint), a **documented outer driver** (operator
-script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
-**deterministically equivalent** provided all of the following hold:
+**native chain supersedes Option B** under **`AUTO_FLOW_MODE=full_autonomy`** + IDE + Task
+available — native in-chat chain is **primary**. When a single Cursor `/auto` invocation
+cannot schedule multiple fresh subagent turns (product/runtime constraint), a **documented
+outer driver** (operator script or manual re-invocation with `start-from` / refreshed
+`resume_brief`) is **deterministically equivalent** (**fallback only** — applies when
+**`NATIVE_CHAIN_UNAVAILABLE`** or headless/CI/`--invoke-cmd` context) provided all of the
+following hold:
 
 - Same intersected phase order as a single-invocation run.
 - Same per-phase isolation evidence (**DEC-0029**) + strict-proof attestation
@@ -766,7 +769,7 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 | `AUTO_PAUSE_REQUEST` / `pause` | **Stop** at safe boundary | **Always** (non-suppressible) |
 | `AUTO_LOOP_MAX_CYCLES` / `loop_max` | **Stop** | **Always** (non-suppressible) |
 | `blocked` (sync/scope gate) | **Stop** | **Always** (non-suppressible) |
-| US lifecycle DONE / sprint segment complete | **Stop** segment; `AUTO_BACKLOG_DRAIN=1` may advance to next OPEN story (recompute phase plan — **Step 5**) | Notify on segment handoff (non-routine) |
+| US lifecycle DONE / sprint segment complete | **IDE `full_autonomy`**: orchestrator **must** drain-advance in-chat (no operator re-`/auto`). **Other modes / fallback**: stop segment; `AUTO_BACKLOG_DRAIN=1` may advance (recompute phase plan — **Step 5**) | Notify on segment handoff (non-routine) |
 | `BACKLOG_MAX_STORIES_REACHED` | **Stop** | **Always** (non-suppressible) |
 
 `stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
@@ -780,7 +783,7 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 
 | Condition | US-0088 | `full_autonomy` delta | Operator notify |
 |-----------|---------|------------------------|-----------------|
-| Next phase, no hard stop | Continue inner `/auto` | Outer driver **re-invokes** when Cursor ends turn early | Quiet OK when `AUTO_QUIET=1` |
+| Next phase, no hard stop | Continue inner `/auto` | Native chain continues in-chat; outer driver **re-invokes** only on **`NATIVE_CHAIN_UNAVAILABLE`** / headless **fallback** | Quiet OK when `AUTO_QUIET=1` |
 | `decision_gate` | Hard stop | **No change — hard** | Always |
 | Unrecoverable `error` | Hard stop | **No change — hard** | Always |
 | Critical `missing_input` | Hard stop | **No change — hard** | Always |
@@ -790,7 +793,7 @@ script or manual re-invocation with `start-from` / refreshed `resume_brief`) is
 | `blocked` — transient/sync | Hard stop | **Relaxable** when recoverable | Notify on cap |
 | `blocked` — isolation/strict-proof/ownership | Hard stop | **No change — hard** | Always |
 | UAT/QA fail | Hard stop (operator) | **Relaxable** when `AUTO_IMPLEMENTATION_LOOP=1` | Notify on cap |
-| Segment complete + `AUTO_BACKLOG_DRAIN=1` | Advance (may need manual re-`/auto`) | **Drain-advance-without-pause** — immediate next item | Segment handoff notify |
+| Segment complete + `AUTO_BACKLOG_DRAIN=1` | Advance (may need manual re-`/auto` in non-native modes) | **Drain-advance-without-pause** — immediate in-chat continuation; **no** operator re-`/auto` | Segment handoff notify |
 | `BACKLOG_MAX_STORIES_REACHED` | Hard stop | **No change — hard** | Always |
 | `AUTO_SCHEDULER_CONFLICT` | Hard stop | **No change — hard** | Always |
 | `RELEASE_PUBLISH_MODE=auto` | Explicit opt-in | **No change — hard default-off** | Always on publish |
@@ -810,7 +813,8 @@ verify → caps → branch. **`NATIVE_CHAIN_UNAVAILABLE`** when Task tool denied
 depth limit hit — hard stop for native path; suggest outer driver as **optional** fallback.
 
 **Activation gate**: `full_autonomy` + IDE context + Task tool → set **`native_chain_active=true`**
-in `state.md` boundary.
+in `state.md` boundary. Set **`native_chain_continuing=true`** when orchestrator scheduled
+next spawn/advance **this** boundary.
 
 **Spawn-only invariants** (**BUG-0006**): orchestrator schedules phase-role subagents only;
 each phase completes via fresh spawn + artifacts; no in-band phase work.
@@ -833,8 +837,16 @@ enabled (**`AUTO_BACKLOG_DRAIN=1`** or bug-queue per **US-0087** mutex); budget 
 | **6** | **APPEND** `state.md` materialization breadcrumb for new segment |
 | **7** | **IMMEDIATELY** spawn first phase subagent — **without operator re-`/auto`**, **no** mandatory outer-driver instruction |
 
+**Between steps 6 and 7** (no operator stop): orchestrator **must not** emit operator wait
+instructions, set **`stop_reason=completed (segment exhausted)`** when drain budget > 0 and
+eligible OPEN item exists, or skip Task-spawn for step **7**. Attest
+**`drain_advance_action=spawned|skipped|not_applicable`** on `state.md` phase boundary;
+**`skipped`** when budget > 0 + OPEN item exists is **invalid** (regression).
+
 **DEC-0069 pairing mandate**: every phase boundary and drain advance **must** refresh
-**`resume_brief`** + **`state.md`** before scheduling in-chat continuation.
+**`resume_brief`** + **`state.md`** before scheduling in-chat continuation. Orchestrator
+**MUST Task-spawn** next phase — **`/auto`** is orchestrator context label, not operator
+re-invocation instruction.
 
 ### Native-chain stop matrix (US-0095)
 
@@ -882,7 +894,9 @@ no secrets. IDE native chain and outer driver **share one accounting model**:
 
 | Field | Semantics |
 |-------|-----------|
-| **`native_chain_active`** | `true` when IDE native chain is driving continuation |
+| **`native_chain_active`** | `true` when IDE native chain is driving continuation (gate eligibility) |
+| **`native_chain_continuing`** | `true` when orchestrator scheduled next spawn/advance **this** boundary |
+| **`drain_advance_action`** | `spawned` \| `skipped` \| `not_applicable` — step 7 outcome at segment boundary |
 | **`outer_cycle_index`** | Continuation cycles this run (int ≥ 0) |
 | **`implementation_loop_index`** | Inner remediation cycles for current story segment (int ≥ 0) |
 
@@ -945,9 +959,101 @@ conditions the script is a no-op and the fail-closed reason codes from
 `test_caveman_compress_input_*` subtests in
 `tests/auto_command_contract_test.py` (**DEC-0073** §11).
 
+### `DELIVERY_MODE` × `TOKEN_PROFILE` × `CAVEMAN_MODE` non-substitution (US-0096 / DEC-0082 §1)
+
+> **`DELIVERY_MODE`** controls lifecycle shape and artifact surfaces only. **`TOKEN_PROFILE`** controls context breadth / token cost only (**DEC-0062**). **`CAVEMAN_MODE`** controls reply voice only (**DEC-0072**). None substitutes for another.
+
+Scratchpad keys: **`DELIVERY_MODE`** (`standard` | `ultra_lean` | `mega_quick`, default **`standard`**);
+**`LEAN_MEMORY_READ`**, **`LEAN_MEMORY_WRITE`**, **`LEAN_COLD_READ_MAX_SECTIONS`** (default **4**),
+**`LEAN_STATE_INDEX_ROWS`** (default **80**), **`AUTO_DELIVERY_ROUTING`**
+(`scratchpad_only` | `backlog_then_scratchpad`, default **`scratchpad_only`**).
+
+### Mode-scoped delivery resolver — step 0 (US-0096 / DEC-0082)
+
+**Before** **DEC-0052** pipeline, **resolve_delivery_mode**: argv `delivery-mode=` → backlog row
+`delivery_mode` (when **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**) → scratchpad
+**`DELIVERY_MODE`** → **`standard`**.
+
+| `delivery_mode` | `resolved_phase_plan` | `reinstatement_mode` | `memory_layer` |
+|-----------------|----------------------|---------------------|----------------|
+| `standard` | Full **DEC-0052** chain | `dec0052_default` | `standard` |
+| `ultra_lean` | `[spec, plan, build+verify, ship]` | `none` | `pack` |
+| `mega_quick` | `[quick]` when eligible | `none` | `quick` |
+
+**reinstatement applies only when delivery_mode=standard**. **`AUTO_PHASE_*`** applies **only**
+when `delivery_mode=standard`; non-standard + non-default **`AUTO_PHASE_*`** →
+**`PHASE_POLICY_CONFLICT`**. **`DELIVERY_MODE_SWITCH_MID_STORY`**: fail closed.
+
+Breadcrumbs: **`delivery_mode`**, **`resolved_phase_plan`**, **`reinstatement_mode`**, **`memory_layer`**.
+
+#### `ultra_lean` macro-phases
+
+| Macro | Merged phases | Role |
+|-------|---------------|------|
+| **`spec`** | intake + discovery | **po** |
+| **`plan`** | research + architecture + sprint-plan | **tech-lead** |
+| **`build+verify`** | execute + qa + verify-work | **dev** / **qa** |
+| **`ship`** | release + refresh-context | **release** / **curator** |
+
+**`AUTO_IMPLEMENTATION_LOOP`** preserved inside **`build+verify`**. No eleven-phase reinstatement.
+
+#### `mega_quick` eligibility
+
+Fail-closed codes: **`MEGA_QUICK_BUG_SEGMENT`**, **`MEGA_QUICK_AC_TOO_BROAD`**,
+**`MEGA_QUICK_ARCHITECTURE_REQUIRED`**, **`MEGA_QUICK_SPRINT_EXISTS`**,
+**`MEGA_QUICK_STORY_OVERRIDE`**, **`MEGA_QUICK_MULTI_COMPONENT`**, **`MEGA_QUICK_GATE_ESCALATION`**.
+Ineligible → **`DELIVERY_MODE_INELIGIBLE`** + specific code.
+
+### Layered memory tiers (US-0096 / DEC-0082 §5)
+
+| Tier | Path | Triad? | Cap |
+|------|------|--------|-----|
+| Hot | **`handoffs/active-context.md`** | **No** | **`LEAN_STATE_INDEX_ROWS`** (default **80**) |
+| Warm | **`work/<story_id>/pack.json`** | n/a | **16 KiB** soft |
+| Cold | vision / architecture / decisions sections | n/a | **`LEAN_COLD_READ_MAX_SECTIONS`** (default **4**) |
+
+**`active-context.md` is NOT a triad member** — **`enforce-triad-hot-surface.py`** does not scan it.
+Oversize with **`LEAN_MEMORY_WRITE=1`** → **`ACTIVE_CONTEXT_OVERSIZE`**.
+
+**`pack.json` schema v1** — validator **`scripts/pack_json_validate.py`**; reason codes **`PACK_*`**.
+Required: **`schema_version`** (`"1"`), **`story_id`**, **`delivery_mode`**, **`status`**, **`ac[]`**,
+**`tasks[]`**, **`refs[]`**, **`deltas[]`**, **`memory_layer`** (`"pack"`).
+
+| Mode | Authoritative tasks surface |
+|------|----------------------------|
+| `standard` | **`sprints/Sxxxx/tasks.md`** |
+| `ultra_lean` | **`work/US-xxxx/pack.json`** `tasks[]` |
+| `mega_quick` | **`sprints/quick/Qxxxx/task.json`** |
+
+### Quality floor + lean memory gates (US-0096 / DEC-0082 §8–§9)
+
+All lean modes: tests before stop; AC traceability in pack/task.json; new patterns →
+architecture/decision delta; **`active-context.md`** updated on material learnings; no secrets/publish
+bypass. **`LEAN_MEMORY_READ=0`** or **`LEAN_MEMORY_WRITE=0`** on **`ultra_lean`** spawn →
+**`LEAN_MEMORY_DISABLED`** (fail closed).
+
+### Run-class extension (US-0096 / DEC-0082 §9 — amends DEC-0062)
+
+Sorted JSON run-class object **must** include **`delivery_mode`**. Evidence rows in
+**`handoffs/token_cost_runs/<orchestrator_run_id>.md`** **must** include **`delivery_mode`** column.
+**`ultra_lean`** vs **`standard`** same story → **`TOKEN_COST_RUN_CLASS_MISMATCH`**.
+
+### Dev environment auto-launch profile (US-0098 / DEC-0084)
+
+**`DEV_AUTO_LAUNCH_PROFILE`** (`off` | `deterministic_v1`, default **`off`**) gates execute step **24**
+— zero overhead when **`off`**. Orthogonal to **`AUTO_REMOTE_AUTOMATION_PROFILE`** (**US-0086**):
+when both **`deterministic_v1`**, **US-0086** remote target resolution (**`docker`** / **`ssh`**) wins
+over **`docker-host-local`**. Persisted profile at **`.cursor/dev-environment.json`** (names-only
+**`*Env`** refs in **`connect`**); **no** **`release-targets.json`** schema change (**US-0064**
+unchanged). **US-0085** inheritance: helper and step **24** never read **`.env`**. **`DEV_SERVER_*`**
+scratchpad keys compose with **`local`** detection. Fail closed → **`DEV_ENV_DETECT_AMBIGUOUS`**
+when stack cannot be resolved. Connect block fields align with
+**`docs/engineering/runtime-connectivity.md`** operator summary template.
+
 ## Steps
-1. Read automation flags from merged scratchpad and **materialize the resolved
-   phase plan** per **Configurable phase selection policy (US-0070 / DEC-0052)**:
+1. **resolve_delivery_mode** (step 0 — **US-0096 / DEC-0082**) then read automation flags from
+   merged scratchpad and **materialize the resolved phase plan** per mode + **Configurable phase
+   selection policy (US-0070 / DEC-0052)** when `delivery_mode=standard`:
    detect exactly-one policy mode, expand, apply non-skippable reinstatement,
    validate tokens/profile/ack requirements, and append plan breadcrumbs
    (`phase_policy_mode`, `resolved_phase_plan`, `skipped_phases` + reasons) to
@@ -986,8 +1092,9 @@ conditions the script is a no-op and the fail-closed reason codes from
    **deterministic stop condition** fires (see **Deterministic stop matrix
    (US-0088)** above). The orchestrator does **not** stop after a single phase
    spawn unless the stop matrix requires it; outer-driver equivalence applies
-   when native chain is unavailable or a single invocation cannot schedule
-   multiple subagent turns (see **Outer-driver equivalence (AC-1, Option B)** above):
+   when **`NATIVE_CHAIN_UNAVAILABLE`**, headless/CI, or `--invoke-cmd` prevents in-chat
+   scheduling (see **Outer-driver equivalence (AC-1, Option B)** above — **fallback only**;
+   **native chain supersedes Option B** in IDE **`full_autonomy`**):
    default full path:
    intake -> discovery -> research -> architecture -> sprint plan ->
    plan verify -> execute -> QA -> verify work -> release -> refresh context.

@@ -1,0 +1,123 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260613-US0097-intake",
+  "candidate_story_ids": ["US-0097"],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "installer-framework-readme-boundary",
+      "title": "Stop delivering framework README to repo root; canonical framework surface is its_magic/README.md only (complete US-0062 / DEC-0045)"
+    },
+    {
+      "plan_area_id": "project-readme-bootstrap",
+      "title": "Bootstrap a project-owned root README scaffold on first project story when missing or still framework placeholder"
+    },
+    {
+      "plan_area_id": "execute-release-delta-workflow",
+      "title": "Mandatory execute/release steps that create and extend project README on each shipped user story or sprint"
+    },
+    {
+      "plan_area_id": "project-readme-audience-structure",
+      "title": "Project README structure with user-facing repo overview plus developer orientation sections"
+    },
+    {
+      "plan_area_id": "framework-vs-project-readme-gates",
+      "title": "Separate validators/gates: framework feature catalog (US-0091) vs project backlog coverage in root README"
+    },
+    {
+      "plan_area_id": "upgrade-migration-non-destructive",
+      "title": "Upgrade/missing install paths that lift legacy framework README out of root without destroying operator project prose"
+    },
+    {
+      "plan_area_id": "docs-tests-parity",
+      "title": "Phase commands, runbook, installer manifest, validators, contract tests, and template parity for project README contract"
+    }
+  ],
+  "plan_area_coverage": [
+    { "plan_area_id": "installer-framework-readme-boundary", "story_ids": ["US-0097"] },
+    { "plan_area_id": "project-readme-bootstrap", "story_ids": ["US-0097"] },
+    { "plan_area_id": "execute-release-delta-workflow", "story_ids": ["US-0097"] },
+    { "plan_area_id": "project-readme-audience-structure", "story_ids": ["US-0097"] },
+    { "plan_area_id": "framework-vs-project-readme-gates", "story_ids": ["US-0097"] },
+    { "plan_area_id": "upgrade-migration-non-destructive", "story_ids": ["US-0097"] },
+    { "plan_area_id": "docs-tests-parity", "story_ids": ["US-0097"] }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "When I start a new project with its-magic, the root README is still the huge its-magic framework catalog. I want a project-specific repo overview for users and developers that is created on first story and extended every sprint — that behavior does not happen today.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260613-US0097-intake:0:c81b4bd2bb6d6944"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Downstream repos after its-magic install (missing/upgrade modes); Cursor slash-command lifecycle through execute and release when shipping project user stories from docs/product/backlog.md.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260613-US0097-intake:1:3f2ffae81c12e677"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Project-owned Markdown at repo root README.md; framework docs confined to its_magic/README.md; Python stdlib validators; installer-owned-paths.manifest and phase command contracts in .cursor/commands/.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260613-US0097-intake:2:5db6dee497bb9fa7"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Finish the US-0062 split: framework README must not be shipped to root; root README is project-owned. Wire per-story README bootstrap and sprint deltas into execute/release with a blocking gate — not only the optional US-0032 user-guide path.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260613-US0097-intake:3:9020cb47576a36c8"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Root README opens with the project name and purpose, then user-facing what-it-does/how-to-run sections, plus a developer section for setup and repo layout; each shipped US-xxxx adds or updates a concise feature blurb in the catalog.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260613-US0097-intake:4:2286c79941eef757"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Project README prose remains subject to US-0071 user-visible metadata hygiene; upgrade must not silently delete operator-written project README content when lifting legacy framework copy to its_magic/.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260613-US0097-intake:5:20e478da61be1597"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Fail-closed when a shipped user-visible project story lacks a detectable README anchor; separate framework US-0091 coverage (its-magic features) from project backlog coverage; default-on behavior for new installs without manual README chores each sprint.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260613-US0097-intake:6:a956cb187b1a2327"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0097 in tranches: A installer boundary + migration, B project README bootstrap scaffold, C execute/release mandatory deltas, D project README validator and gate separation from framework README family.",
+      "intake_run_id": "cursor-20260613-US0097-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260613-US0097-intake:7:8a8ca0a2d5a3d638"
+    }
+  ]
+}

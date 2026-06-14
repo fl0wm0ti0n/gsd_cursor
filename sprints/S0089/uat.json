@@ -1,0 +1,121 @@
+{
+  "sprint_id": "S0089",
+  "story_ids": ["US-0099"],
+  "story_id": "US-0099",
+  "dec_id": "DEC-0084",
+  "status": "verified",
+  "author": "qa",
+  "timestamp": "2026-06-14T22:00:00Z",
+  "orchestrator_run_id": "auto-20260614-01",
+  "implementation_loop_index": 1,
+  "fresh_context_marker": "qa-S0089-US0099-qa-20260614T220000Z-fresh",
+  "verify_work_executed_at": "2026-06-14T23:00:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0089-US0099-verify-work-20260614T230000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/regression re-run green; UAT-1..UAT-8 confirmed; US-0099 remains OPEN per US-0045.",
+  "qa_verdict_reference": "sprints/S0089/qa-findings.md",
+  "qa_verdict": "PASS",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 8,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0084 bootstrap deliverables merged (dev_environment_lib.py --bootstrap, installer hook, postinstall.js)",
+    "template/.cursor/dev-environment.json.example present",
+    "scripts/dev_environment_lib.py present active + template mirrors"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k us0099_copy_when_missing tests/auto_command_contract_test.py -q",
+      "expected": "Absent profile → bootstrap copies example; installer hook on missing + upgrade paths",
+      "result": "pass",
+      "evidence_ref": "test_us0099_copy_when_missing + test_us0099_installer_hook_literals green (verify-work re-run)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k 'us0099_skip or us0099_upgrade' tests/auto_command_contract_test.py -q",
+      "expected": "Existing profile bytes unchanged; DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS on re-run",
+      "result": "pass",
+      "evidence_ref": "test_us0099_skip_when_exists + test_us0099_upgrade_idempotent green (verify-work re-run)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k us0099_path_override tests/auto_command_contract_test.py -q",
+      "expected": "DEV_ENVIRONMENT_CONFIG override resolves; invalid paths → PATH_INVALID",
+      "result": "pass",
+      "evidence_ref": "test_us0099_path_override green (verify-work re-run)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k us0099_postinstall tests/auto_command_contract_test.py -q",
+      "expected": "bin/postinstall.js spawnSync --bootstrap dev_environment_lib.py; global skip token",
+      "result": "pass",
+      "evidence_ref": "test_us0099_postinstall_parity green (verify-work re-run)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0084", "US-0085"],
+      "command": "Manual: confirm template example source + no install_paths manifest row for local profile",
+      "expected": "Source template/.cursor/dev-environment.json.example only; names-only; local gitignored",
+      "result": "pass",
+      "evidence_ref": "architecture # US-0099 § Contrast table; installer-owned-paths.manifest unchanged (verify-work attestation)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0084"],
+      "command": "Manual: runbook § install-time bootstrap (US-0099)",
+      "expected": "Customize-after-bootstrap UX; DEV_ENV_PROFILE_MISSING troubleshooting; DEV_ENV_BOOTSTRAP_* codes",
+      "result": "pass",
+      "evidence_ref": "docs/engineering/runbook.md § install-time bootstrap; template mirror parity OK (verify-work attestation)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0084", "US-0017"],
+      "command": "pytest -k us0099 tests/auto_command_contract_test.py -q && python scripts/check_intake_template_parity.py --scope=dev-environment",
+      "expected": "Seven test_us0099_* green; DEV_ENVIRONMENT_PAIRS parity; harness §26X registered",
+      "result": "pass",
+      "evidence_ref": "7/7 contract subtests; [INTAKE_TEMPLATE_PARITY_OK]; tests/run-tests.ps1 §26X (verify-work re-run)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0084"],
+      "command": "Manual: architecture # US-0099 + DEC-0084 amended § bootstrap posture",
+      "expected": "Hook placement, reason codes, idempotency matrix documented; plan-verify AC-8 attestation",
+      "result": "pass",
+      "evidence_ref": "docs/engineering/architecture.md # US-0099; decisions/DEC-0084.md; sprints/S0089/plan-verify.json (verify-work attestation)",
+      "verified_at": "2026-06-14T23:00:00Z",
+      "verified_by": "verify-work"
+    }
+  ],
+  "probe_results": []
+}

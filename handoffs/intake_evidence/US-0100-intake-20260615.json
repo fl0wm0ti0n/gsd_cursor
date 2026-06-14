@@ -1,0 +1,123 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260615-US0100-intake",
+  "candidate_story_ids": ["US-0100"],
+  "coverage_complete": true,
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "version-changelog-artifacts",
+      "title": "Cumulative growing version history and per-version release documents listing US-xxxx/BUG-xxxx with short summaries"
+    },
+    {
+      "plan_area_id": "release-phase-integration",
+      "title": "/release finalization derives version docs from sprint release notes, backlog, and release_queue without replacing US-0040 sprint-scoped notes"
+    },
+    {
+      "plan_area_id": "github-git-publish",
+      "title": "GitHub/git release and publish paths attach canonical release-note bodies per semver tag (Keep a Changelog / GitHub release best practices)"
+    },
+    {
+      "plan_area_id": "release-queue-version-binding",
+      "title": "release_queue rows bind release_version to sprint notes and version changelog entries deterministically"
+    },
+    {
+      "plan_area_id": "publish-targets-compose",
+      "title": "Compose with RELEASE_PUBLISH_MODE, release-targets.json, and scripts/release-all.sh without bypassing confirmation gates"
+    },
+    {
+      "plan_area_id": "backfill-migration",
+      "title": "One-time or idempotent backfill from existing handoffs/releases/Sxxxx-release-notes.md and released queue rows"
+    },
+    {
+      "plan_area_id": "validators-tests-parity",
+      "title": "Validators, contract tests, runbook/command docs, and active/template parity for version release documentation"
+    }
+  ],
+  "plan_area_coverage": [
+    { "plan_area_id": "version-changelog-artifacts", "story_ids": ["US-0100"] },
+    { "plan_area_id": "release-phase-integration", "story_ids": ["US-0100"] },
+    { "plan_area_id": "github-git-publish", "story_ids": ["US-0100"] },
+    { "plan_area_id": "release-queue-version-binding", "story_ids": ["US-0100"] },
+    { "plan_area_id": "publish-targets-compose", "story_ids": ["US-0100"] },
+    { "plan_area_id": "backfill-migration", "story_ids": ["US-0100"] },
+    { "plan_area_id": "validators-tests-parity", "story_ids": ["US-0100"] }
+  ],
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "We should document which bugfixes and user stories (with short descriptions) in a release document — a cumulative one that grows listing all versions with their US/Bugs, plus per-release docs.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260615-US0100-intake:0:33033d0450f64e6c"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "its-magic framework repo and consumer projects using the workflow; GitHub releases and git tags; npm/choco/brew publish via existing release-all.sh and RELEASE_PUBLISH_MODE.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260615-US0100-intake:1:dcee97076b3f0004"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Markdown release artifacts, Python validators/helpers, gh CLI for GitHub releases, semver from package.json, existing handoffs/releases/Sxxxx-release-notes.md and release_queue.md contracts.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260615-US0100-intake:2:51d022ea3f51a55f"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Extend US-0040 per-sprint notes and release_queue — do not replace; /release finalization should derive version-scoped notes and update cumulative changelog; compose with RELEASE_PUBLISH_MODE and release-targets.json.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260615-US0100-intake:3:ba62c723f47a8410"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Operator-readable cumulative CHANGELOG-style doc (version -> list of US-xxxx/BUG-xxxx with one-line summaries) plus per-version release note files; GitHub release body uses the same canonical content.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260615-US0100-intake:4:56ce544a7de79603"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "No secrets in release notes; RELEASE_PUBLISH_MODE confirm/auto gate preserved; user-visible metadata hygiene US-0071 applies to published bodies.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260615-US0100-intake:5:a7ecf1937e680923"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Deterministic generation from sprint release notes and backlog summaries; idempotent append on re-release; backfill from existing released sprints; template parity; fail-closed when version or sprint mapping ambiguous.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260615-US0100-intake:6:7496a30535eca69e"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0100: version changelog artifacts, /release hook, GitHub/git attach step, queue release_version binding, backfill script, tests — one integrated delivery slice.",
+      "intake_run_id": "cursor-20260615-US0100-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260615-US0100-intake:7:a74b2adbac0fa3d2"
+    }
+  ]
+}

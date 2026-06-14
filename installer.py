@@ -345,6 +345,57 @@ def _load_doc_profile_lib():
     return mod
 
 
+def _load_dev_environment_lib():
+    """Load dev_environment_lib from scripts/ adjacent to this installer."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    path = os.path.join(here, "scripts", "dev_environment_lib.py")
+    if not os.path.isfile(path):
+        raise RuntimeError(
+            "[DEV_ENVIRONMENT_LIB_MISSING] Expected dev environment library at "
+            f"{path} (same directory as installer.py). "
+            f"Reinstall or upgrade its-magic ({REPO_URL})."
+        )
+    spec = importlib.util.spec_from_file_location("dev_environment_lib", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(
+            "[DEV_ENVIRONMENT_LIB_LOAD_ERROR] Could not create import spec for "
+            f"{path}. Reinstall its-magic ({REPO_URL})."
+        )
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules["dev_environment_lib"] = mod
+    try:
+        spec.loader.exec_module(mod)
+    except Exception as e:
+        sys.modules.pop("dev_environment_lib", None)
+        raise RuntimeError(
+            "[DEV_ENVIRONMENT_LIB_LOAD_ERROR] dev_environment_lib failed to load "
+            f"({e!r}). Reinstall its-magic ({REPO_URL})."
+        ) from e
+    return mod
+
+
+def bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+    """
+    Non-destructive dev-environment profile bootstrap.
+    Fail-closed only on PATH_INVALID / SOURCE_MISSING.
+    """
+    try:
+        lib = _load_dev_environment_lib()
+    except RuntimeError as exc:
+        print(str(exc))
+        return False
+    merged, _paths = merge_scratchpad_layers(target_root)
+    reason, _channel = lib.bootstrap_dev_environment_profile(
+        target_root, source_root, merged
+    )
+    if reason in (
+        lib.DEV_ENV_BOOTSTRAP_PATH_INVALID,
+        lib.DEV_ENV_BOOTSTRAP_SOURCE_MISSING,
+    ):
+        return False
+    return True
+
+
 def _doc_profile_sync(target_root, merged, print_ok=True):
     """Append missing normative README/developer doc sections from merged profile (non-destructive)."""
     doc_profile_lib = _load_doc_profile_lib()
@@ -878,6 +929,8 @@ def main():
 
         if not run_scratchpad_postinstall(target_root, source_root, "upgrade", print_ok=True):
             return 1
+        if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+            return 1
         if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
             return 1
 
@@ -957,6 +1010,8 @@ def main():
                 shutil.copy2(src, dst)
 
     if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+        return 1
+    if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
         return 1
     if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
         return 1

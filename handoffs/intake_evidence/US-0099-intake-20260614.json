@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260614-US0099-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "After an its-magic update, scratchpad DEV_ENVIRONMENT_CONFIG points to .cursor/dev-environment.json but the file is missing, so DEV_AUTO_LAUNCH_PROFILE=deterministic_v1 fails with DEV_ENV_PROFILE_MISSING until I manually copy the template example.",
+      "intake_run_id": "cursor-20260614-US0099-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260614-US0099-intake:0:246f0c2d76cee354"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "installer.py / installer.ps1 / installer.sh (missing + upgrade modes), bin/postinstall.js npm path, docs/engineering/context/installer-owned-paths.manifest if needed, docs/engineering/runbook seed recipe, template/.cursor/dev-environment.json.example source, optional helper in dev_environment_lib.py, contract tests and template parity scope.",
+      "intake_run_id": "cursor-20260614-US0099-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260614-US0099-intake:1:c8be45bb8129a845"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Non-destructive only: never overwrite an existing profile at the resolved path; preserve DEC-0084 gitignore/cursorignore for .cursor/dev-environment.json; example stays names-only per US-0085; compose with US-0018 smart upgrade and US-0098/DEC-0084 schema v1 unchanged.",
+      "intake_run_id": "cursor-20260614-US0099-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260614-US0099-intake:2:ff8309a7f9f467de"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Contract tests prove copy-when-missing on fresh install and upgrade, skip-when-exists for operator-customized profiles, idempotent re-upgrade, and path resolution from DEV_ENVIRONMENT_CONFIG default; check_intake_template_parity --scope=dev-environment extended if manifest touched; pytest markers test_us0099_*.",
+      "intake_run_id": "cursor-20260614-US0099-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260614-US0099-intake:3:e9c145526f1ea001"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0099: install/upgrade auto-bootstrap documented and implemented, runbook seed step demoted to customize-after-bootstrap, release flips story DONE per US-0045.",
+      "intake_run_id": "cursor-20260614-US0099-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260614-US0099-intake:4:9ff6cb639adc9585"
+    }
+  ]
+}

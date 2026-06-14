@@ -169,17 +169,32 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 # - ARCH_HOT_MAX_STORY_SECTIONS: integer >= 20 (max # US-xxxx story sections retained)
 # - Manual-override precedence: explicit flag values in this file remain authoritative
 #   for that flag and override profile defaults.
+#
+# Delivery mode (US-0096 / DEC-0082)
+# - DELIVERY_MODE: standard|ultra_lean|mega_quick (default standard; unset = standard)
+# - LEAN_MEMORY_READ: 0|1 (default 1 when pack/active-context paths exist)
+# - LEAN_MEMORY_WRITE: 0|1 (default 1 when pack/active-context paths exist)
+# - LEAN_COLD_READ_MAX_SECTIONS: int >= 1 (default 4)
+# - LEAN_STATE_INDEX_ROWS: int >= 30 (default 80)
+# - AUTO_DELIVERY_ROUTING: scratchpad_only|backlog_then_scratchpad (default scratchpad_only)
+# Tranche A default hot caps (US-0096): 1000/650/3000 — explicit values override.
+DELIVERY_MODE=standard
+LEAN_MEMORY_READ=1
+LEAN_MEMORY_WRITE=1
+LEAN_COLD_READ_MAX_SECTIONS=4
+LEAN_STATE_INDEX_ROWS=80
+AUTO_DELIVERY_ROUTING=scratchpad_only
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
 INTAKE_SUBAGENT_FALLBACK=deny
 INTAKE_WORK_ITEM_KIND=story
 ID_NAMESPACE_BOOTSTRAP=0
 TOKEN_PROFILE=balanced
-STATE_HOT_MAX_LINES=1200
+STATE_HOT_MAX_LINES=1000
 STATE_HOT_MAX_CHECKPOINTS=80
-PO_TO_TL_HOT_MAX_LINES=800
+PO_TO_TL_HOT_MAX_LINES=650
 PO_TO_TL_HOT_MAX_SECTIONS=60
-ARCH_HOT_MAX_LINES=3500
+ARCH_HOT_MAX_LINES=3000
 ARCH_HOT_MAX_STORY_SECTIONS=120
 
 # Publish targets (US-0054)
@@ -239,6 +254,18 @@ DOC_DETAIL_LEVEL=balanced
 README_FEATURE_COVERAGE_ENFORCE=1
 
 #
+# ## Project README coverage (US-0097 / DEC-0083)
+# Project-owned root README bootstrap + per-story catalog growth.
+# - PROJECT_README_ENFORCE: 0|1 (default 1 post-bootstrap)
+#   When 0, /release step 3g skips (migration/grandfathering only). When 1, blocking.
+#   Flip 0→1 only after validate_project_readme_coverage.py --report shows coverage_missing: [].
+# - FRAMEWORK_KIT_REPO: 0|1 (default 0)
+#   When 1 (its-magic dev kit repo only), skip execute 23a/23b and project validator root check.
+#   Consumer repos never set FRAMEWORK_KIT_REPO=1.
+PROJECT_README_ENFORCE=1
+FRAMEWORK_KIT_REPO=0
+
+#
 # ## Browser UAT self-test (US-0093 / DEC-0079)
 # Two-tier browser probe: stdlib lib classifies + agent owns Cursor browser MCP (BUG-0006).
 # - UAT_BROWSER_PROBE_MODE: cursor|http_fallback|playwright_fallback (default cursor)
@@ -258,6 +285,16 @@ UAT_PROCESS_HEALTH_POLL_SECONDS=60
 UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS=2
 DEV_SERVER_PORT=
 DEV_SERVER_COMMAND=
+
+#
+# ## Dev environment auto-launch (US-0098 / DEC-0084)
+# Execute-phase bounded rebuild/relaunch + Connect surfacing — distinct from US-0065 phase QA,
+# US-0086 test routing, and US-0067 release hints. Orthogonal to AUTO_REMOTE_AUTOMATION_PROFILE.
+# When off, execute step 24 skipped with zero overhead.
+# - DEV_AUTO_LAUNCH_PROFILE: off|deterministic_v1 (default off)
+# - DEV_ENVIRONMENT_CONFIG: repo-relative path (default .cursor/dev-environment.json)
+DEV_AUTO_LAUNCH_PROFILE=off
+DEV_ENVIRONMENT_CONFIG=.cursor/dev-environment.json
 
 #
 # ## Caveman mode (US-0089)

@@ -28,6 +28,7 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Policy-driven sync cadence**: optional phase/milestone-triggered sync can be configured, with safe default-off behavior and QA-first constraints.
 - **Release safety gate**: release proceeds only after mandatory check-in tests and QA/UAT evidence pass deterministic gates.
 - **Release history without overwrite**: per-sprint release notes preserve historical records instead of reusing a single mutable file.
+- **Version-scoped release changelog**: a cumulative semver changelog and per-version release docs list shipped **US-xxxx** / **BUG-xxxx** work with short summaries; GitHub/git publish paths attach the same canonical bodies (Keep a Changelog + **`gh release create -F`** best practice).
 - **Release queue visibility**: unreleased and released sprints are tracked in a canonical queue so pending release work is always explicit.
 - **Backlog-release consistency**: released sprint evidence and backlog status/AC checks are deterministically reconciled to prevent stale OPEN stories after completion.
 - **Single-source status trust**: backlog is the canonical story-status source, and acceptance/state artifacts are deterministically reconciled to prevent OPEN/DONE drift.
@@ -1043,6 +1044,26 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Evidence**: `handoffs/intake_evidence/BUG-0011-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); operator `/ask` comparing local `caveman.mdc` vs JuliusBrussee/caveman `SKILL.md`.
 - **Intake closure (2026-06-06, PO)**: Backlog **`BUG-0011`** **OPEN**; next **`/discovery`**.
 
+## Discovery Notes — BUG-0012
+
+- **Operator value proposition**: When **`AUTO_FLOW_MODE=full_autonomy`** and **`AUTO_BACKLOG_DRAIN=1`** are set in Cursor IDE, operators run **`/auto` once** and expect **hands-off** advance across **multiple story segment boundaries** without manual re-**`/auto`** or mandatory **`auto_outer_driver.py`** prose — the product promise **US-0095** / **DEC-0080** shipped **2026-06-07** (**S0084**). **BUG-0012** tracks **post-delivery runtime regression**: operator reports orchestration **stops after every user-story completion** while paradoxically citing active drain/full_autonomy and instructing re-**`/auto`** — behavior resembling pre-**US-0095** manual re-invocation.
+- **Regression framing (discovery-locked)**:
+  - **Not a duplicate of US-0095** — that story **delivered** native in-chat auto-chain contract + static markers; this bug is **contract-vs-runtime gap** after recent adjustments (post-**US-0095** / **US-0096** era).
+  - **Distinct from BUG-0005** (stale resume after bug intake), **BUG-0006** (spawn-only — preserve, do not weaken), **US-0096** (delivery-mode lifecycle shape — orthogonal).
+  - **Primary failure modes (hypothesis)**: orchestrator treats Cursor turn boundary as terminal segment stop; emits forbidden mandatory re-**`/auto`** / outer-driver prose under **`full_autonomy`**; fails **DEC-0080** IDE drain-advance **step 7** (immediate next-segment spawn after **`refresh-context`**).
+- **Product-facing messaging constraints**:
+  - **IDE primary path**: with **`full_autonomy`**, runbook/command prose must **never** instruct mandatory re-**`/auto`** between drain segments when continuation is schedulable (**US-0095** **AC-5** / **AC-6** intent).
+  - **Outer driver = optional fallback only**: **`scripts/auto_outer_driver.py`** remains for headless/CI or **`NATIVE_CHAIN_UNAVAILABLE`** — not default IDE drain path.
+  - **Spawn-only preserved**: in-chat continuation is orchestrator **scheduling** of fresh phase subagents — not in-band phase-role execution (**BUG-0006** / **US-0069**).
+  - **Hard gates unchanged**: **`decision_gate`**, **`loop_max`**, security deny-list, isolation (**US-0048**), strict proof (**DEC-0038**), **`resume_brief`** pairing (**DEC-0069**) — fix must not relax **DEC-0078** matrix.
+  - **`AUTO_QUIET=1`**: suppress routine prose but must not reintroduce outer-driver wait or segment-exhausted terminal messaging when drain budget remains.
+- **Discovery-locked fix boundary (orchestration surfaces only)**:
+  - **Primary**: `.cursor/commands/auto.md` native in-chat auto-chain loop (**US-0095** / **DEC-0080**); IDE drain-advance-without-pause 7-step algorithm; orchestrator foreground Task/subagent continuation; **`handoffs/resume_brief.md`** segment pointers; **`docs/engineering/auto-orchestration-reference.md`** operator messaging rules.
+  - **Secondary**: **`state.md`** **`native_chain_active`** breadcrumb truthfulness; contract tests in **`tests/auto_command_contract_test.py`** (forbidden-prose markers + behavioral regression beyond static string presence).
+  - **Out of scope**: weakening spawn-only contract; deleting outer driver; changing **US-0096** delivery modes; bug-queue mutex (**US-0087**) unless regression test requires; publish automation (**RELEASE_PUBLISH_MODE=auto**).
+- **Done signal (operator)**: single **`/auto`** with **`full_autonomy`** + drain observes hands-off advance across **≥2 consecutive story segments** in IDE without manual **`/auto`** between segments; contract tests lock forbidden drain-stop prose.
+- **Research asks**: reconcile doc/contract PASS vs runtime FAIL; drain-advance step-7 audit; forbidden-prose inventory; **`native_chain_active`** truthfulness; **`AUTO_QUIET`** / **US-0096** interaction; multi-segment E2E strategy — extend **`R-0083`** before **`/architecture`**.
+
 ## Discovery Notes — BUG-0011
 
 - **Operator value proposition**: When **`CAVEMAN_MODE=1`**, operators expect **visibly shorter assistant prose** (fewer output tokens, full technical accuracy) — matching the upstream Caveman intent documented in **`R-0073`**. The fix completes the **response-side voice vertical** that **US-0089** scaffolded but did not ship; it is **orthogonal** to **US-0090** input-side file compression (already **DONE**).
@@ -1200,3 +1221,311 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   - **Quiet mode**: **`AUTO_QUIET=1`** suppresses chatter but must not reintroduce outer-driver wait instructions between segments.
 - **Composition boundaries**: extends **US-0092** / **DEC-0078** (stop matrix, caps, block-retry) + **US-0088** (continuous policy) + **US-0044** (drain) + **US-0087** (bug-queue mutex); does not weaken isolation (**US-0048**) or strict proof (**US-0056**).
 - **Research asks**: native continuation model, IDE drain-advance, cap ledger, fallback boundary, operator messaging — see **`R-0081`** before **`/architecture`**.
+
+## Intake Notes — US-0096
+
+- **Problem**: **US-0080** / **DEC-0062** cut context breadth via **`TOKEN_PROFILE`** and command slimming, but the default lifecycle still runs **~11 subagent spawns** with heavy handoffs and per-phase **`state.md`** checkpoints — **DEC-0052** reinstatement blocks naive phase exclusion. Operators want **50–70% token reduction** at near-same code quality without breaking standard mode.
+- **Intent**: New opt-in **`DELIVERY_MODE`** axis — **`standard`** (default, unchanged), **`ultra_lean`** (4 macro-phases + **`pack.json`** + memory index), **`mega_quick`** (enhanced **`/quick`** under **`/auto`**). **Layered memory**: write deltas, read vision/architecture/decisions by **section reference** — not amnesia. **Tranche A** universal wins ship without any mode toggle.
+- **Operator constraint (hard)**: **`DELIVERY_MODE`** controls **lifecycle shape and artifacts only** — must not substitute for **`TOKEN_PROFILE`** (context breadth) or **`CAVEMAN_MODE`** (reply voice). **`standard`** must remain byte-compatible with pre-**US-0096** behavior.
+- **Evidence**: `handoffs/intake_evidence/US-0096-intake-20260611.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research anchor **`R-0082`**.
+- **Intake closure (2026-06-11, PO)**: Backlog **`US-0096`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0096
+
+- **Operator value proposition**: Operators who accept near-same code quality can cut **~50%** token burn (**`ultra_lean`**, four macro-spawns + layered memory) or **~70%+** (**`mega_quick`**, enhanced **`/quick`** path) without abandoning institutional memory — vision/architecture/decisions stay reachable by **section reference**, not amnesia. **`DELIVERY_MODE=standard`** (default) remains **byte-compatible** with today's full lifecycle.
+- **Three-mode axis (discovery-locked)** — scratchpad key **`DELIVERY_MODE=standard|ultra_lean|mega_quick`** (default **`standard`** when unset):
+
+| Mode | Lifecycle shape | Target token reduction | Primary artifacts |
+|------|-----------------|------------------------|-------------------|
+| **`standard`** | Today's eleven canonical phases + **DEC-0052** reinstatement | Baseline (no regression) | Existing handoffs, sprint folders, triad hot surfaces |
+| **`ultra_lean`** | Four macro-phases: **`spec` → `plan` → `build+verify` → `ship`** | ~50% vs comparable **`standard`** run | **`work/US-xxxx/pack.json`**, **`handoffs/active-context.md`**, section-scoped cold reads |
+| **`mega_quick`** | Enhanced **`/quick`** under **`/auto`** (1 primary spawn; +1 on test failure) | ~70%+ vs comparable **`standard`** run | **`sprints/quick/Qxxxx/task.json`**, **`summary.md`**, compact **`state.md`** index row |
+
+- **Orthogonality table (discovery-locked — non-substitution)**:
+
+| Axis | Controls | Must NOT control |
+|------|----------|------------------|
+| **`TOKEN_PROFILE`** (`lean\|balanced\|full`) | Context breadth / token cost per spawn (**DEC-0062**) | Lifecycle shape, phase count, automation level |
+| **`DELIVERY_MODE`** | Lifecycle shape, artifact surface, spawn count | Context breadth, reply voice, drain/automation |
+| **`CAVEMAN_MODE`** / **`CAVEMAN_LEVEL`** | Reply voice only (**DEC-0072**) | Lifecycle shape, context breadth |
+| **`AUTO_FLOW_MODE=full_autonomy`** | Automation, drain-without-pause (**DEC-0078** / **DEC-0080**) | Lifecycle shape (composes with **`DELIVERY_MODE`**) |
+
+- **Ultra_lean macro-phase mapping (discovery-locked)** — each macro-phase = **one fresh subagent spawn** (**BUG-0006** preserved); inner loops stay **inside** the macro spawn:
+
+| Macro-phase | Role | Absorbs canonical phases | Stop / handoff |
+|-------------|------|--------------------------|----------------|
+| **`spec`** | **po** | **`intake`** + **`discovery`** | Writes/updates **`pack.json`** AC + discovery locks; prepends **`active-context.md`** index row |
+| **`plan`** | **tech-lead** | **`research`** + **`architecture`** + **`sprint-plan`** | Locks tasks in **`pack.json`**; optional architecture/decision **delta** append when new pattern |
+| **`build+verify`** | **dev** (+ **qa** only on test failure) | **`execute`** + merged **`qa`**/**`verify-work`** checklist | **`AUTO_IMPLEMENTATION_LOOP`** preserved; tests green before stop; UAT matrix in one spawn |
+| **`ship`** | **release** (+ **curator** refresh) | **`release`** + **`refresh-context`** | Status flip per **US-0045**; compact evidence hashes; triad rollover when hot surfaces mutate |
+
+- **Layered memory tiers (discovery-locked)**:
+  1. **Hot** — **`handoffs/active-context.md`** (~30–80 lines, rolled over): read-before-code refs for active story; lists **`pack.json`** path, section anchors, last delta ids.
+  2. **Warm** — **`work/US-xxxx/pack.json`**: AC checklist, task seeds, handoff refs, status, **`deltas[]`** pointers — canonical per-story working set for lean modes.
+  3. **Cold** — vision / architecture / decisions: **section-scoped narrow-read** only (cap **`LEAN_COLD_READ_MAX_SECTIONS`**); conditional **delta append** when new patterns learned — never wholesale file reads by default.
+
+- **Mega_quick routing (discovery-locked)**:
+  - **`/auto`** reads **`DELIVERY_MODE=mega_quick`** (or backlog row override per **AC-8**) and routes to enhanced **`/quick`** semantics — **not** a replacement slash command.
+  - **Eligibility signals** (any one sufficient at **`/auto`** materialization): explicit scratchpad mode; backlog story row **`delivery_mode: mega_quick`**; argv **`delivery-mode=mega_quick`**; operator **`/quick`**-class scope (small, bounded, no full sprint ceremony).
+  - **Ineligible** (fail closed to **`standard`** or operator prompt — research locks exact reason code): multi-AC cross-cutting stories, open **`plan_area_inventory` > 1** without operator override, bug segments (**`INTAKE_WORK_ITEM_KIND=bug`**), stories requiring companion **`DEC-xxxx`** + architecture lock before code.
+  - **Artifacts**: **`sprints/quick/Qxxxx/task.json`** holds AC + test commands; **`summary.md`** + one **`state.md`** index row; second spawn **only** on test failure.
+  - **Status flip**: requires **`acceptance_met: true`** + green tests — same quality floor as **AC-9**.
+
+- **Tranche delivery order (discovery-locked)**:
+  - **Tranche A** — universal token wins (always on, no mode toggle): narrow-read context packs in **all** phase commands, tighter default hot-surface thresholds, delta handoff append guidance, touch-graph read policy in runbook.
+  - **Tranche B** — **`ultra_lean`** macro-lifecycle + **`pack.json`** + **`active-context.md`**.
+  - **Tranche C** — **`mega_quick`** **`/auto`** routing + enhanced **`/quick`** contract.
+  - **Tranche D** — optional backlog **`delivery_mode`** row + **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`** precedence chain.
+
+- **Mode-scoped **DEC-0052** reinstatement (discovery-locked)**:
+  - **`DELIVERY_MODE=standard`** (or unset): today's reinstatement algorithm unchanged — excluded phases reinstate per scratchpad phase plan.
+  - **`ultra_lean`** / **`mega_quick`**: **no** reinstatement of eleven-phase chain; resolver materializes mode-specific plan **before** any legacy reinstatement pass; breadcrumbs record **`delivery_mode`**, **`resolved_phase_plan`**, **`memory_layer=pack|quick|standard`**.
+
+- **Composition with native chain (**DEC-0080** / **DEC-0081** / **BUG-0012** closure)**:
+  - Lean modes **reduce spawns per story**; **`full_autonomy`** drain-advance, **`native_chain_continuing`**, and **`drain_advance_action`** semantics **unchanged**.
+  - **`AUTO_QUIET=1`** composes — quiet must not suppress spawn scheduling.
+  - **`NATIVE_CHAIN_UNAVAILABLE`** fallback boundary unchanged — delivery-mode docs must not reintroduce mandatory outer-driver prose for IDE **`full_autonomy`**.
+
+- **Product-facing messaging constraints**:
+  - **Default-off lean modes**: unset **`DELIVERY_MODE`** = **`standard`** — no behavior change for existing downstream repos.
+  - **Quality floor (all modes)**: tests before stop; no secrets deny-list bypass; **`RELEASE_PUBLISH_MODE`** unchanged; compact evidence hashes allowed in lean modes but **auditable refs retained** (**AC-9**).
+  - **Not amnesia**: docs must state lean modes **read** institutional memory by reference — they **compress spawn count and hot surfaces**, not delete vision/architecture/decisions.
+  - **Runbook recipe**: when to use **`standard`** vs **`ultra_lean`** vs **`mega_quick`** (greenfield vs bugfix vs one-liner) — **AC-11**.
+
+- **Optional scratchpad tuning keys (discovery-locked names)**:
+  - **`LEAN_MEMORY_READ`**, **`LEAN_MEMORY_WRITE`**, **`LEAN_COLD_READ_MAX_SECTIONS`**, **`LEAN_STATE_INDEX_ROWS`**, **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**.
+
+- **Top risks (carry to /research)**:
+  - **R1** Partial delivery — **`ultra_lean`** enabled without **`pack.json`** / index contract → single-story vertical slice mitigates.
+  - **R2** **`active-context.md`** vs **DEC-0054** triad hot-surface — rollover ownership and line budgets must not fight **`handoffs/po_to_tl.md`** / **`state.md`** caps.
+  - **R3** **`standard`** regression — contract tests must assert pre-**US-0096** baseline markers unchanged when mode unset.
+  - **R4** **`mega_quick`** false routing of large cross-cutting stories — eligibility guard + fail-closed reason codes.
+  - **R5** **`pack.json`** vs existing **`sprints/Sxxxx/`** layout — research must lock coexistence rules (**standard** keeps sprint folders; lean adds **`work/`** tree).
+
+- **Research asks**: **`pack.json`** schema, mode-scoped **DEC-0052** algorithm, **`active-context.md`** vs triad rollover, **`mega_quick`** eligibility table, Tranche A threshold defaults, **DEC-0062** **`delivery_mode`** field, contract-test inventory — extend **`R-0082`** before **`/architecture`**.
+
+## Intake Notes — US-0097
+
+- **Problem**: New projects installed with its-magic still receive the full **framework** README at repo root (~1600 lines). **US-0062** / **DEC-0045** intended framework metadata in **`its_magic/`**, but the installer manifest still copies root **`README.md`**. No workflow step bootstraps or extends a **project-specific** repo overview as stories ship.
+- **Intent**: Root **`README.md`** = **project-owned** (user repo overview + developer orientation, growing per **`US-xxxx`** / sprint). **`its_magic/README.md`** = **framework-only** catalog. Mandatory **`/execute`** / **`/release`** deltas + blocking project README validator; refactor **US-0091** to framework paths only.
+- **Operator constraint (hard)**: Upgrade/migration must not destroy operator-written project prose when lifting legacy framework copy; **US-0071** hygiene applies to project blurbs.
+- **Alternatives considered**: (1) extend **US-0032** optional user guides only — rejected (not root README, default-off); (2) manual README edits — rejected (observed gap); (3) single combined README — rejected (conflicts with **US-0062** separation).
+- **Evidence**: `handoffs/intake_evidence/US-0097-intake-20260613.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research stub **`R-0084`**.
+- **Intake closure (2026-06-13, PO)**: Backlog **`US-0097`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0097
+
+- **Operator value proposition**: Downstream repos installed with its-magic open a **project-owned** root **`README.md`** — a concise repo front door (what the product does, how to run it, how developers orient) that **grows automatically** as user-visible stories ship. The **framework** catalog (~1600 lines today) lives only under **`its_magic/README.md`**; operators are never asked to manually maintain README drift each sprint.
+- **Product-facing messaging constraints**:
+  - **Audience split (simpler than framework)**: project README uses two operator-facing H2s — **`## For users`** (what it does, how to run/use) and **`## For developers`** (setup, repo layout, where code/tests live). Framework **`USER_*`/`DEV_*`** vocabulary and **`readme-section-affinity.json`** apply only to **`its_magic/README.md`** — not the project root.
+  - **Terseness over encyclopedic guides**: per-shipped-story blurbs are **1–2 sentences** in a **`## Features`** (or **`## What's included`**) catalog — not per-feature user guides (**US-0032** / **`USER_GUIDE_MODE`** remain orthogonal, default-off).
+  - **Framework pointer, not duplication**: project README may include **one optional line** pointing to **`its_magic/README.md`** for its-magic commands — no framework command catalog in the project root.
+  - **Metadata hygiene** (**US-0071**): project blurbs stay operator-readable; no planning tokens (`orchestrator_run_id`, `fresh_context_marker`, etc.).
+  - **Remediation vocabulary**: blocking failures use umbrella **`PROJECT_README_COVERAGE_BLOCKED`** with deterministic sub-codes (`PROJECT_README_COVERAGE_GAP:<US-xxxx>`, bootstrap/migration/placeholder variants per acceptance).
+- **Project README scaffold (discovery-locked outline)** — materialized on first **`/execute`** when root README is missing or matches a **framework-placeholder sentinel**:
+  1. **H1**: `# {Project Name}` — sourced from **`docs/product/vision.md`** H1 or first substantive title line.
+  2. **Purpose**: 1–3 sentences from vision Problem/Value (operator voice, not framework marketing).
+  3. **`## For users`**: placeholder bullets for what-it-does + how-to-run (filled as stories ship).
+  4. **`## For developers`**: setup prerequisites, repo layout pointers (`src/`, `docs/`, tests).
+  5. **`## Features`** with marker `<!-- project-readme-feature-catalog -->` — empty catalog until first shipped blurb.
+  6. **Optional**: one-line link to **`its_magic/README.md`** for framework workflow commands.
+- **Placeholder detection contract (discovery-locked for `/research`)**:
+  - **Framework sentinel signals** (any → treat as placeholder): H1 `# its-magic — AI dev team`; presence of `<!-- readme-feature-coverage-catalog -->`; heading `Feature coverage catalog (US-0091)`; byte-identity with **`template/README.md`** on fresh consumer install.
+  - **Operator-authored prose** (preserve on upgrade): root README **fails** sentinel match **and** contains project-specific title/purpose **or** custom sections outside framework catalog blocks.
+  - **Kit-repo exception** (**R3**): its-magic framework development repo may retain a dual-purpose root README under explicit **`FRAMEWORK_KIT_REPO=1`** scratchpad — consumer repos never set this; architecture must lock detection order (kit flag → sentinel → operator prose).
+- **Per-story delta contract**: each shipped **`user_visible: true`** **`US-xxxx`** adds or updates **one** catalog bullet under **`## Features`** naming the capability in operator language (optional parenthetical id). Sprint releases may add a one-line sprint cross-link — not a substitute for per-story blurbs.
+- **Gate separation (discovery-locked)**:
+  - **US-0091** / **`validate_readme_feature_coverage.py`** → **`its_magic/README.md`** (+ **`template/its_magic/README.md`**) only; root **`README.md`** removed from framework coverage predicate.
+  - **New** **`validate_project_readme_coverage.py`** → root **`README.md`** vs DONE **`user_visible: true`** project backlog rows.
+  - **`/release`** step **3g** (name architecture-locked) runs project gate alongside existing **3f** framework gate; scratchpad **`PROJECT_README_ENFORCE=1`** default post-bootstrap (**`0`** migration-only skip with evidence).
+- **Tranche delivery order**: **A** installer manifest boundary + non-destructive migration → **B** execute bootstrap scaffold → **C** mandatory execute/release deltas → **D** validators + gate separation + contract tests.
+- **External UX refs**: [GitHub README guidance](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) (what/why/how, link out for deep reference); industry pattern 200–800 word front door with features catalog + quick start (**R-0084**).
+- **Research asks**: finalize sentinel heuristic table, kit-repo exception rules, migration merge policy, validator CLI/`--report` schema, execute/release step prose, grandfathering toggle — see **`R-0084`** before **`/architecture`**.
+
+## Intake Notes — US-0098
+
+- **Problem**: During development, operators want the AI to **automatically rebuild and restart** the running app (e.g. Docker containers) after code changes and **show connection parameters** — not only at QA/release. Existing **US-0065** / **US-0086** / **US-0067** cover phase validation, test routing, and release hints but not a **continuous dev-loop relaunch** with **persisted dev-environment profile**.
+- **Intent**: **Default-off** scratchpad-gated **dev auto-launch profile** — agent **detects** where development runs (**local**, **docker-host-local** with direct shell/docker on the machine, optional **docker**/**ssh** automation targets), **persists** operator-seeded profile, runs **bounded** rebuild/restart during **`/execute`**, and surfaces **Connect** info (URL/port/health, names-only secrets). Operator may seed parameters once; agent maintains profile idempotently.
+- **Operator constraint (hard)**: **US-0085** rules unchanged — no **`.env`** reads; no secret literals in git; manual daily work unchanged when profile **off**.
+- **Alternatives considered**: (1) extend **US-0065** only — rejected (phase-gated QA, not dev-loop); (2) extend **US-0086** only — rejected (routing without relaunch/persistence); (3) file-watch daemon v1 — deferred (bounded triggers first: execute task + explicit refresh).
+- **Evidence**: `handoffs/intake_evidence/US-0098-intake-20260613.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); research stub **`R-0085`**.
+- **Intake closure (2026-06-13, PO)**: Backlog **`US-0098`** **OPEN**; next **`/discovery`**.
+
+## Discovery Notes — US-0098
+
+- **Operator value proposition**: When the dev auto-launch profile is **on**, the AI closes the loop after implementation work — **detect** where the app runs, **rebuild/restart** bounded stacks (containers or dev server), **persist** what it learned, and **show how to connect** — without waiting for QA/release. When **off** (default), nothing changes for manual daily work (**parity with `AUTO_REMOTE_AUTOMATION_PROFILE=off`**).
+- **Connect block UX (discovery-locked template)** — emitted in chat and/or **`handoffs/dev_to_qa.md`** after successful relaunch; field names align with **`runtime-connectivity.md`** operator summary where applicable:
+  - **`runtime_mode`**: `local` | `docker-host-local` | `docker` | `ssh`
+  - **`connect_endpoint`**: `protocol://host:port` or `host:port` (literal host/port OK when not secret-derived; env-derived endpoints cite **`*Env` names only**)
+  - **`health_path`**: optional path (e.g. `/health`, `/api/health`)
+  - **`service_id`** / **`container_id`**: stack slice identifier (names/ids, not credentials)
+  - **`target_id`**: when automation remote (**US-0086**) — canonical **`remote.json`** / **`release-targets.json`** id
+  - **`env_refs`**: list of env **names** the operator must have set (never values)
+  - **`relaunch_outcome`**: `success` | `skipped` | `failed` + reason code when not success
+- **Detection matrix (discovery-locked for `/research`)**:
+
+  | Label | Meaning | Primary signals | Not this |
+  |-------|---------|-----------------|----------|
+  | **`local`** | Process dev server on workstation | No active compose/docker profile; **`DEV_SERVER_COMMAND`** / stack profile from repo | Remote SSH shell |
+  | **`docker-host-local`** | Same-machine **`docker`** / **`docker compose`** | Compose file path in profile or repo root; docker CLI succeeds locally; operator on Docker host (not SSH hop) | **`US-0086`** remote docker-over-SSH unless profile explicitly selects remote target |
+  | **`docker`** | Automation remote container target | **`AUTO_REMOTE_AUTOMATION_PROFILE`≠off** + resolved **`target_id`** with docker semantics | Default when profile off |
+  | **`ssh`** | Automation remote shell target | **`AUTO_REMOTE_AUTOMATION_PROFILE`≠off** + **`ssh-server`** (or equivalent) target | Manual SSH the operator runs themselves outside automation |
+
+- **Relaunch trigger contract (v1, discovery-locked)**:
+  1. **Execute-bound (primary)**: after **`/execute`** task completion when changed files match documented **runtime/container surface classes** (e.g. `Dockerfile*`, `docker-compose*.yml`, `compose.yaml`, `package.json`, lockfiles, `requirements*.txt`, documented runtime scripts) — **bounded** retry cap (architecture-locked, e.g. max **2** attempts).
+  2. **Explicit operator refresh**: phrase **`refresh dev environment`** (architecture-locked synonym table) or dedicated command hook — fail-closed when profile **off** or target unroutable.
+  3. **Excluded v1**: unbounded **`docker compose watch`** / filesystem watch daemons as mandatory automation; may document as **operator-opt-in** future extension only after bounded design passes architecture gate.
+- **Container recipe tiers (discovery-locked)** — map file-class → action (research closes exact table):
+  - **Tier A — full rebuild**: `Dockerfile*`, dependency manifests → `docker compose build` + `up` (or stack equivalent)
+  - **Tier B — restart**: config-only or non-hot-reload surfaces → `docker compose restart <service>` or process restart
+  - **Tier C — local dev server**: **`local`** mode → **`DEV_SERVER_COMMAND`** / stack-aware start (reuse **`uat_probe_lib`** / **`DEV_SERVER_*`** patterns)
+- **Profile persistence (discovery-locked outline)** — path candidate **`.cursor/dev-environment.json`** (architecture-locked at **`/architecture`**):
+  - **`version`**, **`detected_mode`**, **`operator_seeded`**, **`last_updated`**, **`compose_file`**, **`service`**, **`connect`** (endpoint + health + `*Env` refs), **`rebuild_recipe`**, **`evidence_refs`**
+  - Committed **`template/.cursor/dev-environment.json.example`** (names-only placeholders); operator-writable persisted file gitignored or local-only per **US-0085** posture
+  - Agent updates **idempotent** with evidence; operator may seed once
+- **Scratchpad gate (discovery-locked proposal for `/research`)** — mirror **`AUTO_REMOTE_AUTOMATION_PROFILE`** pattern:
+  - **`DEV_AUTO_LAUNCH_PROFILE`**: `off` | `deterministic_v1` (default **`off`**)
+  - Optional **`DEV_ENVIRONMENT_CONFIG`**: path override (default **`.cursor/dev-environment.json`**)
+  - Orthogonal to **`AUTO_REMOTE_AUTOMATION_PROFILE`** — both may be off; when dev profile on + remote automation on, **US-0086** precedence applies for remote targets
+- **Repo survey (2026-06-14, PO)**: no **`.cursor/dev-environment.json`** yet; scratchpad documents **`DEV_SERVER_PORT`**, **`DEV_SERVER_COMMAND`**, **`AUTO_REMOTE_AUTOMATION_PROFILE=off`**; **`runtime-connectivity.md`** + **`release-targets.json`** provide release/QA Connect shapes; **`template/.cursor/remote.json`** exists; its-magic framework repo has no project **`docker-compose.yml`** — consumer repos may; detection must be stack-aware not hard-coded to one layout.
+- **External UX / market refs**:
+  - [Docker Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) — industry pattern for **sync** vs **sync+restart** vs **rebuild** by file class; informs Tier A/B mapping but **US-0098 v1 stays execute-triggered**, not background watch (**R-0085**)
+  - **`runtime-connectivity.md`** operator summary template — **Connect** block field alignment for in-dev surfacing vs **US-0067** release-only hints
+  - Dev-tool expectation: AI assistants with filesystem access need **explicit post-change relaunch + connection summary** because operators cannot infer container ports from code alone
+- **Research asks (extend **`R-0085`**)**: finalize profile JSON schema vs **`remote.json`** / **`release-targets.json`** boundaries; file-class → relaunch tier table; execute-step wiring location; reason-code inventory (`DEV_ENV_PROFILE_*`, `DEV_ENV_RELAUNCH_*`); explicit refresh command name; **`check_intake_template_parity.py --scope=dev-environment`** manifest rows; whether companion **`DEC-xxxx`** required beyond discovery locks.
+
+## Intake Notes — US-0099
+
+- **Problem**: After **US-0098** shipped, operators enabling **`DEV_AUTO_LAUNCH_PROFILE`** expect **`.cursor/dev-environment.json`** to exist when scratchpad **`DEV_ENVIRONMENT_CONFIG`** points there — but install/upgrade only delivers the **example** under **`template/`**, not the local gitignored profile.
+- **Proposed fix**: Non-destructive **copy-when-missing** on **`missing`**, **`upgrade`**, and **npm postinstall** — mirror smart-upgrade local-file preservation (**US-0018**).
+- **Operator outcome**: Fresh install or update leaves a starter profile ready to customize (compose service, connect refs) without manual copy step.
+- **Research stub**: **`R-0086`** — extend at **`/discovery`** / **`/research`** for installer hook placement and postinstall parity with **`remote.json`** patterns if any.
+
+## Discovery Notes — US-0099
+
+- **Operator value proposition**: After install or upgrade, a **starter dev-environment profile** exists at the resolved path so **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`** no longer fails with **`DEV_ENV_PROFILE_MISSING`** before the operator customizes compose service or **`*Env`** connect refs. Bootstrap is **automatic and silent** when the file is absent; **customization** (editing service name, connect refs) remains operator-owned.
+- **UX contrast — `remote.json` vs `dev-environment.json`**:
+
+  | Artifact | Bootstrap posture | Rationale |
+  |----------|-------------------|-----------|
+  | **`.cursor/remote.json`** | **Manual seed** from **`template/.cursor/remote.json`** (gitignored; opt-in remote) | Remote execution is default-off (**`REMOTE_EXECUTION=0`**); no auto-materialize |
+  | **`.cursor/dev-environment.json`** | **Auto copy-when-missing** from **`template/.cursor/dev-environment.json.example`** | **`DEV_AUTO_LAUNCH_PROFILE`** gate expects a loadable profile when enabled; install gap is the reported defect |
+
+- **Operator flow (discovery-locked)**:
+  1. **Install / upgrade / `npm install its-magic`** — installer or postinstall copies example → resolved path **only when target absent**; log line cites bootstrap outcome (names-only).
+  2. **Customize** — operator edits **`service`**, **`compose_file`**, **`connect.*Env`** refs in the local profile (no re-copy required).
+  3. **Enable** — set **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`** in scratchpad; execute step **24** loads profile without **`DEV_ENV_PROFILE_MISSING`**.
+  4. **Re-upgrade** — existing local profile **preserved** (**`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`**); smart-upgrade composition with **US-0018**.
+- **Hook placement (discovery-locked for `/research`)**:
+  - Run **after** **`run_scratchpad_postinstall`** on **`missing`** and **`upgrade`** so merged scratchpad supplies **`DEV_ENVIRONMENT_CONFIG`** (Model B: local > baseline > example).
+  - Run **before** **`bootstrap_runbook_commands`** (orthogonal concerns; bootstrap is profile file, not runbook keys).
+  - **`installer.ps1`** / **`installer.sh`** delegate to **`installer.py`** (same pattern as scratchpad-postinstall).
+  - Dedicated helper **`bootstrap_dev_environment_profile()`** in **`scripts/dev_environment_lib.py`** (stdlib; **`template/`** mirror).
+- **Path resolution (discovery-locked)**:
+  - Resolved path = parseable repo-relative **`DEV_ENVIRONMENT_CONFIG`** from merged scratchpad, else **`DEFAULT_PROFILE_PATH`** (**.cursor/dev-environment.json**).
+  - Malformed override (absolute path, traversal, empty) → fail-closed **`DEV_ENV_BOOTSTRAP_PATH_INVALID`**; do not copy.
+  - Source = **`template/.cursor/dev-environment.json.example`** only — never synthesize JSON at install time.
+- **Reason-code family (discovery-locked)** — new **`DEV_ENV_BOOTSTRAP_*`** distinct from **`DEV_ENV_PROFILE_*`** (install-time vs runtime load):
+
+  | Code | When |
+  |------|------|
+  | **`DEV_ENV_BOOTSTRAP_COPIED`** | Target absent; example copied successfully |
+  | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Target already present; skip (non-destructive) |
+  | **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** | **`DEV_ENVIRONMENT_CONFIG`** override malformed |
+  | **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`** | Example source absent in packaged template |
+
+- **Runbook UX (discovery-locked)**: **`docs/engineering/runbook.md`** § Dev environment — demote "Seed profile" prerequisite copy to **"Customize bootstrap profile"**; bootstrap is automatic on install/upgrade; manual copy only when operator wants a non-default path before first install or to reset a deleted file.
+- **npm `postinstall` (discovery-locked outline)**: **`bin/postinstall.js`** today is banner-only; must invoke same bootstrap contract as installer (**`npx its-magic`** / **`npm install its-magic`** consumers). Research closes subprocess vs inline Node and scratchpad-read timing for global installs.
+- **Repo survey (2026-06-14, PO)**: **`installer.py`** copies manifest files but **`.cursor/dev-environment.json`** is **`.gitignore`**d and **not** in **`install_paths`**; **`upgrade`** preserves **`user-data`** prefixes but profile path is under **`.cursor/`** (framework prefix for commands/rules only — profile is **outside** manifest copy); **`bin/postinstall.js`** has no bootstrap; runbook still lists manual seed step; **`dev_environment_lib.py`** has **`load_profile`** but no bootstrap helper yet; **`DEV_ENVIRONMENT_PAIRS`** parity scope exists from **US-0098**.
+- **Tranche order (discovery-locked)**: **A** helper + reason codes → **B** installer hooks (py/ps1/sh) → **C** **`postinstall.js`** → **D** runbook + contract tests + parity manifest delta.
+
+## Intake Notes — US-0100
+
+- **Operator request (2026-06-15)**: Document bugfixes and user stories (with short descriptions) in release documentation — both a **growing cumulative** history (all versions → US/BUG list) and **per-release** docs; wire **GitHub/git release** to attach the right release notes following official best practices; integrate with existing its-magic release concepts (**US-0040** sprint notes, **release_queue**, **RELEASE_PUBLISH_MODE**).
+- **Problem framing**: Sprint-scoped notes answer "what shipped in **S0089**?" but operators and downstream consumers also need "what shipped in **v0.1.2**?" aligned with npm/git tags; **`release-all.sh`** today calls **`gh release create --generate-notes`**, which ignores canonical its-magic narrative.
+- **Recommended artifact model (intake-locked for discovery)**:
+  - **Cumulative**: repo-root **`CHANGELOG.md`** ([Keep a Changelog](https://keepachangelog.com/) 1.1.0 — **`[Unreleased]`** + semver sections, ISO dates).
+  - **Per-version**: **`handoffs/releases/vX.Y.Z-release-notes.md`** (or architecture-locked equivalent) — body source for GitHub Releases.
+  - **Sprint layer unchanged**: **`handoffs/releases/Sxxxx-release-notes.md`** remains workflow evidence (**US-0040**).
+- **Derivation precedence (intake-locked)**: finalized sprint notes → backlog title/summary → queue **`story_refs`**; include **BUG-xxxx** when sprint delivered defect work.
+- **Publish compose (intake-locked)**: **`gh release create vX.Y.Z -F handoffs/releases/vX.Y.Z-release-notes.md`** per GitHub CLI best practice; respect **`RELEASE_PUBLISH_MODE`** (**US-0054**); no bypass of confirm/auto gates.
+- **Research stub**: **`R-0087`** — semver mapping, backfill from ~80 released sprints, optional **`.github/release.yml`** (out of scope v1 unless discovery expands).
+- **Decomposition**: **single story** **US-0100** — docs + `/release` hook + publish attach + backfill + validators.
+- **Intake evidence**: `handoffs/intake_evidence/US-0100-intake-20260615.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`).
+- **Next**: **`/discovery`** (fresh **PO**).
+
+## Discovery Notes — US-0100
+
+- **Operator value proposition**: Operators and downstream consumers need a **semver-aligned release story** — "what shipped in **v0.1.2**?" with **US-xxxx** / **BUG-xxxx** one-liners — that stays truthful across repo docs, GitHub Releases, and npm/choco/brew tags. Sprint notes (**US-0040**) answer workflow evidence; version docs answer product/version evidence.
+- **Problem framing vs existing artifacts**:
+
+  | Surface | Current behavior | Gap |
+  |---------|------------------|-----|
+  | **`handoffs/releases/Sxxxx-release-notes.md`** | Rich per-sprint notes (gates, Run/Connect/Verify per **US-0067**) | No semver rollup; not suitable as GitHub body wholesale |
+  | **`handoffs/release_queue.md`** | **`release_version`** column exists but **mostly empty** (sparse values e.g. **`0.1.2-30`**, **`0.1.2-41`**) | No deterministic version→work-item index |
+  | **`handoffs/release_notes.md`** | Legacy latest pointer only | Not cumulative history |
+  | **`CHANGELOG.md`** | **Absent** | No growing version history |
+  | **`handoffs/releases/vX.Y.Z-release-notes.md`** | **Absent** | No canonical GitHub/git body file |
+  | **`scripts/release-all.sh`** | **`gh release create "$TAG_NAME" --generate-notes`** (lines 94–99) | Ignores its-magic narrative; auto-generated PR list |
+  | **`/release` command** | Writes sprint notes + queue; optional **`RELEASE_PUBLISH_MODE`** targets | No version-doc derivation hook |
+  | **`package.json`** | **`version`: `0.1.2`** | Semver source for **`release-all.sh`** bump, not yet bound to workflow releases |
+
+- **Repo survey (discovery)**:
+  - **79** shipped sprint note files under **`handoffs/releases/S*-release-notes.md`** (plus template **`Sxxxx`** stub); queue rows from **`S0011`** through **`S0089`** with **`status=released`**.
+  - **`release-all.sh`** flow: **`npm version`** bump → npm publish → **`gh release create --generate-notes`** → choco/brew formula updates; **no** read of sprint notes or queue.
+  - Scratchpad **`RELEASE_PUBLISH_MODE=disabled`**; **`RELEASE_TARGETS_FILE=docs/engineering/release-targets.json`** — workflow **`/release`** and operator **`release-all.sh`** are **separate paths** today; **US-0100** must document when each path writes version docs vs when publish attaches them.
+  - Sprint note shape (e.g. **`S0089`**) includes **`## What's new`** bullets and **`story_refs`** — primary derivation feed for version summaries.
+
+- **UX / operator workflow (discovery-locked)**:
+
+  | Workflow | Operator intent | **US-0100** posture |
+  |----------|-----------------|---------------------|
+  | **`/release`** (workflow gate) | Finalize sprint after QA/UAT | After gates pass: derive **per-version doc** + append **CHANGELOG** section for bound **`release_version`**; populate queue **`release_version`** when semver known |
+  | **`scripts/release-all.sh`** | Bump semver, npm/choco/brew + GitHub tag | After bump: use **`gh release create vX.Y.Z -F handoffs/releases/vX.Y.Z-release-notes.md`** when file exists; documented fallback when missing |
+  | **CI tag push** | Automated publish | Same **`-F`** contract; no **`--generate-notes`** when canonical file present |
+  | **Read cumulative history** | Audit all versions | Open repo-root **`CHANGELOG.md`** |
+  | **Read sprint detail** | Run/Connect/Verify | Unchanged **`Sxxxx-release-notes.md`**; version doc cross-links sprint refs |
+
+- **Version doc content shape (discovery-locked template)** — per-version file is **consumer-facing** (GitHub Release body + changelog section source); **not** a duplicate of full sprint gate narrative:
+  - Header: version, date (ISO), git tag **`vX.Y.Z`**
+  - **`## Work items`**: bullet list **`US-xxxx`** / **`BUG-xxxx`** — **one-line summary** each (from backlog title/summary or sprint **What's new**)
+  - **`## Sprint evidence`**: links to **`handoffs/releases/Sxxxx-release-notes.md`** for each contributing sprint
+  - **`## Operator quick links`**: pointer to **US-0067** Run/Connect/Verify in sprint notes (not duplicated inline)
+  - Metadata hygiene (**US-0071**): no inline secrets; env-ref-only where credentials mentioned
+
+- **Cumulative changelog shape (discovery-locked)** — [Keep a Changelog](https://keepachangelog.com/) **1.1.0**:
+  - Repo-root **`CHANGELOG.md`**
+  - Top: **`[Unreleased]`** (workflow releases not yet bound to semver)
+  - Sections: **`## [X.Y.Z] - YYYY-MM-DD`** newest-first
+  - Each version lists **US/BUG** ids + one-liners (may use **Added** / **Changed** / **Fixed** categories when research maps story kind → category)
+
+- **Discovery locks for `/research` and `/architecture`** (14 locks):
+
+  | # | Lock | Discovery decision |
+  |---|------|-------------------|
+  | L1 | **Cumulative path** | Repo-root **`CHANGELOG.md`** (Keep a Changelog 1.1.0) |
+  | L2 | **Per-version path** | **`handoffs/releases/vX.Y.Z-release-notes.md`** (semver in filename; **`v` prefix stripped in filename**) |
+  | L3 | **Sprint layer** | **`handoffs/releases/Sxxxx-release-notes.md`** unchanged (**US-0040**); never overwritten by version layer |
+  | L4 | **Derivation precedence** | Finalized sprint notes (**What's new** / **story_refs**) → backlog title/summary → queue **`story_refs`**; include **BUG-xxxx** when sprint delivered defect work |
+  | L5 | **GitHub body source-of-truth** | Per-version markdown file only; **`gh release create … -F <file>`**; **no `--generate-notes`** when canonical file exists |
+  | L6 | **`release_version` binding** | Populate queue column on **`/release`** finalization when semver known; **`release-all.sh`** uses post-**`npm version`** value as authoritative for publish attach |
+  | L7 | **Idempotency** | Re-run **`/release`** for same sprint/version must not duplicate CHANGELOG sections or per-version files |
+  | L8 | **Backfill scope** | One-time/idempotent script from **~79** **`released`** queue rows + sprint notes; best-effort semver when **`release_version`** empty — operator remediation for ambiguous rows |
+  | L9 | **Multi-sprint → semver** | **Open for research** — when multiple sprints share one npm publish, coalesce work items under one version section (do not drop sprint cross-links) |
+  | L10 | **US-0067 compose** | Run/Connect/Verify remain sprint-note-only; version docs summarize work items + link sprint evidence |
+  | L11 | **US-0054 compose** | GitHub attach respects **`RELEASE_PUBLISH_MODE`**; workflow **`/release`** may write docs under **`disabled`**; publish execution still gated |
+  | L12 | **Workflow separation** | Document three paths: workflow-only **`/release`**, operator **`release-all.sh`**, CI tag — each with explicit version-doc touchpoints |
+  | L13 | **Fail-closed fallbacks** | Reason-code family: **`RELEASE_CHANGELOG_VERSION_MISSING`**, **`RELEASE_CHANGELOG_DUPLICATE_VERSION`**, **`RELEASE_CHANGELOG_WORK_ITEM_GAP`**, plus documented skip/fail when **`gh`** absent or notes file missing |
+  | L14 | **Validator** | **`scripts/release_changelog_validate.py`** (name locked at discovery; architecture may extend flags) |
+
+- **Research open questions (carry to `/research` via `R-0087`)**:
+  - **Q1**: Deterministic backfill semver assignment when **`release_version`** blank for most historical rows.
+  - **Q2**: Category mapping (Added/Changed/Fixed) vs flat US/BUG list for Keep a Changelog compliance.
+  - **Q3**: Whether workflow-only **`/release`** (no npm bump) appends to **`[Unreleased]`** only or requires explicit semver.
+  - **Q4**: Coalesce algorithm when **`release-all.sh`** publishes one version covering multiple sprints since last tag.
+  - **Q5**: Template parity surfaces (**`template/handoffs/releases/`**, **`template/.cursor/commands/release.md`**, optional **`template/CHANGELOG.md`** stub).
+
+- **Design references**: [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/); [GitHub CLI `gh release create -F`](https://cli.github.com/manual/gh_release_create); existing sprint note exemplar **`handoffs/releases/S0089-release-notes.md`**.
+- **Research anchor**: **`R-0087`** — extend at **`/research`** with repo survey closure and Q1–Q5 answers.
+- **Intake evidence**: `handoffs/intake_evidence/US-0100-intake-20260615.json`.
+- **Next**: **`/research`** (fresh **tech-lead**).

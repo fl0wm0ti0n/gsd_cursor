@@ -4710,3 +4710,1352 @@ Deterministic **drain-advance-without-pause** when **`full_autonomy`** + (**`AUT
 - **Evidence refs (US-0095 delivery)**: `sprints/S0084/release-findings.md` (PASS); `handoffs/releases/S0084-release-notes.md`; `sprints/S0084/uat.md` (10/10 PASS); `sprints/S0084/uat.json`; `sprints/S0084/qa-findings.md` (PASS); `sprints/S0084/summary.md`; `sprints/S0084/plan-verify.json` (PASS); `decisions/DEC-0080.md`; `docs/engineering/architecture.md` `# US-0095`; `docs/product/backlog.md` `## US-0095` (DONE + `release_notes`); `docs/product/acceptance.md` (US-0095 row `[x]`); `handoffs/release_queue.md` (`S0084=released`); `tests/auto_command_contract_test.py` (`test_us0095_*`); `docs/engineering/state.md` (Release checkpoint).
 - **Portfolio drain closure signal**: with US-0095 closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment on `auto-20260607-02` closes at **`/refresh-context`**; next `/auto` invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=9` unused of initial **10**).
 - **Open R-xxxx anchors status (post-closure)**: R-0081 **delivered** (this trailer). Next research anchor allocation deferred to the next `/discovery`-phase subagent when a new work item is intaked.
+
+## R-0082 — US-0096: Delivery modes (ultra_lean + mega_quick) with layered memory
+
+- **Date**: 2026-06-11
+- **Topic**: Opt-in **`DELIVERY_MODE`** lifecycle-shape axis — token reduction via fewer spawns and layered memory without amnesia
+- **Query**: How should **`ultra_lean`** (4 macro-phases + **`pack.json`**) and **`mega_quick`** (enhanced **`/quick`**) compose with **DEC-0052** reinstatement, **US-0080** token metrics, and institutional memory (vision/architecture/decisions narrow-read)?
+- **Status**: **resolved for `/research`** (Q1–Q7 closed — architecture next)
+- **Story**: **US-0096**
+- **Problem**: Default eleven-phase lifecycle + **DEC-0052** non-skippable reinstatement limits token savings from **`TOKEN_PROFILE=lean`** alone; operators need mode-scoped lifecycle shapes that preserve code quality and document changes for later runs.
+- **Linked**: **US-0080**, **DEC-0062**, **US-0053**, **US-0070**, **DEC-0052**, **US-0001**, **US-0092**, **US-0095**, **DEC-0072**
+- **Intake evidence**: `handoffs/intake_evidence/US-0096-intake-20260611.json`
+- **Discovery extension**: **`/discovery`** **PASS** — **`2026-06-13T02:30:00Z`**, PO, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=po-US0096-discovery-20260613T023000Z-fresh` (see below)
+- **Research asks (intake-locked)**:
+  1. **`pack.json`** canonical path and schema vs existing sprint folder compatibility
+  2. Mode-scoped **DEC-0052** reinstatement algorithm
+  3. **`active-context.md`** rollover contract vs **DEC-0054** triad hot-surface
+  4. **`mega_quick`** eligibility rules and backlog **`delivery_mode`** row schema
+  5. Universal wins (Tranche A) default threshold changes vs operator override
+  6. **DEC-0062** run-class object extension with **`delivery_mode`** field
+  7. Contract-test marker inventory + template parity scope
+- **Next phase pointers**: **`/discovery`** (PO) → **`/research`** (TL) → **`/architecture`** (TL, **`DEC-xxxx`**)
+
+### Discovery extension (2026-06-13T02:30:00Z, PO, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=po-US0096-discovery-20260613T023000Z-fresh`)
+
+- **`/discovery`** **PASS** — product framing and mode contracts locked for **`/research`** deep-dive.
+- **Q1 (`pack.json` path/schema)**: canonical path **`work/US-xxxx/pack.json`** (discovery-locked); research must lock JSON schema fields (`story_id`, `delivery_mode`, `ac[]`, `tasks[]`, `refs[]`, `deltas[]`, `status`, `memory_layer`) and coexistence with **`sprints/Sxxxx/`** when **`standard`** mode used on same repo — no destructive overlap.
+- **Q2 (mode-scoped DEC-0052)**: resolver reads **`DELIVERY_MODE`** **before** reinstatement; **`standard`** only gets today's reinstatement; **`ultra_lean`** materializes `[spec, plan, build+verify, ship]`; **`mega_quick`** materializes `[quick]` (+ conditional retry spawn); breadcrumbs: **`delivery_mode`**, **`resolved_phase_plan`**, **`memory_layer`**.
+- **Q3 (`active-context.md` vs DEC-0054)**: hot index at **`handoffs/active-context.md`** (~30–80 lines); research must lock rollover trigger (story segment close vs line cap), relationship to triad surfaces (**`po_to_tl.md`**, **`state.md`**, **`architecture.md`**) — **`active-context`** is **warm index**, not fourth triad member unless architecture decides otherwise.
+- **Q4 (`mega_quick` eligibility)**: discovery signals — scratchpad mode, backlog **`delivery_mode: mega_quick`**, argv **`delivery-mode=`**, small-scope heuristics; research must lock fail-closed reason codes for ineligible stories (cross-cutting AC, bug segments, architecture-first stories).
+- **Q5 (Tranche A universal wins)**: always-on narrow-read in all phase commands, tighter hot-surface defaults, delta handoff guidance, touch-graph reads — research quantifies default threshold deltas vs operator **`LEAN_*`** overrides.
+- **Q6 (DEC-0062 extension)**: append **`delivery_mode`** to **`run_class_hash`** object; **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** rows must include mode for AC-12 comparability.
+- **Q7 (contract tests + parity)**: research inventories **`test_us0096_*`** marker names, **`pack.json`** schema validator sketch, **`check_intake_template_parity.py --scope=us-0096`** manifest rows, phase-command literal updates across active + **`template/`**.
+- **Composition note**: **`DELIVERY_MODE`** unset — **orthogonal** to **DEC-0080** native chain (**R-0083** Q5 confirmed); lean modes reduce per-story spawns, not drain-advance semantics.
+- **Status**: **resolved for `/research`** — discovery satisfied; research extension below closes Q1–Q7.
+
+### Research extension (2026-06-13T03:00:00Z, tech-lead, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=tl-US0096-research-20260613T030000Z-fresh`)
+
+- **External (EARLY_RESEARCH)**:
+  - [The Missing Memory Hierarchy (arxiv 2603.09023)](https://arxiv.org/abs/2603.09023v1) — L1 working window + demand-paged L2/L3/L4; **hit-rate** over single-window capacity; aligns with **`active-context`** (L1 index) + **`pack.json`** (L2 warm) + section-scoped cold reads.
+  - [Agent Memory Techniques — hierarchical memory layers](https://github.com/NirDiamant/Agent_Memory_Techniques/blob/main/all_techniques/13_hierarchical_memory_layers/hierarchical_memory_layers.ipynb) — L1/L2/L3 promotion/demotion; **cascading retrieval** (search hot → warm → cold on miss).
+  - [Memory Tiering HOT/WARM/COLD (clawRxiv 2603.00037)](https://clawrxiv.io/abs/2603.00037) — explicit tier targets (HOT **<500 tokens**, WARM **1000–3000**); prune-on-complete to warm/cold — maps to **`active-context`** line budget + **`pack.json`** story close.
+  - **Conclusion**: industry pattern validates discovery locks; its-magic implementation stays **file-based** (no vector DB) — simpler, auditable, template-parity friendly.
+
+#### Q1 — `pack.json` canonical schema + sprint coexistence (`status=resolved`)
+
+**Canonical path**: **`work/<story_id>/pack.json`** (e.g. **`work/US-0096/pack.json`**). One warm pack per active story segment; created at first **`ultra_lean`** spawn (**`spec`**) or lazily on mode switch.
+
+**Schema v1** (JSON object — validator: **`scripts/pack_json_validate.py`**, reason codes **`PACK_*`**):
+
+| Field | Type | Required | Notes |
+|-------|------|----------|-------|
+| `schema_version` | string | yes | Literal **`"1"`** |
+| `story_id` | string | yes | **`US-xxxx`** |
+| `delivery_mode` | string | yes | **`ultra_lean`** when pack active |
+| `status` | string | yes | **`OPEN`** \| **`IN_PROGRESS`** \| **`DONE`** |
+| `ac` | array | yes | Objects: `{ "id": "AC-n", "text": string, "met": bool }` |
+| `tasks` | array | yes | Objects: `{ "id": "T-nnn", "title": string, "status": "pending\|done" }` |
+| `refs` | array | yes | Objects: `{ "kind": "vision\|architecture\|decisions\|handoff\|sprint", "path": string, "section"?: string }` |
+| `deltas` | array | yes | Append-only: `{ "utc": ISO8601, "phase": string, "summary": string, "paths": string[] }` |
+| `memory_layer` | string | yes | Literal **`"pack"`** |
+| `sprint_id` | string \| null | no | Set when **`standard`** sprint folder also exists — cross-link only |
+| `orchestrator_run_id` | string | no | Last writer run id |
+
+**Coexistence with `sprints/Sxxxx/`** (no destructive overlap):
+
+| Mode | Primary task surface | Sprint folder |
+|------|---------------------|---------------|
+| **`standard`** | **`sprints/Sxxxx/tasks.md`** | **Authoritative** — unchanged |
+| **`ultra_lean`** | **`work/US-xxxx/pack.json`** `tasks[]` | **Optional** — created only if story later switches to **`standard`** or release needs **`Sxxxx`** traceability; pack **`sprint_id`** links when both exist |
+| **`mega_quick`** | **`sprints/quick/Qxxxx/task.json`** | **Separate namespace** — no **`work/`** pack |
+
+**Rules**: **`work/`** never deletes or mutates **`sprints/`**; mode switch **`ultra_lean` → `standard`** mid-story fails closed (**`DELIVERY_MODE_SWITCH_MID_STORY`**) unless architecture documents explicit migration (out of scope — operator completes segment in one mode).
+
+#### Q2 — Mode-scoped **DEC-0052** reinstatement algorithm (`status=resolved`)
+
+**Integration point**: **`/auto`** plan materialization — **step 0** before existing **DEC-0052** pipeline (**`R-0049`** steps 1–6).
+
+**Pseudocode**:
+
+```
+delivery_mode := resolve_delivery_mode(argv, backlog_row, merged_scratchpad)
+  // precedence: argv delivery-mode= > backlog delivery_mode > DELIVERY_MODE > "standard"
+
+if delivery_mode == "mega_quick":
+  if not mega_quick_eligible(story, backlog, scratchpad):
+    FAIL DELIVERY_MODE_INELIGIBLE + reason_code
+  plan := ["quick"]
+  reinstatement := "none"
+  memory_layer := "quick"
+  GOTO persist_breadcrumbs
+
+if delivery_mode == "ultra_lean":
+  plan := ["spec", "plan", "build+verify", "ship"]
+  reinstatement := "none"   // macro-phases embed qa+verify inside build+verify
+  memory_layer := "pack"
+  GOTO persist_breadcrumbs
+
+// delivery_mode == "standard" (unset counts as standard)
+candidate := dec0052_expand_policy(scratchpad)     // AUTO_PHASE_* — unchanged
+plan := dec0052_apply_reinstatement(candidate)     // full default non-skippable set
+plan := dec0052_intersect_start_from(plan, argv)
+reinstatement := "dec0052_default"
+memory_layer := "standard"
+persist_breadcrumbs(delivery_mode, plan, reinstatement, memory_layer)
+```
+
+**Macro-phase → role mapping** ( **`ultra_lean`** only):
+
+| Macro | Canonical phases merged | Default role |
+|-------|------------------------|--------------|
+| **`spec`** | `intake` + `discovery` | **po** |
+| **`plan`** | `research` + `architecture` + `sprint-plan` | **tech-lead** |
+| **`build+verify`** | `execute` + `qa` + `verify-work` (+ **`AUTO_IMPLEMENTATION_LOOP`**) | **dev** / **qa** per sub-step |
+| **`ship`** | `release` + `refresh-context` | **release** / **curator** |
+
+**Breadcrumbs** ( **`state.md`** + **`resume_brief.md`** ): **`delivery_mode`**, **`resolved_phase_plan`**, **`reinstatement_mode`**, **`memory_layer`**.
+
+**Orthogonality**: **`AUTO_PHASE_EXCLUDE`** / **`INCLUDE`** / **`PROFILE`** apply **only** when **`delivery_mode=standard`**; non-standard mode + non-default **`AUTO_PHASE_*`** → **`PHASE_POLICY_CONFLICT`** (fail closed).
+
+#### Q3 — `active-context.md` vs **DEC-0054** triad (`status=resolved`)
+
+**Verdict**: **`handoffs/active-context.md`** is a **warm spawn index** — **not** a fourth triad member. **DEC-0054** triad unchanged: **`state.md`**, **`handoffs/po_to_tl.md`**, **`docs/engineering/architecture.md`**.
+
+| Surface | Tier | Owner phase | Line budget |
+|---------|------|-------------|-------------|
+| **`active-context.md`** | Hot index | **`spec`/`plan`/`build+verify`/`ship`** writers; rollover on **`refresh-context`** | Target **30–80** lines; hard cap **`LEAN_STATE_INDEX_ROWS`** (default **80**) |
+| **`pack.json`** | Warm | All **`ultra_lean`** spawns read; append **`deltas[]`** | File size soft cap **16 KiB** (architecture) |
+| Vision/arch/decisions sections | Cold | Section-scoped narrow-read; cap **`LEAN_COLD_READ_MAX_SECTIONS`** (default **4**) | Per-spawn |
+
+**Rollover contract**:
+
+1. **Trigger A** — story segment **`refresh-context`** complete → archive to **`handoffs/archive/active-context-<story_id>-<utc>.md`**, rewrite hot file with next-story stub or empty template.
+2. **Trigger B** — line count **>** **`LEAN_STATE_INDEX_ROWS`** before segment close → same archive path (fail-closed **`ACTIVE_CONTEXT_OVERSIZE`** if spawn proceeds without rollover when **`LEAN_MEMORY_WRITE=1`**).
+3. **Triad interaction** — **`enforce-triad-hot-surface.py`** does **not** scan **`active-context.md`**; no **`STATE_ARCHIVE_REQUIRED`** coupling. **`po_to_tl.md`** in **`ultra_lean`** may shrink to orchestrator handoff stub; full detail lives in **`pack.json`** + **`active-context`**.
+
+**Content template** (hot index rows): `story_id`, `delivery_mode`, `read_before_code[]` (path + optional section anchor), `last_delta_utc`, `open_risks[]` (max 3 bullets).
+
+#### Q4 — `mega_quick` eligibility + backlog row schema (`status=resolved`)
+
+**Routing**: **`DELIVERY_MODE=mega_quick`** OR backlog row **`delivery_mode: mega_quick`** (when **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**) → **`/auto`** materializes **`["quick"]`** only (+ conditional **+1** spawn on test failure inside **`/quick`**).
+
+**Eligibility table** (fail-closed — all must pass):
+
+| # | Rule | Pass | Fail reason code |
+|---|------|------|------------------|
+| E1 | Work item kind | **`story`** only | **`MEGA_QUICK_BUG_SEGMENT`** |
+| E2 | Acceptance count | **`ac` ≤ 3** (count backlog AC bullets) | **`MEGA_QUICK_AC_TOO_BROAD`** |
+| E3 | Cross-cutting flags | No **`DEC-xxxx`** companion required in discovery/arch notes | **`MEGA_QUICK_ARCHITECTURE_REQUIRED`** |
+| E4 | Existing sprint | No active **`sprints/Sxxxx/`** for story | **`MEGA_QUICK_SPRINT_EXISTS`** |
+| E5 | Story override | Row **`delivery_mode`** not **`standard`** when routing enabled | **`MEGA_QUICK_STORY_OVERRIDE`** |
+| E6 | Component scope | **`COMPONENT_SCOPE_MODE=0`** OR single component in **`TARGET_COMPONENTS`** | **`MEGA_QUICK_MULTI_COMPONENT`** |
+| E7 | Security / publish | No elevated gates beyond default **`/quick`** stop conditions | **`MEGA_QUICK_GATE_ESCALATION`** |
+
+**Backlog row optional field** (Tranche D — **`AC-8`**):
+
+```yaml
+delivery_mode: mega_quick   # optional; values: standard | ultra_lean | mega_quick
+```
+
+**Precedence**: argv **`delivery-mode=`** → story row → scratchpad **`DELIVERY_MODE`** → **`standard`**.
+
+**Artifacts**: **`sprints/quick/Qxxxx/task.json`** (AC mirror + **`acceptance_met`**) + **`summary.md`** + one **`state.md`** index row; status flip requires **`acceptance_met: true`** + green tests (**AC-6**).
+
+#### Q5 — Tranche A universal wins vs **`LEAN_*`** overrides (`status=resolved`)
+
+**Principle**: Tranche A ships **always-on** — no **`DELIVERY_MODE`** toggle. Operator **`LEAN_*`** and existing **`*_HOT_MAX_*`** keys **override** tighter defaults (manual-override precedence per scratchpad comment block).
+
+**Proposed default threshold deltas** (architecture locks exact literals in **`DEC-xxxx`**):
+
+| Key | Current default | Tranche A default | Δ | Override key |
+|-----|-----------------|-------------------|---|--------------|
+| **`STATE_HOT_MAX_LINES`** | 1200 | **1000** | −17% | explicit value wins |
+| **`PO_TO_TL_HOT_MAX_LINES`** | 800 | **650** | −19% | explicit value wins |
+| **`ARCH_HOT_MAX_LINES`** | 3500 | **3000** | −14% | explicit value wins |
+| **`LEAN_COLD_READ_MAX_SECTIONS`** | (unset) | **4** | new | **`LEAN_COLD_READ_MAX_SECTIONS`** |
+| **`LEAN_STATE_INDEX_ROWS`** | (unset) | **80** | new | **`LEAN_STATE_INDEX_ROWS`** |
+
+**Always-on behaviors** (no new scratchpad gate):
+
+1. **Narrow-read in all phase commands** — each command **`Inputs`** cites **`docs/engineering/phase-context.md`** + story section anchor; forbid full-file reads of vision/architecture/decisions when section heading exists (**extends **US-0053****).
+2. **Delta handoffs** — phase commands append **delta paragraphs** only (no full rewrites of prior handoff bodies).
+3. **Touch-graph reads** — runbook documents: read **`codebase-map.md`** component slice + touched paths only before execute (**AC-3** measurable on **`run_class_hash`-matched **`standard`** runs**).
+4. **Token target (Tranche A alone)**: **≥10%** **`cache_read_tokens`** reduction on matched **`standard`** runs vs pre-**US-0096** baseline (conservative vs **50%** full-story **`ultra_lean`** claim).
+
+**`LEAN_MEMORY_READ` / `LEAN_MEMORY_WRITE`**: default **`1`** when pack/active-context paths exist; **`0`** fails closed on **`ultra_lean`** spawn (**`LEAN_MEMORY_DISABLED`**).
+
+#### Q6 — **DEC-0062** `run_class_hash` extension (`status=resolved`)
+
+**Amendment** (companion **`DEC-xxxx`** at architecture — extends **DEC-0062** §2):
+
+Add required key to run-class object:
+
+- **`delivery_mode`**: **`standard`** \| **`ultra_lean`** \| **`mega_quick`** (merged scratchpad + argv resolution at plan materialization)
+
+**Serialization**: existing **`canonical_json_dumps`** + **`compute_run_class_hash`** — append key in **sorted** order; all pre-**US-0096** baselines rebaseline with **`delivery_mode=standard`**.
+
+**Evidence rows** (**`handoffs/token_cost_runs/<orchestrator_run_id>.md`**): MUST include **`delivery_mode`** column + hash object echo.
+
+**Comparability rules**:
+
+| Comparison | Valid? |
+|------------|--------|
+| **`standard`** vs **`standard`**, same other keys | yes — AC-2 / AC-3 |
+| **`ultra_lean`** vs **`standard`**, same story | **no** — **`TOKEN_COST_RUN_CLASS_MISMATCH`** (different lifecycle) |
+| **`ultra_lean`** vs **`ultra_lean`**, same story | yes — AC-12 lean trajectory |
+| **`mega_quick`** vs **`mega_quick`**, eligible story class | yes — target **≥70%** reduction vs matched **`standard`** baseline (operator-run acceptable) |
+
+**Orthogonality preserved**: **`TOKEN_PROFILE`**, **`CAVEMAN_MODE`**, **`AUTO_QUIET`** remain independent dimensions in hash object (unchanged keys).
+
+#### Q7 — Contract-test inventory + template parity manifest (`status=resolved`)
+
+**Proposed `test_us0096_*` markers** (architecture locks exact names in **`tests/auto_command_contract_test.py`**):
+
+| Test | Intent |
+|------|--------|
+| **`test_us0096_delivery_mode_scratchpad_keys`** | Active + template scratchpad document **`DELIVERY_MODE`**, **`LEAN_*`**, **`AUTO_DELIVERY_ROUTING`**, non-substitution paragraph |
+| **`test_us0096_standard_mode_baseline_markers_preserved`** | **`DELIVERY_MODE=standard`** / unset — **`test_us0095_*`** + **`test_bug0012_*`** markers still pass (AC-2 regression guard) |
+| **`test_us0096_mode_scoped_reinstatement_literals`** | **`auto.md`** — reinstatement applies **only** when **`delivery_mode=standard`** |
+| **`test_us0096_ultra_lean_macro_phase_literals`** | Four macro-phases + role table + **`AUTO_IMPLEMENTATION_LOOP`** inside **`build+verify`** |
+| **`test_us0096_mega_quick_routing_literals`** | **`/auto`** → **`/quick`** path + eligibility fail-closed codes |
+| **`test_us0096_pack_json_schema_contract`** | Schema fields + validator script presence + **`work/US-xxxx/pack.json`** path literal |
+| **`test_us0096_active_context_contract`** | **`handoffs/active-context.md`** path, line budget, rollover triggers; **not** triad member |
+| **`test_us0096_token_profile_orthogonality_paragraph`** | **`DELIVERY_MODE`** × **`TOKEN_PROFILE`** × **`CAVEMAN_MODE`** non-substitution in reference + runbook |
+
+**`check_intake_template_parity.py --scope=us-0096`** manifest (**`US0096_PAIRS`** — architecture adds to script):
+
+| Active | Template |
+|--------|----------|
+| `.cursor/scratchpad.md` (via example) | `template/.cursor/scratchpad.local.example.md` |
+| `.cursor/commands/auto.md` | `template/.cursor/commands/auto.md` |
+| `docs/engineering/auto-orchestration-reference.md` | `template/docs/engineering/auto-orchestration-reference.md` |
+| `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` |
+| `.cursor/commands/quick.md` | `template/.cursor/commands/quick.md` |
+| `scripts/check_intake_template_parity.py` | `template/scripts/check_intake_template_parity.py` |
+| `scripts/pack_json_validate.py` (new) | `template/scripts/pack_json_validate.py` |
+
+**Harness**: register **`§26Q`** (or next free) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+**Confidence**: **high** on mode-scoped reinstatement + orthogonality; **medium** on Tranche A **10%** standard-run reduction (requires execute measurement); **medium** on **`build+verify`** merged spawn ergonomics (operator E2E in runbook).
+
+**Risks carried to architecture**:
+
+| ID | Risk | Mitigation |
+|----|------|------------|
+| **R1** | **`ultra_lean`** without memory index | Tranche B blocked until **`pack.json`** validator + **`active-context`** template ship |
+| **R2** | **`active-context`** vs triad confusion | Explicit non-triad lock in **`DEC-xxxx`** + contract test |
+| **R3** | **`standard`** regression | **`test_us0096_standard_mode_baseline_markers_preserved`** |
+| **R4** | **`mega_quick`** false routing | Eligibility table + seven fail-closed codes |
+| **R5** | **`pack.json`** / **`sprints/`** drift | Coexistence table + no mid-story mode switch |
+
+**Next phase pointers (`/architecture`)**: author **`# US-0096`** + companion **`DEC-xxxx`** (mode orthogonality, resolver step 0, **`run_class_hash`** extension, Tranche A defaults); lock **`test_us0096_*`** literals + **`US0096_PAIRS`**; runbook operator recipes per mode.
+
+## R-0083 — BUG-0012: full_autonomy native-chain runtime regression (post-US-0095)
+
+- **Date**: 2026-06-12
+- **Topic**: **`AUTO_FLOW_MODE=full_autonomy`** + **`AUTO_BACKLOG_DRAIN=1`** — operator observes manual re-**`/auto`** after each story segment despite **US-0095** / **DEC-0080** native in-chat auto-chain delivery
+- **Query**: Why does Cursor IDE **`/auto`** orchestrator stop at segment boundaries with "re-run /auto" / drain-active messaging when **DEC-0080** mandates in-chat continuation and 7-step drain-advance-without-pause — and what enforcement (command prose, orchestrator loop, contract tests, operator runbook) closes the gap between **shipped contract** and **observed runtime**?
+- **Status**: **resolved for `/research`** (Q1–Q6 closed — architecture next)
+- **Bug**: **BUG-0012**
+- **Problem**: **US-0095** marked **DONE** (**S0084**, **2026-06-07**) with contract tests and doc markers for native-chain + forbidden outer-driver-mandatory prose; operator reports regression **2026-06-12** — behavior feels **less auto** than pre-adjustment runs; stops after every user-story completion while citing active drain/full_autonomy.
+- **Linked**: **US-0095**, **DEC-0080**, **US-0092**, **DEC-0078**, **US-0088**, **US-0044**, **BUG-0006**, **DEC-0069**
+- **Intake evidence**: `handoffs/intake_evidence/BUG-0012-intake-20260612.json`
+- **Prior arc**: operator **`/ask`** (**2026-06-07**) diagnosed same symptom → **US-0095** intake → native-chain shipped; current report = **post-delivery regression** not re-litigation of feature intent.
+- **Research asks (intake-locked)**:
+  1. Reconcile **doc/contract PASS** vs **operator runtime FAIL** — agent compliance vs missing executable hook?
+  2. Drain-advance trigger audit: does orchestrator execute **DEC-0080** step 7 (immediate spawn) or stop at **`stop_reason=completed (segment exhausted)`**?
+  3. Forbidden-prose grep inventory — which end-of-run templates still emit mandatory re-**`/auto`** under **`full_autonomy`**?
+  4. **`native_chain_active`** breadcrumb truthfulness in **`state.md`** at segment stop
+  5. Interaction with **`AUTO_QUIET=1`**, recent **US-0096** / delivery-mode docs, and Task-tool availability (**`NATIVE_CHAIN_UNAVAILABLE`** path)
+  6. Regression test strategy: multi-segment operator E2E + contract markers beyond static string presence
+- **Next phase pointers**: **`/discovery`** (PO) → **`/research`** (TL) → **`/architecture`** (TL)
+
+### Discovery extension (2026-06-12T20:45:00Z, PO, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=po-BUG0012-discovery-20260612T204500Z-fresh`)
+
+- **`/discovery`** **PASS** — regression framing locked: **US-0095** delivered contract; **BUG-0012** = **runtime/operator-observed** failure post-recent adjustments.
+- **Q1 (contract vs runtime)**: prioritize orchestrator **executable continuation loop** audit in `.cursor/commands/auto.md` + reference — static marker presence insufficient if agent stops at turn boundary.
+- **Q2 (drain-advance step 7)**: after **`refresh-context`** + **DEC-0069** pairing, orchestrator must **immediately** spawn first phase of next drain segment — invalid terminal: **`stop_reason=completed (segment exhausted)`** when OPEN stories remain and budget > 0.
+- **Q3 (forbidden prose)**: inventory end-of-run templates that emit mandatory re-**`/auto`**, "run outer driver", or "segment exhausted" under **`full_autonomy`** + drain — cross-check **`tests/auto_command_contract_test.py`** markers.
+- **Q4 (`native_chain_active`)**: verify **`state.md`** breadcrumb reflects actual continuation path at segment boundary (not set true at materialization then false at stop).
+- **Q5 (interactions)**: **`AUTO_QUIET=1`** must not suppress continuation while reintroducing wait prose; **US-0096** delivery-mode docs must not contradict IDE-primary **DEC-0080** path; document **`NATIVE_CHAIN_UNAVAILABLE`** fallback boundary.
+- **Q6 (tests)**: multi-segment operator E2E recipe (≥2 consecutive story boundaries) + additive contract markers for forbidden drain-stop prose and drain-advance spawn evidence.
+- **Status**: **resolved for `/research`** — Q1–Q6 closed below.
+
+### Research extension (2026-06-12T21:30:00Z, tech-lead, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=tl-BUG0012-research-20260612T213000Z-fresh`)
+
+- **External (EARLY_RESEARCH)**: [Cursor Subagents docs](https://cursor.com/docs/subagents) — foreground Task mode blocks until subagent completes; parent orchestrator **must** schedule the next spawn after await. No platform hook auto-continues `/auto` — continuation is **agent-behavior + command-spec** enforced only. **Conclusion**: **BUG-0012** is an **enforcement/compliance gap**, not a missing feature contract (**US-0095** / **DEC-0080** already normative).
+
+#### Q1 — Doc/contract PASS vs operator runtime FAIL (`status=resolved`)
+
+| Layer | Evidence | Verdict |
+|-------|----------|---------|
+| **Static contract** | Seven **`test_us0095_*`** subtests green (`pytest -k us0095`); template parity **`--scope=us-0095`** PASS at **US-0095** release | **PASS** — normative prose + markers shipped |
+| **Operator runtime** | Operator report **2026-06-12**: stops after every story segment; cites active **`full_autonomy`** + drain; instructs manual re-**`/auto`** | **FAIL** — post-delivery regression |
+| **Executable hook** | No stdlib/Cursor hook enforces orchestrator `while` loop; continuation relies on **`/auto`** orchestrator agent compliance | **Missing** — primary root cause |
+
+**Divergence map** (orchestrator stops despite schedulable continuation):
+
+| # | Surface | Conflict | Risk |
+|---|---------|----------|------|
+| 1 | **`.cursor/commands/auto.md`** § Steps (L419–420) | Retains **US-0088** escape: *"Outer-driver equivalence applies when a single invocation cannot schedule multiple subagent turns"* — primes stop at turn boundary under **`full_autonomy`** | **High** — contradicts § Native in-chat auto-chain primary path |
+| 2 | **`.cursor/commands/auto.md`** § Continuous multi-phase (L68) | *"Stop segment; `AUTO_BACKLOG_DRAIN=1` may advance"* — ambiguous vs native chain **must** drain-advance | **High** |
+| 3 | **`docs/engineering/auto-orchestration-reference.md`** § Full-autonomy matrix (L783) | *"Outer driver **re-invokes** when Cursor ends turn early"* — legacy **US-0092** row; not scoped to non-**`full_autonomy`** / fallback-only | **Medium** |
+| 4 | **Phase command specs** (11 files) | *"stop and hand off … in a new subagent/chat"* — **correct** for phase-role subagents (**BUG-0006**); orchestrator must **not** treat phase stop as run terminal | **Medium** — agent conflation |
+| 5 | **`handoffs/resume_brief.md`** contract lines | *"Contract: `/auto` continuation targets `research`"* — orchestrator may echo as **operator** instruction vs **Task-spawn** obligation | **Medium** |
+| 6 | **No runtime attestation** | `state.md` lacks `drain_advance_action` / `native_chain_continuing` — cannot prove step 7 executed | **Medium** — audit gap |
+
+**Root-cause verdict**: **agent compliance gap** (orchestrator stops after phase/subagent return) amplified by **residual US-0088/US-0092 stop priming** in **`auto.md`** + reference — **not** re-litigation of **US-0095** intent. Fix = strengthen orchestrator-only continuation mandate + behavioral contract tests + continuation-truth breadcrumbs (**architecture**).
+
+#### Q2 — Drain-advance step 7 spawn audit (`status=resolved`)
+
+**Normative contract** (**DEC-0080** / **R-0081** Q2): after `stop_phase=refresh-context` + `stop_reason=completed` + drain enabled + budget > 0, orchestrator executes 7-step algorithm; **step 7** = **IMMEDIATELY** Task-spawn first phase of next segment — **no** operator re-**`/auto`**.
+
+**Observed failure mode** (operator repro): steps **1–6** often complete (**DEC-0069** `resume_brief` + `state.md` refresh evidenced in segment boundaries) but **step 7 spawn skipped** — orchestrator emits segment-complete / drain-active messaging and stops. Invalid terminal: **`stop_reason=completed (segment exhausted)`** (or equivalent prose) when OPEN stories remain and `backlog_drain_stories_remaining_budget > 0`.
+
+**Evidence from current run** (`auto-20260612-01`): discovery checkpoint sets `native_chain_active=true`, `next_scheduled_phase=research`, `stop_reason=completed` at **phase** boundary — **correct** for intra-segment phase handoff; proves **DEC-0069** pairing works. Operator bug targets **inter-segment drain-advance** after **`refresh-context`** on **story** segments — same step 7 obligation applies.
+
+**Gap**: no contract test asserts step **7** spawn obligation distinct from static **`immediately`** / **`without operator re-`/auto`**` literals; no `state.md` field records whether drain-advance spawn occurred.
+
+#### Q3 — Forbidden-prose grep inventory (`status=resolved`)
+
+**Normative forbidden patterns** (**DEC-0080** / **R-0081** Q5): mandatory `run the outer driver`; `re-run /auto` between drain segments; `segment exhausted` as terminal when continuation pending; unqualified `python scripts/auto_outer_driver.py` in IDE-primary **`full_autonomy`** prose.
+
+| Surface | Forbidden pattern present? | Notes |
+|---------|---------------------------|-------|
+| **`auto.md`** § Native in-chat auto-chain | **Listed as forbidden** (L144) — positive guard only | `test_us0095_ide_drain_advance` checks native section lacks `run the outer driver` |
+| **`auto.md`** § Steps + US-0088 matrix | **Ambiguous stop priming** (L68, L419–420) | Not covered by **`test_us0095_*`** |
+| **`auto-orchestration-reference.md`** native sections | **Forbidden list** (L862–864) — positive | No negative grep test |
+| **`auto-orchestration-reference.md`** full-autonomy matrix | **Outer driver re-invokes** (L783) | Legacy row; contradicts IDE-primary under **`full_autonomy`** |
+| **Phase commands** (`discovery.md`, `research.md`, …) | **No** forbidden drain-stop phrases | Correct — phase-role stop only |
+| **`handoffs/resume_brief.md`** | **No** mandatory re-**`/auto`** in template | Uses `/auto` as orchestrator context label |
+| **`README.md`** / **`runbook.md`** | **optional** / **fallback** adjacent (US-0095 shipped) | Covered by `test_us0095_outer_driver_fallback_not_mandatory_ide` |
+
+**`test_us0095_*` coverage gap**: seven subtests assert **positive markers** only — **no** negative grep across full **`auto.md`** + reference under **`full_autonomy`**; **no** assertion that orchestrator response templates forbid drain-stop prose; **no** scan of US-0088 matrix rows for native-chain precedence.
+
+#### Q4 — `native_chain_active` breadcrumb truthfulness (`status=resolved`)
+
+**Current semantics**: `native_chain_active=true` set when activation gate holds (**`AUTO_FLOW_MODE=full_autonomy`** + IDE + Task tool) — at materialization and phase boundaries (`state.md` L1117, L1164).
+
+**Truthfulness gap**: field reflects **gate eligibility** (scratchpad + context), **not** **continuation action taken**. Orchestrator can set `native_chain_active=true` then stop without spawn — operator sees paradoxical "native chain active" + "run `/auto` again".
+
+**Architecture recommendation**: add continuation-truth fields at segment boundary:
+
+- `native_chain_continuing=true|false` — orchestrator scheduled next spawn/advance this boundary
+- `drain_advance_action=spawned|skipped|not_applicable` — step 7 outcome
+- `stop_reason` must **not** be `completed (segment exhausted)` when `native_chain_continuing=true`
+
+#### Q5 — `AUTO_QUIET=1`, US-0096, `NATIVE_CHAIN_UNAVAILABLE` (`status=resolved`)
+
+| Interaction | Finding | Verdict |
+|-------------|---------|---------|
+| **`AUTO_QUIET=1`** | Suppresses routine phase/drain prose; **must not** suppress continuation scheduling. Risk: agents conflate "quiet" with "stop after brief status." Table (auto.md L137–142) forbids outer-driver wait under quiet — **does not** forbid re-**`/auto`** instruction in agent-authored end-of-run text | **Contributing** — messaging ambiguity; not root cause alone |
+| **US-0096** / **`R-0082`** | Delivery-mode axis (**`DELIVERY_MODE`**) — open stub; **no** `DELIVERY_MODE` key in merged scratchpad; no `.cursor/commands` delivery-mode prose active | **Orthogonal** when unset — no active contradiction with **DEC-0080** IDE-primary path |
+| **`NATIVE_CHAIN_UNAVAILABLE`** | Fail-closed when Task denied / spawn depth limit; optional outer-driver hint | **Not operator path** — symptom is drain-active + re-**`/auto`**, not unavailable error |
+
+**Precedence lock (architecture)**: under **`AUTO_FLOW_MODE=full_autonomy`** + IDE + Task available, **DEC-0080** native chain **supersedes** US-0088 Option B / US-0092 outer-driver re-invoke rows for continuation — fallback only on **`NATIVE_CHAIN_UNAVAILABLE`** or explicit headless/CI context.
+
+#### Q6 — Regression test strategy (`status=resolved`)
+
+**Existing**: `test_us0095_*` (7 subtests) — static marker parity; green at US-0095 release; **insufficient** for **BUG-0012** runtime regression.
+
+**Proposed additive markers** (architecture locks exact names):
+
+| Test | Intent |
+|------|--------|
+| `test_bug0012_forbidden_drain_stop_prose_negative_grep` | Negative grep: no mandatory `re-run /auto`, `segment exhausted` terminal, `run the outer driver` in **`auto.md`** + reference **native-chain + full_autonomy** normative blocks |
+| `test_bug0012_orchestrator_post_subagent_spawn_mandate` | **`auto.md`** contains explicit orchestrator **MUST Task-spawn** next phase/segment after subagent return when continuation schedulable (distinct from phase-role "stop") |
+| `test_bug0012_drain_advance_step7_no_stop_between_6_and_7` | Step 6 → step 7 **IMMEDIATELY** spawn — no "stop" / "hand off to operator" between steps in normative algorithm |
+| `test_bug0012_native_chain_precedence_over_option_b` | Under **`full_autonomy`**, native chain primary prose precedes / supersedes US-0088 outer-driver equivalence escape in **`auto.md`** Steps |
+
+**Operator multi-segment E2E recipe** (runbook — architecture adds § **BUG-0012 regression verify**):
+
+1. Scratchpad: **`AUTO_FLOW_MODE=full_autonomy`**, **`AUTO_BACKLOG_DRAIN=1`**, **`AUTO_BACKLOG_MAX_STORIES≥2`**, **`AUTO_QUIET=1`**.
+2. Backlog: **≥2 OPEN stories** (distinct segments).
+3. Single **`/auto`** in Cursor IDE Agent panel.
+4. Complete **story A** full lifecycle through **`refresh-context`**.
+5. **Pass**: orchestrator drain-advances to **story B** first phase **without** operator re-**`/auto`** and **without** mandatory outer-driver / "segment exhausted" terminal prose.
+6. Repeat for **story B** boundary or stop at hard gate / budget cap.
+7. Evidence: `state.md` segment boundaries show `drain_advance_action=spawned`; `resume_brief` top pointer advances `story_id`.
+
+**Fix surface inventory** (architecture / execute):
+
+| # | Surface | Change |
+|---|---------|--------|
+| 1 | **`.cursor/commands/auto.md`** (+ template) | Orchestrator-only continuation block; clarify US-0088 matrix vs native chain; demote Option B to **`NATIVE_CHAIN_UNAVAILABLE`** / headless only |
+| 2 | **`docs/engineering/auto-orchestration-reference.md`** (+ template) | Scope L783 outer-driver row to fallback; add step-7 spawn attestation fields |
+| 3 | **`handoffs/resume_brief.md`** pairing contract | Wording: orchestrator **MUST Task-spawn** — not "operator runs `/auto`" |
+| 4 | **`docs/engineering/state.md`** breadcrumbs | `native_chain_continuing`, `drain_advance_action` |
+| 5 | **`tests/auto_command_contract_test.py`** | Four **`test_bug0012_*`** markers above |
+| 6 | **`docs/engineering/runbook.md`** | Multi-segment E2E recipe |
+
+**Preserved invariants**: **BUG-0006** spawn-only; **DEC-0078** hard gates; **DEC-0038** strict proof; **DEC-0069** resume_brief pairing; outer driver **optional fallback** only.
+
+- **Confidence**: **high** on contract-vs-runtime diagnosis and fix surface; **medium** on Cursor spawn-depth limits (operator E2E required).
+- **Next phase pointers (`/architecture`)**: author **`# BUG-0012`** (or amend **`# US-0095`** regression section); lock orchestrator continuation mandate, breadcrumb truth fields, **`test_bug0012_*`** literals, runbook E2E; confirm whether companion **`DEC-xxxx`** needed (research: optional — may extend **DEC-0080** amendment).
+
+### Delivery closure (2026-06-13T02:00:00Z, curator, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=curator-S0085-BUG0012-refresh-context-20260613T020000Z-fresh`)
+
+> Append-only closure trailer for **R-0083**. **BUG-0012** shipped with **S0085** released **2026-06-13T01:30:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. Evidence: **`handoffs/releases/S0085-release-notes.md`**, **`decisions/DEC-0081.md`**, **`docs/engineering/architecture.md`** **`# BUG-0012`**, five **`test_bug0012_*`** contract subtests, runbook § **BUG-0012 regression verify**, template parity **`--scope=bug-0012`**. No new **`R-xxxx`** allocated; no rewrite of **DEC-0080** body (amended by **DEC-0081** only).
+
+- **Anchor status**: **`R-0083.status=delivered`** (**BUG-0012** **DONE** @ **2026-06-13T02:00:00Z** curator refresh).
+- **Research phase status**: **closed** (Q1–Q6 resolved; architecture + execute + release delivered).
+- **Forward pointer**: **`US-0096`** / **`R-0082`** (stub — extend at **`/discovery`**).
+
+### Delivery closure (2026-06-13T17:00:00Z, curator, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=curator-S0086-US0096-refresh-context-20260613T170000Z-fresh`)
+
+> Append-only closure trailer for **R-0082**. **US-0096** shipped with **S0086** released **2026-06-13T16:00:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. Evidence: **`handoffs/releases/S0086-release-notes.md`**, **`decisions/DEC-0082.md`**, **`docs/engineering/architecture.md`** **`# US-0096`**, eight **`test_us0096_*`** contract subtests, **`scripts/pack_json_validate.py`**, runbook § **Delivery modes**, template parity **`--scope=us-0096`**. No new **`R-xxxx`** allocated; no rewrite of **DEC-0052** / **DEC-0062** / **DEC-0080** / **DEC-0081** bodies.
+
+- **Anchor status**: **`R-0082.status=delivered`** (**US-0096** **DONE** @ **2026-06-13T17:00:00Z** curator refresh).
+- **Research phase status**: **closed** (Q1–Q7 resolved at **`/research`**; architecture + execute + release delivered).
+- **Portfolio drain closure signal**: with **US-0096** closed, `docs/product/backlog.md` contains **zero** OPEN stories and **zero** OPEN bugs. Backlog-drain segment on **`auto-20260612-01`** closes at **`/refresh-context`**; next **`/auto`** invocation routes to **`/intake`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=8` of initial **10**).
+- **Open R-xxxx anchors status (post-closure)**: **R-0082** **delivered** (this trailer). Next research anchor allocation deferred to the next **`/discovery`**-phase subagent when a new work item is intaked.
+
+## R-0084 — US-0097: Project-owned root README bootstrap + per-story/sprint growth
+
+- **Status**: `delivered` (delivery closure trailer above; curator refresh **2026-06-14T05:00:00Z**)
+- **Topic**: Separate framework README (`its_magic/README.md`) from project-owned root `README.md` — bootstrap on first story, mandatory per-shipped-story growth, gate separation from **US-0091**
+- **Story**: **US-0097**
+- **Problem**: **DEC-0045** / **US-0062** declared `its_magic/README.md` as framework surface, but **`installer-owned-paths.manifest`** still installs root **`README.md`** (~1600-line its-magic catalog). No workflow step bootstraps or extends a project-specific repo overview as stories ship.
+- **Intake evidence**: `handoffs/intake_evidence/US-0097-intake-20260613.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`)
+- **Linked**: **US-0062**, **DEC-0045**, **US-0091**, **DEC-0074**, **US-0077**, **US-0032**, **US-0030**, **US-0071**, **US-0017**, **US-0094**
+- **Research questions (intake-locked)**:
+  1. **Installer manifest delta** — remove root `README.md` from framework install payload; confirm `its_magic/README.md` + `template/its_magic/README.md` parity path
+  2. **Placeholder sentinel table** — deterministic signals for framework vs operator-authored root README
+  3. **Migration merge policy** — non-destructive upgrade when lifting legacy framework root copy
+  4. **Bootstrap trigger** — execute-time materialization when missing/placeholder; vision title sourcing
+  5. **Per-story delta wiring** — mandatory execute/release steps; fail-closed reason family
+  6. **Project validator sketch** — `validate_project_readme_coverage.py` predicate vs DONE `user_visible: true` rows
+  7. **Gate separation** — reframe **US-0091** paths; release step 3g composition with 3f
+  8. **Kit-repo exception** — `FRAMEWORK_KIT_REPO=1` dual-purpose root README for its-magic dev repo only
+
+### Discovery extension (2026-06-13T20:00:00Z, PO, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=po-US0097-discovery-20260613T200000Z-fresh`)
+
+- **External (EARLY_RESEARCH=1)**: [GitHub — About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) — README answers what/why/how; keep concise, link deep reference to docs. Industry pattern (200–800 words): title + pitch + quick start + scannable features + developer setup — aligns with discovery-locked project scaffold (not framework encyclopedia).
+
+#### Q1 — Installer ownership boundary (`status=resolved at discovery`)
+
+| Path | Today | Target |
+|------|-------|--------|
+| Root `README.md` | In `[install_paths]` line 42 | **Removed** from framework install payload — project-owned |
+| `its_magic/README.md` | Present (mirrors framework catalog) | **Canonical** framework README surface (**DEC-0045**) |
+| `template/README.md` | Framework byte source (**US-0017**) | Stays framework kit source; **not** copied to consumer root on `missing` install |
+
+**Normative**: fresh **`missing`** install on empty consumer target lays down **no** framework README at root; optional minimal pointer stub deferred to bootstrap (**Q4**).
+
+#### Q2 — Framework placeholder sentinel table (`status=resolved at discovery`)
+
+| Signal ID | Detection rule | Verdict |
+|-----------|----------------|---------|
+| **S1** | H1 matches `# its-magic — AI dev team` (exact or normalized whitespace) | placeholder |
+| **S2** | Contains `<!-- readme-feature-coverage-catalog -->` | placeholder |
+| **S3** | Heading contains `Feature coverage catalog (US-0091)` | placeholder |
+| **S4** | Byte-identical to `template/README.md` on consumer install | placeholder |
+| **S5** | None of S1–S4 **and** custom title/purpose outside framework blocks | **operator-authored** — preserve |
+
+**Ambiguous** (partial S1–S4 match + mixed content) → **`PROJECT_README_MIGRATION_AMBIGUOUS`** (fail closed; runbook remediation).
+
+#### Q3 — Kit-repo exception (`status=resolved at discovery`)
+
+- **Consumer repos** (default): root README is **project-owned** only; framework catalog in **`its_magic/README.md`**.
+- **its-magic framework dev repo**: scratchpad **`FRAMEWORK_KIT_REPO=1`** skips consumer bootstrap and preserves dual-purpose root README for dogfooding; **US-0091** continues to validate framework paths under **`its_magic/`** + kit root per architecture lock.
+- **Detection order**: `FRAMEWORK_KIT_REPO=1` → sentinel table → operator-authored heuristic.
+
+#### Q4 — Project README scaffold (`status=resolved at discovery`)
+
+Locked outline (execute materializes when trigger fires):
+
+```
+# {Project Name}          ← vision.md H1
+{1–3 sentence purpose}    ← vision Problem/Value distillate
+## For users              ← what it does; how to run (placeholders OK at bootstrap)
+## For developers         ← setup; repo layout; tests pointer
+## Features
+<!-- project-readme-feature-catalog -->
+*(catalog grows per shipped US-xxxx)*
+*Framework workflow commands: see [its_magic/README.md](its_magic/README.md).*
+```
+
+**Bootstrap trigger**: first **`/execute`** completion for a project story when root README missing **or** any placeholder sentinel (**S1–S4**) matches.
+
+#### Q5 — Per-story delta + phase wiring (`status=open for /research`)
+
+- **Execute** (mandatory): add/update ≥1 user-facing blurb under `<!-- project-readme-feature-catalog -->` for target **`US-xxxx`** before phase PASS.
+- **Release** (mandatory when story ships): re-verify blurb present; sprint summary cross-link optional additive only.
+- **Fail-closed family**: **`PROJECT_README_DELTA_SKIPPED`**, **`PROJECT_README_COVERAGE_GAP:<US-xxxx>`** — exact sub-codes architecture-locked.
+- **Open**: exact execute.md / release.md step numbers; composition with **US-0032** optional user-guide block (orthogonal, zero overhead when `USER_GUIDE_MODE=0`).
+
+#### Q6 — Validator + gate separation (`status=open for /research`)
+
+| Validator | Input paths | Predicate |
+|-----------|-------------|-----------|
+| **`validate_readme_feature_coverage.py`** (**US-0091**) | `its_magic/README.md`, `template/its_magic/README.md` | DONE `user_visible: true` **framework** items |
+| **`validate_project_readme_coverage.py`** (**US-0097**) | root `README.md` | DONE `user_visible: true` **project** backlog items |
+
+- Release **3f** unchanged for framework; new **3g** for project gate.
+- Scratchpad **`PROJECT_README_ENFORCE=0|1`** (default **`1`** post-bootstrap; **`0`** migration-only with skipped evidence).
+
+#### Q7 — Migration merge policy (`status=open for /research`)
+
+1. If root matches placeholder (**S1–S4**) and `its_magic/README.md` missing or older → copy framework content to `its_magic/README.md` (non-destructive).
+2. Replace root with bootstrap scaffold (**Q4**) or minimal pointer per operator policy table.
+3. If operator-authored (**S5**) → **do not** overwrite; add optional `its_magic/README.md` if absent; emit migration evidence tuple.
+
+- **Open**: idempotent re-run rules; conflict when root is hybrid (partial framework + operator edits).
+
+- **Confidence**: **high** on ownership split and sentinel table; **medium** on hybrid migration edge cases and kit-repo **US-0091** path lock.
+- **Next phase pointers (`/research`)**: close Q5–Q7; CLI/`--report` schema; contract-test marker inventory; `check_intake_template_parity.py --scope=project-readme` manifest; confirm companion **`DEC-xxxx`** needed.
+
+### Research extension (2026-06-13T21:00:00Z, tech-lead, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=tl-US0097-research-20260613T210000Z-fresh`)
+
+- **External (EARLY_RESEARCH=1)**: [GitHub — About READMEs](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes) — README answers what/why/how; keep concise; link deep reference to docs/wikis. Confirms discovery-locked **200–800 word** project front door (title + pitch + quick start + scannable features + developer setup) vs framework encyclopedia under **`its_magic/`**.
+- **Repo survey**: **`execute.md`** steps end at **22** (triad); **`release.md`** doc gates end at **3f** (framework README); **`validate_readme_feature_coverage.py`** reads root **`README.md`** + **`docs/developer/README.md`** per **DEC-0074** — must reframe to **`its_magic/README.md`** family only; **`installer-owned-paths.manifest`** line 42 still lists root **`README.md`** in **`[install_paths]`**; no **`validate_project_readme_coverage.py`** exists yet; **`check_intake_template_parity.py`** has no **`--scope=project-readme`**.
+
+#### Q5 — Per-story delta + phase wiring (`status=resolved`)
+
+**Execute placement** — new step **23** after step **22** (triad hot-surface), mirroring optional-gate pattern from step **16** (**US-0032**) and mandatory guard pattern from step **20** (**US-0071**):
+
+| Sub-step | Contract |
+|----------|----------|
+| **23 (preamble)** | Read merged scratchpad **`FRAMEWORK_KIT_REPO`** (default **`0`**). When **`1`**, skip **23a**/**23b** consumer bootstrap/delta (kit-repo exception per Q3). Read **`PROJECT_README_ENFORCE`** for delta obligation context (default **`1`** post-bootstrap). |
+| **23a Bootstrap** | When root **`README.md`** missing **or** any placeholder sentinel **S1–S4** matches (Q2 table), materialize discovery-locked scaffold (Q4) sourcing H1/purpose from **`docs/product/vision.md`**. Emit bootstrap evidence tuple in execute checkpoint. |
+| **23b Per-story delta (mandatory)** | Before **`/execute`** PASS for target **`US-xxxx`**: add or update **≥1** user-facing catalog bullet under **`<!-- project-readme-feature-catalog -->`** containing **`\\bUS-xxxx\\b`** (optional parenthetical id). Applies to **`user_visible: true`** project stories. Fail closed → **`PROJECT_README_DELTA_SKIPPED`**. |
+| **23c Hygiene compose** | Project README prose edits subject to step **20** (**US-0071**) — no duplicate validator invocation beyond step **20** when README unchanged. |
+
+**Release placement** — new step **3g** immediately after **3f**, before step **4** (UAT):
+
+| Gate | Contract |
+|------|----------|
+| **3g Project README coverage** | Read merged scratchpad **`PROJECT_README_ENFORCE`** (default **`1`** post-bootstrap). When **`0`**: skip with **`skipped`** evidence in **`sprints/Sxxxx/release-findings.md`** § doc gates (migration/grandfathering only — same pattern as **3f** + **`README_FEATURE_COVERAGE_ENFORCE=0`**). When **`1`**: run **`python scripts/validate_project_readme_coverage.py --repo . --enforce`**. On failure: umbrella **`PROJECT_README_COVERAGE_BLOCKED`** + sub-codes on stderr. Active + **`template/.cursor/commands/release.md`** byte-identical **3g** block (full-file parity per **US-0017**). |
+
+**Orthogonality locks**:
+
+| Adjacent step | Interaction |
+|---------------|-------------|
+| **Execute 16** (**US-0032** / **`USER_GUIDE_MODE`**) | Zero overhead when **`USER_GUIDE_MODE=0`** — optional **`docs/user-guides/US-xxxx.md`** remains orthogonal to root catalog blurbs. |
+| **Release 3d** (**US-0032**) | Same — no cross-block when user-guide mode off. |
+| **Release 3f** (**US-0091**) | Framework gate unchanged; **3g** is additive sibling — both may run when respective enforce keys are **`1`**. |
+
+**Fail-closed reason-code table** (architecture locks exact strings):
+
+| Code | Phase | Trigger | Remediation |
+|------|-------|---------|-------------|
+| **`PROJECT_README_COVERAGE_BLOCKED`** | release | umbrella when **3g** enforce run fails | inspect sub-codes |
+| **`PROJECT_README_COVERAGE_GAP:<US-xxxx>`** | release / validator | DONE **`user_visible: true`** item lacks catalog blurb | add bullet under **`## Features`** / marker |
+| **`PROJECT_README_DELTA_SKIPPED`** | execute | target story shipped without catalog update | run **23b** before handoff |
+| **`PROJECT_README_BOOTSTRAP_SKIPPED`** | execute | missing/placeholder root not materialized | run **23a** |
+| **`PROJECT_README_MIGRATION_AMBIGUOUS`** | upgrade / migration | hybrid root (Q7) | runbook manual merge |
+| **`PROJECT_README_PLACEHOLDER_UNRESOLVED`** | execute / migration | sentinel classifier inconclusive | apply S1–S5 table |
+| **`PROJECT_README_ENFORCE_SKIPPED`** | release | **`PROJECT_README_ENFORCE=0`** | record migration evidence only |
+| **`PROJECT_README_INPUT_INVALID`** | validator | backlog/README parse failure | fix inputs |
+| **`PROJECT_README_SENTINEL_CONFLICT`** | migration | partial sentinel + operator prose | fail closed; operator resolves |
+
+**Sprint cross-link** (optional additive): release notes may reference **`sprints/Sxxxx/summary.md`** — **not** a substitute for per-story catalog blurbs.
+
+#### Q6 — Validator + gate separation (`status=resolved`)
+
+**Path lock** (reframes **US-0091** / **DEC-0074** without rewriting **DEC-0074** body — architecture + companion **`DEC-0083`** amend scope):
+
+| Surface | **US-0091** (framework) — after reframe | **US-0097** (project) — new |
+|---------|----------------------------------------|----------------------------|
+| Root **`README.md`** | **Excluded** from framework coverage predicate | **Sole** project validator input |
+| **`its_magic/README.md`** | **Primary** framework catalog surface | Out of scope (pointer only from project root) |
+| **`template/its_magic/README.md`** | Parity / install source | Out of scope |
+| **`template/README.md`** | Framework kit source — **not** copied to consumer root on **`missing`** install | Out of scope |
+| **`docs/developer/README.md`** | Remains framework DEV shard for **US-0091** | Out of scope for project gate |
+
+**Kit-repo exception**: when **`FRAMEWORK_KIT_REPO=1`**, project validator **skips** root (same as execute **23** skip); **US-0091** continues on **`its_magic/`** paths + kit root per architecture lock.
+
+**New scripts** (mirror **US-0091** stdlib-only split):
+
+| Script | Role |
+|--------|------|
+| **`scripts/project_readme_coverage_lib.py`** | Sentinel detection (S1–S5), backlog parser reuse, catalog-section extractor, coverage predicate |
+| **`scripts/validate_project_readme_coverage.py`** | CLI entrypoint |
+
+**CLI flags** (parallel to **`validate_readme_feature_coverage.py`**):
+
+| Flag | Purpose |
+|------|---------|
+| **`--repo PATH`** | Target repo root (default: parent of **`scripts/`**) |
+| **`--backlog PATH`** | Default **`docs/product/backlog.md`** under **`--repo`** |
+| **`--self-test`** | Predicate matrix + report schema stability → **`[PROJECT_README_COVERAGE_SELF_TEST_OK]`** |
+| **`--report`** | Emit stable JSON report to stdout |
+| **`--audit-out PATH`** | Write gap audit JSON |
+| **`--enforce`** | Blocking mode for **`/release`** step **3g** |
+| **`--no-kit-skip`** | Test hook — ignore **`FRAMEWORK_KIT_REPO=1`** skip |
+
+**Coverage predicate** (normative sketch):
+
+```
+for each work_item in parse_backlog(backlog.md):
+  if work_item.kind not in {US, BUG}: skip
+  if work_item.status != DONE: skip
+  if work_item.user_visible == false: skip
+  if work_item.user_visible unset and PROJECT_README_ENFORCE == 0: skip (migration pass)
+  if work_item.user_visible unset and PROJECT_README_ENFORCE == 1:
+    emit PROJECT_README_INPUT_INVALID  # require explicit marker post-bootstrap
+  catalog_section = extract_between_markers(root_readme, "<!-- project-readme-feature-catalog -->")
+  if catalog_section contains \b{work_item.id}\b: present else gap
+```
+
+**`--report` JSON schema v1** (sorted keys, trailing newline — same canonical JSON helper as **US-0091**):
+
+```json
+{
+  "catalog_marker_present": true,
+  "coverage_missing": ["US-xxxx"],
+  "coverage_present": ["US-xxxx"],
+  "coverage_total": 0,
+  "framework_paths_excluded": true,
+  "gaps": [{"id": "US-xxxx", "kind": "US", "predicate_source": "explicit:true", "user_visible": true}],
+  "kit_repo_skipped": false,
+  "report_schema_version": 1,
+  "repo_root": ".",
+  "status": "PASS"
+}
+```
+
+**Scratchpad keys**:
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| **`PROJECT_README_ENFORCE`** | **`0`** \| **`1`** | **`1`** post-bootstrap | **`0`** migration/grandfathering only — must record **`PROJECT_README_ENFORCE_SKIPPED`** evidence |
+| **`FRAMEWORK_KIT_REPO`** | **`0`** \| **`1`** | **`0`** | Consumer repos never set **`1`** |
+
+**Release composition with 3f**: gate order **3e → 3f (framework) → 3g (project) → 4 (UAT)** — independent enforce toggles; failure in either blocks release when respective enforce key is **`1`**.
+
+#### Q7 — Migration merge policy (`status=resolved`)
+
+**Idempotent migration algorithm** (upgrade / first-run after manifest fix):
+
+| Step | Condition | Action | Re-run |
+|------|-----------|--------|--------|
+| **M1** | **`FRAMEWORK_KIT_REPO=1`** | Skip consumer migration; preserve dual-purpose root | no-op |
+| **M2** | Root matches **S5** (operator-authored) | **Never** overwrite root; copy framework content to **`its_magic/README.md`** only if missing or older/smaller than root placeholder | idempotent |
+| **M3** | Root matches **S1–S4** (placeholder) and **`its_magic/README.md`** missing | Copy root → **`its_magic/README.md`** (non-destructive lift) | skip if **`its_magic`** already populated |
+| **M4** | Root matches **S1–S4** after **M3** | Replace root with project scaffold (**Q4**) or minimal pointer per operator policy | skip if root already project scaffold (no S1–S4) |
+| **M5** | **Hybrid** (see below) | Fail closed **`PROJECT_README_MIGRATION_AMBIGUOUS`** | same error |
+
+**Hybrid detection rule** (fail closed):
+
+- **`match_count(S1–S4) >= 2`** **AND** custom H1/purpose outside framework blocks → **ambiguous**
+- **OR** **S1** H1 present **AND** **`## For users`** / **`## For developers`** project sections already populated with non-framework prose → **ambiguous** (partial migration state)
+- **OR** root contains **both** **`<!-- readme-feature-coverage-catalog -->`** **and** **`<!-- project-readme-feature-catalog -->`** with conflicting content → **`PROJECT_README_SENTINEL_CONFLICT`**
+
+**Merge policy when root partially customized**:
+
+| Root state | Policy |
+|------------|--------|
+| **S5 only** (no sentinels) | Preserve root verbatim; ensure **`its_magic/README.md`** exists |
+| **Single sentinel + empty project sections** | Treat as placeholder → **M3**/**M4** |
+| **Multiple sentinels + operator edits** | **M5** ambiguous — operator manual merge per runbook |
+| **Project scaffold already present** | No migration action |
+
+**Grandfathering**: **`PROJECT_README_ENFORCE=0`** during migration window; flip to **`1`** only after **`--report`** shows **`coverage_missing: []`** for explicit **`user_visible: true`** DONE rows (same activation pattern as **`README_FEATURE_COVERAGE_ENFORCE`** per **DEC-0074**).
+
+#### Q8 — Contract-test inventory + template parity manifest (`status=resolved`)
+
+**Proposed `test_us0097_*` markers** (architecture locks exact names in **`tests/auto_command_contract_test.py`**):
+
+| Test | Intent |
+|------|--------|
+| **`test_us0097_installer_manifest_no_root_readme`** | **`installer-owned-paths.manifest`** excludes root **`README.md`** from **`[install_paths]`**; includes **`its_magic/README.md`** |
+| **`test_us0097_execute_step23_literals`** | **`execute.md`** step **23** bootstrap/delta/skip prose + reason codes |
+| **`test_us0097_release_step3g_literals`** | **`release.md`** step **3g** + **`PROJECT_README_ENFORCE`** + validator invocation |
+| **`test_us0097_placeholder_sentinel_table`** | S1–S4 + S5 + ambiguous/hybrid literals in lib or runbook |
+| **`test_us0097_framework_validator_paths_reframed`** | **US-0091** validator reads **`its_magic/README.md`** — not consumer root |
+| **`test_us0097_project_readme_enforce_scratchpad_keys`** | Active + template scratchpad document **`PROJECT_README_ENFORCE`**, **`FRAMEWORK_KIT_REPO`** |
+| **`test_us0097_project_readme_coverage_validator_contract`** | Script presence + **`[PROJECT_README_COVERAGE_SELF_TEST_OK]`** + report schema fields |
+| **`test_us0097_us0091_regression_guard`** | Framework gate **3f** markers preserved; root removed from **US-0091** predicate paths |
+
+**`check_intake_template_parity.py --scope=project-readme`** manifest (**`PROJECT_README_PAIRS`** — architecture adds to script):
+
+| Active | Template |
+|--------|----------|
+| **`scripts/validate_project_readme_coverage.py`** | **`template/scripts/validate_project_readme_coverage.py`** |
+| **`scripts/project_readme_coverage_lib.py`** | **`template/scripts/project_readme_coverage_lib.py`** |
+| **`.cursor/commands/execute.md`** | **`template/.cursor/commands/execute.md`** |
+| **`.cursor/commands/release.md`** | **`template/.cursor/commands/release.md`** |
+| **`docs/engineering/runbook.md`** | **`template/docs/engineering/runbook.md`** |
+| **`docs/engineering/context/installer-owned-paths.manifest`** | **`template/docs/engineering/context/installer-owned-paths.manifest`** |
+| **`.cursor/scratchpad.local.example.md`** | **`template/.cursor/scratchpad.local.example.md`** |
+| **`scripts/check_intake_template_parity.py`** | **`template/scripts/check_intake_template_parity.py`** |
+
+**Harness**: register next free section in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** (follow **§26Q** / **US-0096** precedent).
+
+#### Companion DEC decision (`status=resolved`)
+
+**Verdict**: companion **`DEC-0083`** **required** at **`/architecture`** — discovery locks alone insufficient for **AC-10**:
+
+| Factor | Rationale |
+|--------|-----------|
+| **AC-10** | Mandates **`decisions/DEC-xxxx.md`** + **`# US-0097`** |
+| **DEC-0045** / **US-0062** amendment | Installer ownership boundary completion |
+| **DEC-0074** path reframe | **US-0091** scope narrows to framework paths — normative amendment via companion DEC, not silent code drift |
+| Precedent | **US-0096** → **`DEC-0082`**; **US-0091** → **`DEC-0074`** |
+
+**Not optional** (contrast **US-0094** — intro-only, no companion DEC). Research does **not** author **`DEC-0083`** here.
+
+**Confidence**: **high** on phase step numbers, validator API parity, gate order, and DEC requirement; **medium** on hybrid migration edge cases (operator E2E in runbook).
+
+**Risks carried to architecture**:
+
+| ID | Risk | Mitigation |
+|----|------|------------|
+| **R1** | Migration deletes operator prose | S5 preserve + **M5** ambiguous fail-closed |
+| **R2** | **US-0091** regression | Explicit path table + **`test_us0097_us0091_regression_guard`** |
+| **R3** | Kit vs consumer repo | **`FRAMEWORK_KIT_REPO`** detection order + validator skip |
+
+**Research phase closure (US-0097)**: **PASS**. **`R-0084`** Q1–Q8 resolved. Story **US-0097** remains **OPEN** per **US-0045**. **Next**: **`/architecture`** (fresh **tech-lead**) — author **`DEC-0083`**, **`# US-0097`**, atomic task seeds, **`test_us0097_*`** literals, **`PROJECT_README_PAIRS`**.
+
+### Delivery closure trailer — R-0084 (US-0097)
+
+> Append-only closure trailer for **R-0084**. **US-0097** shipped with **S0087** released on **2026-06-14T04:30:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of **DEC-0083** or architecture `# US-0097`. `fresh_context_marker=curator-S0087-US0097-refresh-context-20260614T050000Z-fresh`.
+
+- **Anchor status**: **`R-0084.status=delivered`** (**US-0097** **DONE** @ **2026-06-14T05:00:00Z** curator refresh). Single-story anchor; no shared-anchor split required.
+- **Evidence**: sprint **`S0087`** released via **`handoffs/releases/S0087-release-notes.md`**; governance locked in **`decisions/DEC-0083.md`** + **`docs/engineering/architecture.md`** **`# US-0097`**; **`scripts/validate_project_readme_coverage.py`** + **`scripts/project_readme_coverage_lib.py`**; execute step **23** + release step **3g**; eight **`test_us0097_*`** contract subtests; template parity **`--scope=project-readme`** (**`PROJECT_README_PAIRS`**); UAT **10/10**.
+- **Research phase status**: **closed** (Q1–Q8 resolved at **`/research`**; architecture + execute + release delivered).
+- **Portfolio drain closure signal**: with **US-0097** closed, **`docs/product/backlog.md`** contains **1 OPEN** story (**`US-0098`**) and **0 OPEN** bugs. Backlog-drain segment on **`auto-20260613-01`** closes at **`/refresh-context`**; next native-chain drain advance → **`/discovery`** for **`US-0098`** (`drain_terminated=false`; `backlog_drain_active=true`; `backlog_drain_stories_remaining_budget=9` of initial **10**).
+- **Open R-xxxx anchors status (post-closure)**: **R-0084** **delivered** (this trailer). Active forward stub: **R-0085** (intake stub for **US-0098**). Next research extension deferred to **`/discovery`** for **US-0098**.
+
+## R-0085 — US-0098: Dev environment auto-launch profile (detect, persist, relaunch, connect)
+
+- **Status**: **closed for `/research`** — architecture-ready (**2026-06-14T07:00:00Z**, tech-lead, `orchestrator_run_id=auto-20260613-01`)
+- **Topic**: Operator-requested **dev-loop** automation — after implementation changes, **rebuild/restart** running stack (containers or dev server), **persist** detected dev environment, and **surface connection parameters** to the operator (not release-only).
+- **Intake evidence**: `handoffs/intake_evidence/US-0098-intake-20260613.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`)
+- **Discovery extension (2026-06-14T06:00:00Z, PO, `fresh_context_marker=po-US0098-discovery-20260614T060000Z-fresh`)**:
+  - **Scratchpad proposal**: **`DEV_AUTO_LAUNCH_PROFILE`**: `off`|`deterministic_v1` (default **`off`**); optional **`DEV_ENVIRONMENT_CONFIG`** path override (default **`.cursor/dev-environment.json`**); orthogonal to **`AUTO_REMOTE_AUTOMATION_PROFILE`**
+  - **Profile path**: **`.cursor/dev-environment.json`** + committed **`template/.cursor/dev-environment.json.example`** (names-only); do **not** extend **`release-targets.json`** schema (**US-0064** unchanged)
+  - **Detection matrix** (discovery-locked): **`local`** (process dev server); **`docker-host-local`** (same-machine compose/docker — operator on Docker host, not SSH hop); **`docker`** / **`ssh`** only when automation remote profile resolves a target (**US-0086** precedence)
+  - **Relaunch v1 triggers**: (a) post-**`/execute`** task when touched files ∈ runtime/container surface classes; (b) explicit operator **`refresh dev environment`**; **exclude** mandatory background **`docker compose watch`**
+  - **Recipe tiers**: **A** rebuild (`Dockerfile*`, lockfiles) → `docker compose build`+`up`; **B** restart (config/non-hot-reload); **C** **`local`** → **`DEV_SERVER_COMMAND`** / stack profile
+  - **Connect block fields**: `runtime_mode`, `connect_endpoint`, `health_path`, `service_id`, `container_id`, `target_id`, `env_refs`, `relaunch_outcome` — align **`runtime-connectivity.md`**; distinct from **US-0067** release-only timing
+  - **Reason-code families (candidates)**: `DEV_ENV_PROFILE_DISABLED`, `DEV_ENV_PROFILE_INVALID`, `DEV_ENV_DETECT_AMBIGUOUS`, `DEV_ENV_COMPOSE_UNRESOLVED`, `DEV_ENV_RELAUNCH_FAILED`, `DEV_ENV_RELAUNCH_RETRY_EXhaustED`, `DEV_ENV_CONNECT_UNAVAILABLE`
+  - **External refs**: [Docker Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) (sync/rebuild file-class industry pattern — informs tier table, not v1 watch daemon)
+- **Research questions (remaining for `/research`)** — **all resolved** in research extension below
+- **Overlap anchors**: **US-0065**, **US-0086**, **US-0067**, **US-0085**, **US-0064**, **US-0093** (`process_health` / **`DEV_SERVER_COMMAND`**)
+
+### Research extension (2026-06-14T07:00:00Z, tech-lead, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=tl-US0098-research-20260614T070000Z-fresh`)
+
+- **External (EARLY_RESEARCH=1)**: [Compose Develop specification — `develop.watch` actions](https://github.com/compose-spec/compose-spec/blob/main/develop.md) — industry file-class mapping: **`rebuild`** for `Dockerfile*` / lockfiles / dependency manifests; **`restart`** / **`sync+restart`** for config-only surfaces; **`sync`** for bind-mounted source (hot reload without image rebuild). **US-0098 v1** maps these action classes to execute-triggered **Tier A/B/C** recipes — **does not** ship mandatory **`docker compose watch`** daemon (discovery exclusion reaffirmed).
+- **Repo survey**: **`execute.md`** steps end at **23** (**US-0097** project README); no **`dev_environment_lib.py`**; **`.cursor/dev-environment.json`** absent; **`.gitignore`** gitignores **`.cursor/remote.json`** but not yet **`dev-environment.json`**; **`check_intake_template_parity.py`** has no **`--scope=dev-environment`**; **`runtime-connectivity.md`** operator summary template exists; **US-0086** path filters documented in **`auto-orchestration-reference.md`** / **`R-0068`** (`Dockerfile*`, `docker-compose*.yml`, container runtime scripts).
+
+#### Q1 — Profile schema + git policy (`status=resolved`)
+
+**Canonical path**: **`.cursor/dev-environment.json`** (override via scratchpad **`DEV_ENVIRONMENT_CONFIG`**). Committed example: **`template/.cursor/dev-environment.json.example`**.
+
+**Schema v1** (names-only; no **`release-targets.json`** schema change):
+
+| Field | Type | Operator seed | Agent write | Notes |
+|-------|------|---------------|-------------|-------|
+| **`schema_version`** | integer | optional | required | **`1`** for v1 |
+| **`detected_mode`** | enum | optional | required | **`local`** \| **`docker-host-local`** \| **`docker`** \| **`ssh`** |
+| **`operator_seeded`** | boolean | set **`true`** on first manual seed | may flip **`false`** after agent merge | audit only |
+| **`last_updated`** | ISO UTC string | optional | required on write | idempotent merge key |
+| **`compose_file`** | string path | yes | yes | relative repo path; required for docker modes when known |
+| **`service`** | string | yes | yes | compose service name |
+| **`target_id`** | string | yes | yes | when **`docker`**/**`ssh`** via **US-0086** |
+| **`connect`** | object | yes | yes | **`endpoint`** (literal host:port or **`protocol://host:port`** OK when not secret-derived); **`health_path`**; **`*Env`** keys only (**`hostEnv`**, **`portEnv`**, **`protocolEnv`**) — never values |
+| **`rebuild_recipe`** | object | optional | yes | **`default_tier`** **`A`**\|**`B`**\|**`C`**; optional **`build_command`** / **`up_command`** / **`restart_command`** string templates (no secret literals) |
+| **`env_refs`** | string[] | yes | merge | sorted unique env **names** operator must have set |
+| **`evidence_refs`** | string[] | no | append | sprint/task/handoff refs |
+
+**Git / ignore policy** (mirror **`.cursor/remote.json`** posture per **US-0085**):
+
+| Artifact | Track in git? | Policy |
+|----------|---------------|--------|
+| **`template/.cursor/dev-environment.json.example`** | **yes** | names-only placeholders |
+| **`.cursor/dev-environment.json`** | **no** | add **`.cursor/dev-environment.json`** to **`.gitignore`** + **`.cursorignore`** (defense-in-depth layer 2) |
+| Operator seed in chat | n/a | agent writes/merges local file only; never paste secret values into JSON |
+
+**Idempotent agent writes**: merge by field — operator-seeded **`connect.*Env`** names preserved unless superseded with evidence; **`evidence_refs`** append-only; **`last_updated`** always bumped.
+
+#### Q2 — File-class → relaunch tier table (`status=resolved`)
+
+Shared **container surface** globs align with **US-0086** / **`R-0068`** (deterministic path filters). **Highest matching tier wins** when multiple classes touch in one execute task.
+
+| Tier | Action | Glob / path patterns (repo-relative) | Relaunch recipe (mode-dependent) |
+|------|--------|--------------------------------------|----------------------------------|
+| **A — rebuild** | `docker compose build` + `up -d` (docker-host-local / remote docker) | `Dockerfile`, `Dockerfile.*`, `**/Dockerfile`, `docker-compose*.yml`, `compose.y*ml`, `package.json`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `requirements*.txt`, `pyproject.toml`, `poetry.lock`, `Pipfile.lock`, `go.mod`, `go.sum`, `Cargo.toml`, `Cargo.lock`, `*.csproj`, `global.json` | Full image rebuild + recreate |
+| **B — restart** | `docker compose restart <service>` or process restart | `*.env.example`, `nginx.conf`, `**/traefik/**`, `**/supervisord*.conf`, `application.y*ml`, `application*.properties`, `config/*.y*ml`, `docker-compose*.yml` **env-only** delta when Tier A patterns absent, container **entrypoint/cmd** scripts under `scripts/docker/` or `docker/` | Config / non-hot-reload surfaces |
+| **C — local dev server** | **`DEV_SERVER_COMMAND`** / stack-aware start (**US-0093** / **`uat_probe_lib`**) | Applies when **`detected_mode=local`** and Tier A/B patterns absent but **`src/**`, `app/**`, `lib/**`, `pages/**`, `api/**`** or stack hot-reload paths touched | Process restart only |
+| **Skip** | no relaunch | Docs-only, tests-only, `.md`, `.cursor/commands/**`, `handoffs/**`, `sprints/**`, `docs/**` (unless compose/runtime script under those trees matches Tier A/B) | Emit **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`** |
+
+**Bind-mounted source on docker-host-local**: when Tier A/B absent and only Tier C-like source paths change, default **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`** (container sync/hot-reload assumed) — operator may force via explicit refresh (**Q4**). Architecture may document opt-in profile flag **`rebuild_recipe.restart_on_source_change`** (default **`false`**) in **`DEC-0084`**.
+
+#### Q3 — Execute wiring + `dev_to_qa.md` evidence (`status=resolved`)
+
+**Execute placement** — new step **24** after step **23** (**US-0097**), before execute completion / QA handoff:
+
+| Sub-step | Contract |
+|----------|----------|
+| **24 (preamble)** | Read merged scratchpad **`DEV_AUTO_LAUNCH_PROFILE`** (default **`off`**) and optional **`DEV_ENVIRONMENT_CONFIG`**. When **`off`**, skip **24a–24d** with zero overhead (manual parity). |
+| **24a Gate + profile load** | Validate profile path; run names-only schema check; fail closed → **`DEV_ENV_PROFILE_INVALID`**. When missing and detection cannot infer stack → **`DEV_ENV_PROFILE_MISSING`**. |
+| **24b Detection + persist** | Run detection algorithm (**Q2** / precedence table below); merge **`detected_mode`**, **`compose_file`**, **`service`**, **`target_id`**, **`connect`**, **`env_refs`** idempotently into profile file. |
+| **24c Relaunch (bounded)** | When execute task touched files match Tier A/B/C (**Q2**) **or** explicit refresh trigger fired (**Q4**): run tier recipe; **`retry_count`** max **2** (attempts **0..1** retry); delays **5s** then **15s**; non-transient failures fail fast (missing compose file, disabled target). |
+| **24d Connect + handoff** | On success or skip/fail, append **Dev environment relaunch** + **Connect** sections to **`handoffs/dev_to_qa.md`** (and optional chat mirror). |
+
+**`handoffs/dev_to_qa.md` evidence tuple** (mandatory when step **24** runs and profile **on**):
+
+```markdown
+## Dev environment relaunch (US-0098)
+
+| Field | Value |
+|-------|-------|
+| `dev_auto_launch_profile` | deterministic_v1 |
+| `runtime_mode` | docker-host-local |
+| `relaunch_tier` | A \| B \| C \| (none) |
+| `relaunch_command` | names-only command string(s) executed |
+| `relaunch_outcome` | success \| skipped \| failed |
+| `retry_count` | 0..2 |
+| `reason_code` | (none) or DEV_ENV_* |
+
+### Connect (operator)
+
+| Field | Value |
+|-------|-------|
+| `runtime_mode` | … |
+| `connect_endpoint` | … |
+| `health_path` | … |
+| `service_id` / `container_id` | … |
+| `target_id` | … (when remote) |
+| `env_refs` | [NAME_ONLY, …] |
+| `relaunch_outcome` | … |
+```
+
+**Orthogonality**: step **18** (**US-0065**) runtime QA autopilot remains phase verdict evidence — distinct from **24** dev-loop relaunch. Step **17** (**US-0084**) remote cues compose when both fire.
+
+#### Q4 — Explicit refresh hook (`status=resolved`)
+
+| Trigger | v1 behavior |
+|---------|-------------|
+| **Primary NL phrase** | Exact literal **`refresh dev environment`** (case-sensitive, whole-phrase match in operator message or **`/execute`** argument — same strictness as **US-0086** **`start container <target_id>`**) |
+| **Runbook synonyms (documentation only; not parsed v1)** | "rebuild dev stack", "restart dev environment", "reload dev containers" — map operators to primary phrase |
+| **Optional command hook** | **`.cursor/commands/refresh-dev-environment.md`** thin wrapper delegating to execute step **24c** semantics (architecture may defer to runbook-only v1) |
+| **Profile off** | Fail closed → **`DEV_ENV_PROFILE_DISABLED`** + remediation ("set **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`**") |
+| **Unroutable stack** | **`DEV_ENV_COMPOSE_UNRESOLVED`** or **`DEV_ENV_DETECT_AMBIGUOUS`** |
+
+Explicit refresh **always** attempts relaunch (Tier from profile **`rebuild_recipe.default_tier`** or **B** when unset) even when no execute file-class match — bounded retries apply.
+
+#### Q5 — Stdlib helper + template parity (`status=resolved`)
+
+**Recommendation**: ship **`scripts/dev_environment_lib.py`** (+ **`template/scripts/`** mirror) — not doc-only. Rationale: schema validation, tier classification, and detection are testable; mirrors **`uat_probe_lib.py`**, **`project_readme_coverage_lib.py`** precedent.
+
+**Public surface (architecture-locks exact names)**:
+
+| Function / CLI | Purpose |
+|----------------|---------|
+| **`load_profile(path) -> dict`** | Parse JSON; reject inline secrets; validate required fields |
+| **`classify_touched_files(paths) -> tier\|None`** | **Q2** table |
+| **`detect_mode(repo, profile, scratchpad) -> (mode, reason_code\|None)`** | Detection precedence |
+| **`build_relaunch_plan(mode, tier, profile) -> list[str]`** | Command list (no env value reads) |
+| **`format_connect_block(profile, outcome) -> str`** | Markdown Connect block |
+| **`python scripts/dev_environment_lib.py --self-test`** | **`[DEV_ENVIRONMENT_SELF_TEST_OK]`** contract marker |
+
+**Parity manifest** — new **`DEV_ENVIRONMENT_PAIRS`** + **`check_intake_template_parity.py --scope=dev-environment`**:
+
+| # | Active path | Template path |
+|---|-------------|---------------|
+| 1 | `.cursor/commands/execute.md` (step **24** block) | `template/.cursor/commands/execute.md` |
+| 2 | `.cursor/scratchpad.md` (**`DEV_AUTO_LAUNCH_*`** keys) | `template/.cursor/scratchpad.md` |
+| 3 | `.cursor/scratchpad.local.example.md` | `template/.cursor/scratchpad.local.example.md` |
+| 4 | `template/.cursor/dev-environment.json.example` | (self — byte match active example) |
+| 5 | `scripts/dev_environment_lib.py` | `template/scripts/dev_environment_lib.py` |
+| 6 | `docs/engineering/runbook.md` (dev environment §) | `template/docs/engineering/runbook.md` |
+| 7 | `docs/engineering/auto-orchestration-reference.md` (dev auto-launch §) | `template/docs/engineering/auto-orchestration-reference.md` |
+| 8 | `.gitignore` (**dev-environment.json** line) | `template/.gitignore` (if present) or documented exception row |
+
+**Contract-test markers** ( **`tests/auto_command_contract_test.py`** — architecture literals):
+
+- **`test_us0098_dev_auto_launch_scratchpad_keys`**
+- **`test_us0098_execute_step24_literals`**
+- **`test_us0098_dev_environment_schema_contract`**
+- **`test_us0098_detection_mode_precedence_literals`**
+- **`test_us0098_reason_code_inventory`**
+- **`test_us0098_connect_block_field_literals`**
+- **`test_us0098_refresh_dev_environment_phrase_literal`**
+- **`test_us0098_us0086_compose_no_schema_change`** (regression guard)
+
+Harness section **§26W** (or next free) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+#### Q6 — Security audit (**US-0085** inheritance) (`status=resolved`)
+
+Four defense layers (extends **US-0085** / **DEC-0071**):
+
+| Layer | Control |
+|-------|---------|
+| 1 — Schema | **`load_profile`** rejects inline secret-like literals (reuse remote-config heuristic patterns from **DEC-0016**); only **`*Env`** suffix keys in **`connect`** |
+| 2 — Ignore files | **`.gitignore`** + **`.cursorignore`** block **`.cursor/dev-environment.json`** from agent file tools |
+| 3 — Agent rules | No **`.env`** read; Connect output lists **`env_refs`** names only |
+| 4 — Runtime | Relaunch subprocess inherits operator shell env — helper **never** opens **`.env`**; no **`docker compose`** env-file flags pointing at **`.env`** in v1 recipes |
+
+**Audit paths**: profile load (**24a**), profile persist (**24b**), relaunch command construction (**24c**), Connect emission (**24d**), helper **`--self-test`**. Violation → **`DEV_ENV_SECRET_SURFACE_VIOLATION`**.
+
+#### Q7 — Companion DEC necessity (`status=resolved`)
+
+**Companion `DEC-0084` required at `/architecture`** — discovery locks alone insufficient:
+
+| Factor | Why DEC |
+|--------|---------|
+| New persisted artifact + scratchpad keys | **`DEV_AUTO_LAUNCH_PROFILE`**, **`DEV_ENVIRONMENT_CONFIG`** |
+| Cross-story composition | **US-0086** precedence, **US-0065** boundary, **US-0085** inheritance, **US-0093** **`DEV_SERVER_*`** |
+| Execute contract | Step **24** sub-steps + retry cap |
+| Detection precedence | Four-label matrix + **`docker-host-local`** vs remote disambiguation |
+| Reason-code families | **`DEV_ENV_PROFILE_*`**, **`DEV_ENV_RELAUNCH_*`** registry |
+
+**Alternative rejected**: architecture-only (**US-0094** / **R-0080** pattern) — rejected because **US-0098** introduces new operator-local JSON + execute automation cross-cutting **≥3** delivered decisions.
+
+#### Detection precedence algorithm (`status=resolved`)
+
+1. **`DEV_AUTO_LAUNCH_PROFILE=off`** → no detection/relaunch (manual unchanged).
+2. Load profile from **`DEV_ENVIRONMENT_CONFIG`** or **`.cursor/dev-environment.json`**.
+3. When **`AUTO_REMOTE_AUTOMATION_PROFILE=deterministic_v1`** **and** **US-0086** resolves a target: **`docker`** type → mode **`docker`** + **`target_id`**; **`ssh`** type → mode **`ssh`** + **`target_id`** (**US-0086** wins over local compose).
+4. Else when compose file resolvable (profile **`compose_file`** or repo-root **`compose.y*ml`/`docker-compose*.yml`**) **and** local **`docker`** CLI succeeds → **`docker-host-local`**.
+5. Else when **`DEV_SERVER_COMMAND`** set or stack profile inferable (**US-0065** / **`uat_probe_lib`**) → **`local`**.
+6. Else → fail closed **`DEV_ENV_DETECT_AMBIGUOUS`**.
+
+#### Reason-code inventory (`status=resolved`)
+
+**`DEV_ENV_PROFILE_*`**: **`DEV_ENV_PROFILE_DISABLED`**, **`DEV_ENV_PROFILE_INVALID`**, **`DEV_ENV_PROFILE_MISSING`**, **`DEV_ENV_DETECT_AMBIGUOUS`**, **`DEV_ENV_COMPOSE_UNRESOLVED`**, **`DEV_ENV_TARGET_DISABLED`**, **`DEV_ENV_SECRET_SURFACE_VIOLATION`**
+
+**`DEV_ENV_RELAUNCH_*`**: **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`**, **`DEV_ENV_RELAUNCH_SKIPPED_PROFILE_OFF`**, **`DEV_ENV_RELAUNCH_FAILED`**, **`DEV_ENV_RELAUNCH_RETRY_EXHAUSTED`**, **`DEV_ENV_RELAUNCH_TIMEOUT`**, **`DEV_ENV_CONNECT_UNAVAILABLE`**
+
+#### Risks (carry to `/architecture`)
+
+- **R1**: Relaunch loops / duplicate containers — mitigated by **`retry_count`≤2** + idempotent profile writes + no watch daemon v1.
+- **R2**: **`docker-host-local`** conflated with **US-0086** remote docker — mitigated by detection precedence step **3** vs **4** + explicit matrix in **`DEC-0084`**.
+- **R3**: Secret leakage — mitigated by Q6 four-layer audit + gitignore local profile.
+- **R4**: Execute step proliferation — step **24** gated default-off; zero overhead when **`off`**.
+
+- **Confidence**: **high** on schema, tier table, execute placement, security; **medium** on bind-mount skip default (operator override via refresh).
+- **Status**: **closed for `/research`** — architecture-ready; deliver **`DEC-0084`** + **`# US-0098`** at **`/architecture`**
+- **Next phase pointers**: **`/architecture`** (TL) → **`/sprint-plan`** (TL)
+
+> Append-only closure trailer for **R-0085**. **US-0098** shipped with **S0088** released on **2026-06-14T12:30:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of **DEC-0084** or architecture `# US-0098`. `fresh_context_marker=curator-S0088-US0098-refresh-context-20260614T130000Z-fresh`.
+
+- **Anchor status**: **`R-0085.status=delivered`** (**US-0098** **DONE** @ **2026-06-14T13:00:00Z** curator refresh). Single-story anchor; no shared-anchor split required.
+- **Evidence**: sprint **`S0088`** released via **`handoffs/releases/S0088-release-notes.md`**; governance locked in **`decisions/DEC-0084.md`** + **`docs/engineering/architecture.md`** **`# US-0098`**; **`scripts/dev_environment_lib.py`** + **`--self-test`**; execute step **24**; eight **`test_us0098_*`** contract subtests; template parity **`--scope=dev-environment`** (**`DEV_ENVIRONMENT_PAIRS`**); UAT **10/10**.
+- **Research phase status**: **closed** (Q1–Q7 resolved at **`/research`**; architecture + execute + release delivered).
+- **Portfolio drain closure signal**: with **US-0098** closed, **`docs/product/backlog.md`** contains **0 OPEN** stories and **0 OPEN** bugs. Backlog-drain run **`auto-20260613-01`** terminates at **`/refresh-context`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=8` of initial **10**; **2** stories consumed: **US-0097**, **US-0098**). Next operator action: **`/intake`**.
+- **Open R-xxxx anchors status (post-closure)**: **R-0085** **delivered** (this trailer). No active forward research stubs for open portfolio work.
+
+## R-0086 — US-0099: Dev-environment profile auto-bootstrap on install/upgrade
+
+- **Story**: **US-0099** (intake **2026-06-14**; discovery **2026-06-14**; research **2026-06-14**)
+- **Status**: **closed for `/research`** — architecture-ready (**2026-06-14T16:00:00Z**, tech-lead, `orchestrator_run_id=auto-20260614-01`)
+- **Problem**: **DEC-0084** ships **`template/.cursor/dev-environment.json.example`** and gitignored local path but install/upgrade does not materialize **`.cursor/dev-environment.json`** — operators hit **`DEV_ENV_PROFILE_MISSING`** when enabling **`DEV_AUTO_LAUNCH_PROFILE`** without manual copy.
+
+### Discovery findings (2026-06-14, PO)
+
+**Repo survey**:
+
+| Surface | Current behavior | US-0099 target |
+|---------|------------------|----------------|
+| **`installer.py`** **`missing`/`upgrade`** | Manifest copy + **`run_scratchpad_postinstall`** + **`bootstrap_runbook_commands`**; no profile bootstrap | Add post-postinstall hook calling **`bootstrap_dev_environment_profile()`** |
+| **`installer.ps1`** / **`installer.sh`** | Delegate scratchpad-postinstall to Python | Same delegation for bootstrap hook |
+| **`bin/postinstall.js`** | Banner-only (`npm install` / `npx its-magic`) | Invoke same bootstrap contract |
+| **`installer-owned-paths.manifest`** | Example under **`template/`** via parity; local profile **not** in **`install_paths`** | Unchanged — bootstrap is runtime copy, not manifest row |
+| **`.gitignore`** / **`.cursorignore`** | **`.cursor/dev-environment.json`** excluded | Unchanged (**DEC-0084**) |
+| **`docs/engineering/runbook.md`** § Dev environment | "Seed profile" = manual **`Copy-Item`** prerequisite | Demote to **customize-after-bootstrap** |
+| **`template/.cursor/remote.json`** | Manual seed; gitignored; default-off remote | **Contrast only** — dev profile auto-bootstrap because **`DEV_AUTO_LAUNCH_PROFILE`** expects loadable file |
+
+**Discovery resolutions (Q1–Q4)**:
+
+| Ask | Discovery lock | Research follow-up |
+|-----|----------------|-------------------|
+| **Q1** Hook placement | **After** **`run_scratchpad_postinstall`** on **`missing`** + **`upgrade`**; **before** **`bootstrap_runbook_commands`**; helper in **`dev_environment_lib.py`**; PS1/SH → Python | CLI flags (`--bootstrap`, `--target`); exit-code table; log token literals |
+| **Q2** **`postinstall.js`** | Must share bootstrap contract with installer; read merged scratchpad when repo root detectable, else default path | Subprocess **`python scripts/dev_environment_lib.py --bootstrap`** vs inline Node; global-install cwd edge cases |
+| **Q3** Reason codes | New **`DEV_ENV_BOOTSTRAP_*`** family (install-time) distinct from **`DEV_ENV_PROFILE_*`** (runtime) | Inventory: **`COPIED`**, **`SKIPPED_EXISTS`**, **`PATH_INVALID`**, **`SOURCE_MISSING`** |
+| **Q4** Decision | **Amend DEC-0084** § bootstrap posture — not a new **`DEC-xxxx`** | Amendment paragraph prose + architecture **`# US-0099`** cross-ref |
+
+**Path resolution contract (discovery-locked)**:
+
+1. Parse merged scratchpad **`DEV_ENVIRONMENT_CONFIG`** (Model B layers already applied by postinstall).
+2. If absent or empty → **`DEFAULT_PROFILE_PATH`** (**.cursor/dev-environment.json**).
+3. Reject absolute paths, `..` traversal, non-`.json` suffix (fail-closed **`DEV_ENV_BOOTSTRAP_PATH_INVALID`**).
+4. Source = **`template/.cursor/dev-environment.json.example`** relative to packaged template root.
+5. Target exists → skip (**`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`**); else **`shutil.copy2`** (**`DEV_ENV_BOOTSTRAP_COPIED`**).
+
+**Tranche order (discovery-locked)**: **A** helper + reason codes → **B** installer hooks → **C** postinstall → **D** runbook + **`test_us0099_*`** + parity manifest delta.
+
+### Research extension (2026-06-14T16:00:00Z, tech-lead, `orchestrator_run_id=auto-20260614-01`, `fresh_context_marker=tl-US0099-research-20260614T160000Z-fresh`)
+
+- **External (EARLY_RESEARCH=1)**: [npm scripts lifecycle — `postinstall`](https://docs.npmjs.com/cli/v11/using-npm/scripts/) — **`postinstall`** runs after dependency install/update; keep hooks **minimal and idempotent** (npm recommends avoiding heavy **`install`** scripts). Industry pattern for config bootstrap: check **`fs.existsSync(dest)`** before **`copyFileSync`** ([Stack Overflow — copy JSON on install](https://stackoverflow.com/questions/64448989/how-to-copy-a-json-config-file-when-installing-my-package); [w3tutorials — postinstall asset copy](https://www.w3tutorials.net/blog/how-to-automatically-copy-files-from-package-to-local-directory-via-postinstall-npm-script/)). **US-0099** adopts copy-when-missing (not merge/sync) and delegates logic to stdlib Python helper (mirrors **`virtualenv-postinstall`** subprocess precedent for cross-language install hooks).
+- **Repo survey (2026-06-14, tech-lead)**: **`dev_environment_lib.py`** ships **`load_profile`**, **`--self-test`**, **`--load`** but **no** **`bootstrap_dev_environment_profile()`** yet; **`installer.py`** calls **`run_scratchpad_postinstall`** then **`bootstrap_runbook_commands`** on **`missing`**/**`upgrade`** (lines ~879–886, ~959–966) with no profile hook; **`merge_scratchpad_layers`** / **`parse_scratchpad_file`** in **`installer.py`** are the canonical Model B scratchpad read — bootstrap helper **should reuse** the same merge semantics (import or duplicate minimal parser in lib to avoid circular imports); **`bin/postinstall.js`** banner-only; **`bin/its-magic.js`** uses **`spawnSync`** for PS1/SH — postinstall should **`spawnSync`** Python helper same as installer delegation; **`DEV_ENVIRONMENT_PAIRS`** (8 rows from **US-0098**) already covers **`dev_environment_lib.py`**, runbook, example JSON — **no new byte-parity rows** for root-only **`installer.py`** / **`bin/postinstall.js`** (contract-test literal guards instead).
+
+#### Q5 — Helper CLI surface (`status=resolved`)
+
+**Recommendation**: extend **`scripts/dev_environment_lib.py`** (+ **`template/scripts/`** mirror) with **`bootstrap_dev_environment_profile()`** and **`--bootstrap`** CLI — same stdlib-helper precedent as **R-0085** Q5 / **US-0098**.
+
+**Public API (architecture-locks exact names)**:
+
+| Symbol | Signature / flag | Purpose |
+|--------|------------------|---------|
+| **`bootstrap_dev_environment_profile`** | `(target_root: Path, source_root: Path \| None = None, scratchpad: dict \| None = None) -> tuple[str, str]` | Returns **`(reason_code, log_channel)`** where **`log_channel`** is **`stdout`** or **`stderr`** token line |
+| **`resolve_profile_path`** | `(target_root: Path, scratchpad: dict) -> tuple[Path \| None, str \| None]` | Parse **`DEV_ENVIRONMENT_CONFIG`**; return **`(None, DEV_ENV_BOOTSTRAP_PATH_INVALID)`** when malformed |
+| **`--bootstrap`** | CLI flag | Run install-time bootstrap |
+| **`--target`** | repo root (default **`cwd`**) | Consumer repo path |
+| **`--source-root`** | template root (default **`<pkg>/template`**) | Packaged example source tree |
+
+**Path validation** (fail-closed; discovery locks reaffirmed):
+
+- Reject absolute paths, **`..`** segments, paths outside repo root, non-**`.json`** suffix → **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** (no copy; no silent fallback to default when override present but invalid).
+- When **`DEV_ENVIRONMENT_CONFIG`** absent/empty → **`DEFAULT_PROFILE_PATH`** (**.cursor/dev-environment.json**).
+- Source = **`{source_root}/.cursor/dev-environment.json.example`** only → missing source → **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`**.
+
+**Exit codes**:
+
+| Code | When |
+|------|------|
+| **0** | **`DEV_ENV_BOOTSTRAP_COPIED`** or **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** (install continues) |
+| **1** | **`DEV_ENV_BOOTSTRAP_PATH_INVALID`**, **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`**, or unexpected I/O error |
+
+**User-visible log tokens** (**DEC-0053** — no **`US-xxxx`** / sprint ids on operator channel):
+
+| Outcome | Token (stdout unless noted) |
+|---------|----------------------------|
+| Copied | **`[DEV_ENV_BOOTSTRAP_OK] copied: <repo-relative-target>`** |
+| Skipped | **`[DEV_ENV_BOOTSTRAP_OK] skipped: profile exists at <repo-relative-target>`** |
+| Path invalid | **`[DEV_ENV_BOOTSTRAP_ERROR] DEV_ENV_BOOTSTRAP_PATH_INVALID`** (stderr) |
+| Source missing | **`[DEV_ENV_BOOTSTRAP_ERROR] DEV_ENV_BOOTSTRAP_SOURCE_MISSING`** (stderr) |
+| Postinstall no repo | **`[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected`** (stdout; exit **0**) |
+
+**Reason-code constants** (add to **`dev_environment_lib.py`** alongside **`DEV_ENV_PROFILE_*`**):
+
+- **`DEV_ENV_BOOTSTRAP_COPIED`**
+- **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`**
+- **`DEV_ENV_BOOTSTRAP_PATH_INVALID`**
+- **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`**
+
+**Installer wiring** (Python — architecture literals):
+
+```python
+# After run_scratchpad_postinstall(...); before bootstrap_runbook_commands(...)
+if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+    return 1
+```
+
+Thin wrapper **`bootstrap_dev_environment_profile_installer_hook`** in **`installer.py`** calls **`dev_environment_lib.bootstrap_dev_environment_profile`** with merged scratchpad from **`merge_scratchpad_layers`**. **`installer.ps1`** / **`installer.sh`** — **no** new surface; continue delegating to **`installer.py`**.
+
+#### Q2 residual — Postinstall invocation (`status=resolved`)
+
+**Recommendation**: **`bin/postinstall.js`** invokes Python subprocess — **not** inline Node copy — so bootstrap semantics stay single-sourced in **`dev_environment_lib.py`**.
+
+**Algorithm**:
+
+1. After existing banner, resolve **consumer repo root**: walk up from **`process.cwd()`** for **`.cursor/scratchpad.md`** or **`its_magic/.its-magic-version`** (max **6** parents); if none → emit **`[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected`** and exit **0** (global **`npm install -g`** / package-dir cwd edge case per discovery risk **R1**).
+2. Resolve **package template root**: **`path.join(__dirname, '..', 'template')`** (same layout as **`installer.py`** **`source_root`**).
+3. **`spawnSync(python, [lib_path, '--bootstrap', '--target', repoRoot, '--source-root', templateRoot], { stdio: 'inherit', cwd: repoRoot })`** where **`python`** = **`process.env.PYTHON`** or **`python3`** or **`python`** (first on **`PATH`**).
+4. Map exit code: **0** → success banner line; **1** → print remediation hint but **do not** fail **`npm install`** lifecycle (match scratchpad-postinstall soft-fail posture — log error, continue). Architecture may tighten to fail-closed on **`SOURCE_MISSING`** only.
+
+**Parity with installer**: both paths call identical **`--bootstrap`** CLI; postinstall **does not** re-implement scratchpad merge — helper reads merged layers from target repo disk (requires **`run_scratchpad_postinstall`** to have run first on installer paths; on pure **`npm install its-magic`** in consumer repo, merged **`.cursor/scratchpad.md`** must already exist or helper uses example-only layer + default path).
+
+#### Q6 — Contract tests + parity delta (`status=resolved`)
+
+**Contract-test markers** (**`tests/auto_command_contract_test.py`** — architecture literals):
+
+| Marker | AC | Asserts |
+|--------|-----|---------|
+| **`test_us0099_copy_when_missing`** | AC-1 | Temp repo: absent target → **`--bootstrap`** creates file; content matches example; **`DEV_ENV_BOOTSTRAP_COPIED`** token |
+| **`test_us0099_skip_when_exists`** | AC-2 | Pre-seed customized bytes → second bootstrap → unchanged mtime/content; **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** |
+| **`test_us0099_upgrade_idempotent`** | AC-1, AC-2 | Simulate **`upgrade`** double-call → skip on second; no overwrite |
+| **`test_us0099_path_override`** | AC-3 | Scratchpad **`DEV_ENVIRONMENT_CONFIG=custom/dev.json`** → copy to override; invalid override → **`PATH_INVALID`**, no file |
+| **`test_us0099_postinstall_parity`** | AC-4 | **`bin/postinstall.js`** contains **`--bootstrap`** + **`dev_environment_lib.py`** spawn literal |
+| **`test_us0099_installer_hook_literals`** | AC-1 | **`installer.py`** calls bootstrap **after** **`run_scratchpad_postinstall`** and **before** **`bootstrap_runbook_commands`** on **`missing`** + **`upgrade`** |
+| **`test_us0099_bootstrap_reason_code_inventory`** | AC-7 | All four **`DEV_ENV_BOOTSTRAP_*`** codes defined in **`dev_environment_lib.py`** |
+
+Harness: **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** section **§26X** (or next free after **US-0098** §26W).
+
+**`DEV_ENVIRONMENT_PAIRS` delta** (**`check_intake_template_parity.py --scope=dev-environment`**):
+
+| # | Change | Rationale |
+|---|--------|-----------|
+| 1–8 | **Unchanged** from **US-0098** | Example, lib, runbook, execute step **24**, scratchpad keys already paired |
+| — | **No new rows** for **`installer.py`**, **`installer.ps1`**, **`installer.sh`**, **`bin/postinstall.js`** | Root-only install surfaces — **contract-test literal guards** instead of template byte parity (**US-0097** installer-boundary precedent) |
+| 9 (optional) | **`.gitignore`** **`.cursor/dev-environment.json`** line ↔ **`template/.gitignore`** | Only if architecture adds line to template mirror; otherwise document exception in **`# US-0099`** |
+
+**Runbook delta** (already in pair row 6): replace "Seed profile" prerequisite with **customize-after-bootstrap** + **`DEV_ENV_PROFILE_MISSING`** troubleshooting referencing auto-bootstrap.
+
+#### Q7 — Idempotency matrix (`status=resolved`)
+
+**Rule**: existence check only — **no** byte comparison, merge, or timestamp refresh (**discovery lock**; mitigates risk **R2**).
+
+| Install mode | Target state | Path config | Expected outcome | Disk after |
+|--------------|--------------|-------------|------------------|------------|
+| **`missing`** | absent | default | **`DEV_ENV_BOOTSTRAP_COPIED`** | Example bytes at **`.cursor/dev-environment.json`** |
+| **`missing`** | absent | valid override | **`DEV_ENV_BOOTSTRAP_COPIED`** | Example at override path |
+| **`missing`** | absent | invalid override | **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** | No new file |
+| **`missing`** | present (any) | default | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Unchanged |
+| **`upgrade`** | absent | default | **`DEV_ENV_BOOTSTRAP_COPIED`** | Example copied |
+| **`upgrade`** | present customized | default | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Operator prose preserved |
+| **`upgrade`** | present customized | valid override | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Unchanged at override path |
+| **npm postinstall** | absent | default | **`DEV_ENV_BOOTSTRAP_COPIED`** | Same as **`missing`** |
+| **npm postinstall** | present | any | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Unchanged |
+| **Re-run** (any mode) | present | any | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Idempotent |
+| **Global npm** (no repo) | n/a | n/a | **`[DEV_ENV_BOOTSTRAP_SKIP]`** exit **0** | No side effects |
+
+**Composition with US-0018**: smart-upgrade preserves **`user-data`** / local files; bootstrap adds **`.cursor/dev-environment.json`** only when absent — compatible because profile is gitignored local state, not manifest **`install_paths`** row.
+
+#### Q4 residual — Decision pointer (`status=resolved`)
+
+**No new `DEC-xxxx`**. Amend **`DEC-0084`** § bootstrap posture at **`/architecture`** (discovery lock reaffirmed):
+
+- Install/upgrade/postinstall **copy-when-missing** from committed example.
+- **`remote.json`** remains manual-seed (contrast table preserved).
+- **`DEV_ENV_BOOTSTRAP_*`** reason family documented alongside **`DEV_ENV_PROFILE_*`**.
+
+**Tranche order** (unchanged): **A** helper + codes → **B** installer hooks → **C** postinstall → **D** runbook + **`test_us0099_*`** + parity check.
+
+**Top risks (carry to `/architecture`)**:
+
+- **R1**: Global-install / wrong cwd — **`[DEV_ENV_BOOTSTRAP_SKIP]`** path documented in runbook.
+- **R2**: Accidental overwrite — existence-only skip; contract tests **`skip_when_exists`** + **`upgrade_idempotent`** mandatory.
+- **R3**: User-visible logs leak planning ids — **DEC-0053** scan on tokens above.
+
+**Evidence refs**: `docs/product/vision.md` (**`## Discovery Notes — US-0099`**), `docs/product/backlog.md` (`## US-0099`), `handoffs/intake_evidence/US-0099-intake-20260614.json`, `scripts/dev_environment_lib.py`, `installer.py`, `bin/postinstall.js`, `decisions/DEC-0084.md`, `handoffs/archive/po-to-tl-pack-20260613.md` (US-0099 discovery handoff).
+
+**Next phase pointers**: **`/architecture`** (TL) → **`/sprint-plan`**
+
+> Append-only closure trailer for **R-0086**. **US-0099** shipped with **S0089** released on **2026-06-14T23:30:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new R-xxxx id allocated; no rewrite of **DEC-0084** amended § bootstrap posture or architecture `# US-0099`. `fresh_context_marker=curator-S0089-US0099-refresh-context-20260615T000000Z-fresh`.
+
+- **Anchor status**: **`R-0086.status=delivered`** (**US-0099** **DONE** @ **2026-06-15T00:00:00Z** curator refresh). Single-story anchor; no shared-anchor split required.
+- **Research phase status**: **closed** (Q1–Q7 resolved at **`/research`**; architecture + execute + release delivered).
+- **Portfolio drain closure signal**: with **US-0099** closed, **`docs/product/backlog.md`** contains **0 OPEN** stories and **0 OPEN** bugs. Backlog-drain run **`auto-20260614-01`** terminates at **`/refresh-context`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=7` of initial **8**; **1** story consumed: **US-0099**). Next operator action: **`/intake`**.
+- **Open R-xxxx anchors status (post-closure)**: **R-0086** **delivered** (this trailer). No active forward research stubs for open portfolio work.
+
+## R-0087 — US-0100: Version-scoped release changelog and GitHub release-note attachment
+
+- **Story**: **US-0100** (intake **2026-06-15**; discovery **2026-06-15**; research **2026-06-15**)
+- **Status**: **closed for `/research`** — architecture-ready (**2026-06-15T02:00:00Z**, tech-lead, `orchestrator_run_id=auto-20260615-01`)
+- **Problem**: **US-0040** sprint notes and **`release_queue`** track workflow releases, but there is no semver-aligned cumulative changelog listing **US-xxxx** / **BUG-xxxx** with short summaries; **`scripts/release-all.sh`** uses **`gh release create --generate-notes`**, ignoring canonical its-magic bodies.
+
+### Intake findings (2026-06-15, PO)
+
+**Market / best-practice survey**:
+
+| Pattern | Recommendation for US-0100 |
+|---------|---------------------------|
+| [Keep a Changelog](https://keepachangelog.com/) 1.1.0 | Repo-root **`CHANGELOG.md`**: **`[Unreleased]`** + semver sections (newest first), ISO dates, categorized bullets (Added/Changed/Fixed…) |
+| [GitHub CLI `gh release create`](https://cli.github.com/manual/gh_release_create) | Prefer **`-F notes-file.md`** over **`--generate-notes`** when canonical body exists ([cli#8372](https://github.com/cli/cli/issues/8372): **`--generate-notes`** = GitHub Release Notes API; distinct from tag annotations) |
+| Semantic Versioning | Align with **`package.json`** version + git tag **`vX.Y.Z`** from **`release-all.sh`** |
+| Single source of truth | Derive GitHub release body from same per-version markdown as cumulative changelog section |
+
+**Repo survey (intake)**:
+
+| Surface | Current behavior | US-0100 target |
+|---------|------------------|----------------|
+| **`handoffs/releases/Sxxxx-release-notes.md`** | Rich sprint-scoped notes (**US-0040**) | Remain canonical sprint evidence; feed version doc derivation |
+| **`handoffs/release_queue.md`** | **`release_version`** optional until finalization | Populate on **`/release`**; cross-link version docs |
+| **`scripts/release-all.sh`** | **`gh release create --generate-notes`** | Use canonical version notes file when present |
+| **`CHANGELOG.md`** | Absent | Introduce cumulative artifact + backfill from released sprints |
+| **`/release` command** | Writes sprint notes + queue | Also append version changelog + per-version doc |
+
+### Discovery findings (2026-06-15, PO)
+
+**Repo survey (2026-06-15, TL verification)**:
+
+| Metric | Count | Notes |
+|--------|-------|-------|
+| **`released`** queue rows | **78** | **`handoffs/release_queue.md`** |
+| Rows with **`release_version`** set | **3** | **`S0050`→`0.1.2-30`**, **`S0070`→`0.1.2-41`**, **`S0071`→`0.1.2-41`** (duplicate semver — coalesce exemplar) |
+| Rows with empty **`release_version`** | **75** | Require backfill policy |
+| Sprint note files | **79** shipped + **`Sxxxx`** stub | Primary derivation feed (**`## What's new`**, **`story_refs`**) |
+| **`package.json`** semver | **`0.1.2`** | Authoritative for **`release-all.sh`** bump only today |
+| **`RELEASE_PUBLISH_MODE`** | **`disabled`** | Workflow **`/release`** may write docs; publish execution still gated (**US-0054** / **DEC-0036**) |
+| GitHub attach today | **`scripts/release-all.sh`** L94–99 | **`gh release create "$TAG_NAME" --generate-notes`** — no sprint/queue read |
+
+**Discovery locks (14)**: reaffirmed at research — L1 **`CHANGELOG.md`**, L2 **`handoffs/releases/{semver}-release-notes.md`**, L3 sprint layer unchanged, L4 derivation precedence, L5 **`-F`** per-version SOT, L6 queue binding, L7 idempotency, L8 backfill, L9 multi-sprint coalesce, L10 **US-0067** compose, L11 **US-0054** compose, L12 three workflow paths, L13 reason codes, L14 **`scripts/release_changelog_validate.py`**.
+
+### Research extension (2026-06-15T02:00:00Z, tech-lead, `orchestrator_run_id=auto-20260615-01`, `fresh_context_marker=tl-US0100-research-20260615T020000Z-fresh`)
+
+- **External (EARLY_RESEARCH=1)**: [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/) — maintain **`[Unreleased]`** at top; at release, rename section to version+date and recreate empty **`[Unreleased]`** ([issue #253](https://github.com/olivierlacan/keep-a-changelog/issues/253): update changelog in same PR as feature when possible). [GitHub CLI `gh release create`](https://cli.github.com/manual/gh_release_create) — **`-F file.md`** for operator-curated bodies; **`--generate-notes`** invokes GitHub Release Notes API (PR/commit derived, not its-magic narrative). Community pattern ([cli#9276](https://github.com/cli/cli/issues/9276)): extract version section from **`CHANGELOG.md`** — **US-0100** adopts explicit per-version file as SOT instead of runtime CHANGELOG parsing for **`gh`** attach (simpler, fail-closed).
+
+#### Q1 — Backfill semver when queue rows lack `release_version` (`status=resolved`)
+
+**Problem**: **75/78** released rows have blank **`release_version`**; only **3** explicit values exist.
+
+**Recommendation**: **three-tier deterministic backfill** (idempotent script + operator manifest override):
+
+| Tier | Source | Semver assignment | Queue side-effect |
+|------|--------|-------------------|-------------------|
+| **A — explicit** | Row **`release_version`** non-empty | Use as-is (**`0.1.2-30`**, **`0.1.2-41`**) | No synthetic label |
+| **B — operator manifest** | **`docs/engineering/context/release-version-backfill.manifest.yaml`** (architecture-locked path) | Manual **`sprint_id`→`semver`** map for known npm/git history | Write **`remediation=backfill_manifest=<semver>`** |
+| **C — synthetic workflow** | All remaining **`released`** rows | **`0.0.0-wf.{NNN}`** where **`NNN`** = zero-padded sprint number (**`S0089`→`0.0.0-wf.089`**) | Write **`remediation=backfill_synthetic=0.0.0-wf.089`** |
+
+**Ordering**: process rows sorted by **`last_updated`** ascending for first-run manifest generation; emit **`CHANGELOG.md`** sections **newest-first** (Keep a Changelog).
+
+**Ambiguity handling**:
+
+- Duplicate explicit semver (**`S0070`** + **`S0071`** → **`0.1.2-41`**) → **coalesce** (see Q2); not ambiguous.
+- Manifest collision (two sprints → same semver without coalesce intent) → **`RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS`**; block backfill until manifest fixed.
+- Missing sprint note file → skip row with **`RELEASE_CHANGELOG_SPRINT_ORPHAN`** in backfill report (do not invent work items).
+
+**Alternative rejected**: assign all **75** rows to current **`package.json`** **`0.1.2`** — loses per-sprint audit trail and violates L8 "best-effort semver" without collapsing history.
+
+**Alternative rejected**: git-tag archaeology — tags sparse/inconsistent vs workflow releases; non-deterministic for consumer repos.
+
+#### Q2 — Multi-sprint coalesce into single semver version sections (`status=resolved`)
+
+**Problem**: Multiple workflow sprints may share one npm bump / git tag (**`release-all.sh`**) or duplicate **`release_version`** (**`S0070`/`S0071`**).
+
+**Recommendation**: **coalesce key = normalized semver** (strip leading **`v`**, semver-parse per [SemVer 2.0](https://semver.org/)).
+
+**Coalesce algorithm** (shared helper — architecture name **`release_changelog_lib.py`**):
+
+1. Collect all **`released`** queue rows sharing target semver (explicit field or post-**`npm version`** **`NEW_VERSION`**).
+2. Derive work items per sprint via L4 precedence: sprint **`## What's new`** / **`story_refs`** → backlog title/summary → queue **`story_refs`**; include **BUG-xxxx** when sprint delivered defect work.
+3. **Dedupe** work items by id (stable sort: **US** then **BUG** numeric).
+4. Emit **one** per-version file **`handoffs/releases/{semver}-release-notes.md`** with:
+   - **`## Work items`** — merged bullets
+   - **`## Sprint evidence`** — links to **each** contributing **`Sxxxx-release-notes.md`**
+5. Emit **one** **`CHANGELOG.md`** section **`## [{semver}] - {ISO date}`** — date = latest contributing sprint **`last_updated`** (UTC date component).
+6. **Idempotency**: regenerate overwrites same semver artifacts; fingerprint = **`semver + sorted(work_item_ids)`**; second run must not duplicate bullets (**L7**).
+
+**`release-all.sh` window**: after **`npm version`**, coalesce all **`released`** rows with empty **`release_version`** since last recorded git tag (or since last queue row with semver matching prior **`package.json`**) into **`NEW_VERSION`**; bind **`release_version=NEW_VERSION`** on those rows during attach step.
+
+**Alternative rejected**: one sprint → one semver always — contradicts operator **`release-all.sh`** batch publish and existing **`0.1.2-41`** duplicate.
+
+#### Q3 — `[Unreleased]` section workflow posture (`status=resolved`)
+
+**Problem**: Workflow **`/release`** often finalizes sprints without npm bump (**`RELEASE_PUBLISH_MODE=disabled`**); Keep a Changelog expects **`[Unreleased]`** for not-yet-tagged work.
+
+**Recommendation** (Keep a Changelog 1.1.0 aligned):
+
+| Trigger | **`CHANGELOG.md`** | Per-version file | Queue **`release_version`** |
+|---------|-------------------|------------------|----------------------------|
+| **`/release`** PASS, semver **unknown** | Append work items under top **`## [Unreleased]`** (categorized Added/Fixed) | **Do not create** | Leave empty |
+| **`/release`** PASS, semver **explicit** on row | **Promote**: move **`[Unreleased]`** + target sprint items into **`## [X.Y.Z] - date`**; recreate empty **`[Unreleased]`** | **Create/update** **`handoffs/releases/X.Y.Z-release-notes.md`** | Set **`release_version=X.Y.Z`** |
+| **`release-all.sh`** post-**`npm version`** | Same promotion using **`NEW_VERSION`** | Same | Bind all coalesced rows |
+
+**`[Unreleased]`** is **mandatory** header at top of **`CHANGELOG.md`** (empty placeholder allowed). Validator **`RELEASE_CHANGELOG_UNRELEASED_MISSING`** when absent.
+
+**Promotion idempotency**: if semver section already exists with same fingerprint → no-op (log **`RELEASE_CHANGELOG_IDEMPOTENCY_OK`**); if semver exists with different work items → **`RELEASE_CHANGELOG_DUPLICATE_VERSION`** fail-closed.
+
+**Alternative rejected**: require semver on every **`/release`** — blocks workflow-only releases that historically shipped without npm (**78** rows mostly blank).
+
+#### Q4 — GitHub `-F` body source-of-truth vs sprint `Sxxxx` notes (`status=resolved`)
+
+**Recommendation** (reaffirms discovery **L5**):
+
+| Artifact | Role | Passed to **`gh release create -F`**? |
+|----------|------|--------------------------------------|
+| **`handoffs/releases/{semver}-release-notes.md`** | **Canonical GitHub/git body SOT** | **Yes** |
+| **`handoffs/releases/Sxxxx-release-notes.md`** | Sprint workflow evidence (**US-0040** gates, **US-0067** Run/Connect/Verify) | **Never** |
+| **`CHANGELOG.md`** | Cumulative operator audit | **No** (human doc; optional future extract per cli#9276 — out of v1 scope) |
+
+**Derivation precedence** (structured data, single helper):
+
+```
+sprint Sxxxx notes → backlog summaries → queue story_refs
+        ↓
+release_changelog_lib.build_version_doc(semver, sprint_ids[])
+        ↓
+handoffs/releases/{semver}-release-notes.md  ──→  gh -F
+        ↓
+extract_changelog_section() → CHANGELOG.md append/rewrite
+```
+
+**`release-all.sh` attach** (replace L94–99):
+
+```bash
+VERSION_NOTES="handoffs/releases/${NEW_VERSION}-release-notes.md"
+if [[ -f "$VERSION_NOTES" ]]; then
+  gh release create "$TAG_NAME" -F "$VERSION_NOTES" --title "$TAG_NAME" $GH_PRERELEASE
+else
+  # fail-closed default; optional scratchpad RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES=1 fallback
+  err "RELEASE_CHANGELOG_VERSION_DOC_MISSING: $VERSION_NOTES"
+fi
+```
+
+**`/release` publish path** (**US-0054** / **DEC-0036**): when **`RELEASE_PUBLISH_MODE`** **`confirm|auto`** and git-type target enabled, use same **`-F`** path — docs may be written under **`disabled`**; publish execution remains gated.
+
+**Alternative rejected**: **`--generate-notes`** as default when file missing — violates operator truthfulness goal; keep opt-in fallback only.
+
+#### Q5 — Validator reason-code family (`RELEASE_CHANGELOG_*`) (`status=resolved`)
+
+**Script**: **`scripts/release_changelog_validate.py`** (+ **`template/scripts/`** mirror) — discovery **L14** name locked.
+
+**Core fail-closed codes** (AC-7 + discovery **L13**):
+
+| Code | Condition | Remediation |
+|------|-----------|-------------|
+| **`RELEASE_CHANGELOG_VERSION_MISSING`** | **`released`** row has semver bound in queue but no matching **`CHANGELOG`** section + per-version file | Re-run **`/release`** derivation or backfill |
+| **`RELEASE_CHANGELOG_DUPLICATE_VERSION`** | Two **`CHANGELOG`** sections same semver, or idempotency fingerprint mismatch on re-derive | Manual merge; fix helper input |
+| **`RELEASE_CHANGELOG_WORK_ITEM_GAP`** | Queue **`story_refs`** / sprint note work item absent from semver doc | Re-derive from sprint notes |
+| **`RELEASE_CHANGELOG_ORDER_INVALID`** | Semver sections not newest-first | Re-sort **`CHANGELOG.md`** |
+| **`RELEASE_CHANGELOG_UNRELEASED_MISSING`** | No top **`[Unreleased]`** header | Add Keep a Changelog header block |
+| **`RELEASE_CHANGELOG_QUEUE_DRIFT`** | Queue **`release_version`** ≠ changelog binding for sprint | Reconcile queue or changelog |
+| **`RELEASE_CHANGELOG_VERSION_DOC_MISSING`** | Semver finalized but **`handoffs/releases/{semver}-release-notes.md`** absent | Run derivation before **`gh`** attach |
+| **`RELEASE_CHANGELOG_SPRINT_ORPHAN`** | **`released`** sprint not referenced in any semver section nor **`[Unreleased]`** | Backfill or promote |
+| **`RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS`** | Manifest collision / unresolved semver | Fix **`release-version-backfill.manifest.yaml`** |
+| **`RELEASE_CHANGELOG_IDEMPOTENCY_VIOLATION`** | Duplicate work-item bullets same version on re-run | Fix helper dedupe |
+
+**Category mapping** (closes discovery category ask — supplementary):
+
+| Work item kind | **`CHANGELOG.md` category** | Per-version **`## Work items`** |
+|----------------|----------------------------|--------------------------------|
+| **`US-xxxx`** (default) | **Added** | Flat bullet with one-liner |
+| **`BUG-xxxx`** | **Fixed** | Flat bullet with one-liner |
+| **`user_visible: false`** story | **Changed** (or omit from consumer-facing doc — architecture chooses; default **Changed**) | Include if sprint **`story_refs`** lists it |
+
+**Gate integration**: optional **`/release`** step after finalization (non-blocking when **`PROJECT_README_ENFORCE`-style grandfathering** not needed — default **enforce** for US-0100 scope). **`release-all.sh`** runs **`--enforce`** before **`gh`** attach.
+
+#### Q6 — Publish integration + template parity (`status=resolved`)
+
+**Shared helper surfaces** (both **`/release`** and **`release-all.sh`**):
+
+| Surface | Writer | Reader |
+|---------|--------|--------|
+| **`scripts/release_changelog_lib.py`** | Derivation + coalesce + promote **`[Unreleased]`** | **`release_changelog_validate.py`**, **`release-all.sh`**, **`/release`** |
+| **`scripts/release_changelog_backfill.py`** | One-time/idempotent Tier A/B/C backfill | Validator + backfill report |
+
+**Template parity** (consumer repos):
+
+| Path | Ship in **`template/`** |
+|------|-------------------------|
+| **`CHANGELOG.md`** | Stub (Keep a Changelog header + empty **`[Unreleased]`**) |
+| **`handoffs/releases/vX.Y.Z-release-notes.md.example`** | Pattern doc (rename at use) |
+| **`template/handoffs/releases/Sxxxx-release-notes.md`** | **Unchanged** (**US-0040**) |
+| **`scripts/release_changelog_validate.py`** | Mirror + harness row |
+| **`scripts/release_changelog_lib.py`** | Mirror |
+| **`.cursor/commands/release.md`** | Version-doc steps (**US-0017** parity) |
+
+**Compose with **US-0054** / **DEC-0036****: doc writes are **not** publish; **`RELEASE_PUBLISH_MODE=disabled`** remains valid; git/npm targets invoke **`-F`** only when mode allows. **`release-targets.json`** unchanged schema — optional future **`notesFileEnv`** out of v1.
+
+**Dependencies for architecture**:
+
+- **US-0040** — sprint notes remain evidence; no overwrite
+- **US-0054** / **DEC-0036** — publish confirmation boundary preserved
+- **US-0067** — operator hints stay in sprint notes; version doc links only
+- **US-0008** — extend **`release-all.sh`** GitHub step
+- **US-0017** — template command parity
+
+**Top risks (carry to `/architecture`)**:
+
+- **R1**: Backfill synthetic semver noise — mitigate with manifest Tier B + clear **`remediation`** column labels.
+- **R2**: **`[Unreleased]`** promotion race on parallel sprints — serialize promotion per semver via fingerprint/idempotency.
+- **R3**: Windows filename edge cases for semver pre-release (**`0.1.2-41`**) — use semver as filename stem (no **`v`** prefix per **L2**); test contract marker.
+- **R4**: **`--generate-notes`** fallback temptation — default fail-closed; document opt-in scratchpad only.
+
+**Evidence refs**: `handoffs/intake_evidence/US-0100-intake-20260615.json`, `docs/product/vision.md` (**Discovery Notes — US-0100**), `docs/product/backlog.md` (`## US-0100`), `handoffs/release_queue.md`, `handoffs/releases/S0089-release-notes.md`, `scripts/release-all.sh`, `docs/engineering/release-targets.json`, `.cursor/commands/release.md`, `.cursor/scratchpad.md` (**`RELEASE_PUBLISH_MODE=disabled`**)
+
+**Next phase pointers**: **`/architecture`** (TL) — new **`DEC-xxxx`** locks artifact paths, helper API, backfill manifest, compose rules with **US-0040** / **US-0054**
+
+> Append-only closure trailer for **R-0087**. **US-0100** shipped with **S0090** released on **2026-06-15T08:00:00Z**; this refresh-context pass reconciles the research anchor to `status=delivered`. No new research questions opened; no new **`R-xxxx`** id allocated; no rewrite of **DEC-0085** or architecture **`# US-0100`**. `fresh_context_marker=curator-S0090-US0100-refresh-context-20260615T090000Z-fresh`.
+
+- **Anchor status**: **`R-0087.status=delivered`** (**US-0100** **DONE** @ **2026-06-15T09:00:00Z** curator refresh). Single-story anchor; no shared-anchor split required.
+- **Research phase status**: **closed** (Q1–Q5 resolved at **`/research`**; architecture + execute + release delivered).
+- **Portfolio drain closure signal**: with **US-0100** closed, **`docs/product/backlog.md`** contains **0 OPEN** stories and **0 OPEN** bugs. Backlog-drain run **`auto-20260615-01`** terminates at **`/refresh-context`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=6` of initial **7**; **1** story consumed: **US-0100**). Next operator action: **`/intake`**.
+- **Open R-xxxx anchors status (post-closure)**: **R-0087** **delivered** (this trailer). No active forward research stubs for open portfolio work.

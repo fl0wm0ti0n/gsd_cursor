@@ -1,0 +1,8 @@
+schema_version: 1
+entries:
+  - sprint_id: S0070
+    semver: "0.1.2-41"
+    notes: "Coalesce exemplar with S0071 per DEC-0085 / R-0087"
+  - sprint_id: S0071
+    semver: "0.1.2-41"
+    notes: "Shared semver — dedupe work items in one version doc"

@@ -1428,6 +1428,65 @@ INTAKE_RESUME_BRIEF_PY=$?
 set -e
 assert_true "intake bug resume_brief BUG-0005 fixtures pass" "[ \"$INTAKE_RESUME_BRIEF_PY\" -eq 0 ]"
 
+# 26U) US-0096 / DEC-0082 — delivery modes contract + template parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=us-0096 >/dev/null 2>&1
+US0096_PARITY_PY=$?
+"$PY" "$ROOT/scripts/pack_json_validate.py" --self-test >/dev/null 2>&1
+PACK_JSON_SELF_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0096 >/dev/null 2>&1
+US0096_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=us-0096 passes" "[ \"$US0096_PARITY_PY\" -eq 0 ]"
+assert_true "pack_json_validate.py --self-test passes" "[ \"$PACK_JSON_SELF_PY\" -eq 0 ]"
+assert_true "US-0096 contract subtests pass" "[ \"$US0096_CONTRACT_PY\" -eq 0 ]"
+
+# 26V) US-0097 / DEC-0083 — project README bootstrap contract + template parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=project-readme >/dev/null 2>&1
+US0097_PARITY_PY=$?
+"$PY" "$ROOT/scripts/validate_project_readme_coverage.py" --self-test >/dev/null 2>&1
+PROJECT_README_SELF_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0097 >/dev/null 2>&1
+US0097_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=project-readme passes" "[ \"$US0097_PARITY_PY\" -eq 0 ]"
+assert_true "validate_project_readme_coverage.py --self-test passes" "[ \"$PROJECT_README_SELF_PY\" -eq 0 ]"
+assert_true "US-0097 contract subtests pass" "[ \"$US0097_CONTRACT_PY\" -eq 0 ]"
+
+# 26W) US-0098 / DEC-0084 — dev environment auto-launch contract + template parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=dev-environment >/dev/null 2>&1
+US0098_PARITY_PY=$?
+"$PY" "$ROOT/scripts/dev_environment_lib.py" --self-test >/dev/null 2>&1
+DEV_ENV_SELF_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0098 >/dev/null 2>&1
+US0098_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=dev-environment passes" "[ \"$US0098_PARITY_PY\" -eq 0 ]"
+assert_true "dev_environment_lib.py --self-test passes" "[ \"$DEV_ENV_SELF_PY\" -eq 0 ]"
+assert_true "US-0098 contract subtests pass" "[ \"$US0098_CONTRACT_PY\" -eq 0 ]"
+
+# 26X) US-0099 / DEC-0084 amended bootstrap posture — dev-environment bootstrap contract + parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=dev-environment >/dev/null 2>&1
+US0099_PARITY_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0099 >/dev/null 2>&1
+US0099_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=dev-environment passes (US-0099)" "[ \"$US0099_PARITY_PY\" -eq 0 ]"
+assert_true "US-0099 contract subtests pass" "[ \"$US0099_CONTRACT_PY\" -eq 0 ]"
+
+# 26Y) US-0100 / DEC-0085 — release changelog contract + parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=release-changelog >/dev/null 2>&1
+US0100_PARITY_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0100 >/dev/null 2>&1
+US0100_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=release-changelog passes (US-0100)" "[ \"$US0100_PARITY_PY\" -eq 0 ]"
+assert_true "US-0100 contract subtests pass" "[ \"$US0100_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

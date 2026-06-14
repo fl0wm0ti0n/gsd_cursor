@@ -1576,6 +1576,42 @@ Assert-True "intake documents DEC-0069 resume_brief refresh script (template)" (
 $intakeResumeBriefRun = Start-Process python -ArgumentList @($intakeResumeBriefTest) -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "intake bug resume_brief BUG-0005 fixtures pass" ($intakeResumeBriefRun.ExitCode -eq 0)
 
+# 26U) US-0096 / DEC-0082 — delivery modes contract + template parity
+$us0096Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=us-0096") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=us-0096 passes" ($us0096Parity.ExitCode -eq 0)
+$packJsonSelf = Start-Process python -ArgumentList @((Join-Path $root "scripts\pack_json_validate.py"), "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "pack_json_validate.py --self-test passes" ($packJsonSelf.ExitCode -eq 0)
+$us0096Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0096") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0096 contract subtests pass" ($us0096Contract.ExitCode -eq 0)
+
+# 26V) US-0097 / DEC-0083 — project README bootstrap contract + template parity
+$us0097Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=project-readme") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=project-readme passes" ($us0097Parity.ExitCode -eq 0)
+$projectReadmeSelf = Start-Process python -ArgumentList @((Join-Path $root "scripts\validate_project_readme_coverage.py"), "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "validate_project_readme_coverage.py --self-test passes" ($projectReadmeSelf.ExitCode -eq 0)
+$us0097Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0097") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0097 contract subtests pass" ($us0097Contract.ExitCode -eq 0)
+
+# 26W) US-0098 / DEC-0084 — dev environment auto-launch contract + template parity
+$us0098Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=dev-environment") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=dev-environment passes" ($us0098Parity.ExitCode -eq 0)
+$devEnvSelf = Start-Process python -ArgumentList @((Join-Path $root "scripts\dev_environment_lib.py"), "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "dev_environment_lib.py --self-test passes" ($devEnvSelf.ExitCode -eq 0)
+$us0098Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0098") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0098 contract subtests pass" ($us0098Contract.ExitCode -eq 0)
+
+# 26X) US-0099 / DEC-0084 amended bootstrap posture — dev-environment bootstrap contract + parity
+$us0099Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=dev-environment") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=dev-environment passes (US-0099)" ($us0099Parity.ExitCode -eq 0)
+$us0099Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0099") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0099 contract subtests pass" ($us0099Contract.ExitCode -eq 0)
+
+# 26Y) US-0100 / DEC-0085 — release changelog contract + parity
+$us0100Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=release-changelog") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=release-changelog passes (US-0100)" ($us0100Parity.ExitCode -eq 0)
+$us0100Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0100") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0100 contract subtests pass" ($us0100Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

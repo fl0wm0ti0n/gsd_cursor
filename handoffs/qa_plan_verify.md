@@ -1,5 +1,236 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0090` / `US-0100`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0090/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-15T04:30:00Z`, **qa**, `orchestrator_run_id=auto-20260615-01`, `fresh_context_marker=qa-S0090-US0100-plan-verify-20260615T043000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-012** with **task-seed bijection** (12 architecture seeds → 12 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=12`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0100`**, **`R-0087`**, **`DEC-0085`**, **US-0040**, **US-0054**, **US-0067**, **US-0008**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-002**: PASS — `CHANGELOG.md` + `template/CHANGELOG.md` Keep a Changelog 1.1.0 stub with `[Unreleased]`; `test_us0100_changelog_artifact_paths_literals`.
+  - **AC-2 / T-003**: PASS — per-version `{semver}-release-notes.md` path + `vX.Y.Z-release-notes.md.example`; semver stem without `v` prefix.
+  - **AC-3 / T-001, T-004**: PASS — `release_changelog_lib.py` derive/promote/append/fingerprint; `/release` step 19 (19a–19d); `test_us0100_unreleased_promotion_literals`.
+  - **AC-4 / T-004, T-005**: PASS — `bind_queue_release_version` target-scoped mutation; sprint evidence cross-refs; `test_us0100_derivation_precedence_literals`.
+  - **AC-5 / T-009**: PASS — `release-all.sh` `-F` replace `--generate-notes` + enforce preflight; fail-closed unless `RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES=1`.
+  - **AC-6 / T-007, T-008**: PASS — three-tier backfill A/B/C + `release-version-backfill.manifest.yaml`; `test_us0100_backfill_manifest_schema_literals`.
+  - **AC-7 / T-001, T-006**: PASS — `release_changelog_validate.py` + 10 `RELEASE_CHANGELOG_*` codes; lib fail codes; `test_us0100_reason_code_inventory`.
+  - **AC-8 / T-004, T-010**: PASS — `release.md` step 19 + runbook version-doc workflow; scratchpad keys documented.
+  - **AC-9 / T-011, T-012**: PASS — ten `test_us0100_*` subtests + `RELEASE_CHANGELOG_PAIRS` parity + harness §26Y.
+  - **AC-10 / *(architecture)***: PASS — `DEC-0085` + `# US-0100` locked at architecture phase; plan-verify attestation only.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-001 (AC-3+AC-7)** — **ACCEPTED**: architecture seed 1 — lib API surface shares derivation and fail-code registry.
+  - **T-004 (AC-3+AC-4+AC-8)** — **ACCEPTED**: architecture seed 4 — step 19 sub-steps share `release.md` surface.
+  - **T-007+T-008 (AC-6)** — **ACCEPTED**: architecture seeds 7+8 — backfill script vs manifest/runbook sequential.
+  - **T-011+T-012 (AC-9+AC-10)** — **ACCEPTED**: architecture seeds 11+12 — contract subtests vs parity manifest vs harness sequential.
+- **Non-goals confirmed**: no `Sxxxx-release-notes.md` replacement; no sprint notes to `gh -F`; no `RELEASE_PUBLISH_MODE` bypass; no default `--generate-notes`; no US-0067 operator hints removal; no CHANGELOG.md runtime parsing for gh attach; documentation + contract-test scope only at plan-verify.
+- **Artifacts**: **`sprints/S0090/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0100`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260615-01-plan-verify-qa-20260615T043000Z-S0090-US0100`**, **`proof_hash=493b85cf3e5e0078f310c6c61adb24becb85b04a5768dd07d73c6a80dcef1857`**, **`proof_issued_at=2026-06-15T04:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260615-01-sprint-plan-tech-lead-20260615T040000Z-S0090-US0100`**, **`proof_hash=c33f47806589a544ecb99e4b5c30449142bca3ef1774356415862d5ce8ac8e9f`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0100` + **DEC-0085** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0100`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0090`** / **`US-0100`**.
+
+## Next — **`S0088` / `US-0098`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0088/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-14T09:30:00Z`, **qa**, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=qa-S0088-US0098-plan-verify-20260614T093000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-011** with **task-seed bijection** (11 architecture seeds → 11 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0098`**, **`R-0085`**, **`DEC-0084`**, **DEC-0071**, **US-0064**, **US-0086**, **US-0093**, **US-0065**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-002**: PASS — `DEV_AUTO_LAUNCH_PROFILE` default-off + `DEV_ENVIRONMENT_CONFIG`; orthogonality to `AUTO_REMOTE_AUTOMATION_PROFILE`; `test_us0098_dev_auto_launch_scratchpad_keys`.
+  - **AC-2 / T-001, T-003**: PASS — `dev-environment.json.example` schema v1 + gitignore/cursorignore; `load_profile` + `--self-test`; `test_us0098_dev_environment_schema_contract`.
+  - **AC-3 / T-004**: PASS — four detection modes + US-0086 precedence over docker-host-local; `test_us0098_detection_mode_precedence_literals`.
+  - **AC-4 / T-004, T-006**: PASS — Tier A/B/C + `build_relaunch_plan`; execute step 24 (24a–24d) + `dev_to_qa.md` evidence tuple; `test_us0098_execute_step24_literals`.
+  - **AC-5 / T-005, T-006**: PASS — `format_connect_block` mandatory fields + execute 24d Connect handoff; `test_us0098_connect_block_field_literals`.
+  - **AC-6 / T-007**: PASS — US-0086/US-0085/DEV_SERVER_* compose; no `release-targets.json` schema change; `test_us0098_us0086_compose_no_schema_change`.
+  - **AC-7 / T-006**: PASS — exact literal `refresh dev environment`; `test_us0098_refresh_dev_environment_phrase_literal`.
+  - **AC-8 / T-003, T-004, T-005**: PASS — bounded `retry_count`≤2 + `DEV_ENV_PROFILE_*`/`DEV_ENV_RELAUNCH_*` reason codes; `test_us0098_reason_code_inventory`.
+  - **AC-9 / T-008, T-009, T-011**: PASS — eight `test_us0098_*` subtests + `DEV_ENVIRONMENT_PAIRS` parity + harness §26W.
+  - **AC-10 / T-010**: PASS — runbook operator recipes (enable, seed, refresh, troubleshooting, precedence); architecture + DEC-0084 locked prior.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-003 (AC-2+AC-8)** — **ACCEPTED**: architecture seed 3 — schema validation and security heuristics share `dev_environment_lib.py` surface.
+  - **T-004 (AC-3+AC-4+AC-8)** — **ACCEPTED**: architecture seed 4 — detect/classify/relaunch plan share lib surface.
+  - **T-005 (AC-5+AC-8)** — **ACCEPTED**: architecture seed 5 — connect block formatting and reason-code registry share lib surface.
+  - **T-006 (AC-4+AC-5+AC-7)** — **ACCEPTED**: architecture seed 6 — execute step 24 sub-steps share `execute.md` surface.
+  - **T-008+T-009+T-011 (AC-9)** — **ACCEPTED**: architecture seeds 8+9+11 — contract subtests vs parity manifest vs harness sequential.
+- **Non-goals confirmed**: no mandatory unbounded watch daemon v1; no `release-targets.json` schema change; no `.env` reads; no always-on relaunch; no US-0065/US-0086 replacement; documentation + contract-test scope only at plan-verify.
+- **Artifacts**: **`sprints/S0088/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0098`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260613-01-plan-verify-qa-20260614T093000Z-S0088-US0098`**, **`proof_hash=e41cf5809487854447405722a50533475190a8d3a1dc15400918e5eb184a523a`**, **`proof_issued_at=2026-06-14T09:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260613-01-sprint-plan-tech-lead-20260614T090000Z-S0088-US0098`**, **`proof_hash=e2ea250c9738f1723767009351a261b42226bd253880f0d31aa04a139594a69f`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0098` + **DEC-0084** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0098`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0088`** / **`US-0098`**.
+
+## Next — **`S0088` / `US-0098`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0088/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-14T09:00:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=tl-S0088-US0098-sprint-plan-20260614T090000Z-fresh`); **AC-1..AC-10** mapped surjectively to **T-001..T-011**; plan integrity pre-check (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0098`**, **`R-0085`**, **`DEC-0084`**, **DEC-0071**, **US-0064**, **US-0086**, **US-0093**, **US-0065**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-002**: Default-off `DEV_AUTO_LAUNCH_PROFILE` + `DEV_ENVIRONMENT_CONFIG` scratchpad keys.
+  - **AC-2 / T-001, T-003**: Profile schema v1 example + gitignore + `load_profile` validation.
+  - **AC-3 / T-004**: Four-label detection matrix; US-0086 precedence.
+  - **AC-4 / T-004, T-006**: Tier A/B/C relaunch + execute step 24 + dev_to_qa evidence.
+  - **AC-5 / T-005, T-006**: Connect block fields + execute 24d handoff.
+  - **AC-6 / T-007**: US-0086/US-0085/DEV_SERVER_* compose; no release-targets schema change.
+  - **AC-7 / T-006**: Exact `refresh dev environment` phrase.
+  - **AC-8 / T-003, T-004, T-005**: Bounded retries + `DEV_ENV_*` reason codes.
+  - **AC-9 / T-008, T-009, T-011**: Eight `test_us0098_*` + `DEV_ENVIRONMENT_PAIRS` + harness §26W.
+  - **AC-10 / T-010**: Runbook operator recipes.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-003 (AC-2+AC-8)** — architecture seed 3 — schema validation and security share lib surface.
+  - **T-004 (AC-3+AC-4+AC-8)** — architecture seed 4 — detect/classify/relaunch share lib surface.
+  - **T-005 (AC-5+AC-8)** — architecture seed 5 — connect block + reason codes share lib surface.
+  - **T-006 (AC-4+AC-5+AC-7)** — architecture seed 6 — execute step 24 sub-steps share execute.md.
+  - **T-008+T-009+T-011 (AC-9)** — architecture seeds 8+9+11 — contract vs parity vs harness sequential.
+- **Non-goals confirmed**: no unbounded watch daemon v1; no `release-targets.json` schema change; no `.env` reads; no always-on relaunch; no US-0065/US-0086 replacement; documentation + contract-test scope only at plan-verify.
+- **Artifacts**: **`sprints/S0088/sprint.md`**, **`sprints/S0088/tasks.md`**, **`sprints/S0088/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`**, **`docs/product/backlog.md`** (**`## US-0098`** `sprint_plan_notes`), **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260613-01-sprint-plan-tech-lead-20260614T090000Z-S0088-US0098`**, **`proof_hash=e2ea250c9738f1723767009351a261b42226bd253880f0d31aa04a139594a69f`**.
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260613-01-architecture-tech-lead-20260614T080000Z-US0098`**, **`proof_hash=448d02c57eb712b55f44b546f1870092a95136bd525723e30c7d60ae7a184bb7`**.
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0098` + **DEC-0084** contracts.
+- **Canonical status**: **`US-0098`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0088`** / **`US-0098`**.
+
+## Next — **`S0087` / `US-0097`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0087/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-13T23:30:00Z`, **qa**, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=qa-S0087-US0097-plan-verify-20260613T233000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-011** with **task-seed bijection** (11 architecture seeds → 11 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0097`**, **`R-0084`**, **`DEC-0083`**, **DEC-0045**, **DEC-0074**, **US-0091**, **US-0071**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — remove root README from `[install_paths]`; retain `its_magic/README.md`; `test_us0097_installer_manifest_no_root_readme`.
+  - **AC-2 / T-002**: PASS — migration M1–M5 + sentinels S1–S5 + hybrid fail-closed; `test_us0097_placeholder_sentinel_table`.
+  - **AC-3 / T-003, T-004**: PASS — bootstrap scaffold + execute step 23a when missing/placeholder.
+  - **AC-4 / T-004, T-005**: PASS — execute delta 23b mandatory + release step 3g after 3f.
+  - **AC-5 / T-003, T-007**: PASS — user + developer sections; US-0091 reframed to `its_magic/` only.
+  - **AC-6 / T-007, T-008**: PASS — split validators; project `--report` schema v1; US-0091 regression guard.
+  - **AC-7 / T-005, T-006**: PASS — release 3g + `PROJECT_README_ENFORCE` / `FRAMEWORK_KIT_REPO` scratchpad keys.
+  - **AC-8 / T-004**: PASS — execute 23c US-0071 hygiene compose; no duplicate validator when unchanged.
+  - **AC-9 / T-009, T-010**: PASS — eight `test_us0097_*` subtests + `PROJECT_README_PAIRS` parity + harness §26V.
+  - **AC-10 / T-011**: PASS — runbook operator recipes (bootstrap, migration, gate troubleshooting); tranche order A→D.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-003 (AC-3+AC-5)** — **ACCEPTED**: architecture seed 3 — bootstrap scaffold shares lib with audience structure.
+  - **T-004 (AC-3+AC-4+AC-8)** — **ACCEPTED**: architecture seed 4 — execute step 23 sub-steps share execute.md surface.
+  - **T-005 (AC-4+AC-7)** — **ACCEPTED**: architecture seed 5 — release delta gate + enforce toggle share release.md.
+  - **T-007 (AC-5+AC-6)** — **ACCEPTED**: architecture seed 7 — path reframe serves both audience separation and validator split.
+  - **T-009+T-010 (AC-9)** — **ACCEPTED**: architecture seeds 9+10 — contract subtests vs parity manifest sequential.
+- **Non-goals confirmed**: no combined framework+project README; no US-0091 extension to project root; no S5 prose deletion; no `FRAMEWORK_KIT_REPO` consumer default; no `its_magic/README.md` removal; documentation + contract-test scope only at plan-verify.
+- **Artifacts**: **`sprints/S0087/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0097`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260613-01-plan-verify-qa-20260613T233000Z-S0087-US0097`**, **`proof_hash=ef0f2ea39bd7295fdad9a91fc1f2611cefc4b90b3331c071afc0baa3dbeb8293`**, **`proof_issued_at=2026-06-13T23:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260613-01-sprint-plan-tech-lead-20260613T230000Z-S0087-US0097`**, **`proof_hash=839f15ffcaa54f7dc8066904b7162fd223d63af27afac30910699532633118cc`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0097` + **DEC-0083** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0097`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0087`** / **`US-0097`**.
+
+## Next — **`S0087` / `US-0097`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0087/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-13T23:00:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260613-01`, `fresh_context_marker=tl-S0087-US0097-sprint-plan-20260613T230000Z-fresh`); **AC-1..AC-10** mapped surjectively to **T-001..T-011**; plan integrity pre-check (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0097`**, **`R-0084`**, **`DEC-0083`**, **DEC-0045**, **DEC-0074**, **US-0091**, **US-0071**, **US-0017**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001**: Remove root README from installer `[install_paths]`; its_magic/README.md retained.
+  - **AC-2 / T-002**: Migration M1–M5 + sentinels S1–S5 + hybrid fail-closed reason codes.
+  - **AC-3 / T-003, T-004**: Execute bootstrap 23a when missing/placeholder.
+  - **AC-4 / T-004, T-005**: Execute delta 23b + release 3g mandatory catalog update.
+  - **AC-5 / T-003, T-007**: User + developer sections; framework catalog in its_magic/ only.
+  - **AC-6 / T-007, T-008**: Split validators — US-0091 framework; project root new validator.
+  - **AC-7 / T-005, T-006**: Release 3g + PROJECT_README_ENFORCE scratchpad keys.
+  - **AC-8 / T-004**: Execute 23c US-0071 hygiene compose.
+  - **AC-9 / T-009, T-010**: Eight test_us0097_* + PROJECT_README_PAIRS parity + harness §26V.
+  - **AC-10 / T-011**: Runbook operator recipes (bootstrap, migration, gate troubleshooting).
+- **Multi-AC scrutiny** (primary focus):
+  - **T-003 (AC-3+AC-5)** — architecture seed 3 — bootstrap scaffold shares lib with audience structure.
+  - **T-004 (AC-3+AC-4+AC-8)** — architecture seed 4 — execute step 23 sub-steps share execute.md surface.
+  - **T-005 (AC-4+AC-7)** — architecture seed 5 — release delta gate + enforce toggle share release.md.
+  - **T-007 (AC-5+AC-6)** — architecture seed 7 — path reframe serves both audience separation and validator split.
+  - **T-009+T-010 (AC-9)** — architecture seeds 9+10 — contract subtests vs parity manifest sequential.
+- **Non-goals confirmed**: no combined framework+project README; no US-0091 extension to project root; no S5 prose deletion; no FRAMEWORK_KIT_REPO consumer default; no its_magic/README.md removal; documentation + contract-test scope only at plan-verify.
+- **Artifacts**: **`sprints/S0087/plan-verify.json`** (PENDING), **`handoffs/qa_plan_verify.md`** (this row), **`docs/product/backlog.md`** (**`## US-0097`** `sprint_plan_notes`), **`handoffs/tl_to_dev.md`**, **`handoffs/resume_brief.md`**, **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260613-01-architecture-tech-lead-20260613T220000Z-US0097`**, **`proof_hash=b7d05f95dbd672954a1ed8f6167827a6ea03efbb25239f734bf1366b1bf9cc1b`**.
+- **Decision-gate posture**: **none** — plan pre-check satisfies architecture `# US-0097` + **DEC-0083** contracts pending QA verification.
+- **Canonical status**: **`US-0097`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0087`** / **`US-0097`**.
+
+## Next — **`S0086` / `US-0096`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0086/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-13T06:00:00Z`, **qa**, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=qa-S0086-US0096-plan-verify-20260613T060000Z-fresh`); **AC-1..AC-12** surjective via **T-001..T-012** with **task-seed bijection** (12 architecture seeds → 12 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=12`, `ac_count=12`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0096`**, **`R-0082`**, **`DEC-0082`**, **DEC-0052**, **DEC-0062**, **DEC-0054**, **DEC-0080**, **DEC-0081**, **US-0053**, **US-0095**, **BUG-0012**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — DELIVERY_MODE + LEAN_* + AUTO_DELIVERY_ROUTING scratchpad keys + verbatim non-substitution paragraph.
+  - **AC-2 / T-003**: PASS — standard byte-compatible full chain + baseline marker preservation test.
+  - **AC-3 / T-002**: PASS — Tranche A caps 1000/650/3000, narrow-read all phase commands, delta handoffs, touch-graph.
+  - **AC-4 / T-004**: PASS — ultra_lean spec→plan→build+verify→ship; AUTO_IMPLEMENTATION_LOOP inside build+verify.
+  - **AC-5 / T-005, T-006**: PASS — pack.json schema v1 + active-context.md hot index; non-triad lock.
+  - **AC-6 / T-007**: PASS — mega_quick /quick routing + seven MEGA_QUICK_* fail-closed codes.
+  - **AC-7 / T-003**: PASS — resolver step 0 before DEC-0052; breadcrumbs delivery_mode, resolved_phase_plan, memory_layer.
+  - **AC-8 / T-008**: PASS — AUTO_DELIVERY_ROUTING + optional backlog delivery_mode field + precedence chain.
+  - **AC-9 / T-009**: PASS — quality floor checklist + LEAN_MEMORY_DISABLED fail-closed gates.
+  - **AC-10 / T-010, T-011**: PASS — eight test_us0096_* subtests + US0096_PAIRS parity + harness §26Q.
+  - **AC-11 / T-012**: PASS — runbook operator recipes (when to use each mode).
+  - **AC-12 / T-012**: PASS — delivery_mode in run_class_hash + token-cost evidence column.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-003 (AC-7+AC-2)** — **ACCEPTED**: architecture seed 3 — mode-scoped resolver step 0 and standard reinstatement guard share `auto.md` + reference surfaces.
+  - **T-005+T-006 (AC-5)** — **ACCEPTED**: architecture seeds 5+6 — warm pack validator vs hot active-context index are distinct surfaces under one AC.
+  - **T-010+T-011 (AC-10)** — **ACCEPTED**: architecture seeds 10+11 — contract subtests vs parity manifest are sequential but same AC; execute ordering T-010 before T-011 explicit.
+  - **T-012 (AC-11+AC-12)** — **ACCEPTED**: architecture seed 12 — runbook recipes and run-class/token evidence share runbook + reference surfaces.
+- **Non-goals confirmed**: no mandatory lean mode; no DELIVERY_MODE substituting TOKEN_PROFILE/CAVEMAN_MODE; no active-context triad membership; no mid-story mode switch; no native-chain weakening; no test_us0095_*/test_bug0012_* regression under standard; documentation + contract-test scope only; no implementation in plan-verify phase.
+- **Artifacts**: **`sprints/S0086/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`## US-0096`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260612-01-plan-verify-qa-20260613T060000Z-S0086-US0096`**, **`proof_hash=58898711bf0552eb3680e983929048198e250397b166b81985b46fc94dc11eb9`**, **`proof_issued_at=2026-06-13T06:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260612-01-sprint-plan-tech-lead-20260613T050000Z-S0086-US0096`**, **`proof_hash=adcb3764f037aae8cb35a9616bf588542e47666d4e5dddaea61a96d1181c1bd2`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# US-0096` + **DEC-0082** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`US-0096`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0086`** / **`US-0096`**.
+
+## Next — **`S0086` / `US-0096`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0086/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-13T05:00:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=tl-S0086-US0096-sprint-plan-20260613T050000Z-fresh`); **AC-1..AC-12** mapped surjectively to **T-001..T-012**; plan integrity pre-check (`task_count=12`, `ac_count=12`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0096`**, **`R-0082`**, **`DEC-0082`**, **DEC-0052**, **DEC-0062**, **DEC-0054**, **DEC-0080**, **DEC-0081**, **US-0053**, **US-0095**, **BUG-0012**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001**: DELIVERY_MODE + LEAN_* scratchpad keys + non-substitution paragraph.
+  - **AC-2 / T-003**: standard byte-compatible full chain + baseline marker preservation test.
+  - **AC-3 / T-002**: Tranche A caps 1000/650/3000, narrow-read all phase commands, delta handoffs, touch-graph.
+  - **AC-4 / T-004**: ultra_lean spec→plan→build+verify→ship; AUTO_IMPLEMENTATION_LOOP inside build+verify.
+  - **AC-5 / T-005, T-006**: pack.json schema v1 + active-context.md hot index; non-triad lock.
+  - **AC-6 / T-007**: mega_quick /quick routing + seven MEGA_QUICK_* fail-closed codes.
+  - **AC-7 / T-003**: resolver step 0 before DEC-0052; breadcrumbs delivery_mode, resolved_phase_plan, memory_layer.
+  - **AC-8 / T-008**: AUTO_DELIVERY_ROUTING + optional backlog delivery_mode field + precedence chain.
+  - **AC-9 / T-009**: quality floor checklist + LEAN_MEMORY_DISABLED fail-closed gates.
+  - **AC-10 / T-010, T-011**: eight test_us0096_* subtests + US0096_PAIRS parity + harness §26Q.
+  - **AC-11 / T-012**: runbook operator recipes (when to use each mode).
+  - **AC-12 / T-012**: delivery_mode in run_class_hash + token-cost evidence column.
+- **Non-goals to confirm**: no mandatory lean mode; no DELIVERY_MODE substituting TOKEN_PROFILE/CAVEMAN_MODE; no active-context triad membership; no mid-story mode switch; no native-chain weakening; no test_us0095_*/test_bug0012_* regression under standard.
+- **Artifacts**: **`sprints/S0086/sprint.md`**, **`sprints/S0086/tasks.md`**, **`sprints/S0086/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`** (S0086 handoff), **`docs/product/backlog.md`** (**`## US-0096`** `sprint_plan_notes`), **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260612-01-sprint-plan-tech-lead-20260613T050000Z-S0086-US0096`**, **`proof_hash=adcb3764f037aae8cb35a9616bf588542e47666d4e5dddaea61a96d1181c1bd2`**, **`proof_issued_at=2026-06-13T05:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=sprint-plan`**, **`role=tech-lead`**.
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260612-01-architecture-tech-lead-20260613T040000Z-US0096`**, **`proof_hash=1c530587d7b202c9a3ac979f71a980ff2533e8ff07e895d558b49cf851a0e8d8`**.
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0096` + **DEC-0082** contracts.
+- **Canonical status**: **`US-0096`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0086`** / **`US-0096`**.
+
+## Next — **`S0085` / `BUG-0012`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0085/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-12T22:45:00Z`, **qa**, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=qa-S0085-BUG0012-plan-verify-20260612T224500Z-fresh`); **AC-1..AC-8** surjective via **T-001..T-008** with **task-seed bijection** (8 architecture seeds → 8 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=8`, `ac_count=8`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# BUG-0012`**, **`R-0083`**, **DEC-0081** (binding), **DEC-0080** (amended enforcement only), **DEC-0078**, **BUG-0006**, **DEC-0069**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — orchestrator MUST Task-spawn mandate + actor distinction table; required doc literals locked.
+  - **AC-2 / T-002**: PASS — `native chain supersedes Option B`; US-0088 Option B scoped to NATIVE_CHAIN_UNAVAILABLE / headless fallback.
+  - **AC-3 / T-003**: PASS — drain-advance step 6→7 immediate spawn; no operator stop between; forbidden segment-exhausted terminal when continuation pending.
+  - **AC-4 / T-003, T-004**: PASS — `native_chain_continuing` + `drain_advance_action` breadcrumb semantics documented.
+  - **AC-5 / T-005**: PASS — four `test_bug0012_*` contract subtests; `pytest -k bug0012`; preserve `test_us0095_*` green.
+  - **AC-6 / T-006**: PASS — forbidden-prose negative grep in full_autonomy normative blocks; DEC-0078 unchanged.
+  - **AC-7 / T-004**: PASS — resume_brief DEC-0069 pairing: orchestrator MUST Task-spawn — not operator re-`/auto`.
+  - **AC-8 / T-007, T-008**: PASS — runbook § BUG-0012 regression verify E2E + template parity `--scope=bug-0012` + DEC linkage assert.
+- **Non-goals confirmed**: no spawn-only weakening; no **DEC-0078** hard-gate relaxation; no outer-driver removal; no **US-0095** contract test regression; documentation + contract-test scope only; no implementation in plan-verify phase.
+- **Artifacts**: **`sprints/S0085/plan-verify.json`** (PASS update), **`handoffs/qa_plan_verify.md`** (this row flip), **`docs/product/backlog.md`** (**`### BUG-0012`** `plan_verify_notes` append), **`handoffs/resume_brief.md`** (new top pointer → `/execute`), **`docs/engineering/state.md`** (Plan-verify checkpoint + isolation + strict proof).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260612-01-plan-verify-qa-20260612T224500Z-S0085-BUG0012`**, **`proof_hash=ddb6b303cfd0e9959ed2e25258cbbceb5d5e3711c3cff1062e3a043dd122b299`**, **`proof_issued_at=2026-06-12T22:45:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260612-01-sprint-plan-tech-lead-20260612T223000Z-S0085-BUG0012`**, **`proof_hash=5810e6f73ca2f2803bfe81724e7edc8ac71eebe476921729f2b5ee6b0cb0b172`**.
+- **Decision-gate posture**: **none** — plan satisfies architecture `# BUG-0012` + **DEC-0081** contracts; **`/execute`** unblocked.
+- **Canonical status**: **`BUG-0012`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); closure at **`/release`**.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0085`** / **`BUG-0012`**.
+
+## Next — **`S0085` / `BUG-0012`** (**PENDING** — superseded)
+
+- **Verdict**: **PENDING** — **`sprints/S0085/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-12T22:30:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260612-01`, `fresh_context_marker=tl-S0085-BUG0012-sprint-plan-20260612T223000Z-fresh`); **AC-1..AC-8** mapped surjectively to **T-001..T-008**; plan integrity pre-check (`task_count=8`, `ac_count=8`, `task_ac_bijection=false`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# BUG-0012`**, **`R-0083`**, **`DEC-0081`**, **DEC-0080** (amended enforcement only), **DEC-0078**, **BUG-0006**, **DEC-0069**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001**: Orchestrator MUST Task-spawn mandate + actor distinction.
+  - **AC-2 / T-002**: Native chain supersedes Option B; US-0088 Option B scoped to fallback.
+  - **AC-3 / T-003**: Drain-advance step 7 no-stop between steps 6–7.
+  - **AC-4 / T-003, T-004**: Continuation-truth breadcrumbs (`native_chain_continuing`, `drain_advance_action`).
+  - **AC-5 / T-005**: Four `test_bug0012_*` contract subtests (`pytest -k bug0012`).
+  - **AC-6 / T-006**: Forbidden-prose negative grep in full_autonomy normative blocks.
+  - **AC-7 / T-004**: resume_brief orchestrator spawn pairing (**DEC-0069**).
+  - **AC-8 / T-007, T-008**: Runbook multi-segment E2E + template parity `--scope=bug-0012`.
+- **Non-goals to confirm**: no spawn-only weakening; no **DEC-0078** hard-gate relaxation; no outer-driver removal; no **US-0095** contract test regression; documentation + contract-test scope only.
+- **Artifacts**: **`sprints/S0085/sprint.md`**, **`sprints/S0085/tasks.md`**, **`sprints/S0085/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`** (S0085 handoff), **`docs/product/backlog.md`** (**`### BUG-0012`** `sprint_plan_notes`), **`docs/engineering/state.md`** (Sprint-plan checkpoint).
+- **Strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260612-01-sprint-plan-tech-lead-20260612T223000Z-S0085-BUG0012`**, **`proof_hash=5810e6f73ca2f2803bfe81724e7edc8ac71eebe476921729f2b5ee6b0cb0b172`**, **`proof_issued_at=2026-06-12T22:30:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=sprint-plan`**, **`role=tech-lead`**.
+- **Prior strict proof** (architecture phase): **`runtime_proof_id=rp-auto-20260612-01-architecture-tech-lead-20260612T220000Z-BUG0012`**, **`proof_hash=256afcc1a148be2b2a8180decc9769cd8ed0dbf8ff1aa1f3a904c3e1281af5a9`**.
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# BUG-0012` + **DEC-0081** contracts.
+- **Canonical status**: **`BUG-0012`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0085`** / **`BUG-0012`**.
+
 ## Next — **`S0084` / `US-0095`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0084/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-07T20:30:00Z`, **qa**, `orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=qa-S0084-US0095-plan-verify-20260607T203000Z-fresh`); **AC-1..AC-10** map **1:1** to **T-001..T-010** with all coverage rows `verified=true`; plan integrity confirmed (`task_count=10`, `ac_count=10`, `task_ac_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0095`**, **`R-0081`**, **DEC-0080** (binding), **DEC-0078** (composed, not rewritten), **DEC-0069**, **BUG-0006**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.

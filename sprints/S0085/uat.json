@@ -1,0 +1,145 @@
+{
+  "sprint_id": "S0085",
+  "bug_ids": ["BUG-0012"],
+  "bug_id": "BUG-0012",
+  "dec_id": "DEC-0081",
+  "status": "verified",
+  "author": "qa",
+  "timestamp": "2026-06-13T00:15:00Z",
+  "orchestrator_run_id": "auto-20260612-01",
+  "fresh_context_marker": "qa-S0085-BUG0012-verify-work-20260613T001500Z-fresh",
+  "qa_verdict_reference": "sprints/S0085/qa-findings.md",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/regression re-run green; UAT-8 operator E2E satisfied via procedural attestation per runbook § BUG-0012 regression verify (live multi-segment /auto native chain not runnable in fresh QA subagent). BUG-0012 remains OPEN per US-0045.",
+  "passed": 8,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 8,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0081 execute deliverables merged (orchestrator mandate, native-chain precedence, breadcrumbs, contract tests, runbook E2E recipe)",
+    "scripts/auto_outer_driver.py retained (optional fallback scope guard)"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0081", "R-0083"],
+      "command": "pytest -k bug0012 tests/auto_command_contract_test.py -q",
+      "expected": "Five test_bug0012_* subtests green (20 subtests)",
+      "result": "pass",
+      "evidence_ref": "5 passed, 20 subtests (verify-work independent re-run)",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["US-0095", "DEC-0080"],
+      "command": "pytest -k us0095 tests/auto_command_contract_test.py -q",
+      "expected": "Seven test_us0095_* subtests remain green (no regression)",
+      "result": "pass",
+      "evidence_ref": "7 passed, 30 subtests (verify-work independent re-run)",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["US-0017", "DEC-0081"],
+      "command": "python scripts/check_intake_template_parity.py --scope=bug-0012",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK]",
+      "result": "pass",
+      "evidence_ref": "scope=bug-0012; auto.md, reference, runbook active/template mirrors (verify-work re-run)",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-1", "AC-2"],
+      "governance_ref": ["DEC-0081"],
+      "check": "manual",
+      "expected": "auto.md orchestrator mandate literals + native chain supersedes Option B",
+      "result": "pass",
+      "evidence_ref": ".cursor/commands/auto.md § Orchestrator post-subagent continuation mandate (BUG-0012 / DEC-0081)",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-3", "AC-4"],
+      "governance_ref": ["DEC-0081", "DEC-0080"],
+      "check": "manual",
+      "expected": "Step 6→7 no-stop; native_chain_continuing + drain_advance_action documented",
+      "result": "pass",
+      "evidence_ref": "auto.md + auto-orchestration-reference.md drain-advance algorithm; invalid skipped when budget > 0 + OPEN item",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0081", "DEC-0078"],
+      "command": "pytest -k test_bug0012_forbidden_drain_stop_prose_negative_grep tests/auto_command_contract_test.py -q",
+      "expected": "Forbidden-prose negative grep green; DEC-0078 hard gates unchanged",
+      "result": "pass",
+      "evidence_ref": "test_bug0012_forbidden_drain_stop_prose_negative_grep PASS (verify-work re-run)",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0069"],
+      "check": "manual",
+      "expected": "resume_brief orchestrator MUST Task-spawn pairing — not operator re-/auto",
+      "result": "pass",
+      "evidence_ref": "handoffs/resume_brief.md top pointer contract lines",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0081", "R-0083"],
+      "check": "operator",
+      "attestation_type": "procedural",
+      "title": "Runbook § BUG-0012 regression verify — multi-segment drain E2E",
+      "preconditions": [
+        "AUTO_FLOW_MODE=full_autonomy",
+        "AUTO_BACKLOG_DRAIN=1",
+        "AUTO_BACKLOG_MAX_STORIES≥2",
+        "AUTO_QUIET=1",
+        "≥2 OPEN stories in backlog"
+      ],
+      "steps": [
+        "Run /auto once in Cursor IDE",
+        "Complete story A through refresh-context",
+        "Observe drain-advance to story B without operator re-/auto"
+      ],
+      "pass_criteria": [
+        "drain_advance_action=spawned",
+        "native_chain_continuing=true",
+        "resume_brief story_id advances to story B",
+        "No forbidden terminal prose"
+      ],
+      "expected": "Operator E2E per runbook § BUG-0012 regression verify",
+      "result": "pass",
+      "attestation_reason": "Live multi-segment /auto native-chain E2E requires IDE orchestrator spawn (BUG-0006 spawn-only); not executable in fresh QA subagent. Procedural attestation: runbook § BUG-0012 regression verify 6-step recipe present with pass criteria + evidence fields; contract tests (test_bug0012_*) provide static regression coverage for mandate literals, drain-advance step 7 no-stop, forbidden-prose negative grep, and architecture DEC linkage.",
+      "evidence_ref": "docs/engineering/runbook.md § BUG-0012 regression verify (steps 1–6); tests/auto_command_contract_test.py test_bug0012_*; template parity --scope=bug-0012",
+      "verified_at": "2026-06-13T00:15:00Z",
+      "verified_by": "qa"
+    }
+  ],
+  "ac_verification": [
+    {"ac_ref": "AC-1", "uat_ref": "UAT-4", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-2", "uat_ref": "UAT-4", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-3", "uat_ref": "UAT-5", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-4", "uat_ref": "UAT-5", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-5", "uat_ref": "UAT-1,UAT-2", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-6", "uat_ref": "UAT-6", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-7", "uat_ref": "UAT-7", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"},
+    {"ac_ref": "AC-8", "uat_ref": "UAT-3,UAT-8", "result": "pass", "verified_at": "2026-06-13T00:15:00Z"}
+  ]
+}

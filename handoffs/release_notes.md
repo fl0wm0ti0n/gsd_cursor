@@ -13,10 +13,77 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0084`
-- **Latest canonical notes:** `handoffs/releases/S0084-release-notes.md`
-- **Latest release date:** 2026-06-07
-- **Latest release work item:** US-0095
+- **Latest released sprint:** `S0090`
+- **Latest canonical notes:** `handoffs/releases/S0090-release-notes.md`
+- **Latest release date:** 2026-06-15
+- **Latest release work item:** US-0100
+
+## Release finalized note (S0090)
+
+- Sprint: `S0090`
+- Story: `US-0100` (version-scoped release changelog + GitHub `-F` attachment — DEC-0085 / R-0087)
+- Release: **finalized** (`2026-06-15T08:00:00Z`, `orchestrator_run_id=auto-20260615-01`, strict proof `proof_hash=92e55de82e4089435f4a6b3229e3233bbc2a4c4fd4aca5675313b8d7638d1d85`)
+- Queue: **`handoffs/release_queue.md`** row **`S0090`** = **`released`**
+- **Run / verify:** `pytest -k us0100 tests/auto_command_contract_test.py -v` → 10 passed; `python scripts/release_changelog_validate.py --repo .` → exit 0 warn (enforce notes legacy semver rows pending backfill); see **`handoffs/releases/S0090-release-notes.md`** **## Run** / **## Verify**
+- Changelog: step **19** appended **US-0100** under **`CHANGELOG.md`** **`[Unreleased]`** (workflow-only; no semver)
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **6** remaining
+
+## Release finalized note (S0089)
+
+- Sprint: `S0089`
+- Story: `US-0099` (auto-bootstrap dev-environment profile on install/upgrade — DEC-0084 amended § bootstrap posture / R-0086)
+- Release: **finalized** (`2026-06-14T23:30:00Z`, `orchestrator_run_id=auto-20260614-01`, strict proof `proof_hash=907a95ae387d71891aa3d7c86a9c39a164451f3a75966567d61344a3fba22cda`)
+- Queue: **`handoffs/release_queue.md`** row **`S0089`** = **`released`**
+- **Run / verify:** `pytest -k us0099 tests/auto_command_contract_test.py -v` → 7 passed; `python scripts/dev_environment_lib.py --self-test` → `[DEV_ENVIRONMENT_SELF_TEST_OK]`; see **`handoffs/releases/S0089-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **7** remaining
+
+## Release finalized note (S0088)
+
+- Sprint: `S0088`
+- Story: `US-0098` (dev environment auto-launch profile — DEC-0084 / R-0085)
+- Release: **finalized** (`2026-06-14T12:30:00Z`, `orchestrator_run_id=auto-20260613-01`, strict proof `proof_hash=be1986208496cb2ac1947b34f1b4cea458851f39c88146eb04ba85c8fd009dd5`)
+- Queue: **`handoffs/release_queue.md`** row **`S0088`** = **`released`**
+- **Run / verify:** `pytest -k us0098 tests/auto_command_contract_test.py -v` → 8 passed; `python scripts/dev_environment_lib.py --self-test` → `[DEV_ENVIRONMENT_SELF_TEST_OK]`; see **`handoffs/releases/S0088-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **8** remaining
+
+## Release finalized note (S0087)
+
+- Sprint: `S0087`
+- Story: `US-0097` (project-owned root README bootstrap — DEC-0083 / R-0084)
+- Release: **finalized** (`2026-06-14T04:30:00Z`, `orchestrator_run_id=auto-20260613-01`, strict proof `proof_hash=008ad6a2f2d8c6dd7b1ee5c32145936445e9a33627ed3ed90dc545cc5d468530`)
+- Queue: **`handoffs/release_queue.md`** row **`S0087`** = **`released`**
+- **Run / verify:** `pytest -k us0097 tests/auto_command_contract_test.py -v` → 8 passed; `python scripts/validate_project_readme_coverage.py --self-test` → `[PROJECT_README_COVERAGE_SELF_TEST_OK]`; see **`handoffs/releases/S0087-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio next OPEN **US-0098**; backlog drain budget **9** remaining
+
+## Release finalized note (S0086)
+
+- Sprint: `S0086`
+- Story: `US-0096` (delivery modes: ultra-lean + mega-quick — DEC-0082 / R-0082)
+- Release: **finalized** (`2026-06-13T16:00:00Z`, `orchestrator_run_id=auto-20260612-01`, strict proof `proof_hash=20f59d2ac3731ab4dfdf67925e5b630bf208dc4c20c84892702b537619dc30b1`)
+- Queue: **`handoffs/release_queue.md`** row **`S0086`** = **`released`**
+- **Run / verify:** `pytest -k "us0096 or us0095 or bug0012" tests/auto_command_contract_test.py -v` → 20 passed; `python scripts/check_intake_template_parity.py --scope=us-0096` → `[INTAKE_TEMPLATE_PARITY_OK]`; see **`handoffs/releases/S0086-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **8** remaining
+
+## Release finalized note (S0085)
+
+- Sprint: `S0085`
+- Bug: `BUG-0012` (native-chain drain-advance enforcement — DEC-0081 / R-0083)
+- Release: **finalized** (`2026-06-13T01:30:00Z`, `orchestrator_run_id=auto-20260612-01`, strict proof `proof_hash=44b55cf523c1c6721f1b9e359e683a9216379d5b314f401b0a722f667f51afe2`)
+- Queue: **`handoffs/release_queue.md`** row **`S0085`** = **`released`**
+- **Run / verify:** `pytest -k "bug0012 or us0095" tests/auto_command_contract_test.py -v` → 12 passed; `python scripts/check_intake_template_parity.py --scope=bug-0012` → `[INTAKE_TEMPLATE_PARITY_OK]`; see **`handoffs/releases/S0085-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** — **no** automated publish without explicit operator confirmation (`publish_snapshot=skipped_pending_operator_confirm`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; bug queue **empty**; portfolio next OPEN **US-0096**
 
 ## Release finalized note (S0084)
 
@@ -299,16 +366,16 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0084`**: refer to `## Run` in
-  `handoffs/releases/S0084-release-notes.md`.
-- **Endpoint + port:** Refer to `## Connect` in
-  `handoffs/releases/S0084-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0090`**: `pytest -k us0100 tests/auto_command_contract_test.py -v` — refer to `## Run` in
+  `handoffs/releases/S0090-release-notes.md`.
+- **Endpoint + port:** N/A (release documentation layer) — refer to `## Connect` in
+  `handoffs/releases/S0090-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0084-release-notes.md`.
+  `handoffs/releases/S0090-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0084-release-notes.md` (env-ref only).
+  `handoffs/releases/S0090-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0084-release-notes.md`.
+  `handoffs/releases/S0090-release-notes.md`.
 
 ## Historical references
 

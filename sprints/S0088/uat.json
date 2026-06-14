@@ -1,0 +1,141 @@
+{
+  "sprint_id": "S0088",
+  "story_ids": ["US-0098"],
+  "story_id": "US-0098",
+  "dec_id": "DEC-0084",
+  "status": "verified",
+  "author": "qa",
+  "timestamp": "2026-06-14T11:00:00Z",
+  "orchestrator_run_id": "auto-20260613-01",
+  "fresh_context_marker": "qa-S0088-US0098-qa-20260614T110000Z-fresh",
+  "verify_work_executed_at": "2026-06-14T12:00:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0088-US0098-verify-work-20260614T120000Z-fresh",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/regression re-run green; UAT-1..UAT-10 confirmed; UAT-10 procedural attestation per runbook § Dev environment auto-launch; US-0098 remains OPEN per US-0045.",
+  "qa_verdict_reference": "sprints/S0088/qa-findings.md",
+  "qa_verdict": "PASS",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 10,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0084 execute deliverables merged (dev_environment_lib.py, execute step 24, template parity)",
+    "scripts/dev_environment_lib.py present active + template mirrors"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k us0098_dev_auto_launch_scratchpad tests/auto_command_contract_test.py -q",
+      "expected": "DEV_AUTO_LAUNCH_PROFILE + DEV_ENVIRONMENT_CONFIG documented; default off",
+      "result": "pass",
+      "evidence_ref": "test_us0098_dev_auto_launch_scratchpad_keys green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0084", "US-0085"],
+      "command": "pytest -k us0098_dev_environment_schema tests/auto_command_contract_test.py -q",
+      "expected": "Example path + gitignore + schema v1 fields; names-only secret refs",
+      "result": "pass",
+      "evidence_ref": "test_us0098_dev_environment_schema_contract green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3", "AC-6"],
+      "governance_ref": ["DEC-0084", "US-0086"],
+      "command": "pytest -k us0098_detection_mode tests/auto_command_contract_test.py -q",
+      "expected": "Four detection modes + US-0086 precedence over docker-host-local",
+      "result": "pass",
+      "evidence_ref": "test_us0098_detection_mode_precedence_literals green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4", "AC-7"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k 'us0098_execute or us0098_refresh' tests/auto_command_contract_test.py -q",
+      "expected": "Execute step 24a-24d literals + refresh dev environment whole phrase",
+      "result": "pass",
+      "evidence_ref": "test_us0098_execute_step24_literals + test_us0098_refresh_dev_environment_phrase_literal green",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0084", "US-0064"],
+      "command": "pytest -k us0098_connect_block tests/auto_command_contract_test.py -q",
+      "expected": "Connect block mandatory field names; no secret values",
+      "result": "pass",
+      "evidence_ref": "test_us0098_connect_block_field_literals green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0084", "US-0064", "US-0086"],
+      "command": "pytest -k us0098_us0086_compose tests/auto_command_contract_test.py -q",
+      "expected": "release-targets.json schema unchanged",
+      "result": "pass",
+      "evidence_ref": "test_us0098_us0086_compose_no_schema_change green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0084"],
+      "command": "pytest -k us0098_reason_code tests/auto_command_contract_test.py -q",
+      "expected": "DEV_ENV_PROFILE_* + DEV_ENV_RELAUNCH_* reason-code inventory",
+      "result": "pass",
+      "evidence_ref": "test_us0098_reason_code_inventory green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["DEC-0084"],
+      "command": "python scripts/dev_environment_lib.py --self-test",
+      "expected": "[DEV_ENVIRONMENT_SELF_TEST_OK]",
+      "result": "pass",
+      "evidence_ref": "Helper self-test green (QA re-run)",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["US-0017", "DEC-0084"],
+      "command": "python scripts/check_intake_template_parity.py --scope=dev-environment",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK]",
+      "result": "pass",
+      "evidence_ref": "scope=dev-environment; DEV_ENVIRONMENT_PAIRS (8 surfaces) active/template mirrors",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["DEC-0084", "R-0085"],
+      "command": "Manual: runbook § Dev environment auto-launch + architecture # US-0098",
+      "expected": "Operator recipes table + troubleshooting + commands block",
+      "result": "pass",
+      "evidence_ref": "runbook § Dev environment auto-launch (US-0098 / DEC-0084) operator recipes present",
+      "verified_at": "2026-06-14T12:00:00Z",
+      "verified_by": "verify-work"
+    }
+  ],
+  "probe_results": []
+}

@@ -8,1664 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0077: Documentation audience profiles and dual README strategy
-
-## Overview
-
-**`US-0077`** adds **merged-scratchpad** (**`DEC-0055`**) controls **`DOC_AUDIENCE_PROFILE`**
-and **`DOC_DETAIL_LEVEL`** so documentation generation and validation produce deterministic,
-audience-appropriate output. **`R-0054`** supplies the **9-cell** semantic-key matrix;
-**`DEC-0059`** locks paths, split rules, reason codes, validator location, and migration
-defaults.
-
-## Profile semantics
-
-- **Dimensions**: `DOC_AUDIENCE_PROFILE` ∈ {`user`, `developer`, `both`} ×
-  `DOC_DETAIL_LEVEL` ∈ {`concise`, `balanced`, `technical-deep`}.
-- **Inputs**: **merged** scratchpad only (local → materialized baseline → example); invalid
-  combination values → **`DOC_PROFILE_INVALID`**; merge failure → **`DOC_PROFILE_MERGE_ERROR`**.
-- **Optional modes**: `SPEC_PACK_MODE` / `USER_GUIDE_MODE` are **additive** only — validators
-  must not require their artifacts when **0** (**`R-0054`** §6).
-- **Required keys per cell**: same **semantic key** sets as **`R-0054`** matrix (USER_* and
-  DEV_* vocabulary); architecture adds **normative H2 literals** below for resolver binding.
-
-## Artifact ownership
-
-| Artifact | Role |
-|----------|------|
-| **`README.md`** (repo root) | **User channel** — all **`USER_*`** keys required for the resolved cell when profile audience includes **`user`**. |
-| **`docs/developer/README.md`** | **Developer channel** — all **`DEV_*`** keys required when audience includes **`developer`** or **`both`**. |
-| **`docs/engineering/runbook.md`** | **US-0030** command surface — unchanged; README may link into runbook; no profile-driven rewriting of runbook keys in this story. |
-| **`docs/user-guides/US-xxxx.md`** | **US-0032** when enabled. |
-| Spec-pack paths | **US-0031** when enabled. |
-
-Cross-links from README to developer shard or runbook are allowed; **authoritative** section
-bodies for **`DEV_*`** keys must not live in root README when the cell requires the developer
-shard (**`DEC-0059`** §3).
-
-## README split strategy
-
-- **Canonical layout**: **two files** — root **`README.md`** + **`docs/developer/README.md`**.
-- **`both` × `concise` / `balanced` / `technical-deep`**: user vs developer keys **split** per
-  **`R-0054`**; **`technical-deep`** forbids inlining full **`DEV_*`** bodies in root (pointers
-  only).
-- **`developer` × \***: **`DEV_*`** content **only** in developer shard; root may include one
-  minimal pointer section.
-- **H2 budgets** (root README, user-facing body): follow **`R-0054`** table; overflow →
-  **`DOC_SECTION_BUDGET_EXCEEDED`**.
-
-## Semantic keys → canonical H2 titles (validator)
-
-Exact heading text (Markdown `## …`) — execute phase implements resolver with trim/normalize
-only; renames require updating this table and tests together.
-
-**User channel (`README.md`)**
-
-| Key | H2 title |
-|-----|----------|
-| `USER_PURPOSE` | `Purpose` |
-| `USER_QUICKSTART` | `Quickstart` |
-| `USER_EXAMPLES` | `Examples` |
-| `USER_TROUBLESHOOTING` | `Troubleshooting` |
-| `USER_LIMITATIONS` | `Limitations` |
-| `USER_RELATED_DOCS` | `Related documentation` |
-
-**Developer channel (`docs/developer/README.md`)**
-
-| Key | H2 title |
-|-----|----------|
-| `DEV_PREREQS` | `Prerequisites` |
-| `DEV_WORKFLOW` | `Workflow` |
-| `DEV_QUALITY_GATES` | `Quality gates` |
-| `DEV_ARCHITECTURE` | `Architecture notes` |
-| `DEV_CONTRACTS` | `Contracts and interfaces` |
-| `DEV_DECISIONS` | `Engineering decisions` |
-
-Optional root pointer for developer-audience navigation (not a semantic-key substitute):
-`## Contributing` with a single link line to **`docs/developer/README.md`** — does not count
-toward **`DEV_*`** satisfaction.
-
-## Validator and test strategy
-
-1. **Script**: **`scripts/validate_doc_profile.py`** — loads merged scratchpad via
-   **`installer.py`** merge (**`DEC-0058`** pattern); resolves cell; checks parse gates,
-   completeness (**`DOC_SECTION_MISSING:<key>`**), H2 counts (**`DOC_SECTION_BUDGET_EXCEEDED`**),
-   and **active + `template/`** mirror paths for the same logical files (**`DOC_TEMPLATE_PARITY_FAIL`**).
-2. **Tests**: **`tests/run-tests.ps1`** / **`.sh`** invoke Tier **A/B/C** fixtures per **`R-0054`**
-   (**`AC-8`**): three anchor snapshots, table-driven remaining cells, wiring smoke per
-   audience at **`balanced`** depth.
-3. **CI cost**: full 9× heavy generation is **not** required every run — resolver + fixture
-   trees prove matrix coverage.
-4. **US-0071**: validator and generator stdout/stderr use reason codes; markdown bodies on
-   scanned surfaces stay within metadata guard allowlists (**extend** in execute if new tools
-   emit planning tokens).
-
-## Migration constraints
-
-- **Defaults**: template/example scratchpad documents **`both`** + **`balanced`** as the
-  framework recommendation; **absent keys** on merged scratchpad follow **`DEC-0059`** §6
-  transition rule (treat as **`both`×`balanced`** for resolver until CI mandates explicit
-  keys).
-- **Repos without `docs/developer/README.md`**: must add it before claiming **`developer`** or
-  **`both`** cells in validation; no silent split — generator/docs updates are **non-destructive**
-  (relocate content deliberately, do not drop).
-- **Installer/template**: when the framework ships the developer shard, update
-  **`docs/engineering/context/installer-owned-paths.manifest`** (and **`template/`** mirror)
-  per **`US-0030`** parity.
-
-## Decision linkage
-
-- Research basis: **`R-0054`**
-- Decision: **`DEC-0059`**
-
----
-
-# US-0078: Enforced interactive intake question evidence
-
-## Overview
-
-**`US-0078`** closes the gap between **`DEC-0050`** pack semantics and **provable** in-session questioning/confirmation. Intake MUST NOT persist backlog/acceptance changes unless each required pack topic has **`topic_coverage`** with a valid **`ref`**, **`asked_topics`** aligns with default asked-vs-covered rules, and assumption confirmations carry **`assumption_confirmation_ref`**. Research **`R-0055`** is normative for validation rules and **`AC-8`** fixtures; decision **`DEC-0060`** locks **`ref`** format and migration.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A — Policy text only | Rely on prompts/runbook | Rejected — silent persistence remains possible. |
-| B — Heuristic inference | Infer coverage from model summaries | Rejected — not auditable; fails AC-1/AC-2. |
-| C — Structured evidence + gate | **`topic_coverage`** + deterministic validator | **Chosen** — matches **`R-0055`** / **`DEC-0060`**. |
-
-## Evidence model (runtime)
-
-Persisted bundle (location: inline intake handoff block, sidecar JSON, or equivalent — execute chooses storage; validator consumes the same logical shape):
-
-| Field | Role |
-|-------|------|
-| `selected_pack` | `first-intake-pack` \| `small-intake-pack` |
-| `asked_topics` | Required keys actually **prompted** in-session |
-| `missing_topics` | Unsatisfied keys at gate (empty when pass) |
-| `topic_coverage` | One row per required key: `topic_key`, `satisfied_by`, `ref` |
-| `satisfied_by` | `answer_ref` \| `assumption_confirmation_ref` |
-| `ref` | **`ie:`** binding per **`DEC-0060`** §4 |
-| `assumptions_confirmed` | Literal field per **`DEC-0050`** |
-| `assumption_confirmation_ref` | Required for affirmative assumptions |
-
-**Invariant**: “answered” set = keys in `topic_coverage`; audits compare to `asked_topics` per **`R-0055`** rule 3 (default fail-closed).
-
-## Validation pipeline (deterministic)
-
-1. Resolve `required_keys` from `selected_pack` (**`DEC-0050`** / intake command lists).
-2. Validate each required key has a `topic_coverage` row with parseable **`ie:`** `ref` and matching metadata.
-3. Enforce asked-vs-covered (default: every covered key ∈ `asked_topics`).
-4. Enforce assumption literal + `assumption_confirmation_ref` (**`R-0055`** rules 4–5).
-5. On failure: emit `INTAKE_REQUIRED_TOPIC_MISSING`, `INTAKE_REQUIRED_PACK_INCOMPLETE`, `INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`, and/or umbrella `INTAKE_PERSISTENCE_BLOCKED`; **abort writes**.
-
-**Modes**: **`INTAKE_GUIDED_MODE=1`** and **`0`** both run the pipeline; low-touch does not bypass the gate.
-
-## Workflow integration
-
-| Phase | Behavior |
-|-------|----------|
-| `/intake` | Emit questions/prompts; accumulate `asked_topics` and coverage rows; gate before persistence. |
-| `/execute` | Implement validator, persistence ordering, and tests per **`DEC-0060`** + **`R-0055`**. |
-| `/qa` | Verify negative paths and reason codes; scan for bypass of persistence hook. |
-| Docs | Active + `template/` parity for intake/runbook/README (**AC-9**). |
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Friction for operators | Targeted diagnostics (**AC-7**); bounded prompts. |
-| `ref` implementation drift | Single parser module + **`AC-8`** golden vectors. |
-| Legacy stories without coverage | **`DEC-0060`** grandfather read-only until next intake touch supplies full evidence. |
-
-## Tests strategy (**AC-8**)
-
-Follow **`R-0055`** matrix (P1–P5): Tier A unit tests on synthetic `intake_evidence`; Tier B golden markdown snippets; Tier C dual-mode smoke (`INTAKE_GUIDED_MODE` ∈ {0,1}).
-
-## Migration
-
-Per **`DEC-0060`** §5: no silent partial writes; optional backfill tools are explicit and out of band.
-
-## Decision linkage
-
-- Research basis: **`R-0055`**
-- Decision: **`DEC-0060`** (extends **`DEC-0050`**)
-
----
-
-# US-0079: First-class bug issue workflow (`BUG-xxxx`)
-
-## Overview
-
-**`US-0079`** introduces a **second canonical work-item family** for defects: **`BUG-####`** with **`OPEN`/`DONE`** only, explicit intake routing, minimum reproducibility fields, and parallel **`US-0045`** reconciliation. Research **`R-0056`** informs field and test guidance; **`DEC-0061`** is normative for literals, routing signals, storage, and migration.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A — Track bugs as `US-xxxx` | Single artifact shape | Rejected — conflates feature intent and defects. |
-| B — Full triage / SLA | Enterprise defect model | Rejected — explicit out of scope. |
-| C — `BUG-xxxx` + lightweight lifecycle | Dedicated id + `OPEN`/`DONE` | **Chosen** — aligns with **`R-0056`** / **`DEC-0061`**. |
-
-## Architecture surfaces
-
-| Surface | Behavior |
-|---------|----------|
-| **`docs/product/backlog.md`** | Section **`## Bug issues (canonical)`**; append new bugs; sort by id; status in header. |
-| **`docs/product/acceptance.md`** | Section **`## Bug acceptance (canonical)`** per **`DEC-0061`** §8 — portfolio checkboxes for **`BUG-xxxx`**. |
-| Intake | **`INTAKE_WORK_ITEM_KIND`** (`story`/`bug`) **and/or** explicit **`/intake bug`**; fail closed without signal (**`DEC-0061`** §5). |
-| Sprint / QA / release | Same traceability row style as **`US-0042`**; **`BUG-xxxx`** allowed alongside **`US-xxxx`**. |
-| **`/ask`** | Extend id-family allowlists to **`BUG-####`**. |
-
-## Schema (minimum)
-
-**`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`** (non-empty). Optional **`related_us`**, **`blocks_us`**, **`duplicate_of`**, **`supersedes`**.
-
-## Phase boundary visibility
-
-Per **`DEC-0061`** §13: when a phase mutates bug records, **optional** **`bug_ids=<csv>`** on **`state.md`** phase boundary entries improves **US-0070 AC-10** inspectability without requiring backlog parses.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Duplicate US + BUG for same defect | **`duplicate_of`/`supersedes`**; routing fail-closed; docs in **`DEC-0061`**. |
-| Validator drift | Single module + **`R-0056`** Tier A fixtures. |
-| File size | Default single backlog section; optional split only per **`DEC-0061`** §2. |
-
-## Tests strategy
-
-Follow **`R-0056`** Tier A–D mapping to **AC-1..AC-10** (routing, schema, reconciliation, traceability spot-checks).
-
-## Migration
-
-Grandfather **`US-xxxx`**-only historical defects (**`DEC-0061`** §11); new work uses **`BUG-xxxx`** post-delivery.
-
-## Decision linkage
-
-- Research basis: **`R-0056`**
-- Decision: **`DEC-0061`**
-
----
-
-# US-0080: Token-cost hardening for orchestrated runs
-
-## Overview
-
-**`US-0080`** reduces **cache-read-equivalent** token volume for long `/auto` and phase-command runs by **structural** levers: slimmer repeated command/policy surfaces, **bounded phase-context** inputs, and **auditable** per-run metrics — without disabling cache, removing gates, or weakening **`US-0048`**, **`US-0056`**, **`US-0069`**, or **`US-0039`**. Research **`R-0057`** motivates vendor-aligned semantics; **`DEC-0062`** is normative for metric names, **`run_class_hash`**, evidence paths, parity manifest, and AC-10 trade-offs.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A — Rely on pricing / cache tolerance | No engineering change | Rejected — fails measurable AC-1/AC-2. |
-| B — `TOKEN_PROFILE=lean` only | Scratchpad profile | Rejected — insufficient alone (**`R-0057`**). |
-| C — Slimming + bounded context + committed metrics | Structural + auditable | **Chosen** — aligns with backlog and **`DEC-0062`**. |
-
-## Metric and comparison model
-
-- **Fields**: **`cache_read_tokens`**, **`input_tokens`**, **`output_tokens`**, **`phase_call_count`** per phase; optional **`cache_creation_tokens`**, **`orchestrator_call_estimate`**; host mapping per **`DEC-0062`** §1.
-- **Comparable runs**: Same **`run_class_hash`** over the canonical tuple (**`DEC-0062`** §2): `story_id`, merged **`TOKEN_PROFILE`**, **`SECURITY_REVIEW`**, **`phase_policy_mode`**, ordered **`resolved_phase_plan`**, resume anchor triple.
-- **AC-2 target**: ≥ **50%** reduction in **total run `cache_read_tokens`** vs baseline for the **same `run_class_hash`**, with gates unchanged.
-
-## Evidence and observability
-
-- **Append-only** **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** (or **`.jsonl`**) as canonical audit trail; **`docs/engineering/state.md`** carries **`token_cost_evidence_ref`** pointer (**`DEC-0062`** §3, §7).
-- IDE usage panes remain **supplementary**.
-
-## Slimming and parity
-
-- **Active + `template/`** parity for touched **`.cursor/commands/`**, **`.cursor/rules/`**, and mirrored template paths — enforced via **`DEC-0062`** §5 manifest + CI extension beyond scratchpad-only checks.
-- **AC-4**: Phase handoffs stay within bounded context packs; **no** removal of mandatory isolation, strict-proof, role, or release evidence fields from governed surfaces.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Over-slimming hides policy | Deep links + runbook; AC-8 command-behavior tests |
-| Metric gaming / wrong baselines | **`run_class_hash`** equality rule; **`TOKEN_COST_RUN_CLASS_MISMATCH`** |
-| Template drift | Versioned parity manifest + checks |
-
-## Tests strategy (**AC-8**)
-
-Regression coverage for: command/rule behavior parity after slimming; **`tests/auto_command_contract_test.py`** (slim **`/auto`** contract markers); **`tests/token_cost_fixtures_test.py`** + **`tests/fixtures/token_cost/`** for **`run_class_hash`** + **`token_cost_compare.py`** CLI; **`python scripts/check_token_cost_parity.py --repo .`** (manifest-listed paths); **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** §26M.
-
-## Decision linkage
-
-- Research basis: **`R-0057`**
-- Decision: **`DEC-0062`**
-
----
-
-# BUG-0001: Intake gate script install completeness
-
-## Overview
-
-**`BUG-0001`** fixes **missing mandatory `/intake` gate scripts** in packaged installs: consumers receive **`template/`** from npm/Chocolatey/Homebrew paths, but **`template/scripts/`** omitted the three **`intake_*`** modules that exist in repo **`scripts/`**. **`DEC-0063`** is normative for ship path, **`package.json` `files`** policy, parity tests, and **`US-0018`** upgrade delivery. Research **`R-0058`** bounds minimal payload and installer **`SOURCE_ROOT`** behavior.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A — Publish via **`files`** only (repo **`scripts/`** root) | Skips **`template/scripts/`** | **Rejected** — PS1/SH installers copy **`template/`** only (**`R-0058`**). |
-| B — Full **`scripts/`** mirror into **`template/scripts/`** | Maximum parity | **Rejected** — violates intake-only completeness scope. |
-| C — Three-file **`template/scripts/`** mirror + parity checks | Minimal + testable | **Chosen** — **`DEC-0063`**. |
-
-## Minimal architecture
-
-1. **Authoritative consumer layout**: **`template/scripts/intake_evidence_validate.py`**, **`intake_evidence_lib.py`**, **`intake_bug_routing_guard.py`** — content-aligned with repo **`scripts/`** (**`DEC-0063`** §1).
-2. **npm manifest**: **`template/`** subtree remains the primary ship vehicle; optional explicit **`scripts/intake_*.py`** **`files`** entries only as redundant documentation (**`DEC-0063`** §2).
-3. **Verification**: **`scripts/check_intake_template_parity.py`** (intake trio + checker self-pair) and **`tests/intake_template_parity_fixtures_test.py`**, wired in **`tests/run-tests.*`** §26N; active/**`template/`** byte sync for those paths.
-4. **Upgrade**: **`installer-owned-paths.manifest`** lists the intake modules (and parity checker) under **`scripts/`** so **`installer.ps1` / `installer.sh`** copy them on fresh install and **`--mode upgrade`** (default **`framework`** classification for `scripts/*.py` not under user-data prefixes).
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Copy drift | Parity gate; same PR for both trees when changing intake modules |
-| Upgrade misses new files | Sprint AC covers **`--mode upgrade`** evidence |
-
-## Tests strategy
-
-- **S0060**: **`check_intake_template_parity.py`** + **`tests/intake_template_parity_fixtures_test.py`** (see **`sprints/S0060/summary.md`**).
-- Installer / lifecycle tests as sprint defines (align **`US-0041`** / **`US-0008`** where overlap).
-
-## Decision linkage
-
-- Research basis: **`R-0058`**
-- Decision: **`DEC-0063`**
-- Related: **`DEC-0061`** (bug schema), **`US-0018`** (upgrade)
-
----
-
-# US-0081: First-intake full-plan coverage and story-map gate
-
-## Overview
-
-**`US-0081`** adds a deterministic persistence gate for first/new/broad intake so major plan areas cannot be silently dropped. Intake must persist a normalized **`plan_area_inventory`** and complete coverage bindings (**`plan_area_id -> story_id[] | deferred_ref`**) before backlog write. **`R-0059`** supplies the pattern baseline; **`DEC-0064`** is normative for contract fields, fail codes, and verification policy.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A - Keep decomposition guidance only | Human-only quality check | Rejected - non-deterministic; misses AC-2/AC-7. |
-| B - Auto-generate stories for all areas | Maximum automation | Rejected - overreaches; low signal in ambiguous intake. |
-| C - Mandatory coverage map gate (chosen) | Deterministic + bounded + auditable | **Chosen** - simplest approach that still enforces complete-plan accounting. |
-
-## Deterministic approach
-
-1. **Scope trigger**: Apply gate when intake is first/new/broad (detected by existing intake policy path and explicit intake context).
-2. **Normalize plan inventory**: Build canonical **`plan_area_inventory[]`** with stable **`plan_area_id`** ordering and deterministic text normalization.
-3. **Require total mapping**: Every **`plan_area_id`** must resolve to either:
-   - non-empty **`story_ids[]`**, or
-   - explicit **`deferred_ref`** with bounded rationale.
-4. **Fail closed before persistence**: Any uncovered major area blocks backlog mutation under **`INTAKE_PERSISTENCE_BLOCKED`** with specific subcode.
-5. **Status authority preserved**: Story status remains canonical in **`docs/product/backlog.md`** per **`US-0045`**.
-
-## Data contract additions
-
-- Intake evidence payload gains:
-  - **`plan_area_inventory`**: array of `{ plan_area_id, title, description, priority_hint? }`
-  - **`plan_area_coverage`**: array of `{ plan_area_id, story_ids?, deferred_ref?, deferred_reason? }`
-  - **`coverage_complete`**: boolean derived by validator (must be `true` to persist)
-  - **`coverage_validation_ref`**: deterministic validator trace id/hash reference
-- Contract invariants:
-  - each **`plan_area_id`** appears exactly once in inventory and coverage
-  - each coverage row has exactly one path: `story_ids` xor `deferred_ref`
-  - `story_ids` values must exist in the candidate story set for this intake write
-
-## Fail codes (deterministic)
-
-- **`INTAKE_PERSISTENCE_BLOCKED`** (umbrella)
-- **`INTAKE_PLAN_COVERAGE_MISSING`**: one or more major plan areas unmapped
-- **`INTAKE_PLAN_AREA_ID_INVALID`**: malformed or duplicate `plan_area_id`
-- **`INTAKE_PLAN_COVERAGE_CONTRACT_INVALID`**: contract shape/xor invariant violated
-- **`INTAKE_PLAN_DEFERRED_REF_MISSING`**: defer selected without required reference
-
-## Verification strategy
-
-- **Unit fixtures**: pass/fail/defer matrices for canonical coverage cases (AC-10).
-- **Contract validator tests**: deterministic ordering, id uniqueness, xor enforcement.
-- **Policy-path tests**: low-touch and guided intake both enforce gate for first/new/broad scope (AC-5).
-- **Parity checks**: active + `template/` alignment across intake command, PO guidance, and validator fixtures (AC-9).
-- **Operator guidance checks**: `/ask` and runbook text include coverage-map requirement and fail-code remediation (AC-8).
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Over-classifying "major areas" causes false blocks | Keep bounded area taxonomy with deterministic normalization rules (DEC-0064). |
-| Coverage map drift between prose and artifacts | Validator derives `coverage_complete`; persistence blocked on mismatch. |
-| Policy/document drift between active and template | Explicit parity fixtures in AC-9 test scope. |
-
-## Decision linkage
-
-- Research basis: **`R-0059`**
-- Decision: **`DEC-0064`**
-
----
-
-# US-0082: Agent-driven codebase map bootstrap
-
-## Overview
-
-**`US-0082`** ensures fresh repos can rely on `docs/engineering/codebase-map.md` through deterministic workflow ownership, while preserving **`/map-codebase`** as an explicit manual command. **`R-0060`** frames vendor practice (rules/docs as primary context) vs repo-owned map artifacts; **`DEC-0065`** locks lifecycle gates, idempotency, ownership, diagnostics, and parity expectations.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A - Guidance-only | Runbook reminders, no lifecycle hook | Rejected — misses **AC-1** for unattended bootstrap. |
-| B - Generate on every `/auto` phase | Maximum automation | Rejected — churn / **`state.md`** noise (**R-0060**). |
-| C - CI-only | Fail pipeline without map | Rejected as sole owner — late signal; still needs **AC-1** lifecycle naming. |
-| D - Phase-gated + manual (chosen) | **`/architecture`** primary; optional **`/refresh-context`**; **`/map-codebase`** manual | **Chosen** — minimal automation that meets ACs and respects **DEC-0052**. |
-
-## Deterministic approach
-
-1. **Primary lifecycle point**: **`/architecture`** completion (**tech-lead**) — ensure map exists or deterministic block/skip with diagnostics before **`/sprint-plan`** handoff (sprint implements invocation: command wrapper, script, or documented mandatory step).
-2. **Secondary (policy-gated)**: **`/refresh-context`** may re-materialize or verify map when scratchpad/profile explicitly enables refresh (default off to limit churn).
-3. **Manual path**: **`/map-codebase`** unchanged for explicit operator runs (**AC-2**).
-4. **Idempotency**: Stable ordering; avoid no-op file churn (**AC-3**).
-5. **Ownership**: Same write surfaces as **`/map-codebase`**; **`state.md`** append-only discipline preserved (**AC-4**).
-6. **Diagnostics**: **`CODEBASE_MAP_*`** reason family + remediation (**AC-5**).
-7. **Guidance**: Runbook + **`/ask`** name responsibility locus (**AC-6**).
-8. **Verification**: Active/template parity + fresh / rerun / failure-path tests (**AC-7**, **AC-8**).
-9. **Compatibility**: Non-destructive treatment of existing maps (**AC-9**).
-10. **Traceability**: **`BUG-0002`** closed as mismatch; this story owns implementation (**AC-10**).
-
-## Fail codes (deterministic vocabulary)
-
-- **`CODEBASE_MAP_MISSING`** — expected artifact absent at lifecycle checkpoint.
-- **`CODEBASE_MAP_BLOCKED:<subreason>`** — generation blocked (permissions, policy, profile skip); subreason bounded in sprint.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Custom phase plans skip architecture | Diagnostics + optional CI guard (**DEC-0065** §9). |
-| Overwriting local map customizations | Idempotent merge / section-stable refresh; destructive modes out of scope unless explicit. |
-| Active/template drift | Parity manifest or existing test patterns for commands/rules (**AC-7**). |
-
-## Decision linkage
-
-- Research basis: **`R-0060`**
-- Decision: **`DEC-0065`**
-- Related: **`US-0001`** (command exists), **`BUG-0002`** (closed), **`DEC-0052`** (phase profiles)
-
----
-
-# BUG-0003: Deterministic installer completeness in `missing`/`upgrade`
-
-## Overview
-
-**`BUG-0003`** closes a mode-specific installer trust gap where framework scripts may remain absent after `missing` and `upgrade` runs. **`R-0061`** confirms branch logic parity across `installer.ps1`, `installer.sh`, and `installer.py`; root cause is required-inventory omission (`scripts/enforce-triad-hot-surface.py`) from `docs/engineering/context/installer-owned-paths.manifest`. **`DEC-0066`** locks the minimal fix: manifest-authoritative required script inventory plus deterministic post-install completeness checks and parity tests.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A - Keep current flow + operator reminders | No structural change | Rejected - allows silent incompleteness recurrence. |
-| B - Hard-code required scripts in PS1/SH/PY | Explicit lists per installer | Rejected - highest maintenance and parity drift risk. |
-| C - Manifest as single source + shared completeness validator (chosen) | Minimal, deterministic, testable | **Chosen** - simplest path that satisfies bug acceptance and parity constraints. |
-
-## Deterministic approach
-
-1. **Single required inventory source**: `docs/engineering/context/installer-owned-paths.manifest` owns required framework script paths for install completeness checks.
-2. **Required path inclusion**: ensure `scripts/enforce-triad-hot-surface.py` is included in installer-owned install scope with paired clean ownership policy.
-3. **Post-install invariant**: after mode-specific copy/classification logic, validate all required script paths exist; fail closed on missing entries.
-4. **Stable diagnostics**: emit deterministic reason codes (`INSTALL_COMPLETENESS_FAILED`, `INSTALL_REQUIRED_SCRIPT_MISSING:<path>`) with remediation pointing to manifest parity/update path.
-5. **Parity-safe implementation**: prefer shared completeness logic in `installer.py` with wrappers (`installer.ps1`, `installer.sh`) consuming the same contract.
-6. **Status authority preserved**: `BUG-0003` remains **OPEN** in `docs/product/backlog.md` until execute/qa/verify-work/release close-out (**US-0045**).
-
-## Verification strategy
-
-- **Positive matrix**: `missing` and `upgrade` both produce complete required script set after install.
-- **Negative matrix**: intentionally remove required script from staged source and assert deterministic fail code.
-- **Parity matrix**: active + `template/` installer surfaces and manifest remain aligned.
-- **Symmetry matrix**: install include and clean path ownership stay paired for required scripts.
-- **Regression entrypoints**: extend installer-focused tests and lifecycle smoke checks referenced by sprint tasks.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Future manifest omissions reintroduce silent misses | Required inventory checks + regression fixtures tied to manifest updates. |
-| Divergent wrapper behavior across platforms | Shared Python validation contract and wrapper reuse. |
-| Over-blocking custom repos | Limit completeness gate to installer-owned framework paths. |
-| Install/clean mismatch | Explicit paired review and test coverage for `install_include_paths` + `clean_paths`. |
-
-## Decision linkage
-
-- Research basis: **`R-0061`**
-- Decision: **`DEC-0066`**
-- Related: **`BUG-0001`**, **`US-0018`**, **`US-0045`**, **`DEC-0038`**
-
----
-
-# BUG-0004: POSIX-safe installer shell startup for Unix CLI path
-
-## Overview
-
-**`BUG-0004`** addresses startup failure in Linux shell environments where installer execution aborts with `set: Illegal option -`. Research **`R-0063`** confirms Unix CLI flow (`bin/its-magic.js`) executes installer via `sh installer.sh`, so installer startup must remain POSIX-`sh` compatible and avoid bash-only `set` semantics. **`DEC-0068`** is normative for invocation/compatibility boundaries and regression requirements.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A - Force bash invocation in CLI | `bash installer.sh` on Unix | Rejected - adds dependency and weakens portability. |
-| B - Dynamic shell detection and launcher branching | choose shell at runtime | Rejected - more complexity than needed for defect scope. |
-| C - Keep `sh` contract and enforce POSIX-safe startup (chosen) | minimal and deterministic | **Chosen** - preserves current CLI behavior and fixes failure root. |
-
-## Deterministic approach
-
-1. **Unix launcher contract unchanged**: keep `bin/its-magic.js` Unix execution path via `spawnSync("sh", ...)`.
-2. **Startup option safety**: `installer.sh` startup path must use POSIX-safe `set` options only (`set -e` baseline); no unconditional bash-only flags.
-3. **Failure prevention**: startup must not fail on `/bin/sh` variants due to option incompatibility.
-4. **Status authority preserved**: `BUG-0004` remains **OPEN** in `docs/product/backlog.md` until sprint delivery closes verification/release chain (**US-0045**).
-
-## Verification strategy
-
-- **Direct `sh` matrix**:
-  - `sh installer.sh --target <tmp> --mode missing --create`
-  - `sh installer.sh --target <tmp> --mode upgrade`
-- **CLI Unix matrix**:
-  - `node bin/its-magic.js --target <tmp> --mode missing --create`
-- **Non-regression matrix**:
-  - install completeness checks and existing manifest-governed behavior remain intact.
-- **Parity matrix**:
-  - retain consistent installer behavior expectations across wrapper paths and test harness coverage.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Bash-only options reintroduced later | Keep explicit `sh`-path regression coverage in shared tests. |
-| Local shell mismatch hides regressions | Verify both direct `sh` and CLI invocation paths in deterministic tests. |
-| Scope drift into unrelated resume bugs | Keep this architecture bounded to shell startup compatibility (`BUG-0005` tracked separately). |
-
-## Decision linkage
-
-- Research basis: **`R-0063`**
-- Decision: **`DEC-0068`**
-- Related: **`BUG-0005`**, **`US-0008`**, **`US-0018`**, **`US-0045`**
-
----
-
-# BUG-0005: `resume_brief` refresh at bug-intake boundary for `/auto` resume
-
-## Overview
-
-**`BUG-0005`** addresses **`RESUME_BRIEF_STALE`** on **`/auto`** immediately after canonical **`/intake bug`** persistence: the resume brief can still describe a pre-intake cycle (for example **`intake`**) while the backlog already reflects a new OPEN bug. Deterministic **`/auto`** precedence (**`start-from`** → parseable **`resume_brief`** → **`state.md`**) intentionally **does not** silently ignore a present-but-stale brief. **`R-0064`** and **`DEC-0069`** lock the fix as **intake-time refresh** of **`handoffs/resume_brief.md`** so normal **`/intake bug` → `/auto`** does not false-trigger stale-resume, without weakening fail-fast.
-
-## Contracts (normative)
-
-1. **Intake completion obligation**: On successful bug intake persistence (**`US-0045`**), the intake writer **must** refresh **`handoffs/resume_brief.md`** with **`bug_id`**, **`intended_resume_phase=discovery`** (default OPEN-bug continuation), boundary **`orchestrator_run_id`** / timestamp when known, and intake evidence pointer when present.
-2. **Precedence unchanged**: Explicit **`start-from`** overrides; parseable brief is evaluated before **`state.md`**; stale/unparseable/ambiguous briefs **fail fast** (**`RESUME_BRIEF_STALE`**, etc.) — no silent fallback when a stale brief is present.
-3. **Backlog authority**: Brief content **must not** contradict **`docs/product/backlog.md`** status facts for the referenced **`bug_id`**.
-4. **Optional self-heal**: Orchestrator-side reconciliation is **not** normative for **`BUG-0005`**; any future self-heal requires strict predicates, idempotency, **`state.md` audit**, and a separate decision (**`DEC-0069`** §4).
-
-## Affected artifacts
-
-- **`handoffs/resume_brief.md`** — primary handoff surface refreshed at intake boundary.
-- **`docs/engineering/state.md`** — phase breadcrumbs and auto continuation checkpoints remain authoritative for history; they do not replace a parseable brief in precedence order.
-- **`.cursor/commands/intake.md`** (and **`template/`** parity) — normative command surface for implementing intake-time refresh.
-- **`docs/engineering/auto-orchestration-reference.md`** / **`.cursor/commands/auto.md`** — precedence and fail-fast codes remain source of truth; **`DEC-0069`** adds intake-side obligation only.
-
-## Acceptance / architecture alignment
-
-- Satisfies **`BUG-0005`** expected behavior: after intake, **`/auto`** resolves a valid next phase without requiring manual **`start-from`** for the normal path.
-- Preserves **`US-0045`** canonical status and **`US-0070` / `DEC-0052`** phase-plan materialization (default next phase after bug intake is **`discovery`** unless product documents an exception).
-- Regression matrix: **`R-0064`** table (**five scenarios**) is minimum QA/sprint coverage.
-
-## Decision linkage
-
-- Research basis: **`R-0064`**
-- Decision: **`DEC-0069`**
-- Related: **`US-0037`**, **`US-0045`**, **`US-0070`**, **`US-0080`**, **`DEC-0038`** (strict-proof continuity on phase boundaries)
-
----
-
-# US-0083: Explicit delegable intake topics without weakening fail-closed semantics
-
-## Overview
-
-**`US-0083`** adds a bounded, auditable delegation path for unresolved required intake topics so users can explicitly delegate a decision and continue, while preserving the existing fail-closed gate for non-delegated gaps. **`R-0062`** recommends the smallest viable extension: keep the current `topic_coverage` contract and add a third `satisfied_by` branch with strict evidence requirements. **`DEC-0067`** is normative for schema, validator branching, reason codes, and parity scope.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A - Keep current strict-only gate | No delegation branch | Rejected - preserves safety but fails AC-2/AC-3 user intent. |
-| B - Global delegation toggle for all missing topics | One switch to bypass missing required topics | Rejected - too broad, increases implicit bypass risk. |
-| C - Topic-scoped delegation branch in existing rows (chosen) | Minimal schema extension with explicit evidence per topic | **Chosen** - simplest path that preserves deterministic fail-closed semantics. |
-
-## Deterministic approach
-
-1. **Topic-row contract extension**: allow `topic_coverage[].satisfied_by=delegation_ref` in addition to existing `answer_ref` and `assumption_confirmation_ref`.
-2. **Required delegation fields**: when `satisfied_by=delegation_ref`, require:
-   - `delegation_scope` (bounded decision area),
-   - `delegation_rationale` (why delegation is chosen),
-   - `delegation_confidence` (`low|medium|high`).
-3. **Evidence binding**: delegation rows must still carry a valid `ie:` `ref` and explicit `quoted_user_text`; hash verification remains deterministic and includes the delegated branch literal.
-4. **Validator branch behavior**:
-   - non-delegated unresolved required topic -> unchanged fail-closed path (`INTAKE_REQUIRED_TOPIC_MISSING`, optional `INTAKE_REQUIRED_PACK_INCOMPLETE`, umbrella `INTAKE_PERSISTENCE_BLOCKED`);
-   - delegated topic with complete evidence -> passes as covered;
-   - delegated topic with missing/malformed evidence -> fail closed with delegation-specific deterministic reason codes under `INTAKE_PERSISTENCE_BLOCKED`.
-5. **Mode parity**: guided and low-touch intake use the same validation pipeline; delegation does not introduce mode-specific bypass behavior.
-6. **Status authority unchanged**: canonical story status remains in `docs/product/backlog.md` (**`US-0045`**); `US-0083` stays `OPEN` through architecture.
-
-## Fail codes (deterministic vocabulary)
-
-- **`INTAKE_DELEGATION_EVIDENCE_MISSING`** - delegated topic is missing one or more required delegation fields.
-- **`INTAKE_DELEGATION_EVIDENCE_INVALID`** - delegated topic has invalid field values or invalid/mismatched `ie:` evidence binding.
-- **`INTAKE_PERSISTENCE_BLOCKED`** (umbrella) - retained for all blocked persistence outcomes.
-
-## Verification strategy
-
-- Delegated pass fixtures: required-topic rows with `delegation_ref` and complete evidence succeed.
-- Non-delegated block fixtures: unresolved required topics without delegation remain blocked with existing codes.
-- Delegated block fixtures: malformed/missing delegation fields fail with deterministic delegation codes.
-- Parity fixtures: active + `template/` alignment for intake command/rules/validator surfaces.
-- Mode parity fixtures: guided and low-touch produce the same validation outcome for equivalent evidence bundles.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Delegation becomes implicit bypass | Require explicit `delegation_ref` + `ie:`-bound user quote; no global toggle. |
-| Schema drift across active/template | Include parity checks and mirrored fixtures in sprint scope. |
-| Over-complex delegated metadata recreates intake friction | Keep metadata minimal (`scope`, `rationale`, `confidence`) only. |
-| Downstream consumers treat delegated items as resolved facts | Preserve delegated marker and rationale in persisted evidence and handoffs. |
-
-## Decision linkage
-
-- Research basis: **`R-0062`**
-- Decision: **`DEC-0067`**
-- Related: **`US-0068`**, **`US-0078`**, **`US-0045`**, **`DEC-0050`**, **`DEC-0060`**
-
----
-
-# US-0084: POSIX npm installer + Linux remote test targets (WSL / SSH / Docker)
-
-## Overview
-
-**`US-0084`** locks how the **published** npm **`installer.sh`** stays safe under Debian **`/bin/sh`** (often **dash**), how **LF** shell entrypoints are enforced in the publish path, and how dev/QA aim work at **WSL**, bare **SSH Linux**, or **Docker-over-SSH** using the **existing** **`US-0064`** contract (**`docs/engineering/release-targets.json`**, **`docs/engineering/runtime-connectivity.md`**) — no parallel remote schema. Research basis: **`R-0067`**.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | Bash-only installer (`#!/usr/bin/env bash`, bash **`set`** flags) | **Rejected** — conflicts with **AC-1** / global npm **`sh`** path. |
-| B | New remote JSON schema beside **`release-targets.json`** | **Rejected** — **AC-4** / **US-0064** alignment only. |
-| C | POSIX **`sh`** startup + LF guards + doc map + optional **`scripts/`** helper (**chosen**) | **Chosen** — minimal delta vs repo today; **`R-0067`** confirms active **`installer.sh`** already uses **`set -e`** only on the unconditional path. |
-
-## Published `installer.sh`: POSIX, dash, and LF (**AC-1**)
-
-1. **Shebang and startup**: Keep **`#!/usr/bin/env sh`** and **only** POSIX-safe options on the unconditional startup block (today: **`set -e`** at **`installer.sh:2`**; preserve **BUG-0004** guard comment). **Forbidden** on that path: **`set -u`**, **`pipefail`**, **`set -o …`** bash-only bundles, or any **`set`** line that dash rejects.
-2. **Single shipped copy**: **`package.json`** **`files`** ships root **`installer.sh`** (no in-repo **`template/installer.sh`** today). Architecture treats **git HEAD = publish source of truth**; any future mirrored **`template/`** copy triggers the same parity rules as other template mirrors.
-3. **LF enforcement**: Add repo root **`.gitattributes`** with `*.sh text eol=lf` (and any other packaged shell entrypoints the sprint lists) so Windows checkouts do not silently CRLF the publish artifact. Complement with a **deterministic** check that rejects **`\\r`** in **`installer.sh`** (Python byte scan is sufficient on all maintainer OSes — **R-0067**).
-4. **Invocation reality**: **`bin/its-magic.js`** spawns **`sh`** + package **`installer.sh`** on non-Windows — architecture does not change that contract; it requires the file on disk to remain dash-parseable.
-
-## CI / prepublish guard shape (**AC-2**)
-
-Layered gates (sprint may implement subset if documented, but **preferred full stack**):
-
-| Layer | Purpose | Notes |
-|-------|---------|-------|
-| **Python regression** | Extend **`tests/installer_shell_bug0004_test.py`** (or successor): forbid **`set -euo`** / **`pipefail`** substrings; keep **`sh`** / CLI smokes. | Windows-friendly without **dash** on **`PATH`**. |
-| **`dash -n`** | Syntax check under dash when **`dash`** exists (**CI** or dev opt-in). | **Skip with explicit reason** on runners without **`dash`** (**R-0067** open question); do not silently drop **AC-2** — document skip vs hard in runbook. |
-| **`prepublishOnly`** (optional) | Run the same LF + token + (if available) **`dash -n`** gate before **`npm pack`/`publish`**. | Defense in depth for tarball-only mistakes. |
-
-**Sprint deliverable**: at least one **CI** step **or** **`prepublishOnly`** path that **fails closed** on CRLF in **`installer.sh`** + forbidden **`set`** patterns; **`dash -n`** when the environment provides **`dash`**.
-
-## Remote documentation map — **US-0064** alignment (**AC-4**, **AC-9**)
-
-Canonical table for operator docs (runbook / developer guide); **no new keys** in **`release-targets.json`**.
-
-| Operator path | Maps to | Scratchpad / config cues |
-|---------------|---------|---------------------------|
-| **WSL** | Local Linux kernel on the dev machine — run **`sh`/`dash`** and repo tests **inside WSL**; not a separate **`release-targets`** row by default. | Same repo; cite **environment label** in evidence (**AC-6**). |
-| **Bare SSH Linux** | **`ssh-server`** target (**`release-targets.json`**: **`hostEnv`**, **`userEnv`**, **`authEnv`**, **`remoteCommand`**, **`runtime`**, ingress). | **`REMOTE_EXECUTION`**, **`REMOTE_CONFIG=.cursor/remote.json`** per **`.cursor/scratchpad.md`**; validate shape against **`runtime-connectivity.md`**. |
-| **Docker-over-SSH** | **`ssh-server.dockerOverSsh`** — **`dockerHostEnv`**, **`dockerContextEnv`**, **`composeFile`**, **`service`** + operator **`DOCKER_HOST`** / context docs. | Cross-link **`runtime-connectivity.md`** **`docker_over_ssh`** summary (**`R-0067`**). |
-
-## Helper script contract (**AC-5**, **AC-7**, **AC-10**)
-
-- **Path / name**: **`scripts/remote_config_summary.py`** (Python 3, consistent with existing **`scripts/`** validators).
-- **Inputs**: **`--config`** default **`REMOTE_CONFIG`** env or **`.cursor/remote.json`**; read-only; no network side effects.
-- **Stdout**: **non-secret** summary only — target **label** (e.g. **`ssh-server`**), **host** as **env var name** and/or **“set / unset”** presence flags, **user** env name, **identity file path string** (path ref only, **never** key material), optional **`dockerOverSsh`** **enabled** flag and **env names**. **Do not** print resolved secret **values** (**R-0067** residual risk).
-- **Stderr**: human-readable failure reason (deterministic prefix optional).
-- **Exit codes** (locked for harness fixtures):
-  - **0** — OK (config readable and shape acceptable for documented **US-0064** patterns).
-  - **1** — usage / CLI error.
-  - **2** — config file missing or unreadable.
-  - **3** — invalid JSON.
-  - **4** — schema / required-field mismatch vs documented **US-0064** operator contract (not a second schema — “doc conformance” check).
-  - **5** — **`REMOTE_EXECUTION=0`** fast exit / intentionally skipped validation (if product chooses “no-op when remote off”; otherwise map no-op to **0** — sprint **`decisions.md`** must record the chosen branch).
-
-## `/execute`, `/qa`, and runbook cues (**AC-3**, **AC-6**)
-
-- **`docs/engineering/runbook.md`**: extend **REMOTE_EXECUTION** section (~**783+**) with **troubleshooting** — **`set: Illegal option -`**, **CRLF vs LF**, **`sh` vs `bash`**, **`dos2unix`**, reinstall from fixed version; pointer to **`installer.sh`** POSIX rules above.
-- **Handoffs / evidence**: when **`REMOTE_EXECUTION=1`**, cite **environment label** (e.g. **`WSL`**, **`ssh:<hostEnv>`**, **`dockerOverSsh`**) and **never** paste secrets or key bodies (**AC-7**).
-
-## Test harness rows (**AC-2**, **AC-10**)
-
-Register beside existing installer Python tests (**`tests/run-tests.sh`** / **`tests/run-tests.ps1`**, **§26** style per **`R-0067`**):
-
-| Row | Coverage |
-|-----|----------|
-| H1 | **LF** check + forbidden **`set`** tokens on **`installer.sh`** (extends **BUG-0004** test). |
-| H2 | **`dash -n installer.sh`** when **`dash`** available (or documented CI matrix). |
-| H3 | **`remote_config_summary.py`** — fixture **valid** minimal **`.cursor/remote.json`** → exit **0**, expected stdout keys/names only. |
-| H4 | **`remote_config_summary.py`** — fixture **invalid JSON** → exit **3**. |
-| H5 | **`remote_config_summary.py`** — fixture **schema/doc mismatch** → exit **4** (or **2** for missing file — separate fixture). |
-
-## Active + `template/` parity (**AC-8**)
-
-Any new/edited **commands**, **scratchpad examples**, **`.cursor/remote.json`** template snippets, or **runbook** sections must be mirrored under **`template/`** per existing kit parity rules (same literals where the template carries the surface). **`package.json`** changes (e.g. **`prepublishOnly`**) apply to the **shipping** package only — template mirrors **commands/docs** that consumers receive.
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| CI lacks **`dash`** | Documented **skip vs hard**; Python CRLF + substring gates remain mandatory. |
-| Maintainer publish from Windows without local **`dash`** | **`prepublishOnly`** + Python checks; optional CI **`dash`**. |
-| Helper duplicates **`runtime-connectivity.md`** | Helper = **validate + summarize**; prose stays in **`runtime-connectivity.md`** / runbook. |
-| Secret leakage via “debug” print | **Names-only** / presence flags; code review + fixture asserts on stdout. |
-
-## Decision linkage
-
-- Research basis: **`R-0067`**
-- Related: **`US-0064`**, **`US-0036`**, **BUG-0004**, **`docs/engineering/release-targets.json`**, **`docs/engineering/runtime-connectivity.md`**, **`bin/its-magic.js`**, **`package.json`**
-
----
-
-# BUG-0006: `/auto` spawn-only enforcement (orchestrator must not execute phase work)
-
-## Overview
-
-**`BUG-0006`** closes the gap between **process** `/auto` orchestration (US-0080) and operator behavior: the orchestrator role must **only** schedule materialization, spawn fresh **phase-role** subagents, and verify boundaries—it must **not** author phase deliverables or perform phase work in the same context. **`R-0065`** recommends doc-first enforcement plus static regression; this section locks literals, surfaces, and acceptance hooks.
-
-## Locked reason-code vocabulary
-
-| Code | Use | Remediation (operator-facing) |
-|------|-----|-------------------------------|
-| **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** | Attempted direct orchestrator execution of a lifecycle phase (or equivalent “run `architecture` / `execute` / … in orchestrator context”) instead of spawning the required subagent. | Stop; spawn a **fresh** subagent for the canonical **`phase_id`** and **role** per the phase→role matrix (**DEC-0051**); do not merge phase output into orchestrator turns. |
-| **`PHASE_CONTEXT_ISOLATION_VIOLATION`** (existing) | Orchestrator wrote phase artifacts or violated per-phase isolation (**DEC-0029**). | Distinct from spawn failure: isolation applies **after** correct spawn boundary; keep both codes documented side-by-side. |
-| **`RUNTIME_PROOF_*`**, **`PHASE_ROLE_*`**, **`PHASE_POLICY_*`** (existing) | Strict proof, capability, phase-plan failures (**DEC-0038**, **DEC-0052**). | Unchanged; **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** must not overload these families. |
-| **`[AUTO_RESUME_ERROR]`** codes (existing) | Resume precedence / brief / state resolution. | Separate from spawn integrity; no merge of semantics. |
-
-## Technical approach (doc-first, test-backed)
-
-1. **Normative command (active + template)**: **`.cursor/commands/auto.md`** and **`template/.cursor/commands/auto.md`** — strengthen **non-negotiable** language: “spawn fresh subagent per phase,” “orchestrator must not execute phase work / write phase deliverables,” and enumerate **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** in the fail-fast / reason-code excerpt (alongside existing **`PHASE_CONTEXT_ISOLATION_*`** / **`RUNTIME_PROOF_*`** markers).
-2. **Expanded reference**: **`docs/engineering/auto-orchestration-reference.md`** — mirror the spawn-only rule; cross-link **DEC-0029** (isolation) and **DEC-0038** (strict proof) so operators cannot satisfy one gate and ignore the other; document **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** with one-line remediation.
-3. **Regression**: extend **`tests/auto_command_contract_test.py`** with required substrings: spawn-only phrasing, forbidden orchestrator phase execution, literal **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**, and a **negative** check that the slim command does **not** imply in-orchestrator execution of named phases (pattern established in **`R-0065`** matrix rows 1–4).
-4. **Out of scope**: no claim of runtime Cursor product enforcement; no replacement of isolation or proof tuples as subagent launchers.
-
-## Files to touch (execute phase)
-
-| Path | Change |
-|------|--------|
-| **`.cursor/commands/auto.md`** | Spawn-only + **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** + forbidden direct phase execution. |
-| **`template/.cursor/commands/auto.md`** | Parity with active command (same literals where mirrored). |
-| **`docs/engineering/auto-orchestration-reference.md`** | Expanded contract alignment + cross-links + reason code. |
-| **`tests/auto_command_contract_test.py`** | Assertions for new literals and non-contradiction. |
-
-Optional parity: if repo adds an **`auto`** template parity script later, include these paths; until then, **manual or sprint QA** verifies **`template/`** mirror.
-
-## Acceptance hooks
-
-- Contract test **`python tests/auto_command_contract_test.py`** (or full unittest suite per sprint) **PASS** after edits.
-- **`BUG-0006`** **expected** in backlog: fail-fast when spawn boundary violated, with deterministic diagnostics — satisfied by documented **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`** plus existing isolation/proof codes.
-- Canonical status remains **`docs/product/backlog.md`** only (**US-0045**); closure moves to **DONE** only after execute/QA/verify per backlog.
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| Code overlaps **`PHASE_CONTEXT_ISOLATION_VIOLATION`** | Table above + remediation text distinguishes “no spawn” vs “wrong writer.” |
-| Template drift | Edit **`template/.cursor/commands/auto.md`** in the same change set as active **`auto.md`**. |
-| False sense of runtime enforcement | Docs + static tests only; reference states process contract, not IDE automation. |
-
-## Decision linkage
-
-- Research basis: **`R-0065`**
-- Related: **`US-0048`**, **`US-0069`**, **`US-0080`**, **`US-0045`**, **`DEC-0029`**, **`DEC-0038`**, **`DEC-0051`**, **`DEC-0052`**
-
----
-
-# BUG-0007: Intake evidence truthfulness for `asked_topics` / `topic_coverage`
-
-## Overview
-
-**`BUG-0007`** closes the gap where **`scripts/intake_evidence_validate.py`** can return **`[INTAKE_EVIDENCE_VALIDATION_OK]`** on bundles such as **`handoffs/intake_evidence/BUG-0007-intake-20260403.json`** that list a full **`small-intake-pack`** in **`asked_topics`** while every **`topic_coverage`** row uses **`satisfied_by=answer_ref`** with the **same** (or trivially duplicated) **`quoted_user_text`**—i.e. no real per-topic elicitation. **`R-0066`** shows **`validate_intake_evidence`** in **`scripts/intake_evidence_lib.py`** enforces structural pack coverage, **`ie:`** integrity, and **DEC-0060**-aligned bindings, but not semantic distinction of answers across topics. This section locks the minimal validator + contract + test matrix so the exemplar **fails** after implementation while **US-0083** delegation and **equivalent_evidence_ref** paths stay **PASS**.
-
-## Assumption challenge and alternatives
-
-| Option | Idea | Verdict |
-|--------|------|---------|
-| A | Documentation-only reminder in **`/intake`** | **Rejected** — validator already certifies the bad exemplar (**R-0066**). |
-| B | External chat transcript ingestion | **Deferred** — out of repo scope unless product mandates it. |
-| C | Deterministic lib rules + contract + fixtures (**chosen**) | **Chosen** — same validation pipeline for guided and low-touch; fail-closed subcodes under **`INTAKE_PERSISTENCE_BLOCKED`**. |
-
-**Residual risk**: Duplicate-text heuristics alone do not prove a “question was asked”; optional future **`question_*`** fields or stronger artifacts may be needed. Document any grandfathering in sprint **`decisions.md`** if legacy bundles must migrate.
-
-## Locked technical approach
-
-### 1) Core validation (`scripts/intake_evidence_lib.py`)
-
-Extend **`validate_intake_evidence`** (and shared helpers the lib owns) with deterministic rules applied **after** existing **`ie:`** / pack / delegation / assumption checks:
-
-1. **Duplicate **`answer_ref`** prose across distinct required topics** — For **`small-intake-pack`** (and equivalent required-topic sets), when multiple rows share **`satisfied_by=answer_ref`** and **identical** **`quoted_user_text`** (normalized per existing string rules in the lib), **fail** unless the row is covered by an allowed alternate satisfaction path (**`equivalent_evidence_ref`** / **`evidence_source`** semantics already in lib, **`delegation_ref`** per **DEC-0067**, or **`assumption_confirmation_ref`**). This targets the BUG-0007 pattern without treating two accidental short duplicate answers as the same class of abuse (tune: require duplicate across **all** required keys or use minimum distinct-count threshold — implementation sprint chooses the smallest rule that makes the exemplar **FAIL** and keeps matrix row 2 **PASS**).
-2. **Optional phase-2** — If product requires stronger audit: add optional **`question_prompt_ref`** / **`question_text`** (or bind to a stable prompt id) for **`answer_ref`** rows; then **`INTAKE_ASKED_TOPIC_NOT_EVIDENCED`** applies when **`asked_topics`** lists a key without a bound prompt artifact. **Architecture default for first sprint**: implement (1) first; gate (2) behind explicit backlog if false positives appear.
-
-**`scripts/intake_evidence_validate.py`**: keep CLI contract (**`--file`**, **`--stdin`**, **`--self-test`**); surface lib stderr codes unchanged.
-
-### 2) Normative contract (`.cursor/commands/intake.md` + **`template/`** mirror)
-
-- **`asked_topics`** may list only topics for which a **user-visible question** was posed **or** a **DEC-0060**-allowed alternate applies (**`delegation_ref`**, **`equivalent_evidence_ref`**, **`assumption_confirmation_ref`**).
-- Explicitly **forbid** fabricating per-topic **`answer_ref`** rows by echoing one bug-report blob across all keys to satisfy the validator.
-- Cross-link **DEC-0060** / **DEC-0067** / **US-0083** so operators do not conflate **`ie:`** integrity with “question asked.”
-
-Parity: **`scripts/check_intake_template_parity.py`** (or successor) must stay **PASS** for any **`intake.md`** edit.
-
-### 3) Locked reason codes (under umbrella **`INTAKE_PERSISTENCE_BLOCKED`**)
-
-| Code | When |
-|------|------|
-| **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** | Distinct **`topic_key`** rows with **`satisfied_by=answer_ref`** share non-distinct **`quoted_user_text`** without **`equivalent_evidence_ref`** / other allowed alternate. |
-| **`INTAKE_ASKED_TOPIC_NOT_EVIDENCED`** | (Optional / phase-2) **`asked_topics`** includes a topic without required question-binding artifact when that feature is enabled. |
-| **Existing** | **`INTAKE_DELEGATION_EVIDENCE_MISSING`**, **`INTAKE_DELEGATION_EVIDENCE_INVALID`**, **`INTAKE_ASSUMPTION_CONFIRMATION_REQUIRED`**, **`INTAKE_REQUIRED_TOPIC_MISSING`** — **do not overload** for BUG-0007 duplicate-answer semantics. |
-
-### 4) Test fixtures and regression matrix (**R-0066** § table — sprint must automate)
-
-| # | Scenario | Expected |
-|---|----------|----------|
-| 1 | Fixture aligned with **`BUG-0007-intake-20260403.json`** (duplicate **`answer_ref`** across keys) | **FAIL** with **`INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT`** (or locked synonym) |
-| 2 | Five **distinct** short answers + valid **`ie:`** | **PASS** |
-| 3 | **`satisfied_by=delegation_ref`** + complete delegation metadata + valid **`ie:`** | **PASS** (**US-0083** / **DEC-0067** non-regression) |
-| 4 | **`evidence_source=equivalent_evidence_ref`** row; topic omitted from **`asked_topics`** per lib rules | **PASS** |
-| 5 | **`assumption_confirmation_ref`** path | **PASS** |
-| 6 | **`python scripts/intake_evidence_validate.py --self-test`** | **PASS** after lib change |
-| 7 | Active + **`template/`** parity | **PASS** |
-
-Prefer **`tests/`** unittest module(s) invoking **`validate_intake_evidence`** directly (and/or subprocess on **`intake_evidence_validate.py`**) so CI mirrors operator commands.
-
-## US-0083 / equivalent_evidence non-regression (hard gate)
-
-- **Delegation**: Rows with **`satisfied_by=delegation_ref`**, required delegation fields, and valid **`ie:`** binding must **not** trip duplicate-**`answer_ref`** rules.
-- **Equivalent evidence**: Topics satisfied via **`equivalent_evidence_ref`** / **`evidence_source`** must **not** be forced through fake per-topic **`answer_ref`** duplicates; validator behavior must match **`# US-0083`** architecture and **R-0062** intent.
-- Sprint **execute** must add or extend fixtures that mirror **`handoffs/intake_evidence/US-0083-intake-20260331-b.json`** (or equivalent) and equivalent-evidence samples so matrix rows 3–4 cannot regress silently.
-
-## Files to touch (execute phase — indicative)
-
-| Path | Change |
-|------|--------|
-| **`scripts/intake_evidence_lib.py`** | New deterministic checks + codes. |
-| **`.cursor/commands/intake.md`** | Truthfulness / forbid synthetic **`answer_ref`** echo. |
-| **`template/.cursor/commands/intake.md`** | Parity. |
-| **`tests/`** | New regression tests for BUG-0007 **FAIL** + US-0083 / equivalent-evidence **PASS**. |
-| Optional | **`scripts/intake_bug_resume_brief_refresh.py`** / **`bug_issue_validate.py`** — only if a single choke-point should re-validate; avoid duplicate sources of truth (**R-0066**). |
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| False positives on legitimate repeated short answers | Scope duplicate rule (e.g. “same blob across **all** pack keys”); tune in sprint with matrix row 2. |
-| False confidence after only one heuristic | State residual risk; optional **`question_*`** follow-up. |
-| Template drift | Same change set for active + **`template/`**; parity script **PASS**. |
-
-## Decision linkage
-
-- Research basis: **`R-0066`**
-- Related: **`BUG-0007`**, **US-0068**, **US-0078**, **US-0079**, **US-0083**, **DEC-0060**, **DEC-0067**, **R-0062**, **R-0055**
-
----
-
-# BUG-0008: CRLF `installer-owned-paths.manifest` → empty `install_include_paths` on Linux global npm
-
-## Overview
-
-**`BUG-0008`** fixes global Linux installs where **`its-magic`** aborts with **`[INSTALL_MANIFEST_ERROR] install_include_paths section is empty`** even though the packaged manifest visibly lists paths. Research **`R-0069`** locks the root cause: CRLF line endings leave section headers as **`[install_include_paths]\r`**, so POSIX **`awk`** strict equality **`$0 == "[" s "]"`** in **`installer.sh`** **`get_manifest_paths`** never enters the section. **`US-0084`** (LF **`installer.sh`**, **`.gitattributes`**, prepublish guards) is adjacent but does not replace this bug’s manifest-section contract or publish/E2E closure.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | Rely on **`.gitattributes`** + publish hygiene only | **Insufficient alone** — defensive parse still required for tarballs already in the wild and for any future CR leakage. |
-| B | Replace **`awk`** with a heavier parser (Python/node) in **`installer.sh`** path | **Rejected** — breaks POSIX **`sh`** installer contract and scope. |
-| C | Strip trailing **`\\r`** per line before section match + enforce LF at source + prepublish CR scan (**chosen**) | **Chosen** — minimal runtime fix + deterministic prevention (**R-0069**). |
-
-## Normative contract
-
-1. **Runtime (POSIX)**: **`get_manifest_paths`** in **`installer.sh`** must **`sub(/\\r$/, \"\")`** (or equivalent) on every line **before** section-header comparison and path emission so **`[install_include_paths]`** matches under CRLF inputs.
-2. **Source / npm tarball**: Repo **`.gitattributes`** includes **`*.manifest text eol=lf`** so Git checkouts and packaged manifests default to LF.
-3. **Prepublish**: **`scripts/guard_installer_publish.py`** (and **`template/scripts/`** parity) rejects byte **`\\r`** in **both** active and template **`installer-owned-paths.manifest`** paths (and existing **`installer.sh`** CR rules remain).
-4. **Windows installer parity**: **`installer.ps1`** **`Get-ManifestSection`** trims carriage return (e.g. **`TrimEnd('`r')`**) before section logic, matching **`BUG-0008`** intake expectations.
-5. **Canonical status**: **`BUG-0008`** remains **OPEN** in **`docs/product/backlog.md`** until **`/verify-work`** / release path per **US-0045**; do not mark **DONE** from architecture alone.
-
-## Operator-facing reason codes
-
-- **No new codes** for this architecture. Existing installer stderr remains **`[INSTALL_MANIFEST_ERROR] install_include_paths section is empty`** when the section is still empty after parse (should not reproduce for CRLF once mitigations ship; other empty-section causes keep the same literal).
-- **Maintainer-facing** (prepublish): **`guard_installer_publish`** continues to emit deterministic **`guard_installer_publish: ...`** messages when **`\\r`** is present in **`installer.sh`** or manifest paths.
-
-## Shipped in-repo mitigations (execute already landed; sprint may verify only)
-
-- **`installer.sh`**: **`get_manifest_paths`** awk body strips trailing CR before **`/^\[/`** section match (**BUG-0008** comment in-tree).
-- **`.gitattributes`**: **`*.manifest text eol=lf`**.
-- **`scripts/guard_installer_publish.py`** + **`template/scripts/guard_installer_publish.py`**: CR rejection on packaged manifest paths.
-- **`tests/installer_manifest_crlf_bug0008_test.py`**: CRLF fixture vs awk logic aligned with **`get_manifest_paths`**.
-- **`tests/run-tests.sh`** / **`tests/run-tests.ps1`**: section **26P2** invokes the Python test.
-- **`installer.ps1`**: **`Get-ManifestSection`** CR trim parity.
-
-## Remaining delivery (not satisfied by doc-only architecture)
-
-1. **Version bump** per release policy and **`npm publish`** so operators receive a tarball **after** the mitigations (broken field example: **`its-magic@0.1.2-40`**).
-2. **Debian global E2E**: **`npm install -g`** the new version; **`cat -A`** on installed template manifest (no **`^M$`**); **`its-magic --target <repo> --mode missing`** (or equivalent) **without** **`[INSTALL_MANIFEST_ERROR]`** — align with backlog **done_definition** / intake evidence.
-3. **`R-0069`**: set **closed** with a delivery closure stanza when **`BUG-0008`** is **DONE** (post-QA/release), same pattern as other research items tied to shipped defects.
-
-## Regression obligations (sprint / CI)
-
-| Gate | Obligation |
-|------|------------|
-| **26P2** | **`tests/run-tests.sh`** / **`tests/run-tests.ps1`** must keep **`installer_manifest_crlf_bug0008_test.py`** wired; **PASS** on PR and release candidates. |
-| **Prepublish** | **`python scripts/guard_installer_publish.py`** (or **`npm`** **`prepublishOnly`** hook as wired) **PASS** — rejects CR in **`installer.sh`** and both manifest copies. |
-| **Parity** | Template copies of **`guard_installer_publish.py`** and manifests stay aligned with root (**US-0084** / template policy). |
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| Operators stay on old global version | Explicit publish + release notes / version bump task in sprint. |
-| **26P2** skipped in custom CI | Document that **`run-tests`** section **26P2** is part of installer regression surface. |
-| Only LF tested; mixed encodings | Current scope is CR strip + LF enforcement; BOM or other encodings out of scope unless product expands **R-0069**. |
-
-## Decision linkage
-
-- Research basis: **`R-0069`**
-- Related: **`BUG-0008`**, **`US-0084`**, **`US-0045`**, installer contracts (**`DEC-0068`** shell path context)
-
----
-
-# US-0087: `/auto` explicit bug targeting (OPEN bug queue / single `BUG-####`)
-
-## Overview
-
-**`US-0087`** adds a **default-off**, **fail-closed** bug-scheduler path for **`/auto`**: operators may bind continuation metadata to **one** **`BUG-####`** or to a deterministic **all OPEN bugs** queue (canonical **`docs/product/backlog.md`** **`## Bug issues (canonical)`**, ascending **numeric** id), then run the **same resolved phase plan** (**`US-0070`** / **`DEC-0052`**) **per bug** or per bounded queue segment—without in-process phase execution (**`BUG-0006`** / **`US-0069`** / **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**). Story-only **`AUTO_BACKLOG_DRAIN`** (**`US-0044`** / **`DEC-0022`**) remains a **separate** scheduler; this section locks **one active scheduler** rules and **AC-10** breadcrumbs. Research basis: **`R-0070`** (delivery closure moves with story **DONE**).
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | Fold bug drain into **`AUTO_BACKLOG_DRAIN`** as a profile | **Rejected** — selection rules, sort keys, and backlog sections differ (**`R-0070`**). |
-| B | Bug cursor in **`state.md`** only; no **`resume_brief`** updates | **Rejected** — **`RESUME_BRIEF_STALE`** risk vs **`DEC-0069`** / **`BUG-0005`**. |
-| C | Dedicated **`AUTO_BUG_*`** surface + argv mirror + hard scheduler mutex / argv override (**chosen**) | **Chosen** — explicit operator semantics and testable literals. |
-
-## Architecture-locked scratchpad keys (merged; `template/` parity)
-
-All **default-off** when unset; sprint implements in **`.cursor/scratchpad.md`** + **`template/.cursor/scratchpad.local.example.md`** (and any documented merge layers).
-
-| Key | Values | Role |
-|-----|--------|------|
-| **`AUTO_BUG_QUEUE`** | **`0`** \| **`1`** | Master enable for bug-targeted **`/auto`** ( **`0`** = legacy behavior only). |
-| **`AUTO_BUG_TARGET`** | **`all-open`** \| **`BUG-####`** | Required when **`AUTO_BUG_QUEUE=1`** (unless **explicit argv** supplies the target for that invocation — see precedence). |
-| **`AUTO_BUG_MAX_ITEMS`** | non-negative integer | Optional cap on bugs consumed **per orchestrator run** for **`all-open`**; **`0`** or unset = no cap beyond queue. |
-| **`AUTO_BUG_ON_BLOCK`** | **`stop`** \| **`skip`** | When a bug segment hits a **pause/stop** boundary: halt queue vs advance to next id (deterministic doc + tests). |
-
-**Naming note**: **`AUTO_BUG_MAX_ITEMS`** is the **architecture-locked** name for “max bugs per run” (**AC-2** / **AC-4**); do not introduce parallel spellings without a **DEC** amendment.
-
-## Architecture-locked `/auto` argv syntax (**AC-1**)
-
-Canonical tokens (exact strings for docs + **`tests/auto_command_contract_test.py`**):
-
-1. **Single OPEN bug**: **`bug-target=BUG-####`** (example: **`bug-target=BUG-0007`**) as a **`/auto`** argument token (space-delimited command argv as today’s Cursor command style documents).
-2. **All OPEN bugs (ordered queue)**: **`bug-target=all-open`**.
-
-**Aliases**: **none** in v1 — reduces **AC-7** / reference drift; future aliases require architecture bump + contract test row.
-
-## Precedence and scheduler mutex (**AC-3**)
-
-Resume-source order remains: **explicit `start-from`** > **explicit bug-target / story-drain argv** (if any) > **merged scratchpad** > **`handoffs/resume_brief.md`** > **`docs/engineering/state.md`** fallback — extended so **bug-target argv** is unambiguously parsed **before** scratchpad scheduler keys.
-
-**One active scheduler** (fail-closed):
-
-- If merged scratchpad has **`AUTO_BACKLOG_DRAIN=1`** (or equivalent active story drain) **and** **`AUTO_BUG_QUEUE=1`** **and** the invocation does **not** include an explicit **`bug-target=`** argv token that selects the bug scheduler for this run → **`AUTO_SCHEDULER_CONFLICT`** (documented with **`[AUTO_RESUME_ERROR]`** envelope in **`docs/engineering/auto-orchestration-reference.md`**; literal token **architecture-locked** here).
-- When **explicit `bug-target=`** argv is present, it **selects** the bug scheduler for that invocation; **`AUTO_BACKLOG_DRAIN`** must **not** also drive story selection **for the same run** (orchestrator materialization picks **one** queue; story drain keys are **ignored** when argv bug-target wins — document in reference).
-
-## Fail-closed reason codes (**AC-1**, **AC-4**, **AC-8**)
-
-| Code | When |
-|------|------|
-| **`AUTO_BUG_QUEUE_EMPTY`** | **`bug-target=all-open`** (or equivalent) and **zero** OPEN bugs in canonical section. |
-| **`AUTO_BUG_TARGET_UNKNOWN`** | Malformed id, wrong pattern, or **`BUG-####`** not found in canonical bug section. |
-| **`AUTO_BUG_TARGET_NOT_OPEN`** | Known id but status **not** **OPEN** (e.g. **DONE**). |
-| **`AUTO_SCHEDULER_CONFLICT`** | Story backlog drain + bug queue both enabled per mutex rule above without resolving argv. |
-
-Existing codes (**`PHASE_POLICY_CONFLICT`**, **`START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`**, **`RESUME_BRIEF_STALE`**, etc.) stay **orthogonal** — do **not** overload them for the table above.
-
-## `DEC-0069` / `resume_brief` alignment (**AC-5**)
-
-- **Single-bug segment**: **`resume_brief`** carries **`bug_id`**, **`intended_resume_phase`**, and boundary timestamps consistent with **`DEC-0069`** (post-intake refresh pattern applies where bug intake occurs; mid-queue segments refresh at **lawful** orchestrator boundaries so **`/auto`** without **`start-from`** does not false-trigger **`RESUME_BRIEF_STALE`**).
-- **Multi-bug (`all-open`)**: After each bug’s terminal boundary (e.g. **`refresh-context`** completion or explicit queue stop), **either** refresh **`resume_brief`** with the **next** **`bug_id`** + cursor **or** document a **single** fail-closed exception path where **`state.md`** cursor is authoritative **only** if paired with a **non-stale** brief predicate (**R-0070** preference: paired updates; architecture **defaults** to **brief + state** paired writes at segment boundaries).
-
-## Phase boundary visibility — **AC-10** locked fields
-
-In addition to existing **`orchestrator_run_id`**, **`phase_boundary`**, **`next_scheduled_phase`**, **`story_id`**, **`bug_id`**, **`sprint_id`**:
-
-| Field | Purpose |
-|-------|---------|
-| **`segment_work_item_kind`** | **`story`** — portfolio/meta **`US-0087`** planning segments without an active defect; **`bug`** — defect lifecycle segment. |
-| **`active_bug_id`** | **`BUG-####`** actively bound **or** **`(none)`** when **`segment_work_item_kind=story`**. |
-| **`bug_queue_position`** | 1-based index into the **deterministic** OPEN-bug ordering for the **current** bug segment when **`bug-target=all-open`**; omit or **`(none)`** for single-target runs without queue semantics. |
-| **`bug_queue_remaining`** | Count of OPEN bugs **after** the current position in the same ordering (integer or **`(none)`**). |
-| **`backlog_drain_active`** | Boolean: story **`AUTO_BACKLOG_DRAIN`** is driving scheduling **this** run. |
-| **`bug_queue_active`** | Boolean: bug scheduler (**argv** or **`AUTO_BUG_*`**) is driving **this** run. |
-
-**Invariant**: **`backlog_drain_active`** and **`bug_queue_active`** must **not** both be **true** for the same materialized run (matches mutex).
-
-## Surfaces (execute phase)
-
-| Path | Change |
-|------|--------|
-| **`.cursor/commands/auto.md`** | Inputs, precedence, optional bug-queue stub, fail-fast codes, **AC-10** pointer. |
-| **`docs/engineering/auto-orchestration-reference.md`** | Normative §**Optional bug-queue mode** adjacent backlog-drain; resume precedence; reason-code list; **AC-10** tuple. |
-| **`template/`** | Byte/literal parity for command + reference + scratchpad examples (**AC-10**). |
-| **`tests/auto_command_contract_test.py`** | Markers for **`bug-target=`** argv literals, **`AUTO_SCHEDULER_CONFLICT`**, template parity (**AC-7**). |
-| **`docs/engineering/runbook.md`** | Operator recipe **“targeted bug auto drain”** (**AC-9**). |
-
-## Verification strategy
-
-- Contract tests + template parity (**AC-7**, **AC-10**).
-- Scripted matrix: argv-only bug target; scratchpad-only; conflict **`AUTO_BACKLOG_DRAIN` + `AUTO_BUG_QUEUE`**; empty OPEN queue; **DONE** bug id.
-- **Triad**: **`python scripts/enforce-triad-hot-surface.py`** after hot-surface mutations (**`DEC-0054`**).
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| Double scheduling | Mutex + booleans + **`AUTO_SCHEDULER_CONFLICT`**. |
-| **`RESUME_BRIEF_STALE`** on queue advance | Paired **`resume_brief`** refresh at segment boundaries (**`DEC-0069`**). |
-| Reason-code / literal drift | Single **# US-0087** vocabulary + **`auto_command_contract_test.py`**. |
-| Template lag | Same edit set for **`template/`** paths (**AC-10**). |
-
-## Decision linkage
-
-- Research: **`R-0070`**
-- Related: **`US-0044`**, **`DEC-0022`**, **`DEC-0069`**, **`BUG-0005`**, **`US-0070`**, **`DEC-0052`**, **`US-0079`**, **`DEC-0061`**, **`BUG-0006`**, **`US-0069`**, **`US-0080`**, **`DEC-0062`**
-
----
-
-# US-0088: `/auto` continuous multi-phase loop + quiet backlog drain
-
-## Overview
-
-**`US-0088`** hardens **story-centric** **`/auto`** so a **single orchestrated run** (or a **documented equivalent outer driver** — see **AC-1 equivalence** below) advances through **all intersected lifecycle phases** in order until a **deterministic stop**, while **`AUTO_BACKLOG_DRAIN=1`** (**`US-0044`** / **`DEC-0022`**) can advance **OPEN** stories **without routine operator chatter** except where **AC-2** requires visibility. Normative multi-phase iteration lives in **`docs/engineering/auto-orchestration-reference.md`** **`## Steps`** item **5** (cross-anchor: **“reference Step 5”**); **`.cursor/commands/auto.md`** compact steps **must** point to that block unambiguously so **“Step 5”** cannot be confused with compact step numbering (**per `R-0071`**).
-
-**Spawn-only** (**`BUG-0006`** / **`US-0069`** / **`AUTO_ORCHESTRATOR_PHASE_EXECUTION`**) is **unchanged**: the orchestrator **never** substitutes for a phase-role subagent.
-
-**`US-0087`** bug-queue scheduler, argv literals, **`AUTO_SCHEDULER_CONFLICT`**, and **AC-10** bug tuple fields remain **architecture-locked** in **`# US-0087`** only — **no duplicate** bug-queue semantics here.
-
-## Assumption challenge and alternatives (AC-1)
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | **Single Cursor `/auto` invocation** schedules **N** fresh subagent turns until stop | **Preferred default** when product/runtime allows — matches reference Step 5 literally. |
-| B | **Documented outer driver** (operator or script re-invokes **`/auto`** with **`start-from`** / refreshed **`resume_brief`**) | **Allowed** only if **deterministically equivalent**: same phase order, same isolation + **DEC-0038** proofs per phase, same stop reasons — must be **named explicitly** in **`auto.md`**, reference, and runbook (**AC-1** / **AC-7**). |
-| C | Rely on **`TOKEN_PROFILE=lean`** alone for “quiet” | **Rejected** — **`TOKEN_PROFILE`** is **context breadth / token-cost** (**`DEC-0035`** / **`US-0080`**), **not** notification policy (**per `R-0071`**). |
-
-## Stop matrix (deterministic)
-
-| Condition | Stop / advance | Operator notify (**AC-2**) |
-|-----------|----------------|---------------------------|
-| **Intersected plan** has **next** phase and no hard stop | **Continue** → preflight **US-0069** → spawn next phase subagent | **Quiet OK** when **`AUTO_QUIET=1`** (no routine “phase done” chatter). |
-| **`decision_gate`** | **Stop** until resolved | **Always** (non-suppressible). |
-| **`error`**, **missing critical input** | **Stop** | **Always**. |
-| **`AUTO_PAUSE_REQUEST`** / **`pause`** | **Stop** at safe boundary | **Always**. |
-| **`AUTO_LOOP_MAX_CYCLES`** / **`loop_max`** | **Stop** | **Always**. |
-| **`blocked`** (e.g. sync/scope gate) | **Stop** | **Always**. |
-| **US** lifecycle **DONE** boundary / **sprint segment** complete under active policy | **Stop** this segment; **`AUTO_BACKLOG_DRAIN=1`** may **advance** to **next eligible OPEN story** per **`DEC-0022`** (recompute materialized phase plan) | **Notify** on segment handoff / drain advance (counts as **non-routine**). |
-| **`BACKLOG_MAX_STORIES_REACHED`** / drain cap | **Stop** | **Always**. |
-
-**`stop_reason`** vocabulary stays **fixed**; continuous runs only **clarify** which reason fired after **which** phase depth.
-
-## Quiet policy: **`AUTO_QUIET`** vs **`TOKEN_PROFILE`**
-
-| Key | Values | Role |
-|-----|--------|------|
-| **`AUTO_QUIET`** | **`0`** \| **`1`** (**default `0`**) | **`1`** = suppress **routine** per-phase success chatter only; **must not** hide **`decision_gate`**, **errors**, **pause**, **`loop_max`**, **`blocked`**, or **missing inputs** (**backlog AC-2**). |
-| **`TOKEN_PROFILE`** | **`lean`** \| **`balanced`** \| **`full`** | Unchanged — **DEC-0035** / **`US-0080`**; **orthogonal** to **`AUTO_QUIET`**. |
-
-**Composition**: **`PHASE_MODE`** / **`PERMISSION_MODE`** remain **orthogonal** unless a future **DEC** documents an explicit matrix. **`template/`** + scratchpad example parity required when **`AUTO_QUIET`** ships (**AC-5**).
-
-## **`DEC-0069` / resume pairing** (**`US-0037`**)
-
-- At **every** materialized phase boundary in a **continuous** or **drain** run, **`handoffs/resume_brief.md`** **Latest** pointer and **`docs/engineering/state.md`** append must **mirror** the same tuple: **`intended_resume_phase`** / **`next_scheduled_phase`**, **`story_id`**, **`orchestrator_run_id`**, **`backlog_drain_stories_remaining_budget`** (when drain active), plus **`US-0087`** segment fields when applicable (**`# US-0087`**).
-- **No weakening** of **`RESUME_BRIEF_STALE`** / unparseable fail-fast — fix is **deterministic refresh** at boundaries (**`DEC-0069`** / **`BUG-0005`** lineage), including reconciliation when a **new** story’s brief row could disagree with **`state.md`** mid-segment (**per `R-0071`** lesson).
-
-## Interaction with **`US-0044`** backlog drain
-
-- When **`AUTO_BACKLOG_DRAIN=1`**, after a **story** reaches its terminal boundary (**`refresh-context`** completion or policy stop), the orchestrator **reloads** backlog selection and **recomputes** the materialized phase plan for the **next** story (**reference Step 5**).
-- **`backlog_drain_stories_remaining_budget`** (and **`AUTO_BACKLOG_MAX_STORIES`**) remain the **bounded** counters — **US-0088** does not remove caps.
-
-## Contract-test expectations (**AC-4**, **`tests/auto_command_contract_test.py`**)
-
-- **Positive (reference)**: Assert normative phrases for (1) **intersected resolved schedule order**, (2) **`AUTO_BACKLOG_DRAIN=1`** + **next eligible OPEN story** / **repeat**, (3) **recompute** / **reload** phase plan at **story boundary** — substring set **locked** in execute to avoid brittle noise (**per `R-0071`**).
-- **Positive (command)**: Compact **`auto.md`** step that maps to **multi-phase spawn** must **explicitly** reference **reference Step 5** (or stable anchor text agreed in execute).
-- **Negative**: Retain / extend **spawn-only** tests — no wording that implies the orchestrator may run **`execute`**, **`qa`**, etc. **in-turn** (**`BUG-0006`**).
-- **Limitation**: Static tests prove **repo text**; they do not prove Cursor schedules **multiple** subagent turns — runbook (**AC-7**) states **operator** obligation when **outer driver** is used.
-
-## Surfaces (execute phase)
-
-| Path | Change |
-|------|--------|
-| **`.cursor/commands/auto.md`** | Cross-anchors to **reference Step 5**; **`AUTO_QUIET`**; stop matrix pointer; drain + resume pairing. |
-| **`docs/engineering/auto-orchestration-reference.md`** | Step 5 ↔ compact step equivalence; continuous vs outer-driver; **AC-2** / **AC-10** tuple. |
-| **`template/`** | Parity for command + reference + scratchpad keys. |
-| **`tests/auto_command_contract_test.py`** | Continuation + drain substrings; spawn-only regression. |
-| **`docs/engineering/runbook.md`** | **AC-7** recipe: caps, pause, gates, quiet. |
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| **Step numbering drift** reintroduces **one-phase-stop** | Stable **“reference Step 5”** anchor + contract tests. |
-| **`AUTO_QUIET=1`** hides **decision_gate** | **Non-suppressible** channel rules in **AC-2** + stop matrix. |
-| **False `RESUME_BRIEF_STALE`** mid-run | **Paired** **`resume_brief`** + **`state.md`** refresh (**`DEC-0069`**). |
-| **Double scheduler** with bug queue | **`# US-0087`** mutex only — **`AUTO_SCHEDULER_CONFLICT`**. |
-
-## Decision linkage
-
-- Research: **`R-0071`**
-- Related: **`US-0044`**, **`DEC-0022`**, **`US-0037`**, **`DEC-0069`**, **`BUG-0005`**, **`US-0087`**, **`R-0070`**, **`BUG-0006`**, **`US-0069`**, **`US-0080`**, **`DEC-0062`**, **`DEC-0035`**
-
----
-
-# US-0085: Gitignored `.env` for remote and release connectivity (no AI read)
-
-## Overview
-
-**US-0085** standardizes a repo-root **`.env`** (gitignored) holding **values** for
-the 20 `*Env` environment variables referenced by **`.cursor/remote.json`** and
-**`docs/engineering/release-targets.json`** (**US-0064**), alongside a committed
-**`.env.example`** with **names only**. Agents **must not read `.env`**; operators
-source it outside agent context so SSH/Docker/remote helpers see normal process env.
-
-The architecture locks a **4-layer defense-in-depth** contract (**DEC-0071**):
-`.gitignore` (git tracking) + `.cursorignore` (agent file tools) + Cursor rules
-(behavioral) + operator discipline (don't open `.env` in editor).
-
-## Assumption challenge and alternatives
-
-| # | Question | Options | Verdict |
-|---|----------|---------|---------|
-| 1 | **Secret carrier format** | A: repo-root `.env` (standard) / B: `secrets.json` / C: OS keyring | **A** — `.env` is universal, works with `source`, `dotenv`, and shell `export`; B/C add vendor deps with no benefit for local dev. |
-| 2 | **Agent exclusion layers** | A: `.gitignore` only / B: `.gitignore` + `.cursorignore` / C: `.gitignore` + `.cursorignore` + rules + operator discipline (4-layer) | **C** — `.gitignore` alone is insufficient (agents have filesystem access beyond git); `.cursorignore` blocks agent file tools but not terminal/MCP; rules add behavioral guard; operator discipline covers open-tab leak. Formalized as **DEC-0071**. |
-| 3 | **AC-8 helper** | A: `scripts/print_remote_env_hint.py` (names-only, validates parity with `*Env` fields) / B: documented shell recipe (`source .env && env \| grep`) / C: deliberate omission | **A** — cross-platform, deterministic, validates parity, never touches `.env` values; B is POSIX-only and leaks values to stdout; C loses parity enforcement. |
-| 4 | **Template `.gitignore`** | A: create `template/.gitignore` with `.env` entry / B: document that template users add their own | **A** — this repo ships a template; shipped templates should include `.env` in `.gitignore` so new projects inherit gitignore safety from day one. |
-| 5 | **Agent rule placement** | A: extend `.cursor/rules/coding-standards.mdc` / B: new dedicated rule file | **A** — existing `coding-standards.mdc` already has the **DEC-0016** remote config security bullet; one additional bullet is simpler than a new file. Template parity via `template/.cursor/rules/coding-standards.mdc`. |
-
-## File layout (locked)
-
-| Path | Status | Content |
-|------|--------|---------|
-| **`.env`** | gitignored, cursorignored, **never committed** | Operator-local values for 20 `*Env` variables |
-| **`.env.example`** | committed (active + `template/`) | Names only, grouped by source config, with comments |
-| **`.gitignore`** | updated (active + `template/`) | Add `.env` and `.env.local` patterns |
-| **`.cursorignore`** | **new** (active + `template/`) | `.env`, `.env.local`, `.env.*` exclusion patterns |
-| **`.cursor/rules/coding-standards.mdc`** | updated (active + `template/`) | Add `.env` exclusion rule bullet |
-| **`scripts/print_remote_env_hint.py`** | **new** (active only) | Names-only parity helper (AC-8) |
-| **`docs/engineering/runbook.md`** | updated (active + `template/`) | `.env` copy/source recipe |
-| **`docs/engineering/runtime-connectivity.md`** | updated (active + `template/`) | `*Env` sourcing from `.env` |
-| **`docs/engineering/us-0084-remote-e2e.md`** | updated (active + `template/`) | `.env` / `.env.example` refs in Path B/C |
-| **`tests/test_env_gitignore.py`** | **new** (active only) | AC-9 regression: `git check-ignore` assertions |
-
-## `.env.example` content contract
-
-Names grouped by source — **no values, no secret-shaped literals**.
-
-### From `template/.cursor/remote.json` (3 names)
-
-```
-REMOTE_DOCKER_TOKEN
-REMOTE_SSH_USER
-REMOTE_SSH_KEY_PATH
-```
-
-### From `docs/engineering/release-targets.json` (17 names)
-
-```
-PUBLIC_DOMAIN
-CHOCO_API_KEY
-GITHUB_TOKEN
-DOCKER_TOKEN
-DOCKER_RUNTIME_HOST
-AWS_PROFILE
-APP_DOMAIN
-APP_IP
-CUSTOM_DOMAIN
-CUSTOM_IP
-SSH_HOST
-SSH_USER
-SSH_PRIVATE_KEY
-RUNTIME_DOMAIN
-RUNTIME_IP
-DOCKER_HOST
-DOCKER_CONTEXT
-```
-
-Total: **20 unique `*Env` names**. `.env.example` must list all 20 with section
-comments indicating which config file references each group. The helper script
-(**AC-8**) validates this set against the JSON source files at runtime.
-
-## `.cursorignore` contract
-
-```
-# Agent exclusion — secrets must not be ingested by AI tools (US-0085 / DEC-0071)
-.env
-.env.local
-.env.*
-```
-
-Semantics per Cursor documentation: `.gitignore` syntax; blocks agent file tools
-(`read_file`, `grep`, `@` mentions); does **not** block terminal commands or MCP
-tools. Open-tab caveat: files open in editor may still leak to context.
-
-## Agent rule text (`.cursor/rules/coding-standards.mdc`)
-
-Append after existing DEC-0016 remote config bullet:
-
-```
-- `.env` exclusion (DEC-0071 / US-0085): do not open, attach, read, search
-  inside, or index `.env` or `.env.*` files. Use environment variable names
-  in prose only. Operators source `.env` outside agent context.
-```
-
-## `scripts/print_remote_env_hint.py` contract (AC-8)
-
-- **Input**: reads `.env.example` for names; reads `template/.cursor/remote.json`
-  and `docs/engineering/release-targets.json` for `*Env` field inventory.
-- **Output**: prints required env var names to stdout (one per line, grouped).
-- **Parity check**: reports any name in JSON `*Env` fields not in `.env.example`
-  (exit 1 with `ENV_EXAMPLE_PARITY_MISMATCH`), and any name in `.env.example`
-  not in JSON sources (warning, exit 0).
-- **Safety**: **never** opens, reads, or prints from `.env` — values stay local.
-- **Exit codes**: 0 = PASS / parity ok; 1 = parity mismatch (missing names).
-
-## Test approach (AC-9)
-
-`tests/test_env_gitignore.py` using `subprocess.run`:
-
-1. `git check-ignore .env` → exit code 0 (`.env` is gitignored).
-2. `git check-ignore .env.example` → exit code 1 (`.env.example` is NOT ignored).
-3. Optional: assert `.cursorignore` file exists and contains `.env` pattern.
-
-## Template parity plan (7 touchpoints)
-
-| # | Active path | Template path | Action |
-|---|-------------|---------------|--------|
-| 1 | `.gitignore` | `template/.gitignore` (**new**) | Create with `.env`/`.env.local` entries |
-| 2 | `.cursorignore` (**new**) | `template/.cursorignore` (**new**) | Create with `.env*` patterns |
-| 3 | `.env.example` (**new**) | `template/.env.example` (**new**) | Identical content (20 names) |
-| 4 | `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` | Add `.env` copy/source recipe section |
-| 5 | `docs/engineering/runtime-connectivity.md` | `template/docs/engineering/runtime-connectivity.md` | Add `*Env` sourcing note |
-| 6 | `docs/engineering/us-0084-remote-e2e.md` | `template/docs/engineering/us-0084-remote-e2e.md` | Add `.env`/`.env.example` refs |
-| 7 | `.cursor/rules/coding-standards.mdc` | `template/.cursor/rules/coding-standards.mdc` | Add `.env` exclusion bullet |
-
-Scripts (`print_remote_env_hint.py`) and tests (`test_env_gitignore.py`) are
-**active-only** (not shipped in template — template users write their own).
-
-## Interaction with related stories
-
-| Story | Interaction |
-|-------|-------------|
-| **US-0064** (DONE) | `release-targets.json` contract **unchanged** — still `*Env` name references only; `.env` supplies **values** locally. |
-| **US-0084** (DONE) | `remote_config_summary.py` reads `remote.json` names, **not** `.env` values — **AC-10 PASS** guaranteed. `us-0084-remote-e2e.md` updated to mention `.env` sourcing pattern. |
-| **US-0086** (OPEN) | Automation profile must **compose** with `.env` — automation may **use** env already set; **must not** read `.env` (inherits **DEC-0071** contract). |
-
-## Defense-in-depth layering (**DEC-0071**)
-
-| Layer | Mechanism | Blocks | Does NOT block |
-|-------|-----------|--------|----------------|
-| 1. `.gitignore` | Git tracking exclusion | Commit/push of `.env` | Agent filesystem reads |
-| 2. `.cursorignore` | Cursor file-tool exclusion | `read_file`, `grep`, `@` mentions | Terminal commands, MCP tools |
-| 3. Cursor rules | Behavioral instruction | Agent intent to open/search `.env` | Operator or terminal bypass |
-| 4. Operator discipline | Human practice | Opening `.env` in editor (context leak) | Nothing (last resort) |
-
-**Residual risk**: An operator who opens `.env` in the editor tab may leak it to
-agent context. Mitigation: runbook warns explicitly; `.cursorignore` still blocks
-proactive agent file-tool access.
-
-## Risks
-
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| Terminal bypass (agent runs `cat .env`) | Medium | Cursor rules instruct agents not to; `.cursorignore` blocks file tools; runbook warns operators. Cannot be fully prevented at framework level. |
-| Open-tab leak (`.env` open in editor) | Low | Runbook + rules warn; `.cursorignore` blocks proactive agent reads. |
-| `.env` framework collision (e.g. Node dotenv auto-loads) | Low | This repo is a toolkit, not a Node app; document in `.env.example` header. |
-| Template `.env.example` divergence when `*Env` fields change | Low | `print_remote_env_hint.py` parity check catches drift; run in CI or pre-release. |
-| `remote_config_summary.py` regression | Low | AC-10 explicitly requires existing tests PASS; script reads `remote.json`, not `.env`. |
-
-## Decision linkage
-
-- Decision: **`DEC-0071`** — 4-layer defense-in-depth `.env` exclusion contract
-- Research: **`R-0072`**
-- Related: **`US-0064`**, **`DEC-0070`**, **`US-0084`**, **`US-0086`**, **`DEC-0016`**, **`R-0067`**, **`R-0068`**
-
----
-
-# US-0086: Automation-driven remote execution selection (Docker / SSH / NL container intent)
-
-## Overview
-
-**`US-0086`** adds a deterministic, **automation-only** remote target-routing
-contract that composes with **`US-0064`** and **`US-0085`**: when automation
-profile is enabled, workflows may resolve Docker/SSH/local execution targets
-from canonical config and explicit operator intent; when disabled, default
-manual behavior remains local-first with zero new remote overhead.
-
-Research basis: **`R-0068`** (routing precedence, reason-code candidates,
-evidence tuple, and external references).
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | Always-on remote routing for all runs | Rejected - violates manual-first default and adds unwanted remote dependencies to daily local use. |
-| B | Implicit heuristic-only routing (no explicit intent phrase) | Rejected - ambiguous behavior and harder operator debugging. |
-| C | Automation-profile gate + explicit NL intent + deterministic fallback matrix (chosen) | Chosen - simplest model that satisfies AC-1..AC-10 while preserving fail-closed behavior. |
-
-## Architecture-locked contracts
-
-### 1) Automation profile gate
-
-- **Mode off**: emit deterministic skip posture (`REMOTE_AUTOMATION_MODE_OFF`)
-  and continue local/default execution path.
-- **Mode on**: routing policy may select remote targets for execute/qa/release
-  and related automation surfaces.
-- Manual operator workflows remain unchanged unless profile is explicitly
-  enabled.
-
-### 2) Deterministic routing precedence
-
-1. **Explicit NL intent**: `start container <target_id>` resolves first.
-2. **Target validation**: `target_id` must map to canonical enabled
-   `targets[].id`; unknown/disabled targets fail closed.
-3. **Heuristic fallback** (automation mode only): apply documented file-class
-   matrix (Docker-oriented changes -> container-capable target; SSH/runtime
-   infra changes -> ssh-capable target; else local/default).
-4. **No silent reroute when mode off**.
-
-### 3) Reason-code vocabulary (locked)
-
-| Code | When |
-|------|------|
-| `REMOTE_AUTOMATION_MODE_OFF` | Automation routing requested while profile is disabled. |
-| `REMOTE_TARGET_UNKNOWN` | Explicit target id does not exist in canonical config. |
-| `REMOTE_TARGET_DISABLED` | Target id exists but is disabled/unavailable by config. |
-| `REMOTE_TARGET_UNROUTABLE` | Mode on, routing attempted, but no deterministic target can satisfy policy. |
-
-### 4) Evidence tuple contract (handoffs/state)
-
-When remote automation routing is used, phase evidence must include:
-
-- `target_id`
-- `environment_label`
-- `automation_profile`
-- `routing_source` (`explicit_intent|heuristic_fallback`)
-- `secret_surface=names_only`
-
-No secret values may appear in state/handoffs.
-
-### 5) Security continuity with US-0085
-
-- Automation may use already-exported environment variables.
-- Automation must not read `.env` directly.
-- Logs and handoffs remain names-only for secret references.
-
-### 6) Compatibility boundaries
-
-- **US-0064/DEC-0070** schema remains unchanged; this story adds routing policy,
-  not new canonical remote schema.
-- **US-0084** tooling stays valid; routing composes with existing
-  `remote_config_summary` and runtime-connectivity docs.
-
-## Delivery surfaces (execute phase)
-
-| Path class | Scope |
-|------------|-------|
-| `.cursor/scratchpad*` (+ `template/`) | Automation-profile literals and defaults. |
-| `.cursor/commands/*` + orchestration reference | Routing contract, reason codes, NL intent literals, mode-on/off behavior. |
-| Agent rules (`.cursor/rules/*` + `template/`) | Deterministic routing guidance and no-reroute-on-off guardrails. |
-| Runbook/docs (`docs/engineering/*` + `template/`) | Manual vs automation split and CI recipe notes. |
-| Tests (`tests/*`) | Target resolution pass/fail fixtures and non-regression for mode-off behavior. |
-
-## Risks
-
-| Risk | Mitigation |
-|------|------------|
-| Ambiguous intent parsing for free-form NL | Keep v1 literal constrained to `start container <target_id>`; aliases require explicit architecture update. |
-| Hidden remote reroute surprises | Enforce mode gate + explicit reason codes + runbook/manual-vs-automation split. |
-| Secret leakage in evidence | Inherit US-0085 names-only contract; no `.env` reads and no value logging. |
-| Target drift across active/template/docs | AC-10 parity checks on command/rule/scratchpad surfaces. |
-
-## Decision linkage
-
-- Research: **`R-0068`**
-- Related: **`US-0064`**, **`US-0084`**, **`US-0085`**, **`DEC-0070`**, **`DEC-0071`**
-
----
-
-# US-0089: Cursor Caveman mode (scratchpad-configurable terse responses)
-
-## Overview
-
-**`US-0089`** adds an optional **response-side** Caveman voice to Cursor
-assistant output, toggled from **`.cursor/scratchpad.md`** and **default
-off**. The feature lets operators trade reply prose for terse / imperative
-delivery while leaving every machine-verifiable region of output literal.
-
-Research basis: **`R-0073`** (research-phase extension dated 2026-04-18).
-Governance decision: **`DEC-0072`**. **`US-0090`** covers **input-side** file
-compression and is deferred; this story only reserves the shared scratchpad
-vocabulary.
-
-## Assumption challenge and alternatives
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| A | Orthogonal composition: `TOKEN_PROFILE` owns context breadth (US-0080 / DEC-0062); `CAVEMAN_*` owns voice. Rule-only composition, no new skill. Default off. | **Chosen** — minimal surface, zero regression risk for default-off operators, independent axes remain independent. |
-| B | Explicit `TOKEN_PROFILE × CAVEMAN_MODE` precedence matrix baked into commands/rules. | Rejected — adds doc surface and invites misreadings; Option A's non-substitution paragraph already covers every cell. |
-| C | Collapse voice into `TOKEN_PROFILE` (e.g. `lean-caveman`). | Rejected — breaks US-0080 semantics and couples two independent concerns. |
-| D | Rule + focused skill (`.cursor/skills/its-magic-caveman/SKILL.md`). | Rejected for US-0089 — higher maintenance; no current discoverability evidence. Can be reconsidered in a future story. |
-| E | Skill-only composition (no rule). | Rejected — literal-region invariants must live in rules; skills are contextual. |
-| F | Single key `CAVEMAN=off|lite|full|ultra`. | Rejected — collides with repo `0|1` convention and couples enable flag to level. |
-
-## Architecture-locked contracts
-
-### 1) Scratchpad key contract
-
-Locked names, defaults, and test strings:
-
-| Key | Values | Default | Semantics |
-|-----|--------|---------|-----------|
-| `CAVEMAN_MODE` | `0` or `1` | `0` | `0` = pre-US-0089 behavior. `1` = voice rule active. Absence = `0`. |
-| `CAVEMAN_LEVEL` | `lite`, `full`, `ultra`, or empty | empty | With `MODE=0`: inert. With `MODE=1` and empty: treat as `full`. Unknown value -> `CAVEMAN_LEVEL_UNKNOWN` and fall back to pre-US-0089 voice. |
-| `CAVEMAN_COMPRESS_INPUT` | `0` or `1` | `0` | **Reserved for US-0090**. No-op in US-0089. |
-| `CAVEMAN_FILE_SCOPE` | string (empty) | empty | **Reserved for US-0090**. No-op in US-0089. |
-
-Exact contract lines (tests match byte-for-byte):
-
-```
-CAVEMAN_MODE=0
-CAVEMAN_LEVEL=
-CAVEMAN_COMPRESS_INPUT=0
-CAVEMAN_FILE_SCOPE=
-```
-
-Same four lines (identical defaults) mirrored in
-`.cursor/scratchpad.local.example.md` and
-`template/.cursor/scratchpad.local.example.md`. Comment anchoring text:
-`# reserved for US-0090; inert in US-0089; no behavior until compression story ships`.
-
-### 2) Composition surface (Option A — rule-only)
-
-- **New authoritative file**: `.cursor/rules/caveman.mdc` (active) +
-  `template/.cursor/rules/caveman.mdc` (template mirror).
-- Rule scope: `globs: ["**/*"]` (always-on, same posture as `core.mdc`).
-- **No new skill** in US-0089. `.cursor/skills/its-magic/SKILL.md` is NOT
-  modified.
-- Rule body hosts: `CAVEMAN_MODE` gate, 9-zone literal-region invariant,
-  operator phrase catalog, non-suppressible gate list (inherited from
-  US-0088), and single-line attribution line
-  `Inspired by JuliusBrussee/caveman (MIT). External reference only; not vendored.`
-- No `npx skills add` reference anywhere in the kit.
-
-### 3) TOKEN_PROFILE x CAVEMAN precedence (orthogonal, non-substitution)
-
-| TOKEN_PROFILE \ CAVEMAN_MODE | 0 (off) | 1 (on) |
-|------------------------------|---------|--------|
-| `lean` | Pre-US-0089 behavior, lean pack. | Lean pack + Caveman voice; literals untouched. |
-| `balanced` (default) | Pre-US-0089 behavior, balanced pack. | Balanced pack + Caveman voice. |
-| `full` | Pre-US-0089 behavior, full pack. | Full pack + Caveman voice. |
-
-Canonical non-substitution paragraph (published verbatim in
-`docs/engineering/auto-orchestration-reference.md`,
-`docs/engineering/runbook.md`, and template mirrors):
-
-> `TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply
-> voice. Neither substitutes for the other; setting one does not change the
-> other. Combine freely.
-
-### 4) Literal-region invariant (nine-zone list, hard MUST)
-
-When `CAVEMAN_MODE=1`, these regions remain byte-literal (no abbreviation,
-no rewording, no casing change):
-
-1. Fenced code blocks (both plain and CODE REFERENCE `startLine:endLine:filepath` forms).
-2. File/path strings in backticks (any repo path or filename with extension).
-3. AC checklist items `- [ ]` / `- [x]` and their full text.
-4. Reason codes (`ALL_CAPS_WITH_UNDERSCORES`) — e.g.
-   `PHASE_CONTEXT_ISOLATION_VIOLATION`, `RUNTIME_PROOF_MISSING`,
-   `AUTO_RESUME_ERROR`, `REMOTE_TARGET_UNKNOWN`, `CAVEMAN_LEVEL_UNKNOWN`,
-   `INTAKE_PERSISTENCE_BLOCKED`.
-5. IDs — `US-xxxx`, `DEC-xxxx`, `R-xxxx`, `BUG-####`, `S0xxx`, `T-xxx`.
-6. Contract markers — `[BUG_VALIDATION_OK]`,
-   `[INTAKE_EVIDENCE_VALIDATION_OK]`, `[SCRATCHPAD_PAIR_OK]`,
-   `[ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS]`, `[CODEBASE_MAP_OK]`.
-7. Strict-proof tuple fields (DEC-0038) — `orchestrator_run_id`,
-   `runtime_proof_id`, `proof_hash`, `proof_issued_at`, `proof_ttl_seconds`,
-   `phase_id`, `role`.
-8. Isolation evidence fields (DEC-0029) — `fresh_context_marker`,
-   `evidence_ref`, `timestamp`.
-9. Commit / git refs when quoted — `git commit` messages, branch names,
-   SHAs, `HEAD`, tag names.
-
-### 5) Operator toggle phrase catalog
-
-| Phrase | Effect |
-|--------|--------|
-| `caveman on` | Enable Caveman voice for the session (overlay). Effective next turn. |
-| `caveman off` | Disable Caveman voice for the session (overlay). Effective next turn. |
-| `stop caveman` | Alias for `caveman off`. |
-| `normal mode` | Alias for `caveman off`. |
-| `caveman: lite` / `caveman: full` / `caveman: ultra` | Set level (implies `caveman on`). Effective next turn. |
-
-Determinism rules:
-
-- Scratchpad `CAVEMAN_MODE` / `CAVEMAN_LEVEL` are authoritative across
-  subagent spawns. Session toggles are overlays only; they do NOT persist
-  across a fresh subagent context.
-- Within a session, the last explicit toggle wins.
-- Mid-turn toggle applies from the next turn onward. Current-turn
-  machine-verifiable artifacts (gate messages, reason codes, tuples) remain
-  literal regardless of the toggle.
-- Ambiguous phrases (`be caveman-lite`, `quiet caveman`, `cave man off`,
-  etc.) are not recognized — only the exact literals above.
-
-### 6) Default-off invariant (test contract)
-
-`tests/auto_command_contract_test.py` is extended **in place** (no new test
-module) with the `test_caveman_default_off_*` subtests enumerated in
-**DEC-0072 §6** (8 subtests). Highlights:
-
-- Scratchpad key lines present in active + example + template example files
-  (byte-literal).
-- `.cursor/rules/caveman.mdc` present active + `template/`; contains the
-  tokens `CAVEMAN_MODE`, `literal`, and all five canonical toggle phrases.
-- Non-substitution paragraph present in `auto-orchestration-reference.md`
-  and `runbook.md` (active + template).
-- Existing `required` token list (spawn-only / BUG-0006 / reason codes /
-  `AUTO_QUIET` / `# US-0086`) remains **unchanged** — patch may only add.
-- Non-suppressible gate vocabulary (`decision_gate`, `missing input`,
-  `pause`, `loop_max`, `blocked`, `[BUG_VALIDATION_OK]`,
-  `[INTAKE_EVIDENCE_VALIDATION_OK]`) preserved in `auto.md` and reference.
-- No `npx skills add` token in runbook or rule.
-
-Byte-for-byte baseline invariant: with `CAVEMAN_MODE` unset or `=0`, all
-other `.cursor/commands/*.md`, `.cursor/rules/*` files (excluding the new
-`caveman.mdc`), and handoff template stubs remain byte-identical to
-pre-US-0089 content.
-
-**Voice rules** (delivered in **`BUG-0011`** / **`DEC-0077`**): actionable
-voice-compression directives append to `.cursor/rules/caveman.mdc` under
-`## Voice compression (when CAVEMAN_MODE=1)`. **Not CI-tested**: qualitative
-brevity under `CAVEMAN_MODE=1` remains operator-verified (token-presence
-contract tests only; see **`# BUG-0011`**).
-
-### 7) Template parity inventory (delivery checklist)
-
-`/sprint-plan` atomizes one task per row; all rows marked "active" +
-"template" produce two-surface edits.
-
-| # | Active path | Template path | Action |
-|---|-------------|---------------|--------|
-| 1 | `.cursor/scratchpad.md` | n/a (example-only install per US-0073 / DEC-0055) | Add 4 key lines + `## Caveman mode (US-0089)` comment block. |
-| 2 | `.cursor/scratchpad.local.example.md` | `template/.cursor/scratchpad.local.example.md` | Add identical 4 key lines + comment block. |
-| 3 | `.cursor/rules/caveman.mdc` (**new**) | `template/.cursor/rules/caveman.mdc` (**new**) | Create rule per §2 / §4 / §5. |
-| 4 | `docs/engineering/auto-orchestration-reference.md` | `template/docs/engineering/auto-orchestration-reference.md` | Insert non-substitution paragraph near TOKEN_PROFILE / AUTO_QUIET discussion. |
-| 5 | `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` | Add `### Caveman mode (US-0089)` subsection with key table, phrase catalog, non-substitution paragraph. |
-| 6 | `docs/engineering/architecture.md` `# US-0089` | active-only | This section (already written). |
-| 7 | `tests/auto_command_contract_test.py` | active-only | Extend in place per §6. |
-| 8 | `.cursor/skills/its-magic/SKILL.md` | `template/.cursor/skills/its-magic/SKILL.md` | **No change** (negative parity assertion). |
-
-Files explicitly **not** touched by US-0089: `docs/engineering/decisions.md`
-body (index/context-pack additions only are part of this DEC),
-`docs/product/backlog.md` outside the `## US-0089` `architecture_notes`
-append, `handoffs/intake_evidence/*.json`, `docs/engineering/state.md`
-schema, `scripts/*`, `installer*`, `package.json`, `.env` / `.env.example`.
-
-## Boundaries vs related stories
-
-- **vs US-0090** (input-side compression — deferred). US-0089 reserves
-  `CAVEMAN_COMPRESS_INPUT` and `CAVEMAN_FILE_SCOPE` as documented no-ops.
-  US-0089 **must not** include any script, installer change, or file
-  mutator. US-0090 will extend `R-0073` in its own discovery/research.
-- **vs US-0080 / DEC-0062** (TOKEN_PROFILE / token-cost hardening). Fully
-  orthogonal per §3. Caveman does not change context packs, parity
-  manifests, run-class metrics, or `handoffs/token_cost_runs/` records.
-- **vs US-0053 / DEC-0035** (tiered profile). Untouched. No new profile
-  value. `TOKEN_PROFILE` remains `lean|balanced|full`.
-- **vs US-0088** (`AUTO_QUIET` + continuous `/auto` loop). The Caveman rule
-  MUST preserve the `AUTO_QUIET` non-suppressible gate vocabulary verbatim.
-  Caveman voice never drops or compresses a gate message.
-- **vs US-0071** (user-visible internal metadata sanitization). Caveman
-  terseness MUST NOT cause the agent to drop visible `US-xxxx`, `DEC-xxxx`,
-  `R-xxxx`, or `BUG-####` references (§4, zone 5).
-- **vs US-0078 / DEC-0060** (intake evidence). `handoffs/intake_evidence/*.json`
-  are never rewritten by anything US-0089 ships.
-- **vs US-0048 / DEC-0029** (isolation), **US-0056 / DEC-0038** (strict
-  proof), **BUG-0006** (spawn-only). All three contracts unchanged.
-  Caveman voice does not alter tuple wording (§4, zones 7-8).
-
-## Non-goals
-
-- No input-side file compression.
-- No new npm / Python dependencies.
-- No change to spawn-only orchestration or strict-proof schema.
-- No change to `TOKEN_PROFILE` semantics.
-- No rewrite of canonical `backlog.md`, `acceptance.md`, `state.md`,
-  `decisions.md` body, or DEC files.
-- No vendor plugin install (`npx skills add`) surfaced in runbook or rule.
-- No unit test of voice quality under `CAVEMAN_MODE=1`.
-
-## Risks and mitigations
-
-| Risk | Mitigation |
-|------|------------|
-| Caveman voice drops a reason code or path string. | 9-zone MUST list in rule (§4); contract-test assertion of gate vocabulary preservation. |
-| Operator reads `CAVEMAN_MODE=1` as "lean equivalent". | Verbatim non-substitution paragraph in reference + runbook (§3); test asserts presence in both surfaces. |
-| Scratchpad key rename churn breaks tests. | DEC-0072 §3 locks exact byte strings BEFORE dev phase authors tests. |
-| Session toggle leaks state across subagent spawn. | Rule specifies scratchpad is authoritative across spawns; overlay applies only to current conversation (§5). |
-| Mid-turn toggle masks a gate message. | Rule forbids overlay affecting current-turn gate artifacts (§5); contract test guards gate token preservation. |
-| Template drift (rule added active-side only). | Parity inventory §7 lists both surfaces; contract-test subtests #2 and #3 assert template mirror presence. |
-| Vendor `npx skills add` leaks into runbook. | Contract-test subtest #8 asserts token absence. |
-| US-0090 gets implemented inadvertently under US-0089. | Reserved keys documented as no-ops; DEC-0072 §8 forbids scripts, installer changes, mutators. |
-| `CAVEMAN_LEVEL` typo produces undefined behavior. | Rule specifies deterministic fallback via `CAVEMAN_LEVEL_UNKNOWN` + pre-US-0089 voice. |
-
-## Delivery surfaces (execute phase summary)
-
-| Path class | Scope |
-|------------|-------|
-| `.cursor/scratchpad.md` (active) | Caveman keys + comment block (US-0073 / DEC-0055 example-only install policy means template ships only the `.example.md` mirror). |
-| `.cursor/scratchpad.local.example.md` (active + `template/`) | Caveman keys + comment block, literal byte-parity. |
-| `.cursor/rules/caveman.mdc` (active + `template/`) | New always-on rule hosting gate, literal invariant, phrases, attribution. |
-| `docs/engineering/auto-orchestration-reference.md` (active + `template/`) | Single non-substitution paragraph. |
-| `docs/engineering/runbook.md` (active + `template/`) | Caveman subsection (key table, phrases, non-substitution, attribution). |
-| `docs/engineering/architecture.md` `# US-0089` | This section (active-only). |
-| `tests/auto_command_contract_test.py` | Extend with 8 `test_caveman_default_off_*` subtests. |
-
-## Decision linkage
-
-- Research basis: **`R-0073`**
-- Decision: **`DEC-0072`**
-- Related: **`US-0090`** (deferred), **`US-0080`** / **`DEC-0062`**,
-  **`US-0053`** / **`DEC-0035`**, **`US-0088`**, **`US-0071`**,
-  **`US-0048`** / **`DEC-0029`**, **`US-0056`** / **`DEC-0038`**,
-  **`US-0069`** / **`DEC-0051`**, **`BUG-0006`**, **`US-0017`**,
-  **`DEC-0040`**, **`DEC-0055`**, **`US-0078`** / **`DEC-0060`**,
-  **`US-0045`**.
-- External reference (not vendored): JuliusBrussee/caveman (MIT) —
-  `https://github.com/JuliusBrussee/caveman`.
-
 # US-0090: Optional Caveman-style input compression (safe file scope)
 
 ## Overview
@@ -3411,4 +1753,1196 @@ IDE native chain and **`scripts/auto_outer_driver.py`** share **one accounting m
 - Research: **`R-0081`**
 - Composed: **`DEC-0078`**, **`US-0088`**, **`BUG-0006`**, **`DEC-0069`**, **`DEC-0038`**, **`US-0044`**, **`US-0087`**
 - Related: **`US-0092`**, **`US-0094`**, **`US-0023`**, **`US-0048`**, **`US-0056`**, **`US-0069`**
+
+# BUG-0012: Native-chain orchestrator compliance regression (post-US-0095)
+
+## Overview
+
+**`BUG-0012`** closes a **contract-vs-runtime gap** after **US-0095** / **DEC-0080** / **S0084** (released **2026-06-07**). Static **`test_us0095_*`** contract tests pass, but operators enabling **`AUTO_FLOW_MODE=full_autonomy`** + **`AUTO_BACKLOG_DRAIN=1`** observe orchestrator stops after every story segment with mandatory re-**`/auto`** prose despite schedulable drain-advance continuation.
+
+**Root cause** (**`R-0083`**): orchestrator **agent compliance gap** — no executable continuation hook; residual **US-0088** Option B / **US-0092** outer-driver re-invoke prose primes turn-boundary stop; drain-advance **step 7** spawn skipped; **`native_chain_active`** reflects gate eligibility only.
+
+Binding decision: **`DEC-0081`** (amends **`DEC-0080`** enforcement layer only). Research anchor: **`R-0083`**. **Not** re-litigation of **US-0095** intent.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Strengthen orchestrator command-spec compliance** — explicit MUST Task-spawn mandate, demote Option B, negative contract tests, continuation-truth breadcrumbs | **Preferred** — minimal diff; preserves **DEC-0080** contract |
+| B | **New stdlib hook/script** enforcing orchestrator loop at runtime | **Rejected** — Cursor has no hook for in-chat agent behavior; same compliance problem |
+| C | **Re-open US-0095** as feature story | **Rejected** — feature delivered; this is regression fix |
+| D | **Outer driver as IDE primary** (revert **DEC-0080**) | **Rejected** — contradicts operator expectation and **US-0095** closure |
+
+## Orchestrator compliance contract (AC-1, AC-2, AC-3)
+
+### Actor distinction (spawn-only preserved)
+
+```mermaid
+flowchart LR
+  subgraph phase["Phase-role subagent"]
+    P1["Complete phase artifacts"]
+    P2["Stop — hand off only"]
+    P1 --> P2
+  end
+  subgraph orch["/auto orchestrator"]
+    O1["Await subagent return"]
+    O2{"Continuation schedulable?"}
+    O3["MUST Task-spawn next phase"]
+    O4["Terminal boundary only"]
+    O1 --> O2
+    O2 -->|yes| O3
+    O2 -->|hard gate / empty portfolio| O4
+    O3 --> O1
+  end
+  phase --> orch
+```
+
+**Phase-role commands** correctly say "stop and require next phase in fresh subagent" — orchestrator **must not** treat that as run terminal when next phase or drain target is schedulable (**BUG-0006** unchanged: orchestrator schedules, never executes phase deliverables).
+
+### Orchestrator continuation mandate
+
+After foreground subagent completion, when **any** of (a) next intersected phase exists, (b) drain policy selects another OPEN story/bug, (c) relaxable stop within retry budget — orchestrator **MUST**:
+
+1. **Task-spawn** next phase-role subagent (**US-0069** preflight).
+2. **Not** emit mandatory re-**`/auto`**, **`auto_outer_driver.py`**, or **`segment exhausted`** terminal prose.
+3. Increment **`outer_cycle_index`**; check **`AUTO_LOOP_MAX_CYCLES`**.
+
+**Required doc literals**: **`orchestrator MUST Task-spawn`**, **`post-subagent continuation`**, **`phase-role stop is not run terminal`**.
+
+### Native-chain precedence over US-0088 Option B (AC-2)
+
+Under **`AUTO_FLOW_MODE=full_autonomy`** + IDE + Task available:
+
+| Surface | Amendment |
+|---------|-----------|
+| **`auto.md`** § Continuous multi-phase (US-0088 matrix) | Native chain **must** continue in-chat — not "stop segment; operator may advance" |
+| **`auto.md`** § Steps item 5 | Option B outer-driver equivalence scoped to **`NATIVE_CHAIN_UNAVAILABLE`** / headless/CI only |
+| **`auto-orchestration-reference.md`** full-autonomy matrix | Outer-driver re-invoke row = **fallback** — not IDE-primary |
+
+**Required doc literal**: **`native chain supersedes Option B`**.
+
+### Drain-advance step 7 enforcement (AC-3)
+
+Between **DEC-0080** algorithm steps **6** and **7**:
+
+- **Forbidden**: operator wait, hand-off-to-operator prose, **`stop_reason=completed (segment exhausted)`** when `backlog_drain_stories_remaining_budget > 0` and eligible OPEN item exists.
+- **Required**: immediate Task-spawn of first phase of next segment.
+- **Attestation**: `drain_advance_action=spawned` in `state.md` boundary on successful advance.
+
+## Continuation-truth breadcrumbs (AC-4)
+
+Amend **DEC-0080** §3 breadcrumb semantics:
+
+| Field | Semantics |
+|-------|-----------|
+| **`native_chain_active`** | Gate eligibility (**`full_autonomy`** + IDE + Task) — unchanged |
+| **`native_chain_continuing`** | Orchestrator scheduled spawn/advance **this** boundary |
+| **`drain_advance_action`** | `spawned` \| `skipped` \| `not_applicable` — step 7 outcome |
+
+**Invariant**: `native_chain_continuing=true` ⇒ no mandatory re-**`/auto`** prose; `stop_reason` ≠ `completed (segment exhausted)` when continuation pending.
+
+## Forbidden-prose negative enforcement (AC-5, AC-6)
+
+**Negative grep scope**: **`auto.md`** + **`auto-orchestration-reference.md`** normative blocks under **`full_autonomy`** / native-chain sections.
+
+| Forbidden pattern | Notes |
+|-------------------|-------|
+| Mandatory `re-run /auto` between drain segments | Includes operator-facing end-of-run templates |
+| `segment exhausted` as terminal when continuation pending | Invalid under **`full_autonomy`** |
+| Mandatory `run the outer driver` in IDE-primary path | Outer driver = **optional** / **fallback** only |
+| Unqualified `python scripts/auto_outer_driver.py` | Must have **optional** / **fallback** qualifier |
+
+**Preserved**: seven **`test_us0095_*`** subtests remain green — additive **`test_bug0012_*`** layer only.
+
+## Contract tests (AC-5)
+
+**Run**: `pytest -k bug0012 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| `test_bug0012_forbidden_drain_stop_prose_negative_grep` | AC-5, AC-6 | Negative grep forbidden patterns in native-chain + full_autonomy blocks |
+| `test_bug0012_orchestrator_post_subagent_spawn_mandate` | AC-1 | **`orchestrator MUST Task-spawn`** after subagent return when schedulable |
+| `test_bug0012_drain_advance_step7_no_stop_between_6_and_7` | AC-3 | Step 6→7 immediate spawn — no operator stop between |
+| `test_bug0012_native_chain_precedence_over_option_b` | AC-2 | Native chain primary supersedes US-0088 Option B under **`full_autonomy`** |
+
+## `resume_brief` + reference alignment (AC-7)
+
+**DEC-0069** pairing contract: orchestrator **MUST Task-spawn** next phase — **`/auto`** is orchestrator context label, not operator re-invocation instruction.
+
+**Touch surfaces**: `handoffs/resume_brief.md` template pairing lines; reference drain-advance + continuation sections.
+
+## Operator E2E recipe (AC-8)
+
+Runbook § **BUG-0012 regression verify**:
+
+1. Scratchpad: **`AUTO_FLOW_MODE=full_autonomy`**, **`AUTO_BACKLOG_DRAIN=1`**, **`AUTO_BACKLOG_MAX_STORIES≥2`**, **`AUTO_QUIET=1`**.
+2. Backlog: **≥2 OPEN stories**.
+3. Single **`/auto`** in Cursor IDE Agent panel.
+4. Complete **story A** through **`refresh-context`**.
+5. **Pass**: orchestrator drain-advances to **story B** first phase **without** operator re-**`/auto`** and **without** forbidden terminal prose.
+6. Evidence: `state.md` shows `drain_advance_action=spawned`, `native_chain_continuing=true`; `resume_brief` top pointer advances `story_id`.
+
+## Template parity (AC-8)
+
+**Touch inventory** (6 surfaces): `auto.md` (+ template), reference excerpts (+ template), `resume_brief` pairing contract, contract tests, architecture `# BUG-0012`, runbook E2E subsection (+ template).
+
+**Parity scope**: `--scope=bug-0012`.
+
+## Non-goals
+
+- Weakening **BUG-0006** spawn-only or **DEC-0078** hard gates.
+- Removing outer driver (optional fallback preserved).
+- Changing **US-0096** delivery modes.
+- Modifying **DEC-0038** strict-proof tuple schema (additive breadcrumb fields only).
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Doc fix passes tests; runtime still stops | Operator E2E recipe + `native_chain_continuing` attestation |
+| **R2** Over-broad edits relax hard gates | Explicit **DEC-0078** unchanged assertion in contract tests |
+| **R3** Phase-role vs orchestrator conflation | Actor distinction diagram + mandate literals |
+| **R4** **AUTO_QUIET=1** messaging ambiguity | Scheduling independent of quiet; forbidden wait prose |
+| **R5** Cursor spawn depth | **`NATIVE_CHAIN_UNAVAILABLE`** unchanged |
+
+## AC traceability
+
+| AC | Architecture anchor |
+|----|---------------------|
+| AC-1 Orchestrator MUST Task-spawn mandate | § Orchestrator compliance contract |
+| AC-2 Native chain precedence over Option B | § Native-chain precedence |
+| AC-3 Drain-advance step 7 no-stop | § Drain-advance step 7 enforcement |
+| AC-4 Continuation-truth breadcrumbs | § Continuation-truth breadcrumbs |
+| AC-5 Four `test_bug0012_*` contract tests | § Contract tests |
+| AC-6 Forbidden-prose negative grep | § Forbidden-prose negative enforcement |
+| AC-7 `resume_brief` spawn wording | § `resume_brief` + reference alignment |
+| AC-8 Runbook multi-segment E2E + parity | § Operator E2E recipe; § Template parity |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+| # | Seed | AC | Surfaces |
+|---|------|----|----------|
+| 1 | Add orchestrator-only **MUST Task-spawn** continuation block to `auto.md` — actor distinction, post-subagent loop, forbidden turn-boundary stop | AC-1 | `.cursor/commands/auto.md` + template |
+| 2 | Scope US-0088 matrix + Steps Option B to **`NATIVE_CHAIN_UNAVAILABLE`** / headless only; add **`native chain supersedes Option B`** literal | AC-2 | `auto.md`, reference active + template |
+| 3 | Harden drain-advance algorithm — no operator stop between steps 6–7; `drain_advance_action` attestation docs | AC-3, AC-4 | reference, `auto.md`, `state.md` breadcrumb comments |
+| 4 | Add `native_chain_continuing` + `drain_advance_action` to state boundary field docs and resume_brief pairing spawn wording | AC-4, AC-7 | reference, `resume_brief` template, `auto.md` |
+| 5 | Implement four **`test_bug0012_*`** contract subtests + `pytest -k bug0012` green | AC-5 | `tests/auto_command_contract_test.py` |
+| 6 | Negative grep forbidden drain-stop prose across full_autonomy normative blocks | AC-6 | contract tests (subtest 1), `auto.md`, reference |
+| 7 | Runbook § **BUG-0012 regression verify** — multi-segment operator E2E recipe | AC-8 | `runbook.md` + template |
+| 8 | Template parity `--scope=bug-0012`; preserve all **`test_us0095_*`** green; architecture + DEC linkage assert | AC-8 | template mirrors, parity script, read-only assert |
+
+**Task count**: 8 seeds. `SPRINT_MAX_TASKS=12` — no auto-split expected.
+
+## Decision linkage
+
+- Decision: **`DEC-0081`**
+- Amends: **`DEC-0080`**
+- Research: **`R-0083`**
+- Composed: **`DEC-0078`**, **`BUG-0006`**, **`DEC-0069`**, **`DEC-0038`**, **`US-0095`**
+- Related: **`US-0088`**, **`US-0092`**, **`US-0044`**, **`R-0081`**
+
+# US-0096: Delivery modes — `DELIVERY_MODE` ultra_lean + mega_quick with layered memory
+
+## Overview
+
+**`US-0096`** closes the token-cost gap left by **`US-0080`** / **`DEC-0062`** (context breadth) and **DEC-0052** (non-skippable reinstatement): ships opt-in **`DELIVERY_MODE=standard|ultra_lean|mega_quick`** (default **`standard`**) controlling **lifecycle shape and artifact surfaces** while preserving near-same code quality. **`standard`** remains **byte-compatible** with today's full lifecycle. **Tranche A** universal wins (narrow-read, tighter default hot caps, delta handoffs, touch-graph reads) ship **always-on** without mode toggle.
+
+Binding decision: **`DEC-0082`**. Research anchor: **`R-0082`**. Composes on **`DEC-0052`**, **`DEC-0062`**, **`DEC-0054`**, **`DEC-0080`** / **`DEC-0081`** — lean modes reduce per-story spawns; native chain + drain-advance **unchanged**.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Separate `DELIVERY_MODE` axis** orthogonal to **`TOKEN_PROFILE`** / **`CAVEMAN_MODE`** | **Preferred** — matches **DEC-0062** / **DEC-0072** precedent. |
+| B | **Extend `TOKEN_PROFILE=lean`** to skip phases | **Rejected** — conflates breadth vs lifecycle shape. |
+| C | **Remove `standard` lifecycle** | **Rejected** — AC-2 byte-compatibility. |
+| D | **Vector DB / embedding memory** | **Rejected** — file-based layers simpler, auditable, template-parity friendly (**R-0082**). |
+| E | **Fourth triad member (`active-context.md`)** | **Rejected** — warm index only; **DEC-0054** unchanged. |
+
+## Three-mode axis (AC-1)
+
+| Mode | Phase plan | Primary artifacts | Spawn budget (typical story) |
+|------|------------|-------------------|------------------------------|
+| **`standard`** | Full **DEC-0052** chain | **`sprints/Sxxxx/`**, triad handoffs | ~11 phases (+ loops) |
+| **`ultra_lean`** | **`spec→plan→build+verify→ship`** | **`work/US-xxxx/pack.json`**, **`active-context.md`** | 4 macro-phases (+ **`AUTO_IMPLEMENTATION_LOOP`**) |
+| **`mega_quick`** | **`[quick]`** (+1 on test fail) | **`sprints/quick/Qxxxx/task.json`** | 1–2 |
+
+**Non-substitution paragraph** (contract-test anchor — publish verbatim in reference + runbook):
+
+> **`DELIVERY_MODE`** controls lifecycle shape and artifact surfaces only. **`TOKEN_PROFILE`** controls context breadth / token cost only (**DEC-0062**). **`CAVEMAN_MODE`** controls reply voice only (**DEC-0072**). None substitutes for another.
+
+## Mode-scoped phase resolver — step 0 (AC-7, AC-2)
+
+**Integration**: **`/auto`** plan materialization **before** **DEC-0052** (**`R-0082`** Q2).
+
+```mermaid
+flowchart TD
+  START["resolve_delivery_mode\nargv > backlog > scratchpad"] --> MODE{delivery_mode}
+  MODE -->|mega_quick| ELIG{"mega_quick_eligible?"}
+  ELIG -->|no| FAIL["DELIVERY_MODE_INELIGIBLE\n+ MEGA_QUICK_* code"]
+  ELIG -->|yes| QUICK["plan = quick\nreinstatement = none\nmemory_layer = quick"]
+  MODE -->|ultra_lean| UL["plan = spec, plan,\nbuild+verify, ship\nreinstatement = none\nmemory_layer = pack"]
+  MODE -->|standard| STD["candidate = dec0052_expand\nplan = dec0052_reinstate\nreinstatement = dec0052_default\nmemory_layer = standard"]
+  QUICK --> BC["persist_breadcrumbs"]
+  UL --> BC
+  STD --> BC
+```
+
+**Required doc literals**: **`resolve_delivery_mode`**, **`reinstatement applies only when delivery_mode=standard`**, **`PHASE_POLICY_CONFLICT`**, **`DELIVERY_MODE_SWITCH_MID_STORY`**.
+
+**`AUTO_PHASE_*`**: applies **only** when **`delivery_mode=standard`**. Non-standard + non-default **`AUTO_PHASE_*`** → **`PHASE_POLICY_CONFLICT`**.
+
+**Standard regression guard**: unset or **`standard`** MUST materialize today's full chain — **`test_us0095_*`** + **`test_bug0012_*`** baselines preserved via **`test_us0096_standard_mode_baseline_markers_preserved`**.
+
+## Tranche A universal wins (AC-3)
+
+**Principle**: always-on — no **`DELIVERY_MODE`** toggle required.
+
+| Key | Current | Tranche A default | Override |
+|-----|---------|-------------------|----------|
+| **`STATE_HOT_MAX_LINES`** | 1200 | **1000** | explicit wins |
+| **`PO_TO_TL_HOT_MAX_LINES`** | 800 | **650** | explicit wins |
+| **`ARCH_HOT_MAX_LINES`** | 3500 | **3000** | explicit wins |
+| **`LEAN_COLD_READ_MAX_SECTIONS`** | unset | **4** | **`LEAN_COLD_READ_MAX_SECTIONS`** |
+| **`LEAN_STATE_INDEX_ROWS`** | unset | **80** | **`LEAN_STATE_INDEX_ROWS`** |
+
+**Behaviors** (all phase commands, active + `template/`):
+
+1. **Narrow-read** — **`Inputs`** cite **`phase-context.md`** + story section anchor; forbid full-file reads when section heading exists.
+2. **Delta handoffs** — append delta paragraphs only.
+3. **Touch-graph reads** — runbook: **`codebase-map.md`** component slice + touched paths before execute.
+
+**Target**: **≥10%** **`cache_read_tokens`** reduction on **`run_class_hash`-matched **`standard`** runs vs pre-US-0096 baseline.
+
+## `ultra_lean` macro-lifecycle (AC-4)
+
+| Macro | Merged phases | Role |
+|-------|---------------|------|
+| **`spec`** | intake + discovery | **po** |
+| **`plan`** | research + architecture + sprint-plan | **tech-lead** |
+| **`build+verify`** | execute + qa + verify-work | **dev** / **qa** |
+| **`ship`** | release + refresh-context | **release** / **curator** |
+
+**Invariants**: **`AUTO_IMPLEMENTATION_LOOP`** inside **`build+verify`**; no eleven-phase reinstatement; QA merges AC + UAT in one spawn.
+
+**Required literals**: **`build+verify`**, **`AUTO_IMPLEMENTATION_LOOP`**, **`spec`**, **`plan`**, **`ship`**.
+
+## Layered memory (AC-5)
+
+### Memory tiers
+
+| Tier | Path | Triad? | Cap |
+|------|------|--------|-----|
+| Hot index | **`handoffs/active-context.md`** | **No** | **`LEAN_STATE_INDEX_ROWS`** (default **80**) |
+| Warm pack | **`work/<story_id>/pack.json`** | n/a | **16 KiB** soft |
+| Cold sections | vision / architecture / decisions | n/a | **`LEAN_COLD_READ_MAX_SECTIONS`** (default **4**) |
+
+### `pack.json` schema v1
+
+Validator: **`scripts/pack_json_validate.py`** — reason codes **`PACK_*`**.
+
+Required fields: **`schema_version`** (`"1"`), **`story_id`**, **`delivery_mode`**, **`status`**, **`ac[]`**, **`tasks[]`**, **`refs[]`**, **`deltas[]`**, **`memory_layer`** (`"pack"`).
+
+### Coexistence (no destructive overlap)
+
+| Mode | Authoritative surface |
+|------|----------------------|
+| **`standard`** | **`sprints/Sxxxx/tasks.md`** |
+| **`ultra_lean`** | **`work/US-xxxx/pack.json`** `tasks[]` |
+| **`mega_quick`** | **`sprints/quick/Qxxxx/task.json`** |
+
+### `active-context.md` contract
+
+- **Not** scanned by **`enforce-triad-hot-surface.py`**.
+- Rollover triggers: segment **`refresh-context`** complete **or** line count **>** **`LEAN_STATE_INDEX_ROWS`** → archive **`handoffs/archive/active-context-<story_id>-<utc>.md`**.
+- Oversize with **`LEAN_MEMORY_WRITE=1`** → **`ACTIVE_CONTEXT_OVERSIZE`** (fail closed).
+- Hot index rows: **`story_id`**, **`delivery_mode`**, **`read_before_code[]`**, **`last_delta_utc`**, **`open_risks[]`** (max 3).
+
+## `mega_quick` mode (AC-6)
+
+**Routing**: **`/auto`** → enhanced **`/quick`** when eligible.
+
+| # | Fail code | Rule |
+|---|-----------|------|
+| E1 | **`MEGA_QUICK_BUG_SEGMENT`** | Story-only |
+| E2 | **`MEGA_QUICK_AC_TOO_BROAD`** | AC ≤ 3 |
+| E3 | **`MEGA_QUICK_ARCHITECTURE_REQUIRED`** | No companion DEC required |
+| E4 | **`MEGA_QUICK_SPRINT_EXISTS`** | No active **`Sxxxx`** |
+| E5 | **`MEGA_QUICK_STORY_OVERRIDE`** | Row override consistent |
+| E6 | **`MEGA_QUICK_MULTI_COMPONENT`** | Single component scope |
+| E7 | **`MEGA_QUICK_GATE_ESCALATION`** | No elevated gates |
+
+**Artifacts**: **`sprints/quick/Qxxxx/task.json`** + **`summary.md`**. Second spawn on test failure only. Closure: **`acceptance_met: true`** + green tests.
+
+## Optional backlog routing (AC-8)
+
+**`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**: story row optional **`delivery_mode:`** field.
+
+**Precedence**: argv **`delivery-mode=`** → story row → scratchpad **`DELIVERY_MODE`** → **`standard`**.
+
+## Quality floor (AC-9)
+
+All lean modes: tests before stop; AC in pack/task.json; new patterns → architecture/decision delta; **`active-context.md`** updated; no secrets/publish bypass.
+
+## Run-class extension (AC-12)
+
+Amend **DEC-0062**: add **`delivery_mode`** to sorted run-class object.
+
+**Evidence**: **`handoffs/token_cost_runs/<orchestrator_run_id>.md`** rows include **`delivery_mode`** column.
+
+**Invalid comparison**: **`ultra_lean`** vs **`standard`** same story → **`TOKEN_COST_RUN_CLASS_MISMATCH`**.
+
+## Runbook operator recipes (AC-11)
+
+| Mode | When to use | Avoid when |
+|------|-------------|------------|
+| **`standard`** | Full lifecycle, cross-cutting stories, companion DEC, release gates | N/A (default) |
+| **`ultra_lean`** | P1 stories with clear AC, token budget pressure, institutional memory needed | Mid-story mode switch; no validator/index |
+| **`mega_quick`** | ≤3 AC, single component, docs-only or tiny fix | Architecture-first; existing **`Sxxxx`**; bug segments |
+
+## Contract tests + parity (AC-10)
+
+**Run**: `pytest -k us0096 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| `test_us0096_delivery_mode_scratchpad_keys` | AC-1 | **`DELIVERY_MODE`**, **`LEAN_*`**, **`AUTO_DELIVERY_ROUTING`**, non-substitution |
+| `test_us0096_standard_mode_baseline_markers_preserved` | AC-2 | **`test_us0095_*`** + **`test_bug0012_*`** green under **`standard`** |
+| `test_us0096_mode_scoped_reinstatement_literals` | AC-7 | Reinstatement **only** when **`delivery_mode=standard`** |
+| `test_us0096_ultra_lean_macro_phase_literals` | AC-4 | Four macro-phases + **`build+verify`** + **`AUTO_IMPLEMENTATION_LOOP`** |
+| `test_us0096_mega_quick_routing_literals` | AC-6 | **`/quick`** path + seven **`MEGA_QUICK_*`** codes |
+| `test_us0096_pack_json_schema_contract` | AC-5 | Schema fields + **`pack_json_validate.py`** + **`work/US-xxxx/pack.json`** |
+| `test_us0096_active_context_contract` | AC-5 | Path, line budget, rollover; **not** triad member |
+| `test_us0096_token_profile_orthogonality_paragraph` | AC-1 | Three-axis non-substitution in reference + runbook |
+
+**`US0096_PAIRS`** (`check_intake_template_parity.py --scope=us-0096`):
+
+| Active | Template |
+|--------|----------|
+| `.cursor/scratchpad.md` (via example) | `template/.cursor/scratchpad.local.example.md` |
+| `.cursor/commands/auto.md` | `template/.cursor/commands/auto.md` |
+| `docs/engineering/auto-orchestration-reference.md` | `template/docs/engineering/auto-orchestration-reference.md` |
+| `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` |
+| `.cursor/commands/quick.md` | `template/.cursor/commands/quick.md` |
+| `scripts/check_intake_template_parity.py` | `template/scripts/check_intake_template_parity.py` |
+| `scripts/pack_json_validate.py` (new) | `template/scripts/pack_json_validate.py` |
+
+**Harness**: register **`§26Q`** in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Partial **`ultra_lean`** | Tranche B gated on validator + index |
+| **R2** Triad confusion | Non-triad lock + contract test |
+| **R3** **`standard`** regression | Baseline marker preservation test |
+| **R4** False **`mega_quick`** routing | Seven fail-closed codes |
+| **R5** **`build+verify`** complexity | Runbook E2E |
+
+## AC traceability
+
+| AC | Architecture anchor |
+|----|---------------------|
+| AC-1 Scratchpad contract | § Three-mode axis |
+| AC-2 Standard unchanged | § Mode-scoped resolver; baseline test |
+| AC-3 Tranche A wins | § Tranche A universal wins |
+| AC-4 ultra_lean macro | § ultra_lean macro-lifecycle |
+| AC-5 Layered memory | § Layered memory |
+| AC-6 mega_quick | § mega_quick mode |
+| AC-7 Mode-scoped resolver | § Mode-scoped phase resolver |
+| AC-8 Backlog routing | § Optional backlog routing |
+| AC-9 Quality floor | § Quality floor |
+| AC-10 Contract tests | § Contract tests + parity |
+| AC-11 Architecture + runbook | § Runbook operator recipes |
+| AC-12 Token evidence | § Run-class extension |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+**Tranche order**: A → B → C → D (execute ordering within sprint may interleave for dependency safety).
+
+| # | Seed | AC | Surfaces |
+|---|------|----|----------|
+| 1 | **`DELIVERY_MODE`** + **`LEAN_*`** + **`AUTO_DELIVERY_ROUTING`** scratchpad keys + non-substitution paragraph (active + template example) | AC-1 | scratchpad example, reference, runbook |
+| 2 | Tranche A: default hot-cap deltas, narrow-read in all phase commands, delta handoff guidance, touch-graph runbook § | AC-3 | phase commands active + template, runbook |
+| 3 | Mode-scoped resolver step 0 in **`auto.md`** + reference; **`PHASE_POLICY_CONFLICT`**; standard reinstatement guard prose | AC-7, AC-2 | `auto.md`, reference |
+| 4 | **`ultra_lean`** macro-phase table + role mapping + **`build+verify`** / **`AUTO_IMPLEMENTATION_LOOP`** literals | AC-4 | `auto.md`, reference |
+| 5 | **`pack.json`** schema v1 + **`scripts/pack_json_validate.py`** + template mirror + **`PACK_*`** codes | AC-5 | `work/` convention, scripts |
+| 6 | **`handoffs/active-context.md`** template + rollover contract + non-triad documentation | AC-5 | handoffs, runbook |
+| 7 | **`mega_quick`** routing + seven eligibility codes + **`quick.md`** enhancements | AC-6 | `auto.md`, `quick.md` |
+| 8 | **`AUTO_DELIVERY_ROUTING`** + backlog **`delivery_mode:`** row field + precedence docs | AC-8 | backlog schema docs, reference |
+| 9 | Quality floor checklist in runbook + lean spawn read/write gates (**`LEAN_MEMORY_*`**) | AC-9 | runbook, reference |
+| 10 | Eight **`test_us0096_*`** contract subtests | AC-10 | `tests/auto_command_contract_test.py` |
+| 11 | **`US0096_PAIRS`** parity manifest + harness **§26Q** | AC-10 | parity script, run-tests |
+| 12 | Runbook operator recipes + **`delivery_mode`** in **`run_class_hash`** + token-cost evidence column | AC-11, AC-12 | runbook, token-cost lib/docs |
+
+**Task count**: 12 seeds. `SPRINT_MAX_TASKS=12` — at threshold; no auto-split unless execute discovers hidden scope.
+
+## Decision linkage
+
+- Decision: **`DEC-0082`**
+- Amends: **`DEC-0062`** ( **`delivery_mode`** in run-class)
+- Research: **`R-0082`**
+- Composed: **`DEC-0052`**, **`DEC-0054`**, **`DEC-0080`**, **`DEC-0081`**, **`US-0053`**, **`US-0080`**, **`US-0072`**
+- Related: **`US-0001`**, **`US-0092`**, **`US-0095`**, **`US-0094`**
+
+# US-0097: Project-owned root README bootstrap + per-story/sprint growth
+
+## Overview
+
+**`US-0097`** completes **DEC-0045** / **US-0062** partial delivery: root **`README.md`** becomes **project-owned** (users + developers + growing feature catalog); framework encyclopedia lives only under **`its_magic/README.md`**. Ships bootstrap on first **`/execute`**, mandatory per-shipped-story catalog delta, non-destructive upgrade migration (**M1–M5**), and **gate separation** from **US-0091** / **DEC-0074** (framework paths reframed to **`its_magic/`** family).
+
+Binding decision: **`DEC-0083`**. Research anchor: **`R-0084`**. Amends **`DEC-0045`**; reframes **DEC-0074** path scope without rewriting **DEC-0074** body.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Remove root README from install** + execute-time bootstrap | **Preferred** — clean ownership split per **R-0084** Q1/Q4. |
+| B | **Pointer stub at install** instead of bootstrap | **Rejected** — still ships framework artifact at root. |
+| C | **Single combined README** for framework + project | **Rejected** — violates operator requirement and **DEC-0045**. |
+| D | **Extend US-0091 validator** to cover both surfaces | **Rejected** — conflates predicates; split validators per **R-0084** Q6. |
+| E | **Manual README updates only** (no execute/release gates) | **Rejected** — observed drift gap; fail-closed gates required. |
+
+## Ownership matrix (AC-1, AC-5)
+
+| Path | Owner | Install payload | Validator |
+|------|-------|-----------------|-----------|
+| Root **`README.md`** | **Project** | **Excluded** from **`[install_paths]`** | **`validate_project_readme_coverage.py`** |
+| **`its_magic/README.md`** | **Framework** | **Included** | **`validate_readme_feature_coverage.py`** (**US-0091**) |
+| **`template/its_magic/README.md`** | Framework kit source | Parity mirror | Install source only |
+| **`template/README.md`** | Framework kit source | **Not** copied to consumer root | Out of scope for project gate |
+| **`docs/developer/README.md`** | Framework DEV shard | Unchanged | **US-0091** only |
+
+**Kit-repo exception**: **`FRAMEWORK_KIT_REPO=1`** (its-magic dev repo only) preserves dual-purpose root; consumer repos default **`0`**.
+
+## Placeholder sentinel table (AC-2, AC-3)
+
+| Signal | Rule | Verdict |
+|--------|------|---------|
+| **S1** | H1 `# its-magic — AI dev team` | placeholder |
+| **S2** | `<!-- readme-feature-coverage-catalog -->` | placeholder |
+| **S3** | Heading `Feature coverage catalog (US-0091)` | placeholder |
+| **S4** | Byte-identical to **`template/README.md`** | placeholder |
+| **S5** | No S1–S4 + custom title/purpose | **operator-authored** — preserve |
+
+**Detection order**: **`FRAMEWORK_KIT_REPO=1`** → S1–S4 → S5.
+
+**Hybrid fail-closed**: **`PROJECT_README_MIGRATION_AMBIGUOUS`**, **`PROJECT_README_SENTINEL_CONFLICT`**.
+
+## Project README scaffold (AC-3, AC-5)
+
+Bootstrap trigger: first **`/execute`** when root missing **or** any **S1–S4** matches.
+
+```
+# {Project Name}          ← vision.md H1
+{1–3 sentence purpose}
+## For users
+## For developers
+## Features
+<!-- project-readme-feature-catalog -->
+*Framework workflow commands: see [its_magic/README.md](its_magic/README.md).*
+```
+
+## Migration algorithm M1–M5 (AC-2)
+
+| Step | Condition | Action |
+|------|-----------|--------|
+| **M1** | **`FRAMEWORK_KIT_REPO=1`** | Skip consumer migration |
+| **M2** | Root **S5** | Preserve root; ensure **`its_magic/README.md`** |
+| **M3** | Root **S1–S4**, **`its_magic/`** missing | Lift root → **`its_magic/README.md`** |
+| **M4** | Root **S1–S4** after **M3** | Replace root with project scaffold |
+| **M5** | Hybrid / ambiguous | Fail closed |
+
+**Grandfathering**: **`PROJECT_README_ENFORCE=0`** until **`--report`** clean for explicit **`user_visible: true`** DONE rows.
+
+## Execute step 23 (AC-3, AC-4, AC-8)
+
+Placement: after step **22** (triad hot-surface).
+
+| Sub-step | Contract |
+|----------|----------|
+| **23 preamble** | Read **`FRAMEWORK_KIT_REPO`**; skip **23a**/**23b** when **`1`**. |
+| **23a Bootstrap** | Materialize scaffold when missing/placeholder. |
+| **23b Delta (mandatory)** | ≥1 catalog bullet with **`\bUS-xxxx\b`** under **`<!-- project-readme-feature-catalog -->`**. Fail → **`PROJECT_README_DELTA_SKIPPED`**. |
+| **23c Hygiene** | Compose with step **20** (**US-0071**). |
+
+**Orthogonality**: step **16** (**US-0032**) — zero overhead when **`USER_GUIDE_MODE=0`**.
+
+## Release step 3g (AC-4, AC-7)
+
+Placement: **3e → 3f (framework) → 3g (project) → 4 (UAT)**.
+
+When **`PROJECT_README_ENFORCE=1`**: **`python scripts/validate_project_readme_coverage.py --repo . --enforce`**.
+
+When **`0`**: skip with **`PROJECT_README_ENFORCE_SKIPPED`** evidence (migration only).
+
+Umbrella failure: **`PROJECT_README_COVERAGE_BLOCKED`** + **`PROJECT_README_COVERAGE_GAP:<US-xxxx>`**.
+
+## Validators (AC-6)
+
+| Validator | Paths | Predicate |
+|-----------|-------|-----------|
+| **`validate_readme_feature_coverage.py`** (**US-0091**) | **`its_magic/README.md`**, **`template/its_magic/README.md`**, **`docs/developer/README.md`** | DONE **`user_visible: true`** **framework** items |
+| **`validate_project_readme_coverage.py`** (**US-0097**) | root **`README.md`** | DONE **`user_visible: true`** **project** items |
+
+**Lib split**: **`project_readme_coverage_lib.py`** (sentinels, catalog extractor, predicate).
+
+**`--report` schema v1** fields: **`report_schema_version`**, **`status`**, **`repo_root`**, **`catalog_marker_present`**, **`coverage_present[]`**, **`coverage_missing[]`**, **`coverage_total`**, **`gaps[]`**, **`framework_paths_excluded`**, **`kit_repo_skipped`**.
+
+**Self-test**: **`[PROJECT_README_COVERAGE_SELF_TEST_OK]`**.
+
+## Scratchpad keys (AC-7)
+
+| Key | Default | Purpose |
+|-----|---------|---------|
+| **`PROJECT_README_ENFORCE`** | **`1`** post-bootstrap | Release **3g** toggle |
+| **`FRAMEWORK_KIT_REPO`** | **`0`** | Kit-repo skip for bootstrap/delta/validator |
+
+## Runbook operator recipes (AC-10)
+
+| Scenario | Operator action |
+|----------|-----------------|
+| Fresh consumer repo | First **`/execute`** bootstraps project README; framework catalog in **`its_magic/`** |
+| Legacy framework root README | Run **`upgrade`** — migration **M3**/**M4** lifts to **`its_magic/`** + project scaffold |
+| Operator-authored root (S5) | Migration preserves root; adds **`its_magic/README.md`** if missing |
+| Hybrid / ambiguous root | Fix manually per **`PROJECT_README_MIGRATION_AMBIGUOUS`** runbook § |
+| Migration window | Set **`PROJECT_README_ENFORCE=0`**; backfill **`user_visible:`** markers; flip to **`1`** when **`--report`** clean |
+| Kit repo dogfooding | Set **`FRAMEWORK_KIT_REPO=1`** — skip consumer bootstrap |
+
+## Contract tests + parity (AC-9)
+
+**Run**: `pytest -k us0097 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| `test_us0097_installer_manifest_no_root_readme` | AC-1 | Root excluded from **`[install_paths]`**; **`its_magic/README.md`** included |
+| `test_us0097_execute_step23_literals` | AC-3, AC-4 | Step **23** bootstrap/delta/skip prose + reason codes |
+| `test_us0097_release_step3g_literals` | AC-4, AC-7 | Step **3g** + **`PROJECT_README_ENFORCE`** + validator invocation |
+| `test_us0097_placeholder_sentinel_table` | AC-2 | S1–S4 + S5 + ambiguous/hybrid literals |
+| `test_us0097_framework_validator_paths_reframed` | AC-5, AC-6 | **US-0091** reads **`its_magic/README.md`** — not consumer root |
+| `test_us0097_project_readme_enforce_scratchpad_keys` | AC-7 | **`PROJECT_README_ENFORCE`**, **`FRAMEWORK_KIT_REPO`** in scratchpad |
+| `test_us0097_project_readme_coverage_validator_contract` | AC-6 | Script presence + self-test + report schema |
+| `test_us0097_us0091_regression_guard` | AC-6 | Framework **3f** preserved; root removed from **US-0091** paths |
+
+**`PROJECT_README_PAIRS`** (`check_intake_template_parity.py --scope=project-readme`):
+
+| Active | Template |
+|--------|----------|
+| **`scripts/validate_project_readme_coverage.py`** | **`template/scripts/validate_project_readme_coverage.py`** |
+| **`scripts/project_readme_coverage_lib.py`** | **`template/scripts/project_readme_coverage_lib.py`** |
+| **`.cursor/commands/execute.md`** | **`template/.cursor/commands/execute.md`** |
+| **`.cursor/commands/release.md`** | **`template/.cursor/commands/release.md`** |
+| **`docs/engineering/runbook.md`** | **`template/docs/engineering/runbook.md`** |
+| **`docs/engineering/context/installer-owned-paths.manifest`** | **`template/docs/engineering/context/installer-owned-paths.manifest`** |
+| **`.cursor/scratchpad.local.example.md`** | **`template/.cursor/scratchpad.local.example.md`** |
+| **`scripts/check_intake_template_parity.py`** | **`template/scripts/check_intake_template_parity.py`** |
+
+**Harness**: register next free section in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Migration deletes operator prose | **S5** preserve + **M5** fail-closed |
+| **R2** **US-0091** regression | Path table + **`test_us0097_us0091_regression_guard`** |
+| **R3** Kit vs consumer | **`FRAMEWORK_KIT_REPO`** detection order |
+
+## AC traceability
+
+| AC | Architecture anchor |
+|----|---------------------|
+| AC-1 Installer ownership | § Ownership matrix |
+| AC-2 Non-destructive migration | § Migration M1–M5; § Placeholder sentinels |
+| AC-3 Execute bootstrap | § Execute step 23 (**23a**) |
+| AC-4 Mandatory delta | § Execute step 23 (**23b**); § Release step **3g** |
+| AC-5 Audience structure | § Project README scaffold; § Ownership matrix |
+| AC-6 Split validators | § Validators |
+| AC-7 Release gate + scratchpad | § Release step **3g**; § Scratchpad keys |
+| AC-8 US-0071 hygiene | § Execute step 23 (**23c**) |
+| AC-9 Contract tests | § Contract tests + parity |
+| AC-10 Architecture + runbook | § Runbook operator recipes; this section + **`DEC-0083`** |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+**Tranche order**: A → B → C → D.
+
+| # | Seed | AC | Surfaces |
+|---|------|----|----------|
+| 1 | Remove root **`README.md`** from **`installer-owned-paths.manifest`** **`[install_paths]`**; confirm **`its_magic/README.md`** in manifest (active + template) | AC-1 | manifest, installer |
+| 2 | Migration **M1–M5** + sentinel **S1–S5** in **`project_readme_coverage_lib.py`**; hybrid fail-closed reason codes; runbook migration § | AC-2 | lib, runbook |
+| 3 | Project README bootstrap scaffold + vision.md H1/purpose sourcing helper | AC-3, AC-5 | lib, runbook |
+| 4 | Execute step **23** (**23a**/**23b**/**23c**) in **`execute.md`** (active + template) + reason codes | AC-3, AC-4, AC-8 | execute.md |
+| 5 | Release step **3g** in **`release.md`** (active + template) + gate order **3f→3g→4** | AC-4, AC-7 | release.md |
+| 6 | Scratchpad **`PROJECT_README_ENFORCE`**, **`FRAMEWORK_KIT_REPO`** (active + template example) | AC-7 | scratchpad |
+| 7 | Reframe **`validate_readme_feature_coverage.py`** / **US-0091** to **`its_magic/`** paths only; preserve release **3f** | AC-5, AC-6 | scripts, readme lib |
+| 8 | **`validate_project_readme_coverage.py`** + **`project_readme_coverage_lib.py`** + **`--report`** schema v1 + **`FRAMEWORK_KIT_REPO`** skip | AC-6 | scripts |
+| 9 | Eight **`test_us0097_*`** contract subtests | AC-9 | `tests/auto_command_contract_test.py` |
+| 10 | **`PROJECT_README_PAIRS`** parity manifest + harness section | AC-9 | parity script, run-tests |
+| 11 | Runbook operator recipes (bootstrap, migration, gate troubleshooting) | AC-10 | runbook |
+
+**Task count**: 11 seeds. `SPRINT_MAX_TASKS=12` — under threshold; no auto-split.
+
+## Decision linkage
+
+- Decision: **`DEC-0083`**
+- Amends: **`DEC-0045`**
+- Reframes paths: **`DEC-0074`** (body unchanged)
+- Research: **`R-0084`**
+- Composed: **`DEC-0059`**, **`US-0030`**, **`US-0071`**, **`US-0017`**, **`US-0091`**
+- Related: **`US-0062`**, **`US-0032`**, **`US-0077`**
+
+# US-0098: Dev environment auto-launch profile (detect, persist, relaunch, connect)
+
+## Overview
+
+**`US-0098`** ships a default-off **dev-loop auto-launch profile**: when **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`**, **`/execute`** detects/persists the dev runtime, runs bounded rebuild/restart after runtime/container surface changes (or explicit operator refresh), and surfaces a **Connect** block to the operator — distinct from **US-0065** phase QA, **US-0086** test routing, and **US-0067** release hints.
+
+Binding decision: **`DEC-0084`**. Research anchor: **`R-0085`**. Composes on **US-0085** / **DEC-0071**, **US-0064**, **US-0086**, **US-0093** — no **`release-targets.json`** schema change.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Default-off scratchpad gate** + local **`.cursor/dev-environment.json`** + execute step **24** | **Preferred** — manual parity when off; testable stdlib helper. |
+| B | **Doc-only** profile (no helper) | **Rejected** — tier/detection/schema need contract tests per **R-0085** Q5. |
+| C | **Mandatory `docker compose watch`** daemon | **Rejected** — v1 exclusion; bounded execute-triggered only. |
+| D | **Extend `release-targets.json`** for dev profile | **Rejected** — **US-0064** schema unchanged; separate local artifact. |
+| E | **Architecture-only** (no companion DEC) | **Rejected** — cross-cuts **≥3** delivered decisions per **R-0085** Q7. |
+
+## Scratchpad keys (AC-1)
+
+| Key | Values | Default | Purpose |
+|-----|--------|---------|---------|
+| **`DEV_AUTO_LAUNCH_PROFILE`** | **`off`** \| **`deterministic_v1`** | **`off`** | Master gate — zero overhead when **`off`** |
+| **`DEV_ENVIRONMENT_CONFIG`** | repo-relative path | **`.cursor/dev-environment.json`** | Profile path override |
+
+Orthogonal to **`AUTO_REMOTE_AUTOMATION_PROFILE`** (**US-0086**).
+
+## Profile schema v1 (AC-2)
+
+**Paths**: local **`.cursor/dev-environment.json`** (gitignored); committed **`template/.cursor/dev-environment.json.example`**.
+
+| Field | Notes |
+|-------|-------|
+| **`schema_version`** | **`1`** |
+| **`detected_mode`** | **`local`** \| **`docker-host-local`** \| **`docker`** \| **`ssh`** |
+| **`operator_seeded`**, **`last_updated`** | Audit / idempotent merge |
+| **`compose_file`**, **`service`**, **`target_id`** | Stack identity |
+| **`connect`** | **`endpoint`**, **`health_path`**, **`*Env`** keys only — never secret values |
+| **`rebuild_recipe`** | **`default_tier`** A/B/C; optional command templates; **`restart_on_source_change`** default **`false`** |
+| **`env_refs`**, **`evidence_refs`** | Names-only env refs; append-only evidence |
+
+**Git policy**: example tracked; local profile in **`.gitignore`** + **`.cursorignore`**.
+
+## Detection matrix (AC-3, AC-6)
+
+| Mode | Meaning |
+|------|---------|
+| **`local`** | Process dev server (**`DEV_SERVER_COMMAND`** / stack profile) |
+| **`docker-host-local`** | Same-machine compose/docker — operator on Docker host, not SSH hop |
+| **`docker`** / **`ssh`** | Remote targets when **US-0086** resolves (**US-0086** wins over **docker-host-local**) |
+
+**Precedence**: profile off → skip; load profile → **US-0086** remote target → local compose + docker CLI → **`DEV_SERVER_*`** → fail **`DEV_ENV_DETECT_AMBIGUOUS`**.
+
+## Tier A/B/C relaunch (AC-4, AC-8)
+
+| Tier | Trigger surfaces | Recipe |
+|------|------------------|--------|
+| **A — rebuild** | `Dockerfile*`, lockfiles, `docker-compose*.yml`, dependency manifests | `docker compose build` + `up -d` |
+| **B — restart** | Config-only (`*.env.example`, nginx/traefik, `application.y*ml`, docker entrypoints) | `docker compose restart <service>` |
+| **C — local** | **`detected_mode=local`**; hot-reload source when A/B absent | **`DEV_SERVER_COMMAND`** / stack start |
+| **Skip** | Docs/tests/handoffs unless runtime script matches | **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`** |
+
+**Highest tier wins**. **Bind-mount skip default**: source-only changes on **docker-host-local** skip unless **`restart_on_source_change=true`** or explicit refresh.
+
+**Bounded safety**: **`retry_count`** max **2**; delays **5s**, **15s**; no unbounded watch v1.
+
+## Execute step 24 (AC-4, AC-5, AC-7)
+
+Placement: after step **23** (**US-0097**), before execute completion / QA handoff.
+
+| Sub-step | Contract |
+|----------|----------|
+| **24 preamble** | Read gate + config path; skip **24a–24d** when **`off`**. |
+| **24a Gate + load** | Schema validation; **`DEV_ENV_PROFILE_INVALID`** / **`DEV_ENV_PROFILE_MISSING`**. |
+| **24b Detect + persist** | Detection precedence; idempotent profile merge. |
+| **24c Relaunch** | Tier recipe when file-class match or explicit refresh; bounded retries. |
+| **24d Connect + handoff** | Append evidence to **`handoffs/dev_to_qa.md`**. |
+
+**Explicit refresh**: exact literal **`refresh dev environment`** (case-sensitive whole phrase). Always relaunch when profile on.
+
+**`dev_to_qa.md` evidence tuple** (when step **24** runs and profile **on**):
+
+| Field | Value |
+|-------|-------|
+| `dev_auto_launch_profile` | deterministic_v1 |
+| `runtime_mode` | detected mode |
+| `relaunch_tier` | A \| B \| C \| (none) |
+| `relaunch_command` | names-only command string(s) |
+| `relaunch_outcome` | success \| skipped \| failed |
+| `retry_count` | 0..2 |
+| `reason_code` | (none) or DEV_ENV_* |
+
+**Connect block**: `runtime_mode`, `connect_endpoint`, `health_path`, `service_id`/`container_id`, `target_id`, `env_refs`, `relaunch_outcome`.
+
+**Orthogonality**: step **18** (**US-0065**) QA autopilot; step **17** (**US-0084**) remote cues compose when both fire.
+
+## Stdlib helper (AC-9)
+
+**`scripts/dev_environment_lib.py`** (+ template mirror):
+
+| API | Role |
+|-----|------|
+| **`load_profile`** | Parse + validate names-only schema |
+| **`classify_touched_files`** | Tier A/B/C table |
+| **`detect_mode`** | Precedence algorithm |
+| **`build_relaunch_plan`** | Command list (no `.env` reads) |
+| **`format_connect_block`** | Markdown Connect emission |
+| **`--self-test`** | **`[DEV_ENVIRONMENT_SELF_TEST_OK]`** |
+
+## Security (AC-2, AC-8) — US-0085 inheritance
+
+Four layers: schema rejects secret literals; gitignore/cursorignore local profile; agent rules (no **`.env`** read); runtime subprocess inherits operator env only. Violation → **`DEV_ENV_SECRET_SURFACE_VIOLATION`**.
+
+## Reason codes (AC-8)
+
+**Profile**: **`DEV_ENV_PROFILE_DISABLED`**, **`DEV_ENV_PROFILE_INVALID`**, **`DEV_ENV_PROFILE_MISSING`**, **`DEV_ENV_DETECT_AMBIGUOUS`**, **`DEV_ENV_COMPOSE_UNRESOLVED`**, **`DEV_ENV_TARGET_DISABLED`**, **`DEV_ENV_SECRET_SURFACE_VIOLATION`**
+
+**Relaunch**: **`DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE`**, **`DEV_ENV_RELAUNCH_SKIPPED_PROFILE_OFF`**, **`DEV_ENV_RELAUNCH_FAILED`**, **`DEV_ENV_RELAUNCH_RETRY_EXHAUSTED`**, **`DEV_ENV_RELAUNCH_TIMEOUT`**, **`DEV_ENV_CONNECT_UNAVAILABLE`**
+
+## Runbook operator recipes (AC-10)
+
+| Scenario | Operator action |
+|----------|-----------------|
+| Enable dev auto-launch | Set **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`** in scratchpad |
+| Seed profile | Provide compose service + **`*Env`** connect refs; agent writes **`.cursor/dev-environment.json`** |
+| Force relaunch | Send exact phrase **`refresh dev environment`** |
+| Profile off / manual mode | Leave **`DEV_AUTO_LAUNCH_PROFILE=off`** (default) — step **24** zero overhead |
+| Ambiguous stack | Fix compose path or seed profile; remediate **`DEV_ENV_DETECT_AMBIGUOUS`** |
+| Remote + local both on | **US-0086** remote wins — see precedence table |
+| Bind-mount hot reload | Default skip on source-only docker changes; use refresh or **`restart_on_source_change=true`** |
+
+## Contract tests + parity (AC-9)
+
+**Run**: `pytest -k us0098 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| `test_us0098_dev_auto_launch_scratchpad_keys` | AC-1 | **`DEV_AUTO_LAUNCH_PROFILE`**, **`DEV_ENVIRONMENT_CONFIG`** in scratchpad |
+| `test_us0098_execute_step24_literals` | AC-4 | Step **24** sub-steps + reason codes |
+| `test_us0098_dev_environment_schema_contract` | AC-2 | Schema fields + example path + gitignore |
+| `test_us0098_detection_mode_precedence_literals` | AC-3 | Four modes + **US-0086** precedence |
+| `test_us0098_reason_code_inventory` | AC-8 | **`DEV_ENV_PROFILE_*`**, **`DEV_ENV_RELAUNCH_*`** families |
+| `test_us0098_connect_block_field_literals` | AC-5 | Connect tuple field names |
+| `test_us0098_refresh_dev_environment_phrase_literal` | AC-7 | Exact **`refresh dev environment`** phrase |
+| `test_us0098_us0086_compose_no_schema_change` | AC-6 | **`release-targets.json`** schema unchanged |
+
+**`DEV_ENVIRONMENT_PAIRS`** (`check_intake_template_parity.py --scope=dev-environment`):
+
+| Active | Template |
+|--------|----------|
+| **`.cursor/commands/execute.md`** (step **24**) | **`template/.cursor/commands/execute.md`** |
+| **`.cursor/scratchpad.md`** | **`template/.cursor/scratchpad.md`** |
+| **`.cursor/scratchpad.local.example.md`** | **`template/.cursor/scratchpad.local.example.md`** |
+| **`template/.cursor/dev-environment.json.example`** | (self — byte match) |
+| **`scripts/dev_environment_lib.py`** | **`template/scripts/dev_environment_lib.py`** |
+| **`docs/engineering/runbook.md`** | **`template/docs/engineering/runbook.md`** |
+| **`docs/engineering/auto-orchestration-reference.md`** | **`template/docs/engineering/auto-orchestration-reference.md`** |
+| **`.gitignore`** (dev-environment line) | **`template/.gitignore`** or documented exception |
+
+**Harness**: register next free section in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Relaunch loops | **`retry_count`≤2** + idempotent writes |
+| **R2** docker-host-local vs remote | Precedence + regression test |
+| **R3** Secret leakage | Four-layer audit + gitignore |
+| **R4** Step proliferation | Default-off gate |
+
+## AC traceability
+
+| AC | Architecture anchor |
+|----|---------------------|
+| AC-1 Default-off gate | § Scratchpad keys |
+| AC-2 Profile schema | § Profile schema v1 |
+| AC-3 Detection matrix | § Detection matrix |
+| AC-4 Execute relaunch | § Execute step 24; § Tier A/B/C |
+| AC-5 Connect surface | § Execute step 24 (**24d**); § Contract tests |
+| AC-6 Composition | § Detection matrix; § Orthogonality |
+| AC-7 Explicit refresh | § Execute step 24 |
+| AC-8 Bounded safety + reason codes | § Tier A/B/C; § Reason codes |
+| AC-9 Contract tests | § Contract tests + parity |
+| AC-10 Architecture + runbook | § Runbook operator recipes; **`DEC-0084`** |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+**Tranche order**: A → B → C → D.
+
+| # | Seed | AC | Surfaces |
+|---|------|----|----------|
+| 1 | **`template/.cursor/dev-environment.json.example`** schema v1 + **`.gitignore`** / **`.cursorignore`** local profile lines (active + template) | AC-2 | example, ignore files |
+| 2 | Scratchpad **`DEV_AUTO_LAUNCH_PROFILE`**, **`DEV_ENVIRONMENT_CONFIG`** (active + template + local example) | AC-1 | scratchpad |
+| 3 | **`dev_environment_lib.py`**: **`load_profile`**, schema validation, security heuristics + **`--self-test`** | AC-2, AC-8 | scripts |
+| 4 | **`detect_mode`** precedence + **`classify_touched_files`** Tier A/B/C + **`build_relaunch_plan`** | AC-3, AC-4 | lib |
+| 5 | **`format_connect_block`** + reason-code registry constants | AC-5, AC-8 | lib |
+| 6 | Execute step **24** (**24a–24d**) + **`dev_to_qa.md`** evidence tuple prose (active + template **`execute.md`**) | AC-4, AC-5, AC-7 | execute.md, handoffs contract |
+| 7 | **`auto-orchestration-reference.md`** dev auto-launch § + **`runtime-connectivity.md`** cross-link (active + template) | AC-6 | docs |
+| 8 | Eight **`test_us0098_*`** contract subtests | AC-9 | `tests/auto_command_contract_test.py` |
+| 9 | **`DEV_ENVIRONMENT_PAIRS`** + **`check_intake_template_parity.py --scope=dev-environment`** | AC-9 | parity script |
+| 10 | Runbook operator recipes (enable, seed, refresh, troubleshooting, precedence) | AC-10 | runbook |
+| 11 | Harness section **§26W** (or next free) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** | AC-9 | harness |
+
+**Task count**: 11 seeds. `SPRINT_MAX_TASKS=12` — under threshold; no auto-split.
+
+## Decision linkage
+
+- Decision: **`DEC-0084`**
+- Research: **`R-0085`**
+- Composed: **`DEC-0071`** (US-0085), **US-0064**, **US-0086**, **US-0065**, **US-0093**
+- Related: **US-0067**
+
+# US-0099: Auto-bootstrap dev-environment profile on install/upgrade (non-destructive)
+
+## Overview
+
+**`US-0099`** closes the install-time gap left by **`US-0098`** / **`DEC-0084`**: when operators enable **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`**, execute step **24** expects a loadable profile at **`DEV_ENVIRONMENT_CONFIG`** (default **`.cursor/dev-environment.json`**) but install/upgrade never materializes that gitignored local file — yielding **`DEV_ENV_PROFILE_MISSING`** until manual copy. Ship **non-destructive auto-bootstrap**: copy **`template/.cursor/dev-environment.json.example`** → resolved profile path on **`missing`**, **`upgrade`**, and **npm `postinstall`** **only when the target is absent**; **never** overwrite operator-customized profiles.
+
+Binding decision: **`DEC-0084`** (amended § bootstrap posture — **no new `DEC-xxxx`**). Research anchor: **`R-0086`**. Composes on **`US-0098`**, **`US-0018`**, **`US-0085`**, **`DEC-0084`** gitignore posture — **no** profile schema v1 change; **no** execute step **24** semantic change.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Copy-when-missing** from committed example via stdlib helper; single-sourced **`--bootstrap`** CLI | **Preferred** — idempotent; mirrors scratchpad-postinstall subprocess precedent (**R-0086**). |
+| B | Add local profile to **`install_paths`** manifest row | **Rejected** — would overwrite on upgrade; violates non-destructive requirement. |
+| C | Inline Node copy in **`postinstall.js`** only | **Rejected** — diverges from installer; dual maintenance. |
+| D | Byte-compare / merge on existing file | **Rejected** — risks clobbering operator prose (**R-0086** Q7). |
+| E | Auto-enable **`DEV_AUTO_LAUNCH_PROFILE`** on bootstrap | **Rejected** — default-off gate unchanged (**DEC-0084** §1). |
+| F | Bootstrap **`remote.json`** the same way | **Rejected** — remote stays manual-seed (opt-in, default-off **US-0086**). |
+
+## Hook placement (AC-1, AC-4)
+
+**Installer (`missing` + `upgrade`)** — hook **after** **`run_scratchpad_postinstall`**, **before** **`bootstrap_runbook_commands`**:
+
+```python
+# installer.py — both missing and upgrade paths
+if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+    return 1
+if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+    return 1  # fail-closed on PATH_INVALID / SOURCE_MISSING only
+# ... validate_install_completeness ...
+runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
+```
+
+| Surface | Role |
+|---------|------|
+| **`bootstrap_dev_environment_profile_installer_hook`** | Thin wrapper in **`installer.py`** — passes merged scratchpad from **`merge_scratchpad_layers`** |
+| **`installer.ps1`** / **`installer.sh`** | **No new surface** — continue delegating to **`installer.py`** |
+| **`bin/postinstall.js`** | After banner: resolve consumer repo root; **`spawnSync`** Python **`scripts/dev_environment_lib.py --bootstrap --target <repo> --source-root <template>`** |
+
+**Postinstall repo detection**: walk up from **`process.cwd()`** max **6** parents for **`.cursor/scratchpad.md`** or **`its_magic/.its-magic-version`**; if none → **`[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected`**, exit **0** (global npm edge case).
+
+**Manifest policy**: local profile **not** in **`installer-owned-paths.manifest`** **`install_paths`** — bootstrap is runtime copy, not manifest row (**R-0086** Q4).
+
+## Path resolution (AC-3)
+
+1. Parse merged scratchpad **`DEV_ENVIRONMENT_CONFIG`** (Model B layers on disk after postinstall).
+2. Absent or empty → **`DEFAULT_PROFILE_PATH`** (**`.cursor/dev-environment.json`**).
+3. Reject absolute paths, **`..`** traversal, paths outside repo root, non-**`.json`** suffix → **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** (no copy; no silent fallback when override present but invalid).
+4. Source = **`{source_root}/.cursor/dev-environment.json.example`** only → missing source → **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`**.
+5. Target exists (any bytes) → skip → **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`**; else **`shutil.copy2`** → **`DEV_ENV_BOOTSTRAP_COPIED`**.
+
+**Idempotency rule**: existence check only — **no** byte comparison, merge, or timestamp refresh (**R-0086** Q7).
+
+## Stdlib helper + CLI (AC-1, AC-3, AC-5)
+
+Extend **`scripts/dev_environment_lib.py`** (+ **`template/scripts/`** mirror):
+
+| Symbol | Contract |
+|--------|----------|
+| **`bootstrap_dev_environment_profile(target_root, source_root=None, scratchpad=None)`** | Returns **`(reason_code, log_channel)`** |
+| **`resolve_profile_path(target_root, scratchpad)`** | Returns **`(Path \| None, error_code \| None)`** |
+| **`--bootstrap`** | Run install-time bootstrap |
+| **`--target`** | Consumer repo root (default **`cwd`**) |
+| **`--source-root`** | Packaged template root (default **`<pkg>/template`**) |
+
+**Exit codes**: **0** for **`COPIED`** or **`SKIPPED_EXISTS`**; **1** for **`PATH_INVALID`**, **`SOURCE_MISSING`**, or unexpected I/O.
+
+**User-visible log tokens** (**DEC-0053** — no planning ids on operator channel):
+
+| Outcome | Token |
+|---------|-------|
+| Copied | **`[DEV_ENV_BOOTSTRAP_OK] copied: <repo-relative-target>`** |
+| Skipped | **`[DEV_ENV_BOOTSTRAP_OK] skipped: profile exists at <repo-relative-target>`** |
+| Path invalid | **`[DEV_ENV_BOOTSTRAP_ERROR] DEV_ENV_BOOTSTRAP_PATH_INVALID`** (stderr) |
+| Source missing | **`[DEV_ENV_BOOTSTRAP_ERROR] DEV_ENV_BOOTSTRAP_SOURCE_MISSING`** (stderr) |
+| Postinstall no repo | **`[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected`** (stdout; exit **0**) |
+
+**npm postinstall soft-fail**: on exit **1**, log remediation hint but **do not** fail **`npm install`** lifecycle (matches scratchpad-postinstall posture).
+
+## Reason codes — `DEV_ENV_BOOTSTRAP_*` (AC-2, AC-7)
+
+Install-time family — distinct from runtime **`DEV_ENV_PROFILE_*`** / **`DEV_ENV_RELAUNCH_*`** (**DEC-0084** §10):
+
+| Code | When |
+|------|------|
+| **`DEV_ENV_BOOTSTRAP_COPIED`** | Target absent; example copied successfully |
+| **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** | Target present; no disk mutation |
+| **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** | Malformed **`DEV_ENVIRONMENT_CONFIG`** override |
+| **`DEV_ENV_BOOTSTRAP_SOURCE_MISSING`** | Example file absent at expected template path |
+
+## Contrast: `remote.json` vs dev profile (AC-5)
+
+| Artifact | Bootstrap on install? | Rationale |
+|----------|----------------------|-----------|
+| **`.cursor/dev-environment.json`** | **Yes** — copy-when-missing (**US-0099**) | **`DEV_AUTO_LAUNCH_PROFILE`** gate expects loadable file when enabled |
+| **`.cursor/remote.json`** | **No** — manual seed | **`AUTO_REMOTE_AUTOMATION_PROFILE`** default-off; opt-in remote |
+
+## Runbook operator UX delta (AC-6)
+
+| Before (**US-0098**) | After (**US-0099**) |
+|----------------------|---------------------|
+| "Seed profile" = manual **`Copy-Item`** prerequisite | Bootstrap automatic on install/upgrade/postinstall |
+| **`DEV_ENV_PROFILE_MISSING`** → manual copy first | Troubleshooting references auto-bootstrap + customize-after-bootstrap |
+
+**Customize-after-bootstrap**: operator edits copied example (compose **`service`**, **`*Env`** connect refs) — not a prerequisite to enable the gate.
+
+Update **`docs/engineering/runbook.md`** § Dev environment (active + **`template/`** mirror per **`DEV_ENVIRONMENT_PAIRS`** row 6).
+
+## Contract tests + parity (AC-7)
+
+**Run**: `pytest -k us0099 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| **`test_us0099_copy_when_missing`** | AC-1 | Absent target → **`--bootstrap`** creates file; **`DEV_ENV_BOOTSTRAP_COPIED`** token |
+| **`test_us0099_skip_when_exists`** | AC-2 | Pre-seed customized bytes → unchanged; **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** |
+| **`test_us0099_upgrade_idempotent`** | AC-1, AC-2 | Double bootstrap → skip on second; no overwrite |
+| **`test_us0099_path_override`** | AC-3 | Valid override copies; invalid → **`PATH_INVALID`**, no file |
+| **`test_us0099_postinstall_parity`** | AC-4 | **`bin/postinstall.js`** contains **`--bootstrap`** + **`dev_environment_lib.py`** spawn literal |
+| **`test_us0099_installer_hook_literals`** | AC-1 | **`installer.py`** hook after **`run_scratchpad_postinstall`**, before **`bootstrap_runbook_commands`** on **`missing`** + **`upgrade`** |
+| **`test_us0099_bootstrap_reason_code_inventory`** | AC-7 | All four **`DEV_ENV_BOOTSTRAP_*`** constants in **`dev_environment_lib.py`** |
+
+**`DEV_ENVIRONMENT_PAIRS`**: rows **1–8** **unchanged** from **US-0098**; **no new rows** for root-only **`installer.py`** / **`bin/postinstall.js`** — contract-test literal guards per **US-0097** installer-boundary precedent (**R-0086** Q6).
+
+**Harness**: register next free section (**§26X** after **US-0098** §26W) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`**.
+
+## Idempotency matrix (reference)
+
+| Install mode | Target state | Path config | Expected outcome |
+|--------------|--------------|-------------|------------------|
+| **`missing`** | absent | default | **`DEV_ENV_BOOTSTRAP_COPIED`** |
+| **`missing`** | absent | valid override | **`DEV_ENV_BOOTSTRAP_COPIED`** at override |
+| **`missing`** | absent | invalid override | **`DEV_ENV_BOOTSTRAP_PATH_INVALID`** |
+| **`missing`** / **`upgrade`** | present (any) | any | **`DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS`** |
+| **npm postinstall** | absent | default | **`DEV_ENV_BOOTSTRAP_COPIED`** |
+| **Global npm** (no repo) | n/a | n/a | **`[DEV_ENV_BOOTSTRAP_SKIP]`** exit **0** |
+
+Full matrix: **`R-0086`** Q7.
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Global-install / wrong cwd | **`[DEV_ENV_BOOTSTRAP_SKIP]`** path; runbook edge-case note |
+| **R2** Accidental overwrite on upgrade | Existence-only skip; **`test_us0099_skip_when_exists`** + **`test_us0099_upgrade_idempotent`** mandatory |
+| **R3** User-visible logs leak planning ids | **DEC-0053** scan on bootstrap tokens |
+| **R4** Postinstall without merged scratchpad | Helper reads disk layers; default path when **`DEV_ENVIRONMENT_CONFIG`** unset |
+
+## AC traceability
+
+| AC | Architecture anchor |
+|----|---------------------|
+| AC-1 Copy-when-missing on installer | § Hook placement; § Stdlib helper |
+| AC-2 Never overwrite | § Path resolution; § Idempotency matrix |
+| AC-3 Path resolution | § Path resolution; § Reason codes |
+| AC-4 npm postinstall parity | § Hook placement (**postinstall.js**) |
+| AC-5 Example source contract | § Overview; § Contrast table |
+| AC-6 Runbook customize-after-bootstrap | § Runbook operator UX delta |
+| AC-7 Contract tests + parity | § Contract tests + parity |
+| AC-8 Architecture + decision | **`DEC-0084`** amended § bootstrap posture; this section |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+**Tranche order**: A → B → C → D (per **R-0086**).
+
+| # | Seed | AC | Surfaces |
+|---|------|----|----------|
+| 1 | **`bootstrap_dev_environment_profile`**, **`resolve_profile_path`**, four **`DEV_ENV_BOOTSTRAP_*`** constants, **`--bootstrap`** / **`--target`** / **`--source-root`** CLI + log tokens | AC-1, AC-3, AC-5 | **`scripts/dev_environment_lib.py`**, template mirror |
+| 2 | **`bootstrap_dev_environment_profile_installer_hook`** in **`installer.py`** after **`run_scratchpad_postinstall`**, before **`bootstrap_runbook_commands`** on **`missing`** + **`upgrade`** | AC-1, AC-2 | **`installer.py`** |
+| 3 | **`bin/postinstall.js`**: repo-root walk + **`spawnSync`** **`--bootstrap`** subprocess | AC-4 | **`bin/postinstall.js`** |
+| 4 | Runbook § Dev environment: customize-after-bootstrap; **`DEV_ENV_PROFILE_MISSING`** troubleshooting; bootstrap reason-code family (active + template) | AC-6 | **`docs/engineering/runbook.md`**, template mirror |
+| 5 | **`test_us0099_copy_when_missing`**, **`test_us0099_upgrade_idempotent`** | AC-1 | **`tests/auto_command_contract_test.py`** |
+| 6 | **`test_us0099_skip_when_exists`**, **`test_us0099_path_override`** | AC-2, AC-3 | tests |
+| 7 | **`test_us0099_bootstrap_reason_code_inventory`**, **`test_us0099_installer_hook_literals`**, **`test_us0099_postinstall_parity`** | AC-7 | tests |
+| 8 | Harness section **§26X** (next after §26W) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** | AC-7 | harness |
+| 9 | Verify **`check_intake_template_parity.py --scope=dev-environment`** still **PASS** (**`DEV_ENVIRONMENT_PAIRS`** unchanged) | AC-7 | parity script |
+
+**Task count**: **9** seeds. **`SPRINT_MAX_TASKS=12`** — under threshold; no auto-split.
+
+**AC coverage notes**: AC-1..AC-7 map to seeds **1–8**; AC-8 satisfied by this architecture section + **`DEC-0084`** amendment (not a dev task seed). Bijection: 8 ACs with implementation work → 9 seeds (AC-1 spans seeds **1**+**2**+**5**; AC-7 spans seeds **6**+**7**+**8**+**9**).
+
+## Decision linkage
+
+- Decision: **`DEC-0084`** (amended — bootstrap posture)
+- Research: **`R-0086`**
+- Composed: **`US-0098`**, **`US-0018`**, **`US-0085`**, **`DEC-0084`**
+- Related: **`US-0062`** (installer manifest boundary)
+
+# US-0100: Version-scoped release changelog and GitHub release-note attachment
+
+## Overview
+
+**`US-0100`** closes the operator gap where **US-0040** sprint-scoped notes and **`handoffs/release_queue.md`** track workflow releases but there is **no semver-aligned cumulative changelog** and **`scripts/release-all.sh`** still uses **`gh release create --generate-notes`**. Ship **version-scoped release documentation**: repo-root **`CHANGELOG.md`** (Keep a Changelog 1.1.0), per-version **`handoffs/releases/{semver}-release-notes.md`** as GitHub **`-F`** SOT, **`/release`** derivation hook after finalization, queue **`release_version`** binding, three-tier backfill, and **`RELEASE_CHANGELOG_*`** validators — composing with **US-0040**, **US-0054**, **US-0067**, and **US-0008** without replacing sprint notes.
+
+Binding decision: **`DEC-0085`**. Research anchor: **`R-0087`**.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | Explicit per-version markdown SOT + shared **`release_changelog_lib.py`**; **`gh -F`** attach | **Preferred** — fail-closed; simpler than runtime CHANGELOG parsing (**R-0087** Q4). |
+| B | Extract GitHub body from **`CHANGELOG.md`** at attach time | **Rejected** — parsing fragility; dual maintenance. |
+| C | Replace sprint **`Sxxxx`** notes with version docs | **Rejected** — breaks **US-0040** gates and **US-0067** operator hints. |
+| D | Require semver on every **`/release`** | **Rejected** — blocks workflow-only releases (**75/78** rows blank **`release_version`**). |
+| E | Default **`--generate-notes`** when file missing | **Rejected** — operator truthfulness; opt-in scratchpad only. |
+| F | Assign all backfill rows to **`package.json`** semver | **Rejected** — loses per-sprint audit trail (**R-0087** Q1). |
+
+## Artifact paths (AC-1, AC-2)
+
+| Artifact | Path | Notes |
+|----------|------|-------|
+| Cumulative changelog | **`CHANGELOG.md`** | Mandatory **`## [Unreleased]`** + semver sections newest-first |
+| Per-version body | **`handoffs/releases/{semver}-release-notes.md`** | GitHub **`-F`** SOT; semver stem without **`v`** |
+| Sprint evidence | **`handoffs/releases/Sxxxx-release-notes.md`** | Unchanged (**US-0040**); derivation feed only |
+| Backfill manifest | **`docs/engineering/context/release-version-backfill.manifest.yaml`** | Tier B operator overrides |
+| Shared lib | **`scripts/release_changelog_lib.py`** | Active + **`template/scripts/`** mirror |
+| Validator | **`scripts/release_changelog_validate.py`** | **`--enforce`**; 10 fail codes |
+| Backfill | **`scripts/release_changelog_backfill.py`** | Tier A/B/C idempotent seed |
+| Template stub | **`template/CHANGELOG.md`** | Header + empty **`[Unreleased]`** |
+| Example | **`template/handoffs/releases/vX.Y.Z-release-notes.md.example`** | Pattern doc only |
+
+## Derivation precedence (AC-3, AC-4)
+
+```
+sprint Sxxxx notes (## What's new, story_refs)
+        ↓
+backlog title/summary (US-xxxx / BUG-xxxx)
+        ↓
+queue story_refs (fallback)
+        ↓
+release_changelog_lib.build_version_doc(semver, sprint_ids[])
+        ↓
+handoffs/releases/{semver}-release-notes.md  ──→  gh -F
+        ↓
+promote_unreleased / append_unreleased → CHANGELOG.md
+```
+
+**Category map**: **US→Added**, **BUG→Fixed**, **`user_visible: false`→Changed** when in sprint refs.
+
+## `[Unreleased]` promotion (AC-3)
+
+| Trigger | **`CHANGELOG.md`** | Per-version file | Queue **`release_version`** |
+|---------|-------------------|------------------|----------------------------|
+| **`/release`** PASS, semver unknown | **`append_unreleased`** only | none | empty |
+| **`/release`** PASS, semver explicit | **`promote_unreleased`** | create/update | set semver |
+| **`release-all.sh`** post-**`npm version`** | promote **`NEW_VERSION`** | create/update | bind coalesced rows |
+
+## Coalesce + backfill (AC-6)
+
+- **Coalesce key**: normalized semver — dedupe work items; exemplar **`S0070`/`S0071`→`0.1.2-41`**
+- **Fingerprint**: **`semver + sorted(work_item_ids)`** — idempotency (**L7**)
+- **Three-tier backfill**: explicit queue semver → operator manifest → synthetic **`0.0.0-wf.{NNN}`** per sprint
+- **Manifest schema**: **`schema_version: 1`**, **`entries[]`** with **`sprint_id`**, **`semver`**, optional **`notes`**
+
+## `/release` touchpoint — step 19 (AC-3, AC-8)
+
+After step **9** finalization and step **18** operator hints (**US-0067**), append **step 19** to **`.cursor/commands/release.md`** (+ template byte-identical):
+
+| Sub-step | Action |
+|----------|--------|
+| **19a** | Resolve semver — queue **`release_version`** or empty |
+| **19b** | **`derive_work_items`** + coalesce peers when semver known |
+| **19c** | semver known → **`build_version_doc`** + **`promote_unreleased`** + **`bind_queue_release_version`**; else **`append_unreleased`** |
+| **19d** | When **`RELEASE_CHANGELOG_ENFORCE=1`** (default **`1`**) → **`release_changelog_validate.py --enforce`**; record in **`release-findings.md`** § version-doc gates |
+
+Doc writes are **not** publish — **`RELEASE_PUBLISH_MODE=disabled`** valid (**US-0054**).
+
+## `release-all.sh` touchpoint (AC-5)
+
+Replace L94–99 **`--generate-notes`** with:
+
+1. Ensure **`handoffs/releases/${NEW_VERSION}-release-notes.md`** exists (derive/coalesce if needed via lib CLI)
+2. **`python scripts/release_changelog_validate.py --repo . --enforce`**
+3. **`gh release create "$TAG_NAME" -F "$VERSION_NOTES" --title "$TAG_NAME" $GH_PRERELEASE`**
+4. Fail-closed **`RELEASE_CHANGELOG_VERSION_DOC_MISSING`** unless **`RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES=1`**
+
+## Scratchpad keys
+
+| Key | Default | Role |
+|-----|---------|------|
+| **`RELEASE_CHANGELOG_ENFORCE`** | **`1`** | Validator at step **19d** + **`release-all.sh`** |
+| **`RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES`** | **`0`** | Opt-in **`--generate-notes`** fallback |
+
+## Reason codes — `RELEASE_CHANGELOG_*` (AC-7)
+
+Ten fail-closed codes per **`DEC-0085`** §9: **`VERSION_MISSING`**, **`DUPLICATE_VERSION`**, **`WORK_ITEM_GAP`**, **`ORDER_INVALID`**, **`UNRELEASED_MISSING`**, **`QUEUE_DRIFT`**, **`VERSION_DOC_MISSING`**, **`SPRINT_ORPHAN`**, **`BACKFILL_AMBIGUOUS`**, **`IDEMPOTENCY_VIOLATION`**. Informational: **`IDEMPOTENCY_OK`**.
+
+## Contract tests + parity (AC-9)
+
+**Run**: `pytest -k us0100 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| **`test_us0100_changelog_artifact_paths_literals`** | AC-1, AC-2 | **`CHANGELOG.md`**, **`{semver}-release-notes.md`**, manifest path literals in **`DEC-0085`** / architecture |
+| **`test_us0100_release_changelog_lib_api_surface`** | AC-3, AC-7 | Required symbols in **`release_changelog_lib.py`** |
+| **`test_us0100_reason_code_inventory`** | AC-7 | All 10 **`RELEASE_CHANGELOG_*`** fail codes in validator + lib |
+| **`test_us0100_derivation_precedence_literals`** | AC-3, AC-4 | Precedence order documented in lib docstring or constants |
+| **`test_us0100_release_step19_literals`** | AC-3, AC-8 | Step **19** sub-steps in active + template **`release.md`** |
+| **`test_us0100_release_all_f_replace_literals`** | AC-5 | **`-F`**, **`--enforce`**, fail-closed branch in **`release-all.sh`** |
+| **`test_us0100_backfill_manifest_schema_literals`** | AC-6 | Manifest **`schema_version`**, **`entries`** shape |
+| **`test_us0100_unreleased_promotion_literals`** | AC-3 | **`[Unreleased]`**, **`promote_unreleased`**, **`append_unreleased`** literals |
+| **`test_us0100_compose_us0040_sprint_notes_unchanged`** | AC-1 | **`Sxxxx-release-notes.md`** path preserved; no overwrite contract |
+| **`test_us0100_template_parity_scope`** | AC-9 | **`RELEASE_CHANGELOG_PAIRS`** row in **`check_intake_template_parity.py`** |
+
+**Harness**: add **§26Y** (or next free section) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** for **`pytest -k us0100`**.
+
+**Parity scope**: **`--scope=release-changelog`** — **`RELEASE_CHANGELOG_PAIRS`** table (scripts, **`CHANGELOG.md`**, **`release.md`** step **19**, **`release-all.sh`**, template example).
+
+## Atomic task seeds (for `/sprint-plan`)
+
+| # | AC | Summary |
+|---|-----|---------|
+| 1 | AC-3, AC-7 | **`release_changelog_lib.py`** — API surface + coalesce + fingerprint idempotency |
+| 2 | AC-1 | **`CHANGELOG.md`** stub + **`template/CHANGELOG.md`** |
+| 3 | AC-2 | Per-version path convention + **`vX.Y.Z-release-notes.md.example`** |
+| 4 | AC-3, AC-4, AC-8 | **`/release`** step **19** (19a–19d) active + template **`release.md`** |
+| 5 | AC-4 | Queue **`release_version`** binding via **`bind_queue_release_version`** |
+| 6 | AC-7 | **`release_changelog_validate.py`** + 10 reason codes |
+| 7 | AC-6 | **`release_changelog_backfill.py`** three-tier A/B/C |
+| 8 | AC-6 | **`release-version-backfill.manifest.yaml`** + runbook operator guidance |
+| 9 | AC-5 | **`release-all.sh`** **`-F`** replace **`--generate-notes`** + enforce preflight |
+| 10 | AC-8 | **`docs/engineering/runbook.md`** version-doc workflow (active + template) |
+| 11 | AC-9 | Ten **`test_us0100_*`** contract subtests |
+| 12 | AC-9, AC-10 | **`RELEASE_CHANGELOG_PAIRS`** parity + harness **§26Y** |
+
+**Task count**: **12** (`SPRINT_MAX_TASKS=12`, `within_limit=true` at threshold). **AC-10** pre-satisfied at architecture (**`DEC-0085`** + this section).
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Synthetic semver noise | Tier B manifest + **`remediation`** column labels |
+| **R2** Promotion race on parallel sprints | Fingerprint idempotency per semver |
+| **R3** Pre-release filename (**`0.1.2-41`**) | Semver stem filenames; **`test_us0100_changelog_artifact_paths_literals`** |
+| **R4** **`--generate-notes`** fallback | Default fail-closed; **`RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES=0`** |
+
+## Decision linkage
+
+- Decision: **`DEC-0085`**
+- Research: **`R-0087`**
+- Composed: **US-0040**, **US-0054** / **DEC-0036**, **US-0067**, **US-0008**
+- Related: **US-0091**, **US-0097**
 

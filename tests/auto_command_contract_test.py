@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 import unittest
 from pathlib import Path
 
@@ -1681,6 +1684,305 @@ class AutoCommandContractTest(unittest.TestCase):
                     f"parity mismatch: {active_rel}",
                 )
 
+    # --- BUG-0012: native-chain orchestrator compliance (DEC-0081) ---
+
+    def _bug0012_normative_blocks(self, root: Path) -> tuple[str, str]:
+        """Extract IDE-primary full_autonomy / native-chain normative blocks."""
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        ref = (
+            root / "docs" / "engineering" / "auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        auto_start = auto.find("## Orchestrator post-subagent continuation mandate")
+        auto_end = auto.find("## Full specification (US-0080")
+        auto_block = auto[auto_start:auto_end] if auto_start != -1 else auto
+        ref_start = ref.find("## Continuous multi-phase execution (US-0088)")
+        ref_end = ref.find("### Browser UAT self-test")
+        ref_block = ref[ref_start:ref_end] if ref_start != -1 else ref
+        return auto_block, ref_block
+
+    def test_bug0012_forbidden_drain_stop_prose_negative_grep(self) -> None:
+        """BUG-0012 / AC-5, AC-6: forbidden patterns absent from normative blocks."""
+        root = Path(__file__).resolve().parents[1]
+        auto_block, ref_block = self._bug0012_normative_blocks(root)
+        combined = (auto_block + ref_block).lower()
+        forbidden_mandatory = (
+            "re-run /auto",
+            "run the outer driver",
+            "segment exhausted",
+        )
+        for pattern in forbidden_mandatory:
+            with self.subTest(pattern=pattern):
+                start = 0
+                while True:
+                    idx = combined.find(pattern, start)
+                    if idx == -1:
+                        break
+                    context = combined[max(0, idx - 120) : idx + len(pattern) + 120]
+                    self.assertTrue(
+                        "forbidden" in context
+                        or "invalid" in context
+                        or "fallback" in context
+                        or "optional" in context
+                        or "non-native" in context
+                        or "must not" in context
+                        or "other modes" in context
+                        or "terminal prose" in context
+                        or "as terminal" in context,
+                        f"forbidden pattern {pattern!r} appears as mandatory in normative block",
+                    )
+                    start = idx + len(pattern)
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for line in text.splitlines():
+                    if "python scripts/auto_outer_driver.py" not in line:
+                        continue
+                    lower = line.lower()
+                    if "unqualified" in lower:
+                        continue
+                    self.assertTrue(
+                        "optional" in lower
+                        or "fallback" in lower
+                        or "headless" in lower
+                        or "ci" in lower
+                        or "forbidden" in lower,
+                        f"unqualified outer-driver invocation: {line.strip()!r}",
+                    )
+
+    def test_bug0012_orchestrator_post_subagent_spawn_mandate(self) -> None:
+        """BUG-0012 / AC-1: orchestrator MUST Task-spawn mandate in auto.md."""
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor" / "commands" / "auto.md").read_text(encoding="utf-8")
+        mandate_start = auto.find(
+            "## Orchestrator post-subagent continuation mandate (BUG-0012"
+        )
+        self.assertNotEqual(mandate_start, -1)
+        mandate = auto[mandate_start : mandate_start + 2500]
+        for token in (
+            "orchestrator MUST Task-spawn",
+            "post-subagent continuation",
+            "phase-role stop is not run terminal",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, mandate)
+        self.assertIn("| Phase-role subagent", mandate)
+        self.assertIn("| **`/auto` orchestrator**", mandate)
+
+    def test_bug0012_drain_advance_step7_no_stop_between_6_and_7(self) -> None:
+        """BUG-0012 / AC-3: steps 6→7 immediate spawn — no operator stop between."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("Between steps 6 and 7", text)
+                self.assertIn("drain_advance_action", text)
+                self.assertIn("skipped", text)
+                self.assertIn("invalid", text)
+                self.assertIn("IMMEDIATELY", text)
+                self.assertIn("without operator re-`/auto`", text)
+
+    def test_bug0012_native_chain_precedence_over_option_b(self) -> None:
+        """BUG-0012 / AC-2: native chain supersedes US-0088 Option B under full_autonomy."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("native chain supersedes Option B", text)
+                self.assertIn("NATIVE_CHAIN_UNAVAILABLE", text)
+                self.assertIn("fallback", text.lower())
+
+    def test_bug0012_architecture_dec_linkage(self) -> None:
+        """BUG-0012 / AC-8: architecture # BUG-0012 + DEC-0081 amend linkage (assert-only)."""
+        root = Path(__file__).resolve().parents[1]
+        dec_path = root / "decisions" / "DEC-0081.md"
+        self.assertTrue(dec_path.is_file(), "decisions/DEC-0081.md must exist")
+        dec_text = dec_path.read_text(encoding="utf-8")
+        self.assertIn("Accepted", dec_text)
+        self.assertIn("DEC-0080", dec_text)
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("# BUG-0012", arch)
+        bug_section = arch[arch.find("# BUG-0012") :]
+        for token in (
+            "DEC-0081",
+            "DEC-0080",
+            "R-0083",
+            "native chain supersedes Option B",
+            "orchestrator MUST Task-spawn",
+            "native_chain_continuing",
+            "drain_advance_action",
+            "test_bug0012_",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, bug_section, f"# BUG-0012 must reference {token!r}")
+
+    # --- US-0096: delivery modes, layered memory, mode-scoped resolver ---
+
+    _US0096_ORTHOGONAL_PHRASES = (
+        "controls lifecycle shape and artifact surfaces only",
+        "controls context breadth / token cost only",
+        "controls reply voice only",
+        "None substitutes for another",
+    )
+
+    def test_us0096_delivery_mode_scratchpad_keys(self) -> None:
+        """US-0096 / AC-1: DELIVERY_MODE + LEAN_* + AUTO_DELIVERY_ROUTING in scratchpad surfaces."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/scratchpad.md",
+            "template/.cursor/scratchpad.local.example.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for key in (
+                    "DELIVERY_MODE",
+                    "LEAN_MEMORY_READ",
+                    "LEAN_MEMORY_WRITE",
+                    "LEAN_COLD_READ_MAX_SECTIONS",
+                    "LEAN_STATE_INDEX_ROWS",
+                    "AUTO_DELIVERY_ROUTING",
+                    "DELIVERY_MODE=standard",
+                ):
+                    with self.subTest(key=key):
+                        self.assertIn(key, text)
+
+    def test_us0096_standard_mode_baseline_markers_preserved(self) -> None:
+        """US-0096 / AC-2: test_us0095_* + test_bug0012_* baselines under DELIVERY_MODE=standard."""
+        self.test_us0095_native_in_chat_auto_chain_markers()
+        self.test_us0095_ide_drain_advance_without_outer_driver()
+        self.test_us0095_spawn_only_regression()
+        self.test_us0095_auto_quiet_no_outer_driver_mandatory()
+        self.test_us0095_resume_brief_pairing_markers()
+        self.test_bug0012_orchestrator_post_subagent_spawn_mandate()
+        self.test_bug0012_drain_advance_step7_no_stop_between_6_and_7()
+        self.test_bug0012_native_chain_precedence_over_option_b()
+        root = Path(__file__).resolve().parents[1]
+        auto = (root / ".cursor/commands/auto.md").read_text(encoding="utf-8")
+        self.assertIn("reinstatement applies only when delivery_mode=standard", auto)
+
+    def test_us0096_mode_scoped_reinstatement_literals(self) -> None:
+        """US-0096 / AC-7: reinstatement only when delivery_mode=standard."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for token in (
+                    "resolve_delivery_mode",
+                    "reinstatement applies only when delivery_mode=standard",
+                    "PHASE_POLICY_CONFLICT",
+                    "DELIVERY_MODE_SWITCH_MID_STORY",
+                    "reinstatement_mode",
+                    "memory_layer",
+                ):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0096_ultra_lean_macro_phase_literals(self) -> None:
+        """US-0096 / AC-4: four macro-phases + build+verify + AUTO_IMPLEMENTATION_LOOP."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/commands/auto.md",
+            "docs/engineering/auto-orchestration-reference.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for token in ("build+verify", "AUTO_IMPLEMENTATION_LOOP", "spec", "plan", "ship"):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0096_mega_quick_routing_literals(self) -> None:
+        """US-0096 / AC-6: /quick path + seven MEGA_QUICK_* codes."""
+        root = Path(__file__).resolve().parents[1]
+        codes = (
+            "MEGA_QUICK_BUG_SEGMENT",
+            "MEGA_QUICK_AC_TOO_BROAD",
+            "MEGA_QUICK_ARCHITECTURE_REQUIRED",
+            "MEGA_QUICK_SPRINT_EXISTS",
+            "MEGA_QUICK_STORY_OVERRIDE",
+            "MEGA_QUICK_MULTI_COMPONENT",
+            "MEGA_QUICK_GATE_ESCALATION",
+            "DELIVERY_MODE_INELIGIBLE",
+        )
+        auto = (root / ".cursor/commands/auto.md").read_text(encoding="utf-8")
+        quick = (root / ".cursor/commands/quick.md").read_text(encoding="utf-8")
+        for code in codes:
+            with self.subTest(code=code):
+                self.assertIn(code, auto)
+        self.assertIn("mega_quick", quick.lower())
+        self.assertIn("/auto", quick)
+
+    def test_us0096_pack_json_schema_contract(self) -> None:
+        """US-0096 / AC-5: pack.json schema + pack_json_validate.py + work/US-xxxx/pack.json."""
+        root = Path(__file__).resolve().parents[1]
+        script = root / "scripts" / "pack_json_validate.py"
+        tpl = root / "template" / "scripts" / "pack_json_validate.py"
+        self.assertTrue(script.is_file())
+        self.assertEqual(script.read_bytes(), tpl.read_bytes())
+        text = script.read_text(encoding="utf-8")
+        for token in (
+            "PACK_",
+            "schema_version",
+            "story_id",
+            "delivery_mode",
+            "memory_layer",
+            "work/",
+            "pack.json",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, text)
+        ref = (
+            root / "docs/engineering/auto-orchestration-reference.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("work/<story_id>/pack.json", ref)
+
+    def test_us0096_active_context_contract(self) -> None:
+        """US-0096 / AC-5: active-context path, budget, rollover; not triad member."""
+        root = Path(__file__).resolve().parents[1]
+        stub = root / "handoffs" / "active-context.md"
+        self.assertTrue(stub.is_file())
+        text = stub.read_text(encoding="utf-8")
+        for token in (
+            "handoffs/active-context.md",
+            "NOT a triad member",
+            "LEAN_STATE_INDEX_ROWS",
+            "ACTIVE_CONTEXT_OVERSIZE",
+            "read_before_code",
+            "open_risks",
+            "handoffs/archive/active-context-",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, text)
+        runbook = (root / "docs/engineering/runbook.md").read_text(encoding="utf-8")
+        self.assertIn("active-context.md is NOT a triad member", runbook)
+
+    def test_us0096_token_profile_orthogonality_paragraph(self) -> None:
+        """US-0096 / AC-1: three-axis non-substitution in reference + runbook."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            "docs/engineering/auto-orchestration-reference.md",
+            "template/docs/engineering/auto-orchestration-reference.md",
+            "docs/engineering/runbook.md",
+            "template/docs/engineering/runbook.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for phrase in self._US0096_ORTHOGONAL_PHRASES:
+                    with self.subTest(phrase=phrase):
+                        self.assertIn(phrase, text)
+
     def test_us0093_architecture_linkage(self) -> None:
         """US-0093 / AC-10: architecture # US-0093 + DEC-0079 compose-on linkage."""
         root = Path(__file__).resolve().parents[1]
@@ -1741,6 +2043,646 @@ class AutoCommandContractTest(unittest.TestCase):
                     us0089_section,
                     f"# US-0089 §6 must forward-link {token!r}",
                 )
+
+    def test_us0097_installer_manifest_no_root_readme(self) -> None:
+        """US-0097 / AC-1: root README excluded from install_paths; its_magic included."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            "docs/engineering/context/installer-owned-paths.manifest",
+            "template/docs/engineering/context/installer-owned-paths.manifest",
+        ):
+            with self.subTest(manifest=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                install_block = text.split("[install_include_paths]", 1)[1].split("[", 1)[0]
+                self.assertNotIn("\nREADME.md\n", f"\n{install_block}\n")
+                self.assertIn("\nits_magic\n", f"\n{install_block}\n")
+
+    def test_us0097_execute_step23_literals(self) -> None:
+        """US-0097 / AC-3, AC-4: execute step 23 bootstrap/delta/skip prose."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (".cursor/commands/execute.md", "template/.cursor/commands/execute.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for token in (
+                    "23. Project README bootstrap",
+                    "23a Bootstrap",
+                    "23b Per-story delta",
+                    "23c Hygiene compose",
+                    "FRAMEWORK_KIT_REPO",
+                    "<!-- project-readme-feature-catalog -->",
+                    "PROJECT_README_DELTA_SKIPPED",
+                    "PROJECT_README_BOOTSTRAP_SKIPPED",
+                    "PROJECT_README_PLACEHOLDER_UNRESOLVED",
+                    "PROJECT_README_MIGRATION_AMBIGUOUS",
+                    "PROJECT_README_SENTINEL_CONFLICT",
+                ):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0097_release_step3g_literals(self) -> None:
+        """US-0097 / AC-4, AC-7: release step 3g + PROJECT_README_ENFORCE."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (".cursor/commands/release.md", "template/.cursor/commands/release.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                idx_3f = text.find("3f. README feature coverage")
+                idx_3g = text.find("3g. Project README coverage")
+                idx_4 = text.find("4. Verify UAT completeness")
+                self.assertNotEqual(idx_3f, -1)
+                self.assertNotEqual(idx_3g, -1)
+                self.assertNotEqual(idx_4, -1)
+                self.assertLess(idx_3f, idx_3g)
+                self.assertLess(idx_3g, idx_4)
+                for token in (
+                    "PROJECT_README_ENFORCE",
+                    "validate_project_readme_coverage.py",
+                    "PROJECT_README_COVERAGE_BLOCKED",
+                    "PROJECT_README_COVERAGE_GAP",
+                    "PROJECT_README_ENFORCE_SKIPPED",
+                    "3e → 3f (framework / US-0091) → 3g (project / US-0097) → 4 (UAT)",
+                ):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0097_placeholder_sentinel_table(self) -> None:
+        """US-0097 / AC-2: S1–S4 + S5 + ambiguous/hybrid literals in lib + runbook."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "project_readme_coverage_lib.py").read_text(encoding="utf-8")
+        for token in (
+            "S1",
+            "S2",
+            "S3",
+            "S4",
+            "S5",
+            "its-magic — AI dev team",
+            "readme-feature-coverage-catalog",
+            "Feature coverage catalog (US-0091)",
+            "PROJECT_README_MIGRATION_AMBIGUOUS",
+            "PROJECT_README_SENTINEL_CONFLICT",
+            "M1",
+            "M2",
+            "M3",
+            "M4",
+            "M5",
+        ):
+            with self.subTest(token=token, surface="lib"):
+                self.assertIn(token, lib)
+        runbook = (root / "docs/engineering/runbook.md").read_text(encoding="utf-8")
+        for token in ("S1", "S5", "M3", "M4", "PROJECT_README_MIGRATION_AMBIGUOUS"):
+            with self.subTest(token=token, surface="runbook"):
+                self.assertIn(token, runbook)
+
+    def test_us0097_framework_validator_paths_reframed(self) -> None:
+        """US-0097 / AC-5, AC-6: US-0091 reads its_magic/README.md — not consumer root."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "readme_feature_coverage_lib.py").read_text(encoding="utf-8")
+        self.assertIn('"its_magic", "README.md"', lib.replace("\\", "/").replace('"', '"'))
+        self.assertIn("its_magic/README.md", lib)
+        build_idx = lib.find("def build_report")
+        parity_idx = lib.find("def check_template_parity")
+        self.assertNotEqual(build_idx, -1)
+        section = lib[build_idx : parity_idx if parity_idx > build_idx else build_idx + 800]
+        self.assertIn("its_magic", section)
+        self.assertNotIn('join(repo_root, "README.md")', section)
+
+    def test_us0097_project_readme_enforce_scratchpad_keys(self) -> None:
+        """US-0097 / AC-7: PROJECT_README_ENFORCE + FRAMEWORK_KIT_REPO in scratchpad."""
+        root = Path(__file__).resolve().parents[1]
+        active = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        example = (root / "template" / ".cursor" / "scratchpad.local.example.md").read_text(
+            encoding="utf-8"
+        )
+        for token in (
+            "PROJECT_README_ENFORCE",
+            "FRAMEWORK_KIT_REPO",
+            "Consumer repos never set FRAMEWORK_KIT_REPO=1",
+            "PROJECT_README_ENFORCE=1",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, active)
+                self.assertIn(token, example)
+        self.assertIn("FRAMEWORK_KIT_REPO=0", example)
+
+    def test_us0097_project_readme_coverage_validator_contract(self) -> None:
+        """US-0097 / AC-6: validator script + self-test + report schema fields."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            "scripts/validate_project_readme_coverage.py",
+            "template/scripts/validate_project_readme_coverage.py",
+            "scripts/project_readme_coverage_lib.py",
+            "template/scripts/project_readme_coverage_lib.py",
+        ):
+            with self.subTest(path=rel):
+                self.assertTrue((root / rel).is_file(), rel)
+        proc = subprocess.run(
+            [sys.executable, str(root / "scripts" / "validate_project_readme_coverage.py"), "--self-test"],
+            cwd=str(root),
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertIn("[PROJECT_README_COVERAGE_SELF_TEST_OK]", proc.stdout)
+        lib = (root / "scripts" / "project_readme_coverage_lib.py").read_text(encoding="utf-8")
+        for field in (
+            "report_schema_version",
+            "catalog_marker_present",
+            "coverage_present",
+            "coverage_missing",
+            "framework_paths_excluded",
+            "kit_repo_skipped",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, lib)
+
+    def test_us0097_us0091_regression_guard(self) -> None:
+        """US-0097 / AC-6: framework release 3f preserved; root removed from US-0091 paths."""
+        root = Path(__file__).resolve().parents[1]
+        release = (root / ".cursor" / "commands" / "release.md").read_text(encoding="utf-8")
+        self.assertIn("3f. README feature coverage gate (US-0091 / DEC-0074)", release)
+        self.assertIn("validate_readme_feature_coverage.py", release)
+        self.assertIn("README_FEATURE_COVERAGE_ENFORCE", release)
+        lib = (root / "scripts" / "readme_feature_coverage_lib.py").read_text(encoding="utf-8")
+        parity = lib[lib.find("def check_template_parity") : lib.find("def check_profile_budget")]
+        self.assertIn("its_magic/README.md", parity)
+        self.assertNotIn('"README.md", "template/README.md"', parity)
+
+
+    def test_us0098_dev_auto_launch_scratchpad_keys(self) -> None:
+        """US-0098 / AC-1: DEV_AUTO_LAUNCH_PROFILE + DEV_ENVIRONMENT_CONFIG scratchpad keys."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            ".cursor/scratchpad.md",
+            "template/.cursor/scratchpad.md",
+            "template/.cursor/scratchpad.local.example.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("DEV_AUTO_LAUNCH_PROFILE", text)
+                self.assertIn("DEV_ENVIRONMENT_CONFIG", text)
+                self.assertIn("DEV_AUTO_LAUNCH_PROFILE=off", text)
+                self.assertIn("AUTO_REMOTE_AUTOMATION_PROFILE", text)
+                self.assertIn("orthogonal", text.lower())
+
+    def test_us0098_execute_step24_literals(self) -> None:
+        """US-0098 / AC-4: execute step 24 sub-steps + evidence tuple + reason codes."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (".cursor/commands/execute.md", "template/.cursor/commands/execute.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                for token in (
+                    "24. Dev environment auto-launch profile",
+                    "24 preamble",
+                    "24a Gate + profile load",
+                    "24b Detect + persist",
+                    "24c Relaunch (bounded)",
+                    "24d Connect + handoff",
+                    "dev_auto_launch_profile",
+                    "runtime_mode",
+                    "relaunch_tier",
+                    "relaunch_command",
+                    "relaunch_outcome",
+                    "retry_count",
+                    "reason_code",
+                    "DEV_ENV_PROFILE_INVALID",
+                    "DEV_ENV_PROFILE_MISSING",
+                    "DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE",
+                    "zero overhead",
+                ):
+                    with self.subTest(token=token):
+                        self.assertIn(token, text)
+
+    def test_us0098_dev_environment_schema_contract(self) -> None:
+        """US-0098 / AC-2: schema v1 example + gitignore/cursorignore lines."""
+        root = Path(__file__).resolve().parents[1]
+        example = root / "template" / ".cursor" / "dev-environment.json.example"
+        self.assertTrue(example.is_file(), "template example must exist")
+        text = example.read_text(encoding="utf-8")
+        for field in (
+            "schema_version",
+            "detected_mode",
+            "operator_seeded",
+            "last_updated",
+            "compose_file",
+            "service",
+            "target_id",
+            "connect",
+            "rebuild_recipe",
+            "env_refs",
+            "evidence_refs",
+            "hostEnv",
+            "portEnv",
+            "protocolEnv",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, text)
+        for ignore_rel in (".gitignore", "template/.gitignore", ".cursorignore", "template/.cursorignore"):
+            with self.subTest(ignore=ignore_rel):
+                ignore_text = (root / ignore_rel).read_text(encoding="utf-8")
+                self.assertIn(".cursor/dev-environment.json", ignore_text)
+
+    def test_us0098_detection_mode_precedence_literals(self) -> None:
+        """US-0098 / AC-3: four detection modes + US-0086 precedence over docker-host-local."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "dev_environment_lib.py").read_text(encoding="utf-8")
+        ref = (root / "docs" / "engineering" / "auto-orchestration-reference.md").read_text(
+            encoding="utf-8"
+        )
+        for mode in ("local", "docker-host-local", "docker", "ssh"):
+            with self.subTest(mode=mode):
+                self.assertIn(mode, lib)
+        for token in (
+            "US-0086",
+            "docker-host-local",
+            "DEV_ENV_DETECT_AMBIGUOUS",
+            "AUTO_REMOTE_AUTOMATION_PROFILE",
+        ):
+            with self.subTest(token=token):
+                self.assertIn(token, lib)
+                self.assertIn(token, ref)
+
+    def test_us0098_reason_code_inventory(self) -> None:
+        """US-0098 / AC-8: DEV_ENV_PROFILE_* and DEV_ENV_RELAUNCH_* families in lib."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "dev_environment_lib.py").read_text(encoding="utf-8")
+        profile_codes = (
+            "DEV_ENV_PROFILE_DISABLED",
+            "DEV_ENV_PROFILE_INVALID",
+            "DEV_ENV_PROFILE_MISSING",
+            "DEV_ENV_DETECT_AMBIGUOUS",
+            "DEV_ENV_COMPOSE_UNRESOLVED",
+            "DEV_ENV_TARGET_DISABLED",
+            "DEV_ENV_SECRET_SURFACE_VIOLATION",
+        )
+        relaunch_codes = (
+            "DEV_ENV_RELAUNCH_SKIPPED_NO_SURFACE",
+            "DEV_ENV_RELAUNCH_SKIPPED_PROFILE_OFF",
+            "DEV_ENV_RELAUNCH_FAILED",
+            "DEV_ENV_RELAUNCH_RETRY_EXHAUSTED",
+            "DEV_ENV_RELAUNCH_TIMEOUT",
+            "DEV_ENV_CONNECT_UNAVAILABLE",
+        )
+        for code in profile_codes + relaunch_codes:
+            with self.subTest(code=code):
+                self.assertIn(code, lib)
+
+    def test_us0098_connect_block_field_literals(self) -> None:
+        """US-0098 / AC-5: Connect block mandatory field names."""
+        root = Path(__file__).resolve().parents[1]
+        lib = (root / "scripts" / "dev_environment_lib.py").read_text(encoding="utf-8")
+        execute = (root / ".cursor" / "commands" / "execute.md").read_text(encoding="utf-8")
+        for field in (
+            "runtime_mode",
+            "connect_endpoint",
+            "health_path",
+            "service_id",
+            "container_id",
+            "target_id",
+            "env_refs",
+            "relaunch_outcome",
+            "format_connect_block",
+        ):
+            with self.subTest(field=field):
+                self.assertIn(field, lib)
+                self.assertIn(field, execute)
+
+    def test_us0098_refresh_dev_environment_phrase_literal(self) -> None:
+        """US-0098 / AC-7: exact refresh dev environment phrase in execute step 24."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (".cursor/commands/execute.md", "template/.cursor/commands/execute.md"):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("refresh dev environment", text)
+                self.assertIn("case-sensitive", text)
+
+    def test_us0098_us0086_compose_no_schema_change(self) -> None:
+        """US-0098 / AC-6: release-targets.json schema unchanged; no dev profile fields added."""
+        root = Path(__file__).resolve().parents[1]
+        for rel in (
+            "docs/engineering/release-targets.json",
+            "template/docs/engineering/release-targets.json",
+        ):
+            with self.subTest(path=rel):
+                data = json.loads((root / rel).read_text(encoding="utf-8"))
+                self.assertIn("targets", data)
+                self.assertNotIn("dev_environment", json.dumps(data).lower())
+                self.assertNotIn("dev_auto_launch", json.dumps(data).lower())
+        ref = (root / "docs" / "engineering" / "auto-orchestration-reference.md").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("no", ref.lower())
+        self.assertIn("release-targets.json", ref)
+
+    def _load_dev_environment_lib(self):
+        import importlib.util
+
+        root = Path(__file__).resolve().parents[1]
+        path = root / "scripts" / "dev_environment_lib.py"
+        spec = importlib.util.spec_from_file_location("dev_environment_lib_contract", path)
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod, root
+
+    def test_us0099_copy_when_missing(self) -> None:
+        """US-0099 / AC-1: absent target → bootstrap creates file; DEV_ENV_BOOTSTRAP_COPIED."""
+        import tempfile
+
+        lib, root = self._load_dev_environment_lib()
+        template = root / "template"
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            reason, _channel = lib.bootstrap_dev_environment_profile(target, template, {})
+            self.assertEqual(reason, lib.DEV_ENV_BOOTSTRAP_COPIED)
+            profile = target / ".cursor" / "dev-environment.json"
+            self.assertTrue(profile.is_file())
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    str(root / "scripts" / "dev_environment_lib.py"),
+                    "--bootstrap",
+                    "--target",
+                    str(target),
+                    "--source-root",
+                    str(template),
+                ],
+                capture_output=True,
+                text=True,
+                cwd=str(root),
+            )
+            self.assertEqual(proc.returncode, 0)
+            self.assertIn("[DEV_ENV_BOOTSTRAP_OK] skipped:", proc.stdout)
+
+    def test_us0099_skip_when_exists(self) -> None:
+        """US-0099 / AC-2: pre-seed customized bytes → unchanged; SKIPPED_EXISTS."""
+        import tempfile
+
+        lib, root = self._load_dev_environment_lib()
+        template = root / "template"
+        custom = b'{"schema_version":1,"customized":true}\n'
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            profile = target / ".cursor" / "dev-environment.json"
+            profile.parent.mkdir(parents=True)
+            profile.write_bytes(custom)
+            reason, _channel = lib.bootstrap_dev_environment_profile(target, template, {})
+            self.assertEqual(reason, lib.DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS)
+            self.assertEqual(profile.read_bytes(), custom)
+
+    def test_us0099_upgrade_idempotent(self) -> None:
+        """US-0099 / AC-1, AC-2: double bootstrap → skip on second; no overwrite."""
+        import tempfile
+
+        lib, root = self._load_dev_environment_lib()
+        template = root / "template"
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            first, _ = lib.bootstrap_dev_environment_profile(target, template, {})
+            self.assertEqual(first, lib.DEV_ENV_BOOTSTRAP_COPIED)
+            profile = target / ".cursor" / "dev-environment.json"
+            first_bytes = profile.read_bytes()
+            second, _ = lib.bootstrap_dev_environment_profile(target, template, {})
+            self.assertEqual(second, lib.DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS)
+            self.assertEqual(profile.read_bytes(), first_bytes)
+
+    def test_us0099_path_override(self) -> None:
+        """US-0099 / AC-3: valid override copies; invalid → PATH_INVALID, no file."""
+        import tempfile
+
+        lib, root = self._load_dev_environment_lib()
+        template = root / "template"
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp)
+            valid_pad = {"DEV_ENVIRONMENT_CONFIG": ".cursor/custom-dev.json"}
+            reason, _ = lib.bootstrap_dev_environment_profile(target, template, valid_pad)
+            self.assertEqual(reason, lib.DEV_ENV_BOOTSTRAP_COPIED)
+            self.assertTrue((target / ".cursor" / "custom-dev.json").is_file())
+
+            target2 = Path(tmp) / "invalid"
+            target2.mkdir()
+            invalid_cases = (
+                {"DEV_ENVIRONMENT_CONFIG": "/etc/passwd.json"},
+                {"DEV_ENVIRONMENT_CONFIG": "../outside.json"},
+                {"DEV_ENVIRONMENT_CONFIG": ".cursor/profile.txt"},
+            )
+            for pad in invalid_cases:
+                with self.subTest(pad=pad["DEV_ENVIRONMENT_CONFIG"]):
+                    resolved, err = lib.resolve_profile_path(target2, pad)
+                    self.assertIsNone(resolved)
+                    self.assertEqual(err, lib.DEV_ENV_BOOTSTRAP_PATH_INVALID)
+                    reason, _ = lib.bootstrap_dev_environment_profile(target2, template, pad)
+                    self.assertEqual(reason, lib.DEV_ENV_BOOTSTRAP_PATH_INVALID)
+                    self.assertFalse((target2 / ".cursor" / "dev-environment.json").exists())
+
+    def test_us0099_bootstrap_reason_code_inventory(self) -> None:
+        """US-0099 / AC-7: all four DEV_ENV_BOOTSTRAP_* constants in lib."""
+        lib, root = self._load_dev_environment_lib()
+        text = (root / "scripts" / "dev_environment_lib.py").read_text(encoding="utf-8")
+        for code in (
+            lib.DEV_ENV_BOOTSTRAP_COPIED,
+            lib.DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS,
+            lib.DEV_ENV_BOOTSTRAP_PATH_INVALID,
+            lib.DEV_ENV_BOOTSTRAP_SOURCE_MISSING,
+        ):
+            with self.subTest(code=code):
+                self.assertIn(code, text)
+        self.assertEqual(len(lib.BOOTSTRAP_REASON_CODES), 4)
+
+    def test_us0099_installer_hook_literals(self) -> None:
+        """US-0099 / AC-1: installer hook after scratchpad postinstall, before runbook bootstrap."""
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "installer.py").read_text(encoding="utf-8")
+        for marker in (
+            "bootstrap_dev_environment_profile_installer_hook",
+            "run_scratchpad_postinstall",
+            "bootstrap_runbook_commands",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, text)
+        upgrade_idx = text.find('run_scratchpad_postinstall(target_root, source_root, "upgrade"')
+        self.assertNotEqual(upgrade_idx, -1)
+        upgrade_runbook = text.find("bootstrap_runbook_commands", upgrade_idx)
+        upgrade_hook = text.find("bootstrap_dev_environment_profile_installer_hook", upgrade_idx)
+        self.assertNotEqual(upgrade_hook, -1)
+        self.assertNotEqual(upgrade_runbook, -1)
+        self.assertLess(upgrade_hook, upgrade_runbook)
+        missing_anchor = (
+            "    if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):\n"
+            "        return 1\n"
+            "    if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):"
+        )
+        missing_idx = text.find(missing_anchor)
+        self.assertNotEqual(missing_idx, -1)
+        missing_runbook = text.find("bootstrap_runbook_commands", missing_idx)
+        missing_hook = text.find("bootstrap_dev_environment_profile_installer_hook", missing_idx)
+        self.assertLess(missing_hook, missing_runbook)
+
+    def test_us0099_postinstall_parity(self) -> None:
+        """US-0099 / AC-4: postinstall.js spawnSync --bootstrap dev_environment_lib.py literals."""
+        root = Path(__file__).resolve().parents[1]
+        text = (root / "bin" / "postinstall.js").read_text(encoding="utf-8")
+        self.assertIn("--bootstrap", text)
+        self.assertIn("dev_environment_lib.py", text)
+        self.assertIn("spawnSync", text)
+        self.assertIn("[DEV_ENV_BOOTSTRAP_SKIP] no consumer repository detected", text)
+
+
+class Us0100ReleaseChangelogContractTests(unittest.TestCase):
+    """US-0100 / DEC-0085 — version-scoped release changelog contract markers."""
+
+    @staticmethod
+    def _root() -> Path:
+        return Path(__file__).resolve().parents[1]
+
+    def test_us0100_changelog_artifact_paths_literals(self) -> None:
+        """AC-1, AC-2: canonical artifact path literals in DEC + architecture."""
+        root = self._root()
+        for rel in (
+            "CHANGELOG.md",
+            "docs/engineering/context/release-version-backfill.manifest.yaml",
+            "template/handoffs/releases/vX.Y.Z-release-notes.md.example",
+        ):
+            with self.subTest(path=rel):
+                self.assertTrue((root / rel).is_file(), rel)
+        dec = (root / "decisions" / "DEC-0085.md").read_text(encoding="utf-8")
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(
+            encoding="utf-8"
+        )
+        for blob, label in ((dec, "DEC-0085"), (arch, "architecture")):
+            with self.subTest(doc=label):
+                self.assertIn("{semver}-release-notes.md", blob)
+                self.assertIn("CHANGELOG.md", blob)
+                self.assertIn("0.1.2-41", blob)
+
+    def test_us0100_release_changelog_lib_api_surface(self) -> None:
+        """AC-3, AC-7: required symbols importable from release_changelog_lib."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import release_changelog_lib as rcl  # noqa: E402
+
+        for name in (
+            "normalize_semver",
+            "derive_work_items",
+            "coalesce_sprints_by_semver",
+            "build_version_doc",
+            "promote_unreleased",
+            "append_unreleased",
+            "version_fingerprint",
+            "bind_queue_release_version",
+            "extract_changelog_section",
+        ):
+            with self.subTest(symbol=name):
+                self.assertTrue(callable(getattr(rcl, name, None)))
+
+    def test_us0100_reason_code_inventory(self) -> None:
+        """AC-7: ten RELEASE_CHANGELOG_* fail codes in validator + lib."""
+        root = self._root()
+        lib_text = (root / "scripts" / "release_changelog_lib.py").read_text(
+            encoding="utf-8"
+        )
+        val_text = (root / "scripts" / "release_changelog_validate.py").read_text(
+            encoding="utf-8"
+        )
+        codes = (
+            "RELEASE_CHANGELOG_VERSION_MISSING",
+            "RELEASE_CHANGELOG_DUPLICATE_VERSION",
+            "RELEASE_CHANGELOG_WORK_ITEM_GAP",
+            "RELEASE_CHANGELOG_ORDER_INVALID",
+            "RELEASE_CHANGELOG_UNRELEASED_MISSING",
+            "RELEASE_CHANGELOG_QUEUE_DRIFT",
+            "RELEASE_CHANGELOG_VERSION_DOC_MISSING",
+            "RELEASE_CHANGELOG_SPRINT_ORPHAN",
+            "RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS",
+            "RELEASE_CHANGELOG_IDEMPOTENCY_VIOLATION",
+        )
+        for code in codes:
+            with self.subTest(code=code):
+                self.assertIn(code, lib_text)
+                self.assertIn(code, val_text)
+
+    def test_us0100_derivation_precedence_literals(self) -> None:
+        """AC-3, AC-4: L4 precedence documented in lib."""
+        root = self._root()
+        text = (root / "scripts" / "release_changelog_lib.py").read_text(encoding="utf-8")
+        self.assertIn("DERIVATION_PRECEDENCE", text)
+        self.assertIn("sprint_notes_whats_new", text)
+        self.assertIn("backlog_title_summary", text)
+        self.assertIn("queue_story_refs", text)
+        self.assertIn("What's new", text)
+
+    def test_us0100_release_step19_literals(self) -> None:
+        """AC-3, AC-8: step 19 sub-steps in active + template release.md."""
+        root = self._root()
+        for rel in (
+            ".cursor/commands/release.md",
+            "template/.cursor/commands/release.md",
+        ):
+            with self.subTest(path=rel):
+                text = (root / rel).read_text(encoding="utf-8")
+                self.assertIn("19. Version changelog derivation (US-0100 / DEC-0085)", text)
+                for sub in ("19a", "19b", "19c", "19d"):
+                    self.assertIn(sub, text)
+                self.assertIn("RELEASE_CHANGELOG_ENFORCE", text)
+                self.assertIn("build_version_doc", text)
+                self.assertIn("promote_unreleased", text)
+                self.assertIn("append_unreleased", text)
+
+    def test_us0100_release_all_f_replace_literals(self) -> None:
+        """AC-5: -F, --enforce, fail-closed branch in release-all.sh."""
+        root = self._root()
+        text = (root / "scripts" / "release-all.sh").read_text(encoding="utf-8")
+        self.assertIn('-F "$VERSION_NOTES"', text)
+        self.assertIn("release_changelog_validate.py", text)
+        self.assertIn("--enforce", text)
+        self.assertIn("RELEASE_CHANGELOG_VERSION_DOC_MISSING", text)
+        self.assertIn("RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES", text)
+        self.assertNotIn("--generate-notes --title", text.split("RELEASE_CHANGELOG_ALLOW_GENERATE_NOTES")[0])
+
+    def test_us0100_backfill_manifest_schema_literals(self) -> None:
+        """AC-6: manifest schema_version + entries shape."""
+        root = self._root()
+        manifest = (
+            root / "docs" / "engineering" / "context" / "release-version-backfill.manifest.yaml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("schema_version: 1", manifest)
+        self.assertIn("entries:", manifest)
+        self.assertIn("sprint_id:", manifest)
+        self.assertIn("semver:", manifest)
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        self.assertIn("0.0.0-wf.", runbook)
+        self.assertIn("RELEASE_CHANGELOG_BACKFILL_AMBIGUOUS", runbook)
+
+    def test_us0100_unreleased_promotion_literals(self) -> None:
+        """AC-3: [Unreleased], promote_unreleased, append_unreleased literals."""
+        root = self._root()
+        cl = (root / "CHANGELOG.md").read_text(encoding="utf-8")
+        self.assertIn("## [Unreleased]", cl)
+        lib = (root / "scripts" / "release_changelog_lib.py").read_text(encoding="utf-8")
+        self.assertIn("def promote_unreleased", lib)
+        self.assertIn("def append_unreleased", lib)
+        self.assertIn("Keep a Changelog", cl)
+
+    def test_us0100_compose_us0040_sprint_notes_unchanged(self) -> None:
+        """AC-1: Sxxxx-release-notes.md path preserved; no overwrite contract."""
+        root = self._root()
+        dec = (root / "decisions" / "DEC-0085.md").read_text(encoding="utf-8")
+        release_cmd = (root / ".cursor" / "commands" / "release.md").read_text(
+            encoding="utf-8"
+        )
+        for blob in (dec, release_cmd):
+            self.assertIn("Sxxxx-release-notes.md", blob)
+            self.assertIn("never", blob.lower())
+
+    def test_us0100_template_parity_scope(self) -> None:
+        """AC-9: RELEASE_CHANGELOG_PAIRS registered in parity script."""
+        root = self._root()
+        text = (root / "scripts" / "check_intake_template_parity.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("RELEASE_CHANGELOG_PAIRS", text)
+        self.assertIn('"release-changelog"', text)
+        self.assertIn("release_changelog_lib.py", text)
+        self.assertIn("CHANGELOG.md", text)
 
 
 if __name__ == "__main__":

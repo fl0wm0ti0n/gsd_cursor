@@ -29,6 +29,10 @@ In an execute↔QA implementation loop (`AUTO_IMPLEMENTATION_LOOP=1`), each new
 stale isolation evidence).
 
 ## Inputs
+
+- **Narrow-read (US-0053 / US-0096 Tranche A)**: Start at docs/engineering/phase-context.md
+  and the story section anchor in vision/architecture/decisions when a heading exists; forbid
+  full-file reads when a section heading exists.
 - `handoffs/dev_to_qa.md`
 - `sprints/S0001/summary.md`
 

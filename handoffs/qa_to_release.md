@@ -1,4 +1,313 @@
-## QA → Release — S0083 / US-0094 (`auto-20260607-01`) — **current**
+## QA → Release — US-0100 / S0090 (`auto-20260615-01`) — **current**
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-15T07:00:00Z`); AC **10 / 10 pass** (`sprints/S0090/uat.json`, `sprints/S0090/uat.md`). UAT-10 satisfied via **procedural attestation** (DEC-0085 + architecture review in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Story **US-0100** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0090 / US-0100)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0090/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (10 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (12/12 delivered) | T-001..T-012 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0090/qa-findings.md` |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0090/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0090/plan-verify.json` status=PASS |
+| `release_changelog_validate` | PASS (warn mode) | `[RELEASE_CHANGELOG_VALIDATE_WARN]` on fresh stub; exit 0 |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=release-changelog |
+| `contract_tests` | PASS | `pytest -k us0100` 10/10 (26 subtests) |
+| `metadata_guard` | PASS | `check-user-visible-metadata.py` exit 0 |
+| `bug_validate` | N/A (story scope) | skipped |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+
+### Runtime proof (verify-work)
+
+- `orchestrator_run_id=auto-20260615-01`
+- `runtime_proof_id=rp-auto-20260615-01-verify-work-qa-20260615T070000Z-S0090-US0100`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-15T07:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=01b1568e35e4d144e4d7d145727c05298cd69de0dc1fe18e761090896871ec6c`
+- `fresh_context_marker=qa-S0090-US0100-verify-work-20260615T070000Z-fresh`
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0090-US0100-verify-work-20260615T070000Z-fresh`, `timestamp=2026-06-15T07:00:00Z`, `evidence_ref=[sprints/S0090/uat.json, sprints/S0090/uat.md, handoffs/qa_to_release.md, handoffs/release_queue.md, handoffs/resume_brief.md, docs/product/backlog.md, docs/engineering/state.md]`.
+
+### Next
+
+- **`/release`** (fresh **release**) for **`S0090`** / **`US-0100`**.
+
+---
+
+## QA → Release — US-0099 / S0089 (`auto-20260614-01`) — superseded
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-14T23:00:00Z`); AC **8 / 8 pass** (`sprints/S0089/uat.json`, `sprints/S0089/uat.md`). UAT-5, UAT-6, UAT-8 satisfied via **procedural attestation** (documentation/manifest review in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Story **US-0099** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0089 / US-0099)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 8 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 8 |
+
+AC-1..AC-8 verified at verify-work via UAT-1..UAT-8 (see `sprints/S0089/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (10 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (9/9 delivered) | T-001..T-009 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (8/8) | `sprints/S0089/qa-findings.md` |
+| `ac_uat_pass` | PASS (8/8) | `sprints/S0089/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0089/plan-verify.json` status=PASS |
+| `dev_environment_self_test` | `[DEV_ENVIRONMENT_SELF_TEST_OK]` | verify-work independent re-run |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=dev-environment |
+| `contract_tests` | PASS | `pytest -k us0099` 7/7 (10 subtests) |
+| `metadata_guard` | PASS | `check-user-visible-metadata.py` exit 0 |
+| `bug_validate` | PASS | `[BUG_VALIDATION_OK]` |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+
+### Runtime proof (verify-work)
+
+- `orchestrator_run_id=auto-20260614-01`
+- `runtime_proof_id=rp-auto-20260614-01-verify-work-qa-20260614T230000Z-S0089-US0099`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-14T23:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=89068c94506f47b3f0c3dd4fb4f9ad699ff75f9d6dcd4eb3b25a71ca34f3007f`
+- `fresh_context_marker=qa-S0089-US0099-verify-work-20260614T230000Z-fresh`
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0089-US0099-verify-work-20260614T230000Z-fresh`, `timestamp=2026-06-14T23:00:00Z`, `evidence_ref=[sprints/S0089/uat.json, sprints/S0089/uat.md, handoffs/qa_to_release.md, handoffs/release_queue.md, handoffs/resume_brief.md, docs/product/backlog.md, docs/engineering/state.md]`.
+
+### Next
+
+- **`/release`** (fresh **release**) for **`S0089`** / **`US-0099`**.
+
+---
+
+## QA → Release — US-0098 / S0088 (`auto-20260613-01`) — superseded
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-14T12:00:00Z`); AC **10 / 10 pass** (`sprints/S0088/uat.json`, `sprints/S0088/uat.md`). UAT-10 satisfied via **procedural attestation** per runbook § **Dev environment auto-launch (US-0098 / DEC-0084)** (live operator E2E not runnable in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Story **US-0098** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0088 / US-0098)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0088/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (10 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (11/11 delivered) | T-001..T-011 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0088/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0088/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0088/plan-verify.json` status=PASS |
+| `dev_environment_self_test` | `[DEV_ENVIRONMENT_SELF_TEST_OK]` | verify-work independent re-run |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=dev-environment |
+| `contract_tests` | PASS | `pytest -k us0098` 8/8 (91 subtests) |
+| `metadata_guard` | PASS | `check-user-visible-metadata.py` exit 0 |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+| `dec_invariants` | PASS | **DEC-0084** composes **US-0085**/**US-0064**/**US-0086**/**US-0093**; step **24** zero overhead when profile **off**; **BUG-0006** spawn-only preserved |
+
+### Runtime proof (verify-work)
+
+- `orchestrator_run_id=auto-20260613-01`
+- `runtime_proof_id=rp-auto-20260613-01-verify-work-qa-20260614T120000Z-S0088-US0098`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-14T12:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=b35cc96d1dd30fd966ed4ee92370ef891d4a46e414d7f0b7a0b47e8cc7b61be6`
+- `fresh_context_marker=qa-S0088-US0098-verify-work-20260614T120000Z-fresh`
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0088-US0098-verify-work-20260614T120000Z-fresh`, `timestamp=2026-06-14T12:00:00Z`, `evidence_ref=[sprints/S0088/uat.json, sprints/S0088/uat.md, handoffs/qa_to_release.md, handoffs/resume_brief.md, docs/product/backlog.md, docs/engineering/state.md]`.
+
+### Next
+
+- **`/release`** (fresh **release**) for **`S0088`** / **`US-0098`**.
+
+---
+
+## QA → Release — US-0097 / S0087 (`auto-20260613-01`) — superseded
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-14T02:00:00Z`); AC **10 / 10 pass** (`sprints/S0087/uat.json`, `sprints/S0087/uat.md`). UAT-10 satisfied via **procedural attestation** per runbook § **Project README coverage validation (US-0097 / DEC-0083)** (live operator E2E not runnable in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Story **US-0097** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0087 / US-0097)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 10 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 10 |
+
+AC-1..AC-10 verified at verify-work via UAT-1..UAT-10 (see `sprints/S0087/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (10 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (11/11 delivered) | T-001..T-011 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (10/10) | `sprints/S0087/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (10/10) | `sprints/S0087/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0087/plan-verify.json` status=PASS |
+| `project_readme_validator` | `[PROJECT_README_COVERAGE_SELF_TEST_OK]` | verify-work independent re-run |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=project-readme |
+| `contract_tests` | PASS | `pytest -k us0097` 8/8 (74 subtests) |
+| `metadata_guard` | PASS | `check-user-visible-metadata.py` exit 0 |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+| `dec_invariants` | PASS | **DEC-0083** amends **DEC-0045**; reframes **DEC-0074** paths; **US-0091** release step 3f literals unchanged; **BUG-0006** spawn-only preserved |
+
+### Runtime proof (verify-work)
+
+- `orchestrator_run_id=auto-20260613-01`
+- `runtime_proof_id=rp-auto-20260613-01-verify-work-qa-20260614T020000Z-S0087-US0097`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-14T02:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=58bb54e6a885f56297622fba42a7fc1f3dbcc1141fb1b62847e034f97acf9545`
+- `fresh_context_marker=qa-S0087-US0097-verify-work-20260614T020000Z-fresh`
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0087-US0097-verify-work-20260614T020000Z-fresh`, `timestamp=2026-06-14T02:00:00Z`, `evidence_ref=[sprints/S0087/uat.json, sprints/S0087/uat.md, handoffs/qa_to_release.md, handoffs/resume_brief.md, docs/product/backlog.md, docs/engineering/state.md]`.
+
+### Next
+
+- **`/release`** (fresh **release**) for **`S0087`** / **`US-0097`**.
+
+---
+
+## QA → Release — US-0096 / S0086 (`auto-20260612-01`) — superseded
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-13T15:00:00Z`); AC **12 / 12 pass** (`sprints/S0086/uat.json`, `sprints/S0086/uat.md`). UAT-11/UAT-12 satisfied via **procedural attestation** per runbook § **Delivery modes** (live IDE operator E2E not runnable in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Story **US-0096** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0086 / US-0096)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 12 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 12 |
+
+AC-1..AC-12 verified at verify-work via UAT-1..UAT-12 (see `sprints/S0086/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (11 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (12/12 delivered) | T-001..T-012 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (12/12) | `sprints/S0086/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (12/12) | `sprints/S0086/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0086/plan-verify.json` status=PASS |
+| `pack_validator` | `[PACK_JSON_SELF_TEST_OK]` | verify-work independent re-run |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=us-0096 |
+| `contract_tests` | PASS | `pytest -k us0096` 8/8; `pytest -k us0095` 7/7; `pytest -k bug0012` 5/5 |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+| `dec_invariants` | PASS | **DEC-0082** composes on **DEC-0080**/**DEC-0081**; **BUG-0006** spawn-only preserved; **DEC-0054** triad unchanged |
+| `release_queue` | PASS | **S0086** → **`ready`** |
+
+### Runtime proof (verify-work)
+
+- `orchestrator_run_id=auto-20260612-01`
+- `runtime_proof_id=rp-auto-20260612-01-verify-work-qa-20260613T150000Z-S0086-US-0096`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-13T15:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=c67b0a39583a2fbd43235f7b70d35259db9c521c976cf03317484aae90057774`
+- `fresh_context_marker=qa-S0086-US0096-verify-work-20260613T150000Z-fresh`
+
+### Next
+
+- **`/release`** (fresh **release**) for **`S0086`** / **`US-0096`**.
+
+---
+
+## QA → Release — S0085 / BUG-0012 (`auto-20260612-01`) — superseded
+
+### Status
+
+**READY FOR RELEASE** — **`/verify-work`** **PASS** (`uat_completed_at=2026-06-13T00:15:00Z`); AC **8 / 8 pass** (`sprints/S0085/uat.json`, `sprints/S0085/uat.md`). UAT-8 satisfied via **procedural attestation** per runbook § **BUG-0012 regression verify** (live multi-segment `/auto` native-chain E2E not runnable in fresh QA subagent per **BUG-0006**). Decision-gate posture: **none**. Bug **BUG-0012** remains **OPEN** per **US-0045** (release owns DONE flip).
+
+### UAT summary (S0085 / BUG-0012)
+
+| Bucket | Count |
+|--------|-------|
+| PASS | 8 |
+| FAIL | 0 |
+| SKIP | 0 |
+| Total | 8 |
+
+AC-1..AC-8 verified at verify-work via UAT-1..UAT-8 (see `sprints/S0085/uat.md` AC ↔ UAT results summary).
+
+### Closure preflight (9 gates — all PASS)
+
+| Gate | Verdict | Evidence |
+|------|---------|----------|
+| `tasks_done` | PASS (8/8 delivered) | T-001..T-008 per dev/qa handoffs |
+| `ac_qa_pass` | PASS (8/8) | `sprints/S0085/qa-findings.md` §Per-AC verdicts |
+| `ac_uat_pass` | PASS (8/8) | `sprints/S0085/uat.md` Verdict summary |
+| `plan_verify_status` | PASS | `sprints/S0085/plan-verify.json` status=PASS |
+| `bug_validator` | `[BUG_VALIDATION_OK]` | verify-work independent re-run exit 0 |
+| `parity` | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scope=bug-0012 |
+| `contract_tests` | PASS | `pytest -k bug0012` 5/5; `pytest -k us0095` 7/7 |
+| `isolation_snapshot` | PASS | execute + qa + verify-work distinct `fresh_context_marker` |
+| `dec_invariants` | PASS | **DEC-0081** amends **DEC-0080** only; **BUG-0006** spawn-only preserved; **DEC-0078** hard gates unchanged |
+
+### Verify-work strict proof (this phase)
+
+- `runtime_proof_id=rp-auto-20260612-01-verify-work-qa-20260613T001500Z-S0085-BUG0012`
+- `proof_hash=ea5744b4ba3b6643b80ea0aeb296898894276c7e8f9e276f6de8ca27a1844375`
+- `proof_issued_at=2026-06-13T00:15:00Z`, `proof_ttl_seconds=3600`, `phase_id=verify-work`, `role=qa`.
+
+### Verify-work isolation evidence (this phase)
+
+- `phase_id=verify-work`, `role=qa`, `fresh_context_marker=qa-S0085-BUG0012-verify-work-20260613T001500Z-fresh`, `timestamp=2026-06-13T00:15:00Z`, `evidence_ref=[sprints/S0085/uat.json, sprints/S0085/uat.md, handoffs/qa_to_release.md, handoffs/release_queue.md, docs/product/backlog.md, handoffs/resume_brief.md, docs/engineering/state.md]`.
+
+### Next phase
+
+Spawn **`/release`** (fresh **release**) for **`S0085`** / **`BUG-0012`**.
+
+---
+
+## QA → Release — S0083 / US-0094 (`auto-20260607-01`) (superseded)
 
 ### Status
 

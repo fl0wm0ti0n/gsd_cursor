@@ -1,53 +1,50 @@
-## Dev → QA Handoff — **S0084** / **US-0095** — post-**`/execute`** → **`/qa`**
+# Dev → QA Handoff — S0090 / US-0100
 
-> **2026-06-07T21:30:00Z** — **`/execute`** **PASS** in fresh **dev** context (`orchestrator_run_id=auto-20260607-02`, `fresh_context_marker=dev-S0084-US0095-execute-20260607T213000Z-fresh`, `runtime_proof_id=rp-auto-20260607-02-execute-dev-20260607T213000Z-S0084-US0095`, `proof_hash=9cc96c189853d90cb36dc822c4ea5e2df44eabf73ecf7a319c127eb7ddff351d`). All **T-001..T-010** marked **done**. Story **`US-0095`** remains **OPEN** (**US-0045**). Next phase is **`/qa`** (fresh **qa**).
+> **2026-06-15T05:00:00Z** — **`/execute`** **PASS** in fresh **dev** context (`orchestrator_run_id=auto-20260615-01`, `fresh_context_marker=dev-S0090-US0100-execute-20260615T050000Z-fresh`, `runtime_proof_id=rp-auto-20260615-01-execute-dev-20260615T050000Z-S0090-US0100`, `proof_hash=5e2e2353bdb546ad3fe86b2476e92a6eb8fe44bcb4da05597df02bb1a9b4313f`). **T-001..T-012** complete. Story **`US-0100`** remains **OPEN** (**US-0045**). Next phase: **`/qa`** (fresh **qa** subagent).
 
-### Sprint anchor
+## Sprint anchor
 
-- **Sprint overview**: `sprints/S0084/sprint.md`
-- **Atomic tasks**: `sprints/S0084/tasks.md` (T-001..T-010 — all **done**)
-- **Plan-verify (qa)**: `sprints/S0084/plan-verify.json` (`status=PASS`)
-- **Summary**: `sprints/S0084/summary.md`
-- **Architecture**: `docs/engineering/architecture.md` `# US-0095`
-- **Decision**: `decisions/DEC-0080.md`
-- **Research**: `docs/engineering/research.md` `R-0081`
+- **Sprint**: `sprints/S0090/sprint.md`
+- **Tasks**: `sprints/S0090/tasks.md` (all done)
+- **Summary**: `sprints/S0090/summary.md`
+- **Plan-verify**: `sprints/S0090/plan-verify.json` (**PASS**)
+- **Binding decision**: `decisions/DEC-0085.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0100`
 
-### AC ↔ Task delivery map
+## Scope delivered
 
-| Task | AC | Status | Evidence |
-|------|-----|--------|----------|
-| T-001 | AC-1 | done | `Native in-chat auto-chain (US-0095)` § in `auto.md` + reference Step 5 IDE-primary |
-| T-002 | AC-2 | done | 7-step drain-advance algorithm with `drain-advance-without-pause`, `immediately`, `without operator re-`/auto`` |
-| T-003 | AC-3 | done | Spawn-only loop invariants; US-0069 preflight/post; no BUG-0006 forbidden patterns |
-| T-004 | AC-4 | done | Native-chain stop matrix; `decision_gate` hard stop unchanged |
-| T-005 | AC-5 | done | Runbook `### Native in-chat auto-chain (US-0095)` primary; outer driver demoted to fallback; README intro ¶3 updated |
-| T-006 | AC-6 | done | AUTO_QUIET suppression table + forbidden grep patterns |
-| T-007 | AC-7 | done | DEC-0069 pairing mandate; `RESUME_BRIEF_STALE` fail-closed |
-| T-008 | AC-8 | done | Seven `test_us0095_*` subtests green |
-| T-009 | AC-9 | done | `--scope=us-0095` parity OK; `test_us0095_template_parity_auto_surfaces` green |
-| T-010 | AC-10 | done | Unified cap/ledger; `remediation_action` values; breadcrumb fields; security deny-list unchanged |
+Version-scoped release documentation per **DEC-0085**:
 
-### Gate results (dev-run)
+- Cumulative **`CHANGELOG.md`** stub (Keep a Changelog 1.1.0 + `[Unreleased]`)
+- **`scripts/release_changelog_lib.py`** — nine API symbols, L4 derivation, coalesce, fingerprint idempotency, queue bind
+- **`scripts/release_changelog_validate.py`** — ten fail-closed `RELEASE_CHANGELOG_*` codes + `--enforce`
+- **`scripts/release_changelog_backfill.py`** — Tier A/B/C backfill + `--ensure-version` for publish
+- **`/release`** step **19** (19a–19d) active + template parity
+- **`scripts/release-all.sh`** — `-F` per-version notes, validate preflight, fail-closed `RELEASE_CHANGELOG_VERSION_DOC_MISSING`
+- Runbook § **Version-scoped release docs (US-0100)**
+- Ten **`test_us0100_*`** contract subtests + harness **§26Y** + **`RELEASE_CHANGELOG_PAIRS`**
 
-| Check | Result |
-|-------|--------|
-| `pytest -k us0095 tests/auto_command_contract_test.py` | **PASS** — 7 passed |
-| `python scripts/check_intake_template_parity.py --scope=us-0095` | **PASS** `[INTAKE_TEMPLATE_PARITY_OK]` |
+## QA verification commands
 
-### QA focus areas
+1. `pytest -k us0100 tests/auto_command_contract_test.py -v` → expect **10 passed**.
+2. `python scripts/check_intake_template_parity.py --scope=release-changelog` → `[INTAKE_TEMPLATE_PARITY_OK]`.
+3. `python scripts/release_changelog_validate.py --repo .` → `[RELEASE_CHANGELOG_VALIDATE_OK]` (non-enforce on fresh stub).
+4. `python scripts/check-user-visible-metadata.py --repo .` → exit 0.
+5. Confirm **`US-0100`** still **OPEN** in `docs/product/backlog.md` until **`/release`**.
 
-1. Verify native-chain literals present in active + template `auto.md` and reference (byte-identical).
-2. Confirm README + runbook demote outer driver to **optional** / **fallback** without deleting US-0092 autonomy headline.
-3. Re-run `pytest -k us0095` and parity `--scope=us-0095` on fresh checkout.
-4. Confirm spawn-only (**BUG-0006**) invariants not weakened in native-chain prose.
-5. Confirm forbidden-pattern list documented but not used as mandatory IDE instructions.
+## Test evidence (execute)
 
-### Scope guards for `/qa`
+- `pytest -k us0100`: **10 passed**, 26 subtests
+- Parity: `[INTAKE_TEMPLATE_PARITY_OK] scope=release-changelog`
+- Metadata guard: exit 0
+- Triad: rollover + check PASS (pre-append rollover)
 
-- **Do not** advance backlog status — **US-0095** stays **OPEN** until `/release`.
-- **Do not** weaken isolation (**US-0048**) or strict-proof (**US-0056**) gates.
-- **Do not** delete `scripts/auto_outer_driver.py`.
+## Scope guards (unchanged)
 
-### Next
+- Do **not** overwrite non-target **`Sxxxx-release-notes.md`** during QA/release.
+- Do **not** pass sprint notes to **`gh -F`** — per-version semver file only.
+- **`FRAMEWORK_KIT_REPO=1`**: execute step **23** README delta skipped (kit repo).
 
-- **`/qa`** (fresh **qa**) for **`S0084`** / **`US-0095`**
+## Next
+
+- **`/qa`** (fresh **qa**) for **`S0090`** / **US-0100**

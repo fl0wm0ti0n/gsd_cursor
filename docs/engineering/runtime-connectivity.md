@@ -62,6 +62,14 @@ through SSH to a host where Docker commands run; **`dockerHostEnv`** and
 artifacts). **`composeFile`** and **`service`** identify the stack slice. Full
 fields remain in **`docs/engineering/release-targets.json`** and **DEC-0044**.
 
+## Dev environment Connect fields (US-0098 / DEC-0084)
+
+When execute step **24** runs with **`DEV_AUTO_LAUNCH_PROFILE=deterministic_v1`**, the **Connect**
+block in **`handoffs/dev_to_qa.md`** uses the same operator-facing field names as this document:
+**`runtime_mode`**, **`connect_endpoint`**, **`health_path`**, **`service_id`** / **`container_id`**,
+**`target_id`**, **`env_refs`**, **`relaunch_outcome`**. Values are names-only — never inline secrets.
+See **`scripts/dev_environment_lib.py`** **`format_connect_block`** and **`decisions/DEC-0084.md`**.
+
 ## Optional deterministic CI routing recipe (US-0086)
 
 This recipe is optional and applies only when automation routing is explicitly

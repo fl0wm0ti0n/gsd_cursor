@@ -38,6 +38,30 @@ description: "its-magic auto: deterministic continuation orchestrator."
   (wrong writer / isolation break) and **`RUNTIME_PROOF_*`** / **`PHASE_ROLE_*`**
   families—do not overload those codes for a missing-spawn violation.
 
+## Orchestrator post-subagent continuation mandate (BUG-0012 / DEC-0081)
+
+**Orchestrator context only** — phase-role commands still **stop** and hand off via
+artifacts (**BUG-0006**). When **`/auto`** runs as orchestrator, **post-subagent continuation**
+is **not** optional when the next phase, drain-advance target, or relaxable retry within
+budget is schedulable.
+
+After any foreground phase-role subagent returns, orchestrator **MUST Task-spawn** the next
+phase-role subagent per **US-0069** preflight. Orchestrator **must not** treat phase-role
+handoff as run terminal; **phase-role stop is not run terminal** for the orchestrator when
+continuation is schedulable.
+
+| Actor | After phase completes |
+|-------|----------------------|
+| Phase-role subagent (`po`, `tech-lead`, `dev`, `qa`, …) | **Stop** — hand off via artifacts only (**BUG-0006**) |
+| **`/auto` orchestrator** | **Continue** — orchestrator **MUST Task-spawn** when schedulable (**DEC-0080** / **BUG-0012**) |
+
+Orchestrator **must not** emit mandatory re-**`/auto`**, mandatory **`auto_outer_driver.py`**, or
+**`segment exhausted`** terminal prose when continuation is schedulable.
+
+**Required contract literals** (regression anchors): **`orchestrator MUST Task-spawn`**,
+**`post-subagent continuation`**, **`phase-role stop is not run terminal`**,
+**`native chain supersedes Option B`**.
+
 ## Continuous multi-phase execution (US-0088)
 
 A single `/auto` orchestrated run advances through **all phases** in the
@@ -45,14 +69,15 @@ A single `/auto` orchestrated run advances through **all phases** in the
 **deterministic stop condition** fires. The orchestrator does **not** stop after
 spawning one phase unless the stop matrix requires it.
 
-**Outer-driver equivalence (AC-1, Option B)**: When a single Cursor `/auto`
-invocation cannot schedule multiple fresh subagent turns (product/runtime
-constraint), a **documented outer driver** (operator script or manual
-re-invocation with `start-from` / refreshed `resume_brief`) is
-**deterministically equivalent** provided: same intersected phase order, same
-isolation + strict-proof attestation per phase (**DEC-0038**), same stop
-reasons, and same `resume_brief` + `state.md` refresh at every boundary.
-Operators must follow the runbook recipe
+**native chain supersedes Option B** under **`AUTO_FLOW_MODE=full_autonomy`** + IDE + Task
+available — native in-chat chain is **primary**; **Outer-driver equivalence (AC-1, Option B)**
+applies **only** when **`NATIVE_CHAIN_UNAVAILABLE`** or headless/CI/`--invoke-cmd` context.
+When a single Cursor `/auto` invocation cannot schedule multiple fresh subagent turns
+(product/runtime constraint), a **documented outer driver** (operator script or manual
+re-invocation with `start-from` / refreshed `resume_brief`) is **deterministically equivalent**
+(**fallback only**) provided: same intersected phase order, same isolation + strict-proof
+attestation per phase (**DEC-0038**), same stop reasons, and same `resume_brief` + `state.md`
+refresh at every boundary. Operators must follow the runbook recipe
 (**`docs/engineering/runbook.md`** § Continuous `/auto` + backlog drain).
 
 **Deterministic stop matrix** (see also architecture `# US-0088`):
@@ -65,7 +90,7 @@ Operators must follow the runbook recipe
 | `AUTO_PAUSE_REQUEST` / `pause` | **Stop** at safe boundary (non-suppressible) |
 | `AUTO_LOOP_MAX_CYCLES` / `loop_max` | **Stop** (non-suppressible) |
 | `blocked` (sync/scope gate) | **Stop** (non-suppressible) |
-| US lifecycle DONE / sprint segment complete | **Stop** segment; `AUTO_BACKLOG_DRAIN=1` may advance to next OPEN story (recompute phase plan — **reference Step 5**) |
+| US lifecycle DONE / sprint segment complete | **IDE `full_autonomy`**: orchestrator **must** drain-advance in-chat (no operator re-`/auto`). **Other modes / fallback**: stop segment; `AUTO_BACKLOG_DRAIN=1` may advance (recompute phase plan — **reference Step 5**) |
 | `BACKLOG_MAX_STORIES_REACHED` | **Stop** (non-suppressible) |
 
 `stop_reason` vocabulary: `completed`, `decision_gate`, `missing_input`,
@@ -88,6 +113,11 @@ re-invocation between segments.
 | 3 | Task tool available for foreground subagent spawn |
 
 Set **`native_chain_active=true`** in `state.md` phase boundary when all hold.
+Set **`native_chain_continuing=true`** when orchestrator scheduled next spawn/advance **this**
+boundary. Set **`drain_advance_action=spawned|skipped|not_applicable`** on drain-advance
+boundaries (**`skipped`** when budget > 0 + OPEN item exists is **invalid**). When
+**`native_chain_continuing=true`**, **`stop_reason`** must **not** be
+**`completed (segment exhausted)`** and operator prose must **not** mandate re-**`/auto`**.
 
 ### Continuation loop (reference Step 5 — IDE primary)
 
@@ -126,7 +156,13 @@ Deterministic **7-step** algorithm when **`full_autonomy`** + drain policy activ
 | **6** | **APPEND** `state.md` materialization breadcrumb for new segment |
 | **7** | **IMMEDIATELY** spawn first phase subagent — **without operator re-`/auto`**, **no** mandatory outer-driver instruction |
 
-**DEC-0069 pairing mandate**: every phase boundary and drain advance **must** refresh **`resume_brief`** + **`state.md`** before scheduling in-chat continuation. Stale brief → **`RESUME_BRIEF_STALE`** fail-closed (no advance).
+**Between steps 6 and 7** (no operator stop): orchestrator **must not** emit operator wait
+instructions, set **`stop_reason=completed (segment exhausted)`** when drain budget > 0 and
+eligible OPEN item exists, or skip Task-spawn for step **7**. Attest
+**`drain_advance_action=spawned|skipped|not_applicable`** on `state.md` phase boundary;
+**`skipped`** when budget > 0 + OPEN item exists is **invalid** (regression).
+
+**DEC-0069 pairing mandate**: every phase boundary and drain advance **must** refresh **`resume_brief`** + **`state.md`** before scheduling in-chat continuation. Stale brief → **`RESUME_BRIEF_STALE`** fail-closed (no advance). Orchestrator **MUST Task-spawn** next phase — **`/auto`** is orchestrator context label, not operator re-invocation instruction.
 
 ### Native-chain stop matrix (US-0095)
 
@@ -154,7 +190,7 @@ native in-chat auto-chain above. **Optional fallback**: stdlib outer driver
 
 The driver **loops hook invocations** — spawn-only preserved (**BUG-0006**); it
 never performs phase-role work. Headless/CI recipe: set scratchpad keys → run
-`python scripts/auto_outer_driver.py --repo .` once → interpret exit table in
+`python scripts/auto_outer_driver.py --repo .` once (**fallback** for headless/CI) → interpret exit table in
 **`docs/engineering/runbook.md`** § **Full-autonomy outer driver (US-0092)** (**fallback**).
 
 **Drain-advance-without-pause**: with **`full_autonomy`** + **`AUTO_BACKLOG_DRAIN=1`**
@@ -170,7 +206,7 @@ explicit opt-in for publish (unchanged default-off).
 
 | Condition | US-0088 (all modes) | `full_autonomy` delta |
 |-----------|---------------------|------------------------|
-| Next phase, no hard stop | Continue inner `/auto` | Outer driver **re-invokes** when Cursor ends turn early |
+| Next phase, no hard stop | Continue inner `/auto` | Native chain continues in-chat; outer driver **re-invokes** only on **`NATIVE_CHAIN_UNAVAILABLE`** / headless **fallback** |
 | `decision_gate` | Hard stop | **No change — hard** |
 | Unrecoverable `error` | Hard stop | **No change — hard** |
 | Critical `missing_input` | Hard stop | **No change — hard** |
@@ -180,7 +216,7 @@ explicit opt-in for publish (unchanged default-off).
 | `blocked` — transient/sync | Hard stop | **Relaxable** when ledger classifies recoverable |
 | `blocked` — isolation / strict-proof / ownership | Hard stop | **No change — hard** |
 | UAT/QA fail | Hard stop (operator) | **Relaxable** when `AUTO_IMPLEMENTATION_LOOP=1` |
-| Segment complete + `AUTO_BACKLOG_DRAIN=1` | Advance (may need manual re-`/auto`) | **Drain-without-pause** — immediate next item |
+| Segment complete + `AUTO_BACKLOG_DRAIN=1` | Advance (may need manual re-`/auto` in non-native modes) | **Drain-without-pause** — immediate in-chat continuation; **no** operator re-`/auto` |
 | `BACKLOG_MAX_STORIES_REACHED` | Hard stop | **No change — hard** |
 | `AUTO_SCHEDULER_CONFLICT` | Hard stop | **No change — hard** |
 | Security deny (`.env`, intake evidence mutation) | Hard deny | **No change — hard** |
@@ -245,6 +281,59 @@ parseable `EXECUTE_OVERRIDE_GOVERNANCE_REF`.
 
 Role reason codes: `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`.
 
+## Mode-scoped delivery resolver — step 0 (US-0096 / DEC-0082)
+
+**Before** **Configurable phase selection policy (US-0070 / DEC-0052)**, **resolve_delivery_mode**
+from precedence: argv `delivery-mode=` → backlog row `delivery_mode` (when
+`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`) → scratchpad `DELIVERY_MODE` → **`standard`**.
+
+| `delivery_mode` | `resolved_phase_plan` | `reinstatement_mode` | `memory_layer` |
+|-----------------|----------------------|---------------------|----------------|
+| `standard` | Full **DEC-0052** chain | `dec0052_default` | `standard` |
+| `ultra_lean` | `[spec, plan, build+verify, ship]` | `none` | `pack` |
+| `mega_quick` | `[quick]` when eligible (+1 on test failure) | `none` | `quick` |
+
+**reinstatement applies only when delivery_mode=standard**. **`AUTO_PHASE_*`** applies **only**
+when `delivery_mode=standard`; non-standard + non-default **`AUTO_PHASE_*`** →
+**`PHASE_POLICY_CONFLICT`** (fail closed).
+
+**`DELIVERY_MODE_SWITCH_MID_STORY`**: fail closed — complete segment in one mode.
+
+Persist breadcrumbs at each phase boundary in `state.md` + top `resume_brief` pointer:
+**`delivery_mode`**, **`resolved_phase_plan`**, **`reinstatement_mode`**, **`memory_layer`**.
+
+### `ultra_lean` macro-phases (US-0096 / DEC-0082)
+
+Four macro-phases — **no** eleven-phase reinstatement when `delivery_mode=ultra_lean`:
+
+| Macro | Merged canonical phases | Default role |
+|-------|------------------------|--------------|
+| **`spec`** | intake + discovery | **po** |
+| **`plan`** | research + architecture + sprint-plan | **tech-lead** |
+| **`build+verify`** | execute + qa + verify-work | **dev** / **qa** |
+| **`ship`** | release + refresh-context | **release** / **curator** |
+
+**`AUTO_IMPLEMENTATION_LOOP`** preserved inside **`build+verify`**. QA merges AC checklist + UAT
+in one spawn.
+
+### `mega_quick` routing (US-0096 / DEC-0082)
+
+When `DELIVERY_MODE=mega_quick` and eligible, materialize **`["quick"]`** only. Ineligible →
+**`DELIVERY_MODE_INELIGIBLE`** + specific **`MEGA_QUICK_*`** code:
+
+| Code | Rule |
+|------|------|
+| **`MEGA_QUICK_BUG_SEGMENT`** | Story-only (no bug segment) |
+| **`MEGA_QUICK_AC_TOO_BROAD`** | AC ≤ 3 |
+| **`MEGA_QUICK_ARCHITECTURE_REQUIRED`** | No companion DEC required |
+| **`MEGA_QUICK_SPRINT_EXISTS`** | No active `sprints/Sxxxx/` for story |
+| **`MEGA_QUICK_STORY_OVERRIDE`** | Row `delivery_mode` consistent when routing enabled |
+| **`MEGA_QUICK_MULTI_COMPONENT`** | Single component or `COMPONENT_SCOPE_MODE=0` |
+| **`MEGA_QUICK_GATE_ESCALATION`** | No elevated gates beyond default `/quick` |
+
+Artifacts: **`sprints/quick/Qxxxx/task.json`** + **`summary.md`**. Second spawn on test
+failure only. Closure requires **`acceptance_met: true`** + green tests.
+
 ## Configurable phase selection policy (US-0070 / DEC-0052)
 
 Treat **resolved phase plan** as fail-closed schedule from merged scratchpad **before**
@@ -264,6 +353,10 @@ bug-queue segments, also record **`segment_work_item_kind`**, **`active_bug_id`*
 and **`docs/engineering/auto-orchestration-reference.md`**.
 
 ## Inputs
+
+- **Narrow-read (US-0053 / US-0096 Tranche A)**: Start at `docs/engineering/phase-context.md`
+  and the story section anchor in vision/architecture/decisions when a heading exists; forbid
+  full-file reads when a section heading exists.
 
 Merged scratchpad (**US-0073** / **DEC-0055**), automation flags (`AUTO_*`, `SECURITY_REVIEW`,
 `TEAM_*`), phase-plan keys `AUTO_PHASE_PLAN`, `AUTO_PHASE_EXCLUDE`, `AUTO_PHASE_INCLUDE`,
@@ -416,8 +509,10 @@ used for resume/materialization failures):
    `## Continuous multi-phase execution (US-0088)` above). When
    `AUTO_BACKLOG_DRAIN=1`, repeat the story lifecycle for the next eligible OPEN
    story, **reloading** scratchpad and **recomputing** the materialized phase
-   plan at each story boundary. Outer-driver equivalence applies when a single
-   invocation cannot schedule multiple subagent turns (**AC-1 Option B**).
+   plan at each story boundary.
+   Outer-driver equivalence applies when **`NATIVE_CHAIN_UNAVAILABLE`**, headless/CI, or
+   `--invoke-cmd` prevents in-chat scheduling (**AC-1 Option B** — **fallback only**;
+   **native chain supersedes Option B** in IDE **`full_autonomy`**).
    `stop_reason`: `completed|decision_gate|missing_input|pause_request|loop_max|error|blocked`.
 6. Isolation evidence verification at each boundary (**reference** step 11a).
 7. At each phase boundary, verify strict runtime attestation tuple exists

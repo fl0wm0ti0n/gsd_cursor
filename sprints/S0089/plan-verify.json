@@ -1,0 +1,122 @@
+{
+  "sprint_id": "S0089",
+  "story_refs": ["US-0099"],
+  "status": "PASS",
+  "reason": null,
+  "verdict_reason_codes": [],
+  "planned_at": "2026-06-14T18:00:00Z",
+  "plan_verified_at": "2026-06-14T18:30:00Z",
+  "role_planned": "tech-lead",
+  "role_verified": "qa",
+  "planned_by": {
+    "role": "tech-lead",
+    "orchestrator_run_id": "auto-20260614-01",
+    "fresh_context_marker": "tl-S0089-US0099-sprint-plan-20260614T180000Z-fresh"
+  },
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260614-01",
+    "fresh_context_marker": "qa-S0089-US0099-plan-verify-20260614T183000Z-fresh"
+  },
+  "verification_proof_ref": "rp-auto-20260614-01-plan-verify-qa-20260614T183000Z-S0089-US0099",
+  "verification_proof_hash": "f88723256900915d8114a682661fbe69708d53c3330d5438c657b4e41d039086",
+  "orchestrator_run_id": "auto-20260614-01",
+  "dec_id": "DEC-0084",
+  "research_anchor": "R-0086",
+  "architecture_anchor": "docs/engineering/architecture.md#US-0099",
+  "acs_covered": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6", "AC-7", "AC-8"],
+  "ac_coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-002", "T-005"], "verified": true, "notes": "PASS — bootstrap_dev_environment_profile + --bootstrap CLI (T-001); installer hook after run_scratchpad_postinstall on missing+upgrade (T-002); test_us0099_copy_when_missing + test_us0099_upgrade_idempotent (T-005); DEC-0084 § bootstrap posture; architecture § Hook placement + § Stdlib helper."},
+    {"ac": "AC-2", "tasks": ["T-002", "T-006"], "verified": true, "notes": "PASS — existence-only skip in installer hook (T-002); test_us0099_skip_when_exists + DEV_ENV_BOOTSTRAP_SKIPPED_EXISTS (T-006); architecture § Path resolution + § Idempotency matrix."},
+    {"ac": "AC-3", "tasks": ["T-001", "T-006"], "verified": true, "notes": "PASS — resolve_profile_path + DEV_ENVIRONMENT_CONFIG override (T-001); test_us0099_path_override valid/invalid paths (T-006); DEV_ENV_BOOTSTRAP_PATH_INVALID fail-closed; architecture § Path resolution."},
+    {"ac": "AC-4", "tasks": ["T-003"], "verified": true, "notes": "PASS — bin/postinstall.js repo-root walk + spawnSync --bootstrap subprocess; global npm skip token; test_us0099_postinstall_parity (T-007 dependency); architecture § Hook placement (postinstall.js)."},
+    {"ac": "AC-5", "tasks": ["T-001"], "verified": true, "notes": "PASS — source = template/.cursor/dev-environment.json.example only; names-only contract preserved; no schema/gitignore change; architecture § Overview + § Contrast table."},
+    {"ac": "AC-6", "tasks": ["T-004"], "verified": true, "notes": "PASS — runbook § Dev environment customize-after-bootstrap UX; DEV_ENV_PROFILE_MISSING troubleshooting; DEV_ENV_BOOTSTRAP_* family documented; active/template parity; architecture § Runbook operator UX delta."},
+    {"ac": "AC-7", "tasks": ["T-005", "T-006", "T-007", "T-008", "T-009"], "verified": true, "notes": "PASS — seven test_us0099_* contract subtests (T-005/T-006/T-007); harness §26X (T-008); check_intake_template_parity.py --scope=dev-environment DEV_ENVIRONMENT_PAIRS unchanged (T-009); architecture § Contract tests + parity."},
+    {"ac": "AC-8", "tasks": [], "verified": true, "notes": "PASS — pre-satisfied at /architecture phase: DEC-0084 amended § bootstrap posture; docs/engineering/architecture.md # US-0099 documents hook placement, reason codes, atomic task seeds; plan-verify attestation only (no dev task seed per architecture § AC traceability)."}
+  ],
+  "coverage": [
+    {"ac": "AC-1", "tasks": ["T-001", "T-002", "T-005"], "verified": true},
+    {"ac": "AC-2", "tasks": ["T-002", "T-006"], "verified": true},
+    {"ac": "AC-3", "tasks": ["T-001", "T-006"], "verified": true},
+    {"ac": "AC-4", "tasks": ["T-003"], "verified": true},
+    {"ac": "AC-5", "tasks": ["T-001"], "verified": true},
+    {"ac": "AC-6", "tasks": ["T-004"], "verified": true},
+    {"ac": "AC-7", "tasks": ["T-005", "T-006", "T-007", "T-008", "T-009"], "verified": true},
+    {"ac": "AC-8", "tasks": [], "verified": true}
+  ],
+  "plan_integrity": {
+    "task_count": 9,
+    "ac_count": 8,
+    "task_ac_bijection": false,
+    "task_seed_bijection": true,
+    "ac_coverage_surjective": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false
+  },
+  "governance_alignment": {
+    "decision_ref": "DEC-0084",
+    "composed_decisions": ["US-0098", "US-0018", "US-0085", "US-0062"],
+    "architecture_anchor": "docs/engineering/architecture.md#US-0099",
+    "research_anchor": "R-0086",
+    "out_of_scope_guard": "Install bootstrap only; no profile schema change; no execute step 24 change; no overwrite; no auto-enable DEV_AUTO_LAUNCH_PROFILE",
+    "non_goals_respected": [
+      "no profile schema v1 change",
+      "no execute step 24 semantic change",
+      "no overwrite of existing profiles",
+      "no auto-enable DEV_AUTO_LAUNCH_PROFILE",
+      "no remote.json bootstrap",
+      "no .env reads during bootstrap"
+    ]
+  },
+  "gates_passed": [
+    "AC_COVERAGE_SURJECTIVE: AC-1..AC-8 all ≥1 task or architecture attestation; no PLAN_AC_COVERAGE_GAP",
+    "TASK_SEED_BIJECTION: T-001..T-009 map 1:1 to architecture # US-0099 § Atomic task seeds (9 seeds → 9 tasks)",
+    "TASK_ATOMICITY: T-001/T-002/T-005/T-006/T-007 multi-AC scopes accepted per architecture # US-0099 § Atomic task seeds (not PLAN_AC_ATOMICITY_VIOLATION)",
+    "DEC_ANCHORING: every task cites DEC-0084 § bootstrap posture matching architecture § AC traceability",
+    "ACCEPTANCE_CHECKS_TESTABLE: every task has concrete acceptance_check bullets (pytest -k us0099, parity script, CLI exit codes, runbook literals)",
+    "PARITY_TOUCHPOINTS_EXPLICIT: DEV_ENVIRONMENT_PAIRS 8-surface inventory + template mirrors mapped per task parity_touchpoints",
+    "TASK_COUNT_WITHIN_LIMIT: task_count=9 <= sprint_max_tasks=12; SPRINT_AUTO_SPLIT not triggered",
+    "ORDERING_NO_CYCLES: recommended /execute ordering T-001→T-009 Tranche A→D has no circular dependencies",
+    "NON_GOALS_PRESERVED: all DEC-0084 / architecture non-goals enumerated in sprint.md and governance_alignment.non_goals_respected",
+    "TEST_STRATEGY_ALIGNED: seven test_us0099_* subtests (T-005/T-006/T-007), DEV_ENVIRONMENT_PAIRS + harness §26X (T-008/T-009), post-edit gate sequence in sprint.md matches architecture § Contract tests",
+    "GOVERNANCE_ANCHORS_VALID: DEC-0084 amended; R-0086; architecture # US-0099; US-0098; US-0018; US-0085; US-0062; US-0017; US-0045; US-0048; US-0056; DEC-0038",
+    "STATUS_AUTHORITY_PRESERVED: US-0099 stays OPEN in docs/product/backlog.md through plan-verify (US-0045; closure at /release)",
+    "AC-8_ARCHITECTURE_ATTESTATION: DEC-0084 amended + # US-0099 locked at architecture phase; plan-verify attests AC-8 without dev task seed"
+  ],
+  "checks_performed": [
+    "Sprint-plan authored in fresh tech-lead context (auto-20260614-01, 2026-06-14T18:00:00Z, fresh_context_marker=tl-S0089-US0099-sprint-plan-20260614T180000Z-fresh); plan-verify authored in fresh qa context (auto-20260614-01, 2026-06-14T18:30:00Z, fresh_context_marker=qa-S0089-US0099-plan-verify-20260614T183000Z-fresh)",
+    "AC-to-task mapping surjective (AC-1..AC-8 covered by T-001..T-009 + AC-8 architecture attestation); task-to-seed bijection (9 architecture seeds → T-001..T-009); multi-AC tasks T-001/T-002/T-005/T-006/T-007 justified per architecture # US-0099 § Atomic task seeds",
+    "Architecture § Atomic task seeds rows 1–9 cross-checked against tasks.md T-001..T-009 descriptions, ac_ref, parity_touchpoints, and acceptance_check bullets — 1:1 match",
+    "DEC-0084 § bootstrap posture cross-checked against tasks.md acceptance_check bullets and sprint.md AC coverage table",
+    "Scope aligns with docs/engineering/architecture.md#US-0099 and DEC-0084 (bootstrap helper CLI, installer hook, postinstall parity, runbook UX, contract tests, harness §26X, parity sweep)",
+    "Template parity inventory locked per architecture § DEV_ENVIRONMENT_PAIRS (8 pairs unchanged); negative-parity constraints documented in sprint.md",
+    "Non-goals preserved: no profile schema v1 change; no execute step 24 semantic change; no overwrite; no auto-enable DEV_AUTO_LAUNCH_PROFILE; no remote.json bootstrap; no .env reads",
+    "Task count 9 within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered",
+    "Recommended /execute ordering verified acyclic (Tranche A helper → B installer → C postinstall → D runbook+tests+harness+parity)",
+    "Backlog AC-1..AC-8 acceptance bullets reconciled against sprint task acceptance_check coverage — no semantic gaps"
+  ],
+  "gates_failed": [],
+  "gates_pending": [],
+  "remediation_required": [],
+  "governance_refs": [
+    "DEC-0084",
+    "US-0098",
+    "US-0018",
+    "US-0085",
+    "US-0062",
+    "US-0045",
+    "US-0048",
+    "US-0056",
+    "architecture.md#US-0099",
+    "R-0086"
+  ],
+  "runtime_proof_id": "rp-auto-20260614-01-plan-verify-qa-20260614T183000Z-S0089-US0099",
+  "proof_hash": "f88723256900915d8114a682661fbe69708d53c3330d5438c657b4e41d039086",
+  "proof_issued_at": "2026-06-14T18:30:00Z",
+  "proof_ttl_seconds": 3600,
+  "phase_id": "plan-verify",
+  "role": "qa"
+}
