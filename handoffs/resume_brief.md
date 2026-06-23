@@ -1,6 +1,243 @@
 # Resume brief
 
-## Latest orchestration pointer — post-refresh-context S0090 / US-0100 (DEC-0069)
+## Latest orchestration pointer — post-refresh-context US-0101 (DEC-0069)
+
+- **Boundary**: **`/refresh-context`** for **`US-0101`** — **`segment_closure_utc=2026-06-16T00:10:00Z`**
+- **`story_id`**: **`US-0101`** — **DONE** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`** — **released**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`refresh-context-S0091-US0101-curator-20260616T001000Z-fresh`**
+- **`intended_resume_phase`**: **(none — segment closed)**
+- **`resolved_start_phase`**: **`refresh-context`**
+- **`next_scheduled_phase`**: **(drain-advance or stop)**
+- **Contract**: refresh-context **PASS** — segment closure for **`US-0101`**; all 10 phases complete; **`S0091`** released; **`US-0101`** → **DONE**; drain-advance to next OPEN story or stop
+- **`research_anchor`**: **`R-0088`** (closed)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`refresh-context`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-refresh-context (**DEC-0069**)
+- segment_work_item_kind=story
+
+---
+
+## Latest orchestration pointer — post-release US-0101 (DEC-0069)
+
+- **Boundary**: **`/release`** for **`US-0101`** — **`release_boundary_utc=2026-06-16T00:00:00Z`**
+- **`story_id`**: **`US-0101`** — **DONE** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`** — **released**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`release-S0091-US0101-release-20260616T000000Z-fresh`**
+- **`intended_resume_phase`**: **`refresh-context`**
+- **`resolved_start_phase`**: **`release`**
+- **`next_scheduled_phase`**: **`refresh-context`**
+- **Contract**: release **PASS** — **`S0091`** released; **`US-0101`** → **DONE**; release notes created; spawn fresh **curator** for **`/refresh-context`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- boundary=post-release (**DEC-0069**)
+- segment_work_item_kind=story
+
+---
+
+## Prior orchestration pointer — post-verify-work US-0101 (DEC-0086)
+
+- **Boundary**: **`/verify-work`** for **`US-0101`** — **`verify_work_boundary_utc=2026-06-15T23:30:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-US0101-verify-work-20260615T233000Z-fresh`**
+- **`intended_resume_phase`**: **`release`**
+- **`resolved_start_phase`**: **`verify-work`**
+- **`next_scheduled_phase`**: **`release`**
+- **Contract**: verify-work **PASS** — all 10 tasks DONE; QA verdict PASS confirmed; 8/8 contract tests passing; all 9 ACs satisfied; all artifacts present; US-0101 remains OPEN (US-0045); ready for /release; spawn fresh **release** for **`/release`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+---
+
+## Prior orchestration pointer — post-qa US-0101 (DEC-0086)
+
+- **Boundary**: **`/qa`** for **`US-0101`** — **`qa_boundary_utc=2026-06-15T23:00:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-US0101-qa-20260615T230000Z-fresh`**
+- **`intended_resume_phase`**: **`verify-work`**
+- **`resolved_start_phase`**: **`qa`**
+- **`next_scheduled_phase`**: **`verify-work`**
+- **Contract**: qa **PASS** — **AC-1..AC-9** satisfied; 8/8 contract tests passing; parity + harness §26Z green; zero blocking findings; spawn fresh **qa** for **`/verify-work`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+---
+
+## Prior orchestration pointer — post-execute US-0101 (DEC-0086)
+
+- **Boundary**: **`/execute`** for **`US-0101`** — **`execute_boundary_utc=2026-06-15T22:30:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`dev-US0101-execute-20260615T223000Z-fresh`**
+- **`intended_resume_phase`**: **`qa`**
+- **`resolved_start_phase`**: **`execute`**
+- **`next_scheduled_phase`**: **`qa`**
+- **Contract**: execute **PASS** — **T-001..T-010** done; 8/8 contract tests passing; parity + harness §26Z green; spawn fresh **qa** for **`/qa`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+---
+
+## Latest orchestration pointer — post-plan-verify US-0101 (DEC-0086)
+
+- **Boundary**: **`/plan-verify`** for **`US-0101`** — **`plan_verify_boundary_utc=2026-06-15T22:00:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-US0101-plan-verify-20260615T220000Z-fresh`**
+- **`intended_resume_phase`**: **`execute`**
+- **`resolved_start_phase`**: **`execute`**
+- **`next_scheduled_phase`**: **`execute`**
+- **Contract**: plan-verify **PASS** — AC/task bijection verified; governance traceability confirmed; sprint **`S0091`** ready for execute; spawn fresh **dev** for **`/execute`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+---
+
+## Prior orchestration pointer — post-sprint-plan US-0101 (DEC-0086)
+
+- **Boundary**: **`/sprint-plan`** for **`US-0101`** — **`sprint_plan_boundary_utc=2026-06-15T21:30:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0091`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`tl-US0101-sprint-plan-20260615T213000Z-fresh`**
+- **`intended_resume_phase`**: **`plan-verify`**
+- **`resolved_start_phase`**: **`plan-verify`**
+- **`next_scheduled_phase`**: **`plan-verify`**
+- **Contract**: sprint-plan **PASS** — sprint **`S0091`** allocated; 10 tasks mapped; 8 contract tests; spawn fresh **qa** for **`/plan-verify`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+---
+
+## Prior orchestration pointer — post-architecture US-0101 (DEC-0086)
+
+- **Boundary**: **`/architecture`** for **`US-0101`** — **`architecture_boundary_utc=2026-06-15T21:00:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`tl-US0101-architecture-20260615T210000Z-fresh`**
+- **`intended_resume_phase`**: **`sprint-plan`**
+- **`resolved_start_phase`**: **`sprint-plan`**
+- **`next_scheduled_phase`**: **`sprint-plan`**
+- **Contract**: architecture **PASS** — **`DEC-0086`** locked; **`# US-0101`** appended; 10 task seeds; eight **`test_us0101_*`** markers; spawn fresh **tech-lead** for **`/sprint-plan`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+## Prior orchestration pointer — post-research US-0101 (DEC-0069)
+
+- **Boundary**: **`/research`** for **`US-0101`** — **`research_boundary_utc=2026-06-15T20:30:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`tl-US0101-research-20260615T203000Z-fresh`**
+- **`intended_resume_phase`**: **`architecture`**
+- **`resolved_start_phase`**: **`architecture`**
+- **`next_scheduled_phase`**: **`architecture`**
+- **Contract**: research **PASS** — **`R-0088`** Q1–Q5 closed; companion **`DEC-xxxx`** pending at architecture; spawn fresh **tech-lead** for **`/architecture`**
+- **`research_anchor`**: **`R-0088`** (closed for `/research`)
+- **`dec_id`**: **`(pending — architecture)`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+## Prior orchestration pointer — post-discovery US-0101 (DEC-0069)
+
+- **Boundary**: **`/discovery`** for **`US-0101`** — **`discovery_boundary_utc=2026-06-15T20:00:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`po-US0101-discovery-20260615T200000Z-fresh`**
+- **`intended_resume_phase`**: **`research`**
+- **`resolved_start_phase`**: **`research`**
+- **`next_scheduled_phase`**: **`research`**
+- **Contract**: discovery **PASS** — 12 locks captured; **`R-0088`** Q1–Q5 open; spawn fresh **tech-lead** for **`/research`**
+- **`research_anchor`**: **`R-0088`** (discovery extension appended)
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+
+## Prior orchestration pointer — drain advance US-0101 (DEC-0069)
+
+- **Boundary**: fresh **`/auto`** drain advance — **`materialization_boundary_utc=2026-06-15T19:00:00Z`**
+- **`story_id`**: **`US-0101`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`bug_id`**: **`(none)`**
+- **`sprint_id`**: **`(none)`** — not yet planned
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`implementation_loop_index`**: **`0`**
+- **`fresh_context_marker`**: **`(pending — discovery)`**
+- **`intended_resume_phase`**: **`discovery`**
+- **`resolved_start_phase`**: **`discovery`**
+- **`resolution_source`**: **`backlog_authority`**
+- **`next_scheduled_phase`**: **`discovery`**
+- **Contract**: intake **PASS** for **`US-0101`** (2026-06-14); portfolio **1 OPEN** story; spawn fresh **PO** for **`/discovery`** (per-phase model tier selection — MODEL_TIER scratchpad controls, default phase→tier matrix, local catalog, provider-mode runbook)
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0101-intake-20260614.json`**
+- **`research_anchor`**: **`R-0088`** (stub)
+- **`dec_id`**: **`(pending — architecture)`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **6**
+- **`drain_terminated`**: **false**
+- **`portfolio_open_stories`**: **1**
+- **`portfolio_open_bugs`**: **0**
+- **`next_drain_story_id`**: **`US-0101`**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`delivery_mode`**: **`standard`**
+- **`resolved_phase_plan`**: **`dec0052_full_chain`** (intake complete; discovery → refresh-context)
+- **`reinstatement_mode`**: **`dec0052_default`**
+- **`memory_layer`**: **`standard`**
+
+## Prior orchestration pointer — post-refresh-context S0090 / US-0100 (DEC-0069)
 
 - **Boundary**: **`/refresh-context`** for **`US-0100`** / **`S0090`** — **`refresh_context_boundary_utc=2026-06-15T09:00:00Z`**
 - **`story_id`**: **`US-0100`** — **DONE** in **`docs/product/backlog.md`** (authority)
@@ -611,47 +848,45 @@
 
 ## Current status
 
-- **Active story**: **`(none)`** — **US-0100** **DONE**; portfolio **0 OPEN** stories
+- **Active story**: **`US-0101`** — **OPEN** (post-verify-work)
 - **Active bug**: **`(none)`**
-- **Active sprint**: **`(none)`** — **`S0090`** **released**
-- **Phase completed**: **`refresh-context`** (**`curator`**, **PASS**)
-- **Next scheduled phase**: **`none`**
-- **Portfolio**: **0 OPEN** stories; **0 OPEN** bugs
+- **Active sprint**: **`S0091`** — verify-work PASS
+- **Phase completed**: **`verify-work`** (**`qa`**, **PASS** for **`US-0101`**)
+- **Next scheduled phase**: **`release`** (fresh **release** for **`US-0101`**)
+- **Portfolio**: **1 OPEN** story (**`US-0101`**); **0 OPEN** bugs
 
 ## Intended resume phase
 
-`intake`
+`release`
 
 ## Resume target
 
 - bug_id=(none)
-- story_id=(none)
-- sprint_id=(none)
-- boundary=post-refresh-context (**DEC-0069**)
+- story_id=US-0101
+- sprint_id=S0091
+- boundary=post-verify-work (**DEC-0086**)
 - segment_work_item_kind=story
 
 ## Latest auto breadcrumb seed
 
 - requested_start_from=(none)
-- resolved_start_phase=intake
+- resolved_start_phase=release
 - resolution_source=resume_brief
 - resolution_status=resolved
 - stop_reason=completed
-- stop_phase=refresh-context
-- next_scheduled_phase=none
-- orchestrator_run_id=auto-20260615-01
-- backlog_drain_active=false
+- stop_phase=verify-work
+- next_scheduled_phase=release
+- orchestrator_run_id=auto-20260615-02
+- backlog_drain_active=true
 - backlog_drain_stories_remaining_budget=6
-- backlog_drain_segment_complete=1
-- drain_terminated=true
-- drain_terminated_reason=no_open_stories
-- portfolio_open_stories=0
+- drain_terminated=false
+- portfolio_open_stories=1
 - portfolio_open_bugs=0
 - native_chain_active=true
-- native_chain_continuing=false
-- drain_advance_action=not_applicable
-- dec_id=DEC-0085
-- refresh_context_boundary_utc=2026-06-15T09:00:00Z
+- native_chain_continuing=true
+- drain_advance_action=spawned
+- dec_id=DEC-0086
+- verify_work_boundary_utc=2026-06-15T23:30:00Z
 
 ---
 

@@ -8,286 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0090: Optional Caveman-style input compression (safe file scope)
-
-## Overview
-
-**Composes on `# US-0089`** (response-side Caveman voice — `DEC-0072`). This
-section delivers the **input-side** contract: an optional, script-invoked,
-default-off file compressor under operator-controlled scope with sidecar
-originals, hard deny-list, and single-algorithm safe-mode idempotency.
-
-Binding decision: **`DEC-0073`** (composes on `DEC-0072` without rewriting
-it). This section is a **self-contained summary** for sprint planners; open
-`decisions/DEC-0073.md` for the normative statement, alternatives, and risk
-resolutions.
-
-## Forbidden surfaces (deny-list baseline — hard MUST)
-
-Input compression **never** touches, even when an allow-list glob would
-otherwise match, and even when an operator explicitly requests it:
-
-- Secrets — `.env`, `.env.*`, `**/.env`, `**/.env.*` (**`US-0085`** /
-  **`R-0072`**).
-- Intake evidence — `handoffs/intake_evidence/*.json` (**`US-0078`** /
-  **`DEC-0060`**; `BUG-0007` class risk).
-- Canonical product / engineering authority — `docs/product/backlog.md`,
-  `docs/product/acceptance.md`, `docs/engineering/state.md`,
-  `docs/engineering/decisions.md`, `decisions/DEC-*.md` (**`US-0045`**,
-  `DEC-0040`).
-- Sprint lifecycle evidence — `sprints/*/*`.
-- Publish / runtime / install surfaces — `package.json`,
-  `package-lock.json`, `installer.*`, `.github/workflows/*.yml`,
-  `.cursor/hooks/*.py`, `bin/its-magic.js`, `packaging/homebrew/*.rb`.
-- Contract surfaces — `.cursor/rules/*.mdc`, `.cursor/commands/*.md`,
-  `.cursor/skills/**/SKILL.md` (Caveman voice composes with them; compression
-  must never rewrite them).
-- Manifest / parity sources —
-  `docs/engineering/context/installer-owned-paths.manifest`,
-  `docs/engineering/release-targets.json`,
-  `docs/engineering/token-cost-parity-manifest.md`.
-- Binaries — `.png`, `.jpg`, `.pdf`, `.zip`, archives, fonts, media, `.bin`,
-  `.exe`, `.dll`.
-- Vendor-install text containing `npx skills add` (carried from
-  `DEC-0072` §8).
-
-`DEC-0073` §4.1 contains the verbatim baseline. Evaluation order:
-deny-hard → `.gitignore` secret merge → optional `.cursorignore` overlay →
-allow-list → literal-region scan → write. Deny always wins over allow.
-
-## Minimal architecture
-
-### A. Activation (DEC-0073 §2)
-
-Activates only when **all** hold:
-
-1. `CAVEMAN_COMPRESS_INPUT=1` in `.cursor/scratchpad.md` (default `0`).
-2. `CAVEMAN_FILE_SCOPE=` resolves to a non-empty set after §5 grammar
-   parsing.
-3. CLI mode is explicit (`--write` for mutation; `--verify-originals` for
-   read-only sidecar audit).
-
-Default is off. Empty scope fails closed with
-`CAVEMAN_COMPRESS_SCOPE_EMPTY`.
-
-### B. Sidecar original policy (DEC-0073 §3)
-
-Parallel tree: `docs/.caveman-originals/<relative/path>/<file>`. Atomic
-write order: sidecar (temp+replace) → literal-region scan on proposed
-output → target (temp+replace). Any step fails → no partial state.
-`.gitkeep` materializes the root; repo-root `.gitignore` anchor
-`docs/.caveman-originals/`. `.cursorignore` remains operator-owned per
-**`US-0085`**.
-
-### C. Allow-list grammar (DEC-0073 §5)
-
-`CAVEMAN_FILE_SCOPE` accepts: named profile (v1: `docs-prose-only`) |
-raw CSV globs | hybrid `profile:<name>;globs:<csv>`. Empty = pure opt-in.
-Unknown profile fails closed with `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE`.
-
-**Frozen v1 profile (`docs-prose-only`)**:
-
-- `docs/user-guides/**/*.md`
-- `docs/engineering/runbook.md`
-- `docs/engineering/state-archive/**/*.md`
-- `handoffs/archive/*.md`
-
-### D. Compression algorithm — safe-mode only in v1 (DEC-0073 §6)
-
-Single deterministic line-level minifier:
-
-1. Collapse runs of ≥2 blank lines to one.
-2. Trim trailing whitespace.
-3. Normalize line endings to `\n`.
-4. Preserve EOF-newline status.
-
-Idempotent by construction: `compress(compress(f)) == compress(f)` byte-for-
-byte. **Aggressive mode** (filler-word strip + prose rewriter) and **LLM-
-assisted** compression are **out of scope** in v1. No `--mode` flag ships in
-v1 — reserved for future DEC.
-
-**Literal-region invariant** (`DEC-0072` §4 reused verbatim — nine zones):
-fenced code, file paths, AC checklists, reason codes, IDs, contract markers,
-strict-proof tuple fields, isolation evidence fields, git refs. Any byte
-difference inside a zone fails closed with
-`CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED` **before** commit.
-
-### E. CLI contract (DEC-0073 §8)
-
-`scripts/caveman_compress_input.py` (active + `template/scripts/` mirror).
-Flags: `--dry-run` (default), `--write`, `--verify-originals`, `--report`
-(JSON to stdout). Conflicting flags fail closed with
-`CAVEMAN_COMPRESS_FLAG_CONFLICT`. Exit `0` only on zero violations.
-
-### F. Reason-code vocabulary — 9 codes, 3 families, pre/during-write only (DEC-0073 §7)
-
-| Family | Codes |
-|--------|-------|
-| **Gating** | `CAVEMAN_COMPRESS_MODE_DISABLED`, `CAVEMAN_COMPRESS_FLAG_CONFLICT` |
-| **Scope** | `CAVEMAN_COMPRESS_SCOPE_EMPTY`, `CAVEMAN_COMPRESS_SCOPE_UNKNOWN_PROFILE`, `CAVEMAN_COMPRESS_SCOPE_VIOLATION` |
-| **Integrity** | `CAVEMAN_COMPRESS_DENY_HIT`, `CAVEMAN_COMPRESS_NOT_IDEMPOTENT`, `CAVEMAN_COMPRESS_LITERAL_REGION_DAMAGED`, `CAVEMAN_COMPRESS_ORIGINAL_MISSING` |
-
-No post-write codes. No new codes without a subsequent DEC revising §7.
-
-## Three-axis non-substitution (DEC-0073 §1)
-
-`TOKEN_PROFILE` (US-0080 / DEC-0062), `CAVEMAN_MODE` (DEC-0072 §1), and
-`CAVEMAN_COMPRESS_INPUT` (this DEC) are **three independent axes**. None
-substitutes for another. The following paragraph is published verbatim in
-**`docs/engineering/auto-orchestration-reference.md`** and
-**`docs/engineering/runbook.md`** (active + `template/` mirrors; extends
-the DEC-0072 §1 published paragraph in-place):
-
-> `TOKEN_PROFILE` controls context breadth. `CAVEMAN_MODE` controls reply
-> voice. `CAVEMAN_COMPRESS_INPUT` controls input-side file mutation. None
-> substitutes for another; setting one does not change the others. Combine
-> freely.
-
-Operator phrases from DEC-0072 §5 (`caveman on`, `caveman: lite`…) do **not**
-activate input compression. Input compression is **script-invoked**, not
-voice-toggled.
-
-## Template parity (DEC-0073 §9) — 8-row inventory
-
-| # | Active path | Template path | Change |
-|---|-------------|---------------|--------|
-| 1 | `scripts/caveman_compress_input.py` (**new**) | `template/scripts/caveman_compress_input.py` (**new**) | Byte-identical script. |
-| 2 | `docs/engineering/runbook.md` | `template/docs/engineering/runbook.md` | `### Caveman input compression (US-0090)` subsection. |
-| 3 | `docs/engineering/auto-orchestration-reference.md` | `template/docs/engineering/auto-orchestration-reference.md` | Replace DEC-0072 §1 paragraph with the three-sentence form. |
-| 4 | `docs/engineering/architecture.md` `# US-0090` | active-only | This section. |
-| 5 | `tests/auto_command_contract_test.py` | active-only | Extend in place with `test_caveman_compress_input_*`. |
-| 6 | `tests/fixtures/caveman_compress/` (**new**) | active-only | Fixture classes 1–8 (see DEC-0073 §9 test strategy). |
-| 7 | `.gitignore` | n/a | Add repo-root anchor `docs/.caveman-originals/`. |
-| 8 | `docs/.caveman-originals/.gitkeep` (**new**) | active-only | Empty placeholder. |
-
-**NEGATIVE parity (MUST NOT be touched)**:
-`.cursor/rules/caveman.mdc` (+ `template/` mirror; pre-US-0090 SHA-256
-`E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`
-preserved — R10 mitigation), scratchpad byte strings (DEC-0072 §3 key
-reservations retained; semantics activated without renaming),
-`.cursor/skills/its-magic/SKILL.md` (+ mirror), contract-surface files
-(DEC-0072 §7 rows 8/9 preserved), all canonical artifacts in the deny-list.
-
-## Installer / publish (DEC-0073 §10)
-
-- `docs/engineering/context/installer-owned-paths.manifest` (active +
-  `template/`) gains `template/scripts/caveman_compress_input.py` under
-  `install_include_paths` (R11 mitigation — defends against the exact
-  BUG-0003 defect class).
-- No new npm script; no new runtime / dev dependency (stdlib Python only).
-- Parity test: extend `scripts/check_intake_template_parity.py` with
-  `--scope=caveman-compress` mode (asserts script byte-identity).
-- Install-completeness fixture: extend
-  `tests/installer_completeness_bug0003_test.py` to verify
-  `--mode missing` / `--mode upgrade` deliver
-  `template/scripts/caveman_compress_input.py` across all three installer
-  entrypoints.
-- A new `run-tests` section (candidate `§26S`; exact number locked by
-  `/sprint-plan`) runs the US-0090 contract and fixture suite.
-
-## Test strategy (DEC-0073 §9 — STRATEGY ONLY; `/sprint-plan` + `/execute` own implementation)
-
-Fixture classes under `tests/fixtures/caveman_compress/` (active only;
-architecture may add but MUST NOT narrow):
-
-1. **Whitespace baseline** — multi-blank collapse + trailing trim + LF
-   normalize.
-2. **Literal-region preservation** — one fixture per DEC-0072 §4 zone (9
-   total).
-3. **Deny-list refusal** — one fixture per DEC-0073 §4.1 entry class
-   (asserts `CAVEMAN_COMPRESS_DENY_HIT` before any mutation).
-4. **Scope violations** — empty / outside allow / unknown profile →
-   respective scope reason codes.
-5. **Idempotency (AC-6)** — compress twice, assert byte-equal.
-6. **Mode-disabled** — `CAVEMAN_COMPRESS_INPUT=0` → `CAVEMAN_COMPRESS_MODE_DISABLED`.
-7. **Original-missing** — `--verify-originals` on orphan →
-   `CAVEMAN_COMPRESS_ORIGINAL_MISSING`.
-8. **Flag-conflict** — conflicting / unknown CLI flags →
-   `CAVEMAN_COMPRESS_FLAG_CONFLICT`.
-
-Additional contract-test guards:
-
-- Deny-list version guard — `--report`'s `deny_list_version` SHA-256 is
-  stable across runs; changes require a DEC.
-- Rule byte-identity guard (R10) — active and template
-  `.cursor/rules/caveman.mdc` remain byte-equal post-US-0090 (SHA-256
-  equality assertion).
-
-Extend `tests/auto_command_contract_test.py` in place with a
-`test_caveman_compress_input_*` prefix. Existing `test_caveman_default_off_*`
-subtests (DEC-0072 §6 row 6 invariant) remain byte-unchanged.
-
-## Guardrail invariants
-
-- **Default off** — no file mutation without explicit
-  `CAVEMAN_COMPRESS_INPUT=1` + non-empty `CAVEMAN_FILE_SCOPE` + `--write`.
-- **Deny always wins over allow** — evaluation order in §B.
-- **Sidecar-first atomic write** — no target mutation without a sidecar
-  successfully written first; temp+replace on both.
-- **Literal-region invariant** — DEC-0072 §4 nine zones reused verbatim;
-  byte-equality required pre-commit.
-- **Idempotent algorithm** — safe-mode minifier is strictly idempotent by
-  construction.
-- **No post-write reason codes** — all failures pre- or during-write.
-- **No rule-file edit in v1** — `.cursor/rules/caveman.mdc` byte-identity
-  preserved.
-- **No scratchpad / contract-surface / canonical-artifact rewrite** —
-  enforced structurally via §4.1 deny-list.
-- **No vendor-install leak** — DEC-0072 §8 `npx skills add` ban carried.
-- **No `TOKEN_PROFILE` / `CAVEMAN_MODE` / strict-proof / isolation /
-  `AUTO_QUIET` / US-0071 contract change** — input compression is
-  orthogonal.
-
-## Risks and mitigations
-
-- **R8** — aggressive-mode filler-word drift → **deferred aggressive mode
-  entirely in v1** (DEC-0073 §6); future DEC must specify frozen list +
-  `--report` hash.
-- **R9** — reason-code proliferation → locked 9-code set grouped into three
-  families; no additions without a subsequent DEC revising §7.
-- **R10** — rule-subsection byte-identity → **no subsection added to
-  `.cursor/rules/caveman.mdc` in v1**; pre-US-0090 SHA-256
-  `E10EFC32C628E790E69E2393F381108FE0B1F16E0BCDCFFFC162EFF6F91E47DE`
-  preserved; contract subtest guards byte-equality.
-- **R11** — install-completeness omission → install-completeness fixture
-  extension is **non-negotiable** (DEC-0073 §10); `/sprint-plan` MUST seed
-  a task; `/release` MUST NOT ship without it.
-
-## Decision linkage
-
-- Research basis: **`R-0073`** (shared anchor with US-0089; no new `R-xxxx`
-  allocated per DEC-0011 precedent).
-- Decision: **`DEC-0073`** (composes on **`DEC-0072`** — forward-link, not
-  rewrite).
-- Related: **`US-0089`** / **`DEC-0072`** (response-side substrate),
-  **`US-0053`** / **`DEC-0035`** (tiered profile), **`US-0080`** /
-  **`DEC-0062`** (`TOKEN_PROFILE`), **`US-0085`** / **`DEC-0071`** (`.env`
-  / `.cursorignore` / `.gitignore` defense-in-depth; `R-0072`),
-  **`US-0078`** / **`DEC-0060`** (intake evidence integrity),
-  **`US-0045`** (backlog status authority), **`DEC-0040`** (artifact
-  ordering), **`US-0017`** (active / template parity policy),
-  **`BUG-0001`** / **`DEC-0063`** + **`BUG-0003`** / **`DEC-0066`**
-  (installer-completeness precedent), **`US-0088`** (`AUTO_QUIET`),
-  **`US-0071`** (user-visible metadata), **`US-0048`** / **`DEC-0029`**
-  (isolation evidence), **`US-0056`** / **`DEC-0038`** (strict runtime
-  proof), **`US-0069`** / **`DEC-0051`** (phase-role matrix),
-  **`BUG-0006`** (spawn-only).
-- External reference (not vendored): JuliusBrussee/caveman (MIT) —
-  `https://github.com/JuliusBrussee/caveman`.
-
-## AC traceability
-
-| AC | Governing section(s) |
-|----|----------------------|
-| AC-1 Gating | §A (activation) + DEC-0073 §2 + §7 |
-| AC-2 Originals | §B (sidecar) + DEC-0073 §3 |
-| AC-3 Deny list | §Forbidden surfaces + DEC-0073 §4 + §7 |
-| AC-4 Scope | §C (allow-list grammar) + DEC-0073 §5 + §7 |
-| AC-5 Operator UX | §E (CLI) + runbook subsection (row 2) + §B (revert via sidecar) |
-| AC-6 Tests | §D (idempotent by construction) + test strategy classes 1–8 |
-| AC-7 `# US-0090` | This section (links `# US-0089`, US-0053, US-0085, US-0078 / DEC-0060) |
-| AC-8 Template parity | §Template parity + Installer / publish |
-
 # US-0091: README ↔ backlog feature coverage backfill + blocking drift gate
 
 ## Overview
@@ -2945,4 +2665,182 @@ Ten fail-closed codes per **`DEC-0085`** §9: **`VERSION_MISSING`**, **`DUPLICAT
 - Research: **`R-0087`**
 - Composed: **US-0040**, **US-0054** / **DEC-0036**, **US-0067**, **US-0008**
 - Related: **US-0091**, **US-0097**
+
+---
+
+# US-0101: Per-phase model tier selection for subagents (MODEL_TIER + local catalog)
+
+## Overview
+
+**Composes on `# US-0080` / `DEC-0062`** (TOKEN_PROFILE orthogonality). This
+section delivers the **model strength** axis: per-phase LLM tier selection
+(`cheap`|`balanced`|`strong`) via stable Cursor aliases (`fast`/`inherit`/omit),
+an optional operator-local slug catalog, template agent defaults using aliases
+only (no hardcoded vendor slugs), and a provider-mode runbook for
+`MODEL_PROVIDER_MODE=cursor|api`.
+
+Binding decision: **`DEC-0086`** (composes `DEC-0062` without amending
+TOKEN_PROFILE tier meanings). This section is a **self-contained summary**
+for sprint planners; open `decisions/DEC-0086.md` for the normative statement,
+alternatives, and risk resolutions.
+
+## Tier contract (AC-1, AC-2)
+
+### Scratchpad keys
+
+| Key | Default | Role |
+|-----|---------|------|
+| **`MODEL_TIER_DEFAULT`** | **`balanced`** | Fallback when phase-specific key absent |
+| **`MODEL_TIER_<PHASE>`** | *(per matrix)* | Per-phase tier override; `<PHASE>` = canonical phase id |
+| **`MODEL_CATALOG`** | **`.cursor/model-catalog.local.json`** | Path to local slug catalog |
+| **`MODEL_RESOLVE`** | **`alias_only`** | Resolution strategy (`alias_only` \| `local_catalog`) |
+| **`MODEL_FALLBACK`** | **`inherit`** | Fallback when catalog lookup fails |
+| **`MODEL_PROVIDER_MODE`** | **`cursor`** | Provider routing (`cursor` \| `api`) |
+
+Merge precedence: **local > materialized > example** per **DEC-0055**.
+
+### Default phase→tier matrix (architecture-locked)
+
+| Tier | Phases |
+|------|--------|
+| **`cheap`** | `ask`, `refresh-context`, `memory-audit`, `status-reconcile`, `pause` |
+| **`balanced`** | `intake`, `discovery`, `research`, `release`, `plan-verify` |
+| **`strong`** | `architecture`, `execute`, `quick`, `qa`, `verify-work`, `security-review` |
+| *(inherit parent)* | `auto` (orchestrator always inherits parent model) |
+
+## Tier→alias resolution chain (AC-3)
+
+| Tier | Cursor alias | Agent frontmatter |
+|------|-------------|-------------------|
+| **`cheap`** | **`fast`** | `model: fast` |
+| **`balanced`** | **`inherit`** | `model: inherit` |
+| **`strong`** | *(omit)* | No `model:` field — Cursor default resolution |
+
+**Rationale (R-0088 Q1)**: No stable middle-tier alias exists in Cursor's public API as of 2026-06. `inherit` is the only stable non-vendor alias. `strong` omits the field so Cursor's default resolution applies (parent model or strongest available).
+
+## Local catalog schema + resolver (AC-4)
+
+### Schema v1
+
+```json
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "<slug>",
+    "balanced": "<slug>",
+    "strong": "<slug>"
+  },
+  "notes": "optional free-text"
+}
+```
+
+- Path: **`.cursor/model-catalog.local.json`** (gitignored)
+- Example: **`.cursor/model-catalog.local.example.json`** (committed, placeholder values)
+- All three tier keys required; values are opaque vendor slug strings
+
+### Resolver algorithm
+
+1. Read `MODEL_TIER_<PHASE>` from merged scratchpad → tier value
+2. If `MODEL_RESOLVE=alias_only` (default): use built-in mapping (table above)
+3. If `MODEL_RESOLVE=local_catalog`: load catalog JSON → lookup tier key → slug
+4. If key missing → **`MODEL_SLUG_UNKNOWN`** fail-closed
+5. If `MODEL_FALLBACK=inherit` and lookup fails → emit **`MODEL_RESOLVE_FALLBACK`** + use `inherit`
+6. Unknown tier value → **`MODEL_TIER_INVALID`** fail-closed
+7. Malformed catalog JSON → **`MODEL_CATALOG_INVALID`** fail-closed
+
+## Template agent defaults (AC-5)
+
+| Agent role | Tier | `model:` field |
+|-----------|------|----------------|
+| `curator` | cheap | `model: fast` |
+| `po` | balanced | `model: inherit` |
+| `release` | balanced | `model: inherit` |
+| `tech-lead` | strong | *(omit)* |
+| `dev` | strong | *(omit)* |
+| `qa` | strong | *(omit)* |
+| `security` | strong | *(omit)* |
+
+**Forbidden in `template/.cursor/agents/`**: hardcoded vendor slugs (`composer-*`, `claude-*`, `gpt-*`, `opus-*`). Template files use aliases only.
+
+## Provider mode runbook (AC-6)
+
+| Mode | Description |
+|------|-------------|
+| **`cursor`** (default) | All subagents route through Cursor-managed infrastructure; tier aliases work as designed |
+| **`api`** | Operator uses BYOK via Cursor Settings → Models → API Key |
+
+**Known limitation (confirmed 2026-06)**: Subagents do NOT inherit custom API keys or base URLs — they always bill against Cursor plan. Workaround: use parent model + `inherit`, or run phases manually in separate chats.
+
+**Non-substitution paragraph**: `MODEL_TIER` selects model strength; `TOKEN_PROFILE` selects context breadth; `DELIVERY_MODE` selects lifecycle shape. These are **independent axes** — none substitutes for another.
+
+## Reason codes — `MODEL_TIER_*` / `MODEL_CATALOG_*` / `MODEL_RESOLVE_*` / `MODEL_SLUG_*` (AC-7)
+
+| Code | Trigger |
+|------|---------|
+| **`MODEL_TIER_INVALID`** | Unknown tier value (not `cheap`/`balanced`/`strong`) |
+| **`MODEL_CATALOG_INVALID`** | Malformed catalog JSON (parse error, missing `schema_version`) |
+| **`MODEL_SLUG_UNKNOWN`** | Tier key missing from catalog when `MODEL_RESOLVE=local_catalog` |
+| **`MODEL_RESOLVE_FALLBACK`** | Catalog lookup failed but `MODEL_FALLBACK=inherit` → reason + fallback |
+
+## Contract tests + parity (AC-8)
+
+**Run**: `pytest -k us0101 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| **`test_us0101_scratchpad_keys`** | AC-1 | `MODEL_TIER_<PHASE>` enum + `MODEL_TIER_DEFAULT` literals |
+| **`test_us0101_default_matrix_literals`** | AC-2 | Phase→tier table matches architecture-locked matrix |
+| **`test_us0101_token_profile_orthogonality`** | AC-6 | Grep confirms `MODEL_TIER` ≠ `TOKEN_PROFILE` |
+| **`test_us0101_template_agent_model_aliases`** | AC-5 | Template agents use `fast`/`inherit`/omit only |
+| **`test_us0101_forbidden_slug_grep`** | AC-5 | No vendor slugs in `template/.cursor/agents/` |
+| **`test_us0101_catalog_schema_contract`** | AC-4 | Validates `.cursor/model-catalog.local.example.json` schema |
+| **`test_us0101_provider_mode_literals`** | AC-6 | `MODEL_PROVIDER_MODE` enum + runbook refs |
+| **`test_us0101_reason_code_inventory`** | AC-7 | All 4 fail-closed codes in validator + lib |
+
+**Harness**: add **§26Z** (or next free section) in **`tests/run-tests.ps1`** / **`tests/run-tests.sh`** for **`pytest -k us0101`**.
+
+**Parity scope**: **`--scope=model-tier`** — **`MODEL_TIER_PAIRS`** table (scripts, template agents, catalog example, scratchpad docs, runbook).
+
+## Tranche ordering
+
+| Tranche | Scope | Seeds |
+|---------|-------|-------|
+| **A** | Scratchpad + scratchpad docs | 1, 2 |
+| **B** | Template agent defaults + catalog example | 3, 4 |
+| **C** | Resolver lib + validator | 5, 6 |
+| **D** | Runbook + provider-mode docs | 7, 8 |
+| **E** | Contract tests + parity + harness | 9, 10 |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+| # | AC | Tranche | Summary |
+|---|-----|---------|---------|
+| 1 | AC-1 | A | **Scratchpad keys** — `MODEL_TIER_*`, `MODEL_CATALOG`, `MODEL_RESOLVE`, `MODEL_FALLBACK`, `MODEL_PROVIDER_MODE` in `.cursor/scratchpad.md` + template docs |
+| 2 | AC-2 | A | **Default phase→tier matrix** — document architecture-locked table in scratchpad comments + runbook |
+| 3 | AC-5 | B | **Template agent `model:` defaults** — apply `model: fast`/`model: inherit`/omit to `.cursor/agents/*.mdc` + `template/.cursor/agents/*.mdc` |
+| 4 | AC-4 | B | **Local catalog example** — `.cursor/model-catalog.local.example.json` + gitignore `.cursor/model-catalog.local.json` |
+| 5 | AC-4, AC-7 | C | **`model_tier_lib.py`** — resolver algorithm + catalog schema validation + 4 reason codes |
+| 6 | AC-7 | C | **`model_tier_validate.py`** — CLI validator (tier enum, catalog schema, phase key spelling, forbidden slug grep) |
+| 7 | AC-6 | D | **Runbook provider-mode subsection** — `docs/engineering/runbook.md` + `auto-orchestration-reference.md` `MODEL_PROVIDER_MODE=cursor|api` + BYOK limitation + workaround recipes |
+| 8 | AC-6 | D | **Non-substitution paragraph** — explicit `MODEL_TIER` ≠ `TOKEN_PROFILE` ≠ `DELIVERY_MODE` in runbook + scratchpad comments |
+| 9 | AC-8 | E | **Eight `test_us0101_*` contract subtests** — scratchpad keys, matrix literals, orthogonality, template aliases, forbidden slug grep, catalog schema, provider mode, reason codes |
+| 10 | AC-8, AC-9 | E | **`MODEL_TIER_PAIRS` parity + harness §26Z** — `check_intake_template_parity.py --scope=model-tier` + harness section |
+
+**Task count**: **10** (`SPRINT_MAX_TASKS=12`, `within_limit=true`, under threshold — no auto-split). **AC-9** pre-satisfied at architecture (**`DEC-0086`** + this section).
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Cursor subagent BYOK limitation limits api-only mode value | Document limitation; provide workaround recipes |
+| **R2** `inherit` unreliable on some billing plans | Framework alias layer degrades gracefully; `strong` omits field for best fallback |
+| **R3** Parent agent can override subagent `model:` via Task tool | Document known Cursor behavior; stable alias layer still provides intent signal |
+| **R4** Operator confusion between MODEL_TIER and TOKEN_PROFILE | Explicit non-substitution paragraph in runbook + scratchpad comments |
+
+## Decision linkage
+
+- Decision: **`DEC-0086`**
+- Research: **`R-0088`**
+- Composed: **DEC-0062** (TOKEN_PROFILE), **US-0069** (phase→role), **US-0003** (subagent defs), **US-0080** (TOKEN_PROFILE), **US-0092** (outer driver)
+- Related: **US-0023**, **US-0048**
 

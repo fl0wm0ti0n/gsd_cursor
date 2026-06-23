@@ -322,3 +322,41 @@ CAVEMAN_MODE=1
 CAVEMAN_LEVEL=full
 CAVEMAN_COMPRESS_INPUT=0
 CAVEMAN_FILE_SCOPE=
+
+#
+# ## Per-phase model tier selection (US-0101 / DEC-0086)
+# MODEL_TIER selects LLM model strength (which model runs).
+# MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE — these are independent axes;
+#   none substitutes for the other (DEC-0062 / US-0080 / US-0096).
+# - MODEL_TIER_DEFAULT: cheap|balanced|strong (default balanced)
+# - MODEL_TIER_<PHASE>: cheap|balanced|strong (per-phase override; PHASE = canonical phase id)
+#   Examples: MODEL_TIER_EXECUTE=cheap, MODEL_TIER_QA=strong, MODEL_TIER_RESEARCH=balanced
+#   Set in .cursor/scratchpad.local.md to override per phase without touching committed defaults.
+#   Default matrix (architecture-locked):
+#     cheap    — ask, refresh-context, memory-audit, status-reconcile, pause
+#     balanced — intake, discovery, research, release, plan-verify
+#     strong   — architecture, execute, quick, qa, verify-work, security-review
+#     (inherit parent) — auto (orchestrator always inherits parent model)
+# - MODEL_CATALOG: path to local slug catalog (default .cursor/model-catalog.local.json)
+# - MODEL_RESOLVE: alias_only|local_catalog (default alias_only)
+#   alias_only    = use Cursor-stable aliases (cheap->fast, balanced->inherit, strong->omit model:)
+#   local_catalog = look up vendor model slugs from MODEL_CATALOG; requires valid JSON catalog
+# - MODEL_FALLBACK: fallback when catalog lookup fails (default inherit)
+# - MODEL_PROVIDER_MODE: cursor|api (default cursor)
+#   cursor = all subagents route through Cursor-managed infrastructure
+#   api = operator uses BYOK via Cursor Settings → Models → API Key
+#   Known limitation: subagents do NOT inherit custom API keys/base URLs.
+#
+# Example catalogs for 4 software-complexity levels + a Cursor-only variant:
+#   .cursor/model-catalog.local.example.json                           — minimal placeholder template
+#   .cursor/model-catalog.local.example.cursor-only.json             — only Cursor-integrated Composer models
+#   .cursor/model-catalog.local.example.level-1-easy.json            — small/simple apps
+#   .cursor/model-catalog.local.example.level-2-complex.json         — complex multi-service apps
+#   .cursor/model-catalog.local.example.level-3-mega.json            — mega-complex / modular monoliths
+#   .cursor/model-catalog.local.example.level-4-super.json            — super-high-sophisticated / mission-critical
+# Copy one to .cursor/model-catalog.local.json and set MODEL_RESOLVE=local_catalog to activate it.
+MODEL_TIER_DEFAULT=balanced
+MODEL_CATALOG=.cursor/model-catalog.local.json
+MODEL_RESOLVE=alias_only
+MODEL_FALLBACK=inherit
+MODEL_PROVIDER_MODE=cursor

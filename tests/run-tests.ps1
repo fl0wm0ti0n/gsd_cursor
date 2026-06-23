@@ -1612,6 +1612,14 @@ Assert-True "check_intake_template_parity --scope=release-changelog passes (US-0
 $us0100Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0100") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0100 contract subtests pass" ($us0100Contract.ExitCode -eq 0)
 
+# 26Z) US-0101 / DEC-0086 — model tier contract + parity
+$us0101Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=model-tier") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=model-tier passes (US-0101)" ($us0101Parity.ExitCode -eq 0)
+$us0101Self = Start-Process python -ArgumentList @((Join-Path $root "scripts\model_tier_lib.py"), "--self-test") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "model_tier_lib.py --self-test passes" ($us0101Self.ExitCode -eq 0)
+$us0101Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0101") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0101 contract subtests pass" ($us0101Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

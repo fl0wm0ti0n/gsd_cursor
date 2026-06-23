@@ -650,6 +650,125 @@ When **`AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`**, story row may declare 
 
 **Release status (S0086 / US-0096)**: **`released`** (`2026-06-13T16:00:00Z`); **`US-0096`** **DONE** in canonical backlog. Operator verify: **`handoffs/releases/S0086-release-notes.md`** **## Verify**; publish skipped while **`RELEASE_PUBLISH_MODE=confirm`**.
 
+## Per-phase model tier selection (US-0101 / DEC-0086)
+
+`MODEL_TIER` selects LLM model strength (which model runs per lifecycle phase).
+Three operator-facing tiers map to stable Cursor aliases — no vendor slugs in
+template files.
+
+| Key | Values | Default | Role |
+|-----|--------|---------|------|
+| **`MODEL_TIER_DEFAULT`** | `cheap` \| `balanced` \| `strong` | `balanced` | Fallback when phase-specific key absent |
+| **`MODEL_TIER_<PHASE>`** | `cheap` \| `balanced` \| `strong` | *(per matrix)* | Per-phase tier override |
+| **`MODEL_CATALOG`** | path | `.cursor/model-catalog.local.json` | Path to local slug catalog |
+| **`MODEL_RESOLVE`** | `alias_only` \| `local_catalog` | `alias_only` | Resolution strategy |
+| **`MODEL_FALLBACK`** | `inherit` | `inherit` | Fallback when catalog lookup fails |
+| **`MODEL_PROVIDER_MODE`** | `cursor` \| `api` | `cursor` | Provider routing |
+
+### Default phase→tier matrix (architecture-locked)
+
+| Tier | Cursor alias | `model:` field | Phases |
+|------|-------------|----------------|--------|
+| **`cheap`** | `fast` | `model: fast` | `ask`, `refresh-context`, `memory-audit`, `status-reconcile`, `pause` |
+| **`balanced`** | `inherit` | `model: inherit` | `intake`, `discovery`, `research`, `release`, `plan-verify` |
+| **`strong`** | *(omit)* | no `model:` field | `architecture`, `execute`, `quick`, `qa`, `verify-work`, `security-review` |
+| *(inherit parent)* | — | — | `auto` (orchestrator always inherits parent model) |
+
+### Provider mode (MODEL_PROVIDER_MODE)
+
+| Mode | Description |
+|------|-------------|
+| **`cursor`** (default) | All subagents route through Cursor-managed infrastructure; tier aliases work as designed |
+| **`api`** | Operator uses BYOK via Cursor Settings → Models → API Key |
+
+**Known limitation (confirmed 2026-06)**: Cursor subagents do **NOT** inherit
+custom API keys or base URLs — they always bill against the Cursor plan. When
+`MODEL_PROVIDER_MODE=api`, the local catalog is the only operator-controlled
+surface; subagent `model:` aliases still resolve through Cursor infrastructure.
+
+**Workaround recipes**:
+
+1. **Parent model + `inherit`** — set the parent chat model to the desired BYOK
+   model; subagents using `model: inherit` (balanced tier) pick it up.
+2. **Manual phase runs** — run each phase in a separate chat with the desired
+   model selected at the chat level (no subagent spawn).
+3. **Local catalog override** — set `MODEL_RESOLVE=local_catalog` and populate
+   `.cursor/model-catalog.local.json` with vendor slugs; materializer applies
+   slugs at template materialization time (not at subagent runtime).
+
+### Non-substitution paragraph
+
+MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE
+
+> **`MODEL_TIER`** selects LLM model strength (which model runs).
+> **`TOKEN_PROFILE`** selects context breadth / token cost (how much context the model sees).
+> **`DELIVERY_MODE`** selects lifecycle shape (standard / ultra_lean / mega_quick).
+> These are **independent axes** — none substitutes for another. A `strong` tier
+> with `lean` profile is valid; a `cheap` tier with `full` profile is valid.
+> Setting one does not change the others. Combine freely.
+
+### Reason codes — `MODEL_TIER_*` / `MODEL_CATALOG_*` / `MODEL_RESOLVE_*` / `MODEL_SLUG_*`
+
+| Code | Trigger |
+|------|---------|
+| **`MODEL_TIER_INVALID`** | Unknown tier value (not `cheap`/`balanced`/`strong`) |
+| **`MODEL_CATALOG_INVALID`** | Malformed catalog JSON (parse error, missing `schema_version`) |
+| **`MODEL_SLUG_UNKNOWN`** | Tier key missing from catalog when `MODEL_RESOLVE=local_catalog` |
+| **`MODEL_RESOLVE_FALLBACK`** | Catalog lookup failed but `MODEL_FALLBACK=inherit` → reason + fallback |
+
+### Template agent defaults
+
+| Agent role | Tier | `model:` field |
+|-----------|------|----------------|
+| `curator` | cheap | `model: fast` |
+| `po` | balanced | `model: inherit` |
+| `release` | balanced | `model: inherit` |
+| `tech-lead` | strong | *(omit)* |
+| `dev` | strong | *(omit)* |
+| `qa` | strong | *(omit)* |
+| `security` | strong | *(omit)* |
+
+**Forbidden in `template/.cursor/agents/`**: hardcoded vendor slugs
+(`composer-*`, `claude-*`, `gpt-*`, `opus-*`). Template files use aliases only.
+
+### Local catalog schema (v1)
+
+```json
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "<slug>",
+    "balanced": "<slug>",
+    "strong": "<slug>"
+  },
+  "notes": "optional free-text"
+}
+```
+
+- Path: `.cursor/model-catalog.local.json` (gitignored)
+- Example: `.cursor/model-catalog.local.example.json` (committed, placeholder values)
+- All three tier keys required; values are opaque vendor slug strings
+
+### Resolver algorithm
+
+1. Read `MODEL_TIER_<PHASE>` from merged scratchpad → tier value
+2. If `MODEL_RESOLVE=alias_only` (default): use built-in mapping (table above)
+3. If `MODEL_RESOLVE=local_catalog`: load catalog JSON → lookup tier key → slug
+4. If key missing → `MODEL_SLUG_UNKNOWN` fail-closed
+5. If `MODEL_FALLBACK=inherit` and lookup fails → emit `MODEL_RESOLVE_FALLBACK` + use `inherit`
+6. Unknown tier value → `MODEL_TIER_INVALID` fail-closed
+7. Malformed catalog JSON → `MODEL_CATALOG_INVALID` fail-closed
+
+### Validation commands
+
+- `python scripts/model_tier_validate.py --repo .`
+- `pytest -k us0101 tests/auto_command_contract_test.py`
+- `python scripts/check_intake_template_parity.py --scope=model-tier`
+- `tests/run-tests.ps1` / `tests/run-tests.sh` §26Z
+
+Normative architecture: `docs/engineering/architecture.md` (**# US-0101**).
+Binding decision: `decisions/DEC-0086.md`.
+
 Context compaction policy:
 
 - `docs/engineering/state.md` is a compact hot surface for current execution

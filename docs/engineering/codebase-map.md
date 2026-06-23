@@ -44,8 +44,9 @@ The installed content for target repos:
 | Directory | Contents |
 |-----------|----------|
 | `.cursor/commands/` | 19 slash commands (intake, discovery, research, architecture, sprint-plan, plan-verify, execute, qa, verify-work, release, pause, resume, refresh-context, auto, quick, milestone-start, milestone-complete, map-codebase, phase-context) |
+| `.cursor/model-catalog.local.example.json` | Example local catalog (gitignored) — operator-maintained tier→slug mapping; schema v1 with `{schema_version, tiers:{cheap,balanced,strong}, notes}` (US-0101) |
 | `.cursor/rules/` | 5 AI behavior rules (core, quality, coding-standards, handoffs, escalation) |
-| `.cursor/agents/` | 6 subagent definitions (dev, qa, po, tech-lead, curator, release) |
+| `.cursor/agents/` | 6 subagent definitions (dev, qa, po, tech-lead, curator, release); `curator.mdc`, `po.mdc`, `release.mdc` carry `model: fast`/`inherit` tier defaults (US-0101) |
 | `.cursor/skills/its-magic/` | SKILL.md + 14 JSON/MD templates |
 | `.cursor/hooks/` | hook.py + hooks.json + README.md |
 | `docs/product/` | vision.md, backlog.md, acceptance.md |
@@ -63,6 +64,8 @@ The installed content for target repos:
 |------|---------|
 | `scripts/release-all.ps1` | Unified release: version bump + npm + GitHub release + Chocolatey + Homebrew (Windows) |
 | `scripts/release-all.sh` | Same for Unix |
+| `scripts/model_tier_lib.py` | Model tier resolver library — validates tier enum, catalog schema, phase keys; resolves tier→alias (fast/inherit); fail-closed reason codes (US-0101) |
+| `scripts/model_tier_validate.py` | CLI validator for MODEL_TIER scratchpad keys and local catalog JSON (US-0101) |
 | `scripts/generate-release-notes.ps1` | Auto-generate release notes from sprint artifacts |
 | `scripts/generate-release-notes.sh` | Same for Unix |
 | `packaging/chocolatey/its-magic.nuspec` | Chocolatey package manifest |
@@ -77,6 +80,7 @@ The installed content for target repos:
 |------|---------|
 | `tests/run-tests.ps1` | PowerShell test runner: validates template structure, command sections, runbook keys, installer smoke test |
 | `tests/run-tests.sh` | Bash equivalent |
+| `tests/auto_command_contract_test.py` | Python contract tests for auto-orchestration; `test_us0101_*` markers validate model tier scratchpad keys, default matrix, template agent defaults, orthogonality vs TOKEN_PROFILE (US-0101) |
 | `benchmarks/run-bench.ps1/.sh` | Scenario-based validation benchmarks |
 | `benchmarks/live/` | Live benchmark via hook telemetry |
 | `benchmarks/headless/` | Headless benchmark via Cursor CLI |

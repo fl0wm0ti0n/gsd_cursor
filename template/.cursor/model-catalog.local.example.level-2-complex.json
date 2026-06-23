@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "qwen-3.7-plus",
+    "balanced": "composer-2.5-standard",
+    "strong": "glm-5.2"
+  },
+  "notes": "Level 2 — complex apps (multi-service, auth, DB, FE+BE, Docker, API, worker/queue). Balanced: cheap Qwen for mass DEV, Composer 2.5 Standard as Cursor default, strong GLM-5.2 for architecture/QA/release gates. Based on ai_modell_auslegung_cursor_highend.md 'Komplexere Apps'. Enable with MODEL_RESOLVE=local_catalog."
+}

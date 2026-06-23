@@ -1487,6 +1487,19 @@ set -e
 assert_true "check_intake_template_parity --scope=release-changelog passes (US-0100)" "[ \"$US0100_PARITY_PY\" -eq 0 ]"
 assert_true "US-0100 contract subtests pass" "[ \"$US0100_CONTRACT_PY\" -eq 0 ]"
 
+# 26Z) US-0101 / DEC-0086 — model tier contract + parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=model-tier >/dev/null 2>&1
+US0101_PARITY_PY=$?
+"$PY" "$ROOT/scripts/model_tier_lib.py" --self-test >/dev/null 2>&1
+US0101_SELF_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0101 >/dev/null 2>&1
+US0101_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=model-tier passes (US-0101)" "[ \"$US0101_PARITY_PY\" -eq 0 ]"
+assert_true "model_tier_lib.py --self-test passes" "[ \"$US0101_SELF_PY\" -eq 0 ]"
+assert_true "US-0101 contract subtests pass" "[ \"$US0101_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

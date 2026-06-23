@@ -2684,6 +2684,121 @@ class Us0100ReleaseChangelogContractTests(unittest.TestCase):
         self.assertIn("release_changelog_lib.py", text)
         self.assertIn("CHANGELOG.md", text)
 
+    # === US-0101: Per-phase model tier selection (MODEL_TIER + local catalog) ===
+
+    def test_us0101_scratchpad_keys(self) -> None:
+        """AC-1: MODEL_TIER_<PHASE> enum + MODEL_TIER_DEFAULT literals."""
+        root = self._root()
+        scratchpad = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        # Check for tier enum values
+        self.assertIn("MODEL_TIER_DEFAULT", scratchpad)
+        self.assertIn("cheap", scratchpad)
+        self.assertIn("balanced", scratchpad)
+        self.assertIn("strong", scratchpad)
+        # Check for phase-specific tier documentation
+        self.assertIn("MODEL_TIER_<PHASE>", scratchpad)
+        self.assertIn("execute", scratchpad)
+        self.assertIn("intake", scratchpad)
+
+    def test_us0101_default_matrix_literals(self) -> None:
+        """AC-2: Phase→tier table matches architecture-locked matrix."""
+        root = self._root()
+        arch = (root / "docs" / "engineering" / "architecture.md").read_text(encoding="utf-8")
+        # Check for default phase→tier matrix section
+        self.assertIn("## Default phase→tier matrix", arch)
+        # Check for tier values in matrix
+        self.assertIn("cheap", arch)
+        self.assertIn("balanced", arch)
+        self.assertIn("strong", arch)
+        # Check for phase examples
+        self.assertIn("execute", arch)
+        self.assertIn("intake", arch)
+        self.assertIn("refresh-context", arch)
+
+    def test_us0101_token_profile_orthogonality(self) -> None:
+        """AC-6: Grep confirms MODEL_TIER ≠ TOKEN_PROFILE."""
+        root = self._root()
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        # Check for orthogonality statement
+        self.assertIn("MODEL_TIER", runbook)
+        self.assertIn("TOKEN_PROFILE", runbook)
+        # Check for explicit non-substitution paragraph
+        self.assertIn("MODEL_TIER ≠ TOKEN_PROFILE", runbook)
+        # Check for independent axes statement
+        self.assertIn("independent axes", runbook.lower())
+
+    def test_us0101_template_agent_model_aliases(self) -> None:
+        """AC-5: Template agents use fast/inherit/omit only."""
+        root = self._root()
+        template_agents_dir = root / "template" / ".cursor" / "agents"
+        # Check curator uses fast (cheap tier)
+        curator = (template_agents_dir / "curator.mdc").read_text(encoding="utf-8")
+        self.assertIn("model: fast", curator)
+        # Check po uses inherit (balanced tier)
+        po = (template_agents_dir / "po.mdc").read_text(encoding="utf-8")
+        self.assertIn("model: inherit", po)
+        # Check dev uses no model field (strong tier = omit)
+        dev = (template_agents_dir / "dev.mdc").read_text(encoding="utf-8")
+        self.assertNotIn("model:", dev)
+
+    def test_us0101_forbidden_slug_grep(self) -> None:
+        """AC-5: No vendor slugs in template/.cursor/agents/."""
+        root = self._root()
+        template_agents_dir = root / "template" / ".cursor" / "agents"
+        # Check for forbidden vendor slugs
+        for agent_file in template_agents_dir.glob("*.mdc"):
+            content = agent_file.read_text(encoding="utf-8")
+            # Forbidden: composer-*, claude-*, gpt-*, opus-*
+            self.assertNotIn("composer-", content)
+            self.assertNotIn("claude-", content)
+            self.assertNotIn("gpt-", content)
+            self.assertNotIn("opus-", content)
+
+    def test_us0101_catalog_schema_contract(self) -> None:
+        """AC-4: Validates .cursor/model-catalog.local.example.json schema."""
+        root = self._root()
+        catalog_example = root / ".cursor" / "model-catalog.local.example.json"
+        self.assertTrue(catalog_example.exists())
+        content = catalog_example.read_text(encoding="utf-8")
+        # Check for schema_version
+        self.assertIn('"schema_version"', content)
+        # Check for tiers object
+        self.assertIn('"tiers"', content)
+        # Check for all three tier keys
+        self.assertIn('"cheap"', content)
+        self.assertIn('"balanced"', content)
+        self.assertIn('"strong"', content)
+
+    def test_us0101_provider_mode_literals(self) -> None:
+        """AC-6: MODEL_PROVIDER_MODE enum + runbook refs."""
+        root = self._root()
+        scratchpad = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        # Check for MODEL_PROVIDER_MODE in scratchpad
+        self.assertIn("MODEL_PROVIDER_MODE", scratchpad)
+        # Check for provider mode enum values
+        self.assertIn("cursor", scratchpad)
+        self.assertIn("api", scratchpad)
+        # Check for provider mode section in runbook
+        self.assertIn("MODEL_PROVIDER_MODE", runbook)
+        self.assertIn("Provider mode", runbook)
+
+    def test_us0101_reason_code_inventory(self) -> None:
+        """AC-7: All 4 fail-closed codes in validator + lib."""
+        root = self._root()
+        lib = (root / "scripts" / "model_tier_lib.py").read_text(encoding="utf-8")
+        validator = (root / "scripts" / "model_tier_validate.py").read_text(encoding="utf-8")
+        # Check for all 4 reason codes
+        reason_codes = [
+            "MODEL_TIER_INVALID",
+            "MODEL_CATALOG_INVALID",
+            "MODEL_SLUG_UNKNOWN",
+            "MODEL_RESOLVE_FALLBACK",
+        ]
+        for code in reason_codes:
+            self.assertIn(code, lib)
+            self.assertIn(code, validator)
+
 
 if __name__ == "__main__":
     unittest.main()

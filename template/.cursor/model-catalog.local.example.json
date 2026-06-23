@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "<your-cheap-model-slug>",
+    "balanced": "<your-balanced-model-slug>",
+    "strong": "<your-strong-model-slug>"
+  },
+  "notes": "Copy this file to .cursor/model-catalog.local.json and replace placeholder slugs with vendor-specific model IDs. Enable with MODEL_RESOLVE=local_catalog in .cursor/scratchpad.local.md. All three tier keys are required."
+}

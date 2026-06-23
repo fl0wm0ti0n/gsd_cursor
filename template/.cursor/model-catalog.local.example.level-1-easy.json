@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "qwen-3.7-plus",
+    "balanced": "composer-2.5-standard",
+    "strong": "glm-4.7"
+  },
+  "notes": "Level 1 — small/simple apps (CRUD, dashboard, bot, single-service). Cost-focused: Qwen3.7 Plus handles routine volume, Composer 2.5 Standard is the Cursor default, GLM-4.7 covers occasional architecture/release gates. Based on ai_modell_auslegung_cursor_highend.md 'Kleine unkomplizierte Apps'. Enable with MODEL_RESOLVE=local_catalog."
+}

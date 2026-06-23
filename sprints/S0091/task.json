@@ -1,0 +1,88 @@
+{
+  "sprint_id": "S0091",
+  "story_id": "US-0101",
+  "created_at": "2026-06-15T21:30:00Z",
+  "dec_ref": "DEC-0086",
+  "tasks": [
+    {
+      "task_id": "T-001",
+      "tranche": "A",
+      "ac": ["AC-1"],
+      "summary": "Scratchpad keys — MODEL_TIER_*, MODEL_CATALOG, MODEL_RESOLVE, MODEL_FALLBACK, MODEL_PROVIDER_MODE in .cursor/scratchpad.md + template docs",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-002",
+      "tranche": "A",
+      "ac": ["AC-2"],
+      "summary": "Default phase→tier matrix — document architecture-locked table in scratchpad comments + runbook",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-003",
+      "tranche": "B",
+      "ac": ["AC-5"],
+      "summary": "Template agent model: defaults — apply model: fast/model: inherit/omit to .cursor/agents/*.mdc + template/.cursor/agents/*.mdc",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-004",
+      "tranche": "B",
+      "ac": ["AC-4"],
+      "summary": "Local catalog example — .cursor/model-catalog.local.example.json + gitignore .cursor/model-catalog.local.json",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-005",
+      "tranche": "C",
+      "ac": ["AC-4", "AC-7"],
+      "summary": "model_tier_lib.py — resolver algorithm + catalog schema validation + 4 reason codes",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-006",
+      "tranche": "C",
+      "ac": ["AC-7"],
+      "summary": "model_tier_validate.py — CLI validator (tier enum, catalog schema, phase key spelling, forbidden slug grep)",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-007",
+      "tranche": "D",
+      "ac": ["AC-6"],
+      "summary": "Runbook provider-mode subsection — docs/engineering/runbook.md + auto-orchestration-reference.md MODEL_PROVIDER_MODE=cursor|api + BYOK limitation + workaround recipes",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-008",
+      "tranche": "D",
+      "ac": ["AC-6"],
+      "summary": "Non-substitution paragraph — explicit MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE in runbook + scratchpad comments",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-009",
+      "tranche": "E",
+      "ac": ["AC-8"],
+      "summary": "Eight test_us0101_* contract subtests — scratchpad keys, matrix literals, orthogonality, template aliases, forbidden slug grep, catalog schema, provider mode, reason codes",
+      "status": "DONE"
+    },
+    {
+      "task_id": "T-010",
+      "tranche": "E",
+      "ac": ["AC-8", "AC-9"],
+      "summary": "MODEL_TIER_PAIRS parity + harness §26Z — check_intake_template_parity.py --scope=model-tier + harness section",
+      "status": "DONE"
+    }
+  ],
+  "contract_tests": [
+    "test_us0101_scratchpad_keys",
+    "test_us0101_default_matrix_literals",
+    "test_us0101_token_profile_orthogonality",
+    "test_us0101_template_agent_model_aliases",
+    "test_us0101_forbidden_slug_grep",
+    "test_us0101_catalog_schema_contract",
+    "test_us0101_provider_mode_literals",
+    "test_us0101_reason_code_inventory"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "qwen-3.7-plus",
+    "balanced": "glm-5.2",
+    "strong": "gpt-5.5"
+  },
+  "notes": "Level 3 — mega-complex software / modular monoliths (trading/finance platforms, multi-team systems, long-lived infrastructure). Strong GPT-5.5 for chief-architect/final-gate work, GLM-5.2 for SA/QA/RELEASE, Qwen for volume DEV. Based on ai_modell_auslegung_cursor_highend.md 'Mega-komplexe Software'. Enable with MODEL_RESOLVE=local_catalog."
+}

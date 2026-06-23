@@ -11,6 +11,7 @@ backups/
 .cursor/remote.json
 .cursor/dev-environment.json
 .cursor/scratchpad.local.md
+.cursor/model-catalog.local.json
 
 # Template hook state (not shipped)
 template/.cursor/hooks/*.jsonl

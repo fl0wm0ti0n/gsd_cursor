@@ -1,3 +1,178 @@
+## Sprint-plan handoff — **US-0101** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
+
+> **2026-06-15T21:30:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=tl-US0101-sprint-plan-20260615T213000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-sprint-plan-tech-lead-20260615T213000Z-US0101`, `proof_hash=50a44fd3f88d6859d00ae8ac5aadf3f0c70ab7b69499fac94df1c09ed68c1ab6`). Sprint **`S0091`** allocated; **`sprints/S0091/task.json`** created with 10 tasks (T-001..T-010, Tranche A→E); **`sprints/S0091/summary.md`** created; 8 **`test_us0101_*`** contract tests mapped. Binding **`DEC-0086`**. Story **`US-0101`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint**: `sprints/S0091/`
+- **Task file**: `sprints/S0091/task.json`
+- **Summary**: `sprints/S0091/summary.md`
+- **Decision**: `decisions/DEC-0086.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0101`
+
+### Task ordering (Tranche A→E)
+
+| Tranche | Tasks | Scope |
+|---------|-------|-------|
+| **A** | T-001, T-002 | Scratchpad keys + default phase→tier matrix |
+| **B** | T-003, T-004 | Template agent `model:` defaults + local catalog example |
+| **C** | T-005, T-006 | `model_tier_lib.py` resolver + `model_tier_validate.py` CLI |
+| **D** | T-007, T-008 | Runbook provider-mode subsection + non-substitution paragraph |
+| **E** | T-009, T-010 | Eight `test_us0101_*` contract tests + `MODEL_TIER_PAIRS` parity + harness §26Z |
+
+### Contract tests (8)
+
+1. `test_us0101_scratchpad_keys`
+2. `test_us0101_default_matrix_literals`
+3. `test_us0101_token_profile_orthogonality`
+4. `test_us0101_template_agent_model_aliases`
+5. `test_us0101_forbidden_slug_grep`
+6. `test_us0101_catalog_schema_contract`
+7. `test_us0101_provider_mode_literals`
+8. `test_us0101_reason_code_inventory`
+
+---
+
+## Architecture handoff — **US-0101** — post-**`/architecture`** → **`/sprint-plan`** (**tech-lead**)
+
+> **2026-06-15T21:00:00Z** — **`/architecture`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=tl-US0101-architecture-20260615T210000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-architecture-tech-lead-20260615T210000Z-US0101`, `proof_hash=e4fbfe8fed8494758cf9856302d276e9eca0774b750ccd2f2f94916c3ef29828`). **`DEC-0086`** locked; **`# US-0101`** appended to `docs/engineering/architecture.md`; 10 atomic task seeds (at **`SPRINT_MAX_TASKS`** threshold); eight **`test_us0101_*`** markers. Story **`US-0101`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/sprint-plan`** (fresh **tech-lead**).
+
+### Architecture anchor
+
+- **Decision**: `decisions/DEC-0086.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0101`
+- **Research**: `docs/engineering/research.md` `R-0088`
+
+### Task seeds (10 — at SPRINT_MAX_TASKS threshold)
+
+| # | AC | Tranche | Summary |
+|---|-----|---------|---------|
+| 1 | AC-1 | A | **Scratchpad keys** — `MODEL_TIER_*`, `MODEL_CATALOG`, `MODEL_RESOLVE`, `MODEL_FALLBACK`, `MODEL_PROVIDER_MODE` |
+| 2 | AC-2 | A | **Default phase→tier matrix** — architecture-locked table in scratchpad comments + runbook |
+| 3 | AC-5 | B | **Template agent `model:` defaults** — apply `model: fast`/`model: inherit`/omit to `.cursor/agents/*.mdc` + `template/.cursor/agents/*.mdc` |
+| 4 | AC-4 | B | **Local catalog example** — `.cursor/model-catalog.local.example.json` + gitignore `.cursor/model-catalog.local.json` |
+| 5 | AC-4, AC-7 | C | **`model_tier_lib.py`** — resolver algorithm + catalog schema validation + 4 reason codes |
+| 6 | AC-7 | C | **`model_tier_validate.py`** — CLI validator (tier enum, catalog schema, phase key spelling, forbidden slug grep) |
+| 7 | AC-6 | D | **Runbook provider-mode subsection** — `docs/engineering/runbook.md` + `auto-orchestration-reference.md` `MODEL_PROVIDER_MODE=cursor|api` + BYOK limitation + workaround recipes |
+| 8 | AC-6 | D | **Non-substitution paragraph** — explicit `MODEL_TIER` ≠ `TOKEN_PROFILE` ≠ `DELIVERY_MODE` in runbook + scratchpad comments |
+| 9 | AC-8 | E | **Eight `test_us0101_*` contract subtests** — scratchpad keys, matrix literals, orthogonality, template aliases, forbidden slug grep, catalog schema, provider mode, reason codes |
+| 10 | AC-8, AC-9 | E | **`MODEL_TIER_PAIRS` parity + harness §26Z** — `check_intake_template_parity.py --scope=model-tier` + harness section |
+
+### Tranche ordering
+
+- **Tranche A**: Scratchpad + scratchpad docs (seeds 1, 2)
+- **Tranche B**: Template agent defaults + catalog example (seeds 3, 4)
+- **Tranche C**: Resolver lib + validator (seeds 5, 6)
+- **Tranche D**: Runbook + provider-mode docs (seeds 7, 8)
+- **Tranche E**: Contract tests + parity + harness (seeds 9, 10)
+
+### Recommended /execute ordering
+
+1. **1** → **2** — Tranche A (scratchpad keys + matrix)
+2. **3** → **4** — Tranche B (template agents + catalog example)
+3. **5** → **6** — Tranche C (resolver lib + validator)
+4. **7** → **8** — Tranche D (runbook + non-substitution)
+5. **9** → **10** — Tranche E (contract tests + parity + harness)
+
+### Scope guards for `/execute`
+
+- **Do not** hardcode vendor slugs (`composer-*`, `claude-*`, `gpt-*`, `opus-*`) in `template/.cursor/agents/`.
+- **Do not** amend `TOKEN_PROFILE` semantics (orthogonal axis per **DEC-0062**).
+- **Do not** change mandatory QA/release gate semantics.
+- **Do not** implement dynamic `models.list()` at IDE spawn (out of scope v1).
+
+### Evidence refs
+
+- `decisions/DEC-0086.md`
+- `docs/engineering/architecture.md` `# US-0101`
+- `docs/engineering/research.md` `R-0088`
+- `docs/product/backlog.md` `## US-0101` `architecture_notes`
+- `docs/engineering/state.md` (Architecture checkpoint — this run)
+- `handoffs/resume_brief.md` (top pointer → `/sprint-plan`)
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead** context) for **`US-0101`** — materialize sprint from 10 architecture seeds; AC-1..AC-9 bijection check.
+
+### Decision gate
+
+- **None** — architecture satisfied; sprint-plan readiness explicit.
+
+---
+
+## Architecture handoff — **US-0101** — post-**`/architecture`** → **`/sprint-plan`** (**tech-lead**)
+
+> **2026-06-15T21:00:00Z** — **`/architecture`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=tl-US0101-architecture-20260615T210000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-architecture-tech-lead-20260615T210000Z-US0101`, `proof_hash=e4fbfe8fed8494758cf9856302d276e9eca0774b750ccd2f2f94916c3ef29828`). **`DEC-0086`** locked; **`# US-0101`** appended to **`docs/engineering/architecture.md`**; **10** atomic task seeds (at **`SPRINT_MAX_TASKS=12`** threshold — no auto-split); eight **`test_us0101_*`** contract markers; compose **DEC-0062** (TOKEN_PROFILE orthogonality) + **US-0069** (phase→role matrix) + **US-0003** (subagent definitions) + **US-0080** (TOKEN_PROFILE) + **US-0092** (outer driver). Story **`US-0101`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/sprint-plan`** (fresh **tech-lead**).
+
+### Architecture anchor
+
+- **Decision**: `decisions/DEC-0086.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0101`
+- **Research**: `docs/engineering/research.md` `R-0088` (Q1–Q5 closed)
+
+### Task seeds (for `/sprint-plan`)
+
+| # | AC | Tranche | Summary |
+|---|-----|---------|---------|
+| 1 | AC-1 | A | **Scratchpad keys** — `MODEL_TIER_*`, `MODEL_CATALOG`, `MODEL_RESOLVE`, `MODEL_FALLBACK`, `MODEL_PROVIDER_MODE` in `.cursor/scratchpad.md` + template docs |
+| 2 | AC-2 | A | **Default phase→tier matrix** — document architecture-locked table in scratchpad comments + runbook |
+| 3 | AC-5 | B | **Template agent `model:` defaults** — apply `model: fast`/`model: inherit`/omit to `.cursor/agents/*.mdc` + `template/.cursor/agents/*.mdc` |
+| 4 | AC-4 | B | **Local catalog example** — `.cursor/model-catalog.local.example.json` + gitignore `.cursor/model-catalog.local.json` |
+| 5 | AC-4, AC-7 | C | **`model_tier_lib.py`** — resolver algorithms + catalog schema validation + 4 reason codes |
+| 6 | AC-7 | C | **`model_tier_validate.py`** — CLI validator (tier enum, catalog schema, phase key spelling, forbidden slug grep) |
+| 7 | AC-6 | D | **Runbook provider-mode subsection** — `docs/engineering/runbook.md` + `auto-orchestration-reference.md` `MODEL_PROVIDER_MODE=cursor|api` + BYOK limitation + workaround recipes |
+| 8 | AC-6 | D | **Non-substitution paragraph** — explicit `MODEL_TIER` ≠ `TOKEN_PROFILE` ≠ `DELIVERY_MODE` in runbook + scratchpad comments |
+| 9 | AC-8 | E | **Eight `test_us0101_*` contract subtests** — scratchpad keys, matrix literals, orthogonality, template aliases, forbidden slug grep, catalog schema, provider mode, reason codes |
+| 10 | AC-8, AC-9 | E | **`MODEL_TIER_PAIRS` parity + harness §26Z** — `check_intake_template_parity.py --scope=model-tier` + harness section |
+
+**Task count**: **10** (`SPRINT_MAX_TASKS=12`, `within_limit=true`, at threshold — no auto-split). **AC-9** pre-satisfied at architecture (**`DEC-0086`** + **`# US-0101`**).
+
+### Recommended `/sprint-plan` ordering
+
+Tranche **A** → **B** → **C** → **D** → **E** (scratchpad → template → resolver → runbook → tests).
+
+### Contract tests (eight `test_us0101_*` markers)
+
+1. `test_us0101_scratchpad_keys` — validates `MODEL_TIER_<PHASE>` enum + `MODEL_TIER_DEFAULT`
+2. `test_us0101_default_matrix_literals` — verifies AC-2 phase→tier table
+3. `test_us0101_token_profile_orthogonality` — grep confirms `MODEL_TIER` ≠ `TOKEN_PROFILE`
+4. `test_us0101_template_agent_model_aliases` — template agents use `fast`/`inherit`/omit only
+5. `test_us0101_forbidden_slug_grep` — no vendor slugs in `template/.cursor/agents/`
+6. `test_us0101_catalog_schema_contract` — validates `.cursor/model-catalog.local.example.json` schema
+7. `test_us0101_provider_mode_literals` — `MODEL_PROVIDER_MODE` enum + runbook refs
+8. `test_us0101_reason_code_inventory` — `MODEL_TIER_INVALID`, `MODEL_CATALOG_INVALID`, `MODEL_RESOLVE_FALLBACK`, `MODEL_SLUG_UNKNOWN` family
+
+**Parity scope**: `check_intake_template_parity.py --scope=model-tier` (`MODEL_TIER_PAIRS`) — template agent `model:` fields + catalog example + scratchpad docs.
+
+**Harness**: add **§26Z** (or next free section) in `tests/run-tests.ps1` / `tests/run-tests.sh` for `pytest -k us0101`.
+
+### Top risks (carry to `/sprint-plan`)
+
+- **R1** Cursor subagent BYOK limitation limits api-only mode value — document limitation; provide workaround recipes.
+- **R2** `inherit` unreliable on some billing plans — framework alias layer degrades gracefully; `strong` omits field for best fallback.
+- **R3** Parent agent can override subagent `model:` via Task tool — document known Cursor behavior; stable alias layer still provides intent signal.
+- **R4** Operator confusion between MODEL_TIER and TOKEN_PROFILE — explicit non-substitution paragraph in runbook + scratchpad comments.
+
+### Evidence refs
+
+- `decisions/DEC-0086.md`
+- `docs/engineering/architecture.md` (`# US-0101`)
+- `docs/engineering/research.md` (`R-0088` — Q1–Q5 closed)
+- `docs/product/backlog.md` (`## US-0101` — `architecture_notes` appended)
+- `docs/engineering/state.md` (Architecture checkpoint — this run)
+- `handoffs/resume_brief.md` (top pointer → `/sprint-plan`)
+- Prior research proof: `rp-auto-20260615-02-research-tech-lead-20260615T203000Z-US0101`
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead** context) for **`US-0101`** — materialize sprint from 10 architecture seeds; AC-1..AC-9 bijection check.
+
+### Decision gate
+
+- **None** — architecture satisfied; sprint-plan readiness explicit.
+
+---
+
 ## Sprint Plan — **S0090** / **US-0100** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
 
 > **2026-06-15T04:00:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-01`, `fresh_context_marker=tl-S0090-US0100-sprint-plan-20260615T040000Z-fresh`, `runtime_proof_id=rp-auto-20260615-01-sprint-plan-tech-lead-20260615T040000Z-S0090-US0100`, `proof_hash=c33f47806589a544ecb99e4b5c30449142bca3ef1774356415862d5ce8ac8e9f`). Sprint **`S0090`** created; **AC-1..AC-10** surjective via **T-001..T-012** (12 architecture seeds; `task_count=12`, `within_limit=true`; AC-10 pre-satisfied at architecture). Story **`US-0100`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).

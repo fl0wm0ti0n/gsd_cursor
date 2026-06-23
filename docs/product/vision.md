@@ -1543,3 +1543,43 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Research stub**: **`R-0088`** — materializer design, catalog schema, contract tests, UI precedence.
 - **Intake evidence**: `handoffs/intake_evidence/US-0101-intake-20260614.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`).
 - **Next**: **`/discovery`** (fresh **PO**).
+
+## Discovery Notes — US-0101
+
+- **Discovery date**: 2026-06-15T20:00:00Z
+- **Problem framing**: Operators need per-phase LLM strength control (cheap for light work like ask/refresh-context, strong for coding/architecture) without hardcoding volatile vendor model IDs in template agent files. Current state: all subagents inherit one parent model or use ad-hoc `model:` slugs — no framework tier contract, no local catalog, no provider-mode guidance.
+- **Recommended approach (discovery-locked)**:
+  - `MODEL_TIER_<phase>=cheap|balanced|strong` in scratchpad with local override precedence per DEC-0055.
+  - Tier→alias resolution: `cheap` → `fast`, `strong` → `inherit`, `balanced` → `inherit` or documented middle alias (open for research).
+  - Template agents use aliases only (`fast`/`inherit`); operator slugs in `.cursor/model-catalog.local.json` (gitignored).
+  - `MODEL_PROVIDER_MODE=cursor|api` documented with subagent BYOK limitations.
+  - Orthogonal to `TOKEN_PROFILE` (DEC-0062 — context breadth only, never model choice).
+- **12 discovery locks (L1–L12)**:
+  | # | Lock | Decision |
+  |---|------|----------|
+  | L1 | **Tier enum** | `cheap` / `balanced` / `strong` — three-tier model |
+  | L2 | **Default phase→tier matrix** | cheap: ask/refresh-context/memory-audit/status-reconcile/pause; balanced: intake/discovery/research/release/plan-verify; strong: architecture/execute/qa/verify-work/security-review |
+  | L3 | **Tier→alias resolution** | `cheap` → `fast`, `strong` → `inherit`; `balanced` → open for research (inherit vs middle alias) |
+  | L4 | **Local catalog schema** | `.cursor/model-catalog.local.json` (gitignored) + `.example.json`; maps tier → operator slug string |
+  | L5 | **Template agent defaults** | aliases only in `template/.cursor/agents/`; no hardcoded vendor slugs |
+  | L6 | **Provider mode runbook** | `MODEL_PROVIDER_MODE=cursor|api` subsection in runbook + auto-orchestration-reference |
+  | L7 | **Scratchpad merge precedence** | local > materialized > example per DEC-0055 |
+  | L8 | **Orthogonality vs TOKEN_PROFILE** | explicit non-substitution paragraph; MODEL_TIER ≠ TOKEN_PROFILE |
+  | L9 | **Fail-closed reason codes** | `MODEL_TIER_INVALID`, `MODEL_CATALOG_INVALID`, `MODEL_RESOLVE_FALLBACK`, `MODEL_SLUG_UNKNOWN` |
+  | L10 | **Contract test inventory** | `test_us0101_*` markers for scratchpad keys, matrix literals, orthogonality, template aliases, forbidden slug grep |
+  | L11 | **Template parity scope** | `check_intake_template_parity.py --scope=model-tier` when surfaces touched |
+  | L12 | **DEC-0062 compose** | new decision composes DEC-0062 without amending TOKEN_PROFILE tier meanings |
+- **Research open questions (carry to `/research` via `R-0088`)**:
+  - Q1: Finalize tier→alias mapping — balanced→inherit stable? middle alias?
+  - Q2: Local catalog JSON schema + resolver algorithm details.
+  - Q3: Agent template defaults — which roles get `fast` vs `inherit`?
+  - Q4: Provider mode runbook UX — how to document BYOK limitations clearly.
+  - Q5: Contract-test inventory + parity scope finalization.
+- **Risks**:
+  - R1: Cursor subagent BYOK limitation may limit api-only mode practical value.
+  - R2: Balanced tier alias ambiguity — inherit vs new middle alias.
+  - R3: Materializer hook scope — scratchpad-only vs active agent rewrite.
+- **Design references**: existing `TOKEN_PROFILE` pattern (DEC-0062), `MODEL_PROVIDER_MODE` operator concept, `.cursor/agents/*.mdc` template structure.
+- **Research anchor**: **`R-0088`** — extend at `/research` with Q1–Q5 answers.
+- **Intake evidence**: `handoffs/intake_evidence/US-0101-intake-20260614.json`.
+- **Next**: **`/research`** (fresh **tech-lead**).

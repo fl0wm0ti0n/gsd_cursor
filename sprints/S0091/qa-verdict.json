@@ -1,0 +1,90 @@
+{
+  "sprint_id": "S0091",
+  "story_id": "US-0101",
+  "verdict": "PASS",
+  "timestamp": "2026-06-15T23:00:00Z",
+  "fresh_context_marker": "qa-US0101-qa-20260615T230000Z-fresh",
+  "role": "qa",
+  "phase_id": "qa",
+  "orchestrator_run_id": "auto-20260615-02",
+  "ac_verification": [
+    {
+      "ac_id": "AC-1",
+      "status": "PASS",
+      "evidence": "scratchpad.md lines 327-349 contain MODEL_TIER_DEFAULT, MODEL_TIER_<PHASE>, MODEL_CATALOG, MODEL_RESOLVE, MODEL_FALLBACK, MODEL_PROVIDER_MODE keys with correct defaults. Contract test test_us0101_scratchpad_keys PASS."
+    },
+    {
+      "ac_id": "AC-2",
+      "status": "PASS",
+      "evidence": "Default phase->tier matrix documented in scratchpad.md lines 333-337 and architecture.md lines 2702-2709. Matrix matches DEC-0086 locked table: cheap (ask, refresh-context, memory-audit, status-reconcile, pause), balanced (intake, discovery, research, release, plan-verify), strong (architecture, execute, quick, qa, verify-work, security-review), auto inherits parent. Contract test test_us0101_default_matrix_literals PASS."
+    },
+    {
+      "ac_id": "AC-3",
+      "status": "PASS",
+      "evidence": "Tier->alias resolution implemented in model_tier_lib.py TIER_ALIAS_MAP: cheap->fast, balanced->inherit, strong->None (omit). Documented in DEC-0086 section 2 and architecture.md lines 2711-2719. Resolver algorithm in model_tier_lib.py resolve_model_tier() follows DEC-0086 section 3 steps 1-7."
+    },
+    {
+      "ac_id": "AC-4",
+      "status": "PASS",
+      "evidence": "Local catalog example at .cursor/model-catalog.local.example.json with schema_version=1, tiers object with cheap/balanced/strong keys. Gitignored at .gitignore line 14 (.cursor/model-catalog.local.json). Resolver library scripts/model_tier_lib.py implements validate_catalog_schema() and load_catalog(). Contract test test_us0101_catalog_schema_contract PASS."
+    },
+    {
+      "ac_id": "AC-5",
+      "status": "PASS",
+      "evidence": "Template agent model defaults verified: curator.mdc has 'model: fast' (cheap), po.mdc has 'model: inherit' (balanced), release.mdc has 'model: inherit' (balanced). Strong-tier agents (tech-lead, dev, qa, security) omit model: field. No forbidden vendor slugs (composer-, claude-, gpt-, opus-) in template/.cursor/agents/. Contract tests test_us0101_template_agent_model_aliases and test_us0101_forbidden_slug_grep PASS."
+    },
+    {
+      "ac_id": "AC-6",
+      "status": "PASS",
+      "evidence": "Runbook docs/engineering/runbook.md lines 653-767 contain: model tier section with key table, default phase->tier matrix, provider mode subsection (MODEL_PROVIDER_MODE=cursor|api), BYOK limitation documentation, workaround recipes, non-substitution paragraph (MODEL_TIER != TOKEN_PROFILE != DELIVERY_MODE), reason codes table, template agent defaults, local catalog schema, resolver algorithm, validation commands. Contract test test_us0101_token_profile_orthogonality and test_us0101_provider_mode_literals PASS."
+    },
+    {
+      "ac_id": "AC-7",
+      "status": "PASS",
+      "evidence": "Validator CLI scripts/model_tier_validate.py implements tier enum validation, catalog schema validation, phase key spelling, forbidden slug grep. All 4 reason codes present in both model_tier_lib.py and model_tier_validate.py: MODEL_TIER_INVALID, MODEL_CATALOG_INVALID, MODEL_SLUG_UNKNOWN, MODEL_RESOLVE_FALLBACK. Self-test passes. Full repo validation passes. Contract test test_us0101_reason_code_inventory PASS."
+    },
+    {
+      "ac_id": "AC-8",
+      "status": "PASS",
+      "evidence": "Eight test_us0101_* contract tests implemented in tests/auto_command_contract_test.py lines 2689-2800. All 8/8 passing: test_us0101_scratchpad_keys, test_us0101_default_matrix_literals, test_us0101_token_profile_orthogonality, test_us0101_template_agent_model_aliases, test_us0101_forbidden_slug_grep, test_us0101_catalog_schema_contract, test_us0101_provider_mode_literals, test_us0101_reason_code_inventory. pytest -k us0101 exit code 0."
+    },
+    {
+      "ac_id": "AC-9",
+      "status": "PASS",
+      "evidence": "Architecture anchor at docs/engineering/architecture.md # US-0101 (line 2671+). Decision anchor at decisions/DEC-0086.md (locked). MODEL_TIER_PAIRS parity in scripts/check_intake_template_parity.py (lines 231-238). Harness section 26Z in tests/run-tests.ps1 (lines 1615-1621). Parity check passes: python scripts/check_intake_template_parity.py --scope=model-tier -> [INTAKE_TEMPLATE_PARITY_OK]."
+    }
+  ],
+  "contract_tests": {
+    "total": 8,
+    "passing": 8,
+    "failing": 0,
+    "results": [
+      {"test": "test_us0101_scratchpad_keys", "status": "PASS"},
+      {"test": "test_us0101_default_matrix_literals", "status": "PASS"},
+      {"test": "test_us0101_token_profile_orthogonality", "status": "PASS"},
+      {"test": "test_us0101_template_agent_model_aliases", "status": "PASS"},
+      {"test": "test_us0101_forbidden_slug_grep", "status": "PASS"},
+      {"test": "test_us0101_catalog_schema_contract", "status": "PASS"},
+      {"test": "test_us0101_provider_mode_literals", "status": "PASS"},
+      {"test": "test_us0101_reason_code_inventory", "status": "PASS"}
+    ]
+  },
+  "additional_checks": {
+    "model_tier_lib_self_test": "PASS",
+    "model_tier_validate_repo": "PASS",
+    "check_intake_template_parity_model_tier": "PASS"
+  },
+  "issues_found": [],
+  "blocking_findings": 0,
+  "ac_surjective_coverage": {
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002"],
+    "AC-3": ["DEC-0086"],
+    "AC-4": ["T-004", "T-005"],
+    "AC-5": ["T-003"],
+    "AC-6": ["T-007", "T-008"],
+    "AC-7": ["T-005", "T-006"],
+    "AC-8": ["T-009", "T-010"],
+    "AC-9": ["T-010", "DEC-0086", "architecture.md"]
+  }
+}

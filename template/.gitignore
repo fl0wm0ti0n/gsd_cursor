@@ -4,3 +4,4 @@
 .env.*
 !.env.example
 .cursor/dev-environment.json
+.cursor/model-catalog.local.json
