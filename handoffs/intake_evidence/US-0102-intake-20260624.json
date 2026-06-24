@@ -1,0 +1,58 @@
+{
+  "intake_run_id": "cursor-20260624-US0102-intake",
+  "turn_index": "2026-06-24T21:58:00Z",
+  "selected_pack": "small-intake-pack",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": [],
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:us0102-outcome",
+      "quoted_user_text": "per phase/command AI-modelle festzulegen... für /ask",
+      "intake_run_id": "cursor-20260624-US0102-intake",
+      "turn_index": "2026-06-24T21:58:00Z"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:us0102-impacted",
+      "quoted_user_text": "Technical inference from scratchpad + architecture surface: scratchpad MODEL_<PHASE> keys, model-catalog schema, default phase→tier matrix, resolver logic, validators, contract tests",
+      "intake_run_id": "cursor-20260624-US0102-intake",
+      "turn_index": "2026-06-24T21:58:00Z"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:us0102-constraints",
+      "quoted_user_text": "Compose with US-0101/DEC-0086, not amend; no volatile vendor IDs in templates; backward compatibility (tier-only still works); precedence: MODEL_<PHASE> > MODEL_TIER_<PHASE> > MODEL_TIER_DEFAULT > alias",
+      "intake_run_id": "cursor-20260624-US0102-intake",
+      "turn_index": "2026-06-24T21:58:00Z"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:us0102-tests",
+      "quoted_user_text": "Backward compatibility (tier-only still works); precedence validation; resolver handles both layers; catalog schema extension; new contract tests test_us0102_*",
+      "intake_run_id": "cursor-20260624-US0102-intake",
+      "turn_index": "2026-06-24T21:58:00Z"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:us0102-done-def",
+      "quoted_user_text": "Scratchpad MODEL_<PHASE>=<slug> keys; /ask phase in default matrix (cheap); local catalog extended with role-based presets; validator updates; contract tests; documentation updates; 3 tiers retained as baseline",
+      "intake_run_id": "cursor-20260624-US0102-intake",
+      "turn_index": "2026-06-24T21:58:00Z"
+    }
+  ],
+  "assumptions_used": [],
+  "validator_status": "[INTAKE_EVIDENCE_VALIDATION_OK]"
+}

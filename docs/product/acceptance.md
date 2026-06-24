@@ -126,6 +126,7 @@
 - [x] US-0099: Auto-bootstrap dev-environment profile on install/upgrade — non-destructive copy of template example to `.cursor/dev-environment.json` when missing; npm postinstall parity; runbook customize-after-bootstrap (8 ACs) (UAT closure: `sprints/S0089/uat.json`, `sprints/S0089/uat.md`, verify-work **2026-06-14T23:00:00Z** / `orchestrator_run_id=auto-20260614-01`; release **2026-06-14T23:30:00Z** / `handoffs/releases/S0089-release-notes.md`, queue **`S0089`** → **`released`**)
 - [x] US-0100: Version-scoped release changelog — cumulative CHANGELOG with US/BUG summaries per semver, per-version release docs, `/release` derivation + GitHub/git notes attachment composing with US-0040/US-0054 (10 ACs)
 - [x] US-0101: Per-phase model tier selection for subagents — MODEL_TIER scratchpad (cheap/balanced/strong), stable Cursor aliases, optional local slug catalog, provider-mode runbook; orthogonal to TOKEN_PROFILE (9 ACs) (release **2026-06-16T00:00:00Z** / `handoffs/releases/S0091-release-notes.md`, queue **`S0091`** → **`released`**)
+- [ ] US-0102: Direct per-phase model slug override and role-based catalog presets — extend US-0101 tier-based selection with `MODEL_<PHASE>=<vendor-slug>` direct override, role-based catalog v2 (po/sa/dev/dev_difficult/qa/security/release), backward compatible 3-tier baseline, `/ask` phase reinforcement, precedence logic, validator extensions, contract tests (10 ACs)
 
 ## Bug acceptance (canonical)
 

@@ -1,0 +1,37 @@
+## US-0102 — Direct per-phase model slug override and role-based catalog presets (US-0101 extension)
+- user_visible: true
+- Title: Extend US-0101 tier-based model selection with direct per-phase slug override and role-based catalog presets, while retaining 3-tier baseline
+- Summary: US-0101 delivered per-phase `MODEL_TIER_<PHASE>` (cheap/balanced/strong) with Cursor alias mapping (fast/inherit) and optional local catalog. Operators now request a second axis: direct per-phase model slug assignment (`MODEL_<PHASE>=<vendor-slug>`) that bypasses tier indirection, plus role-based catalog presets (PO/SA/DEV/QA profiles per `ai_modell_auslegung_cursor_highend.md`) for curated model sets without manual tier mapping. The 3-tier system remains as default/fallback layer; precedence: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `MODEL_TIER_DEFAULT` > Cursor alias. `/ask` phase reinforced with direct override support. Compose with US-0101/DEC-0086 (do not amend — US-0101 stays DONE). Backward compatible: tier-only configurations continue unchanged. No volatile vendor IDs in template files. New catalog schema v2 extends v1 with `roles` section. New contract tests `test_us0102_*` validate precedence, schema, backward compatibility.
+- Priority: P2
+- Status: OPEN
+- Decomposition (US-0051):
+  - Single story — direct override scratchpad keys, precedence logic, catalog schema v2, role-based presets, backward compatibility, validator updates, contract tests ship as one vertical slice.
+- Overlap / duplicate evaluation:
+  - US-0101 / DEC-0086 (DONE): compose, do not amend.
+  - US-0080 / DEC-0062 (DONE): orthogonal — direct slug override selects LLM identity (not context breadth).
+  - US-0003 (DONE): unchanged — template agents keep stable Cursor aliases.
+  - US-0092 (DONE): distinct.
+- Intake pack evidence (small-intake-pack):
+  - selected_pack=small-intake-pack
+  - asked_topics: outcome_and_success_criteria, impacted_components, constraints_and_compatibility, required_acceptance_criteria, definition_of_done
+  - missing_topics: (none)
+  - assumptions_confirmed: (none)
+  - intake_evidence_ref: handoffs/intake_evidence/US-0102-intake-20260624.json
+  - Validator: [INTAKE_EVIDENCE_VALIDATION_OK]
+- Acceptance:
+  - [ ] AC-1: Direct per-phase slug override scratchpad keys — document `MODEL_<PHASE>=<vendor-slug>` keys for all canonical phases incl. `ask`. Values are direct vendor model slugs (e.g., `MODEL_EXECUTE=kimi-k2.7-code`). Merge precedence for model resolution: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `MODEL_TIER_DEFAULT` > Cursor alias.
+  - [ ] AC-2: Precedence validation and resolution logic — `scripts/model_tier_lib.py` (or new `scripts/model_overrides_lib.py`) implements deterministic resolution; fail-closed reason codes: `MODEL_OVERRIDE_SLUG_UNKNOWN`, `MODEL_ROLE_SLUG_UNKNOWN`.
+  - [ ] AC-3: Local catalog schema v2 with role-based presets — extend `.cursor/model-catalog.local.json` schema to v2: add `roles` section alongside `tiers` (po, sa, dev, dev_difficult, qa, security, release). Backward compatible; new example catalogs with placeholder slugs.
+  - [ ] AC-4: Role-based resolver (opt-in) — `MODEL_RESOLVE=alias_only|local_catalog|role_catalog` (default `alias_only`). `role_catalog` mode resolves phase → role mapping per US-0069/DEC-0051 → role slug from catalog.
+  - [ ] AC-5: /ask phase reinforcement — `/ask` phase already in US-0101 default matrix as `cheap` tier; reinforce with direct override support.
+  - [ ] AC-6: Backward compatibility — existing US-0101 configurations continue unchanged; validator accepts both v1 and v2 catalog schemas.
+  - [ ] AC-7: Template stability and volatile-ID protection — `template/.cursor/scratchpad.md` examples show only `MODEL_TIER_*` keys; role-based catalog examples use placeholder slugs only.
+  - [ ] AC-8: Validator + reason codes — extend `scripts/model_tier_lib.py` for direct slug keys, catalog schema v2, precedence logic; fail-closed reason codes `MODEL_OVERRIDE_SLUG_UNKNOWN`, `MODEL_ROLE_SLUG_UNKNOWN`, `MODEL_CATALOG_SCHEMA_V2_INVALID`.
+  - [ ] AC-9: Contract tests — `test_us0102_*` markers validate direct slug keys, precedence resolution, catalog schema v2, role-based resolver, backward compatibility, template stability, reason code inventory, `/ask` phase reinforcement; `check_intake_template_parity.py --scope=model-tier-overrides`.
+  - [ ] AC-10: Documentation + runbook — document `MODEL_<PHASE>` keys in `.cursor/scratchpad.md` with examples in comments (no vendor slugs); update `MODEL_RESOLVE` enum to include `role_catalog`; add `# US-0102` section in `docs/engineering/architecture.md`; runbook `MODEL_OVERRIDE_MODE` subsection documents precedence, role-based resolution, backward compatibility contract.
+- Boundaries:
+  - In scope: direct per-phase model slug scratchpad keys, role-based catalog presets, `/ask` phase reinforcement, backward compatibility for tier system.
+  - Out of scope: change US-0101's DONE status or DEC-0086 locks, require migration from tier-based to direct override, force role-based catalogs, modify Cursor billing-plan enforcement, fix Cursor subagent BYOK bugs.
+- related_us: US-0101, US-0069, US-0080
+- intake_evidence_ref: handoffs/intake_evidence/US-0102-intake-20260624.json
+- intake_notes (2026-06-24, PO, `cursor-20260624-US0102-intake`, `INTAKE_GUIDED_MODE=1`, `INTAKE_WORK_ITEM_KIND=story`): `/intake` **PASS** — operator request (German): extend US-0101 so operators can assign specific AI models per phase/command (including /ask) in addition to the existing 3-tier system. Reference: `ai_modell_auslegung_cursor_highend.md`. Compose with US-0101/DEC-0086 (do not amend). Retain 3-tier as baseline. **small-intake-pack**; all 5 topics covered; validator **[INTAKE_EVIDENCE_VALIDATION_OK]**. Decomposition evaluator → single story. Research stub deferred. No `/discovery` needed (clear scope, no new problem framing). **Next**: `/architecture` (fresh tech-lead).
