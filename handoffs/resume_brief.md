@@ -1,6 +1,265 @@
 # Resume brief
 
-## Latest orchestration pointer — post-refresh-context US-0101 (DEC-0069)
+## Latest orchestration pointer — segment closure US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/refresh-context`** for **`US-0102`** — **`refresh_context_boundary_utc=2026-06-26T01:00:00Z`**
+- **`story_id`**: **`US-0102`** — **DONE** in **`docs/product/backlog.md`** (authority per **US-0045**)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`curator-S0092-US0102-refresh-context-20260626T010000Z-fresh`**
+- **`intended_resume_phase`**: **`intake`**
+- **`resolved_start_phase`**: **`intake`**
+- **`next_scheduled_phase`**: **`none`**
+- **`default_spawn_role`**: **`po`**
+- **Contract**: refresh-context **PASS** — segment closed; all 11 phases complete; portfolio **0 OPEN** stories; **0 OPEN** bugs; drain **terminated** (`no_open_stories`); operator enqueues new work via **`/intake`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`runtime_proof_id`**: **`rp-auto-20260615-02-refresh-context-curator-20260626T010000Z-S0092-US0102`**
+- **`backlog_drain_active`**: **false**
+- **`backlog_drain_stories_remaining_budget`**: **4**
+- **`backlog_drain_segment_complete`**: **1**
+- **`drain_terminated`**: **true**
+- **`drain_terminated_reason`**: **`no_open_stories`**
+- **`drain_advance_action`**: **`not_applicable`**
+- **`portfolio_open_stories`**: **0**
+- **`portfolio_open_bugs`**: **0**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **false**
+- **`stop_phase`**: **`refresh-context`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-refresh-context (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `(none — drain terminated)`
+
+---
+
+## Prior orchestration pointer — post-release US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/release`** for **`US-0102`** — **`release_boundary_utc=2026-06-26T00:00:00Z`**
+- **`story_id`**: **`US-0102`** — **DONE** in **`docs/product/backlog.md`** (authority per **US-0045**)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`release-S0092-US0102-release-20260626T000000Z-fresh`**
+- **`intended_resume_phase`**: **`refresh-context`**
+- **`resolved_start_phase`**: **`refresh-context`**
+- **`next_scheduled_phase`**: **`refresh-context`**
+- **`default_spawn_role`**: **`curator`**
+- **Contract**: release **PASS** — queue **`S0092`** → **`released`**; **`handoffs/releases/S0092-release-notes.md`**; **`CHANGELOG.md`** **`[Unreleased]`** updated; publish **skipped** (`RELEASE_PUBLISH_MODE=disabled`); spawn fresh **curator** for **`/refresh-context`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`runtime_proof_id`**: **`rp-auto-20260615-02-release-release-20260626T000000Z-S0092-US0102`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **4**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`release`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-release (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-verify-work US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/verify-work`** for **`US-0102`** — **`verify_work_boundary_utc=2026-06-25T23:30:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority; status flip at **`/release`**)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-S0092-US0102-verify-work-20260625T233000Z-fresh`**
+- **`intended_resume_phase`**: **`release`**
+- **`resolved_start_phase`**: **`release`**
+- **`next_scheduled_phase`**: **`release`**
+- **`default_spawn_role`**: **`release`**
+- **Contract**: verify-work **PASS** — UAT 10/10; QA PASS 10/10 ACs confirmed; `pytest -k us0102` 8/8 + `us0101` 8/8; validator + parity PASS; all release artifacts present; spawn fresh **release** for **`/release`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`runtime_proof_id`**: **`rp-auto-20260615-02-verify-work-qa-20260625T233000Z-S0092-US0102`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`verify-work`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-verify-work (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-qa US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/qa`** for **`US-0102`** — **`qa_boundary_utc=2026-06-25T22:00:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-S0092-US0102-qa-20260625T220000Z-fresh`**
+- **`intended_resume_phase`**: **`verify-work`**
+- **`resolved_start_phase`**: **`verify-work`**
+- **`next_scheduled_phase`**: **`verify-work`**
+- **`default_spawn_role`**: **`qa`**
+- **Contract**: qa **PASS** — AC-1..AC-10 satisfied (10/10); eight `test_us0102_*` green; US-0101 backward compat 8/8; parity `[INTAKE_TEMPLATE_PARITY_OK]` scope=model-tier-overrides; harness **§26AA**; spawn fresh **verify-work** for **`/verify-work`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`runtime_proof_id`**: **`rp-auto-20260615-02-qa-qa-20260625T220000Z-S0092-US0102`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`qa`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-qa (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-execute US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/execute`** for **`US-0102`** — **`execute_boundary_utc=2026-06-25T21:00:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`dev-S0092-US0102-execute-20260625T210000Z-fresh`**
+- **`intended_resume_phase`**: **`qa`**
+- **`resolved_start_phase`**: **`qa`**
+- **`next_scheduled_phase`**: **`qa`**
+- **`default_spawn_role`**: **`qa`**
+- **Contract**: execute **PASS** — T-001..T-011 complete; eight `test_us0102_*` green; parity `[INTAKE_TEMPLATE_PARITY_OK]` scope=model-tier-overrides; harness **§26AA**; spawn fresh **qa** for **`/qa`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`runtime_proof_id`**: **`rp-auto-20260615-02-execute-dev-20260625T210000Z-S0092-US0102`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`execute`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-execute (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `qa` → `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-plan-verify US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/plan-verify`** for **`US-0102`** — **`plan_verify_boundary_utc=2026-06-25T20:00:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`**
+- **`intended_resume_phase`**: **`execute`**
+- **`resolved_start_phase`**: **`execute`**
+- **`next_scheduled_phase`**: **`execute`**
+- **`default_spawn_role`**: **`dev`**
+- **Contract**: plan-verify **PASS** — AC-1..AC-10 surjective via T-001..T-011; task-seed bijection 11:11; **`plan-verify.json`** **PASS**; **`/execute`** unblocked; spawn fresh **dev** for **`/execute`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`plan-verify`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-plan-verify (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-sprint-plan US-0102 / S0092 (DEC-0087)
+
+- **Boundary**: **`/sprint-plan`** for **`US-0102`** — **`sprint_plan_boundary_utc=2026-06-25T19:30:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **`S0092`**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh`**
+- **`intended_resume_phase`**: **`plan-verify`**
+- **`resolved_start_phase`**: **`plan-verify`**
+- **`next_scheduled_phase`**: **`plan-verify`**
+- **`default_spawn_role`**: **`qa`**
+- **Contract**: sprint-plan **PASS** — sprint **`S0092`** allocated; 11 tasks (T-001..T-011); 8 contract tests; **`plan-verify.json`** **PENDING**; spawn fresh **qa** for **`/plan-verify`**
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`sprint-plan`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-sprint-plan (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-architecture US-0102 (DEC-0069)
+
+- **Boundary**: **`/architecture`** for **`US-0102`** — **`architecture_boundary_utc=2026-06-25T19:00:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **(none)**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **`tl-US0102-architecture-20260625T190000Z-fresh`**
+- **`intended_resume_phase`**: **`sprint-plan`**
+- **`resolved_start_phase`**: **`architecture`**
+- **`next_scheduled_phase`**: **`sprint-plan`**
+- **Contract**: architecture **PASS** — **`DEC-0087`** locked; **11** task seeds; eight **`test_us0102_*`** markers; compose **DEC-0086** (do not amend)
+- **`dec_id`**: **`DEC-0087`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`**
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`architecture`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-architecture (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `sprint-plan` → `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — drain-advance US-0102 (DEC-0069)
+
+- **Boundary**: **`/auto`** drain-advance after **`US-0101`** segment closure — **`drain_advance_utc=2026-06-25T18:54:00Z`**
+- **`story_id`**: **`US-0102`** — **OPEN** in **`docs/product/backlog.md`** (authority)
+- **`sprint_id`**: **(none)**
+- **`orchestrator_run_id`**: **`auto-20260615-02`**
+- **`fresh_context_marker`**: **(pending architecture spawn)**
+- **`intended_resume_phase`**: **`architecture`**
+- **`resolved_start_phase`**: **`architecture`**
+- **`next_scheduled_phase`**: **`architecture`**
+- **Contract**: drain-advance materialized — **`US-0101`** segment closed; next OPEN story **`US-0102`**; skipped phases **`intake`**, **`discovery`**, **`research`**; spawn fresh **tech-lead** for **`/architecture`**
+- **`intake_evidence_ref`**: **`handoffs/intake_evidence/US-0102-intake-20260624.json`**
+- **`related_us`**: **`US-0101`** / **`DEC-0086`** (compose, do not amend)
+- **`backlog_drain_active`**: **true**
+- **`backlog_drain_stories_remaining_budget`**: **5**
+- **`native_chain_active`**: **true**
+- **`native_chain_continuing`**: **true**
+- **`drain_advance_action`**: **spawned**
+- **`stop_phase`**: **`drain-advance`**
+- **`stop_reason`**: **`completed`**
+- boundary=post-drain-advance (**DEC-0069**)
+- segment_work_item_kind=story
+- **`resolved_phase_plan`**: `architecture` → `sprint-plan` → `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+
+---
+
+## Prior orchestration pointer — post-refresh-context US-0101 (DEC-0069)
 
 - **Boundary**: **`/refresh-context`** for **`US-0101`** — **`segment_closure_utc=2026-06-16T00:10:00Z`**
 - **`story_id`**: **`US-0101`** — **DONE** in **`docs/product/backlog.md`** (authority)

@@ -1,0 +1,120 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "intake-sovereign-20260627-01",
+  "writer_id": "po-sovereign-intake",
+  "intake_boundary_utc": "2026-06-27T14:19:00Z",
+  "decomposition": "user-authoritative 8-story split (US-0103..US-0110)",
+  "ID_NAMESPACE_BOOTSTRAP": 0,
+  "INTAKE_GUIDED_MODE": 1,
+  "INTAKE_WORK_ITEM_KIND": "story",
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "candidate_story_ids": [
+    "US-0103",
+    "US-0104",
+    "US-0105",
+    "US-0106",
+    "US-0107",
+    "US-0108",
+    "US-0109",
+    "US-0110"
+  ],
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "sovereign_loop",
+      "description": "Sovereign-loop autonomous delivery layer: audit ledger, cross-model critic, sovereign memory, role-behavior manifest, sovereign loop mode, parallel dev arbitrage, self-healing deploy, convergence predicate"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "sovereign_loop",
+      "story_ids": [
+        "US-0103",
+        "US-0104",
+        "US-0105",
+        "US-0106",
+        "US-0107",
+        "US-0108",
+        "US-0109",
+        "US-0110"
+      ]
+    }
+  ],
+  "coverage_complete": true,
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "automatismus verbessern... ganze projekt voll autonom zu erstellen... bei fehlern losung gefunden werden ohne stehen zu bleiben",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 0,
+      "ref": "ie:intake-sovereign-20260627-01:0:36bd00474ed00652"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "its-magic framework in Cursor IDE; existing US-0001..US-0102 already delivered; sovereign loop layers ON TOP of existing auto.md orchestrator",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 1,
+      "ref": "ie:intake-sovereign-20260627-01:1:2b76a5c77327a07b"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Python scripts + JSONL artifacts + YAML manifest + Markdown docs; extends existing scripts/*_lib.py pattern",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 2,
+      "ref": "ie:intake-sovereign-20260627-01:2:3030665e736fa057"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Additive sovereign layer over existing /auto + /execute + /release + refresh-context; default-off (AUTO_SOVEREIGN=0|1); backward compatible; compose with existing stories (do not amend)",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 3,
+      "ref": "ie:intake-sovereign-20260627-01:3:a36c988f6f0f33c5"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "assumption_confirmation_ref",
+      "quoted_user_text": "no UI/design surface - sovereign loop is operator-scratchpad-controlled framework capability only; no UI expectations applicable",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 4,
+      "ref": "ie:intake-sovereign-20260627-01:4:ffa355737bc8f946"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Hard gates in US-0092/DEC-0078 (decision_gate, loop_max, security deny) preserved; auto-deploy requires explicit opt-in; sovereign memory artifacts append-only, no secret exposure",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 5,
+      "ref": "ie:intake-sovereign-20260627-01:5:f5d132d088ee97c9"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Priority 1: determinism + bounded retries + token budget per injection; Priority 2: backward compat with existing /auto stop matrix; Priority 3: operator auditability via ledger",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 6,
+      "ref": "ie:intake-sovereign-20260627-01:6:b50e26cbde8795e1"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "8 stories delivered in dependency order: US-0110 foundation first, then US-0103, US-0105, US-0104, US-0106, US-0107, US-0108, US-0109",
+      "intake_run_id": "intake-sovereign-20260627-01",
+      "turn_index": 7,
+      "ref": "ie:intake-sovereign-20260627-01:7:fcf05899a1bf8b57"
+    }
+  ]
+}

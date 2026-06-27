@@ -1,3 +1,77 @@
+## Plan-verify handoff — **US-0102** / **S0092** — post-**`/plan-verify`** → **`/execute`** (**dev**)
+
+> **2026-06-25T20:00:00Z** — **`/plan-verify`** **PASS** in fresh **qa** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-plan-verify-qa-20260625T200000Z-S0092-US0102`, `proof_hash=f9dfe7f28a2b5e72f49df78d7f073348f0eb779aa287f6bb8dede45d248b49da`). AC-1..AC-10 surjective via T-001..T-011; task-seed bijection 11:11; **`plan-verify.json`** **PASS**. Story **`US-0102`** remains **OPEN** (**US-0045**). Next phase is **`/execute`** (fresh **dev**).
+
+### Execute anchor
+
+- **Sprint**: `sprints/S0092/`
+- **Tasks**: `sprints/S0092/tasks.md` (T-001..T-011, all **pending**)
+- **Plan verify**: `sprints/S0092/plan-verify.json` (**PASS**)
+- **QA findings**: `sprints/S0092/qa-findings.md`
+- **Decision**: `decisions/DEC-0087.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0102`
+
+### Recommended execute order (Tranche A→E)
+
+1. **T-001** → **T-002** — scratchpad keys + `MODEL_RESOLVE` docs
+2. **T-003** → **T-004** — catalog v2 examples + template stability
+3. **T-005** → **T-006** → **T-007** — resolver + validation + CLI validator
+4. **T-008** — runbook subsection
+5. **T-009** — eight `test_us0102_*` contract subtests (after T-001..T-008)
+6. **T-010** → **T-011** — parity scope + harness §26AA
+
+### Scope guards (unchanged)
+
+- **Do not** amend **DEC-0086** / **US-0101** tier locks.
+- **Do not** hardcode vendor slugs in **`template/`** files.
+- **Do not** require migration from tier-only configurations.
+- **Do not** weaken **US-0023** / **US-0048** spawn isolation gates.
+
+---
+
+## Sprint-plan handoff — **US-0102** / **S0092** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
+
+> **2026-06-25T19:30:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-sprint-plan-tech-lead-20260625T193000Z-US0102`, `proof_hash=8f3186f0574696a89af213f2687ac3425150b2c0e9365ac8a7888259d2d6c7aa`). Sprint **`S0092`** created; **`sprints/S0092/sprint.md`**, **`sprints/S0092/tasks.md`** (T-001..T-011); 8 **`test_us0102_*`** contract tests mapped. Binding **`DEC-0087`** (composes **DEC-0086** — do not amend). Story **`US-0102`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).
+
+### Sprint anchor
+
+- **Sprint**: `sprints/S0092/`
+- **Scope**: `sprints/S0092/sprint.md`
+- **Tasks**: `sprints/S0092/tasks.md`
+- **Plan verify**: `sprints/S0092/plan-verify.json` (PENDING)
+- **Decision**: `decisions/DEC-0087.md`
+- **Architecture**: `docs/engineering/architecture.md` `# US-0102`
+
+### Task ordering (Tranche A→E)
+
+| Tranche | Tasks | Scope |
+|---------|-------|-------|
+| **A** | T-001, T-002 | Scratchpad **`MODEL_<PHASE>`** keys + **`MODEL_RESOLVE=role_catalog`** docs |
+| **B** | T-003, T-004 | Catalog v2 role-based examples + template stability |
+| **C** | T-005, T-006, T-007 | **`model_tier_lib.py`** resolver + catalog v2 validation + **`model_tier_validate.py`** |
+| **D** | T-008 | Runbook direct override + role catalog subsection |
+| **E** | T-009, T-010, T-011 | Eight **`test_us0102_*`** + **`MODEL_TIER_OVERRIDES_PAIRS`** parity + harness **§26AA** |
+
+### Contract tests (8)
+
+1. `test_us0102_direct_override_keys`
+2. `test_us0102_precedence_chain`
+3. `test_us0102_catalog_schema_v2`
+4. `test_us0102_role_catalog_resolver`
+5. `test_us0102_tier_only_backward_compat`
+6. `test_us0102_no_vendor_slugs_in_template`
+7. `test_us0102_reason_codes`
+8. `test_us0102_ask_phase_reinforcement`
+
+### Scope guards for `/execute`
+
+- **Do not** amend **DEC-0086** / **US-0101** tier locks.
+- **Do not** hardcode vendor slugs in **`template/`** files.
+- **Do not** require migration from tier-only configurations.
+- **Do not** weaken **US-0023** / **US-0048** spawn isolation gates.
+
+---
+
 ## Sprint-plan handoff — **US-0101** — post-**`/sprint-plan`** → **`/plan-verify`** (**qa**)
 
 > **2026-06-15T21:30:00Z** — **`/sprint-plan`** **PASS** in fresh **tech-lead** context (`orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=tl-US0101-sprint-plan-20260615T213000Z-fresh`, `runtime_proof_id=rp-auto-20260615-02-sprint-plan-tech-lead-20260615T213000Z-US0101`, `proof_hash=50a44fd3f88d6859d00ae8ac5aadf3f0c70ab7b69499fac94df1c09ed68c1ab6`). Sprint **`S0091`** allocated; **`sprints/S0091/task.json`** created with 10 tasks (T-001..T-010, Tranche A→E); **`sprints/S0091/summary.md`** created; 8 **`test_us0101_*`** contract tests mapped. Binding **`DEC-0086`**. Story **`US-0101`** remains **OPEN** (**US-0045**). **Do not implement** in this phase. Next phase is **`/plan-verify`** (fresh **qa**).

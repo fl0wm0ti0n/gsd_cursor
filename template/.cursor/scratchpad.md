@@ -338,9 +338,10 @@ CAVEMAN_FILE_SCOPE=
 #     strong   — architecture, execute, quick, qa, verify-work, security-review
 #     (inherit parent) — auto (orchestrator always inherits parent model)
 # - MODEL_CATALOG: path to local slug catalog (default .cursor/model-catalog.local.json)
-# - MODEL_RESOLVE: alias_only|local_catalog (default alias_only)
+# - MODEL_RESOLVE: alias_only|local_catalog|role_catalog (default alias_only)
 #   alias_only    = use Cursor-stable aliases (cheap->fast, balanced->inherit, strong->omit model:)
 #   local_catalog = look up vendor model slugs from MODEL_CATALOG; requires valid JSON catalog
+#   role_catalog  = opt-in phase→role→catalog slug lookup (US-0102 / DEC-0087); falls through on miss
 # - MODEL_FALLBACK: fallback when catalog lookup fails (default inherit)
 # - MODEL_PROVIDER_MODE: cursor|api (default cursor)
 #   cursor = all subagents route through Cursor-managed infrastructure
@@ -354,9 +355,32 @@ CAVEMAN_FILE_SCOPE=
 #   .cursor/model-catalog.local.example.level-2-complex.json         — complex multi-service apps
 #   .cursor/model-catalog.local.example.level-3-mega.json            — mega-complex / modular monoliths
 #   .cursor/model-catalog.local.example.level-4-super.json            — super-high-sophisticated / mission-critical
-# Copy one to .cursor/model-catalog.local.json and set MODEL_RESOLVE=local_catalog to activate it.
+#   .cursor/model-catalog.local.example.role-based-balanced.json     — v2 role preset (balanced)
+#   .cursor/model-catalog.local.example.role-based-highend.json      — v2 role preset (high-end)
+# Copy one to .cursor/model-catalog.local.json and set MODEL_RESOLVE=local_catalog or role_catalog to activate.
 MODEL_TIER_DEFAULT=balanced
 MODEL_CATALOG=.cursor/model-catalog.local.json
 MODEL_RESOLVE=alias_only
 MODEL_FALLBACK=inherit
 MODEL_PROVIDER_MODE=cursor
+#
+# ## Direct per-phase model slug override + role catalog (US-0102 / DEC-0087)
+# Composes on US-0101 / DEC-0086 — tier baseline unchanged; overlays are optional.
+# Precedence chain (deterministic, per canonical phase_id):
+#   1. MODEL_<PHASE>           — direct vendor slug override (highest priority)
+#   2. MODEL_TIER_<PHASE>      — DEC-0086 tier→alias / local_catalog chain
+#   3. role_catalog lookup     — only when MODEL_RESOLVE=role_catalog; miss falls through
+#   4. MODEL_TIER_DEFAULT      — DEC-0086 tier chain
+#   5. Cursor stable alias     — DEC-0086 built-in mapping (fast / inherit / omit)
+# Scratchpad merge precedence for all MODEL_* keys: MODEL_<PHASE> > MODEL_TIER_<PHASE> > MODEL_TIER_DEFAULT
+# - MODEL_<PHASE>: direct vendor slug; <PHASE> = canonical phase id (same list as MODEL_TIER_<PHASE>)
+#   Set in .cursor/scratchpad.local.md only — use <your-vendor-slug> placeholders in committed files.
+#   Canonical phase ids: ask, refresh-context, memory-audit, status-reconcile, pause,
+#     intake, discovery, research, release, plan-verify, architecture, execute, quick,
+#     qa, verify-work, security-review, auto
+#   Examples (placeholders — replace in scratchpad.local.md):
+#     MODEL_ASK=<your-vendor-slug>
+#     MODEL_EXECUTE=<your-vendor-slug>
+#     MODEL_QA=<your-vendor-slug>
+#     MODEL_REFRESH-CONTEXT=<your-vendor-slug>
+#   MODEL_ASK participates in step 1 like any other phase (no special-case bypass).

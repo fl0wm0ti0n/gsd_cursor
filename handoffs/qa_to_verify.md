@@ -1,20 +1,22 @@
-# QA-to-Verify-Work Handoff — Sprint S0091 / US-0101
+# QA-to-Verify-Work Handoff — Sprint S0092 / US-0102
 
 ## QA Phase Complete
 
-**Story**: US-0101 — Per-phase model tier selection for subagents
-**Decision**: DEC-0086 (locked)
-**Sprint**: S0091
-**Phase**: qa → verify-work
-**Timestamp**: 2026-06-15T23:00:00Z
-**Fresh Context Marker**: `qa-US0101-qa-20260615T230000Z-fresh`
+**Story**: US-0102 — Direct per-phase model slug override and role-based catalog presets  
+**Decision**: DEC-0087 (locked; composes DEC-0086 — do not amend)  
+**Sprint**: S0092  
+**Phase**: qa → verify-work  
+**Timestamp**: 2026-06-25T22:00:00Z  
+**Fresh Context Marker**: `qa-S0092-US0102-qa-20260625T220000Z-fresh`  
+**Runtime Proof ID**: `rp-auto-20260615-02-qa-qa-20260625T220000Z-S0092-US0102`
 
 ---
 
 ## QA Verdict: PASS
 
-All 9 acceptance criteria (AC-1 through AC-9) verified and satisfied.
-All 8 contract tests passing (8/8).
+All 10 acceptance criteria (AC-1 through AC-10) verified and satisfied.  
+Eight `test_us0102_*` contract subtests passing (8/8).  
+US-0101 backward-compat subtests passing (8/8).  
 Zero blocking findings.
 
 ---
@@ -23,23 +25,27 @@ Zero blocking findings.
 
 | AC | Description | Status | Evidence |
 |----|-------------|--------|----------|
-| AC-1 | Scratchpad tier contract | PASS | scratchpad.md lines 327-349; test_us0101_scratchpad_keys |
-| AC-2 | Default phase→tier matrix | PASS | architecture.md # US-0101; test_us0101_default_matrix_literals |
-| AC-3 | Tier→Cursor alias resolution | PASS | model_tier_lib.py TIER_ALIAS_MAP; DEC-0086 §2 |
-| AC-4 | Local model catalog | PASS | model-catalog.local.example.json; test_us0101_catalog_schema_contract |
-| AC-5 | Agent template defaults | PASS | template agents verified; test_us0101_template_agent_model_aliases + forbidden_slug_grep |
-| AC-6 | Provider mode runbook | PASS | runbook.md lines 653-767; test_us0101_provider_mode_literals + orthogonality |
-| AC-7 | Validator + reason codes | PASS | model_tier_validate.py; test_us0101_reason_code_inventory |
-| AC-8 | Contract tests + parity | PASS | 8/8 passing; parity --scope=model-tier green |
-| AC-9 | Architecture + decision anchor | PASS | architecture.md # US-0101 + DEC-0086 locked + harness §26Z |
+| AC-1 | Direct per-phase slug override scratchpad keys | PASS | scratchpad.md + template; `test_us0102_direct_override_keys` |
+| AC-2 | Precedence validation and resolution logic | PASS | `resolve_model_for_phase()`; `test_us0102_precedence_chain` |
+| AC-3 | Local catalog schema v2 with role-based presets | PASS | role-based example JSON; `test_us0102_catalog_schema_v2` |
+| AC-4 | Role-based resolver (opt-in) | PASS | `MODEL_RESOLVE=role_catalog`; `test_us0102_role_catalog_resolver` |
+| AC-5 | `/ask` phase reinforcement | PASS | `MODEL_ASK`; `test_us0102_ask_phase_reinforcement` |
+| AC-6 | Backward compatibility | PASS | `test_us0102_tier_only_backward_compat`; `pytest -k us0101` 8/8 |
+| AC-7 | Template stability and volatile-ID protection | PASS | `test_us0102_no_vendor_slugs_in_template` |
+| AC-8 | Validator + reason codes | PASS | three new reason codes; `test_us0102_reason_codes` |
+| AC-9 | Contract tests + template parity | PASS | 8/8 passing; parity `--scope=model-tier-overrides`; harness §26AA |
+| AC-10 | Documentation + runbook | PASS | scratchpad docs; runbook § US-0102; architecture `# US-0102` |
 
 ---
 
 ## Contract Test Results
 
 ```
-pytest tests/auto_command_contract_test.py -k us0101 -v
-8 passed, 135 deselected in 0.08s
+pytest tests/auto_command_contract_test.py -k us0102 -q
+8 passed, 143 deselected in 0.09s
+
+pytest tests/auto_command_contract_test.py -k us0101 -q
+8 passed, 143 deselected in 0.08s
 ```
 
 ---
@@ -48,9 +54,8 @@ pytest tests/auto_command_contract_test.py -k us0101 -v
 
 | Check | Result |
 |-------|--------|
-| `python scripts/model_tier_lib.py --self-test` | `[MODEL_TIER_SELF_TEST_OK]` |
 | `python scripts/model_tier_validate.py --repo .` | `[MODEL_TIER_VALIDATION_OK]` |
-| `python scripts/check_intake_template_parity.py --scope=model-tier` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `python scripts/check_intake_template_parity.py --repo . --scope=model-tier-overrides` | `[INTAKE_TEMPLATE_PARITY_OK]` |
 
 ---
 
@@ -58,8 +63,7 @@ pytest tests/auto_command_contract_test.py -k us0101 -v
 
 | Artifact | Path |
 |----------|------|
-| QA verdict | `sprints/S0091/qa-verdict.json` |
-| QA findings | `sprints/S0091/qa-findings.md` |
+| QA findings | `sprints/S0092/qa-findings.md` |
 | QA-to-verify handoff | `handoffs/qa_to_verify.md` |
 | State checkpoint | `docs/engineering/state.md` (qa checkpoint appended) |
 
@@ -67,9 +71,9 @@ pytest tests/auto_command_contract_test.py -k us0101 -v
 
 ## Governance Notes
 
-- **US-0101** remains **OPEN** in `docs/product/backlog.md` (authority) — do NOT flip status (US-0045)
-- **DEC-0086** locked — architecture decisions binding
-- **Spawn-only (BUG-0006)**: QA verification persisted; spawn fresh QA for `/verify-work`
+- **US-0102** remains **OPEN** in `docs/product/backlog.md` (authority) — do NOT flip status or AC checkboxes (**US-0045**)
+- **DEC-0087** locked — composes **DEC-0086** / **US-0101** (do not amend)
+- **Spawn-only (BUG-0006)**: QA verification persisted; spawn fresh verify-work for **`/verify-work`**
 
 ---
 
@@ -79,11 +83,11 @@ pytest tests/auto_command_contract_test.py -k us0101 -v
 - `next_scheduled_phase=verify-work`
 - `intended_resume_phase=verify-work`
 - `resolved_start_phase=qa`
-- Contract: qa **PASS** — AC-1..AC-9 satisfied; 8/8 contract tests; parity + harness §26Z green
+- Contract: qa **PASS** — AC-1..AC-10 satisfied (10/10); 8/8 `test_us0102_*`; US-0101 backward compat 8/8; parity + harness §26AA green
 
 ---
 
 ## Handoff Status
 
-**Ready for `/verify-work` phase**
-**Handoff Timestamp**: 2026-06-15T23:00:00Z
+**Ready for `/verify-work` phase**  
+**Handoff Timestamp**: 2026-06-25T22:00:00Z

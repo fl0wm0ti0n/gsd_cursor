@@ -1,595 +1,5 @@
 # Engineering State
 
-## Architecture checkpoint (2026-06-14T17:00:00Z) — `auto-20260614-01` — US-0099
-
-- **`phase_id=architecture`**; **`role=tech-lead`**; **`story_id=US-0099`**; **`verdict=PASS`**.
-- **`fresh_context_marker=tl-US0099-architecture-20260614T170000Z-fresh`**.
-- **Artifacts touched**: `docs/engineering/architecture.md` (**`# US-0099`** appended); `decisions/DEC-0084.md` (amended § bootstrap posture + **`DEV_ENV_BOOTSTRAP_*`**); `docs/engineering/decisions.md` (context pack); `docs/product/backlog.md` (`## US-0099` — `architecture_notes` appended); `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` (normative contract cross-ref); `handoffs/po_to_tl.md` (Orchestrated architecture handoff — US-0099); `handoffs/resume_brief.md` (top pointer → `/sprint-plan`); triad **`--rollover`** units=2,1,2; this state checkpoint.
-- **Decision**: **`DEC-0084`** amended (no new **`DEC-xxxx`**); research anchor **`R-0086`** closed; **9** task seeds; **7** **`test_us0099_*`** contract markers.
-- **Status authority (US-0045)**: **US-0099** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — architecture satisfied; sprint-plan readiness explicit.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=architecture`
-- `role=tech-lead`
-- `fresh_context_marker=tl-US0099-architecture-20260614T170000Z-fresh`
-- `timestamp=2026-06-14T17:00:00Z`
-- `evidence_ref=docs/product/backlog.md,docs/engineering/architecture.md,decisions/DEC-0084.md,handoffs/resume_brief.md,docs/engineering/state.md,handoffs/intake_evidence/US-0099-intake-20260614.json,docs/engineering/research.md,handoffs/po_to_tl.md,docs/engineering/decisions.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260614-01`
-- `runtime_proof_id=rp-auto-20260614-01-architecture-tech-lead-20260614T170000Z-US0099`
-- `phase_id=architecture`
-- `role=tech-lead`
-- `proof_issued_at=2026-06-14T17:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=ff9e7453552ff634899e279efe60d8d9cdadf43a19a7cc91b8918be89b86a186`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260614-01","phase_id":"architecture","proof_issued_at":"2026-06-14T17:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260614-01-architecture-tech-lead-20260614T170000Z-US0099"}`.
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=architecture`
-- `next_scheduled_phase=sprint-plan`
-- `segment_work_item_kind=story`
-- `story_id=US-0099`
-- `bug_id=(none)`
-- `sprint_id=(none)`
-- `dec_id=DEC-0084`
-- `orchestrator_run_id=auto-20260614-01`
-- `native_chain_active=true`
-- `native_chain_continuing=true`
-- `delivery_mode=standard`
-- `resolved_phase_plan=dec0052_full_chain`
-- `drain_advance_action=spawned`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=8`
-- `drain_terminated=false`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=architecture`
-- `intended_resume_phase=sprint-plan`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=sprint-plan`, `role=tech-lead` for **`US-0099`** (fresh tech-lead subagent; spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
-
-## Sprint-plan checkpoint (2026-06-14T18:00:00Z) — `auto-20260614-01` — US-0099 / S0089
-
-- **`phase_id=sprint-plan`**; **`role=tech-lead`**; **`story_id=US-0099`**; **`sprint_id=S0089`**; **`verdict=PASS`**.
-- **`fresh_context_marker=tl-S0089-US0099-sprint-plan-20260614T180000Z-fresh`**.
-- **Artifacts touched**: `sprints/S0089/sprint.md`, `sprints/S0089/tasks.md` (T-001..T-009), `sprints/S0089/plan-verify.json` (PENDING), `sprints/S0089/uat.json`, `sprints/S0089/uat.md` (placeholders); `handoffs/tl_to_dev.md` (Sprint Plan — S0089 / US-0099); `handoffs/resume_brief.md` (top pointer → `/plan-verify`); this state checkpoint.
-- **Task count**: **9** seeds → **T-001..T-009**; **`SPRINT_MAX_TASKS=12`** — under threshold; no auto-split.
-- **AC coverage**: AC-1..AC-8 surjective (AC-8 pre-satisfied at architecture; plan-verify attestation pending).
-- **Status authority (US-0045)**: **US-0099** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — sprint-plan satisfied; plan-verify readiness explicit.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `fresh_context_marker=tl-S0089-US0099-sprint-plan-20260614T180000Z-fresh`
-- `timestamp=2026-06-14T18:00:00Z`
-- `evidence_ref=sprints/S0089/sprint.md,sprints/S0089/tasks.md,sprints/S0089/plan-verify.json,handoffs/tl_to_dev.md,handoffs/resume_brief.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0084.md,handoffs/intake_evidence/US-0099-intake-20260614.json`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260614-01`
-- `runtime_proof_id=rp-auto-20260614-01-sprint-plan-tech-lead-20260614T180000Z-S0089-US0099`
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `proof_issued_at=2026-06-14T18:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=22ff8dd999cdfbddaffc07b6581f2b51e7638c82f1899f271641fbf710a54038`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260614-01","phase_id":"sprint-plan","proof_issued_at":"2026-06-14T18:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260614-01-sprint-plan-tech-lead-20260614T180000Z-S0089-US0099"}`.
-
-**Boundary verification (sprint-plan boundary; upstream architecture consumed)**: prior architecture checkpoint `tl-US0099-architecture-20260614T170000Z-fresh` / `proof_hash=ff9e7453552ff634899e279efe60d8d9cdadf43a19a7cc91b8918be89b86a186`.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0099 | S0089 | T-001..T-009 | PLANNED | sprints/S0089/sprint.md, sprints/S0089/tasks.md, sprints/S0089/plan-verify.json, handoffs/tl_to_dev.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=sprint-plan`
-- `next_scheduled_phase=plan-verify`
-- `segment_work_item_kind=story`
-- `story_id=US-0099`
-- `bug_id=(none)`
-- `sprint_id=S0089`
-- `dec_id=DEC-0084`
-- `orchestrator_run_id=auto-20260614-01`
-- `native_chain_active=true`
-- `native_chain_continuing=true`
-- `delivery_mode=standard`
-- `resolved_phase_plan=dec0052_full_chain`
-- `drain_advance_action=spawned`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=8`
-- `drain_terminated=false`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=sprint-plan`
-- `intended_resume_phase=plan-verify`
-- `task_count=9`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=plan-verify`, `role=qa` for **`S0089`** / **`US-0099`** (fresh **qa** subagent; spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
-
-## Execute checkpoint (2026-06-14T19:00:00Z) — `auto-20260614-01` — US-0099 / S0089
-
-- **`phase_id=execute`**; **`role=dev`**; **`story_id=US-0099`**; **`sprint_id=S0089`**; **`verdict=PASS`**.
-- **`fresh_context_marker=dev-S0089-US0099-execute-20260614T190000Z-fresh`**.
-- **Artifacts touched**: `scripts/dev_environment_lib.py`, `template/scripts/dev_environment_lib.py`, `installer.py`, `bin/postinstall.js`, `docs/engineering/runbook.md`, `template/docs/engineering/runbook.md`, `tests/auto_command_contract_test.py`, `tests/run-tests.ps1`, `tests/run-tests.sh`, `sprints/S0089/tasks.md`, `sprints/S0089/summary.md`, `handoffs/dev_to_qa.md`, `handoffs/resume_brief.md`; scratchpad parity re-sync (T-009).
-- **Task count**: **9/9** complete (**T-001..T-009**).
-- **Status authority (US-0045)**: **US-0099** remains **OPEN** in `docs/product/backlog.md`.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-S0089-US0099-execute-20260614T190000Z-fresh`
-- `timestamp=2026-06-14T19:00:00Z`
-- `evidence_ref=handoffs/dev_to_qa.md,sprints/S0089/summary.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`).
-
-- `orchestrator_run_id=auto-20260614-01`
-- `runtime_proof_id=rp-auto-20260614-01-execute-dev-20260614T190000Z-S0089-US0099`
-- `phase_id=execute`
-- `role=dev`
-- `proof_issued_at=2026-06-14T19:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=717d3ab077c4b5437b334ce419bcf970b42a811d3f13a1040adad8f0590518bb`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260614-01","phase_id":"execute","proof_issued_at":"2026-06-14T19:00:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260614-01-execute-dev-20260614T190000Z-S0089-US0099"}`.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0099 | S0089 | T-001..T-009 | EXECUTE_COMPLETE | sprints/S0089/summary.md, handoffs/dev_to_qa.md, docs/engineering/state.md (this checkpoint) |
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=execute`
-- `next_scheduled_phase=qa`
-- `segment_work_item_kind=story`
-- `story_id=US-0099`
-- `bug_id=(none)`
-- `sprint_id=S0089`
-- `dec_id=DEC-0084`
-- `orchestrator_run_id=auto-20260614-01`
-- `stop_reason=completed`
-- `stop_phase=execute`
-- `intended_resume_phase=qa`
-- `task_count=9`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=qa`, `role=qa` for **`S0089`** / **`US-0099`** (fresh **qa** subagent; spawn-only per **BUG-0006**).
-
-## Refresh-context checkpoint (2026-06-15T00:00:00Z) — post S0089 / US-0099 (`auto-20260614-01`)
-
-- `timestamp=2026-06-15T00:00:00Z`
-- `phase_id=refresh-context`
-- `role=curator`
-- `story_id=US-0099`
-- `sprint_id=S0089`
-- `orchestrator_run_id=auto-20260614-01`
-- `verdict=PASS`
-- `stop_reason=completed`
-- `stop_phase=refresh-context`
-- `backlog_drain_segment_complete=1`
-- `backlog_drain_stories_remaining_budget=7`
-- Segment close for **`US-0099`** / **`S0089`** (released `2026-06-14T23:30:00Z`, notes **`handoffs/releases/S0089-release-notes.md`**). Story drain segment on **`auto-20260614-01`**: **US-0099** **DONE** (1 story consumed from budget). Portfolio **0 OPEN** stories; **0 OPEN** bugs. **`drain_terminated=true`**; **`drain_terminated_reason=no_open_stories`**; **`backlog_drain_active=false`**. Next command: **`/intake`** (operator enqueues new work).
-- **Triad hot-surface (DEC-0054)**: pre-append `--check` → `STATE_ARCHIVE_REQUIRED` on `state` (1454/1000, units=24/80); pre-append `--rollover` → `rollover_complete units=8` → **`docs/engineering/state-archive/state-pack-20260613-m.md`** (`boundary=8`, `retained=16`); post-checkpoint append → `--check` → `STATE_ARCHIVE_REQUIRED` on `state` (1059/1000); post-checkpoint `--rollover` → `rollover_complete units=1` → **`docs/engineering/state-archive/state-pack-20260613-n.md`**; final `--check` **PASS**.
-- **Context-pack reconciliations** (curator-owned scope):
-  - **`docs/engineering/decisions.md`** — Current context pack → **`US-0099`** **DONE** / **`DEC-0084`** delivered; Continuation-hygiene → **`/intake`** (portfolio empty; drain terminated).
-  - **`docs/engineering/research.md`** — **`R-0086`** delivery-closure trailer (`status=delivered`).
-  - **`sprints/S0089/summary.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`** (`refresh_context_notes` under **`## US-0099`**).
-- **Consistency checks (lightweight)**:
-  - `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → **`[BUG_VALIDATION_OK]`** (exit 0).
-  - `docs/product/backlog.md` **`## US-0099`** `- Status: DONE`; AC-1..AC-8 all `[x]`.
-  - `handoffs/release_queue.md` **`S0089`** row `status=released` (`2026-06-14T23:30:00Z`, release-notes `handoffs/releases/S0089-release-notes.md`).
-  - **0 OPEN** stories; **0 OPEN** bugs.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=refresh-context`
-- `role=curator`
-- `fresh_context_marker=curator-S0089-US0099-refresh-context-20260615T000000Z-fresh`
-- `timestamp=2026-06-15T00:00:00Z`
-- `evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,docs/engineering/research.md,sprints/S0089/summary.md,handoffs/resume_brief.md,docs/product/backlog.md,handoffs/releases/S0089-release-notes.md,handoffs/release_queue.md,docs/engineering/state-archive/state-pack-20260613-m.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- `orchestrator_run_id=auto-20260614-01`
-- `runtime_proof_id=rp-auto-20260614-01-refresh-context-curator-20260615T000000Z-S0089-US0099`
-- `phase_id=refresh-context`
-- `role=curator`
-- `proof_issued_at=2026-06-15T00:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=d13f6ddb070f5adc76c32a8447f4dca9f20a95a250f73976a8b1342dc696ceee`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260614-01","phase_id":"refresh-context","proof_issued_at":"2026-06-15T00:00:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260614-01-refresh-context-curator-20260615T000000Z-S0089-US0099"}`.
-
-**Boundary verification (refresh-context boundary; upstream release proof consumed)**: consumed release-phase proof `runtime_proof_id=rp-auto-20260614-01-release-release-20260614T233000Z-S0089-US0099` / `proof_hash=907a95ae387d71891aa3d7c86a9c39a164451f3a75966567d61344a3fba22cda` (archived in **`docs/engineering/state-archive/state-pack-20260613-m.md`**); current curator-phase strict proof recorded above.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0099 | S0089 | T-001..T-009 | RELEASED + SEGMENT CLOSED | handoffs/releases/S0089-release-notes.md, sprints/S0089/summary.md, handoffs/release_queue.md (S0089=released), docs/product/backlog.md, docs/product/acceptance.md, docs/engineering/decisions.md, docs/engineering/research.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
-
-## Phase boundary status (post-refresh-context, US-0099 / S0089 / auto-20260614-01)
-
-- `phase_boundary=refresh-context`
-- `next_scheduled_phase=none`
-- `segment_work_item_kind=story`
-- `active_bug_id=(none)`
-- `story_id=(none)`
-- `bug_id=(none)`
-- `sprint_id=(none)`
-- `dec_id=DEC-0084`
-- `orchestrator_run_id=auto-20260614-01`
-- `native_chain_active=true`
-- `native_chain_continuing=false`
-- `drain_advance_action=not_applicable`
-- `backlog_drain_active=false`
-- `backlog_drain_stories_remaining_budget=7`
-- `backlog_drain_segment_complete=1`
-- `drain_terminated=true`
-- `drain_terminated_reason=no_open_stories`
-- `portfolio_open_stories=0`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=refresh-context`
-- `intended_resume_phase=intake`
-
-**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=refresh-context`; `next_scheduled_phase=none`; `segment_work_item_kind=story`; `active_bug_id=(none)`; `story_id=(none)`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260614-01`; `backlog_drain_active=false`; `backlog_drain_stories_remaining_budget=7`; `backlog_drain_segment_complete=1`; `drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `portfolio_open_stories=0`; `portfolio_open_bugs=0`; `stop_reason=completed`; `stop_phase=refresh-context`; `intended_resume_phase=intake`.
-
-**Bug validator (US-0088 / DEC-0069)**: `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → **`[BUG_VALIDATION_OK]`**. Bug issue format + acceptance rows intact post-refresh-context artifact writes.
-
-**Preflight for next phase (US-0069 / DEC-0051)**: operator-initiated **`/intake`** or fresh **`/auto`** — portfolio empty; no scheduled drain candidate; enqueue new **US** or **BUG** work via **`/intake`**.
-
-## Discovery checkpoint (2026-06-15T01:00:00Z) — `auto-20260615-01` — US-0100
-
-- **`phase_id=discovery`**; **`role=po`**; **`story_id=US-0100`**; **`verdict=PASS`**.
-- **`fresh_context_marker=po-US0100-discovery-20260615T010000Z-fresh`**.
-- **Artifacts touched**: `docs/product/backlog.md` (`## US-0100` — `discovery_notes` appended); `docs/product/vision.md` (**Discovery Notes — US-0100**); `handoffs/po_to_tl.md` (Orchestrated discovery handoff — US-0100); `handoffs/resume_brief.md` (top pointer → `/research`); this state checkpoint.
-- **Discovery locks**: **14** (L1–L14) — cumulative **`CHANGELOG.md`**, per-version **`handoffs/releases/vX.Y.Z-release-notes.md`**, derivation precedence, GitHub **`-F`** SOT, backfill ~79 released sprints, **`scripts/release_changelog_validate.py`**; **Q1–Q5** open for **`/research`**.
-- **Research anchor**: **`R-0087`** (stub — extend at research with Q1–Q5 closure).
-- **Status authority (US-0045)**: **US-0100** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — discovery satisfied; research readiness explicit on backfill semver, multi-sprint coalesce, and **`[Unreleased]`** workflow posture.
-- **Triad hot-surface (DEC-0054)**: post-`po_to_tl.md` mutation → `--rollover` → `rollover_complete units=1,1` → **`docs/engineering/state-archive/state-pack-20260613-o.md`**; final `--check` **PASS** (exit 0).
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=discovery`
-- `role=po`
-- `fresh_context_marker=po-US0100-discovery-20260615T010000Z-fresh`
-- `timestamp=2026-06-15T01:00:00Z`
-- `evidence_ref=docs/product/backlog.md,docs/product/vision.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0100-intake-20260615.json,docs/engineering/research.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-discovery-po-20260615T010000Z-US0100`
-- `phase_id=discovery`
-- `role=po`
-- `proof_issued_at=2026-06-15T01:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=8767e4aeafa481352b581708a18cbd64ca4bdaab439f1549b4a3cb292726a5ca`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"discovery","proof_issued_at":"2026-06-15T01:00:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260615-01-discovery-po-20260615T010000Z-US0100"}`.
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=discovery`
-- `next_scheduled_phase=research`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `bug_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260615-01`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=7`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=discovery`
-- `intended_resume_phase=research`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **tech-lead** for **`/research`** on **`US-0100`** — close **`R-0087`** Q1–Q5; no sprint materialized yet.
-
-## Research checkpoint (2026-06-15T02:00:00Z) — `auto-20260615-01` — US-0100
-
-- **`phase_id=research`**; **`role=tech-lead`**; **`story_id=US-0100`**; **`verdict=PASS`**.
-- **`fresh_context_marker=tl-US0100-research-20260615T020000Z-fresh`**.
-- **Artifacts touched**: `docs/engineering/research.md` (**`R-0087`** extended — Q1–Q5 closed); `docs/product/backlog.md` (`## US-0100` — `research_notes` appended); `docs/engineering/decisions.md` (current context pack); `handoffs/resume_brief.md` (top pointer → `/architecture`); this state checkpoint.
-- **Research closure**: **Q1** three-tier backfill (**78** released rows; **75** blank **`release_version`**); **Q2** semver coalesce + dedupe; **Q3** **`[Unreleased]`** vs promotion; **Q4** per-version **`-F`** SOT; **Q5** **`RELEASE_CHANGELOG_*`** validator family (+ Q6 publish/template parity).
-- **Research anchor**: **`R-0087`** **closed for `/research`** — architecture-ready; companion **`DEC-xxxx`** pending (not forced at research).
-- **Status authority (US-0045)**: **US-0100** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — research satisfied; architecture locks artifact paths, helper API, backfill manifest.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=research`
-- `role=tech-lead`
-- `fresh_context_marker=tl-US0100-research-20260615T020000Z-fresh`
-- `timestamp=2026-06-15T02:00:00Z`
-- `evidence_ref=docs/engineering/research.md,docs/product/backlog.md,docs/engineering/decisions.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0100-intake-20260615.json,handoffs/release_queue.md,scripts/release-all.sh,docs/product/vision.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-research-tech-lead-20260615T020000Z-US0100`
-- `phase_id=research`
-- `role=tech-lead`
-- `proof_issued_at=2026-06-15T02:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=7d548b6a2adcf8820620b803e71a405b45008f4a1c9bdbec1eb6080498f9e6c4`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"research","proof_issued_at":"2026-06-15T02:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260615-01-research-tech-lead-20260615T020000Z-US0100"}`.
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=research`
-- `next_scheduled_phase=architecture`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `bug_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260615-01`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=7`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=research`
-- `intended_resume_phase=architecture`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **tech-lead** for **`/architecture`** on **`US-0100`** — materialize **`DEC-xxxx`**, append **`# US-0100`** to **`docs/engineering/architecture.md`**; run triad hot-surface + codebase map gates before sprint-plan handoff.
-
-## Architecture checkpoint (2026-06-15T03:00:00Z) — `auto-20260615-01` — US-0100
-
-- **`phase_id=architecture`**; **`role=tech-lead`**; **`story_id=US-0100`**; **`verdict=PASS`**.
-- **`fresh_context_marker=tl-US0100-architecture-20260615T030000Z-fresh`**.
-- **Artifacts touched**: `decisions/DEC-0085.md` (new); `docs/engineering/architecture.md` (**`# US-0100`** appended); `docs/engineering/decisions.md` (current context pack + **`DEC-0085`** index); `docs/product/backlog.md` (`## US-0100` — `architecture_notes` appended); `handoffs/tl_to_dev.md` (architecture handoff prepended); `handoffs/resume_brief.md` (top pointer → `/sprint-plan`); this state checkpoint.
-- **Architecture closure**: **`DEC-0085`** locks **`CHANGELOG.md`**, per-version **`{semver}-release-notes.md`**, **`release_changelog_lib.py`** API, three-tier backfill manifest, derivation precedence, **`[Unreleased]`** promotion, **`/release`** step **19**, **`release-all.sh`** **`-F`**, 10 **`RELEASE_CHANGELOG_*`** codes; **12** task seeds; ten **`test_us0100_*`** contract markers; compose **US-0040** / **US-0054** / **US-0067** / **US-0008**.
-- **Triad gate**: pre-append **`baseline_h2_count=0`**; **`--rollover`** + **`--check`** **PASS**; heading policy **`--check-arch-heading-policy`** **PASS** (H1 **`# US-0100`** only).
-- **Codebase map gate**: **`python scripts/materialize_codebase_map.py --trigger architecture`** → **`[CODEBASE_MAP_OK]`**.
-- **Status authority (US-0045)**: **US-0100** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=architecture`
-- `role=tech-lead`
-- `fresh_context_marker=tl-US0100-architecture-20260615T030000Z-fresh`
-- `timestamp=2026-06-15T03:00:00Z`
-- `evidence_ref=decisions/DEC-0085.md,docs/engineering/architecture.md,docs/engineering/decisions.md,docs/product/backlog.md,handoffs/tl_to_dev.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0100-intake-20260615.json,docs/engineering/research.md,docs/engineering/state.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-architecture-tech-lead-20260615T030000Z-US0100`
-- `phase_id=architecture`
-- `role=tech-lead`
-- `proof_issued_at=2026-06-15T03:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=bfeb6413be42db2a44de3291992c80a9839586fbc13d7b5d0439fa4e5d5f66f0`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"architecture","proof_issued_at":"2026-06-15T03:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260615-01-architecture-tech-lead-20260615T030000Z-US0100"}`.
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=architecture`
-- `next_scheduled_phase=sprint-plan`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `bug_id=(none)`
-- `sprint_id=(none)`
-- `orchestrator_run_id=auto-20260615-01`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=7`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=architecture`
-- `intended_resume_phase=sprint-plan`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **tech-lead** for **`/sprint-plan`** on **`US-0100`** — materialize sprint from 12 architecture seeds; AC-1..AC-10 bijection check; run **`/plan-verify`** after sprint-plan.
-
-## Sprint-plan checkpoint (2026-06-15T04:00:00Z) — `auto-20260615-01` — US-0100 / S0090
-
-- **`phase_id=sprint-plan`**; **`role=tech-lead`**; **`story_id=US-0100`**; **`sprint_id=S0090`**; **`verdict=PASS`**.
-- **`fresh_context_marker=tl-S0090-US0100-sprint-plan-20260615T040000Z-fresh`**.
-- **Artifacts touched**: `sprints/S0090/sprint.md`, `sprints/S0090/tasks.md` (T-001..T-012), `sprints/S0090/summary.md`, `sprints/S0090/progress.md`, `sprints/S0090/plan-verify.json` (PENDING), `sprints/S0090/uat.json`, `sprints/S0090/uat.md` (placeholders); `docs/product/backlog.md` (`## US-0100` — `sprint_plan_notes` appended); `handoffs/tl_to_dev.md` (Sprint Plan — S0090 / US-0100); `handoffs/resume_brief.md` (top pointer → `/plan-verify`); this state checkpoint.
-- **Task count**: **12** seeds → **T-001..T-012**; **`SPRINT_MAX_TASKS=12`** — at threshold; no auto-split.
-- **AC coverage**: AC-1..AC-10 surjective (AC-10 pre-satisfied at architecture; plan-verify attestation pending).
-- **Status authority (US-0045)**: **US-0100** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — sprint-plan satisfied; plan-verify readiness explicit.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `fresh_context_marker=tl-S0090-US0100-sprint-plan-20260615T040000Z-fresh`
-- `timestamp=2026-06-15T04:00:00Z`
-- `evidence_ref=sprints/S0090/sprint.md,sprints/S0090/tasks.md,sprints/S0090/plan-verify.json,sprints/S0090/summary.md,handoffs/tl_to_dev.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0085.md,handoffs/intake_evidence/US-0100-intake-20260615.json`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-sprint-plan-tech-lead-20260615T040000Z-S0090-US0100`
-- `phase_id=sprint-plan`
-- `role=tech-lead`
-- `proof_issued_at=2026-06-15T04:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=c33f47806589a544ecb99e4b5c30449142bca3ef1774356415862d5ce8ac8e9f`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"sprint-plan","proof_issued_at":"2026-06-15T04:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260615-01-sprint-plan-tech-lead-20260615T040000Z-S0090-US0100"}`.
-
-**Boundary verification (sprint-plan boundary; upstream architecture consumed)**: prior architecture checkpoint `tl-US0100-architecture-20260615T030000Z-fresh` / `proof_hash=bfeb6413be42db2a44de3291992c80a9839586fbc13d7b5d0439fa4e5d5f66f0`.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0100 | S0090 | T-001..T-012 | PLANNED | sprints/S0090/sprint.md, sprints/S0090/tasks.md, sprints/S0090/plan-verify.json, handoffs/tl_to_dev.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=sprint-plan`
-- `next_scheduled_phase=plan-verify`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `bug_id=(none)`
-- `sprint_id=S0090`
-- `dec_id=DEC-0085`
-- `orchestrator_run_id=auto-20260615-01`
-- `native_chain_active=true`
-- `native_chain_continuing=true`
-- `delivery_mode=standard`
-- `resolved_phase_plan=dec0052_full_chain`
-- `drain_advance_action=spawned`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=7`
-- `drain_terminated=false`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=sprint-plan`
-- `intended_resume_phase=plan-verify`
-- `task_count=12`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=plan-verify`, `role=qa` for **`S0090`** / **`US-0100`** (fresh **qa** subagent; spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
-
-## Plan-verify checkpoint (2026-06-15T04:30:00Z) — `auto-20260615-01` — US-0100 / S0090
-
-- **`phase_id=plan-verify`**; **`role=qa`**; **`story_id=US-0100`**; **`sprint_id=S0090`**; **`verdict=PASS`**.
-- **`fresh_context_marker=qa-S0090-US0100-plan-verify-20260615T043000Z-fresh`**.
-- **Artifacts touched**: `sprints/S0090/plan-verify.json` (PASS); `handoffs/qa_plan_verify.md` (S0090 / US-0100 PASS row); `docs/product/backlog.md` (`## US-0100` — `plan_verify_notes` appended); `handoffs/resume_brief.md` (top pointer → `/execute`); this state checkpoint.
-- **AC coverage**: AC-1..AC-10 surjective via T-001..T-012; AC-10 attested from architecture (**DEC-0085** + **`# US-0100`**); task-seed bijection (12 seeds → 12 tasks); all coverage rows `verified=true`.
-- **Status authority (US-0045)**: **US-0100** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
-- **Decision gate posture**: **none** — plan-verify satisfied; **`/execute`** unblocked.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=plan-verify`
-- `role=qa`
-- `fresh_context_marker=qa-S0090-US0100-plan-verify-20260615T043000Z-fresh`
-- `timestamp=2026-06-15T04:30:00Z`
-- `evidence_ref=sprints/S0090/plan-verify.json,sprints/S0090/tasks.md,sprints/S0090/sprint.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0085.md,handoffs/intake_evidence/US-0100-intake-20260615.json`
-
-Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-plan-verify-qa-20260615T043000Z-S0090-US0100`
-- `phase_id=plan-verify`
-- `role=qa`
-- `proof_issued_at=2026-06-15T04:30:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=493b85cf3e5e0078f310c6c61adb24becb85b04a5768dd07d73c6a80dcef1857`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"plan-verify","proof_issued_at":"2026-06-15T04:30:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260615-01-plan-verify-qa-20260615T043000Z-S0090-US0100"}`.
-
-**Boundary verification (plan-verify boundary; upstream sprint-plan consumed)**: prior sprint-plan checkpoint `tl-S0090-US0100-sprint-plan-20260615T040000Z-fresh` / `proof_hash=c33f47806589a544ecb99e4b5c30449142bca3ef1774356415862d5ce8ac8e9f`.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0100 | S0090 | T-001..T-012 | PLANNED (plan-verified) | sprints/S0090/plan-verify.json, sprints/S0090/tasks.md, sprints/S0090/sprint.md, handoffs/qa_plan_verify.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
-
-**Phase boundary operator visibility (AC-10)** — compact status:
-
-- `phase_boundary=plan-verify`
-- `next_scheduled_phase=execute`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `bug_id=(none)`
-- `sprint_id=S0090`
-- `dec_id=DEC-0085`
-- `orchestrator_run_id=auto-20260615-01`
-- `native_chain_active=true`
-- `native_chain_continuing=true`
-- `delivery_mode=standard`
-- `resolved_phase_plan=dec0052_full_chain`
-- `drain_advance_action=spawned`
-- `backlog_drain_active=true`
-- `backlog_drain_stories_remaining_budget=7`
-- `drain_terminated=false`
-- `portfolio_open_stories=1`
-- `portfolio_open_bugs=0`
-- `stop_reason=completed`
-- `stop_phase=plan-verify`
-- `intended_resume_phase=execute`
-- `task_count=12`
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=execute`, `role=dev` for **`S0090`** / **`US-0100`** (fresh **dev** subagent; spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
-
-## Auto orchestration run summary (2026-06-15) — `auto-20260614-01` — complete
-
-- **`invocation_mode=auto`**; segments: **`US-0099`** (story drain); all phases **PASS** through **`refresh-context`**.
-- **`backlog_drain_active=false`**; **`backlog_drain_stories_remaining_budget=7`** (of initial **8**; **1** consumed: **US-0099**); **`drain_terminated=true`** (`no_open_stories`).
-- **`portfolio_open_stories=0`**; **`portfolio_open_bugs=0`**; **`next_scheduled_phase=none`**; **`intended_resume_phase=intake`**.
-
-## Execute checkpoint (2026-06-15T05:00:00Z) — `auto-20260615-01` — US-0100 / S0090
-
-- **`phase_id=execute`**; **`role=dev`**; **`story_id=US-0100`**; **`sprint_id=S0090`**; **`verdict=PASS`**.
-- **`fresh_context_marker=dev-S0090-US0100-execute-20260615T050000Z-fresh`**.
-- **Artifacts touched**: `scripts/release_changelog_lib.py`, `scripts/release_changelog_validate.py`, `scripts/release_changelog_backfill.py`, `CHANGELOG.md`, `.cursor/commands/release.md` step **19**, `scripts/release-all.sh`, runbook § US-0100, `tests/auto_command_contract_test.py` (`test_us0100_*`), harness **§26Y**, `RELEASE_CHANGELOG_PAIRS`; `sprints/S0090/tasks.md`, `sprints/S0090/summary.md`, `sprints/S0090/progress.md`, `handoffs/dev_to_qa.md`, `handoffs/resume_brief.md`; active + `template/` parity pairs.
-- **AC coverage**: **T-001..T-012** done; **US-0100** remains **OPEN** (**US-0045**).
-- **Triad hot-surface (DEC-0054)**: pre-append `--check` → `STATE_ARCHIVE_REQUIRED` on `state`; `--rollover` → `rollover_complete units=1`; final `--check` **PASS**.
-
-Isolation evidence (**US-0048** / **DEC-0029**):
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-S0090-US0100-execute-20260615T050000Z-fresh`
-- `timestamp=2026-06-15T05:00:00Z`
-- `evidence_ref=handoffs/dev_to_qa.md,sprints/S0090/summary.md,scripts/release_changelog_lib.py,sprints/S0090/tasks.md`
-
-Strict runtime proof (**US-0056** / **DEC-0038**):
-
-- `orchestrator_run_id=auto-20260615-01`
-- `runtime_proof_id=rp-auto-20260615-01-execute-dev-20260615T050000Z-S0090-US0100`
-- `phase_id=execute`
-- `role=dev`
-- `proof_issued_at=2026-06-15T05:00:00Z`
-- `proof_ttl_seconds=3600`
-- `proof_hash=5e2e2353bdb546ad3fe86b2476e92a6eb8fe44bcb4da05597df02bb1a9b4313f`
-
-Canonical payload: `{"orchestrator_run_id":"auto-20260615-01","phase_id":"execute","proof_issued_at":"2026-06-15T05:00:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260615-01-execute-dev-20260615T050000Z-S0090-US0100"}`.
-
-**Boundary verification (execute boundary)**: prior plan-verify checkpoint `qa-S0090-US0100-plan-verify-20260615T043000Z-fresh` / `proof_hash=493b85cf3e5e0078f310c6c61adb24becb85b04a5768dd07d73c6a80dcef1857`.
-
-Traceability index (**DEC-0010**):
-
-| Story | Sprint | Tasks | Status | Evidence |
-|-------|--------|-------|--------|----------|
-| US-0100 | S0090 | T-001..T-012 | OPEN (execute-complete) | handoffs/dev_to_qa.md, sprints/S0090/summary.md, sprints/S0090/tasks.md |
-
-**Phase boundary operator visibility**:
-
-- `phase_boundary=execute`
-- `next_scheduled_phase=qa`
-- `segment_work_item_kind=story`
-- `story_id=US-0100`
-- `sprint_id=S0090`
-- `dec_id=DEC-0085`
-- `orchestrator_run_id=auto-20260615-01`
-- `stop_reason=completed`
-- `stop_phase=execute`
-- `intended_resume_phase=qa`
-- `task_count=12` (all done)
-
-**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=qa`, `role=qa` for **`S0090`** / **`US-0100`** (fresh **qa** subagent; spawn-only per **BUG-0006**).
-
 ## QA checkpoint (2026-06-15T06:00:00Z) — `auto-20260615-01` — US-0100 / S0090
 
 - **`phase_id=qa`**; **`role=qa`**; **`story_id=US-0100`**; **`sprint_id=S0090`**; **`verdict=PASS`**.
@@ -989,3 +399,577 @@ Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"refres
 - **Verify-work summary**: All 10 tasks complete (10/10 DONE). QA verdict PASS confirmed. 8/8 contract tests passing. All 9 acceptance criteria satisfied (AC-1..AC-9). All required artifacts present. US-0101 remains OPEN per US-0045. Sprint ready for /release phase.
 - **US-0101 remains OPEN** in `docs/product/backlog.md` (authority) — per US-0045
 - **Spawn-only (BUG-0006)**: Verify-work artifacts persisted; spawn fresh **release** for **`/release`**
+
+---
+
+## Auto continuation metadata (2026-06-25T18:54:00Z) — `auto-20260615-02` — drain-advance
+
+- `invocation_mode=auto`
+- `requested_start_from=(none)`
+- `resolved_start_phase=architecture`
+- `resolution_source=drain_advance`
+- `resolution_status=ok`
+- `timestamp=2026-06-25T18:54:00Z`
+- `delivery_mode=standard`
+- `resolved_phase_plan=dec0052_full_chain`
+- `reinstatement_mode=dec0052_default`
+- `memory_layer=standard`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+
+---
+
+## Drain-advance materialization (2026-06-25T18:54:00Z) — `auto-20260615-02` — US-0102 story segment
+
+- **`drain_advance_action=spawned`**; **`native_chain_continuing=true`**; **`native_chain_active=true`**.
+- **`segment_work_item_kind=story`**; **`story_id=US-0102`**; **`bug_id=(none)`**; **`sprint_id=(none)`**.
+- **`resolved_start_phase=architecture`** (**`intake`**, **`discovery`**, **`research`** skipped — **`US-0102`** intake complete per backlog; discovery/research deferred as small **US-0101** refinement).
+- **`resolved_phase_plan`**: `architecture` → `sprint-plan` → `plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`.
+- **`skipped_phases`**: `intake`, `discovery`, `research`.
+- **`backlog_drain_active=true`**; **`backlog_drain_stories_remaining_budget=5`** (of **10**); **`drain_terminated=false`**.
+- **`portfolio_open_stories=1`** (**US-0102**); **`portfolio_open_bugs=0`**.
+- **`intake_evidence_ref=handoffs/intake_evidence/US-0102-intake-20260624.json`**.
+- **`related_us=US-0101`**; **`dec_id=(pending architecture)`**; compose with **DEC-0086** (do not amend).
+- **`phase_boundary=drain-advance`**; **`next_scheduled_phase=architecture`**; **`orchestrator_run_id=auto-20260615-02`**.
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn `phase_id=architecture`, `role=tech-lead` for **`US-0102`** (fresh tech-lead subagent; spawn-only per **BUG-0006**; native-chain drain advance per **DEC-0080** / **DEC-0081**).
+
+---
+
+## Architecture checkpoint (2026-06-25T19:00:00Z) — `auto-20260615-02` — US-0102
+
+- **`phase_id=architecture`**; **`role=tech-lead`**; **`story_id=US-0102`**; **`verdict=PASS`**.
+- **`fresh_context_marker=tl-US0102-architecture-20260625T190000Z-fresh`**.
+- **Artifacts touched**: `decisions/DEC-0087.md` (new); `docs/engineering/architecture.md` (**`# US-0102`** appended); `docs/engineering/decisions.md` (current context pack + **`DEC-0087`** index); `docs/product/backlog.md` (`## US-0102` — `architecture_notes` appended); `handoffs/po_to_tl.md` (architecture handoff prepended); `handoffs/resume_brief.md` (top pointer → `/sprint-plan`); this state checkpoint.
+- **Architecture closure**: **`DEC-0087`** locks 5-step precedence, catalog schema v2 optional `roles`, `MODEL_RESOLVE=role_catalog`, extend **`model_tier_lib.py`**, three new reason codes, eight **`test_us0102_*`** markers; **11** task seeds; compose **DEC-0086** (do not amend).
+- **Triad gate**: pre-append **`baseline_h2_count=0`**; **`--rollover`** + **`--check`** (see gate output below).
+- **Codebase map gate**: **`python scripts/materialize_codebase_map.py --trigger architecture`** (see gate output below).
+- **Status authority (US-0045)**: **US-0102** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=architecture`
+- `role=tech-lead`
+- `fresh_context_marker=tl-US0102-architecture-20260625T190000Z-fresh`
+- `timestamp=2026-06-25T19:00:00Z`
+- `evidence_ref=decisions/DEC-0087.md,docs/engineering/architecture.md,docs/engineering/decisions.md,docs/product/backlog.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0102-intake-20260624.json,docs/engineering/state.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-architecture-tech-lead-20260625T190000Z-US0102`
+- `phase_id=architecture`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-25T19:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=76a312360c0ef9a7593bc5b512dc4a1a4f5a8fd94d91eaaa9edf6203147ed068`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"architecture","proof_issued_at":"2026-06-25T19:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260615-02-architecture-tech-lead-20260625T190000Z-US0102"}`.
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=architecture`
+- `next_scheduled_phase=sprint-plan`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=architecture`
+- `intended_resume_phase=sprint-plan`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **tech-lead** for **`/sprint-plan`** on **`US-0102`** — materialize sprint from 11 architecture seeds; AC-1..AC-10 bijection check.
+
+---
+
+## Sprint-plan checkpoint (2026-06-25T19:30:00Z) — `auto-20260615-02` — US-0102 / S0092
+
+- **`phase_id=sprint-plan`**; **`role=tech-lead`**; **`story_id=US-0102`**; **`sprint_id=S0092`**; **`verdict=PASS`**.
+- **`fresh_context_marker=tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh`**.
+- **Artifacts touched**: `sprints/S0092/sprint.md`, `sprints/S0092/tasks.md` (T-001..T-011), `sprints/S0092/progress.md`, `sprints/S0092/plan-verify.json` (PENDING), `sprints/S0092/uat.json`, `sprints/S0092/uat.md` (placeholders); `docs/product/backlog.md` (`## US-0102` — `sprint_plan_notes` appended); `handoffs/tl_to_dev.md` (Sprint Plan — S0092 / US-0102); `handoffs/po_to_tl.md` (sprint-plan + architecture handoffs prepended); `handoffs/qa_plan_verify.md` (S0092 PENDING queue); `handoffs/resume_brief.md` (top pointer → `/plan-verify`); this state checkpoint.
+- **Task count**: **11** seeds → **T-001..T-011**; **`SPRINT_MAX_TASKS=12`** — within limit; no auto-split.
+- **AC coverage**: AC-1..AC-10 surjective (task-seed bijection 11:11; multi-AC tasks T-001, T-003, T-005, T-006, T-009/T-010/T-011).
+- **Status authority (US-0045)**: **US-0102** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
+- **Decision gate posture**: **none** — sprint-plan satisfied; plan-verify readiness explicit.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `fresh_context_marker=tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh`
+- `timestamp=2026-06-25T19:30:00Z`
+- `evidence_ref=sprints/S0092/sprint.md,sprints/S0092/tasks.md,sprints/S0092/plan-verify.json,sprints/S0092/progress.md,sprints/S0092/uat.json,sprints/S0092/uat.md,handoffs/tl_to_dev.md,handoffs/po_to_tl.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0087.md,handoffs/intake_evidence/US-0102-intake-20260624.json`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-sprint-plan-tech-lead-20260625T193000Z-US0102`
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-25T19:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=8f3186f0574696a89af213f2687ac3425150b2c0e9365ac8a7888259d2d6c7aa`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"sprint-plan","proof_issued_at":"2026-06-25T19:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260615-02-sprint-plan-tech-lead-20260625T193000Z-US0102"}`.
+
+**Boundary verification (sprint-plan boundary; upstream architecture consumed)**: prior architecture checkpoint `tl-US0102-architecture-20260625T190000Z-fresh` / `proof_hash=76a312360c0ef9a7593bc5b512dc4a1a4f5a8fd94d91eaaa9edf6203147ed068`.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | PLANNED | sprints/S0092/sprint.md, sprints/S0092/tasks.md, sprints/S0092/plan-verify.json, handoffs/tl_to_dev.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=sprint-plan`
+- `next_scheduled_phase=plan-verify`
+- `default_spawn_role=qa`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `bug_id=(none)`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=sprint-plan`
+- `intended_resume_phase=plan-verify`
+- `task_count=11`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **qa** for **`/plan-verify`** on **`S0092`** / **US-0102** — verify AC-1..AC-10 ↔ T-001..T-011 surjective coverage, task-seed bijection, governance alignment; target `sprints/S0092/plan-verify.json` **PENDING** → **PASS**.
+
+---
+
+## Plan-verify checkpoint (2026-06-25T20:00:00Z) — `auto-20260615-02` — US-0102 / S0092
+
+- **`phase_id=plan-verify`**; **`role=qa`**; **`story_id=US-0102`**; **`sprint_id=S0092`**; **`verdict=PASS`**.
+- **`fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`**.
+- **Artifacts touched**: `sprints/S0092/plan-verify.json` (PASS); `sprints/S0092/qa-findings.md`; `sprints/S0092/progress.md`; `handoffs/qa_plan_verify.md` (S0092 / US-0102 PASS row); `docs/product/backlog.md` (`## US-0102` — `plan_verify_notes` appended); `handoffs/resume_brief.md` (top pointer → `/execute`); this state checkpoint.
+- **AC coverage**: AC-1..AC-10 surjective via T-001..T-011; task-seed bijection (11 seeds → 11 tasks); all coverage rows `verified=true`.
+- **Status authority (US-0045)**: **US-0102** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
+- **Decision gate posture**: **none** — plan-verify satisfied; **`/execute`** unblocked.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=plan-verify`
+- `role=qa`
+- `fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`
+- `timestamp=2026-06-25T20:00:00Z`
+- `evidence_ref=sprints/S0092/qa-findings.md,sprints/S0092/plan-verify.json,sprints/S0092/tasks.md,sprints/S0092/sprint.md,handoffs/qa_plan_verify.md,handoffs/resume_brief.md,docs/product/backlog.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0087.md,handoffs/intake_evidence/US-0102-intake-20260624.json`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-plan-verify-qa-20260625T200000Z-S0092-US0102`
+- `phase_id=plan-verify`
+- `role=qa`
+- `proof_issued_at=2026-06-25T20:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=f9dfe7f28a2b5e72f49df78d7f073348f0eb779aa287f6bb8dede45d248b49da`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"plan-verify","proof_issued_at":"2026-06-25T20:00:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260615-02-plan-verify-qa-20260625T200000Z-S0092-US0102"}`.
+
+**Boundary verification (plan-verify boundary; upstream sprint-plan consumed)**: prior sprint-plan checkpoint `tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh` / `proof_hash=8f3186f0574696a89af213f2687ac3425150b2c0e9365ac8a7888259d2d6c7aa`.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | PLANNED (plan-verified) | sprints/S0092/plan-verify.json, sprints/S0092/qa-findings.md, sprints/S0092/tasks.md, sprints/S0092/sprint.md, handoffs/qa_plan_verify.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=plan-verify`
+- `next_scheduled_phase=execute`
+- `default_spawn_role=dev`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=plan-verify`
+- `intended_resume_phase=execute`
+- `task_count=11`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **dev** for **`/execute`** on **`S0092`** / **US-0102** (spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
+
+---
+
+## Execute checkpoint — US-0102 / S0092 (DEC-0087)
+
+- **`fresh_context_marker=dev-S0092-US0102-execute-20260625T210000Z-fresh`**.
+- **`orchestrator_run_id=auto-20260615-02`**.
+- **`phase_id=execute`**, **`role=dev`**, **`timestamp=2026-06-25T21:00:00Z`**.
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-S0092-US0102-execute-20260625T210000Z-fresh`
+- `timestamp=2026-06-25T21:00:00Z`
+- `evidence_ref=sprints/S0092/summary.md, handoffs/dev_to_qa.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `runtime_proof_id=rp-auto-20260615-02-execute-dev-20260625T210000Z-S0092-US0102`
+- `proof_hash=02c4969a5fbb1c8970ef1f18e9ccdca458878ac555c35930f921dd8cfd03f386`
+- `proof_issued_at=2026-06-25T21:00:00Z`
+- `proof_ttl_seconds=3600`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"execute","proof_issued_at":"2026-06-25T21:00:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260615-02-execute-dev-20260625T210000Z-S0092-US0102"}`.
+
+**Boundary verification (execute boundary; upstream plan-verify consumed)**: prior plan-verify checkpoint `qa-S0092-US0102-plan-verify-20260625T200000Z-fresh` / `proof_hash=f9dfe7f28a2b5e72f49df78d7f073348f0eb779aa287f6bb8dede45d248b49da`.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | EXECUTE_COMPLETE (pending qa) | sprints/S0092/summary.md, handoffs/dev_to_qa.md, docs/engineering/state.md (this checkpoint) |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=execute`
+- `next_scheduled_phase=qa`
+- `default_spawn_role=qa`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=execute`
+- `intended_resume_phase=qa`
+- `task_count=11`
+- `tasks_completed=11`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **qa** for **`/qa`** on **`S0092`** / **US-0102** (spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
+
+---
+
+## QA checkpoint — US-0102 / S0092 (DEC-0087)
+
+- **`phase_id=qa`**; **`role=qa`**; **`story_id=US-0102`**; **`sprint_id=S0092`**; **`verdict=PASS`**.
+- **`fresh_context_marker=qa-S0092-US0102-qa-20260625T220000Z-fresh`**.
+- **Artifacts touched**: `sprints/S0092/qa-findings.md` (qa section); `handoffs/qa_to_verify.md`; `handoffs/resume_brief.md` (top pointer → `/verify-work`); this state checkpoint.
+- **AC verification**: AC-1..AC-10 satisfied (10/10); eight `test_us0102_*` green; US-0101 backward compat 8/8; validator `[MODEL_TIER_VALIDATION_OK]`; parity `[INTAKE_TEMPLATE_PARITY_OK]` scope=model-tier-overrides.
+- **Status authority (US-0045)**: **US-0102** remains **OPEN** in `docs/product/backlog.md`. No AC checkbox changes, no backlog status flip.
+- **Decision gate posture**: **none** — qa satisfied; **`/verify-work`** unblocked.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=qa`
+- `role=qa`
+- `fresh_context_marker=qa-S0092-US0102-qa-20260625T220000Z-fresh`
+- `timestamp=2026-06-25T22:00:00Z`
+- `evidence_ref=sprints/S0092/qa-findings.md,sprints/S0092/summary.md,handoffs/dev_to_qa.md,handoffs/qa_to_verify.md,sprints/S0092/tasks.md,docs/product/backlog.md,docs/engineering/state.md,docs/engineering/architecture.md,decisions/DEC-0087.md,handoffs/intake_evidence/US-0102-intake-20260624.json`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-qa-qa-20260625T220000Z-S0092-US0102`
+- `phase_id=qa`
+- `role=qa`
+- `proof_issued_at=2026-06-25T22:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=273723c7cee6cf36d3326fc899ac9c6e712ea648a6ac51f968a34bfb1460a32d`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"qa","proof_issued_at":"2026-06-25T22:00:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260615-02-qa-qa-20260625T220000Z-S0092-US0102"}`.
+
+**Boundary verification (qa boundary; upstream execute consumed)**: prior execute checkpoint `dev-S0092-US0102-execute-20260625T210000Z-fresh` / `proof_hash=02c4969a5fbb1c8970ef1f18e9ccdca458878ac555c35930f921dd8cfd03f386`.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | QA_COMPLETE (pending verify-work) | sprints/S0092/qa-findings.md, handoffs/qa_to_verify.md, sprints/S0092/summary.md, docs/engineering/state.md (this checkpoint) |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=qa`
+- `next_scheduled_phase=verify-work`
+- `default_spawn_role=qa`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=qa`
+- `intended_resume_phase=verify-work`
+- `task_count=11`
+- `tasks_completed=11`
+- `ac_verification=10/10`
+- `blocking_findings=0`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **verify-work** for **`/verify-work`** on **`S0092`** / **US-0102** (spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
+
+---
+
+## Verify-work checkpoint — US-0102 / S0092 (DEC-0087)
+
+- **`phase_id=verify-work`**; **`role=qa`**; **`story_id=US-0102`**; **`sprint_id=S0092`**; **`verdict=PASS`**.
+- **`fresh_context_marker=qa-S0092-US0102-verify-work-20260625T233000Z-fresh`**.
+- **Artifacts touched**: `sprints/S0092/uat.json`, `sprints/S0092/uat.md` (placeholder → populated); `sprints/S0092/verify-work-verdict.json`, `sprints/S0092/verify-work-verdict.md`; `handoffs/verify_to_release.md`; `handoffs/resume_brief.md` (top pointer → `/release`); `docs/product/backlog.md` (AC-1..AC-10 checkboxes checked; status **OPEN**); this state checkpoint.
+- **Verification**: QA PASS confirmed (10/10 ACs, 0 blockers); `pytest -k us0102` 8/8 + `us0101` 8/8; `[MODEL_TIER_VALIDATION_OK]`; parity `[INTAKE_TEMPLATE_PARITY_OK]` scopes model-tier-overrides + model-tier; UAT matrix 10/10 pass.
+- **Status authority (US-0045)**: **US-0102** remains **OPEN** in `docs/product/backlog.md`. AC checkboxes checked as release prep; status flip at **`/release`**.
+- **Decision gate posture**: **none** — verify-work satisfied; **`/release`** unblocked.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=verify-work`
+- `role=qa`
+- `fresh_context_marker=qa-S0092-US0102-verify-work-20260625T233000Z-fresh`
+- `timestamp=2026-06-25T23:30:00Z`
+- `evidence_ref=sprints/S0092/verify-work-verdict.json,sprints/S0092/verify-work-verdict.md,sprints/S0092/uat.json,sprints/S0092/uat.md,handoffs/verify_to_release.md,sprints/S0092/qa-findings.md,docs/product/backlog.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-verify-work-qa-20260625T233000Z-S0092-US0102`
+- `phase_id=verify-work`
+- `role=qa`
+- `proof_issued_at=2026-06-25T23:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=a4af01ce2f7238b582f5a38d7e6b1cdb11485455aa45bd12e5d3cb90b7a6e4ad`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"verify-work","proof_issued_at":"2026-06-25T23:30:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260615-02-verify-work-qa-20260625T233000Z-S0092-US0102"}`.
+
+**Boundary verification (verify-work boundary; upstream qa consumed)**: prior qa checkpoint `qa-S0092-US0102-qa-20260625T220000Z-fresh` / `proof_hash=273723c7cee6cf36d3326fc899ac9c6e712ea648a6ac51f968a34bfb1460a32d`.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | VERIFY_WORK_PASS (pending release) | sprints/S0092/verify-work-verdict.json, sprints/S0092/uat.json, sprints/S0092/uat.md, handoffs/verify_to_release.md, docs/engineering/state.md (this checkpoint) |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=verify-work`
+- `next_scheduled_phase=release`
+- `default_spawn_role=release`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=5`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=verify-work`
+- `intended_resume_phase=release`
+- `task_count=11`
+- `tasks_completed=11`
+- `ac_verification=10/10`
+- `uat_passed=10/10`
+- `blocking_findings=0`
+- `ready_for_release=true`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **release** for **`/release`** on **`S0092`** / **US-0102** (spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
+
+---
+
+## Release checkpoint (2026-06-26T00:00:00Z) — `auto-20260615-02` — US-0102 / S0092
+
+- **`phase_id=release`**; **`role=release`**; **`story_id=US-0102`**; **`sprint_id=S0092`**; **`verdict=PASS`**.
+- **`fresh_context_marker=release-S0092-US0102-release-20260626T000000Z-fresh`**.
+- **Artifacts touched**: `handoffs/releases/S0092-release-notes.md`; `sprints/S0092/release-findings.md`; `handoffs/release_queue.md` (row **S0092** → **`released`**); `handoffs/release_notes.md`; `CHANGELOG.md` (**`[Unreleased]`** append **US-0102**); `docs/product/backlog.md` (**US-0102** → **DONE**); `docs/product/acceptance.md` (US-0102 checked); `handoffs/resume_brief.md` (top pointer → **`/refresh-context`**); this state checkpoint.
+- **Gate chain**: check-in_test **PASS** (us0102 8/8 + us0101 8/8); qa **PASS** (0 blockers); uat **PASS** (10/10); isolation **PASS**; strict_proof **PASS**; readme_feature_coverage_3f **observation** (post-S0077 kit-repo drift); project_readme_coverage_3g **PASS** (kit_repo_skipped); version_doc_19 **PASS**; publish **skipped** (`RELEASE_PUBLISH_MODE=disabled`).
+- **Status authority (US-0045)**: **US-0102** → **DONE** in `docs/product/backlog.md`; acceptance row checked.
+- **Segment closure attestation**: release finalization complete for **US-0102** / **S0092**; **`/refresh-context`** next (fresh **curator**).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=release`
+- `role=release`
+- `fresh_context_marker=release-S0092-US0102-release-20260626T000000Z-fresh`
+- `timestamp=2026-06-26T00:00:00Z`
+- `evidence_ref=sprints/S0092/release-findings.md,handoffs/releases/S0092-release-notes.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**): canonical tuple hashed as **SHA-256** of **sorted-key JSON** over (`orchestrator_run_id`, `runtime_proof_id`, `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`). `proof_ttl_seconds` is a JSON **integer**.
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-release-release-20260626T000000Z-S0092-US0102`
+- `phase_id=release`
+- `role=release`
+- `proof_issued_at=2026-06-26T00:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=18d3bed52733e0325eac9068b5aa61f07a97153791217d1e23e4e62663e0b858`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"release","proof_issued_at":"2026-06-26T00:00:00Z","proof_ttl_seconds":3600,"role":"release","runtime_proof_id":"rp-auto-20260615-02-release-release-20260626T000000Z-S0092-US0102"}`.
+
+**Boundary verification (release boundary; upstream verify-work consumed)**: prior verify-work checkpoint `qa-S0092-US0102-verify-work-20260625T233000Z-fresh` / `proof_hash=a4af01ce2f7238b582f5a38d7e6b1cdb11485455aa45bd12e5d3cb90b7a6e4ad`.
+
+**Isolation compliance gate**: execute + qa + verify-work + release distinct `fresh_context_marker` — **PASS**.
+
+**Strict runtime proof gate**: execute + qa + verify-work + release tuples present and unique — **PASS**.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | RELEASED (DONE) | handoffs/releases/S0092-release-notes.md, sprints/S0092/release-findings.md, handoffs/release_queue.md, docs/product/backlog.md |
+
+**Phase boundary operator visibility (AC-10)** — compact status:
+
+- `phase_boundary=release`
+- `next_scheduled_phase=refresh-context`
+- `default_spawn_role=curator`
+- `segment_work_item_kind=story`
+- `story_id=US-0102`
+- `bug_id=(none)`
+- `sprint_id=S0092`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=4`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=0`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=release`
+- `intended_resume_phase=refresh-context`
+- `task_count=11`
+- `tasks_completed=11`
+- `ac_verification=10/10`
+- `uat_passed=10/10`
+- `blocking_findings=0`
+- `ready_for_release=false`
+- `release_finalized=true`
+
+**Preflight for next phase (US-0069 / DEC-0051)**: spawn fresh **curator** for **`/refresh-context`** on **`S0092`** / **US-0102** segment closeout (spawn-only per **BUG-0006**; native chain per **DEC-0080** / **DEC-0081**).
+
+---
+
+## Refresh-context checkpoint (2026-06-26T01:00:00Z) — post S0092 / US-0102 (`auto-20260615-02`)
+
+- `timestamp=2026-06-26T01:00:00Z`
+- `phase_id=refresh-context`
+- `role=curator`
+- `story_id=US-0102`
+- `sprint_id=S0092`
+- `orchestrator_run_id=auto-20260615-02`
+- `verdict=PASS`
+- `stop_reason=completed`
+- `stop_phase=refresh-context`
+- `backlog_drain_segment_complete=1`
+- `backlog_drain_stories_remaining_budget=4`
+- Segment close for **`US-0102`** / **`S0092`** (released `2026-06-26T00:00:00Z`, notes **`handoffs/releases/S0092-release-notes.md`**). Story drain segment on **`auto-20260615-02`**: **US-0102** **DONE** (1 story consumed from budget). Portfolio **0 OPEN** stories; **0 OPEN** bugs. **`drain_terminated=true`**; **`drain_terminated_reason=no_open_stories`**; **`backlog_drain_active=false`**. Next command: **`/intake`** (operator enqueues new work).
+- **Triad hot-surface (DEC-0054)**: pre-append `--check` → `STATE_ARCHIVE_REQUIRED` on `state` (1358/1000, units=24/80); pre-append `--rollover` → `rollover_complete units=7,2` → **`docs/engineering/state-archive/state-pack-20260625-a.md`**, **`handoffs/archive/po-to-tl-pack-20260625-a.md`**; post-checkpoint append → `--check` → `STATE_ARCHIVE_REQUIRED` on `state` (1027/1000); post-checkpoint `--rollover` → `rollover_complete units=1` → **`docs/engineering/state-archive/state-pack-20260625-b.md`**; final `--check` **PASS**.
+- **Context-pack reconciliations** (curator-owned scope):
+  - **`docs/engineering/decisions.md`** — Current context pack → **`US-0102`** **DONE** / **`DEC-0087`** delivered; Continuation-hygiene → **`/intake`** (portfolio empty; drain terminated).
+  - **`docs/engineering/research.md`** — **`R-0088`** delivery-closure trailers (**US-0101** + **US-0102**); anchor `status=delivered`.
+  - **`docs/engineering/codebase-map.md`** — US-0102 resolver extensions noted on **`model_tier_*`** entries.
+  - **`sprints/S0092/summary.md`**, **`handoffs/resume_brief.md`**, **`docs/product/backlog.md`** (`refresh_context_notes` under **`## US-0102`**).
+- **Consistency checks (lightweight)**:
+  - `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → **`[BUG_VALIDATION_OK]`** (exit 0).
+  - `docs/product/backlog.md` **`## US-0102`** `- Status: DONE`; AC-1..AC-10 all `[x]`.
+  - `handoffs/release_queue.md` **`S0092`** row `status=released` (`2026-06-26T00:00:00Z`, release-notes `handoffs/releases/S0092-release-notes.md`).
+  - **0 OPEN** stories; **0 OPEN** bugs.
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=refresh-context`
+- `role=curator`
+- `fresh_context_marker=curator-S0092-US0102-refresh-context-20260626T010000Z-fresh`
+- `timestamp=2026-06-26T01:00:00Z`
+- `evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,docs/engineering/research.md,sprints/S0092/summary.md,handoffs/resume_brief.md,docs/product/backlog.md,handoffs/releases/S0092-release-notes.md,handoffs/release_queue.md,docs/engineering/state-archive/state-pack-20260625-a.md,docs/engineering/codebase-map.md`
+
+Strict runtime proof (**US-0056** / **DEC-0038**):
+
+- `orchestrator_run_id=auto-20260615-02`
+- `runtime_proof_id=rp-auto-20260615-02-refresh-context-curator-20260626T010000Z-S0092-US0102`
+- `phase_id=refresh-context`
+- `role=curator`
+- `proof_issued_at=2026-06-26T01:00:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=5d4785252094d47573fe2b950802284d83b276b2ed4a898d3e335460707c73cb`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260615-02","phase_id":"refresh-context","proof_issued_at":"2026-06-26T01:00:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260615-02-refresh-context-curator-20260626T010000Z-S0092-US0102"}`.
+
+**Boundary verification (refresh-context boundary; upstream release proof consumed)**: consumed release-phase proof `runtime_proof_id=rp-auto-20260615-02-release-release-20260626T000000Z-S0092-US0102` / `proof_hash=18d3bed52733e0325eac9068b5aa61f07a97153791217d1e23e4e62663e0b858` (release checkpoint above); current curator-phase strict proof recorded above.
+
+Traceability index (**DEC-0010**):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0102 | S0092 | T-001..T-011 | RELEASED + SEGMENT CLOSED | handoffs/releases/S0092-release-notes.md, sprints/S0092/summary.md, handoffs/release_queue.md (S0092=released), docs/product/backlog.md, docs/product/acceptance.md, docs/engineering/decisions.md, docs/engineering/research.md, handoffs/resume_brief.md, docs/engineering/state.md (this checkpoint) |
+
+## Phase boundary status (post-refresh-context, US-0102 / S0092 / auto-20260615-02)
+
+- `phase_boundary=refresh-context`
+- `next_scheduled_phase=none`
+- `segment_work_item_kind=story`
+- `active_bug_id=(none)`
+- `story_id=(none)`
+- `bug_id=(none)`
+- `sprint_id=(none)`
+- `dec_id=DEC-0087`
+- `orchestrator_run_id=auto-20260615-02`
+- `native_chain_active=true`
+- `native_chain_continuing=false`
+- `drain_advance_action=not_applicable`
+- `backlog_drain_active=false`
+- `backlog_drain_stories_remaining_budget=4`
+- `backlog_drain_segment_complete=1`
+- `drain_terminated=true`
+- `drain_terminated_reason=no_open_stories`
+- `portfolio_open_stories=0`
+- `portfolio_open_bugs=0`
+- `stop_reason=completed`
+- `stop_phase=refresh-context`
+- `intended_resume_phase=intake`
+
+**Phase boundary operator visibility (AC-10)** — compact status: `phase_boundary=refresh-context`; `next_scheduled_phase=none`; `segment_work_item_kind=story`; `active_bug_id=(none)`; `story_id=(none)`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260615-02`; `backlog_drain_active=false`; `backlog_drain_stories_remaining_budget=4`; `backlog_drain_segment_complete=1`; `drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `portfolio_open_stories=0`; `portfolio_open_bugs=0`; `stop_reason=completed`; `stop_phase=refresh-context`; `intended_resume_phase=intake`.
+
+**Bug validator (US-0088 / DEC-0069)**: `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → **`[BUG_VALIDATION_OK]`**. Bug issue format + acceptance rows intact post-refresh-context artifact writes.
+
+**Preflight for next phase (US-0069 / DEC-0051)**: operator-initiated **`/intake`** or fresh **`/auto`** — portfolio empty; no scheduled drain candidate; enqueue new **US** or **BUG** work via **`/intake`**.
+

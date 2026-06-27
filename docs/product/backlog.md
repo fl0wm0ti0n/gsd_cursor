@@ -3000,7 +3000,7 @@
 - Title: Extend US-0101 tier-based model selection with direct per-phase slug override and role-based catalog presets, while retaining 3-tier baseline
 - Summary: US-0101 delivered per-phase `MODEL_TIER_<PHASE>` (cheap/balanced/strong) → Cursor alias mapping (fast/inherit) with optional local catalog for vendor slugs. Operators now request a second axis: **direct per-phase model slug assignment** (`MODEL_<PHASE>=<vendor-slug>`) that bypasses the tier indirection layer, plus **role-based catalog presets** (PO/SA/DEV/QA model profiles per `ai_modell_auslegung_cursor_highend.md`) for operators who want curated model sets without manual tier mapping. The 3-tier system remains as the default/fallback layer: **precedence** `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `MODEL_TIER_DEFAULT` > Cursor alias (local catalog or stable alias). The `/ask` phase (already in US-0101 default matrix as `cheap`) is reinforced with direct override support. **Compose with US-0101/DEC-0086** (do not amend — US-0101 stays DONE). **Backward compatible**: tier-only configurations continue to work unchanged. **No volatile vendor IDs in template files** — direct slug keys and role-based presets live in local catalog JSON (gitignored) only; templates keep Cursor-stable identifiers. New catalog schema v2 extends v1 with optional `roles` section. New contract tests `test_us0102_*` validate precedence, schema, backward compatibility.
 - Priority: P2
-- Status: OPEN
+- Status: DONE
 - Decomposition (US-0051):
   - **Single story** — direct override scratchpad keys, precedence logic, catalog schema v2, role-based presets, backward compatibility, validator updates, contract tests ship as one vertical slice; splitting would ship override logic without catalog integration or reverse.
   - **Rationale**: "tier system stays default; advanced operators can assign exact models per phase or pick a role-based preset" without breaking US-0101 DONE status or forcing tier users to migrate.
@@ -3017,23 +3017,154 @@
   - `assumptions_confirmed=(none)`
   - `intake_evidence_ref=handoffs/intake_evidence/US-0102-intake-20260624.json`
 - Acceptance:
-  - [ ] AC-1: **Direct per-phase slug override scratchpad keys** — document `MODEL_<PHASE>=<vendor-slug>` keys (canonical phase ids: same as US-0101 list, including `ask`). Values are direct vendor model slugs (e.g. `MODEL_EXECUTE=kimi-k2.7-code`). **Forbidden** in `template/.cursor/scratchpad.md`: hardcoded vendor slugs (document only in `.cursor/scratchpad.local.md` examples). Merge precedence for model resolution: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `MODEL_TIER_DEFAULT` > Cursor alias (local catalog or stable alias).
-  - [ ] AC-2: **Precedence validation and resolution logic** — `scripts/model_tier_lib.py` (or new `scripts/model_overrides_lib.py`) implements deterministic resolution: (1) check `MODEL_<PHASE>` scratchpad key → return slug or fail-closed `MODEL_OVERRIDE_SLUG_UNKNOWN`; (2) fall back to `MODEL_TIER_<PHASE>` tier → resolve via US-0101 chain; (3) fall back to `MODEL_TIER_DEFAULT` tier → resolve; (4) fall back to Cursor stable alias per US-0101 AC-3. Unknown slug in step (1) → `MODEL_OVERRIDE_SLUG_UNKNOWN` reason code with remediation text.
-  - [ ] AC-3: **Local catalog schema v2 with role-based presets** — extend `.cursor/model-catalog.local.json` schema from v1 to v2: add optional `roles` section alongside existing `tiers`. Schema: `{schema_version: 2, tiers: {cheap, balanced, strong}, roles: {po, sa, dev, dev_difficult, qa, security, release}, notes}`. Role slugs follow `ai_modell_auslegung_cursor_highend.md` recommendations. **Backward compatible**: v1 catalogs (no `roles`) still work; v2 catalogs are opt-in. New example catalogs: `.cursor/model-catalog.local.example.role-based-balanced.json`, `.cursor/model-catalog.local.example.role-based-highend.json` (placeholder slugs only).
-  - [ ] AC-4: **Role-based resolver (opt-in)** — scratchpad flag `MODEL_RESOLVE=alias_only|local_catalog|role_catalog` (default `alias_only`). When `role_catalog`, resolver looks up phase → role mapping (from `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, or phase→role defaults per `US-0069 / DEC-0051`) → role slug from catalog. Precedence: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `role_catalog` role lookup > `MODEL_TIER_DEFAULT` > Cursor alias. Role lookup fails → `MODEL_ROLE_SLUG_UNKNOWN` → fall back to tier or alias.
-  - [ ] AC-5: **/ask phase reinforcement** — `/ask` phase already in US-0101 default matrix as `cheap` tier; reinforce with direct override support: `MODEL_ASK=<slug>` scratchpad key works same as other phases. No change to default matrix (keep `ask: cheap`); no change to US-0101 AC-1 (phase list already includes `ask`).
-  - [ ] AC-6: **Backward compatibility** — existing US-0101 configurations (tier-only, no direct overrides, v1 catalogs) continue to work unchanged. No migration required. Validator accepts both v1 and v2 catalog schemas. Contract tests verify tier-only resolution still produces correct aliases without direct override keys present.
-  - [ ] AC-7: **Template stability and volatile-ID protection** — `template/.cursor/scratchpad.md` examples show only `MODEL_TIER_*` keys (no `MODEL_<PHASE>` vendor slugs). `template/.cursor/model-catalog.local.example.json` and role-based examples use placeholder slugs (`<your-po-model-slug>`, not `glm-5.2` directly). Operator configures slugs in `.cursor/scratchpad.local.md` and `.cursor/model-catalog.local.json` only (gitignored). Forbidden: hardcoded vendor slugs in `template/` files (grep check in contract tests).
-  - [ ] AC-8: **Validator + reason codes** — `scripts/model_tier_lib.py` extends to validate: (1) direct slug keys (`MODEL_<PHASE>=<slug>`) for valid phase ids and non-empty slugs; (2) catalog schema v2 (roles section optional, but when present must have valid slugs); (3) precedence resolution logic; (4) backward compatibility (v1 catalogs). New fail-closed reason codes: `MODEL_OVERRIDE_SLUG_UNKNOWN` (direct slug not recognized), `MODEL_ROLE_SLUG_UNKNOWN` (role catalog lookup failed), `MODEL_CATALOG_SCHEMA_V2_INVALID` (v2 schema validation failure). Extend existing `MODEL_TIER_*` reason codes to handle v2 catalogs.
-  - [ ] AC-9: **Contract tests + template parity** — `test_us0102_*` markers validate: (1) direct slug scratchpad keys (`test_us0102_direct_override_keys`), (2) precedence resolution (`test_us0102_precedence_chain`), (3) catalog schema v2 (`test_us0102_catalog_schema_v2`), (4) role-based resolver (`test_us0102_role_catalog_resolver`), (5) backward compatibility (`test_us0102_tier_only_backward_compat`), (6) template stability (`test_us0102_no_vendor_slugs_in_template`), (7) reason code inventory (`test_us0102_reason_codes`), (8) `/ask` phase reinforcement (`test_us0102_ask_phase_reinforcement`). **`check_intake_template_parity.py --scope=model-tier-overrides`** added to existing `--scope=model-tier` family.
-  - [ ] AC-10: **Documentation + runbook** — `.cursor/scratchpad.md` documents `MODEL_<PHASE>` keys with examples in comments (no vendor slugs). Runbook and architecture `# US-0102` documents direct override precedence, role-based resolution, backward compatibility. `ai_modell_auslegung_cursor_highend.md` referenced in runbook as role-based recommendation source (not normative).
+  - [x] AC-1: **Direct per-phase slug override scratchpad keys** — document `MODEL_<PHASE>=<vendor-slug>` keys (canonical phase ids: same as US-0101 list, including `ask`). Values are direct vendor model slugs (e.g. `MODEL_EXECUTE=kimi-k2.7-code`). **Forbidden** in `template/.cursor/scratchpad.md`: hardcoded vendor slugs (document only in `.cursor/scratchpad.local.md` examples). Merge precedence for model resolution: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `MODEL_TIER_DEFAULT` > Cursor alias (local catalog or stable alias).
+  - [x] AC-2: **Precedence validation and resolution logic** — `scripts/model_tier_lib.py` (or new `scripts/model_overrides_lib.py`) implements deterministic resolution: (1) check `MODEL_<PHASE>` scratchpad key → return slug or fail-closed `MODEL_OVERRIDE_SLUG_UNKNOWN`; (2) fall back to `MODEL_TIER_<PHASE>` tier → resolve via US-0101 chain; (3) fall back to `MODEL_TIER_DEFAULT` tier → resolve; (4) fall back to Cursor stable alias per US-0101 AC-3. Unknown slug in step (1) → `MODEL_OVERRIDE_SLUG_UNKNOWN` reason code with remediation text.
+  - [x] AC-3: **Local catalog schema v2 with role-based presets** — extend `.cursor/model-catalog.local.json` schema from v1 to v2: add optional `roles` section alongside existing `tiers`. Schema: `{schema_version: 2, tiers: {cheap, balanced, strong}, roles: {po, sa, dev, dev_difficult, qa, security, release}, notes}`. Role slugs follow `ai_modell_auslegung_cursor_highend.md` recommendations. **Backward compatible**: v1 catalogs (no `roles`) still work; v2 catalogs are opt-in. New example catalogs: `.cursor/model-catalog.local.example.role-based-balanced.json`, `.cursor/model-catalog.local.example.role-based-highend.json` (placeholder slugs only).
+  - [x] AC-4: **Role-based resolver (opt-in)** — scratchpad flag `MODEL_RESOLVE=alias_only|local_catalog|role_catalog` (default `alias_only`). When `role_catalog`, resolver looks up phase → role mapping (from `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`, or phase→role defaults per `US-0069 / DEC-0051`) → role slug from catalog. Precedence: `MODEL_<PHASE>` > `MODEL_TIER_<PHASE>` > `role_catalog` role lookup > `MODEL_TIER_DEFAULT` > Cursor alias. Role lookup fails → `MODEL_ROLE_SLUG_UNKNOWN` → fall back to tier or alias.
+  - [x] AC-5: **/ask phase reinforcement** — `/ask` phase already in US-0101 default matrix as `cheap` tier; reinforce with direct override support: `MODEL_ASK=<slug>` scratchpad key works same as other phases. No change to default matrix (keep `ask: cheap`); no change to US-0101 AC-1 (phase list already includes `ask`).
+  - [x] AC-6: **Backward compatibility** — existing US-0101 configurations (tier-only, no direct overrides, v1 catalogs) continue to work unchanged. No migration required. Validator accepts both v1 and v2 catalog schemas. Contract tests verify tier-only resolution still produces correct aliases without direct override keys present.
+  - [x] AC-7: **Template stability and volatile-ID protection** — `template/.cursor/scratchpad.md` examples show only `MODEL_TIER_*` keys (no `MODEL_<PHASE>` vendor slugs). `template/.cursor/model-catalog.local.example.json` and role-based examples use placeholder slugs (`<your-po-model-slug>`, not `glm-5.2` directly). Operator configures slugs in `.cursor/scratchpad.local.md` and `.cursor/model-catalog.local.json` only (gitignored). Forbidden: hardcoded vendor slugs in `template/` files (grep check in contract tests).
+  - [x] AC-8: **Validator + reason codes** — `scripts/model_tier_lib.py` extends to validate: (1) direct slug keys (`MODEL_<PHASE>=<slug>`) for valid phase ids and non-empty slugs; (2) catalog schema v2 (roles section optional, but when present must have valid slugs); (3) precedence resolution logic; (4) backward compatibility (v1 catalogs). New fail-closed reason codes: `MODEL_OVERRIDE_SLUG_UNKNOWN` (direct slug not recognized), `MODEL_ROLE_SLUG_UNKNOWN` (role catalog lookup failed), `MODEL_CATALOG_SCHEMA_V2_INVALID` (v2 schema validation failure). Extend existing `MODEL_TIER_*` reason codes to handle v2 catalogs.
+  - [x] AC-9: **Contract tests + template parity** — `test_us0102_*` markers validate: (1) direct slug scratchpad keys (`test_us0102_direct_override_keys`), (2) precedence resolution (`test_us0102_precedence_chain`), (3) catalog schema v2 (`test_us0102_catalog_schema_v2`), (4) role-based resolver (`test_us0102_role_catalog_resolver`), (5) backward compatibility (`test_us0102_tier_only_backward_compat`), (6) template stability (`test_us0102_no_vendor_slugs_in_template`), (7) reason code inventory (`test_us0102_reason_codes`), (8) `/ask` phase reinforcement (`test_us0102_ask_phase_reinforcement`). **`check_intake_template_parity.py --scope=model-tier-overrides`** added to existing `--scope=model-tier` family.
+  - [x] AC-10: **Documentation + runbook** — `.cursor/scratchpad.md` documents `MODEL_<PHASE>` keys with examples in comments (no vendor slugs). Runbook and architecture `# US-0102` documents direct override precedence, role-based resolution, backward compatibility. `ai_modell_auslegung_cursor_highend.md` referenced in runbook as role-based recommendation source (not normative).
 - Boundaries:
   - In scope: direct per-phase model slug scratchpad keys, role-based catalog presets, `/ask` phase reinforcement, backward compatibility for tier system.
   - Out of scope: changing US-0101 DONE status or DEC-0086 locks; requiring migration from tier-based to direct override; forcing operators to use role-based catalogs; modifying Cursor billing-plan enforcement; fixing Cursor subagent BYOK bugs (document only); changing mandatory QA/release gate semantics; TOKEN_PROFILE behavior changes.
 - related_us: US-0101, US-0003, US-0023, US-0048, US-0069, US-0080, US-0092
 - intake_evidence_ref: handoffs/intake_evidence/US-0102-intake-20260624.json
 - intake_notes (2026-06-24, PO, `cursor-20260624-US0102-intake`, `INTAKE_GUIDED_MODE=1`, `INTAKE_WORK_ITEM_KIND=story`): **`/intake`** **PASS** — operator (German/English): extend US-0101 with direct per-phase model slug assignment (bypass tier indirection) + role-based catalog presets (PO/SA/DEV/QA profiles from `ai_modell_auslegung_cursor_highend.md`); retain 3-tier system as default/fallback; include `/ask` phase; backward compatible; no volatile vendor IDs in template files; compose with US-0101/DEC-0086 (do not amend). **small-intake-pack**; all 5 topics covered; validator **`[INTAKE_EVIDENCE_VALIDATION_OK]`**. Decomposition evaluator → single story. Overlap vs US-0101 confirms composition (not amendment). Research stub deferred (small refinement of existing US-0101). **Status: OPEN** per **US-0045**. **Next**: **`/architecture`** (fresh **tech-lead**) for **US-0102** — no `/discovery` needed (clear scope, no new problem framing).
+- architecture_notes (2026-06-25, TL, `auto-20260615-02`): **`/architecture`** **PASS** — **`DEC-0087`** locked; **`# US-0102`** appended; **11** atomic task seeds (Tranche A→E); 5-step precedence (`MODEL_<PHASE>` > tier > role_catalog > default > alias); catalog schema v2 optional `roles`; extend **`model_tier_lib.py`** in place (no separate overrides module); eight **`test_us0102_*`** contract markers + **`--scope=model-tier-overrides`** parity; compose **DEC-0086** (do not amend). **Status: OPEN** per **US-0045**. **Next**: **`/sprint-plan`** (fresh **tech-lead**).
+- sprint_plan_notes (2026-06-25, TL, `auto-20260615-02`, `fresh_context_marker=tl-S0092-US0102-sprint-plan-20260625T193000Z-fresh`): Sprint **`S0092`** — **`sprints/S0092/sprint.md`**, **`sprints/S0092/tasks.md`** (**T-001..T-011** ↔ AC-1..AC-10 surjective; 11 architecture seeds 1:1), **`sprints/S0092/plan-verify.json`** **PENDING**; UAT scaffolds **`uat.json`** / **`uat.md`**; **`handoffs/tl_to_dev.md`**, **`handoffs/qa_plan_verify.md`**, **`handoffs/resume_brief.md`** → **`/plan-verify`**. **Status: OPEN** (**US-0045**). **Next**: **`/plan-verify`** (**QA**).
+- plan_verify_notes (2026-06-25, QA, `auto-20260615-02`, `fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`): **`/plan-verify`** **PASS** — **`sprints/S0092/plan-verify.json`** **PASS**; AC-1..AC-10 surjective via **T-001..T-011**; task-seed bijection (11:11); all coverage rows `verified=true`; multi-AC tasks accepted per architecture seeds; **`sprints/S0092/qa-findings.md`**; **`/execute`** unblocked. **Status: OPEN** (**US-0045**). **Next**: **`/execute`** (**dev**).
+- verify_work_notes (2026-06-25, QA, `auto-20260615-02`, `fresh_context_marker=qa-S0092-US0102-verify-work-20260625T233000Z-fresh`): **`/verify-work`** **PASS** — UAT 10/10 pass; key tests re-run green (`pytest -k us0102/us0101`, validator, parity); **`sprints/S0092/verify-work-verdict.json`**; **`/release`** unblocked. AC-1..AC-10 checkboxes checked (release prep). **Status: OPEN** (**US-0045**). **Next**: **`/release`** (**release**).
+- release_notes (2026-06-26T00:00:00Z, release, `orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=release-S0092-US0102-release-20260626T000000Z-fresh`, `sprint_id=S0092`, `dec_id=DEC-0087`): **`/release`** **PASS** — **`handoffs/releases/S0092-release-notes.md`**; queue **`S0092`** → **`released`**; all 11 tasks DONE (T-001..T-011); all 10 ACs satisfied (AC-1..AC-10); 8/8 `test_us0102_*` + 8/8 `test_us0101_*` backward compat; **DEC-0087** locked; compose **DEC-0086** (unchanged); **`runtime_proof_id=rp-auto-20260615-02-release-release-20260626T000000Z-S0092-US0102`**, **`proof_hash=18d3bed52733e0325eac9068b5aa61f07a97153791217d1e23e4e62663e0b858`**. **Status: DONE**. **Next**: **`/refresh-context`** (fresh **curator**).
+- refresh_context_notes (2026-06-26T01:00:00Z, curator, `orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=curator-S0092-US0102-refresh-context-20260626T010000Z-fresh`, `sprint_id=S0092`, `dec_id=DEC-0087`): **`/refresh-context`** **PASS** — segment-closure trailer for **US-0102** (status **DONE** unchanged per **US-0045**; release advanced the status flip). Reconciled **`docs/engineering/decisions.md`** (Current context pack → **US-0102** **DONE** / **DEC-0087** delivered; Continuation-hygiene → **`/intake`**), **`docs/engineering/research.md`** (**R-0088** delivery closure trailers for **US-0101** + **US-0102**), **`sprints/S0092/summary.md`**, **`handoffs/resume_brief.md`** (`intended_resume_phase=intake`; `drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `portfolio_open_stories=0`; `backlog_drain_stories_remaining_budget=4`). Canonical spot-check: **US-0102** **DONE**; AC-1..AC-10 all `[x]`; **`handoffs/release_queue.md`** **S0092** `released`; **`python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance`** → **`[BUG_VALIDATION_OK]`**; portfolio **0 OPEN** stories; **0 OPEN** bugs; **`runtime_proof_id=rp-auto-20260615-02-refresh-context-curator-20260626T010000Z-S0092-US0102`**, **`proof_hash=5d4785252094d47573fe2b950802284d83b276b2ed4a898d3e335460707c73cb`**. **Status: DONE**. **Next**: **`/intake`** (operator enqueues new work).
 
+## US-0103 — AI Decision Ledger + Plan Fidelity policy
+- user_visible: false
+- Title: Append-only ledger of every AI deviation and plan-fidelity scratchpad tri-state
+- Summary: Sovereign-loop foundation - every AI decision made while running autonomously must be auditable. New handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl records each decision as {ts, role, decision_id, type, from_artifact, to_artifact, rationale, plan_fidelity, cross_model_reviewed, risk_tier}. Governed by AUTO_PLAN_FIDELITY=strict|relaxed|extended: strict = hard stop on deviation, relaxed = AI may drop/reorder ACs, extended = AI may add new stories/features. QA cross-checks the ledger at every /qa boundary. Default-off AI_DECISION_LEDGER=0|1. Compose with US-0070/US-0048/US-0069 (do not amend).
+- Priority: P0
+- Status: OPEN
+- Decomposition (US-0051):
+  - **Single story** - audit ledger + plan-fidelity policy are one vertical capability; splitting would orphan the ledger or the governance.
+  - **Rationale**: "Every autonomous AI decision must be recorded and auditable; plan-fidelity governs what deviations are allowed."
+- Overlap / duplicate evaluation:
+  - **US-0070 (DONE)** / **US-0048 (DONE)** / **US-0069 (DONE)** / **US-0092 (DONE)**: phase selection policy, isolation evidence, phase role enforcement, full-autonomy outer driver - **compose, do not amend**: sovereign loop adds ledger + plan-fidelity governance ON TOP of resolved_phase_plan.
+- Intake pack evidence (**first-intake-pack**):
+  - selected_pack=first-intake-pack (8 new capability stories, broad scope)
+  - sked_topics= all 8 first-pack keys covered
+  - missing_topics=(none)
+  - ssumptions_confirmed=(none)
+  - plan_area_inventory=[sovereign_loop]
+  - plan_area_coverage=[sovereign_loop > story_ids=[US-0103..US-0110]]
+  - coverage_complete=true
+  - intake_evidence_ref=handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- Acceptance:
+  - [ ] AC-1: Scratchpad keys AI_DECISION_LEDGER=0|1 (default  ) and AUTO_PLAN_FIDELITY=strict|relaxed|extended (default strict); when ledger  , zero overhead.
+  - [ ] AC-2: Artifact handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl with deterministic JSON-lines schema; append-only; per-entry fields as described.
+  - [ ] AC-3: strict mode (any unapproved deviation from resolved_phase_plan / acceptance criteria results in PLAN_FIDELITY_VIOLATION hard stop; operator-approved relaxations via scratchpad override recorded in ledger.
+  - [ ] AC-4: elaxed mode (AI may drop/reorder ACs with ledger entry + QA-verifiable; new ACs/stories results in decision gate.
+  - [ ] AC-5: extended mode (AI may extend scope with new stories/features/deployment targets; documented but non-blocking; QA still cross-checks; operator sees extension report at convergence.
+  - [ ] AC-6: QA cross-check (/qa phase reads ledger + emits ledger_findings in qa-findings.md.
+  - [ ] AC-7: Contract tests 	est_us0103_* for plan-fidelity tri-state, ledger schema, strict/relaxed/extended branches, QA cross-check.
+  - [ ] AC-8: Documentation runbook + architecture # US-0103; active + template/ byte-parity; reason codes PLAN_FIDELITY_* + LEDGER_* inventory.
+- Boundaries:
+  - In scope: scratchpad flags, ledger artifact schema, plan-fidelity tri-state logic, QA cross-check, contract tests, template parity.
+  - Out of scope: changing US-0070/US-0069/US-0048/US-0092 semantics; mandatory QA/release gate weakening; isolation evidence changes.
+- related_us: US-0070, US-0069, US-0048, US-0092, US-0104, US-0105, US-0107, US-0109
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0104 — Cross-Model Adversarial Critic
+- user_visible: false
+- Title: Per-phase cross-model critic subagent with Challenger/Architect/Subtractor lenses + anti-slop scoring
+- Summary: After each phase-role subagent completes, sovereign loop optionally spawns a critic subagent using a different model from the producer. The critic evaluates through one of three lenses: Challenger (edge cases, race conditions), Architect (coupling, boundaries), Subtractor (over-engineering, premature abstraction). Findings reconcile via parallel jury: agreement = high-confidence; single-finder = flagged. New field model_id in isolation evidence. Anti-slop scoring (per-lens 0-N score; below threshold results in rework loop). Falls back to single-model-multi-lens when only one model CLI installed. Compose with US-0048/US-0069/US-0110.
+- Priority: P1
+- Status: OPEN
+- Acceptance (8 ACs): CROSS_MODEL_REVIEW scratchpad flag, critic subagent spawn via /sovereign-critic command, model_id in isolation evidence, reconciliation via sovereign_critic_lib.py with confidence levels, anti-slop scoring with threshold + rework loop, degraded single-model fallback, contract tests, documentation + template parity.
+- Boundaries:
+  - In scope: critic subagent spawn, three-lens prompt, reconciliation logic, anti-slop scoring, degraded fallback, contract tests, template parity.
+  - Out of scope: changing US-0048/US-0069 isolation/role semantics; mandatory QA/release gate weakening; US-0101/US-0102 tier resolution changes.
+- related_us: US-0048, US-0069, US-0023, US-0101, US-0102, US-0103, US-0110
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0105 — Sovereign Memory
+- user_visible: false
+- Title: Project-level learnings substrate injected into phase spawns
+- Summary: New docs/engineering/sovereign-memory/ directory with decisions-log.jsonl, mistakes.jsonl, patterns.jsonl, plan-drift-register.jsonl, retrospectives/<sprint>.md. Bounded injection at phase spawn: top-N recent + top-K high-impact. Token budget enforced. Curator refresh-context writes retrospective after each release. Dedup on decisions-log.jsonl. Compose with US-0029/US-0080 (not amending).
+- Priority: P1
+- Status: OPEN
+- Acceptance (8 ACs): SOVEREIGN_MEMORY scratchpad flag, directory schema with JSONL artifacts, bounded injection logic via sovereign_memory_lib.py, curator retrospective write, dedup on decisions-log.jsonl, mistake-tagging on failed fix/revert, contract tests, documentation + template parity.
+- Boundaries:
+  - In scope: directory schema, JSONL artifacts, bounded injection logic, curator retrospective, dedup, mistake-tagging, contract tests, template parity.
+  - Out of scope: changing US-0029/US-0080/US-0072 semantics; mandatory QA/release gate weakening; state archive changes.
+- related_us: US-0029, US-0080, US-0072, US-0103, US-0104, US-0107
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0106 — Sovereign Role-Behavior Manifest
+- user_visible: false
+- Title: Per-role objective + inter-role review obligations bootstrappable from single YAML
+- Summary: .cursor/sovereign-role-manifest.yaml + template copy declaring per-role objective_function + review_obligations (directed graph: PO reviews arch for user-value drift, QA reviews PO ACs for testability, dev reviews arch for buildability, release reviews QA for deployability) + allowed_self_overrides + cross_model_policy + escalation_rules. Validator scripts/sovereign_role_manifest_validate.py --self-test. Default-off SOVEREIGN_ROLE_MANIFEST=0|1.
+- Priority: P2
+- Status: OPEN
+- Acceptance (8 ACs): SOVEREIGN_ROLE_MANIFEST scratchpad flag, manifest schema with roles + review_obligations sections, validator with --self-test flag, role objective injection into subagent prompts, cross-role review dispatch via obligations graph, template copy + parity check, contract tests, documentation.
+- Boundaries:
+  - In scope: YAML manifest schema, validator, role objective injection, cross-role review dispatch, template parity, contract tests.
+  - Out of scope: changing US-0069/US-0003 semantics; mandatory QA/release gate weakening; canonical phase-to-role matrix changes.
+- related_us: US-0069, US-0003, US-0103, US-0104, US-0107
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0107 — Sovereign Loop Mode (AUTO_SOVEREIGN)
+- user_visible: false
+- Title: Project-level autonomous delivery that owns backlog/deploy/convergence end-to-end
+- Summary: New AUTO_SOVEREIGN=0|1 orthogonal to full_autonomy. Four capabilities: (a) deferral register (handoffs/sovereign_deferrals.jsonl bounded by AUTO_SOVEREIGN_DEFERRAL_MAX); (b) drain-generate (when portfolio empty + convergence not met, PO-loop spawn creates candidate stories from vision + sovereign-memory; operator decision gate per candidate); (c) notification (SOVEREIGN_NOTIFY_TARGET ntfy|email|hook on convergence or cap exhaustion); (d) self-healing deploy integration (defers to US-0109). Compose with US-0088/US-0092/US-0095.
+- Priority: P1
+- Status: OPEN
+- Acceptance (8 ACs): AUTO_SOVEREIGN scratchpad flag, deferral register with bounded queue + orchestrator advance logic, drain-generate PO spawn with decision gate per candidate, notification dispatch on convergence or cap exhaustion, self-healing deploy integration declaration (US-0109), contract tests, documentation + template parity, backward compat (0 = no change).
+- Boundaries:
+  - In scope: scratchpad flags, deferral register schema, drain-generate logic, notification dispatch, contract tests, template parity.
+  - Out of scope: changing US-0088/US-0092/US-0095/US-0044/US-0087 semantics; mandatory QA/release gate weakening; stop matrix changes.
+- related_us: US-0088, US-0092, US-0095, US-0044, US-0069, US-0087, US-0103, US-0105, US-0109, US-0110
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0108 — Parallel Instance Arbitrage for dev phase
+- user_visible: false
+- Title: Multiple dev subagents race on same task in isolated worktrees; QA critic picks winner
+- Summary: Under SOVEREIGN_PARALLEL_DEV=1, execute spawns N (bounded, default 3) parallel dev subagents in isolated git worktrees with different models/lenses. QA cross-reviewer evaluates all N outputs; passing one selected (first PASS + highest anti-slop score; ties break by earliest proof_issued_at). Merge via AUTO_SOVEREIGN_MERGE_RESOLVE=first_pass_wins|last_pass_wins|manual. Resource guard AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL=6. Compose with US-0047/US-0092.
+- Priority: P2
+- Status: OPEN
+- Acceptance (8 ACs): SOVEREIGN_PARALLEL_DEV scratchpad flag with N parameter, worktree isolation per subagent bounded by AUTO_SOVEREIGN_WORKTREE_MAX, selection predicate (first PASS + highest anti-slop), merge policy (first_pass_wins|last_pass_wins|manual), resource guard with cap, contract tests, backward compat (0 = single dev), documentation + template parity.
+- Boundaries:
+  - In scope: parallel dev scratchpad flags, worktree isolation logic, selection predicate, merge policy, resource guard, contract tests, template parity.
+  - Out of scope: changing US-0047/US-0092 semantics; mandatory QA/release gate weakening; bulk execute changes.
+- related_us: US-0047, US-0092, US-0103, US-0104, US-0107
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0109 — Self-Healing Deploy Loop
+- user_visible: false
+- Title: Post-deploy smoke probe + bounded repair loop; DEPLOY_DEFERRED on failure
+- Summary: Extends RELEASE_PUBLISH_MODE=auto with post-deploy smoke probe + bounded repair loop. After publish PASS, smoke probe runs (health endpoint + key acceptance smoke). On FAIL, bounded retry loop up to AUTO_SOVEREIGN_DEPLOY_RETRY_MAX (default 3). After retries exhausted: DEPLOY_DEFERRED state (work item moves to US-0107 sovereign deferral register). Compose with US-0054/US-0100.
+- Priority: P2
+- Status: OPEN
+- Acceptance (8 ACs): SOVEREIGN_SELF_HEALING_DEPLOY scratchpad flag + AUTO_SOVEREIGN_DEPLOY_RETRY_MAX, post-deploy smoke probe with health endpoint + acceptance smoke, bounded retry loop with execute retries, DEPLOY_DEFERRED state transition to US-0107 deferral register, contract tests, documentation + template parity, backward compat (0 = US-0054 only), US-0107 integration point declaration.
+- Boundaries:
+  - In scope: scratchpad flags, post-deploy smoke probe logic, bounded retry loop, DEPLOY_DEFERRED state transition, US-0107 integration, contract tests, template parity.
+  - Out of scope: changing US-0054/US-0100 semantics; mandatory QA/release gate weakening; publish target changes.
+- related_us: US-0054, US-0100, US-0103, US-0107
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+
+## US-0110 — Goal-Based Convergence Loops
+- user_visible: false
+- Title: Convergence predicate as sovereign-loop terminal condition + goal progress visibility
+- Summary: scripts/sovereign_convergence_lib.py exposes evaluate_convergence(repo, scratchpad) returning {converged, unmet_conditions[], blocked_by[]}. Convergence = all OPEN stories DONE AND 0 deferrals AND all cross-reviewer findings resolved AND smoke probe green AND ledger has no unapproved extensions. SOVEREIGN_GOAL=<text> explicit or auto-derive from docs/product/vision.md. Mid-loop progress emitted in curator refresh-context as goal_progress block. On timeout: SOVEREIGN_GOAL_TIMEOUT with handoffs/sovereign_partial_delivery.md. SOVEREIGN_GOAL_MODE=phase_driven|goal_convergence (default phase_driven). Compose with US-0088/US-0092/US-0095/US-0044.
+- Priority: P0
+- Status: OPEN
+- Acceptance (8 ACs): SOVEREIGN_GOAL_MODE scratchpad flag, convergence evaluator library with evaluate_convergence(repo, scratchpad), goal authoring (explicit text or auto-derive from vision top-N), mid-loop progress emission in curator refresh-context, partial delivery report on SOVEREIGN_GOAL_TIMEOUT, contract tests, backward compat (phase_driven = existing stop matrix), documentation + template parity.
+- Boundaries:
+  - In scope: convergence evaluator library, goal authoring logic, mid-loop progress emission, partial delivery report, contract tests, template parity.
+  - Out of scope: changing US-0088/US-0092/US-0095/US-0044 semantics; mandatory QA/release gate weakening; stop matrix changes.
+- related_us: US-0088, US-0092, US-0095, US-0044, US-0103, US-0107
+- intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
 ## Bug issues (canonical)
 
 Per **`DEC-0061`** / **`US-0079`**: defect work items use **`BUG-####`** ids (**allocator**: next id after highest existing in this section), **`OPEN`/`DONE`** only, and required fields **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`** (non-empty). Append new bugs as **`### BUG-#### — Title`** blocks; keep blocks **sorted by id**. Optional link bullets: **`related_us`**, **`blocks_us`**, **`duplicate_of`**, **`supersedes`** (ids only).

@@ -1,13 +1,14 @@
-# Verify-Work-to-Release Handoff — Sprint S0091 / US-0101
+# Verify-Work-to-Release Handoff — Sprint S0092 / US-0102
 
 ## Verify-Work Phase Complete
 
-**Story**: US-0101 — Per-phase model tier selection for subagents
-**Decision**: DEC-0086 (locked)
-**Sprint**: S0091
-**Phase**: verify-work → release
-**Timestamp**: 2026-06-15T23:30:00Z
-**Fresh Context Marker**: `qa-US0101-verify-work-20260615T233000Z-fresh`
+**Story**: US-0102 — Direct per-phase model slug override and role-based catalog presets  
+**Decision**: DEC-0087 (locked; composes DEC-0086 — do not amend)  
+**Sprint**: S0092  
+**Phase**: verify-work → release  
+**Timestamp**: 2026-06-25T23:30:00Z  
+**Fresh Context Marker**: `qa-S0092-US0102-verify-work-20260625T233000Z-fresh`  
+**Runtime Proof ID**: `rp-auto-20260615-02-verify-work-qa-20260625T233000Z-S0092-US0102`
 
 ---
 
@@ -21,67 +22,44 @@ All verification checks passed. Sprint ready for release.
 
 | Check | Status | Evidence |
 |-------|--------|----------|
-| All tasks complete | PASS | 10/10 tasks DONE in task.json |
-| QA verdict confirmed | PASS | qa-verdict.json verdict=PASS |
-| Contract tests | PASS | 8/8 contract tests passing |
-| AC coverage | PASS | All 9 ACs (AC-1..AC-9) satisfied |
+| QA verdict confirmed | PASS | 10/10 ACs, 0 blockers (`sprints/S0092/qa-findings.md`) |
+| All tasks complete | PASS | 11/11 tasks done (`sprints/S0092/tasks.md`) |
+| US-0102 contract tests | PASS | `pytest -k us0102` → 8 passed |
+| US-0101 backward compat | PASS | `pytest -k us0101` → 8 passed |
+| Model tier validator | PASS | `[MODEL_TIER_VALIDATION_OK]` |
+| Template parity | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scopes model-tier-overrides + model-tier |
+| UAT matrix | PASS | 10/10 pass (`sprints/S0092/uat.json`) |
 | Artifacts complete | PASS | All required artifacts present |
-| Governance compliance | PASS | US-0101 remains OPEN (US-0045) |
+| Governance compliance | PASS | US-0102 remains OPEN (US-0045); AC boxes checked for release prep |
 
 ---
 
-## Task Completion
-
-**Total Tasks**: 10
-**Completed**: 10
-**Status**: ALL_DONE
-
-| Task | AC | Summary | Status |
-|------|----|---------|--------|
-| T-001 | AC-1 | Scratchpad keys | DONE |
-| T-002 | AC-2 | Default phase→tier matrix | DONE |
-| T-003 | AC-5 | Template agent model defaults | DONE |
-| T-004 | AC-4 | Local catalog example | DONE |
-| T-005 | AC-4, AC-7 | model_tier_lib.py resolver | DONE |
-| T-006 | AC-7 | model_tier_validate.py CLI | DONE |
-| T-007 | AC-6 | Runbook provider-mode subsection | DONE |
-| T-008 | AC-6 | Non-substitution paragraph | DONE |
-| T-009 | AC-8 | Eight contract tests | DONE |
-| T-010 | AC-8, AC-9 | MODEL_TIER_PAIRS parity + harness §26Z | DONE |
-
----
-
-## Contract Test Results
-
-**Total**: 8
-**Passing**: 8
-**Failing**: 0
-**Status**: ALL_PASSING
+## Contract Test Results (verify-work re-run)
 
 ```
-pytest tests/auto_command_contract_test.py -k us0101
-8 passed, 135 deselected in 0.08s
+pytest tests/auto_command_contract_test.py -k us0102 -q
+8 passed, 143 deselected in 0.08s
+
+pytest tests/auto_command_contract_test.py -k us0101 -q
+8 passed, 143 deselected in 0.07s
+
+python scripts/model_tier_validate.py --repo .
+[MODEL_TIER_VALIDATION_OK]
+
+python scripts/check_intake_template_parity.py --scope=model-tier-overrides
+[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier-overrides
+
+python scripts/check_intake_template_parity.py --scope=model-tier
+[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier
 ```
 
 ---
 
-## Acceptance Criteria Coverage
+## UAT Matrix (AC-1..AC-10)
 
-**Total ACs**: 9
-**Satisfied**: 9
-**Status**: ALL_SATISFIED
+**Total**: 10 | **Passed**: 10 | **Failed**: 0 | **Status**: populated
 
-| AC | Description | Tasks | Status |
-|----|-------------|-------|--------|
-| AC-1 | Scratchpad tier contract | T-001 | PASS |
-| AC-2 | Default phase→tier matrix | T-002 | PASS |
-| AC-3 | Tier→Cursor alias resolution | DEC-0086 | PASS |
-| AC-4 | Local model catalog | T-004, T-005 | PASS |
-| AC-5 | Agent template defaults | T-003 | PASS |
-| AC-6 | Provider mode runbook | T-007, T-008 | PASS |
-| AC-7 | Validator + reason codes | T-005, T-006 | PASS |
-| AC-8 | Contract tests + parity | T-009, T-010 | PASS |
-| AC-9 | Architecture + decision anchor | T-010, DEC-0086, architecture.md | PASS |
+All UAT steps pass — see `sprints/S0092/uat.md` and `sprints/S0092/uat.json`.
 
 ---
 
@@ -89,23 +67,27 @@ pytest tests/auto_command_contract_test.py -k us0101
 
 | Artifact | Path | Status |
 |----------|------|--------|
-| Task definitions | sprints/S0091/task.json | Present |
-| Implementation summary | sprints/S0091/summary.md | Present |
-| QA verdict | sprints/S0091/qa-verdict.json | Present |
-| QA findings | sprints/S0091/qa-findings.md | Present |
+| Sprint plan | sprints/S0092/sprint.md | Present |
+| Tasks | sprints/S0092/tasks.md | Present |
+| Implementation summary | sprints/S0092/summary.md | Present |
+| Plan-verify | sprints/S0092/plan-verify.json | Present |
+| QA findings | sprints/S0092/qa-findings.md | Present |
+| UAT (machine) | sprints/S0092/uat.json | Populated |
+| UAT (human) | sprints/S0092/uat.md | Populated |
+| Verify-work verdict (json) | sprints/S0092/verify-work-verdict.json | Created |
+| Verify-work verdict (md) | sprints/S0092/verify-work-verdict.md | Created |
 | Dev-to-QA handoff | handoffs/dev_to_qa.md | Present |
 | QA-to-verify handoff | handoffs/qa_to_verify.md | Present |
-| Decision record | decisions/DEC-0086.md | Present |
-| Verify-work verdict | sprints/S0091/verify-work-verdict.json | Created |
+| Decision record | decisions/DEC-0087.md | Present |
 | Verify-to-release handoff | handoffs/verify_to_release.md | Created |
 
 ---
 
 ## Governance Notes
 
-- **US-0101** remains **OPEN** in `docs/product/backlog.md` (authority) — do NOT flip status (US-0045)
-- **DEC-0086** locked — architecture decisions binding
-- **R-0088** closed — research complete
+- **US-0102** remains **OPEN** in `docs/product/backlog.md` (authority) — status flip to **DONE** at `/release` per **US-0045**
+- AC checkboxes checked in backlog as release prep (verify-work boundary)
+- **DEC-0087** locked — composes **DEC-0086** / **US-0101** (do not amend)
 - **Spawn-only (BUG-0006)**: Verify-work verification persisted; spawn fresh **release** for `/release`
 
 ---
@@ -115,8 +97,8 @@ pytest tests/auto_command_contract_test.py -k us0101
 `handoffs/resume_brief.md` updated to point to `/release` phase with:
 - `next_scheduled_phase=release`
 - `intended_resume_phase=release`
-- `resolved_start_phase=verify-work`
-- Contract: verify-work **PASS** — all tasks DONE; QA verdict PASS; 8/8 contract tests; all 9 ACs satisfied; ready for /release
+- `default_spawn_role=release`
+- Contract: verify-work **PASS** — 11/11 tasks done; QA PASS 10/10 ACs; UAT 10/10; ready for `/release`
 
 ---
 
@@ -125,12 +107,12 @@ pytest tests/auto_command_contract_test.py -k us0101
 Verify-work checkpoint appended to `docs/engineering/state.md`:
 - `phase_id=verify-work`
 - `role=qa`
-- `fresh_context_marker=qa-US0101-verify-work-20260615T233000Z-fresh`
-- `timestamp=2026-06-15T23:30:00Z`
+- `fresh_context_marker=qa-S0092-US0102-verify-work-20260625T233000Z-fresh`
+- `timestamp=2026-06-25T23:30:00Z`
 - `verdict=PASS`
-- `evidence_ref=sprints/S0091/verify-work-verdict.json,handoffs/verify_to_release.md`
+- `evidence_ref=sprints/S0092/verify-work-verdict.json,sprints/S0092/uat.json,sprints/S0092/uat.md,handoffs/verify_to_release.md`
 
 ---
 
-**Handoff Status**: Ready for `/release` phase
-**Handoff Timestamp**: 2026-06-15T23:30:00Z
+**Handoff Status**: Ready for `/release` phase  
+**Handoff Timestamp**: 2026-06-25T23:30:00Z

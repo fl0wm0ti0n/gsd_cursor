@@ -1620,6 +1620,12 @@ Assert-True "model_tier_lib.py --self-test passes" ($us0101Self.ExitCode -eq 0)
 $us0101Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0101") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0101 contract subtests pass" ($us0101Contract.ExitCode -eq 0)
 
+# 26AA) US-0102 / DEC-0087 — model override contract + parity
+$us0102Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=model-tier-overrides") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=model-tier-overrides passes (US-0102)" ($us0102Parity.ExitCode -eq 0)
+$us0102Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0102") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0102 contract subtests pass" ($us0102Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

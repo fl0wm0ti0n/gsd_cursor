@@ -1,0 +1,137 @@
+{
+  "sprint_id": "S0092",
+  "story_ids": ["US-0102"],
+  "story_id": "US-0102",
+  "dec_id": "DEC-0087",
+  "status": "populated",
+  "author": "qa",
+  "timestamp": "2026-06-25T23:30:00Z",
+  "orchestrator_run_id": "auto-20260615-02",
+  "fresh_context_marker": "qa-S0092-US0102-verify-work-20260625T233000Z-fresh",
+  "passed": 10,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 10,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0087 execute deliverables present (model_tier_lib.py extensions, catalog v2 examples, validator, runbook)",
+    "template/ mirrors for MODEL_TIER_OVERRIDES_PAIRS",
+    "QA PASS confirmed — 10/10 ACs, 0 blockers",
+    "US-0102 remains OPEN in docs/product/backlog.md per US-0045"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": "AC-1",
+      "description": "Direct per-phase slug override scratchpad keys documented (MODEL_<PHASE>, MODEL_ASK, precedence comment block)",
+      "result": "pass",
+      "evidence": "test_us0102_direct_override_keys; .cursor/scratchpad.md + template mirrors"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": "AC-2",
+      "description": "5-step precedence resolution in resolve_model_for_phase()",
+      "result": "pass",
+      "evidence": "test_us0102_precedence_chain; scripts/model_tier_lib.py"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": "AC-3",
+      "description": "Catalog schema v2 with role-based presets (v1 backward compatible)",
+      "result": "pass",
+      "evidence": "test_us0102_catalog_schema_v2; model-catalog.local.example.role-based-*.json"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": "AC-4",
+      "description": "Role catalog resolver when MODEL_RESOLVE=role_catalog (opt-in, fail-closed fall-through)",
+      "result": "pass",
+      "evidence": "test_us0102_role_catalog_resolver"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": "AC-5",
+      "description": "/ask phase MODEL_ASK direct override reinforcement",
+      "result": "pass",
+      "evidence": "test_us0102_ask_phase_reinforcement"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": "AC-6",
+      "description": "Tier-only backward compatibility unchanged vs US-0101",
+      "result": "pass",
+      "evidence": "test_us0102_tier_only_backward_compat; pytest -k us0101 → 8 passed"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": "AC-7",
+      "description": "Template stability — no vendor slugs under template/",
+      "result": "pass",
+      "evidence": "test_us0102_no_vendor_slugs_in_template"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": "AC-8",
+      "description": "Validator extensions + three new reason codes",
+      "result": "pass",
+      "evidence": "test_us0102_reason_codes; [MODEL_TIER_VALIDATION_OK]"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": "AC-9",
+      "description": "Eight test_us0102_* contract subtests + MODEL_TIER_OVERRIDES_PAIRS parity + harness §26AA",
+      "result": "pass",
+      "evidence": "pytest -k us0102 → 8 passed; [INTAKE_TEMPLATE_PARITY_OK] scope=model-tier-overrides; tests/run-tests.ps1 §26AA"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": "AC-10",
+      "description": "Documentation + runbook + architecture anchor (DEC-0087, # US-0102)",
+      "result": "pass",
+      "evidence": "docs/engineering/runbook.md § US-0102; docs/engineering/architecture.md # US-0102; scratchpad MODEL_RESOLVE enum"
+    }
+  ],
+  "probe_results": [
+    {
+      "probe_id": "verify-us0102-contract",
+      "probe_type": "test",
+      "command": "pytest -k us0102 tests/auto_command_contract_test.py -q",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "output_ref": "8 passed, 143 deselected"
+    },
+    {
+      "probe_id": "verify-us0101-backcompat",
+      "probe_type": "test",
+      "command": "pytest -k us0101 tests/auto_command_contract_test.py -q",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "output_ref": "8 passed, 143 deselected"
+    },
+    {
+      "probe_id": "verify-model-tier-validate",
+      "probe_type": "cli_smoke",
+      "command": "python scripts/model_tier_validate.py --repo .",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "output_ref": "[MODEL_TIER_VALIDATION_OK]"
+    },
+    {
+      "probe_id": "verify-parity-overrides",
+      "probe_type": "cli_smoke",
+      "command": "python scripts/check_intake_template_parity.py --scope=model-tier-overrides",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "output_ref": "[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier-overrides"
+    },
+    {
+      "probe_id": "verify-parity-tier",
+      "probe_type": "cli_smoke",
+      "command": "python scripts/check_intake_template_parity.py --scope=model-tier",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "output_ref": "[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier"
+    }
+  ]
+}

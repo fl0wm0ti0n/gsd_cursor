@@ -3,8 +3,8 @@ $ErrorActionPreference = 'Stop'
 # --- Config ---
 $packageName = 'its-magic'
 # UPDATE: url and checksum before each release
-$url         = 'https://github.com/fl0wm0ti0n/its-magic/archive/refs/tags/v0.1.3-0.zip'
-$checksum    = '93e20a41ef5bd04e7f82bd1b99ddd8f3ad00f1d9c21cd184a461304e118e1860'
+$url         = 'https://github.com/fl0wm0ti0n/its-magic/archive/refs/tags/v0.1.3-1.zip'
+$checksum    = 'f8886e60845ead8d9605bf5ec3091361d5c1bf04a706fe825cbab6ff8f2ea476'
 $checksumType= 'sha256'
 
 # --- Download & extract ---
@@ -53,6 +53,8 @@ Write-Host ""
 Write-Host "  Run: its-magic --help" -ForegroundColor White
 Write-Host ""
 [Console]::OutputEncoding = $prev
+
+
 
 
 

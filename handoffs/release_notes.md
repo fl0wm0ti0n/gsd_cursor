@@ -13,10 +13,22 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0090`
-- **Latest canonical notes:** `handoffs/releases/S0090-release-notes.md`
-- **Latest release date:** 2026-06-15
-- **Latest release work item:** US-0100
+- **Latest released sprint:** `S0092`
+- **Latest canonical notes:** `handoffs/releases/S0092-release-notes.md`
+- **Latest release date:** 2026-06-26
+- **Latest release work item:** US-0102
+
+## Release finalized note (S0092)
+
+- Sprint: `S0092`
+- Story: `US-0102` (direct per-phase model slug override + role-based catalog presets — DEC-0087 / composes DEC-0086)
+- Release: **finalized** (`2026-06-26T00:00:00Z`, `orchestrator_run_id=auto-20260615-02`, strict proof `proof_hash=18d3bed52733e0325eac9068b5aa61f07a97153791217d1e23e4e62663e0b858`)
+- Queue: **`handoffs/release_queue.md`** row **`S0092`** = **`released`**
+- **Run / verify:** `pytest -k us0102 tests/auto_command_contract_test.py -v` → 8 passed; `python scripts/model_tier_validate.py --repo .` → `[MODEL_TIER_VALIDATION_OK]`; see **`handoffs/releases/S0092-release-notes.md`** **## Run** / **## Verify**
+- Changelog: step **19** appended **US-0102** under **`CHANGELOG.md`** **`[Unreleased]`** (workflow-only; no semver)
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0 OPEN** stories; backlog drain budget **4** remaining
 
 ## Release finalized note (S0090)
 

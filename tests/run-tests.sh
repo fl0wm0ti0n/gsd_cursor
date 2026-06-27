@@ -1500,6 +1500,16 @@ assert_true "check_intake_template_parity --scope=model-tier passes (US-0101)" "
 assert_true "model_tier_lib.py --self-test passes" "[ \"$US0101_SELF_PY\" -eq 0 ]"
 assert_true "US-0101 contract subtests pass" "[ \"$US0101_CONTRACT_PY\" -eq 0 ]"
 
+# 26AA) US-0102 / DEC-0087 — model override contract + parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=model-tier-overrides >/dev/null 2>&1
+US0102_PARITY_PY=$?
+"$PY" -m pytest tests/auto_command_contract_test.py -q -k us0102 >/dev/null 2>&1
+US0102_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=model-tier-overrides passes (US-0102)" "[ \"$US0102_PARITY_PY\" -eq 0 ]"
+assert_true "US-0102 contract subtests pass" "[ \"$US0102_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

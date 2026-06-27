@@ -8,177 +8,6 @@ The existing installer architecture (Node.js CLI wrapper → OS-specific install
 
 ---
 
-# US-0091: README ↔ backlog feature coverage backfill + blocking drift gate
-
-## Overview
-
-**Composes on `# US-0077`** (dual-README audience — **`DEC-0059`**) and **extends the
-release doc-gate family** alongside **US-0030** (delta-driven command/flag documentation
-gate). `US-0030` blocks README/runbook **deltas** when commands/flags change; **US-0091**
-blocks **missing initial blurbs** for DONE user-visible work items. Audit, backfill, and
-blocking validator ship atomically in one story.
-
-Binding decision: **`DEC-0074`**. Research anchor: **`R-0074`**. Open
-`decisions/DEC-0074.md` for normative predicate, reason codes, grandfathering, and
-parity inventory.
-
-## Gate composition diagram
-
-```mermaid
-flowchart TD
-  subgraph release_doc_gates["Release doc-gate family"]
-    A["US-0030 doc-delta\n(agent checklist)\ncommands/flags changed?"]
-    B["US-0091 static coverage\n(step 3f script)\nall DONE user-visible\ncatalog present?"]
-  end
-  A --> B
-  B --> C["Step 4 UAT / downstream gates"]
-  A -.->|unchanged| A
-  B -->|README_FEATURE_COVERAGE_ENFORCE=0| skip["skipped evidence\n(grandfathering)"]
-  B -->|README_FEATURE_COVERAGE_ENFORCE=1\n+ --enforce| block["README_FEATURE_COVERAGE_BLOCKED\n+ sub-codes"]
-```
-
-**Remediation vocabulary** (runbook subsection):
-
-| Gate | Question answered | Remediation |
-|------|-------------------|-------------|
-| US-0030 delta | Did this sprint change commands/flags without README/runbook update? | Update README/runbook for changed surfaces |
-| US-0091 static | Does every DONE user-visible item have a README blurb + DEV row? | Backfill root + DEV shard; set `user_visible:` marker |
-
-## Minimal architecture
-
-### A. Predicate and backlog marker (DEC-0074 §1–§2)
-
-- Canonical input: backlog block field **`user_visible: true|false`**.
-- In-scope: **DONE** + explicit `true` or migration-heuristic pass (H1–H8) when
-  `README_FEATURE_COVERAGE_ENFORCE=0`.
-- Out-of-scope: explicit `false` or pure-internal surfaces (H5 without H6).
-- Ambiguous (H7 on stories) → **`README_FEATURE_COVERAGE_INPUT_INVALID`**.
-- When **`README_FEATURE_COVERAGE_ENFORCE=1`**: heuristic disabled; unset → fail closed.
-
-**Heuristic table H1–H8** — verbatim in **`DEC-0074` §2** and **`R-0074`** research
-extension.
-
-### B. Three-file coverage target (DEC-0074 §3)
-
-| File | Role |
-|------|------|
-| Root **`README.md`** | Operator blurbs under existing `USER_*` H2s |
-| **`template/README.md`** | Byte parity with root (**US-0017**) |
-| **`docs/developer/README.md`** | `DEV_*` traceability rows (id + US/DEC + scratchpad flags) |
-
-Backfill: 1–2 sentence operator blurbs; no new H2 literals. Profile budgets enforced via
-`doc_profile_lib` composition.
-
-### C. Section-affinity manifest (DEC-0074 §4)
-
-**`docs/engineering/context/readme-section-affinity.json`** (active + `template/` mirror)
-maps work-item tags → `root_h2` + `dev_h2`. Classifier: first matching tag from summary
-keywords / slash-command; fallback `slash_command` if H1 else `governance`.
-
-### D. Validator (DEC-0074 §5–§6)
-
-**`scripts/validate_readme_feature_coverage.py`** + **`scripts/readme_feature_coverage_lib.py`**
-(stdlib-only).
-
-| Flag | Purpose |
-|------|---------|
-| `--self-test` | Predicate matrix + schema stability |
-| `--report` | Stable JSON (`coverage_total` / `coverage_present` / `coverage_missing`) |
-| `--audit-out PATH` | Gap artifact for execute phase |
-| `--enforce` | Blocking mode (release step 3f) |
-
-**Reason codes**: umbrella **`README_FEATURE_COVERAGE_BLOCKED`** + sub-codes per AC-5
-(gap, parity fail, input invalid, profile violation).
-
-### E. Release wiring — step 3f (DEC-0074 §7)
-
-After **3e** legacy drift, before step **4** UAT in `.cursor/commands/release.md`
-(active + `template/`):
-
-- Read merged scratchpad **`README_FEATURE_COVERAGE_ENFORCE`** (default **`0`**).
-- When **`0`**: skip with `skipped` evidence (grandfathering).
-- When **`1`**: `python scripts/validate_readme_feature_coverage.py --repo . --enforce`.
-
-**Not** wired into `validate-and-push` (wrong lifecycle).
-
-### F. Grandfathering (DEC-0074 §8)
-
-Scratchpad **`README_FEATURE_COVERAGE_ENFORCE=0|1`** (default **`0`** until backfill
-completes). Same-sprint flip **0→1** with backfill merge — no retroactive `/release`
-block on pre-backfill DONE items.
-
-### G. Template parity inventory (DEC-0074 §9)
-
-Extend **`check_intake_template_parity.py --scope=readme-feature-coverage`**:
-
-| Active | Template |
-|--------|----------|
-| `scripts/validate_readme_feature_coverage.py` | `template/scripts/...` |
-| `scripts/readme_feature_coverage_lib.py` | `template/scripts/...` |
-| `docs/engineering/context/readme-section-affinity.json` | `template/docs/engineering/context/...` |
-| `.cursor/commands/release.md` (step 3f) | `template/.cursor/commands/release.md` |
-| `docs/engineering/runbook.md` (subsection) | `template/docs/engineering/runbook.md` |
-| `installer-owned-paths.manifest` (script paths) | `template/.../installer-owned-paths.manifest` |
-
-Compose with **US-0017** README byte guard — do not duplicate parity logic inside validator.
-
-**Harness**: **`§27U`** in `tests/run-tests.ps1` + `tests/run-tests.sh`.
-
-**Active-only**: `# US-0091` (this section), `tests/fixtures/readme_feature_coverage/`,
-generated `readme-feature-coverage-audit.json`.
-
-## Risks (architecture-resolved)
-
-| ID | Mitigation |
-|----|------------|
-| R1 False positives | Explicit markers + H7 fail-closed |
-| R2 README bloat | 1–2 sentence blurbs + profile budget check |
-| R3 Parity drift | US-0017 + scoped parity script |
-| R4 Retroactive lock-in | `README_FEATURE_COVERAGE_ENFORCE=0` until flip |
-| R5 US-0071 leakage | Command/flag tokens in root; metadata scanner on changed paths |
-| R6 Heuristic ambiguity | enforce=1 disables heuristic |
-| R7 Delta vs static confusion | Runbook remediation table above |
-
-## AC traceability
-
-| AC | Architecture anchor |
-|----|---------------------|
-| AC-1 Predicate | §A + DEC-0074 §1–§2 |
-| AC-2 Audit report | §D (`--report` / `--audit-out`) |
-| AC-3 Three-file backfill | §B |
-| AC-4 Audience boundaries | §B, §C, DEC-0059 |
-| AC-5 Validator + reason codes | §D + DEC-0074 §6 |
-| AC-6 Release gate | §E (step 3f) |
-| AC-7 Idempotent `--report` | §D |
-| AC-8 US-0071 hygiene | §B (blurb preference) |
-| AC-9 Template parity | §G |
-| AC-10 Grandfathering DEC | §F + **`DEC-0074`** |
-
-## Atomic task seeds (for `/sprint-plan`)
-
-| # | Seed | AC | Surfaces |
-|---|------|----|----------|
-| 1 | Implement `readme_feature_coverage_lib.py` — predicate H1–H8, backlog parser, affinity resolver, README index | AC-1, AC-2 | `scripts/` + `template/scripts/` |
-| 2 | Implement `validate_readme_feature_coverage.py` CLI (`--self-test`, `--report`, `--audit-out`, `--enforce`) | AC-5, AC-7 | `scripts/` + `template/scripts/` |
-| 3 | Ship `readme-section-affinity.json` manifest | AC-2, AC-4 | `docs/engineering/context/` + `template/` |
-| 4 | One-time audit + three-file backfill (root + template + DEV shard) | AC-2, AC-3, AC-4, AC-8 | README family + backlog `user_visible:` markers |
-| 5 | Release step **3f** + runbook subsection (delta vs static table) | AC-6 | `.cursor/commands/release.md` + runbook + `template/` |
-| 6 | Scratchpad `README_FEATURE_COVERAGE_ENFORCE` + example parity | AC-10 | scratchpad active + template examples |
-| 7 | Extend `check_intake_template_parity.py --scope=readme-feature-coverage` | AC-9 | parity script + `template/` |
-| 8 | Installer manifest entries for new scripts | AC-9 | `installer-owned-paths.manifest` + `template/` |
-| 9 | Fixtures `tests/fixtures/readme_feature_coverage/` + harness **§27U** | AC-5, AC-7, AC-9 | tests active-only |
-| 10 | Architecture linkage assert (this section references US-0030, DEC-0059, US-0017, US-0071) | AC-10 | read-only check |
-
-**Task count**: 10 seeds. `SPRINT_MAX_TASKS=12` — no auto-split expected.
-
-## Related
-
-- **`US-0030`** — delta gate (unchanged)
-- **`US-0077`** / **`DEC-0059`** — audience profiles
-- **`US-0017`** — template drift guard
-- **`US-0071`** — user-visible metadata sanitization
-- **`R-0074`** — research anchor
-
 # BUG-0009: Downstream-safe template CI vs kit-internal active CI
 
 ## Overview
@@ -2843,4 +2672,210 @@ Merge precedence: **local > materialized > example** per **DEC-0055**.
 - Research: **`R-0088`**
 - Composed: **DEC-0062** (TOKEN_PROFILE), **US-0069** (phase→role), **US-0003** (subagent defs), **US-0080** (TOKEN_PROFILE), **US-0092** (outer driver)
 - Related: **US-0023**, **US-0048**
+
+# US-0102: Direct per-phase model slug override and role-based catalog presets
+
+## Overview
+
+**Composes on `# US-0101` / `DEC-0086`** (tier baseline — **do not amend**). This section adds two optional operator overlays: **direct per-phase vendor slug assignment** (`MODEL_<PHASE>=<slug>`) and **role-based catalog presets** (`MODEL_RESOLVE=role_catalog`), while retaining the three-tier system as default/fallback.
+
+Binding decision: **`DEC-0087`**. This section is a self-contained summary for sprint planners; open `decisions/DEC-0087.md` for the normative statement, alternatives, and risk resolutions.
+
+## Assumption challenge and alternatives
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| A | **Extend `model_tier_lib.py`** with unified precedence + v2 catalog | **Preferred** — single resolver surface; backward compatible with US-0101 call sites. |
+| B | **New `model_overrides_lib.py`** module | **Rejected** — duplicates tier logic; two validators to keep in sync. |
+| C | **Role presets replace tiers** | **Rejected** — AC requires tier-only configs unchanged; migration forbidden. |
+| D | **Hardcode vendor slugs in template agents** | **Rejected** — volatile IDs forbidden; local catalog + scratchpad.local only. |
+| E | **Architecture-only (no companion DEC)** | **Rejected** — extends **DEC-0086** resolver contract and reason-code families. |
+
+## Precedence chain (AC-1, AC-2, AC-4)
+
+Normative resolution order for each canonical `phase_id`:
+
+```
+MODEL_<PHASE>  →  MODEL_TIER_<PHASE>  →  [role_catalog lookup]  →  MODEL_TIER_DEFAULT  →  Cursor alias
+```
+
+| Step | Condition | Action |
+|------|-----------|--------|
+| **1** | `MODEL_<PHASE>` non-empty | Return slug (validate per § Direct slug validation) or **`MODEL_OVERRIDE_SLUG_UNKNOWN`** |
+| **2** | `MODEL_TIER_<PHASE>` set (or phase matrix default) | **DEC-0086** tier→alias / `local_catalog` tier lookup |
+| **3** | `MODEL_RESOLVE=role_catalog` | Phase→logical role (**DEC-0051** + `AUTO_ROLE_*`) → catalog `roles[<key>]`; miss → **`MODEL_ROLE_SLUG_UNKNOWN`** → continue |
+| **4** | `MODEL_TIER_DEFAULT` | **DEC-0086** tier chain |
+| **5** | Fallback | **DEC-0086** §2 Cursor alias (`fast` / `inherit` / omit) |
+
+When `MODEL_RESOLVE` is `alias_only` or `local_catalog`, step **3** is skipped.
+
+## Scratchpad keys (AC-1, AC-5)
+
+| Key | Default | Role |
+|-----|---------|------|
+| **`MODEL_<PHASE>`** | *(absent)* | Direct vendor slug; `<PHASE>` = same list as **DEC-0086** (includes **`ask`**, **`architecture`**, **`execute`**, …) |
+| **`MODEL_RESOLVE`** | **`alias_only`** | **`alias_only`** \| **`local_catalog`** \| **`role_catalog`** |
+
+**DEC-0086** keys unchanged. Merge precedence for scratchpad files: **local > materialized > example** (**DEC-0055**).
+
+**Template policy (AC-7)**: `template/.cursor/scratchpad.md` shows `MODEL_TIER_*` keys and documents `MODEL_<PHASE>` in comments with `<your-vendor-slug>` placeholders — **no real vendor slugs**. Operator examples in `.cursor/scratchpad.local.md` only.
+
+## Direct slug validation (AC-2, AC-8)
+
+| `MODEL_RESOLVE` | Validation for `MODEL_<PHASE>` |
+|-----------------|--------------------------------|
+| **`alias_only`** | Non-empty string → return opaque slug |
+| **`local_catalog`** / **`role_catalog`** | Slug must appear in catalog `tiers` values or `roles` values (when `roles` present) |
+
+Unknown phase id, empty slug, or catalog miss (when validation required) → **`MODEL_OVERRIDE_SLUG_UNKNOWN`** with remediation text.
+
+## Catalog schema v2 (AC-3, AC-6)
+
+### v1 (unchanged)
+
+Existing **DEC-0086** v1 schema continues to work — no `roles` section required.
+
+### v2 (opt-in)
+
+```json
+{
+  "schema_version": 2,
+  "tiers": {
+    "cheap": "<slug>",
+    "balanced": "<slug>",
+    "strong": "<slug>"
+  },
+  "roles": {
+    "po": "<slug>",
+    "sa": "<slug>",
+    "dev": "<slug>",
+    "dev_difficult": "<slug>",
+    "qa": "<slug>",
+    "security": "<slug>",
+    "release": "<slug>"
+  },
+  "notes": "optional"
+}
+```
+
+- **`tiers`**: all three keys required (same as v1).
+- **`roles`**: optional; when present, all seven keys required with non-empty slugs.
+- Role recommendations reference `ai_modell_auslegung_cursor_highend.md` (non-normative).
+- Validator accepts **both** v1 and v2; v2 malformation → **`MODEL_CATALOG_SCHEMA_V2_INVALID`**.
+
+**Committed examples** (placeholder slugs only):
+
+| File | Purpose |
+|------|---------|
+| `.cursor/model-catalog.local.example.role-based-balanced.json` | Balanced role preset template |
+| `.cursor/model-catalog.local.example.role-based-highend.json` | High-end role preset template |
+
+## Role catalog resolver (AC-4)
+
+Active when **`MODEL_RESOLVE=role_catalog`**.
+
+### Phase → logical role (**DEC-0051**)
+
+| phase_id | Default logical role | Policy override |
+|----------|---------------------|-----------------|
+| `intake`, `discovery` | `po` | — |
+| `research` | `tech-lead` | `AUTO_ROLE_RESEARCH` |
+| `architecture`, `sprint-plan` | `tech-lead` | — |
+| `plan-verify` | `qa` | `AUTO_ROLE_PLAN_VERIFY` |
+| `execute`, `quick` | `dev` | — |
+| `qa`, `verify-work` | `qa` | — |
+| `security-review` | `security` | — |
+| `release` | `release` | — |
+| `refresh-context` | `curator` | `AUTO_ROLE_REFRESH_CONTEXT` |
+| `ask`, `memory-audit`, `status-reconcile`, `pause` | `dev` | cheap-phase worker default |
+| `auto` | *(skip role lookup)* | inherits parent |
+
+### Logical role → catalog `roles` key
+
+| Logical role | Catalog key |
+|--------------|-------------|
+| `po` | `po` |
+| `tech-lead` | `sa` |
+| `dev`, `curator` | `dev` |
+| `qa` | `qa` |
+| `security` | `security` |
+| `release` | `release` |
+
+Operators assign **`dev_difficult`** slugs via direct override (`MODEL_EXECUTE=<slug>`) or tier **`strong`** + catalog tier mapping — no automatic phase→`dev_difficult` routing in v1.
+
+## Backward compatibility (AC-6)
+
+- Tier-only configurations (no `MODEL_<PHASE>` keys, `MODEL_RESOLVE=alias_only`, v1 catalog) behave identically to **US-0101** / **DEC-0086**.
+- No migration required; v2 catalogs are opt-in.
+- Contract test **`test_us0102_tier_only_backward_compat`** asserts pre-US-0102 resolution paths unchanged.
+
+## Reason codes — new + extended (AC-8)
+
+| Code | Trigger |
+|------|---------|
+| **`MODEL_OVERRIDE_SLUG_UNKNOWN`** | Direct slug validation failure (§ Direct slug validation) |
+| **`MODEL_ROLE_SLUG_UNKNOWN`** | Role key missing from catalog when `MODEL_RESOLVE=role_catalog` |
+| **`MODEL_CATALOG_SCHEMA_V2_INVALID`** | v2 schema validation failure |
+| *(existing **DEC-0086** codes)* | Unchanged — tier/catalog/resolve family |
+
+## Contract tests + parity (AC-9)
+
+**Run**: `pytest -k us0102 tests/auto_command_contract_test.py`
+
+| Test | AC | Key assertions |
+|------|-----|----------------|
+| **`test_us0102_direct_override_keys`** | AC-1 | `MODEL_<PHASE>` scratchpad key literals + phase id enum |
+| **`test_us0102_precedence_chain`** | AC-2 | Deterministic 5-step precedence in resolver |
+| **`test_us0102_catalog_schema_v2`** | AC-3 | v2 schema + v1 backward compat |
+| **`test_us0102_role_catalog_resolver`** | AC-4 | Phase→role→slug when `role_catalog` |
+| **`test_us0102_tier_only_backward_compat`** | AC-6 | Tier-only path matches **US-0101** baseline |
+| **`test_us0102_no_vendor_slugs_in_template`** | AC-7 | No vendor slugs under `template/` |
+| **`test_us0102_reason_codes`** | AC-8 | Three new codes in lib + validator |
+| **`test_us0102_ask_phase_reinforcement`** | AC-5 | `MODEL_ASK` participates in step 1 |
+
+**Parity scope**: **`check_intake_template_parity.py --scope=model-tier-overrides`** — extends **`--scope=model-tier`** with **`MODEL_TIER_OVERRIDES_PAIRS`** (scratchpad override docs, v2 catalog examples, resolver literals, runbook).
+
+## Tranche ordering
+
+| Tranche | Scope | Seeds |
+|---------|-------|-------|
+| **A** | Scratchpad keys + docs | 1, 2 |
+| **B** | Catalog v2 examples + template placeholders | 3, 4 |
+| **C** | Resolver + validator lib | 5, 6, 7 |
+| **D** | Runbook + operator guide refs | 8 |
+| **E** | Contract tests + parity + harness | 9, 10, 11 |
+
+## Atomic task seeds (for `/sprint-plan`)
+
+| # | AC | Tranche | Summary |
+|---|-----|---------|---------|
+| 1 | AC-1, AC-5 | A | **`MODEL_<PHASE>` scratchpad keys** — document in `.cursor/scratchpad.md` + `template/.cursor/scratchpad.md` (placeholder comments only; include `MODEL_ASK`) |
+| 2 | AC-10 | A | **`MODEL_RESOLVE=role_catalog`** enum extension in scratchpad docs + precedence comment block |
+| 3 | AC-3, AC-7 | B | **Catalog schema v2 examples** — `.cursor/model-catalog.local.example.role-based-balanced.json` + `.role-based-highend.json` (placeholder slugs) + template copies |
+| 4 | AC-7 | B | **Template stability** — ensure `template/.cursor/scratchpad.md` tier-only examples; no vendor slugs in template catalog files |
+| 5 | AC-2, AC-4, AC-6 | C | **`model_tier_lib.py` unified resolver** — 5-step precedence; `resolve_model_for_phase()` API; v1/v2 catalog load; phase→role mapping constants |
+| 6 | AC-3, AC-8 | C | **Catalog v2 validation** — accept v1 unchanged; v2 `roles` optional section rules; **`MODEL_CATALOG_SCHEMA_V2_INVALID`** |
+| 7 | AC-8 | C | **`model_tier_validate.py` extensions** — direct slug keys, precedence self-test, three new reason codes |
+| 8 | AC-10 | D | **Runbook subsection** — direct override precedence, role catalog operator recipe, `ai_modell_auslegung_cursor_highend.md` reference (non-normative), backward-compat note |
+| 9 | AC-9 | E | **Eight `test_us0102_*` contract subtests** — all markers per AC-9 table |
+| 10 | AC-9 | E | **`MODEL_TIER_OVERRIDES_PAIRS` parity** — `check_intake_template_parity.py --scope=model-tier-overrides` |
+| 11 | AC-9 | E | **Harness section** — add **§26AA** (or next free) in `tests/run-tests.ps1` / `tests/run-tests.sh` for `pytest -k us0102` |
+
+**Task count**: **11** (`SPRINT_MAX_TASKS=12`, `within_limit=true` — no auto-split). **AC-10** architecture section pre-satisfied at **`/architecture`** (**`DEC-0087`** + this section).
+
+## Risks
+
+| Risk | Mitigation |
+|------|------------|
+| **R1** Precedence confusion (override vs tier vs role) | Locked 5-step chain + `test_us0102_precedence_chain` |
+| **R2** Vendor slugs committed to template | Grep gate + placeholder-only examples |
+| **R3** v1 catalog break on v2 validator | Explicit v1 path unchanged; regression test |
+| **R4** Role mapping drift vs **DEC-0051** | Architecture-locked table + shared constants in lib |
+| **R5** Isolation/spawn gates weakened by direct slug | **US-0023** / **US-0048** unchanged — model selection orthogonal to spawn isolation |
+
+## Decision linkage
+
+- Decision: **`DEC-0087`**
+- Composed: **DEC-0086** (US-0101 — do not amend), **DEC-0062** (TOKEN_PROFILE), **DEC-0051** (phase→role), **US-0003**, **US-0080**, **US-0092**
+- Related: **US-0101**, **US-0023**, **US-0048**, **US-0069**
 

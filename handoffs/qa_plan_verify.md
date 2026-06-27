@@ -1,5 +1,35 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
+## Next — **`S0092` / `US-0102`** (**PASS**)
+
+- **Verdict**: **PASS** — **`sprints/S0092/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-25T20:00:00Z`, **qa**, `orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-011** with **task-seed bijection** (11 architecture seeds → 11 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0102`**, **`DEC-0087`**, **DEC-0086**, **DEC-0051**, **DEC-0062**, **US-0003**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
+- **Findings summary** (one per AC):
+  - **AC-1 / T-001**: PASS — `MODEL_<PHASE>` direct override scratchpad keys + precedence; `test_us0102_direct_override_keys`.
+  - **AC-2 / T-005**: PASS — 5-step precedence in `resolve_model_for_phase()`; `test_us0102_precedence_chain`.
+  - **AC-3 / T-003, T-006**: PASS — catalog v2 examples + validation rules; `test_us0102_catalog_schema_v2`.
+  - **AC-4 / T-005**: PASS — role catalog resolver when `MODEL_RESOLVE=role_catalog`; `test_us0102_role_catalog_resolver`.
+  - **AC-5 / T-001**: PASS — `MODEL_ASK` reinforcement; `test_us0102_ask_phase_reinforcement`.
+  - **AC-6 / T-005**: PASS — tier-only backward compat unchanged; `test_us0102_tier_only_backward_compat`.
+  - **AC-7 / T-003, T-004**: PASS — placeholder-only template policy; `test_us0102_no_vendor_slugs_in_template`.
+  - **AC-8 / T-006, T-007**: PASS — three new reason codes + validator extensions; `test_us0102_reason_codes`.
+  - **AC-9 / T-009, T-010, T-011**: PASS — eight `test_us0102_*` + `MODEL_TIER_OVERRIDES_PAIRS` parity + harness §26AA.
+  - **AC-10 / T-002, T-008**: PASS — scratchpad `MODEL_RESOLVE` docs + runbook; architecture attestation (**DEC-0087** + `# US-0102`).
+- **Multi-AC scrutiny** (primary focus):
+  - **T-001 (AC-1+AC-5)** — **ACCEPTED**: architecture seed 1 — direct override keys share scratchpad surface with ask reinforcement.
+  - **T-003 (AC-3+AC-7)** — **ACCEPTED**: architecture seed 3 — v2 examples share catalog file surface with template stability.
+  - **T-005 (AC-2+AC-4+AC-6)** — **ACCEPTED**: architecture seed 5 — unified resolver shares precedence, role lookup, backward compat.
+  - **T-006 (AC-3+AC-8)** — **ACCEPTED**: architecture seed 6 — v2 schema validation shares lib with reason codes.
+  - **T-009+T-010+T-011 (AC-9)** — **ACCEPTED**: architecture seeds 9–11 — contract vs parity vs harness sequential.
+- **Non-goals confirmed**: no **DEC-0086** amendment; no tier-to-override migration; no vendor slugs in template; no **TOKEN_PROFILE** change; no spawn isolation weakening.
+- **Artifacts**: **`sprints/S0092/qa-findings.md`**, **`sprints/S0092/plan-verify.json`** (PASS), **`handoffs/resume_brief.md`** (top pointer → `/execute`), **`docs/product/backlog.md`** (`## US-0102` `plan_verify_notes`), **`docs/engineering/state.md`** (Plan-verify checkpoint).
+- **Strict proof** (plan-verify phase): **`runtime_proof_id=rp-auto-20260615-02-plan-verify-qa-20260625T200000Z-S0092-US0102`**, **`proof_hash=f9dfe7f28a2b5e72f49df78d7f073348f0eb779aa287f6bb8dede45d248b49da`**, **`proof_issued_at=2026-06-25T20:00:00Z`**, **`proof_ttl_seconds=3600`**, **`phase_id=plan-verify`**, **`role=qa`**.
+- **Prior strict proof** (sprint-plan phase): **`runtime_proof_id=rp-auto-20260615-02-sprint-plan-tech-lead-20260625T193000Z-US0102`**, **`proof_hash=8f3186f0574696a89af213f2687ac3425150b2c0e9365ac8a7888259d2d6c7aa`**.
+- **Decision-gate posture**: **none** — plan-verify satisfied; **`/execute`** unblocked.
+- **Canonical status**: **`US-0102`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0092`** / **`US-0102`**.
+
+## Prior — **`S0092` / `US-0102`** (**PENDING** — superseded)
+
 ## Next — **`S0090` / `US-0100`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0090/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-15T04:30:00Z`, **qa**, `orchestrator_run_id=auto-20260615-01`, `fresh_context_marker=qa-S0090-US0100-plan-verify-20260615T043000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-012** with **task-seed bijection** (12 architecture seeds → 12 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=12`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0100`**, **`R-0087`**, **`DEC-0085`**, **US-0040**, **US-0054**, **US-0067**, **US-0008**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Model tier validator CLI (US-0101 / DEC-0086).
+Model tier validator CLI (US-0101 / DEC-0086; US-0102 / DEC-0087).
 
 Validates:
 - Tier enum values (cheap|balanced|strong)
-- Catalog schema (schema_version, tiers object, all keys present)
+- Catalog schema (v1 + v2)
+- Direct MODEL_<PHASE> slug keys
 - Phase key spelling (canonical phase IDs)
 - Forbidden vendor slugs in template agents
 
@@ -18,39 +19,42 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
-# Import from model_tier_lib
 sys.path.insert(0, str(Path(__file__).parent))
 from model_tier_lib import (
+    CANONICAL_PHASE_IDS,
+    CATALOG_ROLE_KEYS,
     DEFAULT_PHASE_TIER_MATRIX,
+    PRECEDENCE_CHAIN_STEPS,
     ReasonCode,
     Tier,
+    catalog_validation_reason_code,
+    phase_to_model_key,
+    resolve_model_for_phase,
     validate_catalog_schema,
+    validate_direct_slug,
 )
 
-# Reason codes used for fail-closed reporting (DEC-0086 §3):
+# Reason codes used for fail-closed reporting (DEC-0086 §3 + DEC-0087 §8):
 # - MODEL_TIER_INVALID: unknown tier value
-# - MODEL_CATALOG_INVALID: malformed catalog JSON
+# - MODEL_CATALOG_INVALID: malformed catalog JSON (v1)
 # - MODEL_SLUG_UNKNOWN: tier key missing from catalog
 # - MODEL_RESOLVE_FALLBACK: catalog lookup failed, using fallback
-REASON_CODES = [
-    ReasonCode.MODEL_TIER_INVALID,
-    ReasonCode.MODEL_CATALOG_INVALID,
-    ReasonCode.MODEL_SLUG_UNKNOWN,
-    ReasonCode.MODEL_RESOLVE_FALLBACK,
-]
+# - MODEL_OVERRIDE_SLUG_UNKNOWN: direct slug validation failure
+# - MODEL_ROLE_SLUG_UNKNOWN: role catalog lookup miss
+# - MODEL_CATALOG_SCHEMA_V2_INVALID: v2 schema validation failure
+REASON_CODES = list(ReasonCode)
 
-# Forbidden vendor slug patterns (DEC-0086 §4)
 FORBIDDEN_SLUG_PATTERNS = [
     r"composer-",
     r"claude-",
     r"gpt-",
     r"opus-",
+    r"glm-",
 ]
 
-# Canonical phase IDs (from US-0069 / DEC-0051)
-CANONICAL_PHASE_IDS = set(DEFAULT_PHASE_TIER_MATRIX.keys())
+CANONICAL_PHASE_ID_SET = set(CANONICAL_PHASE_IDS)
 
 
 def validate_tier_enum(tier_value: str) -> Tuple[bool, str]:
@@ -64,8 +68,11 @@ def validate_tier_enum(tier_value: str) -> Tuple[bool, str]:
 
 def validate_phase_key(phase: str) -> Tuple[bool, str]:
     """Validate phase key spelling."""
-    if phase not in CANONICAL_PHASE_IDS:
-        return False, f"Unknown phase ID: {phase} (canonical: {', '.join(sorted(CANONICAL_PHASE_IDS))})"
+    if phase not in CANONICAL_PHASE_ID_SET:
+        return False, (
+            f"Unknown phase ID: {phase} "
+            f"(canonical: {', '.join(sorted(CANONICAL_PHASE_ID_SET))})"
+        )
     return True, ""
 
 
@@ -102,20 +109,45 @@ def check_template_agents(repo_root: Path) -> List[str]:
     return violations
 
 
-def validate_catalog(catalog_path: Path) -> Tuple[bool, List[str]]:
+def parse_scratchpad_keys(scratchpad_path: Path) -> Dict[str, str]:
+    """Parse key=value lines from scratchpad (skip comments)."""
+    result: Dict[str, str] = {}
+    if not scratchpad_path.exists():
+        return result
+    for line in scratchpad_path.read_text(encoding="utf-8").split("\n"):
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        if "=" in stripped:
+            key, value = stripped.split("=", 1)
+            result[key.strip()] = value.strip()
+    return result
+
+
+def validate_catalog(catalog_path: Path) -> Tuple[bool, List[str], ReasonCode]:
     """Validate catalog schema and return list of errors."""
-    errors = []
+    errors: List[str] = []
 
     if not catalog_path.exists():
         errors.append(f"Catalog file not found: {catalog_path}")
-        return False, errors
+        return False, errors, ReasonCode.MODEL_CATALOG_INVALID
 
     is_valid, error_msg = validate_catalog_schema(catalog_path)
     if not is_valid:
-        errors.append(error_msg)
-        return False, errors
+        schema_version = None
+        try:
+            with open(catalog_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                schema_version = data.get("schema_version")
+        except (json.JSONDecodeError, OSError):
+            pass
+        code = catalog_validation_reason_code(
+            error_msg,
+            {"schema_version": schema_version} if schema_version else None,
+        )
+        errors.append(error_msg or "Catalog validation failed")
+        return False, errors, code
 
-    # Additional validation: check tier values are non-empty
     with open(catalog_path, "r", encoding="utf-8") as f:
         catalog = json.load(f)
 
@@ -123,31 +155,40 @@ def validate_catalog(catalog_path: Path) -> Tuple[bool, List[str]]:
         if not slug.strip():
             errors.append(f"Tier '{tier_name}' has empty slug")
 
-    return len(errors) == 0, errors
+    if catalog.get("schema_version") == 2 and "roles" in catalog:
+        for role_name in CATALOG_ROLE_KEYS:
+            if role_name not in catalog["roles"]:
+                errors.append(f"Missing role key: {role_name}")
+            elif not catalog["roles"][role_name].strip():
+                errors.append(f"Role '{role_name}' has empty slug")
+
+    code = (
+        ReasonCode.MODEL_CATALOG_SCHEMA_V2_INVALID
+        if catalog.get("schema_version") == 2
+        else ReasonCode.MODEL_CATALOG_INVALID
+    )
+    return len(errors) == 0, errors, code
 
 
 def validate_scratchpad_tiers(scratchpad_path: Path) -> Tuple[bool, List[str]]:
     """Validate MODEL_TIER_* keys in scratchpad file."""
-    errors = []
+    errors: List[str] = []
 
     if not scratchpad_path.exists():
-        return True, errors  # scratchpad is optional
+        return True, errors
 
     content = scratchpad_path.read_text(encoding="utf-8")
 
-    # Find MODEL_TIER_* lines
     for line in content.split("\n"):
         line = line.strip()
         if line.startswith("MODEL_TIER_") and "=" in line:
             key, value = line.split("=", 1)
             value = value.strip()
 
-            # Skip comments
             if key.startswith("#"):
                 continue
 
-            # Validate tier value
-            if value and not value.startswith("<"):  # skip placeholders
+            if value and not value.startswith("<"):
                 is_valid, error = validate_tier_enum(value)
                 if not is_valid:
                     errors.append(f"{key}={value}: {error}")
@@ -155,20 +196,54 @@ def validate_scratchpad_tiers(scratchpad_path: Path) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
+def validate_scratchpad_direct_slugs(scratchpad_path: Path, catalog: dict | None) -> Tuple[bool, List[str]]:
+    """Validate MODEL_<PHASE> direct override keys."""
+    errors: List[str] = []
+    pad = parse_scratchpad_keys(scratchpad_path)
+    model_resolve = pad.get("MODEL_RESOLVE", "alias_only")
+
+    for phase_id in CANONICAL_PHASE_ID_SET:
+        key = phase_to_model_key(phase_id)
+        if key in pad and pad[key].strip() and not pad[key].startswith("<"):
+            slug = pad[key].strip()
+            is_valid, error = validate_direct_slug(slug, model_resolve, catalog)
+            if not is_valid:
+                errors.append(f"{key}={slug}: {error} [{ReasonCode.MODEL_OVERRIDE_SLUG_UNKNOWN.value}]")
+
+    return len(errors) == 0, errors
+
+
+def run_precedence_self_test() -> List[str]:
+    """Precedence self-test hook (DEC-0087)."""
+    errors: List[str] = []
+
+    if len(PRECEDENCE_CHAIN_STEPS) != 5:
+        errors.append("PRECEDENCE_CHAIN_STEPS must have exactly 5 steps")
+
+    # Step 1 wins over tier
+    pad = {"MODEL_EXECUTE": "<test-slug>", "MODEL_TIER_EXECUTE": "cheap", "MODEL_RESOLVE": "alias_only"}
+    result = resolve_model_for_phase("execute", pad)
+    if not result.success or result.slug != "<test-slug>":
+        errors.append("Precedence self-test: MODEL_EXECUTE should win step 1")
+
+    # Tier-only backward compat: execute → strong → omit alias
+    result = resolve_model_for_phase("execute", {"MODEL_RESOLVE": "alias_only"})
+    if not result.success or result.tier != Tier.STRONG or result.alias is not None:
+        errors.append("Precedence self-test: tier-only execute should resolve to strong/omit")
+
+    return errors
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Model tier validator (US-0101 / DEC-0086)",
+        description="Model tier validator (US-0101 / US-0102)",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Validate all (repo root)
   python scripts/model_tier_validate.py --repo .
-
-  # Validate specific catalog
   python scripts/model_tier_validate.py --catalog .cursor/model-catalog.local.json
-
-  # Check template agents for forbidden slugs
   python scripts/model_tier_validate.py --check-template-agents
+  python scripts/model_tier_validate.py --enforce
         """,
     )
 
@@ -177,36 +252,40 @@ Examples:
     parser.add_argument("--scratchpad", type=Path, help="Path to scratchpad file")
     parser.add_argument("--check-template-agents", action="store_true", help="Check template agents for forbidden slugs")
     parser.add_argument("--self-test", action="store_true", help="Run self-test (validate library contract)")
+    parser.add_argument("--enforce", action="store_true", help="Exit non-zero on any fail-closed code")
 
     args = parser.parse_args()
 
-    # Default to current directory
-    repo_root = args.repo or Path.cwd()
-    repo_root = repo_root.resolve()
+    repo_root = (args.repo or Path.cwd()).resolve()
+    all_errors: List[str] = []
 
-    all_errors = []
-
-    # Self-test mode
     if args.self_test:
         print("[SELF-TEST] Validating model_tier_lib contract...")
 
-        # Test 1: Tier enum
         for tier in Tier:
             is_valid, error = validate_tier_enum(tier.value)
             if not is_valid:
                 all_errors.append(f"Self-test failed: {error}")
 
-        # Test 2: Phase matrix
-        for phase in CANONICAL_PHASE_IDS:
+        for phase in CANONICAL_PHASE_ID_SET:
             is_valid, error = validate_phase_key(phase)
             if not is_valid:
                 all_errors.append(f"Self-test failed: {error}")
 
-        # Test 3: Forbidden slug patterns
         test_content = "model: composer-1"
         for pattern in FORBIDDEN_SLUG_PATTERNS:
             if not re.search(pattern, test_content, re.IGNORECASE):
                 all_errors.append(f"Self-test failed: pattern '{pattern}' not matching test content")
+
+        all_errors.extend(run_precedence_self_test())
+
+        for code in (
+            ReasonCode.MODEL_OVERRIDE_SLUG_UNKNOWN,
+            ReasonCode.MODEL_ROLE_SLUG_UNKNOWN,
+            ReasonCode.MODEL_CATALOG_SCHEMA_V2_INVALID,
+        ):
+            if code not in ReasonCode:
+                all_errors.append(f"Self-test failed: missing reason code {code.value}")
 
         if all_errors:
             print("[SELF_TEST_FAILED]")
@@ -217,75 +296,69 @@ Examples:
             print("[DEV_ENVIRONMENT_SELF_TEST_OK]")
             sys.exit(0)
 
-    # Validate catalog
+    catalog_dict = None
+
     if args.catalog:
         print(f"[CATALOG] Validating {args.catalog}...")
-        is_valid, errors = validate_catalog(args.catalog)
+        is_valid, errors, code = validate_catalog(args.catalog)
         if not is_valid:
-            all_errors.extend(errors)
+            all_errors.extend(f"[{code.value}] {e}" for e in errors)
             print(f"[CATALOG_INVALID] {args.catalog}", file=sys.stderr)
             for error in errors:
-                print(f"  {error}", file=sys.stderr)
+                print(f"  [{code.value}] {error}", file=sys.stderr)
+        else:
+            with open(args.catalog, "r", encoding="utf-8") as f:
+                catalog_dict = json.load(f)
 
-    # Validate scratchpad
     if args.scratchpad:
         print(f"[SCRATCHPAD] Validating {args.scratchpad}...")
         is_valid, errors = validate_scratchpad_tiers(args.scratchpad)
         if not is_valid:
             all_errors.extend(errors)
-            print(f"[SCRATCHPAD_INVALID] {args.scratchpad}", file=sys.stderr)
-            for error in errors:
-                print(f"  {error}", file=sys.stderr)
+        is_valid, errors = validate_scratchpad_direct_slugs(args.scratchpad, catalog_dict)
+        if not is_valid:
+            all_errors.extend(errors)
 
-    # Check template agents
     if args.check_template_agents:
         print(f"[TEMPLATE] Checking {repo_root / 'template' / '.cursor' / 'agents'}...")
         violations = check_template_agents(repo_root)
         if violations:
             all_errors.extend(violations)
-            print("[FORBIDDEN_SLUG_DETECTED]", file=sys.stderr)
-            for violation in violations:
-                print(f"  {violation}", file=sys.stderr)
 
-    # Default: validate all
     if not args.catalog and not args.scratchpad and not args.check_template_agents:
         print(f"[REPO] Validating {repo_root}...")
 
-        # Check catalog example
-        catalog_example = repo_root / ".cursor" / "model-catalog.local.example.json"
-        if catalog_example.exists():
-            print(f"[CATALOG] Validating {catalog_example}...")
-            is_valid, errors = validate_catalog(catalog_example)
-            if not is_valid:
-                all_errors.extend(errors)
-                print(f"[CATALOG_INVALID] {catalog_example}", file=sys.stderr)
-                for error in errors:
-                    print(f"  {error}", file=sys.stderr)
+        for example_name in (
+            "model-catalog.local.example.json",
+            "model-catalog.local.example.role-based-balanced.json",
+            "model-catalog.local.example.role-based-highend.json",
+        ):
+            catalog_example = repo_root / ".cursor" / example_name
+            if catalog_example.exists():
+                print(f"[CATALOG] Validating {catalog_example}...")
+                is_valid, errors, code = validate_catalog(catalog_example)
+                if not is_valid:
+                    all_errors.extend(f"[{code.value}] {e}" for e in errors)
 
-        # Check scratchpad
         scratchpad = repo_root / ".cursor" / "scratchpad.md"
         if scratchpad.exists():
             print(f"[SCRATCHPAD] Validating {scratchpad}...")
             is_valid, errors = validate_scratchpad_tiers(scratchpad)
             if not is_valid:
                 all_errors.extend(errors)
-                print(f"[SCRATCHPAD_INVALID] {scratchpad}", file=sys.stderr)
-                for error in errors:
-                    print(f"  {error}", file=sys.stderr)
 
-        # Check template agents
         print(f"[TEMPLATE] Checking {repo_root / 'template' / '.cursor' / 'agents'}...")
         violations = check_template_agents(repo_root)
         if violations:
             all_errors.extend(violations)
-            print("[FORBIDDEN_SLUG_DETECTED]", file=sys.stderr)
-            for violation in violations:
-                print(f"  {violation}", file=sys.stderr)
 
-    # Final verdict
+        all_errors.extend(run_precedence_self_test())
+
     if all_errors:
         print(f"\n[MODEL_TIER_VALIDATION_FAILED] {len(all_errors)} error(s)", file=sys.stderr)
-        sys.exit(1)
+        for error in all_errors:
+            print(f"  {error}", file=sys.stderr)
+        sys.exit(1 if args.enforce or True else 0)
     else:
         print("\n[MODEL_TIER_VALIDATION_OK]")
         sys.exit(0)

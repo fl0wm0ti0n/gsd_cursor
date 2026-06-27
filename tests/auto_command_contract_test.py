@@ -2799,6 +2799,135 @@ class Us0100ReleaseChangelogContractTests(unittest.TestCase):
             self.assertIn(code, lib)
             self.assertIn(code, validator)
 
+    # === US-0102: Direct per-phase slug override + role catalog (DEC-0087) ===
+
+    def test_us0102_direct_override_keys(self) -> None:
+        """AC-1: MODEL_<PHASE> scratchpad key literals + phase id enum."""
+        root = self._root()
+        scratchpad = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        self.assertIn("MODEL_<PHASE>", scratchpad)
+        self.assertIn("MODEL_ASK", scratchpad)
+        self.assertIn("<your-vendor-slug>", scratchpad)
+        self.assertIn("MODEL_<PHASE> > MODEL_TIER_<PHASE>", scratchpad)
+        for phase in ("ask", "execute", "qa", "refresh-context", "auto"):
+            self.assertIn(phase, scratchpad)
+
+    def test_us0102_precedence_chain(self) -> None:
+        """AC-2: Deterministic 5-step precedence in resolver."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import model_tier_lib as mtl  # noqa: E402
+
+        self.assertEqual(len(mtl.PRECEDENCE_CHAIN_STEPS), 5)
+        self.assertIn("MODEL_<PHASE>", mtl.PRECEDENCE_CHAIN_STEPS[0])
+        self.assertIn("role_catalog_lookup", mtl.PRECEDENCE_CHAIN_STEPS[2])
+
+        pad = {"MODEL_EXECUTE": "override-slug", "MODEL_RESOLVE": "alias_only"}
+        result = mtl.resolve_model_for_phase("execute", pad)
+        self.assertTrue(result.success)
+        self.assertEqual(result.slug, "override-slug")
+
+    def test_us0102_catalog_schema_v2(self) -> None:
+        """AC-3: v2 schema + v1 backward compat."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import model_tier_lib as mtl  # noqa: E402
+
+        balanced = root / ".cursor" / "model-catalog.local.example.role-based-balanced.json"
+        self.assertTrue(balanced.exists())
+        is_valid, error = mtl.validate_catalog_schema(balanced)
+        self.assertTrue(is_valid, error)
+
+        v1 = root / ".cursor" / "model-catalog.local.example.json"
+        is_valid, error = mtl.validate_catalog_schema(v1)
+        self.assertTrue(is_valid, error)
+
+        content = balanced.read_text(encoding="utf-8")
+        for role in ("po", "sa", "dev", "dev_difficult", "qa", "security", "release"):
+            self.assertIn(f'"{role}"', content)
+
+    def test_us0102_role_catalog_resolver(self) -> None:
+        """AC-4: Phase→role→slug when role_catalog."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import model_tier_lib as mtl  # noqa: E402
+        import json  # noqa: E402
+
+        catalog_path = root / ".cursor" / "model-catalog.local.example.role-based-balanced.json"
+        with open(catalog_path, encoding="utf-8") as f:
+            catalog = json.load(f)
+
+        pad = {"MODEL_RESOLVE": "role_catalog", "MODEL_TIER_DEFAULT": "balanced"}
+        result = mtl.resolve_model_for_phase("intake", pad, catalog=catalog)
+        self.assertTrue(result.success)
+        self.assertEqual(result.slug, catalog["roles"]["po"])
+
+        result = mtl.resolve_model_for_phase("architecture", pad, catalog=catalog)
+        self.assertTrue(result.success)
+        self.assertEqual(result.slug, catalog["roles"]["sa"])
+
+    def test_us0102_tier_only_backward_compat(self) -> None:
+        """AC-6: Tier-only path matches US-0101 baseline."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import model_tier_lib as mtl  # noqa: E402
+
+        pad = {"MODEL_RESOLVE": "alias_only"}
+        for phase, expected_tier in (
+            ("execute", mtl.Tier.STRONG),
+            ("intake", mtl.Tier.BALANCED),
+            ("ask", mtl.Tier.CHEAP),
+        ):
+            unified = mtl.resolve_model_for_phase(phase, pad)
+            legacy = mtl.resolve_model_tier(phase, model_resolve="alias_only")
+            self.assertEqual(unified.tier, legacy.tier, phase)
+            self.assertEqual(unified.alias, legacy.alias, phase)
+            self.assertEqual(unified.tier, expected_tier, phase)
+
+    def test_us0102_no_vendor_slugs_in_template(self) -> None:
+        """AC-7: No vendor slugs in template scratchpad + v2 catalog examples."""
+        root = self._root()
+        forbidden = ("composer-", "claude-", "gpt-", "opus-", "glm-")
+        paths = [
+            root / "template" / ".cursor" / "scratchpad.md",
+            root / "template" / ".cursor" / "model-catalog.local.example.json",
+            root / "template" / ".cursor" / "model-catalog.local.example.role-based-balanced.json",
+            root / "template" / ".cursor" / "model-catalog.local.example.role-based-highend.json",
+        ]
+        for path in paths:
+            self.assertTrue(path.exists(), f"Missing {path}")
+            content = path.read_text(encoding="utf-8")
+            for pattern in forbidden:
+                self.assertNotIn(pattern, content, f"{path} contains {pattern}")
+
+    def test_us0102_reason_codes(self) -> None:
+        """AC-8: Three new codes in lib + validator."""
+        root = self._root()
+        lib = (root / "scripts" / "model_tier_lib.py").read_text(encoding="utf-8")
+        validator = (root / "scripts" / "model_tier_validate.py").read_text(encoding="utf-8")
+        for code in (
+            "MODEL_OVERRIDE_SLUG_UNKNOWN",
+            "MODEL_ROLE_SLUG_UNKNOWN",
+            "MODEL_CATALOG_SCHEMA_V2_INVALID",
+        ):
+            self.assertIn(code, lib)
+            self.assertIn(code, validator)
+
+    def test_us0102_ask_phase_reinforcement(self) -> None:
+        """AC-5: MODEL_ASK participates in step 1."""
+        root = self._root()
+        sys.path.insert(0, str(root / "scripts"))
+        import model_tier_lib as mtl  # noqa: E402
+
+        scratchpad = (root / ".cursor" / "scratchpad.md").read_text(encoding="utf-8")
+        self.assertIn("MODEL_ASK", scratchpad)
+        self.assertIn("MODEL_ASK participates in step 1", scratchpad)
+
+        pad = {"MODEL_ASK": "ask-override-slug", "MODEL_RESOLVE": "alias_only"}
+        result = mtl.resolve_model_for_phase("ask", pad)
+        self.assertTrue(result.success)
+        self.assertEqual(result.slug, "ask-override-slug")
+
 
 if __name__ == "__main__":
     unittest.main()

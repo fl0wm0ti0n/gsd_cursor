@@ -1,3 +1,5 @@
+## --- ##
+
 ## Orchestrated architecture handoff — US-0098 / auto-20260613-01
 
 ### Target

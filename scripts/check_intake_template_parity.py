@@ -255,6 +255,37 @@ MODEL_TIER_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+MODEL_TIER_OVERRIDES_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        ".cursor/scratchpad.md",
+        "template/.cursor/scratchpad.md",
+    ),
+    (
+        ".cursor/scratchpad.local.example.md",
+        "template/.cursor/scratchpad.local.example.md",
+    ),
+    (
+        ".cursor/model-catalog.local.example.role-based-balanced.json",
+        "template/.cursor/model-catalog.local.example.role-based-balanced.json",
+    ),
+    (
+        ".cursor/model-catalog.local.example.role-based-highend.json",
+        "template/.cursor/model-catalog.local.example.role-based-highend.json",
+    ),
+    (
+        "scripts/model_tier_lib.py",
+        "template/scripts/model_tier_lib.py",
+    ),
+    (
+        "scripts/model_tier_validate.py",
+        "template/scripts/model_tier_validate.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+)
+
 DOWNSTREAM_CI_GUARD_PAIRS: tuple[tuple[str, str], ...] = (
     (
         "scripts/check_downstream_ci_guard.py",
@@ -280,6 +311,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "dev-environment": DEV_ENVIRONMENT_PAIRS,
     "release-changelog": RELEASE_CHANGELOG_PAIRS,
     "model-tier": MODEL_TIER_PAIRS,
+    "model-tier-overrides": MODEL_TIER_OVERRIDES_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -294,6 +326,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + DEV_ENVIRONMENT_PAIRS
         + RELEASE_CHANGELOG_PAIRS
         + MODEL_TIER_PAIRS
+        + MODEL_TIER_OVERRIDES_PAIRS
     ),
 }
 

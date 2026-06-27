@@ -64,8 +64,8 @@ The installed content for target repos:
 |------|---------|
 | `scripts/release-all.ps1` | Unified release: version bump + npm + GitHub release + Chocolatey + Homebrew (Windows) |
 | `scripts/release-all.sh` | Same for Unix |
-| `scripts/model_tier_lib.py` | Model tier resolver library — validates tier enum, catalog schema, phase keys; resolves tier→alias (fast/inherit); fail-closed reason codes (US-0101) |
-| `scripts/model_tier_validate.py` | CLI validator for MODEL_TIER scratchpad keys and local catalog JSON (US-0101) |
+| `scripts/model_tier_lib.py` | Model tier resolver library — tier→alias (US-0101) + `resolve_model_for_phase()` 5-step precedence, catalog v2 roles (US-0102); fail-closed reason codes |
+| `scripts/model_tier_validate.py` | CLI validator for MODEL_TIER/MODEL_<PHASE> scratchpad keys and local catalog JSON v1/v2 (US-0101, US-0102) |
 | `scripts/generate-release-notes.ps1` | Auto-generate release notes from sprint artifacts |
 | `scripts/generate-release-notes.sh` | Same for Unix |
 | `packaging/chocolatey/its-magic.nuspec` | Chocolatey package manifest |

@@ -767,6 +767,84 @@ MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE
 - `tests/run-tests.ps1` / `tests/run-tests.sh` §26Z
 
 Normative architecture: `docs/engineering/architecture.md` (**# US-0101**).
+
+## Direct per-phase model slug override + role catalog (US-0102 / DEC-0087)
+
+Composes on **US-0101** / **DEC-0086** — tier-only operators need no migration.
+
+### 5-step precedence chain
+
+| Step | Source | Outcome |
+|------|--------|---------|
+| **1** | `MODEL_<PHASE>` | Non-empty slug → return (validate per mode) or `MODEL_OVERRIDE_SLUG_UNKNOWN` |
+| **2** | `MODEL_TIER_<PHASE>` | **DEC-0086** tier→alias / `local_catalog` chain |
+| **3** | `MODEL_RESOLVE=role_catalog` | Phase→logical role → catalog `roles[<key>]`; miss → `MODEL_ROLE_SLUG_UNKNOWN` → fall through |
+| **4** | `MODEL_TIER_DEFAULT` | **DEC-0086** tier chain |
+| **5** | Cursor alias | **DEC-0086** built-in mapping |
+
+When `MODEL_RESOLVE` is `alias_only` or `local_catalog`, step **3** is skipped.
+
+### Scratchpad keys (new)
+
+| Key | Default | Role |
+|-----|---------|------|
+| **`MODEL_<PHASE>`** | *(absent)* | Direct vendor slug; includes `MODEL_ASK` |
+| **`MODEL_RESOLVE`** | `alias_only` | Extended: `alias_only` \| `local_catalog` \| **`role_catalog`** |
+
+Operator slugs live in `.cursor/scratchpad.local.md` and `.cursor/model-catalog.local.json` only (gitignored).
+
+### Role catalog enablement recipe
+
+1. Copy a v2 example catalog:
+   - `.cursor/model-catalog.local.example.role-based-balanced.json`, or
+   - `.cursor/model-catalog.local.example.role-based-highend.json`
+2. Save as `.cursor/model-catalog.local.json` with real vendor slugs.
+3. Set `MODEL_RESOLVE=role_catalog` in `.cursor/scratchpad.local.md`.
+4. Optional: set `MODEL_<PHASE>=<slug>` for direct overrides (step 1 wins over role lookup).
+5. Run `python scripts/model_tier_validate.py --repo .` to validate.
+
+On role lookup miss → `MODEL_ROLE_SLUG_UNKNOWN` emitted; resolver falls through to `MODEL_TIER_DEFAULT` then Cursor alias.
+
+**`dev_difficult`**: no automatic phase routing — use `MODEL_EXECUTE=<slug>` direct override or tier `strong` + catalog tier slug.
+
+Non-normative role recommendations: `ai_modell_auslegung_cursor_highend.md`.
+
+### Catalog schema v2 (opt-in)
+
+```json
+{
+  "schema_version": 2,
+  "tiers": { "cheap": "<slug>", "balanced": "<slug>", "strong": "<slug>" },
+  "roles": {
+    "po": "<slug>", "sa": "<slug>", "dev": "<slug>", "dev_difficult": "<slug>",
+    "qa": "<slug>", "security": "<slug>", "release": "<slug>"
+  }
+}
+```
+
+v1 catalogs (tiers only) unchanged. Malformed v2 → `MODEL_CATALOG_SCHEMA_V2_INVALID`.
+
+### New reason codes
+
+| Code | Trigger |
+|------|---------|
+| **`MODEL_OVERRIDE_SLUG_UNKNOWN`** | Direct slug validation failure |
+| **`MODEL_ROLE_SLUG_UNKNOWN`** | Role catalog lookup miss |
+| **`MODEL_CATALOG_SCHEMA_V2_INVALID`** | v2 schema validation failure |
+
+### Non-substitution paragraph
+
+MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE — unchanged from **US-0101**; model selection is orthogonal to context breadth.
+
+### Validation commands
+
+- `python scripts/model_tier_validate.py --repo .`
+- `pytest -k us0102 tests/auto_command_contract_test.py`
+- `python scripts/check_intake_template_parity.py --scope=model-tier-overrides`
+- `tests/run-tests.ps1` / `tests/run-tests.sh` §26AA
+
+Normative architecture: `docs/engineering/architecture.md` (**# US-0102**); decision: **`DEC-0087`**.
+
 Binding decision: `decisions/DEC-0086.md`.
 
 Context compaction policy:
