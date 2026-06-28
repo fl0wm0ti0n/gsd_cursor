@@ -2579,6 +2579,519 @@ Single-writer drift safety:
   sourcing `.env` — the process inherits normal environment variables.
 - Referencing env var **names** (not values) in documentation and handoffs.
 
+## AI Decision Ledger (US-0103 / DEC-0103)
+
+**Default-off sovereign-loop audit layer**. When `AI_DECISION_LEDGER=0` (default),
+zero overhead — no files read or written. When `AI_DECISION_LEDGER=1`, every
+autonomous AI deviation is recorded in an append-only JSONL ledger under
+`handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl`.
+
+### Scratchpad keys
+
+| Key | Values | Default | Behavior when off |
+|-----|--------|---------|-------------------|
+| `AI_DECISION_LEDGER` | `0` \| `1` | `0` | No reads / writes / schema checks. |
+| `AUTO_PLAN_FIDELITY` | `strict` \| `relaxed` \| `extended` | `strict` | Active only when ledger enabled. |
+
+Set in `.cursor/scratchpad.local.md` (gitignored) or `.cursor/scratchpad.md`.
+
+### Enable / disable
+
+```bash
+# Enable ledger auditing
+echo "AI_DECISION_LEDGER=1" >> .cursor/scratchpad.local.md
+
+# Switch fidelity mode (relaxed allows AC drop/reorder; extended allows scope add)
+echo "AUTO_PLAN_FIDELITY=relaxed" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "AI_DECISION_LEDGER=0" >> .cursor/scratchpad.local.md
+```
+
+### Audit ledger entries
+
+```bash
+# Validate all ledger files in handoffs/sovereign_decisions/
+python scripts/ledger_validate.py --repo .
+
+# Validate a single ledger file
+python scripts/ledger_validate.py --file handoffs/sovereign_decisions/auto-20260628-01.jsonl
+
+# Print QA findings block (JSON)
+python scripts/ledger_validate.py --qa-find --orchestrator-run-id auto-20260628-01
+
+# Validate with fail-closed enforcement
+python scripts/ledger_validate.py --repo . --enforce
+
+# Library self-test
+python scripts/decision_ledger_lib.py --self-test
+```
+
+### Plan-fidelity modes
+
+| Mode | Behavior | When to use |
+|------|----------|-------------|
+| `strict` | Any unapproved deviation from `resolved_phase_plan` → **`PLAN_FIDELITY_VIOLATION` hard stop**. Operator must approve override or revert. | Default. Production runs, high-risk stories. |
+| `relaxed` | AI may drop/reorder existing ACs with ledger entry + QA-verifiable; new ACs/stories → `PLAN_FIDELITY_SCOPE_GATE` hard stop. | Iterative development where AC refinement is expected. |
+| `extended` | AI may extend scope with new stories/features; documented non-blocking in ledger as `PLAN_FIDELITY_EXTENSION`. QA still cross-checks. | Exploratory work, prototyping, scope discovery. |
+
+### Typical audit workflow
+
+1. **Enable ledger** before long `/auto` run: set `AI_DECISION_LEDGER=1` in scratchpad.
+2. **Run `/auto`** to completion — ledger writes accumulate in `handoffs/sovereign_decisions/<run_id>.jsonl`.
+3. **Run `/qa`** — phase reads ledger, emits `ledger_findings` block in `sprints/Sxxxx/qa-findings.md` with decision counts, risk tier distribution, and fail-closed code summary.
+4. **Inspect findings** — look for `violation_count > 0` (unapproved deviations) or `schema_invalid` status (corrupt ledger).
+5. **Remediate or approve** — if deviations justified, set `AUTO_PLAN_FIDELITY=relaxed` or `=extended` and re-run; otherwise revert changes.
+
+### Common failure scenarios and recovery
+
+| Reason code | Symptom | Recovery |
+|-------------|---------|----------|
+| `LEDGER_FILE_MISSING` | `AI_DECISION_LEDGER=1` but no ledger file for current run | Create `handoffs/sovereign_decisions/<run_id>.jsonl` or set `AI_DECISION_LEDGER=0` |
+| `LEDGER_SCHEMA_INVALID` | JSONL line fails 12-field schema validation | Open ledger, locate invalid line (validator prints line number), fix JSON syntax; if unrecoverable, truncate to last valid line |
+| `LEDGER_CORRUPT` | Whole file non-UTF-8 or broken JSON | Manual repair required; consider `git restore` from prior commit or truncate to known-good prefix |
+| `LEDGER_APPEND_FAILED` | Disk full, permission error, I/O error | Check disk space (`df -h`), file permissions (`ls -la handoffs/sovereign_decisions/`); retry after remediation |
+| `PLAN_FIDELITY_VIOLATION` | Unapproved deviation under strict mode | Review ledger last entry; if justified, switch to `AUTO_PLAN_FIDELITY=relaxed` in scratchpad and re-run `/execute`; otherwise revert AC changes |
+| `PLAN_FIDELITY_SCOPE_GATE` | New scope request under strict/relaxed mode | If scope-add intentional, switch to `AUTO_PLAN_FIDELITY=extended` and document in `sprints/Sxxxx/extension-report.md`; otherwise drop new scope |
+| `LEDGER_DISABLED` | Informational — `AI_DECISION_LEDGER=0` | No action required; zero overhead when off. Opt-in via scratchpad if ledger auditing desired. |
+
+### Parity enforcement
+
+```bash
+# Verify active ↔ template byte-parity for ledger scripts + scratchpad
+python scripts/check_intake_template_parity.py --scope=sovereign-ledger
+```
+
+Pair table (`SOVEREIGN_LEDGER_PAIRS` + scratchpad):
+- `scripts/decision_ledger_lib.py` ↔ `template/scripts/decision_ledger_lib.py`
+- `scripts/ledger_validate.py` ↔ `template/scripts/ledger_validate.py`
+- `.cursor/scratchpad.md` ↔ `template/.cursor/scratchpad.md`
+- `.cursor/scratchpad.local.example.md` ↔ `template/.cursor/scratchpad.local.example.md`
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0103`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0103
+- **Decision record**: `decisions/DEC-0103.md`
+- **Contract tests**: `tests/us0103_contract_test.py` (8 tests)
+
+## Goal-Based Convergence (US-0110 / DEC-0110)
+
+**Default-off sovereign-loop terminal predicate**. When `SOVEREIGN_GOAL_MODE=phase_driven`
+(default), zero overhead — no evaluation, no `goal_progress` block, no partial-delivery write.
+When `goal_convergence`, `evaluate_convergence` reads composed surfaces (backlog, deferrals,
+critic, smoke, ledger) and emits progress/timeout artifacts only.
+
+### Scratchpad keys
+
+| Key | Values | Default | Behavior when off |
+|-----|--------|---------|-------------------|
+| `SOVEREIGN_GOAL_MODE` | `phase_driven` \| `goal_convergence` | `phase_driven` | No evaluation side effects. |
+| `SOVEREIGN_GOAL` | free-text | *(empty)* | Explicit goal wins over vision derive. |
+| `SOVEREIGN_GOAL_TOP_N` | int ≥ 1 | `3` | Vision paragraph count for auto-derive. |
+| `SOVEREIGN_GOAL_MAX_CHARS` | int ≥ 64 | `512` | Truncation cap for goal text. |
+| `SOVEREIGN_GOAL_TIMEOUT_MAX` | int ≥ 0 | `0` | Iteration-count cap (`0` = disabled). |
+
+### Enable / disable
+
+```bash
+# Enable goal-driven convergence
+echo "SOVEREIGN_GOAL_MODE=goal_convergence" >> .cursor/scratchpad.local.md
+echo "SOVEREIGN_GOAL=Ship sovereign-loop batch with zero regressions" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead — US-0088/US-0092/US-0095/US-0044 stop matrix unchanged)
+echo "SOVEREIGN_GOAL_MODE=phase_driven" >> .cursor/scratchpad.local.md
+```
+
+### Evaluate convergence
+
+```bash
+# Library self-test
+python scripts/sovereign_convergence_lib.py --self-test
+
+# Evaluate five-conjunct predicate (JSON)
+python scripts/sovereign_convergence_lib.py --evaluate --repo . --orchestrator-run-id auto-20260628-04
+
+# Dump goal_progress block
+python scripts/sovereign_convergence_lib.py --dump-progress --repo . --orchestrator-run-id auto-20260628-04
+
+# Validator self-test + schema fixtures
+python scripts/sovereign_convergence_validate.py --self-test
+
+# Validate artifacts in repo
+python scripts/sovereign_convergence_validate.py --repo . --enforce
+```
+
+### Interpret `goal_progress` block
+
+Curator **`/refresh-context`** emits a fenced JSON block under **`### goal_progress`** in
+`handoffs/resume_brief.md` when `SOVEREIGN_GOAL_MODE=goal_convergence` and the sovereign loop
+is active. Placement: after the latest orchestration pointer, before prior pointers.
+
+Fields: `goal_text`, `goal_source`, `mode`, `converged`, `unmet_conditions[]`, `blocked_by[]`,
+`conjuncts`, `evaluated_at`, `orchestrator_run_id`, `schema_version`.
+
+### Partial delivery on timeout
+
+When `SOVEREIGN_GOAL_TIMEOUT_MAX > 0` and iteration count reaches the cap without
+`converged=true`, the evaluator emits **`SOVEREIGN_GOAL_TIMEOUT`** and writes
+`handoffs/sovereign_partial_delivery.md` (sections: Goal, Evaluated At, Unmet Conditions,
+Blocked By, Completed Stories, Open Stories, Deferrals Summary, Remediation).
+
+### Troubleshooting reason codes
+
+See `docs/engineering/reason_codes.md` § US-0110 for the 10-code inventory and remediation.
+
+| Reason code | Symptom | Recovery |
+|-------------|---------|----------|
+| `CONVERGENCE_OPEN_STORIES_REMAIN` | OPEN stories in backlog | Complete stories or adjust goal scope |
+| `CONVERGENCE_SMOKE_PROBE_FAIL` | `tests/report.md` Fail > 0 or UAT smoke step failed | Fix tests; re-run `/verify-work` |
+| `SOVEREIGN_GOAL_TIMEOUT` | Iteration cap exhausted | Read partial-delivery report; increase cap or resolve blockers |
+| `SOVEREIGN_GOAL_DERIVE_FAILED` | Empty/unreadable vision | Set explicit `SOVEREIGN_GOAL` |
+
+### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-convergence
+```
+
+Pair table (`SOVEREIGN_CONVERGENCE_PAIRS`):
+- `scripts/sovereign_convergence_lib.py` ↔ `template/scripts/sovereign_convergence_lib.py`
+- `scripts/sovereign_convergence_validate.py` ↔ `template/scripts/sovereign_convergence_validate.py`
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0110`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0110
+- **Decision record**: `decisions/DEC-0110.md`
+- **Contract tests**: `tests/us0110_contract_test.py` (8 tests)
+
+### Cross-Model Adversarial Critic (US-0104)
+
+**Default-off cross-model review**. When `CROSS_MODEL_REVIEW=0` (default), zero overhead — no
+critic spawn, no findings writes, no anti-slop gate. When `1`, `/auto` spawns `/sovereign-critic`
+after each producer phase.
+
+#### Scratchpad keys
+
+| Key | Values | Default | Behavior when off |
+|-----|--------|---------|-------------------|
+| `CROSS_MODEL_REVIEW` | `0` \| `1` | `0` | No critic spawn or findings writes. |
+| `CROSS_MODEL_ANTISLOP_THRESHOLD` | int 0–10 | `6` | Aggregate below → rework loop. |
+| `CROSS_MODEL_REWORK_MAX` | int ≥ 0 | `2` | Max producer re-spawns per `(run, phase)`. |
+
+#### Enable / disable
+
+```bash
+# Enable cross-model critic
+echo "CROSS_MODEL_REVIEW=1" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "CROSS_MODEL_REVIEW=0" >> .cursor/scratchpad.local.md
+```
+
+#### Validate findings JSONL
+
+```bash
+python scripts/sovereign_critic_lib.py --self-test
+python scripts/sovereign_critic_validate.py --self-test
+python scripts/sovereign_critic_validate.py --repo . --enforce
+python scripts/sovereign_critic_validate.py --open-blocking --repo .
+```
+
+#### Interpret findings JSONL
+
+Canonical path: `handoffs/sovereign_critic_findings.jsonl` (append-only, 15-field v1 schema).
+Each line includes `lens` (`challenger` \| `architect` \| `subtractor`), `severity`, `confidence`
+(set by reconciliation), `anti_slop_score`, `blocking`, and `degraded_mode`.
+
+Reconciliation: ≥2 lenses share `issue_key` → `confidence=high`; single lens → `medium`.
+
+#### Anti-slop rework remediation
+
+When aggregate `min(lens_scores) < CROSS_MODEL_ANTISLOP_THRESHOLD` and blocking findings exist:
+
+1. Producer phase re-spawns with fresh context (bounded by `CROSS_MODEL_REWORK_MAX`).
+2. Reason **`CROSS_MODEL_ANTISLOP_FAIL`** during rework; **`CROSS_MODEL_REWORK_CAP_EXHAUSTED`**
+   at cap → operator decision gate (waive or abort).
+
+#### Degraded fallback troubleshooting
+
+When `select_critic_model` resolves the same slug as producer (or catalog miss), framework sets
+`degraded_mode=true` and runs three sequential lens spawns on the same model. Informational reason
+**`CROSS_MODEL_DEGRADED_MODE`** — not a hard stop. Documented limitation per **R-0088**.
+
+#### Isolation `model_id` v2
+
+When `CROSS_MODEL_REVIEW=1`, producer **and** critic isolation evidence rows require additive
+`model_id`. Missing → **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`**.
+
+#### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-critic
+```
+
+Pair table (`SOVEREIGN_CRITIC_PAIRS`): lib, validator, command, scratchpad, `DEC-0104.md`.
+
+#### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0104`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0104
+- **Decision record**: `decisions/DEC-0104.md`
+- **Contract tests**: `tests/us0104_contract_test.py` (8 tests + 2 compose guards)
+
+### Sovereign Memory (US-0105)
+
+**Default-off institutional memory**. When `SOVEREIGN_MEMORY=0` (default), zero overhead —
+no JSONL writes, no injection reads, no spawn digest assembly. When `1`, bounded learnings
+inject into phase spawns via `scripts/sovereign_memory_lib.py`.
+
+#### Scratchpad keys
+
+| Key | Values | Default | Behavior when off |
+|-----|--------|---------|-------------------|
+| `SOVEREIGN_MEMORY` | `0` \| `1` | `0` | No reads / writes / digest assembly. |
+| `SOVEREIGN_MEMORY_TOP_N` | int ≥ 0 | `5` | Recent pool size (all four JSONL families). |
+| `SOVEREIGN_MEMORY_TOP_K` | int ≥ 0 | `3` | High-impact pool (`patterns` + `mistakes`). |
+| `SOVEREIGN_MEMORY_MAX_CHARS` | int ≥ 0 | `2048` | Hard cap on assembled `digest_text`. |
+| `SOVEREIGN_MEMORY_JSONL_MAX_LINES` | int ≥ 1 | `500` | Active JSONL line cap before archive rollover. |
+
+#### Enable / disable
+
+```bash
+# Enable sovereign memory
+echo "SOVEREIGN_MEMORY=1" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "SOVEREIGN_MEMORY=0" >> .cursor/scratchpad.local.md
+```
+
+#### JSONL families vs per-run ledger
+
+| Artifact | Path | Scope | Injected v1? |
+|----------|------|-------|--------------|
+| Decisions log | `docs/engineering/sovereign-memory/decisions-log.jsonl` | Cross-run distilled learnings | yes |
+| Mistakes | `docs/engineering/sovereign-memory/mistakes.jsonl` | Orchestrator mistake hooks | yes (top-K) |
+| Patterns | `docs/engineering/sovereign-memory/patterns.jsonl` | Phase/curator consolidation | yes (top-K) |
+| Plan drift | `docs/engineering/sovereign-memory/plan-drift-register.jsonl` | Fidelity/scope hooks | yes (top-N) |
+| Retrospectives | `sovereign-memory/retrospectives/<sprint_id>.md` | Curator `/refresh-context` | **no** |
+| Per-run ledger (**US-0103**) | `handoffs/sovereign_decisions/<run_id>.jsonl` | Per-run audit | no (optional promotion) |
+
+Promotion at `/refresh-context` copies ledger highlights to `decisions-log.jsonl` with
+`provenance_ref=ledger:<decision_id>` when both `SOVEREIGN_MEMORY=1` and `AI_DECISION_LEDGER=1`.
+
+#### Validate / self-test
+
+```bash
+python scripts/sovereign_memory_lib.py --self-test
+python scripts/sovereign_memory_validate.py --self-test
+python scripts/sovereign_memory_validate.py --repo . --enforce
+```
+
+#### Injection char-cap troubleshooting
+
+When digest appears truncated:
+
+1. Check `SOVEREIGN_MEMORY_MAX_CHARS` (default **2048**).
+2. Reduce `SOVEREIGN_MEMORY_TOP_N` / `SOVEREIGN_MEMORY_TOP_K` if too many entries compete.
+3. Informational **`SOVEREIGN_MEMORY_READ_BOUND`** when tail read truncates — digest still emitted.
+
+#### Archive rollover remediation
+
+When append fails with **`SOVEREIGN_MEMORY_ARCHIVE_REQUIRED`**:
+
+1. Check permissions on `docs/engineering/sovereign-memory-archive/`.
+2. Verify disk space; active file rollover moves to `<basename>-<YYYYMMDDTHHMMSSZ>.jsonl`.
+3. Rollover is **not** triad compaction (**US-0072** unchanged).
+
+#### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-memory
+```
+
+Pair table (`SOVEREIGN_MEMORY_PAIRS`): lib, validator, scratchpad, `.gitkeep`, `DEC-0105.md`.
+
+#### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0105`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0105
+- **Decision record**: `decisions/DEC-0105.md`
+- **Contract tests**: `tests/us0105_contract_test.py` (8 tests + 2 compose guards)
+
+### Sovereign Loop Mode (US-0107)
+
+**Default-off project orchestration**. When `AUTO_SOVEREIGN=0` (default), zero overhead — no
+deferral reads/writes, no advance, no notifications. When enabled, requires
+`SOVEREIGN_GOAL_MODE=goal_convergence` (fail-closed **`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`**).
+
+#### Scratchpad keys
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `AUTO_SOVEREIGN` | `0` \| `1` | `0` | Master enable gate. |
+| `AUTO_SOVEREIGN_DEFERRAL_MAX` | int ≥ 1 | `50` | Max open deferral rows. |
+| `AUTO_SOVEREIGN_DRAIN_GENERATE_MAX` | int ≥ 0 | `3` | Drain-generate iterations per run. |
+| `AUTO_SOVEREIGN_DEFERRAL_POLICY` | `stop` \| `skip` \| `resolve_first` | `resolve_first` | Deferral gate policy. |
+| `SOVEREIGN_NOTIFY_TARGET` | `off` \| `ntfy` \| `email` \| `hook` | `off` | Notification adapter. |
+| `SOVEREIGN_NOTIFY_NTFY_TOPIC` | string | *(empty)* | Local-only ntfy topic. |
+| `SOVEREIGN_NOTIFY_NTFY_BASE` | URL | *(empty)* | Optional ntfy base override — local-only. |
+| `SOVEREIGN_NOTIFY_HOOK_URL` | URL | *(empty)* | Webhook POST target — local-only. |
+| `SOVEREIGN_NOTIFY_EMAIL_TO` | email | *(empty)* | Email v1 deferred. |
+
+#### Enable / disable
+
+```bash
+# Enable sovereign loop (both keys required)
+echo "AUTO_SOVEREIGN=1" >> .cursor/scratchpad.local.md
+echo "SOVEREIGN_GOAL_MODE=goal_convergence" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "AUTO_SOVEREIGN=0" >> .cursor/scratchpad.local.md
+```
+
+Notification topic/URL values belong in `.cursor/scratchpad.local.md` only — never commit secrets.
+
+#### Deferral register operator workflow
+
+| Action | Command / API |
+|--------|----------------|
+| Append deferral | `append_deferral(...)` via `sovereign_loop_lib.py` |
+| Resolve deferral | `resolve_deferral(repo, deferral_id, orchestrator_run_id=...)` |
+| List open rows | `list_open_deferrals(repo, scratchpad=...)` (latest-state-wins) |
+| Validate JSONL | `python scripts/sovereign_loop_validate.py --repo . --enforce` |
+
+Path: `handoffs/sovereign_deferrals.jsonl` (create-on-first-write; bootstrap `.gitkeep` only).
+Sidecar: `handoffs/sovereign_loop_state.json` v1 — per-run drain-generate iteration counter.
+
+#### Drain-generate decision gate
+
+When backlog has zero OPEN stories but convergence is not met and iterations remain under cap,
+`/auto` spawns a fresh **PO** subagent (spawn-only **US-0095**) with ephemeral id
+`drain-gen-{orchestrator_run_id}-{iteration}`. PO proposes up to **3** candidates per iteration.
+
+**Mandatory per-candidate decision gate**: accept → `/intake` or controlled backlog append;
+reject → discard. No auto-append without operator gate.
+
+#### US-0109 integration (`DEPLOY_DEFERRED`)
+
+**US-0109** (deploy smoke) is the downstream writer for `DEPLOY_DEFERRED` deferral rows when
+deploy smoke cap is exhausted. Schema v1 fields: `work_item_kind=deploy`, standard deferral
+register fields per **DEC-0107** §2. US-0107 owns schema, validator, and read paths only — no
+deploy smoke logic in this story.
+
+#### Validate / self-test
+
+```bash
+python scripts/sovereign_loop_lib.py --self-test
+python scripts/sovereign_loop_validate.py --self-test
+python scripts/sovereign_loop_validate.py --repo . --enforce
+pytest -k us0107
+```
+
+#### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-loop
+```
+
+Pair table (`SOVEREIGN_LOOP_PAIRS`): lib, validator, scratchpad, deferrals `.gitkeep`, `DEC-0107.md`.
+
+#### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0107`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0107
+- **Decision record**: `decisions/DEC-0107.md`
+- **Contract tests**: `tests/us0107_contract_test.py` (8 tests + 2 compose guards)
+
+### Sovereign Role-Behavior Manifest (US-0106)
+
+**Default-off per-role objective + inter-role review obligations**. When `SOVEREIGN_ROLE_MANIFEST=0` (default),
+zero overhead — no manifest reads, no objective injection, no review dispatch. Review spawns are
+supplementary post-phase hooks — they never substitute for the US-0069 producer role.
+
+#### Scratchpad keys
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `SOVEREIGN_ROLE_MANIFEST` | `0` \| `1` | `0` | Master enable gate. |
+| `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS` | int ≥ 1 | `512` | Hard truncate for injection block. |
+| `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` | int ≥ 0 | `2` | Per-phase review dispatch cap. |
+| `SOVEREIGN_ROLE_REVIEW_REWORK_MAX` | int ≥ 0 | `1` | Bounded rework before decision gate. |
+
+#### Enable / disable
+
+```bash
+# Enable sovereign role manifest
+echo "SOVEREIGN_ROLE_MANIFEST=1" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "SOVEREIGN_ROLE_MANIFEST=0" >> .cursor/scratchpad.local.md
+```
+
+#### Manifest edit operator workflow
+
+1. Open `.cursor/sovereign-role-manifest.yaml` (active) or `template/.cursor/sovereign-role-manifest.yaml.example` (template).
+2. Add role: append `role_id` ∈ {`po`, `tech-lead`, `dev`, `qa`, `release`, `curator`} with `objective_function` (≤ 1024 chars at file; truncated at injection to `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`).
+3. Add obligation: `obligation_id` (unique slug), `reviewer_role`, `target_role`, `trigger_phase` ∈ canonical phase ids, `review_focus` ∈ {`user_value_drift`, `testability`, `buildability`, `deployability`}, `artifact_refs[]`, optional `blocking` (default `false`).
+4. Edit `cross_model_policy.default_order` ∈ {`role_review_first`, `critic_first`, `critic_only`, `role_review_only`} to set critic vs role-review ordering.
+5. Edit `escalation_rules.rework_max` for bounded rework cap.
+6. Run validator: `python scripts/sovereign_role_manifest_validate.py --repo . --enforce`.
+
+#### Validator invocation
+
+```bash
+# Validate single manifest file
+python scripts/sovereign_role_manifest_validate.py --file .cursor/sovereign-role-manifest.yaml
+
+# Validate repo active + template pair
+python scripts/sovereign_role_manifest_validate.py --repo . --enforce
+
+# Lib self-test
+python scripts/sovereign_role_manifest_validate.py --self-test
+```
+
+Success: `[SOVEREIGN_ROLE_MANIFEST_VALIDATION_OK]`.
+Fail: reason codes `SOVEREIGN_ROLE_*` — `SCHEMA_INVALID`, `UNKNOWN_ROLE`, `UNKNOWN_PHASE`, `SECRET_DETECTED`, `OBJECTIVE_OVERFLOW`.
+
+#### Review dispatch troubleshooting
+
+| Reason code | Symptom | Remediation |
+|-------------|---------|-------------|
+| `SOVEREIGN_ROLE_MANIFEST_DISABLED` | `SOVEREIGN_ROLE_MANIFEST=0` — no dispatch | Set `SOVEREIGN_ROLE_MANIFEST=1` to enable |
+| `ROLE_REVIEW_DISPATCH_FAILED` | JSONL append I/O error | Check file permissions on `handoffs/sovereign_role_reviews.jsonl` |
+| `ROLE_REVIEW_SPAWN_FAILED` | Subagent spawn error | Retry spawn; check Task tool availability |
+| `ROLE_REVIEW_BLOCKED` | Blocking review verdict `fail` | Apply escalation: rework (bounded by `SOVEREIGN_ROLE_REVIEW_REWORK_MAX`) or operator decision gate |
+| `ROLE_REVIEW_DEFERRAL_FAILED` | US-0107 deferral append error | Check `handoffs/sovereign_deferrals.jsonl` permissions; fail-open logged |
+| `ROLE_REVIEW_REWORK_CAP` | Rework max exhausted | Operator decision gate: waive findings or abort |
+
+Reviews JSONL: `handoffs/sovereign_role_reviews.jsonl` (v1 schema: `schema_version`, `obligation_id`, `reviewer_role`, `target_role`, `trigger_phase`, `review_focus`, `producer_evidence_ref`, `orchestrator_run_id`, `ts`, `verdict`, `blocking`, `findings_ref`).
+
+#### Validate / self-test
+
+```bash
+python scripts/sovereign_role_manifest_lib.py --self-test
+python scripts/sovereign_role_manifest_validate.py --self-test
+python scripts/sovereign_role_manifest_validate.py --repo . --enforce
+pytest -k us0106
+```
+
+#### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-role-manifest
+```
+
+Pair table (`SOVEREIGN_ROLE_MANIFEST_PAIRS`): scratchpad keys, manifest YAML, example manifest, validator, lib, reviews JSONL, template validator, template lib.
+
+#### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0106`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0106
+- **Decision record**: `decisions/DEC-0106.md`
+- **Contract tests**: `tests/us0106_contract_test.py` (8 tests + 2 compose guards)
+
 ## Project run steps
 
 ### Prerequisites

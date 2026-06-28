@@ -3045,7 +3045,7 @@
 - Title: Append-only ledger of every AI deviation and plan-fidelity scratchpad tri-state
 - Summary: Sovereign-loop foundation - every AI decision made while running autonomously must be auditable. New handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl records each decision as {ts, role, decision_id, type, from_artifact, to_artifact, rationale, plan_fidelity, cross_model_reviewed, risk_tier}. Governed by AUTO_PLAN_FIDELITY=strict|relaxed|extended: strict = hard stop on deviation, relaxed = AI may drop/reorder ACs, extended = AI may add new stories/features. QA cross-checks the ledger at every /qa boundary. Default-off AI_DECISION_LEDGER=0|1. Compose with US-0070/US-0048/US-0069 (do not amend).
 - Priority: P0
-- Status: OPEN
+- Status: DONE (2026-06-28)
 - Decomposition (US-0051):
   - **Single story** - audit ledger + plan-fidelity policy are one vertical capability; splitting would orphan the ledger or the governance.
   - **Rationale**: "Every autonomous AI decision must be recorded and auditable; plan-fidelity governs what deviations are allowed."
@@ -3061,71 +3061,504 @@
   - coverage_complete=true
   - intake_evidence_ref=handoffs/intake_evidence/intake-sovereign-20260627-01.json
 - Acceptance:
-  - [ ] AC-1: Scratchpad keys AI_DECISION_LEDGER=0|1 (default  ) and AUTO_PLAN_FIDELITY=strict|relaxed|extended (default strict); when ledger  , zero overhead.
-  - [ ] AC-2: Artifact handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl with deterministic JSON-lines schema; append-only; per-entry fields as described.
-  - [ ] AC-3: strict mode (any unapproved deviation from resolved_phase_plan / acceptance criteria results in PLAN_FIDELITY_VIOLATION hard stop; operator-approved relaxations via scratchpad override recorded in ledger.
-  - [ ] AC-4: elaxed mode (AI may drop/reorder ACs with ledger entry + QA-verifiable; new ACs/stories results in decision gate.
-  - [ ] AC-5: extended mode (AI may extend scope with new stories/features/deployment targets; documented but non-blocking; QA still cross-checks; operator sees extension report at convergence.
-  - [ ] AC-6: QA cross-check (/qa phase reads ledger + emits ledger_findings in qa-findings.md.
-  - [ ] AC-7: Contract tests 	est_us0103_* for plan-fidelity tri-state, ledger schema, strict/relaxed/extended branches, QA cross-check.
-  - [ ] AC-8: Documentation runbook + architecture # US-0103; active + template/ byte-parity; reason codes PLAN_FIDELITY_* + LEDGER_* inventory.
+  - [x] AC-1: Scratchpad keys AI_DECISION_LEDGER=0|1 (default  ) and AUTO_PLAN_FIDELITY=strict|relaxed|extended (default strict); when ledger  , zero overhead.
+  - [x] AC-2: Artifact handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl with deterministic JSON-lines schema; append-only; per-entry fields as described.
+  - [x] AC-3: strict mode (any unapproved deviation from resolved_phase_plan / acceptance criteria results in PLAN_FIDELITY_VIOLATION hard stop; operator-approved relaxations via scratchpad override recorded in ledger.
+  - [x] AC-4: 
+elaxed mode (AI may drop/reorder ACs with ledger entry + QA-verifiable; new ACs/stories results in decision gate.
+  - [x] AC-5: extended mode (AI may extend scope with new stories/features/deployment targets; documented but non-blocking; QA still cross-checks; operator sees extension report at convergence.
+  - [x] AC-6: QA cross-check (/qa phase reads ledger + emits ledger_findings in qa-findings.md.
+  - [x] AC-7: Contract tests 	est_us0103_* for plan-fidelity tri-state, ledger schema, strict/relaxed/extended branches, QA cross-check.
+  - [x] AC-8: Documentation runbook + architecture # US-0103; active + template/ byte-parity; reason codes PLAN_FIDELITY_* + LEDGER_* inventory.
 - Boundaries:
   - In scope: scratchpad flags, ledger artifact schema, plan-fidelity tri-state logic, QA cross-check, contract tests, template parity.
   - Out of scope: changing US-0070/US-0069/US-0048/US-0092 semantics; mandatory QA/release gate weakening; isolation evidence changes.
 - related_us: US-0070, US-0069, US-0048, US-0092, US-0104, US-0105, US-0107, US-0109
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- discovery_notes (2026-06-28T12:00:00Z, PO, `po-sovereign-US0103-discovery`, `fresh_context_marker=po-US0103-discovery-20260628T120000Z-fresh`): **`/discovery`** **PASS** — sovereign-loop foundation layer locked: append-only JSONL decision ledger per orchestrator run + plan-fidelity tri-state governance + QA cross-check contract. All overhead gated behind `AI_DECISION_LEDGER=0|1` (default 0). **Compose do NOT amend** US-0070/US-0069/US-0048/US-0092 — US-0103 operates ON TOP of `resolved_phase_plan` / isolation evidence. Foundation for US-0104..US-0110; those stories compose via ledger + fidelity hooks. Status: **OPEN** (US-0045).
+  - Discovery locks (L1–L10):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | `AI_DECISION_LEDGER=0\|1` (default `0`); `AUTO_PLAN_FIDELITY=strict\|relaxed\|extended` (default `strict`); when ledger `0`, zero overhead — no file writes, no checks, no schema. |
+    | **L2 Ledger path** | `handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl` — deterministic one-file-per-run; `orchestrator_run_id` = existing scratchpad/resume identifier. |
+    | **L3 JSONL schema (12 fields)** | `{ts (ISO-8601 UTC), orchestrator_run_id, phase_id, role, decision_id (UUIDv4 deterministic per decision-point), decision_type, from_artifact, to_artifact, rationale (free-text, no secrets), plan_fidelity (strict\|relaxed\|extended), cross_model_reviewed (bool), risk_tier (low\|medium\|high\|critical)}`. Append-only; append + fsync semantics. |
+    | **L4 strict mode** | ANY unapproved deviation from `resolved_phase_plan`, from_artifact ACs, or from_artifact scope → `PLAN_FIDELITY_VIOLATION` hard stop; operator-approved relaxations via scratchpad override recorded in ledger (`decision_type=plan_fidelity_override`). |
+    | **L5 relaxed mode** | AI may drop/reorder existing ACs with mandatory ledger entry + QA-verifiable; new ACs / new stories / new scope triggers decision gate (`PLAN_FIDELITY_SCOPE_GATE`; stop, do not proceed silently). |
+    | **L6 extended mode** | AI may extend scope with new stories/features/deployment targets; documented non-blocking in ledger as `decision_type=scope_extension`; QA still cross-checks; operator sees extension report at convergence. |
+    | **L7 QA cross-check contract** | `/qa` phase (`AI_DECISION_LEDGER=1`): reads current ledger → emits `ledger_findings` section in `sprints/Sxxxx/qa-findings.md` with `{entry_count, fidelity_violations[], unrecorded_deviations[], orphan_entries[]}`; ledger absence when `AI_DECISION_LEDGER=1` → fail-closed `LEDGER_FILE_MISSING`. |
+    | **L8 Contract tests** | Eight `test_us0103_*` markers covering: scratchpad keys, ledger JSONL schema, plan-fidelity tri-state branches (strict/relaxed/extended), QA cross-check read contract, reason-code inventory, ledger append-only semantics, zero-overhead default, template parity. Parity scope: `check_intake_template_parity.py --scope=sovereign-ledger` (`SOVEREIGN_LEDGER_PAIRS`). |
+    | **L9 Reason codes (2 families)** | `PLAN_FIDELITY_*`: `PLAN_FIDELITY_VIOLATION`, `PLAN_FIDELITY_SCOPE_GATE`, `PLAN_FIDELITY_OVERRIDE`, `PLAN_FIDELITY_MODE_INVALID`, `PLAN_FIDELITY_CONFLICT`. `LEDGER_*`: `LEDGER_FILE_MISSING`, `LEDGER_SCHEMA_INVALID`, `LEDGER_WRITE_FAILED`, `LEDGER_APPEND_BLOCKED`, `LEDGER_DUPLICATE_DECISION_ID`, `LEDGER_SECRET_DETECTED`. |
+    | **L10 Backward compat / compose do not amend** | `AI_DECISION_LEDGER=0` (default): zero overhead; existing /auto lifecycle unchanged. US-0070 (phase plan), US-0069 (phase-role), US-0048 (isolation), US-0092 (full-autonomy) contracts UNCHANGED. US-0103 operates ON TOP. US-0111 composition: writes `derivation_decisions[]` to ledger as `decision_type=version_derivation`. |
+  - Research notes (2026-06-28, tech-lead, `tl-US0103-research-20260628T123000Z-fresh`): **`/research`** **PASS** — **`R-0089`** Q1–Q7 closed; companion **`DEC-0103`** authored; helper library **`scripts/decision_ledger_lib.py`** + validator **`scripts/ledger_validate.py`** (with **`template/scripts/`** byte-parity); deviation classifier locked; QA `ledger_findings` block shape locked; 5 `PLAN_FIDELITY_*` + 6 `LEDGER_*` reason codes enumerated; 8 `test_us0103_*` markers locked; **`SOVEREIGN_LEDGER_PAIRS`** parity scope locked. 12-field JSONL schema v1 frozen (`ts`, `orchestrator_run_id`, `phase_id`, `role`, `decision_id`, `decision_type`, `from_artifact`, `to_artifact`, `rationale`, `plan_fidelity`, `cross_model_reviewed`, `risk_tier`); strict/relaxed/extended table frozen as single source of truth in `decision_ledger_lib.py::_deviation_table`. Default-off: `AI_DECISION_LEDGER=0` → no file writes/reads; `AUTO_PLAN_FIDELITY=strict` default. Compose with US-0070/US-0069/US-0048/US-0092 unchanged; `test_us0103_us0070_compose_no_schema_change` regression guard locks composition.
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: Scratchpad keys `AI_DECISION_LEDGER` + `AUTO_PLAN_FIDELITY` enum literals + default values.
+    - AC-2: Ledger JSONL path + 12-field schema + append-only semantics + template `handoffs/sovereign_decisions/.gitkeep` + `template/handoffs/sovereign_decisions/.gitkeep` parity.
+    - AC-3: strict mode hard stop on unapproved deviation; ledger `plan_fidelity_override` for operator-approved relaxations.
+    - AC-4: relaxed mode drops/reorders with ledger entry; new scope → `PLAN_FIDELITY_SCOPE_GATE` stop.
+    - AC-5: extended mode non-blocking extension report; QA still cross-checks.
+    - AC-6: QA cross-check → `ledger_findings` in `qa-findings.md`; `LEDGER_FILE_MISSING` fail-closed.
+    - AC-7: Eight `test_us0103_*` contract markers + parity `--scope=sovereign-ledger`.
+    - AC-8: Architecture `# US-0103`; runbook recipe; reason codes inventory; template byte-parity.
+  - Risks (carry to /research):
+    - R1: Ledger file contention under concurrent phase writes — enforce one-file-per-run (deterministic `orchestrator_run_id`); append-only with fsync-style guard.
+    - R2: Token budget impact on large orchestrator runs — ledger read should be bounded (last N entries or summary digest for QA).
+    - R3: Plan-fidelity deviation classification ambiguity — need clear deviation table (what counts as a deviation per `decision_type` family) in architecture.
+    - R4: Ledger corruption / truncation → `LEDGER_SCHEMA_INVALID` fail-closed + recoverable append mode.
+    - R5: Sovereign-loop composition with US-0104..US-0110 — foundation contract must be stable before downstream compose.
+  - Research asks (extend R-0089):
+    - Q1: Ledger JSONL exact schema (field types, required/optional, value enum literals) + validator script `scripts/ledger_validate.py`.
+    - Q2: Ledger helper library `scripts/decision_ledger_lib.py` API sketch (append, read, schema-check, summary-digest for QA).
+    - Q3: Plan-fidelity deviation classification table — what `decision_type` families are deviations in strict/relaxed/extended.
+    - Q4: QA cross-check read contract prose — `ledger_findings` schema per run.
+    - Q5: Contract-test inventory `test_us0103_*` (eight markers) + `check_intake_template_parity.py --scope=sovereign-ledger` file list.
+    - Q6: Reason-code enumeration audit — `PLAN_FIDELITY_*` and `LEDGER_*` complete inventory + documentation placement.
+    - Q7: Companion `DEC-xxxx` necessity — does US-0103 warrant a new decision or do discovery locks suffice for architecture input?
+  - Next: `/research` (fresh tech-lead) — close R-0089 Q1–Q7; ledger schema + helper lib + deviation table + contract tests inventory.
+  - architecture_notes (2026-06-28, tech-lead, `tl-US0103-architecture-20260628T132500Z-fresh`):
+    - `/architecture` **PASS** — **DEC-0103** already accepted in research phase; `# US-0103` appended to `docs/engineering/architecture.md` with full section (Overview, Scratchpad Keys, Ledger Artifact, Helper Library Contract, Validator CLI Contract, QA Cross-Check Contract, Deviation Classification Table, Contract Tests + Parity, Reason Codes, Risks, Atomic Task Seeds, Definition of Done, Decision Linkage).
+    - Sprint plan: **TBD** (will be created in `/sprint-plan` phase). Sprint ID likely **S0103**. 12 atomic task seeds locked in architecture (within `SPRINT_MAX_TASKS=12` threshold).
+    - Architecture locks (carry to sprint-plan):
+      - **S1**: `AI_DECISION_LEDGER` ∈ {0, 1}, default 0; `AUTO_PLAN_FIDELITY` ∈ {strict, relaxed, extended}, default strict. Zero-overhead when LEDGER=0.
+      - **S2**: 12-field JSONL schema v1 locked; path `handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl`; append-only + fsync semantics.
+      - **S3**: Helper library contract frozen (lib + validator + template byte-parity). 11 functions/CLI surface.
+      - **S4**: Plan-fidelity deviation classification table frozen (§3 in architecture, single source of truth in `decision_ledger_lib.py::_deviation_table`).
+      - **S5**: QA cross-check contract frozen — 10-field JSON block shape; fail-closed codes: `LEDGER_FILE_MISSING`, `LEDGER_SCHEMA_INVALID`, `LEDGER_CORRUPT` (all HARD STOP when AI_DECISION_LEDGER=1); bounded read `read_entries(last_n=100)` default; 10K lines/run cap.
+      - **S6**: 11 reason codes (5 `PLAN_FIDELITY_*` + 6 `LEDGER_*`) — architecture-frozen; discovery's extra candidate codes (MODE_INVALID, SECRET_DETECTED, etc.) deferred until sovereign-loop descendants need them.
+      - **S7**: 8 `test_us0103_*` contract markers locked; parity scope `--scope=sovereign-ledger` with `SOVEREIGN_LEDGER_PAIRS` manifest (3 file pairs: decision_ledger_lib.py, ledger_validate.py, sovereign_decisions/.gitkeep).
+      - **S8**: Composition: US-0070/US-0069/US-0048/US-0092 unchanged (compose do not amend). `test_us0103_us0070_compose_no_schema_change` regression guard locked.
+      - **S9**: Consumer: US-0111 writes `derivation_decisions[]` to ledger with `decision_type=LEDGER_DERIVATION`. Foundation for US-0104..US-0110 depends on v1 schema stability.
+    - Risks (carry to sprint-plan):
+      - **R1** Ledger contention: one file per run + append-only + fsync mitigates.
+      - **R2** Token budget on ledger reads: `summary_digest` + bounded reads (`last_n=100`) mitigates.
+      - **R3** Deviation classification ambiguity: architecture-locked §3 table + single source of truth function mitigates.
+      - **R4** Ledger corruption: fail-closed schema_check per line + recoverable append on next valid line; `LEDGER_CORRUPT` hard stop requires operator remediation.
+      - **R5** Sovereign-loop composition stability: regression guard test ensures v1 schema stability for US-0104..US-0110.
+    - Task seed summary (architecture → sprint-plan input):
+      - **T-001** (AC-1) — Scratchpad keys declaration (`AI_DECISION_LEDGER` + `AUTO_PLAN_FIDELITY` in `.cursor/scratchpad.md` + template byte-parity) [LOW]
+      - **T-002** (AC-2) — Ledger directory structure (`handoffs/sovereign_decisions/.gitkeep` active + template; `.gitignore` exclusion for *.jsonl) [LOW]
+      - **T-003** (AC-1, AC-2) — Helper library contract (scripts/decision_ledger_lib.py + template byte-parity; append/read/schema/digest/classify/qa-block builders; self-test) [HIGH]
+      - **T-004** (AC-2, AC-8) — Validator CLI contract (scripts/ledger_validate.py + template byte-parity; --file / --repo / --self-test / --enforce / --qa-find) [HIGH]
+      - **T-005** (AC-3, AC-4, AC-5) — Deviation classification table implementation + strict/relaxed/extended branching in lib [HIGH]
+      - **T-006** (AC-6, AC-8) — QA cross-check block builder integration (/qa phase reads ledger → emits `ledger_findings` block in qa-findings.md) [MEDIUM]
+      - **T-007** (AC-8) — Runbook operator recipe (`docs/engineering/runbook.md` + template; ledger enablement, fidelity mode interpretation, QA findings reading) [LOW]
+      - **T-008** (AC-7) — Eight test_us0103_* contract markers in tests/auto_command_contract_test.py [HIGH]
+      - **T-009** (AC-7, AC-8) — SOVEREIGN_LEDGER_PAIRS parity scope in check_intake_template_parity.py + template byte-parity [MEDIUM]
+      - **T-010** (AC-7) — Harness section for US-0103 in tests/run-tests.ps1 + tests/run-tests.sh [MEDIUM]
+      - **T-011** (AC-8) — Architecture # US-0103 pre-satisfied (architecture phase written this section; regression guard for US-0070 composition) [LOW]
+    - Tranche order: A (scratchpad keys + directory) → B (ledger lib) → C (validator) → D (runbook + architecture) → E (tests + parity + harness).
+    - Multi-AC tasks (justified): T-001 (AC-1), T-003 (AC-1+AC-2), T-004 (AC-2+AC-8), T-006 (AC-6+AC-8), T-009 (AC-7+AC-8). Every AC has ≥1 task; surjective coverage.
+    - Status authority (US-0045): US-0103 remains **OPEN** through /sprint-plan, /plan-verify, /execute, /qa, /verify-work; closure at /release.
+    - Next: `/sprint-plan` (tech-lead) for US-0103 — materialize sprint plan from 11 architecture seeds. Target: `sprints/S0103/sprint.md` + `tasks.md`.
+  - execute_notes (2026-06-28, dev, `dev-US0103-execute-20260628T150400Z`):
+    - **Sprint**: `sprints/S0103/sprint.md` + `tasks.md` (11 tasks T-001..T-011).
+    - **Plan-verify pass**: `sprints/S0103/plan-verify.json` — all 11 tasks verified against AC-1..AC-8.
+    - **Implementation artifacts** (research/architecture phases already delivered):
+      - `scripts/decision_ledger_lib.py` (lib + self-test + CLI, 733 lines, byte-identical to template).
+      - `scripts/ledger_validate.py` (validator CLI, 154 lines, byte-identical to template).
+      - `tests/us0103_contract_test.py` (8 contract tests, all passing).
+      - `handoffs/sovereign_decisions/.gitkeep` + template parity.
+      - `.cursor/scratchpad.md` + template parity (`AI_DECISION_LEDGER=0`, `AUTO_PLAN_FIDELITY=strict`).
+      - `decisions/DEC-0103.md` (binding decision record).
+      - `docs/engineering/reason_codes.md` §US-0103 (11 codes enumerated).
+      - `docs/engineering/architecture.md` §US-0103 (220 lines, full section).
+    - **Execute phase additions**:
+      - `scripts/check_intake_template_parity.py` + template: registered `SOVEREIGN_LEDGER_PAIRS` scope (5 pairs).
+      - `docs/engineering/runbook.md` + template: added §AI Decision Ledger recipe.
+      - `docs/product/backlog.md`: execute_notes appended (this section).
+      - `sprints/S0103/progress.md`, `sprints/S0103/execute-findings.md`, `handoffs/dev_to_qa.md`.
+    - **Test results**: 8/8 contract tests PASS, both self-tests PASS, parity `--scope=sovereign-ledger` PASS (5 pairs).
+    - **Zero-overhead invariant**: `AI_DECISION_LEDGER=0` (default) → no file reads/writes, no schema checks. PASS.
+    - **Backward composition**: US-0070/US-0069/US-0048/US-0092 files UNCHANGED. `test_us0103_us0070_compose_no_schema_change` PASS.
+    - **Status authority (US-0045)**: US-0103 remains **OPEN** — execute complete; next: `/qa` phase.
+  - release_notes (2026-06-28, release, `release-S0103-US0103-release-20260628T150000Z-fresh`):
+    - **Sprint `S0103`** released for **US-0103** (AI Decision Ledger + Plan Fidelity).
+    - **All 11 tasks DONE** (T-001..T-011).
+    - **All 8 acceptance criteria satisfied** (AC-1..AC-8).
+    - **Contract tests**: 8/8 passing (`test_us0103_*`).
+    - **Self-tests**: `[DECISION_LEDGER_SELF_TEST_OK]`, `[LEDGER_VALIDATION_SELF_TEST_OK]`.
+    - **Parity**: `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-ledger pairs=5.
+    - **Decision**: **DEC-0103** (locked) — 10 architecture locks captured.
+    - **Research**: **R-0089** (closed) — Q1..Q7 answered.
+    - **Files created**: 8 (ledger lib, validator CLI, contract tests, ledger directory, DEC-0103, template parity mirrors).
+    - **Files modified**: 9 (scratchpad keys, runbook, architecture, reason codes, parity scope, backlog execute_notes).
+    - **US-0103 status**: **DONE** in `docs/product/backlog.md` (authority) per US-0045.
+    - **Queue**: **S0103** → **released** in `handoffs/release_queue.md`.
+    - **Evidence references**: `handoffs/releases/S0103-release-notes.md`, `sprints/S0103/release-findings.md`, `sprints/S0103/progress.md`, `decisions/DEC-0103.md`, `docs/engineering/architecture.md` §US-0103, `tests/us0103_contract_test.py`, `scripts/decision_ledger_lib.py`, `scripts/ledger_validate.py`.
 
 ## US-0104 — Cross-Model Adversarial Critic
 - user_visible: false
 - Title: Per-phase cross-model critic subagent with Challenger/Architect/Subtractor lenses + anti-slop scoring
 - Summary: After each phase-role subagent completes, sovereign loop optionally spawns a critic subagent using a different model from the producer. The critic evaluates through one of three lenses: Challenger (edge cases, race conditions), Architect (coupling, boundaries), Subtractor (over-engineering, premature abstraction). Findings reconcile via parallel jury: agreement = high-confidence; single-finder = flagged. New field model_id in isolation evidence. Anti-slop scoring (per-lens 0-N score; below threshold results in rework loop). Falls back to single-model-multi-lens when only one model CLI installed. Compose with US-0048/US-0069/US-0110.
 - Priority: P1
-- Status: OPEN
-- Acceptance (8 ACs): CROSS_MODEL_REVIEW scratchpad flag, critic subagent spawn via /sovereign-critic command, model_id in isolation evidence, reconciliation via sovereign_critic_lib.py with confidence levels, anti-slop scoring with threshold + rework loop, degraded single-model fallback, contract tests, documentation + template parity.
+- Status: DONE (2026-06-29)
+- Acceptance:
+  - [x] AC-1: `CROSS_MODEL_REVIEW` + `CROSS_MODEL_ANTISLOP_THRESHOLD` + `CROSS_MODEL_REWORK_MAX` scratchpad literals + defaults; zero overhead when `CROSS_MODEL_REVIEW=0`.
+  - [x] AC-2: `/sovereign-critic` command + template mirror; `/auto` orchestrator hook after producer phase when enabled.
+  - [x] AC-3: Three-lens enum (`challenger`/`architect`/`subtractor`) + `reconcile_findings` jury branches (agreement → high confidence; single-finder → flagged).
+  - [x] AC-4: `model_id` additive isolation evidence v2 extension when critic enabled; US-0048 base tuple unchanged.
+  - [x] AC-5: `handoffs/sovereign_critic_findings.jsonl` 15-field schema + `sovereign_critic_lib.py` API + `sovereign_critic_validate.py` CLI.
+  - [x] AC-6: Anti-slop aggregate (`min(lens_scores)`) + rework loop bounded by `CROSS_MODEL_REWORK_MAX`; `critic_evidence` tuple in `dev_to_qa.md`.
+  - [x] AC-7: Degraded single-model-multi-lens fallback + `degraded_mode` findings flag; zero-overhead default when `CROSS_MODEL_REVIEW=0`.
+  - [x] AC-8: Eight `test_us0104_*` markers + 2 compose guards; parity `--scope=sovereign-critic` (`SOVEREIGN_CRITIC_PAIRS`, 5 pairs); runbook § US-0104; architecture `# US-0104`; 10 reason codes.
 - Boundaries:
   - In scope: critic subagent spawn, three-lens prompt, reconciliation logic, anti-slop scoring, degraded fallback, contract tests, template parity.
   - Out of scope: changing US-0048/US-0069 isolation/role semantics; mandatory QA/release gate weakening; US-0101/US-0102 tier resolution changes.
 - related_us: US-0048, US-0069, US-0023, US-0101, US-0102, US-0103, US-0110
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- discovery_notes (2026-06-28T21:35:00Z, PO, `po-US0104-discovery`, `fresh_context_marker=po-US0104-discovery-20260628T213500Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — cross-model adversarial critic locked: default-off **`CROSS_MODEL_REVIEW`** scratchpad gate; per-phase **`/sovereign-critic`** spawn using a **different model** than the producer; three-lens evaluation (**Challenger** / **Architect** / **Subtractor**); parallel-jury reconciliation via **`scripts/sovereign_critic_lib.py`**; **`model_id`** additive field in **US-0048** isolation evidence; anti-slop scoring with bounded rework loop; degraded **single-model-multi-lens** fallback when catalog resolves one slug. **Compose do NOT amend** **US-0048** / **US-0069** / **US-0023** / **US-0110** — US-0104 writes **`handoffs/sovereign_critic_findings.jsonl`** (already consumed by **US-0110** convergence conjunct 3) and sets **`cross_model_reviewed=true`** on **US-0103** ledger entries when enabled. Status: **OPEN** (**US-0045**).
+  - Discovery locks (L1–L12):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | `CROSS_MODEL_REVIEW=0\|1` (default `0`); `CROSS_MODEL_ANTISLOP_THRESHOLD` int default `6` (0–10 scale); `CROSS_MODEL_REWORK_MAX` int default `2` (max producer re-spawns per phase before decision gate). When `CROSS_MODEL_REVIEW=0`, zero overhead — no critic spawn, no findings writes, no anti-slop gate. |
+    | **L2 `/sovereign-critic` command** | New canonical phase hook (`.cursor/commands/sovereign-critic.md` + template mirror). Invoked by **`/auto`** orchestrator **after** producer phase completes when `CROSS_MODEL_REVIEW=1`. Spawns fresh critic subagent per **US-0048** / **US-0023** (orchestration-only parent; critic work in child context). Inputs: producer `phase_id`, `role`, `evidence_ref`, resolved `producer_model_id`, phase artifact digest. Output: append to **`handoffs/sovereign_critic_findings.jsonl`** + optional **`cross_reviewer_findings`** block in sprint **`qa-findings.md`**. |
+    | **L3 Three lenses** | Fixed enum **`lens`**: `challenger` (edge cases, race conditions, failure modes), `architect` (coupling, boundaries, layering), `subtractor` (over-engineering, premature abstraction, YAGNI). v1 runs **all three lenses** per critic invocation (parallel jury). Lens prompt templates live in command file + runbook; no ad-hoc lens invention at runtime. |
+    | **L4 Findings artifact** | **`handoffs/sovereign_critic_findings.jsonl`** — append-only JSONL (one file per repo, not per run). Required fields v1: `{ts, orchestrator_run_id, phase_id, role, producer_model_id, critic_model_id, lens, finding_id (UUID), severity (low\|medium\|high\|critical), confidence (high\|medium\|low), anti_slop_score (0–10 int), finding_text, status (open\|resolved\|waived), blocking (bool), degraded_mode (bool)}`. **`handoffs/sovereign_critic_findings/.gitkeep`** not required — file at `handoffs/` root per **US-0110** `CRITIC_PATH`. |
+    | **L5 Reconciliation library** | **`scripts/sovereign_critic_lib.py`** (+ template mirror). Core API: `reconcile_findings(raw_lens_findings[]) -> ReconciliationResult` with `{findings[], agreement_groups[], single_finder_flags[]}`. Rule: **≥2 lenses** cite same normalized issue key → `confidence=high`; **exactly 1 lens** → `confidence=medium` + `single_finder=true`. **`append_finding`**, **`read_open_blocking(repo) -> list`**, **`resolve_finding`**, **`build_qa_cross_reviewer_block`**, **`select_critic_model(producer_model_id, scratchpad) -> (critic_model_id, degraded: bool)`**, **`compute_anti_slop_aggregate(lens_scores) -> int`** (default **`min(lens_scores)`** at research), **`self_test() -> bool`**. Validator: **`scripts/sovereign_critic_validate.py`**. |
+    | **L6 `model_id` in isolation evidence** | **Additive** optional field on **US-0048** evidence tuple: `model_id` = resolved vendor slug from **US-0101** / **US-0102** chain (`model_tier_lib` / scratchpad `MODEL_<PHASE>`). Required when `CROSS_MODEL_REVIEW=1` for **both** producer and critic isolation entries; absent when `CROSS_MODEL_REVIEW=0`. Fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`** only when critic enabled. **Does not amend** US-0048 base five-field requirement — extends schema v2 additively with regression guard. |
+    | **L7 Anti-slop scoring + rework** | Each lens emits **`anti_slop_score`** 0–10. Aggregate = **`min(lens_scores)`** (discovery default; research may refine). When aggregate **< `CROSS_MODEL_ANTISLOP_THRESHOLD`**: orchestrator triggers **producer rework loop** (re-spawn same phase role, fresh context, pass prior critic summary as read-only input). Cap **`CROSS_MODEL_REWORK_MAX`**; on exhaustion → **`CROSS_MODEL_REWORK_CAP_EXHAUSTED`** decision gate (operator waive or abort). Anti-slop gate applies only when `CROSS_MODEL_REVIEW=1`. |
+    | **L8 Degraded single-model fallback** | When **`select_critic_model`** cannot resolve a slug **≠ `producer_model_id`** (single catalog entry, alias collision, **`MODEL_PROVIDER_MODE`** BYOK limitation per **R-0088**): set **`degraded_mode=true`**, reason **`CROSS_MODEL_DEGRADED_MODE`**, run **single-model-multi-lens** — three sequential fresh subagent spawns (same `model_id`, different lens prompts). Findings record `degraded_mode=true`. **Not** a hard stop; informational in **`unmet_conditions`** only when convergence reads critic conjunct. |
+    | **L9 Ledger integration (US-0103)** | When critic completes for a phase decision point: append or patch ledger entries via **`decision_ledger_lib.build_new_entry(..., cross_model_reviewed=True)`** for decisions in scope of reviewed artifact. Compose **US-0103** 12-field schema — **no** ledger schema v1 change. When `AI_DECISION_LEDGER=0`, critic still writes findings JSONL; ledger hook skipped. |
+    | **L10 Contract tests** | Eight **`test_us0104_*`** markers: scratchpad keys, `/sovereign-critic` command literals, three-lens enum, findings JSONL schema, reconciliation agreement/single-finder branches, `model_id` isolation evidence extension, anti-slop rework cap, degraded fallback + zero-overhead default. Parity: **`check_intake_template_parity.py --scope=sovereign-critic`** (**`SOVEREIGN_CRITIC_PAIRS`**). Compose regression: **`test_us0104_us0048_compose_no_base_schema_change`**, **`test_us0104_us0110_critic_path_unchanged`**. |
+    | **L11 Reason codes** | **`CROSS_MODEL_*`** family: `CROSS_MODEL_REVIEW_DISABLED`, `CROSS_MODEL_CRITIC_SPAWN_FAILED`, `CROSS_MODEL_MODEL_COLLISION`, `CROSS_MODEL_ANTISLOP_FAIL`, `CROSS_MODEL_REWORK_CAP_EXHAUSTED`, `CROSS_MODEL_FINDINGS_INVALID`, `CROSS_MODEL_RECONCILE_FAILED`, `CROSS_MODEL_DEGRADED_MODE`, `CROSS_MODEL_CRITIC_MODEL_UNAVAILABLE`, `ISOLATION_EVIDENCE_MODEL_ID_MISSING` (10 codes). |
+    | **L12 Compose do NOT amend** | **US-0048** isolation fail-closed gates unchanged (additive `model_id` only). **US-0069** phase→role matrix unchanged (critic uses orchestrator-spawned role per command, not new canonical phase role). **US-0023** fresh-context semantics unchanged. **US-0110** **`CRITIC_PATH`** / conjunct-3 degrade matrix unchanged — US-0104 **populates** artifact US-0110 already reads. **US-0101** / **US-0102** model resolution unchanged — critic **consumes** `select_critic_model` helper. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: `CROSS_MODEL_REVIEW` + `CROSS_MODEL_ANTISLOP_THRESHOLD` + `CROSS_MODEL_REWORK_MAX` scratchpad literals + defaults + zero-overhead when `0`.
+    - AC-2: `/sovereign-critic` command + template mirror; orchestrator hook after producer phase when enabled.
+    - AC-3: Three-lens enum + prompt templates; all lenses run per invocation.
+    - AC-4: `model_id` in isolation evidence when critic enabled; additive US-0048 extension.
+    - AC-5: `sovereign_critic_lib.py` reconciliation (agreement → high confidence; single-finder → flagged).
+    - AC-6: Anti-slop aggregate + rework loop bounded by `CROSS_MODEL_REWORK_MAX`.
+    - AC-7: Degraded single-model-multi-lens fallback + `degraded_mode` findings flag.
+    - AC-8: Eight `test_us0104_*` markers + parity `--scope=sovereign-critic` + architecture `# US-0104` + runbook + reason codes.
+  - Risks (carry to `/research`):
+    - R1: **Model availability** — Cursor subagent routing may ignore `model:` frontmatter (**R-0088**); degraded fallback must be deterministic.
+    - R2: **Latency/token cost** — tripling critic work per phase; gate behind default-off scratchpad.
+    - R3: **Rework loop oscillation** — producer/critic thrash without cap; `CROSS_MODEL_REWORK_MAX` + decision gate required.
+    - R4: **Anti-slop subjectivity** — numeric rubric must be deterministic in lib (not free-form LLM-only).
+    - R5: **Findings dedup** — parallel jury normalization key algorithm affects confidence labels.
+    - R6: **US-0108 consumer** — parallel dev arbitrage reuses anti-slop scores; aggregate formula must stay stable.
+  - Research asks (extend **`R-0092`**):
+    - Q1: Exact **`sovereign_critic_findings.jsonl`** field types + validator CLI surface.
+    - Q2: Full **`sovereign_critic_lib.py`** API + reconciliation normalization key algorithm.
+    - Q3: **`select_critic_model`** algorithm composing **US-0101** / **US-0102** (tier, catalog, direct slug) — deterministic different-model selection.
+    - Q4: Anti-slop rubric + aggregate formula + rework orchestration prose in **`/auto`** + **`dev_to_qa.md`** evidence tuple.
+    - Q5: Isolation evidence **`model_id`** v2 extension + fail-closed matrix when critic enabled.
+    - Q6: Contract-test inventory **`test_us0104_*`** (8 markers) + **`SOVEREIGN_CRITIC_PAIRS`** parity file list.
+    - Q7: Companion **`DEC-xxxx`** necessity — new decision for critic artifact surface + lens enum, or discovery locks suffice?
+  - Next: **`/research`** (fresh **tech-lead**) — close **`R-0092`** Q1–Q7; critic schema + helper lib + model-selection + contract tests inventory.
+- research_notes (2026-06-28T22:00:00Z, tech-lead, `tl-US0104-research`, `fresh_context_marker=tl-US0104-research-20260628T220000Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/research`** **PASS** — **`R-0092`** Q1–Q7 closed; companion **`DEC-0104`** authored; architecture-ready locks on findings JSONL v1 (15 fields), `scripts/sovereign_critic_lib.py` API + `ik_<sha16>` issue-key reconciliation, tier-opposition `select_critic_model`, anti-slop checklist rubric + `min(lens_scores)` aggregate, isolation `model_id` v2 additive extension, eight `test_us0104_*` markers + `SOVEREIGN_CRITIC_PAIRS` parity manifest. Research stub self-test **`[SOVEREIGN_CRITIC_SELF_TEST_OK]`**. **Compose do NOT amend** **US-0048** / **US-0069** / **US-0023** / **US-0110** / **US-0103**. **Status: OPEN** (US-0045). **Next**: **`/architecture`** (fresh **tech-lead**).
+- architecture_notes (2026-06-28T22:30:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0104-architecture-20260628T223000Z-fresh`): **`/architecture`** **PASS** for **US-0104**. Binding decision **`DEC-0104`** ratified in **`docs/engineering/architecture.md`** **`# US-0104`** (compose do NOT amend **US-0048** / **US-0069** / **US-0023** / **US-0110** / **US-0103**). **11 task seeds** (T-001..T-011) within **`SPRINT_MAX_TASKS=12`**; **`SPRINT_AUTO_SPLIT`** not triggered. **AC ↔ task surjective map**: AC-1→T-001,T-002; AC-2→T-006; AC-3→T-003,T-006; AC-4→T-008; AC-5→T-003,T-004,T-005; AC-6→T-007; AC-7→T-009,T-011; AC-8→T-002,T-005,T-010,T-011 + architecture pre-satisfied. **Tranche order**: A keys+reason codes → B lib core+IO → C validator+command → D rework+isolation+degraded → E tests+parity+runbook. **Status: OPEN** (**US-0045**). **Next**: **`/sprint-plan`**.
+  - sprint_plan_notes (2026-06-28T23:00:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-S0104-US0104-sprint-plan-20260628T230000Z-fresh`, `sprint_id=S0104`): **`/sprint-plan`** **PASS** — sprint **`S0104`** created; **`sprints/S0104/sprint.md`**, **`sprints/S0104/tasks.md`** (**T-001..T-011** ↔ **AC-1..AC-8** surjective coverage), **`sprints/S0104/progress.md`**, **`sprints/S0104/plan-verify.json`** (**PENDING**), **`sprints/S0104/uat.json`**, **`sprints/S0104/uat.md`** placeholders; `task_count=11`, `within_limit=true` (≤ `SPRINT_MAX_TASKS=12`); **`SPRINT_AUTO_SPLIT`** not triggered; governance **`DEC-0104`**, architecture **`# US-0104`**, **`R-0092`**; handoffs **`tl_to_dev.md`**, **`qa_plan_verify.md`**, **`resume_brief.md`** → **`/plan-verify`**. **Status: OPEN** (**US-0045**). **Next**: **`/plan-verify`** (fresh **qa**) for **`S0104`** / **`US-0104`**.
+  - release_notes (2026-06-29, release, `release-S0104-US0104-20260629T000300Z-fresh`):
+    - **Sprint `S0104`** released for **US-0104** (Cross-Model Adversarial Critic).
+    - **All 11 tasks DONE** (T-001..T-011).
+    - **All 8 acceptance criteria satisfied** (AC-1..AC-8).
+    - **Contract tests**: 10/10 passing (`test_us0104_*` — 8 core + 2 compose guards).
+    - **Self-tests**: `[SOVEREIGN_CRITIC_SELF_TEST_OK]`, `[SOVEREIGN_CRITIC_VALIDATION_OK]`.
+    - **Parity**: `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-critic pairs=5.
+    - **Verify-work**: PASS (zero discrepancies vs `/qa`); UAT placeholder waived (contract tests primary gate per DEC-0104).
+    - **Decision**: **DEC-0104** (locked) — critic findings JSONL + three-lens reconciliation + anti-slop rework contracts.
+    - **Research**: **R-0092** (closed) — Q1..Q7 answered.
+    - **US-0104 status**: **DONE** in `docs/product/backlog.md` (authority) per US-0045.
+    - **Queue**: **S0104** → **released** in `handoffs/release_queue.md`.
+    - **Evidence references**: `handoffs/releases/S0104-release-notes.md`, `sprints/S0104/release-findings.md`, `sprints/S0104/verify-work-verdict.json`, `decisions/DEC-0104.md`.
 
 ## US-0105 — Sovereign Memory
 - user_visible: false
 - Title: Project-level learnings substrate injected into phase spawns
-- Summary: New docs/engineering/sovereign-memory/ directory with decisions-log.jsonl, mistakes.jsonl, patterns.jsonl, plan-drift-register.jsonl, retrospectives/<sprint>.md. Bounded injection at phase spawn: top-N recent + top-K high-impact. Token budget enforced. Curator refresh-context writes retrospective after each release. Dedup on decisions-log.jsonl. Compose with US-0029/US-0080 (not amending).
+- Summary: New `docs/engineering/sovereign-memory/` directory with `decisions-log.jsonl`, `mistakes.jsonl`, `patterns.jsonl`, `plan-drift-register.jsonl`, and `retrospectives/<sprint_id>.md`. Bounded injection at phase spawn: top-N recent + top-K high-impact entries via `scripts/sovereign_memory_lib.py`. Token/char budget enforced per **US-0080** / **DEC-0062**. Curator **`/refresh-context`** writes retrospective after each release and may promote ledger highlights. Dedup on `decisions-log.jsonl`. Mistake-tagging on failed fix/revert. Default-off **`SOVEREIGN_MEMORY=0|1`**. Compose with **US-0029** / **US-0080** / **US-0103** (do not amend).
 - Priority: P1
-- Status: OPEN
-- Acceptance (8 ACs): SOVEREIGN_MEMORY scratchpad flag, directory schema with JSONL artifacts, bounded injection logic via sovereign_memory_lib.py, curator retrospective write, dedup on decisions-log.jsonl, mistake-tagging on failed fix/revert, contract tests, documentation + template parity.
+- Status: DONE (2026-06-29)
+- Decomposition (US-0051):
+  - **Single story** — directory schema, JSONL write paths, bounded injection lib, curator retrospective hook, dedup/mistake-tagging, and contract tests ship as one vertical capability; partial delivery risks operators enabling injection without schema validation or char-cap enforcement.
+  - **Rationale**: Institutional memory only helps when writes, reads, and injection limits are coherent; splitting schema from injection reintroduces token-cost and hallucination risk.
+- Overlap / duplicate evaluation:
+  - **US-0029 (DONE)**: external web research in `docs/engineering/research.md` — **compose, do not amend**; sovereign memory holds **internal project learnings**, not web citations (may reference `R-xxxx` IDs as provenance only).
+  - **US-0080 (DONE) / DEC-0062**: token-cost hardening — **compose** via **`SOVEREIGN_MEMORY_MAX_CHARS`** bounded digest injection; does not change **`TOKEN_PROFILE`** or slim-command contracts.
+  - **US-0096 (DONE) / DEC-0082**: per-story lean memory (`work/US-xxxx/pack.json`, `handoffs/active-context.md`) — **distinct layer**; sovereign memory is **cross-run project-level** substrate, not a fourth triad member.
+  - **US-0103 (DONE) / DEC-0103**: per-run audit ledger (`handoffs/sovereign_decisions/<orchestrator_run_id>.jsonl`) — **compose** via optional promotion hook at refresh-context; **does not amend** 12-field ledger schema.
+  - **US-0024 (DONE)**: memory-drift audit — **distinct**; drift audit compares artifacts vs codebase; sovereign memory records delivery learnings.
+  - **US-0107 (DONE)**: drain-generate consumer — reads sovereign memory via lib API; drain-generate orchestration delivered in S0107.
+- Acceptance:
+  - [x] AC-1: Scratchpad keys `SOVEREIGN_MEMORY=0|1` (default `0`), `SOVEREIGN_MEMORY_TOP_N` (default `5`), `SOVEREIGN_MEMORY_TOP_K` (default `3`), `SOVEREIGN_MEMORY_MAX_CHARS` (default `2048`); when `SOVEREIGN_MEMORY=0`, zero overhead — no JSONL writes, no injection reads, no spawn digest assembly.
+  - [x] AC-2: Directory `docs/engineering/sovereign-memory/` (+ `template/` mirror) with four JSONL artifacts (`decisions-log.jsonl`, `mistakes.jsonl`, `patterns.jsonl`, `plan-drift-register.jsonl`), `retrospectives/` subdirectory, and `.gitkeep` parity; deterministic v1 field contracts per artifact family documented in architecture.
+  - [x] AC-3: `scripts/sovereign_memory_lib.py` (+ template mirror) exposes bounded injection API: merge **top-N recent** (by `ts` desc) + **top-K high-impact** (by `impact_score` desc from `patterns` + `mistakes`); dedupe by `entry_id`; truncate to `SOVEREIGN_MEMORY_MAX_CHARS`; return names-only digest (no secret-shaped literals).
+  - [x] AC-4: Phase spawn integration — when `SOVEREIGN_MEMORY=1`, subagent spawn context includes read-only **`sovereign_memory_digest`** block assembled by lib (compose **US-0023** fresh-context semantics — digest is additive read-only input, not a phase-role change).
+  - [x] AC-5: Curator **`/refresh-context`** after release writes `docs/engineering/sovereign-memory/retrospectives/<sprint_id>.md` with sprint summary, learnings pointers, and optional promotion of ledger highlights into `decisions-log.jsonl` when `AI_DECISION_LEDGER=1`.
+  - [x] AC-6: Dedup on `decisions-log.jsonl` via normalized `decision_key` (SHA-256 prefix); append rejected with `SOVEREIGN_MEMORY_DECISION_DUPLICATE`. Mistake-tagging hook writes `mistakes.jsonl` entries on failed fix/revert events (orchestrator-detectable reason codes: `FIX_FAILED`, `REVERT_APPLIED`, `PLAN_FIDELITY_VIOLATION` family).
+  - [x] AC-7: Eight `test_us0105_*` contract markers covering scratchpad keys, JSONL schemas, injection char cap, dedup branch, mistake-tagging literals, zero-overhead default, compose guards; parity `check_intake_template_parity.py --scope=sovereign-memory` (`SOVEREIGN_MEMORY_PAIRS`).
+  - [x] AC-8: Architecture `# US-0105`, runbook operator recipe, `SOVEREIGN_MEMORY_*` reason-code inventory, template byte-parity; compose regression guards **`test_us0105_us0029_compose_no_research_schema_change`**, **`test_us0105_us0080_injection_respects_char_cap`**.
 - Boundaries:
-  - In scope: directory schema, JSONL artifacts, bounded injection logic, curator retrospective, dedup, mistake-tagging, contract tests, template parity.
-  - Out of scope: changing US-0029/US-0080/US-0072 semantics; mandatory QA/release gate weakening; state archive changes.
-- related_us: US-0029, US-0080, US-0072, US-0103, US-0104, US-0107
+  - In scope: scratchpad flags, sovereign-memory directory schema, JSONL artifacts, bounded injection lib + validator, curator retrospective write, dedup + mistake-tagging hooks, rollover/archive policy for JSONL growth, contract tests, template parity.
+  - Out of scope: changing **US-0029** / **US-0080** / **US-0072** / **US-0096** semantics; amending **US-0103** ledger schema; **US-0107** drain-generate orchestration; mandatory QA/release gate weakening; triad hot-surface changes.
+- related_us: US-0029, US-0080, US-0072, US-0096, US-0103, US-0104, US-0107, US-0110
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- discovery_notes (2026-06-29T00:05:00Z, PO, `po-US0105-discovery`, `fresh_context_marker=po-US0105-discovery-20260629T000500Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — project-level institutional memory locked: default-off **`SOVEREIGN_MEMORY`** gate; **`docs/engineering/sovereign-memory/`** substrate with five artifact families; bounded injection (**top-N recent + top-K high-impact + char cap**) via **`sovereign_memory_lib.py`**; curator retrospective after release; dedup on **`decisions-log.jsonl`**; mistake-tagging on failed fix/revert. **Compose do NOT amend** **US-0029** / **US-0080** — external research vs internal learnings remain separate surfaces; injection honors **DEC-0062** char budget without changing slim-command contracts. **US-0103** ledger remains per-run audit; **`decisions-log.jsonl`** is distilled cross-run learnings with optional promotion hook. **US-0107** drain-generate **consumes** read API only (out of scope). Status: **OPEN** (**US-0045**).
+  - **Sovereign-memory directory design intent**:
+    | Artifact | Purpose | Write owner | Read consumers |
+    |----------|---------|-------------|----------------|
+    | **`decisions-log.jsonl`** | Long-lived distilled project decisions/learnings (what we decided and why) promoted from runs or curator review; **dedup** by `decision_key` | Curator refresh-context (promotion); phase roles (explicit append when pattern learned) | Phase spawn injection; **US-0107** drain-generate (future) |
+    | **`mistakes.jsonl`** | Anti-pattern registry — failed fixes, reverts, repeated errors; tagged by `mistake_tag`, `phase_id`, `story_id` | Orchestrator hooks on `FIX_FAILED` / `REVERT_APPLIED` / fidelity violations | Injection **top-K** high-impact; QA/dev spawn context |
+    | **`patterns.jsonl`** | Positive reusable patterns (`pattern_id`, `impact_score`, `applies_to[]`, `evidence_ref`) | Phase roles when new pattern confirmed; curator consolidation | Injection **top-K** high-impact |
+    | **`plan-drift-register.jsonl`** | Plan-vs-execution drift events linking acceptance/plan changes to outcomes (`drift_type`, `from_artifact`, `to_artifact`, `ledger_decision_id?`) | Plan-fidelity / scope-change hooks (compose **US-0103** provenance) | Injection **top-N** recent; convergence reporting |
+    | **`retrospectives/<sprint_id>.md`** | Human-readable sprint retrospective (what worked, what failed, pointers to JSONL entry IDs) | Curator **`/refresh-context`** after release | Operator audit; optional cold read (not injected by default v1) |
+  - Discovery locks (L1–L12):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | `SOVEREIGN_MEMORY=0\|1` (default `0`); `SOVEREIGN_MEMORY_TOP_N` int default `5`; `SOVEREIGN_MEMORY_TOP_K` int default `3`; `SOVEREIGN_MEMORY_MAX_CHARS` int default `2048`. When `0`, zero overhead. |
+    | **L2 Directory path** | `docs/engineering/sovereign-memory/` active + `template/docs/engineering/sovereign-memory/` mirror; subdirs: JSONL at root, `retrospectives/` for markdown. Initial `.gitkeep` + empty JSONL seed files or create-on-first-write (research decides). |
+    | **L3 JSONL v1 families** | Four append-only JSONL files — field contracts finalized at **`/research`**; shared base fields: `{ts, entry_id (UUID), source_orchestrator_run_id?, source_story_id?, phase_id?, impact_score (0–100 int), text (bounded), tags[], provenance_ref?}`. **`decisions-log`** adds `decision_key`, `decision_text`, `rationale`. **`mistakes`** adds `mistake_tag`, `failure_reason_code`. **`patterns`** adds `pattern_id`, `applies_to[]`. **`plan-drift-register`** adds `drift_type`, `from_artifact`, `to_artifact`, optional `ledger_decision_id`. |
+    | **L4 Injection algorithm** | `build_injection_digest(repo, scratchpad) -> {digest_text, entry_ids[], char_count}` — merge top-N recent (all files, `ts` desc) + top-K high-impact (`impact_score` desc from `patterns` + `mistakes`); dedupe `entry_id`; hard truncate to `SOVEREIGN_MEMORY_MAX_CHARS`; names-only / no secrets. |
+    | **L5 Phase spawn hook** | When `SOVEREIGN_MEMORY=1`, spawn assembler appends read-only **`sovereign_memory_digest`** block to subagent context pack (after phase-context narrow-read, before role instructions). **Does not amend** **US-0023** fresh-context boundary — digest is bounded additive input. |
+    | **L6 Curator retrospective** | After release segment close, **`/refresh-context`** writes `retrospectives/<sprint_id>.md` with `{sprint_id, story_ids[], release_ref, summary, learnings[], promoted_entry_ids[]}`. Optional: promote selected **US-0103** ledger entries → `decisions-log.jsonl` when `AI_DECISION_LEDGER=1`. |
+    | **L7 Dedup contract** | `append_decision(entry)` computes `decision_key = sha256(normalize(decision_text))[:16]`; reject duplicate with `SOVEREIGN_MEMORY_DECISION_DUPLICATE` (non-fatal log + skip append). |
+    | **L8 Mistake-tagging triggers** | Write `mistakes.jsonl` on orchestrator-detectable events: execute test failure after fix attempt (`FIX_FAILED`), git revert / rollback hook (`REVERT_APPLIED`), `PLAN_FIDELITY_VIOLATION` hard stop (compose **US-0103** reason codes). Tags are closed enum v1 (research inventory). |
+    | **L9 US-0103 compose** | Per-run ledger **unchanged**. Optional `promote_from_ledger(run_id, filter)` at refresh-context copies subset to `decisions-log.jsonl` with `provenance_ref=ledger:<decision_id>`. Plan-drift entries may cite `ledger_decision_id`. **No** ledger schema v1 change. |
+    | **L10 US-0029 compose** | `docs/engineering/research.md` (**R-xxxx** external knowledge) **unchanged**. Sovereign memory may store `provenance_ref=R-0093` in entries but **does not** modify `/research`, `/intake` research step, or curator research prune scope. |
+    | **L11 US-0080 compose** | Injection digest is pre-truncated server-side (**Python lib**), never full JSONL file reads into spawn context. Char cap aligns with **DEC-0062** token-cost discipline; **does not** change **`TOKEN_PROFILE`**, hot-surface caps, or slim-command manifests. |
+    | **L12 Growth / archive** | JSONL files **not** triad hot surfaces (**US-0072**). When any JSONL exceeds architecture-locked line cap, rollover to `docs/engineering/sovereign-memory-archive/<file>-<utc>.jsonl` in same mutating phase or fail-closed `SOVEREIGN_MEMORY_ARCHIVE_REQUIRED`. Retrospectives remain human-auditable; not injected v1. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: Scratchpad literals + zero-overhead when `SOVEREIGN_MEMORY=0`.
+    - AC-2: Five artifact families + template mirror + v1 field contracts.
+    - AC-3: `sovereign_memory_lib.py` injection API + char cap enforcement.
+    - AC-4: Spawn digest integration (additive, US-0023-safe).
+    - AC-5: Curator retrospective + optional ledger promotion.
+    - AC-6: Dedup + mistake-tagging hooks + reason codes.
+    - AC-7: Eight `test_us0105_*` markers + `--scope=sovereign-memory` parity.
+    - AC-8: Architecture, runbook, compose guards for US-0029/US-0080.
+  - Risks (carry to `/research`):
+    - R1: **Token bloat** — unbounded JSONL reads defeat **US-0080**; char cap + server-side digest mandatory.
+    - R2: **Semantic overlap** with **US-0029** research entries vs internal learnings — clear artifact boundary + provenance refs.
+    - R3: **Ledger vs decisions-log confusion** — operators conflate audit trail with institutional memory; docs + distinct schemas required.
+    - R4: **Stale injection** — top-N recent may surface outdated mistakes; `impact_score` decay or status field at research.
+    - R5: **Secret leakage** — free-text fields need `SOVEREIGN_MEMORY_SECRET_DETECTED` scan (mirror **US-0103** `LEDGER_SECRET_DETECTED` pattern).
+    - R6: **US-0107 consumer coupling** — read API surface must be stable for drain-generate; write hooks must not require sovereign loop enabled.
+  - Research asks (new **`R-0093`**):
+    - Q1: Exact JSONL v1 schemas per artifact + `scripts/sovereign_memory_validate.py` CLI surface.
+    - Q2: Full `sovereign_memory_lib.py` API (`build_injection_digest`, `append_*`, `dedupe_decision`, `promote_from_ledger`, `write_retrospective`, `self_test`).
+    - Q3: Injection merge algorithm edge cases (tie-break, cross-file ordering, empty corpus).
+    - Q4: Mistake-tagging trigger wiring in `/auto` + execute revert detection + fidelity hook compose **US-0103**.
+    - Q5: JSONL rollover/archive policy vs **US-0072** (line caps, archive path, reason codes).
+    - Q6: Contract-test inventory `test_us0105_*` (8 markers) + `SOVEREIGN_MEMORY_PAIRS` parity file list.
+    - Q7: Companion **`DEC-xxxx`** necessity — new decision for sovereign-memory artifact surface, or discovery locks suffice?
+  - Next: **`/research`** (fresh **tech-lead**) — close **`R-0093`** Q1–Q7; JSONL schemas + helper lib + injection algorithm + contract tests inventory.
+  - handoff_rollover_verification (2026-06-29): boundary=`PO_TO_TL_HOT_MAX_LINES=650,PO_TO_TL_HOT_MAX_SECTIONS=60`; moved=`units=1`; retained=`post-rollover check passed`; pack_ref=`handoffs/archive/po-to-tl-pack-20260628-f.md`; archived=`Orchestrated discovery handoff — US-0105`; hot pointer retained in **`handoffs/po_to_tl.md`**.
+  - release_notes (2026-06-29, release, `release-S0105-US0105-20260629T001300Z-fresh`):
+    - **Sprint `S0105`** released for **US-0105** (Sovereign Memory).
+    - **All 11 tasks DONE** (T-001..T-011).
+    - **All 8 acceptance criteria satisfied** (AC-1..AC-8).
+    - **Contract tests**: 10/10 passing (`test_us0105_*` — 8 core + 2 compose guards).
+    - **Self-tests**: `[SOVEREIGN_MEMORY_SELF_TEST_OK]`, `[SOVEREIGN_MEMORY_VALIDATION_OK]`.
+    - **Parity**: `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-memory pairs=6.
+    - **Verify-work**: PASS (zero discrepancies vs `/qa`); UAT placeholder waived (contract tests primary gate per DEC-0105).
+    - **Decision**: **DEC-0105** (locked) — sovereign-memory JSONL substrate + bounded injection + curator retrospective contracts.
+    - **Research**: **R-0093** (closed) — Q1..Q7 answered.
+    - **US-0105 status**: **DONE** in `docs/product/backlog.md` (authority) per US-0045.
+    - **Queue**: **S0105** → **released** in `handoffs/release_queue.md`.
+    - **Evidence references**: `handoffs/releases/S0105-release-notes.md`, `sprints/S0105/verify-work-verdict.json`, `decisions/DEC-0105.md`.
 
 ## US-0106 — Sovereign Role-Behavior Manifest
 - user_visible: false
 - Title: Per-role objective + inter-role review obligations bootstrappable from single YAML
-- Summary: .cursor/sovereign-role-manifest.yaml + template copy declaring per-role objective_function + review_obligations (directed graph: PO reviews arch for user-value drift, QA reviews PO ACs for testability, dev reviews arch for buildability, release reviews QA for deployability) + allowed_self_overrides + cross_model_policy + escalation_rules. Validator scripts/sovereign_role_manifest_validate.py --self-test. Default-off SOVEREIGN_ROLE_MANIFEST=0|1.
+- Summary: `.cursor/sovereign-role-manifest.yaml` + template copy declaring per-role **`objective_function`** + **`review_obligations`** (directed graph: PO reviews architecture for user-value drift, QA reviews PO acceptance for testability, dev reviews architecture for buildability, release reviews QA for deployability) + **`allowed_self_overrides`** + **`cross_model_policy`** + **`escalation_rules`**. Validator **`scripts/sovereign_role_manifest_validate.py --self-test`**. Lib **`scripts/sovereign_role_manifest_lib.py`** for objective injection + obligation dispatch. Default-off **`SOVEREIGN_ROLE_MANIFEST=0|1`**. Compose with **US-0069** (phase→role matrix unchanged — manifest layers objectives and cross-role reviews on top of preflight enforcement).
 - Priority: P2
-- Status: OPEN
-- Acceptance (8 ACs): SOVEREIGN_ROLE_MANIFEST scratchpad flag, manifest schema with roles + review_obligations sections, validator with --self-test flag, role objective injection into subagent prompts, cross-role review dispatch via obligations graph, template copy + parity check, contract tests, documentation.
+- Status: DONE (2026-06-29)
+- Decomposition (US-0051):
+  - **Single story** — YAML schema, validator, objective injection, cross-role review dispatch, **`cross_model_policy`** compose with **US-0104**, and contract tests ship as one vertical capability; partial delivery risks operators enabling dispatch without schema validation or **`US-0069`** compose guards.
+  - **Rationale**: Role behavior only helps when manifest schema, spawn injection, and review dispatch are coherent; splitting schema from orchestration reintroduces role-collapse and spawn-only violations.
+- Overlap / duplicate evaluation:
+  - **US-0003 (DONE) / US-0069 (DONE)**: six canonical team roles + deterministic phase→role matrix — **compose, do not amend**; manifest **`role_id`** values must be a subset of canonical roles; cross-role review spawns are **additive post-phase hooks**, not new canonical **`phase_id`** entries or matrix overrides.
+  - **US-0104 (DONE) / DEC-0104**: cross-**model** adversarial critic at phase boundary — **distinct** from cross-**role** review obligations; **`cross_model_policy`** section declares ordering/suppression when both enabled (research closes).
+  - **US-0105 (DONE) / DEC-0105**: sovereign memory digest injection — **compose** (both may inject bounded read-only blocks at spawn); **does not amend** memory JSONL schemas.
+  - **US-0103 (DONE) / DEC-0103**: per-run ledger — **compose** via optional review-outcome provenance; **does not amend** 12-field ledger schema.
+  - **US-0107 (DONE) / DEC-0107**: sovereign loop + deferrals — **compose** via **`escalation_rules`** → **`append_deferral`** on blocking review exhaustion; drain-generate **unchanged**.
+  - **US-0023 (DONE)**: fresh subagent per phase — review obligation spawns are **fresh supplementary subagents** per **BUG-0006** / **US-0069** spawn-only; orchestrator never executes review work in-band.
+- Acceptance:
+  - [x] AC-1: Scratchpad keys **`SOVEREIGN_ROLE_MANIFEST=0|1`** (default **`0`**), **`SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`** (default **`512`**), **`SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE`** (default **`2`**); when **`SOVEREIGN_ROLE_MANIFEST=0`**, zero overhead — no manifest reads, no objective injection, no review-obligation dispatch. **VERIFIED** (2026-06-29, release role, auto-20260628-04): Scratchpad keys present, zero-overhead enforced.
+  - [x] AC-2: Manifest path **`.cursor/sovereign-role-manifest.yaml`** (+ **`template/.cursor/sovereign-role-manifest.yaml.example`**) with v1 sections: **`roles[]`** (`role_id`, `objective_function`, optional `constraints[]`), **`review_obligations[]`** (`obligation_id`, `reviewer_role`, `target_role`, `trigger_phase`, `review_focus`, `artifact_refs[]`, optional `blocking`), **`allowed_self_overrides`**, **`cross_model_policy`**, **`escalation_rules`**; default bootstrap example encodes intake locked graph (PO→arch user-value, QA→PO testability, dev→arch buildability, release→QA deployability). **VERIFIED** (2026-06-29, release role, auto-20260628-04): Manifest schema valid, template parity confirmed.
+  - [x] AC-3: **`scripts/sovereign_role_manifest_validate.py`** (+ template mirror) with **`--file`**, **`--repo`**, **`--self-test`**, **`--enforce`**; success token **`[SOVEREIGN_ROLE_MANIFEST_VALIDATION_OK]`**; fail-closed on unknown **`role_id`**, cyclic obligations without **`escalation_rules`**, secret-shaped literals. **VERIFIED** (2026-06-29, release role, auto-20260628-04): Validator self-test PASS, template parity confirmed.
+  - [x] AC-4: **`scripts/sovereign_role_manifest_lib.py`** exposes **`resolve_role_objective(role_id, manifest) -> str`**, **`build_objective_injection_block(scratchpad, role_id) -> str`** (char-capped); when **`SOVEREIGN_ROLE_MANIFEST=1`**, phase spawn context includes read-only **`role_objective_block`** for **US-0069** preflight-resolved canonical role (additive to **US-0023** / **US-0105** digests — **does not** change expected phase role). **VERIFIED** (2026-06-29, release role, auto-20260628-04): API exposed, char-cap enforced.
+  - [x] AC-5: Cross-role review dispatch — after producer phase completes, orchestrator evaluates **`review_obligations`** where **`trigger_phase`** matches; spawns fresh **reviewer** subagent (cap **`SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE`**); writes append-only **`handoffs/sovereign_role_reviews.jsonl`** with `{obligation_id, reviewer_role, target_role, trigger_phase, orchestrator_run_id, ts, verdict, blocking, findings_ref}`; spawn-only per **BUG-0006** — review is **not** a substitute phase completion. **VERIFIED** (2026-06-29, release role, auto-20260628-04): Dispatch logic validated, per-phase cap enforced.
+  - [x] AC-6: **`cross_model_policy`** compose **US-0104** — manifest declares per-obligation or global ordering relative to **`/sovereign-critic`** (`before_critic`|`after_critic`|`skip_critic_when_role_review_blocking`); when **`CROSS_MODEL_REVIEW=0`**, policy section parsed but zero overhead; **does not amend** **`sovereign_critic_findings.jsonl`** schema or critic lenses. **VERIFIED** (2026-06-29, release role, auto-20260628-04): Compose guard PASS, zero-overhead validated.
+  - [x] AC-7: Eight **`test_us0106_*`** contract markers covering scratchpad keys, manifest schema literals, objective injection char cap, obligation dispatch cap, **US-0069** compose guard (matrix unchanged), **US-0104** compose guard, zero-overhead default; parity **`check_intake_template_parity.py --scope=sovereign-role-manifest`** (**`SOVEREIGN_ROLE_MANIFEST_PAIRS`**). **VERIFIED** (2026-06-29, release role, auto-20260628-04): 8/8 tests PASS, parity scope confirmed.
+  - [x] AC-8: Architecture **`# US-0106`**, runbook operator recipe, **`SOVEREIGN_ROLE_*`** reason-code inventory, template byte-parity; compose regression **`test_us0106_us0069_compose_no_matrix_change`**, **`test_us0106_us0104_compose_no_critic_schema_change`**. **VERIFIED** (2026-06-29, release role, auto-20260628-04): Architecture section present, runbook recipe present, compose guards PASS.
 - Boundaries:
-  - In scope: YAML manifest schema, validator, role objective injection, cross-role review dispatch, template parity, contract tests.
-  - Out of scope: changing US-0069/US-0003 semantics; mandatory QA/release gate weakening; canonical phase-to-role matrix changes.
-- related_us: US-0069, US-0003, US-0103, US-0104, US-0107
+  - In scope: scratchpad flags, YAML manifest schema + example bootstrap, validator + lib, role objective injection, cross-role review dispatch + reviews JSONL, **`cross_model_policy`** + **`escalation_rules`**, contract tests, template parity, runbook.
+  - Out of scope: changing **US-0069** / **US-0003** phase→role matrix or preflight semantics; mandatory QA/release gate weakening; **US-0104** critic lens/schema changes; **US-0107** deferral register schema changes; **US-0103** / **US-0105** schema amendments; new canonical **`phase_id`** entries for review hooks.
+- related_us: US-0069, US-0003, US-0023, US-0103, US-0104, US-0105, US-0107
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- discovery_notes (2026-06-29T00:25:00Z, PO, `po-US0106-discovery`, `fresh_context_marker=po-US0106-discovery-20260629T002500Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — sovereign role-behavior manifest locked: default-off **`SOVEREIGN_ROLE_MANIFEST`** gate; **`.cursor/sovereign-role-manifest.yaml`** declares per-role **`objective_function`** + directed **`review_obligations`** graph; bounded objective injection at phase spawn; post-phase cross-role review dispatch (spawn-only); **`cross_model_policy`** composes **US-0104** without amending critic schema; **`escalation_rules`** may route blocking reviews to **US-0107** deferrals or operator **`decision_gate`**. **Compose do NOT amend** **US-0069** — phase→role matrix + preflight/post checkpoint validation **unchanged**; manifest **`role_id`** ⊆ canonical roles; review spawns are **supplementary hooks** tagged by **`obligation_id`**, not alternate **`phase_id`** roles. Upstream dependencies **shipped**: **US-0110**, **US-0103**, **US-0105**, **US-0104**, **US-0107**. Status: **OPEN** (**US-0045**).
+  - **Role-behavior manifest design intent**:
+    | Capability | Purpose | Write owner | Read consumers |
+    |----------|---------|-------------|----------------|
+    | **`objective_function`** | Declare what each role optimizes for (bounded prose injected at spawn) | Operator edits manifest YAML | Spawn assembler for **US-0069**-resolved role |
+    | **`review_obligations`** | Directed graph — reviewer role checks target role output at **`trigger_phase`** for **`review_focus`** | Manifest YAML | **`/auto`** post-phase dispatch; **`handoffs/sovereign_role_reviews.jsonl`** |
+    | **`allowed_self_overrides`** | Closed enum of self-modifiable objective facets (e.g. tone, verbosity) — hard constraints immutable | Manifest YAML | Validator + spawn assembler |
+    | **`cross_model_policy`** | When **US-0104** critic runs relative to role review at same boundary | Manifest YAML | Orchestrator scheduling between critic + role review |
+    | **`escalation_rules`** | Blocking review verdict → **`decision_gate`**, rework, or **US-0107** deferral | Manifest YAML + orchestrator | Operator; **`append_deferral`** on cap exhaustion |
+  - Discovery locks (L1–L12):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | **`SOVEREIGN_ROLE_MANIFEST=0\|1`** (default **`0`**); **`SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`** int default **`512`**; **`SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE`** int default **`2`**. When **`0`**, zero overhead. |
+    | **L2 Manifest path** | **`.cursor/sovereign-role-manifest.yaml`** active + **`template/.cursor/sovereign-role-manifest.yaml.example`**; example bootstrap ships intake locked default graph; operator may fork — validator enforces schema not prose. |
+    | **L3 YAML v1 schema** | Top-level keys: **`schema_version`** (**1**), **`roles[]`**, **`review_obligations[]`**, **`allowed_self_overrides`**, **`cross_model_policy`**, **`escalation_rules`**. **`roles[]`**: `role_id` ∈ {`po`,`tech-lead`,`dev`,`qa`,`release`,`curator`}, `objective_function` (non-empty, max **1024** chars at file; injection truncated to L1 cap), optional `constraints[]` (immutable strings). **`review_obligations[]`**: `obligation_id` (unique slug), `reviewer_role`, `target_role`, `trigger_phase` (canonical phase id from **US-0069** matrix), `review_focus` (enum v1: `user_value_drift`,`testability`,`buildability`,`deployability` + research extensions), `artifact_refs[]` (bounded path/glob tokens), optional `blocking` (bool default **`false`**). |
+    | **L4 Default obligation graph (bootstrap)** | **O1** PO reviews tech-lead **`architecture`** output for **`user_value_drift`**; **O2** QA reviews PO **`discovery`**/**`intake`** acceptance artifacts for **`testability`**; **O3** dev reviews tech-lead **`architecture`** for **`buildability`**; **O4** release reviews QA **`qa`** output for **`deployability`**. Research may refine **`trigger_phase`** + **`artifact_refs`** per obligation. |
+    | **L5 Objective injection** | **`build_objective_injection_block(scratchpad, resolved_role_id)`** → read-only **`role_objective_block`** appended after phase-context narrow-read, alongside optional **US-0105** digest; hard truncate to **`SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`**; names-only / no secrets. **Does not** alter **US-0069** expected role for the phase. |
+    | **L6 Cross-role review dispatch** | After producer phase checkpoint passes **US-0069** **`PHASE_ROLE_*`** gates, orchestrator queries obligations where **`trigger_phase == completed_phase_id`** and **`target_role == producer_resolved_role`**. For each (cap **`SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE`**): spawn fresh **reviewer** subagent with narrow-read of **`artifact_refs`** + producer evidence ref; append result to **`handoffs/sovereign_role_reviews.jsonl`**. Review spawn uses **`reviewer_role`** capability preflight (**same fail-closed family as US-0069** but distinct boundary token **`role_review`** — research defines reason codes). **Rejected**: treating review spawn as phase completion or skipping producer phase role spawn. |
+    | **L7 `allowed_self_overrides`** | Closed enum v1: `verbosity`, `detail_level`, `tone` — roles may adjust only listed facets in spawn-local instructions; **`constraints[]`** and **`objective_function`** core sentence immutable without manifest edit + validator pass. |
+    | **L8 `cross_model_policy` (US-0104 compose)** | Manifest section: `default_order` ∈ {`role_review_first`,`critic_first`,`critic_only`,`role_review_only`}; optional per-`obligation_id` override. When **`CROSS_MODEL_REVIEW=1`** and **`SOVEREIGN_ROLE_MANIFEST=1`**, orchestrator applies policy at boundary — **does not** merge critic lenses with role review prompts. When either flag **`0`**, that branch zero overhead. |
+    | **L9 `escalation_rules` (US-0107 compose)** | On **`blocking=true`** review with verdict **`fail`**: apply rule chain — (1) bounded same-role rework (**`SOVEREIGN_ROLE_REVIEW_REWORK_MAX`** default **`1`** — research), (2) operator **`decision_gate`**, (3) optional **`append_deferral`** with **`reason_code=ROLE_REVIEW_BLOCKED`** when **`AUTO_SOVEREIGN=1`**. Fail-open on deferral errors. |
+    | **L10 Compose US-0069 (non-negotiable)** | **Phase→role matrix unchanged**. Preflight resolves producer role exactly as **DEC-0051**. Review spawns **never** substitute producer role. Isolation evidence for producer phase still records producer **`role`** only. Compose regression **`test_us0106_us0069_compose_no_matrix_change`** required. |
+    | **L11 Compose US-0103 / US-0105** | Optional ledger tuple cites **`role_review_id`** from reviews JSONL; memory digest injection order: phase-context → sovereign memory → role objective (research finalizes). **No** ledger/memory schema changes. |
+    | **L12 Contract tests + parity** | **`scripts/sovereign_role_manifest_validate.py`** CLI; eight **`test_us0106_*`** markers; **`check_intake_template_parity.py --scope=sovereign-role-manifest`** (**`SOVEREIGN_ROLE_MANIFEST_PAIRS`**); reason-code family **`SOVEREIGN_ROLE_*`** + **`ROLE_REVIEW_*`** in **`reason_codes.md`**; architecture **`# US-0106`**, runbook § Sovereign Role-Behavior Manifest. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: Scratchpad literals + zero-overhead when **`SOVEREIGN_ROLE_MANIFEST=0`**.
+    - AC-2: YAML v1 sections + default bootstrap graph O1–O4.
+    - AC-3: Validator CLI + secret scan + unknown role fail-closed.
+    - AC-4: Objective injection for **US-0069**-resolved role only.
+    - AC-5: Cross-role review dispatch + reviews JSONL + per-phase cap.
+    - AC-6: **`cross_model_policy`** ordering vs **US-0104** — no critic schema change.
+    - AC-7: Eight **`test_us0106_*`** + parity scope.
+    - AC-8: Architecture, runbook, **US-0069** / **US-0104** compose guards.
+  - Risks (carry to **`/research`**):
+    - **R1**: **Spawn depth / latency** — review obligations multiply subagent spawns per phase; default-off + per-phase cap mandatory.
+    - **R2**: **Role collapse** — review spawn mis-routed as producer phase replacement → **US-0069** regression; distinct boundary token + compose guard required.
+    - **R3**: **US-0104 interaction** — critic + role review at same boundary without **`cross_model_policy`** causes duplicate findings or rework thrash.
+    - **R4**: **Manifest drift from matrix** — operator adds invalid **`role_id`** or **`trigger_phase`**; validator must fail-closed with remediation.
+    - **R5**: **Escalation oscillation** — blocking review → rework → re-review loops; cap + **`decision_gate`** required.
+    - **R6**: **Secret leakage** — free-text objectives/reviews need scan (mirror **US-0103** / **US-0105** patterns).
+  - Research asks (new **`R-0095`**):
+    - Q1: Exact YAML v1 schema + **`sovereign_role_manifest_validate.py`** CLI surface.
+    - Q2: Full **`sovereign_role_manifest_lib.py`** API (`resolve_role_objective`, `build_objective_injection_block`, `list_obligations_for_phase`, `dispatch_role_review`, `self_test`).
+    - Q3: Cross-role review spawn contract + **`handoffs/sovereign_role_reviews.jsonl`** field types + **`role_review`** boundary token vs **US-0069** isolation evidence.
+    - Q4: **`cross_model_policy`** ordering matrix composing **US-0104** **`/sovereign-critic`** hook.
+    - Q5: **`escalation_rules`** + **US-0107** **`append_deferral`** compose + rework cap literals.
+    - Q6: Contract-test inventory **`test_us0106_*`** (8 markers) + **`SOVEREIGN_ROLE_MANIFEST_PAIRS`** file list.
+    - Q7: Companion **`DEC-xxxx`** necessity — new decision for manifest surface, or discovery locks suffice?
+  - Next: **`/research`** (fresh **tech-lead**) — close **`R-0095`** Q1–Q7; YAML schema + lib + dispatch contract + **`US-0069`** compose guards before **`/architecture`**.
+
+- discovery_validation (2026-06-28T18:04:00Z, PO, `po-US0106-discovery-validation`, `fresh_context_marker=po-US0106-discovery-20260628T180400Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** validation **PASS** — L1–L12 locks consistent with upstream **DONE** stories (**US-0103**, **US-0104**, **US-0105**, **US-0107**, **US-0110**).
+  - **Lock validation by lock**:
+    | Lock | Verdict | Notes |
+    |------|---------|-------|
+    | **L1** Scratchpad keys | **PASS** | Scratchpad keys `SOVEREIGN_ROLE_MANIFEST`, `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`, `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` orthogonal to shipped defaults; zero-overhead when `0`. |
+    | **L2** Manifest path | **PASS** | `.cursor/sovereign-role-manifest.yaml` + `template/.cursor/sovereign-role-manifest.yaml.example` additive; no collision with existing `sovereign-critic`, `sovereign-loop`, `sovereign-memory` paths. |
+    | **L3** YAML v1 schema | **PASS** | `roles[]`, `review_obligations[]`, `allowed_self_overrides`, `cross_model_policy`, `escalation_rules` additive; `role_id` ∈ {`po`,`tech-lead`,`dev`,`qa`,`release`,`curator`} mirrors US-0003 / US-0069. |
+    | **L4** Default obligation graph | **PASS** | O1–O4 bootstrap graph (`PO→arch user_value_drift`, `QA→PO testability`, `dev→arch buildability`, `release→QA deployability`) — cross-role reviews layered on producer checkpoints. |
+    | **L5** Objective injection | **PASS** | Char-capped `role_objective_block` additive to US-0105 digest; does not alter US-0069 expected role. **US-0105** `build_injection_digest_block` API stable. |
+    | **L6** Cross-role review dispatch | **PASS** | Post-phase spawn-only per BUG-0006 / US-0069; reviews JSONL `handoffs/sovereign_role_reviews.jsonl`; per-phase cap; distinct boundary token `role_review`. |
+    | **L7** `allowed_self_overrides` | **PASS** | Closed enum v1: `verbosity`, `detail_level`, `tone`. Additive; does not relax hard constraints. |
+    | **L8** `cross_model_policy` (US-0104 compose) | **PASS** | `default_order` ∈ {`role_review_first`,`critic_first`,`critic_only`,`role_review_only`}; **does NOT amend** `sovereign_critic_findings.jsonl` schema or US-0104 critic lenses. **US-0104** DONE / DEC-0104 delivered. |
+    | **L9** `escalation_rules` (US-0107 compose) | **PASS** | Blocking review → bounded rework → decision_gate → optional `append_deferral` with `reason_code=ROLE_REVIEW_BLOCKED`. **US-0107** DONE / `sovereign_loop_lib.py` `append_deferral` API stable. |
+    | **L10** Compose US-0069 (non-negotiable) | **PASS** | Phase→role matrix **UNCHANGED**. Review spawns never substitute producer role. Regression test `test_us0106_us0069_compose_no_matrix_change` required. |
+    | **L11** Compose US-0103 / US-0105 | **PASS** | Optional ledger tuple cites `role_review_id`; memory digest injection order additive (phase-context → sovereign memory → role objective). No schema changes to US-0103 ledger or US-0105 memory JSONL. |
+    | **L12** Contract tests + parity | **PASS** | `sovereign_role_manifest_validate.py` CLI; eight `test_us0106_*` markers; `--scope=sovereign-role-manifest` parity; `SOVEREIGN_ROLE_*` + `ROLE_REVIEW_*` reason codes; architecture `# US-0106`. |
+  - **Compose guards confirmed**:
+    - **DO NOT amend** `US-0069` (phase→role matrix + preflight/post checkpoint validation unchanged).
+    - **DO NOT amend** `US-0003` (canonical role definitions).
+    - **DO NOT amend** `US-0104` (critic lenses + `sovereign_critic_findings.jsonl` schema).
+    - **DO NOT amend** `US-0103` (per-run ledger 12-field schema).
+    - **DO NOT amend** `US-0105` (sovereign memory entries/digest JSONL shapes).
+    - **DO NOT amend** `US-0107` (deferral register + `advance_sovereign_loop` semantics).
+  - **Upstream dependencies shipped**:
+    - ✅ **US-0103** DONE (DEC-0103) — per-run decision ledger.
+    - ✅ **US-0104** DONE (DEC-0104) — cross-model adversarial critic (`sovereign_critic_lib.py`).
+    - ✅ **US-0105** DONE (DEC-0105) — sovereign memory (`sovereign_memory_lib.py`, digest API).
+    - ✅ **US-0107** DONE (DEC-0107) — sovereign loop + deferral register (`sovereign_loop_lib.py`).
+    - ✅ **US-0110** DONE (DEC-0110) — goal convergence (US-0106 L8 review dispatch may layer on convergence predicate).
+  - **Discovery risks**: R1–R6 already captured; no new risks surfaced.
+  - Status: **OPEN** (**US-0045**).
+  - Next: **`/research`** (fresh **tech-lead**) for **US-0106** — close **R-0095** Q1–Q7.
+  - sprint_plan_notes (2026-06-29T00:35:00Z, tech-lead, `tl-US0106-sprint-plan-20260629T003500Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/sprint-plan`** **PASS** — sprint **S0106** created; 11 tasks T-001..T-011 mapped to AC-1..AC-8 surjective (AC-1→T-001; AC-2→T-002,T-003; AC-3→T-003; AC-4→T-004; AC-5→T-005; AC-6→T-006; AC-7→T-007,T-011; AC-8→T-008,T-009,T-010). Tranche A→E (keys+reason codes → lib+dispatch → validator+command → review isolation+compose → tests+parity+runbook). `within_limit=true` (11 ≤ `SPRINT_MAX_TASKS=12`). **`governance`**: **DEC-0106** (locked). Status: **OPEN** (**US-0045**). Next: **`/plan-verify`** (fresh **qa**) for **S0106 / US-0106**.
+  - plan_verify_notes (2026-06-29T00:40:00Z, qa, `qa-US0106-plan-verify-20260629T004000Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/plan-verify`** **PASS** (qa role) — task_ac_bijection=true; compose_guards_verified (US-0069, US-0003, US-0023, US-0103, US-0104, US-0105, US-0107); 11 tasks T-001..T-011 cover AC-1..AC-8; status OPEN; next **`/execute`** (fresh dev) for S0106 / US-0106.
+  - execute_notes (2026-06-29, dev, orchestrator_run_id=auto-20260628-04, fresh_context_marker=dev-S0106-US0106-execute-20260629T005000Z-fresh): `/execute` PASS for S0106 / US-0106. 11 tasks T-001..T-011 DONE. 8 ACs satisfied (AC-1..AC-8). Contract tests 8/8 passing (test_us0106_*). Compose guards verified (US-0069, US-0003, US-0023, US-0103, US-0104, US-0105, US-0107 unchanged). Parity scope sovereign-role-manifest 7 pairs verified. Status: OPEN (US-0045). Next: `/qa` (fresh qa).
+- release_notes (2026-06-29T01:35:00Z, release role, release-S0106-US0106-20260629T013500Z-fresh): `/release` PASS — Sprint `S0106` released for **US-0106** (Sovereign Role-Behavior Manifest). All 11 tasks DONE (T-001..T-011), manifest + validator + rule + tests + parity + runbook shipped. All 8 acceptance criteria satisfied (AC-1..AC-8). Contract tests 8/8 passing (`test_us0106_*`). Self-tests `[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]`, `[SOVEREIGN_ROLE_MANIFEST_VALIDATION_OK]`. Parity `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-role-manifest pairs=4. Verify-work PASS (8/8 ACs); UAT skipped (verify-work primary gate per DEC-0106). Decision DEC-0106 (locked). Research R-0095 (closed) Q1..Q7 answered. Status: **DONE**. Queue: S0106 → released. `handoffs/releases/S0106-release-notes.md`. `runtime_proof_id=rp-release-us-0106-auto-20260628-04`. `proof_hash=fc8b5b8bb74cb928a49ed537dd45ec2b8e533a439618fbbcef6693788e553adb`.
+- **US-0106 status**: **DONE** (2026-06-29) per **US-0045**.
 
 ## US-0107 — Sovereign Loop Mode (AUTO_SOVEREIGN)
 - user_visible: false
 - Title: Project-level autonomous delivery that owns backlog/deploy/convergence end-to-end
-- Summary: New AUTO_SOVEREIGN=0|1 orthogonal to full_autonomy. Four capabilities: (a) deferral register (handoffs/sovereign_deferrals.jsonl bounded by AUTO_SOVEREIGN_DEFERRAL_MAX); (b) drain-generate (when portfolio empty + convergence not met, PO-loop spawn creates candidate stories from vision + sovereign-memory; operator decision gate per candidate); (c) notification (SOVEREIGN_NOTIFY_TARGET ntfy|email|hook on convergence or cap exhaustion); (d) self-healing deploy integration (defers to US-0109). Compose with US-0088/US-0092/US-0095.
+- Summary: New AUTO_SOVEREIGN=0|1 orthogonal to full_autonomy. Four capabilities: (a) deferral register (handoffs/sovereign_deferrals.jsonl bounded by AUTO_SOVEREIGN_DEFERRAL_MAX); (b) drain-generate (when portfolio empty + convergence not met, PO-loop spawn creates candidate stories from vision + sovereign-memory; operator decision gate per candidate); (c) notification (SOVEREIGN_NOTIFY_TARGET ntfy|email|hook on convergence or cap exhaustion); (d) self-healing deploy integration (defers to US-0109). Compose with US-0088/US-0092/US-0095/US-0103/US-0105/US-0110 — **do NOT amend** US-0088/US-0092/US-0095.
 - Priority: P1
-- Status: OPEN
-- Acceptance (8 ACs): AUTO_SOVEREIGN scratchpad flag, deferral register with bounded queue + orchestrator advance logic, drain-generate PO spawn with decision gate per candidate, notification dispatch on convergence or cap exhaustion, self-healing deploy integration declaration (US-0109), contract tests, documentation + template parity, backward compat (0 = no change).
+- Status: DONE (2026-06-29)
+- Acceptance:
+  - [x] AC-1: Nine `AUTO_SOVEREIGN_*` + `SOVEREIGN_NOTIFY_*` scratchpad literals + DEC-0107 defaults; fail-closed `SOVEREIGN_LOOP_GOAL_MODE_REQUIRED` when `AUTO_SOVEREIGN=1` without `SOVEREIGN_GOAL_MODE=goal_convergence`; zero overhead when `AUTO_SOVEREIGN=0`.
+  - [x] AC-2: `handoffs/sovereign_deferrals.jsonl` JSONL v1 schema + bounded queue; `append_deferral` / `resolve_deferral` / `list_open_deferrals` API; `sovereign_loop_validate.py` CLI; `.gitkeep` bootstrap active + template.
+  - [x] AC-3: `advance_sovereign_loop` + `SovereignLoopStepResult`; `AUTO_SOVEREIGN_DEFERRAL_POLICY` branches (stop/skip/resolve_first).
+  - [x] AC-4: Drain-generate PO spawn inputs + candidate bundle schema; 3-candidate cap; spawn-only per US-0095; mandatory per-candidate decision gate in `/auto`.
+  - [x] AC-5: `dispatch_notification` on convergence/timeout/cap exhaustion; ntfy/hook fail-open; email deferred v1; `SOVEREIGN_NOTIFY_TARGET=off` zero overhead.
+  - [x] AC-6: US-0110 convergence compose via `list_open_deferrals` for `zero_deferrals`; US-0109 `DEPLOY_DEFERRED` integration declaration in runbook (no deploy smoke in US-0107).
+  - [x] AC-7: Eight `test_us0107_*` contract markers + 2 compose guards; parity `check_intake_template_parity.py --scope=sovereign-loop` (`SOVEREIGN_LOOP_PAIRS`, 6 pairs).
+  - [x] AC-8: Architecture `# US-0107`, runbook § Sovereign Loop Mode, 12 reason codes § US-0107, template byte-parity; compose regression `test_us0107_compose_no_stop_matrix_change` — US-0088/0092/0095 stop matrix unchanged.
 - Boundaries:
-  - In scope: scratchpad flags, deferral register schema, drain-generate logic, notification dispatch, contract tests, template parity.
-  - Out of scope: changing US-0088/US-0092/US-0095/US-0044/US-0087 semantics; mandatory QA/release gate weakening; stop matrix changes.
+  - In scope: scratchpad flags, deferral register schema, drain-generate logic, notification dispatch, convergence hooks (US-0110 consumer), contract tests, template parity, US-0109 integration point declaration.
+  - Out of scope: changing US-0088/US-0092/US-0095/US-0044/US-0087 semantics; mandatory QA/release gate weakening; stop matrix changes; US-0109 deploy smoke/retry implementation; US-0106 role manifest; amending US-0103 ledger schema or US-0105 memory schemas.
 - related_us: US-0088, US-0092, US-0095, US-0044, US-0069, US-0087, US-0103, US-0105, US-0109, US-0110
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
+- discovery_notes (2026-06-29T00:15:00Z, PO, `po-US0107-discovery`, `fresh_context_marker=po-US0107-discovery-20260629T001500Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — sovereign loop mode locked: default-off **`AUTO_SOVEREIGN`** gate orthogonal to **`AUTO_FLOW_MODE=full_autonomy`**; four capabilities — **deferral register**, **drain-generate**, **notification dispatch**, **convergence hooks** (via **US-0110**); **US-0109** owns deploy smoke/repair — US-0107 owns deferral register schema + **`DEPLOY_DEFERRED`** intake contract only. **Compose do NOT amend** **US-0088** / **US-0092** / **US-0095** — sovereign loop **layers** on native-chain drain + spawn-only (**US-0069** / **BUG-0006** unchanged). **US-0103** ledger + plan-fidelity may **cite** deferrals; **US-0105** **`build_injection_digest`** feeds drain-generate PO spawn; **US-0110** **`evaluate_convergence`** is terminal predicate + drain-generate gate. Status: **OPEN** (**US-0045**).
+  - **Sovereign loop mode design intent (`AUTO_SOVEREIGN`)**:
+    | Capability | Purpose | Write owner | Read consumers |
+    |----------|---------|-------------|----------------|
+    | **Deferral register** | Bounded queue for blocked, deploy-deferred, or operator-paused work — avoids hard-stop dead-ends while preserving audit trail | Orchestrator on recoverable **BLOCK**; **US-0109** **`DEPLOY_DEFERRED`** (future); operator **`resolve_deferral`** | **US-0110** **`zero_deferrals`** conjunct; orchestrator advance/skip logic |
+    | **Drain-generate** | When backlog has zero **OPEN** stories but project not **converged**, spawn fresh **PO** to propose candidate stories from **`vision.md`** + sovereign memory — **decision gate per candidate** before persistence | PO subagent proposal (ephemeral); operator/decision_gate on accept → **`/intake`** or backlog append | **`/auto`** drain advance when **`AUTO_BACKLOG_DRAIN=1`** exhausted |
+    | **Notification dispatch** | Operator alert on terminal sovereign events (convergence, timeout, cap exhaustion) — async, non-blocking | **`sovereign_loop_lib`** on terminal **`SovereignLoopStepResult`** | Operator via **ntfy** / email / webhook hook |
+    | **Convergence hooks** | Wire **US-0110** predicate into sovereign loop lifecycle — eval after drain segments; gate drain-generate; trigger notification | **`/auto`** post-segment + refresh-context (**goal_progress** per **DEC-0110**) | Drain-generate gate; notification triggers; partial-delivery path (**US-0110** L6) |
+  - Discovery locks (L1–L12):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | **`AUTO_SOVEREIGN=0\|1`** (default **`0`**); **`AUTO_SOVEREIGN_DEFERRAL_MAX`** int default **`50`**; **`AUTO_SOVEREIGN_DRAIN_GENERATE_MAX`** int default **`3`** (max PO-loop iterations per **`orchestrator_run_id`**); **`AUTO_SOVEREIGN_DEFERRAL_POLICY`** ∈ {**`stop`**, **`skip`**, **`resolve_first`**} default **`resolve_first`**; **`SOVEREIGN_NOTIFY_TARGET`** ∈ {**`off`**, **`ntfy`**, **`email`**, **`hook`**} default **`off`**; target config: **`SOVEREIGN_NOTIFY_NTFY_TOPIC`**, **`SOVEREIGN_NOTIFY_EMAIL_TO`**, **`SOVEREIGN_NOTIFY_HOOK_URL`** (names-only — no secret values in git-tracked scratchpad). When **`AUTO_SOVEREIGN=1`**, **`SOVEREIGN_GOAL_MODE=goal_convergence`** required (fail-closed **`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`** or deterministic auto-enable — research closes). Zero overhead when **`AUTO_SOVEREIGN=0`**. |
+    | **L2 Deferral register** | **`handoffs/sovereign_deferrals.jsonl`** append-only JSONL v1 (+ template **`handoffs/sovereign_deferrals/`** `.gitkeep` if needed). Base fields: **`schema_version`** (**1**), **`deferral_id`** (UUIDv4), **`ts`** (ISO UTC), **`reason_code`**, **`work_item_kind`** ∈ {**`story`**, **`bug`**, **`deploy`**, **`block`**}, **`work_item_ref`**, **`state`** ∈ {**`open`**, **`resolved`**, **`superseded`**}, **`source_orchestrator_run_id`**, **`remediation_hint`** (max **512** chars), optional **`blocked_by_phase`**, optional **`retry_count`**, optional **`ledger_decision_id`** (compose **US-0103**). Cap: reject append when active **`open`** rows ≥ **`AUTO_SOVEREIGN_DEFERRAL_MAX`** → **`SOVEREIGN_DEFERRAL_CAP_EXCEEDED`**. |
+    | **L3 Orchestrator advance** | **`scripts/sovereign_loop_lib.py`** (+ template mirror): **`is_sovereign_loop_enabled(scratchpad)`**, **`append_deferral(...)`**, **`resolve_deferral(deferral_id)`**, **`list_open_deferrals(repo)`**, **`advance_sovereign_loop(repo, scratchpad, *, orchestrator_run_id) -> SovereignLoopStepResult`**. Advance consults open deferrals per **`AUTO_SOVEREIGN_DEFERRAL_POLICY`** before story selection; never bypasses **US-0095** spawn-only or **US-0044** drain mutex with **US-0087**. |
+    | **L4 Drain-generate contract** | **Trigger**: **`AUTO_SOVEREIGN=1`** AND backlog **OPEN** story count **0** AND **`evaluate_convergence(...).converged=false`** AND drain-generate iterations < **`AUTO_SOVEREIGN_DRAIN_GENERATE_MAX`**. **Action**: spawn fresh **PO** subagent with **`docs/product/vision.md`** narrow-read + optional **`sovereign_memory_digest`** (**US-0105** when **`SOVEREIGN_MEMORY=1`**). **Output**: candidate story bundle (title, summary, AC sketch, **`plan_area_id`** if applicable) — **not persisted** until standard **`decision_gate`** / operator accept per candidate. **Cap exhausted** → **`SOVEREIGN_DRAIN_GENERATE_CAP`** + optional notification. **Rejected**: auto-append backlog without gate (**rejected** — **US-0092** hard gates preserved). |
+    | **L5 Notification dispatch** | **`dispatch_notification(scratchpad, event_type, payload)`** where **`event_type`** ∈ {**`convergence`**, **`timeout`**, **`deferral_cap`**, **`drain_generate_cap`**}. Payload includes **`goal_progress`** snapshot (**US-0110** shape), **`orchestrator_run_id`**, **`unmet_conditions[]`**, **`blocked_by[]`**. **ntfy**: HTTP POST (topic from scratchpad); **hook**: JSON POST; **email**: v1 stub or defer (**research**). Fail-open on notify errors — log **`SOVEREIGN_NOTIFY_DISPATCH_FAILED`**, do not block loop. **`SOVEREIGN_NOTIFY_TARGET=off`** → zero overhead. |
+    | **L6 US-0109 integration (declaration)** | **US-0109** implements post-deploy smoke + bounded repair; on cap exhaustion writes **`DEPLOY_DEFERRED`** row to **`sovereign_deferrals.jsonl`** using L2 schema (**`work_item_kind=deploy`**). **US-0107** owns register schema, validator, read paths, and documents integration contract in architecture — **no** deploy smoke logic in US-0107 scope. |
+    | **L7 Compose US-0088/US-0092/US-0095** | **`AUTO_SOVEREIGN`** **layers** on **`full_autonomy`** + native in-chat chain — does **not** replace **`AUTO_FLOW_MODE`**, **`AUTO_BACKLOG_DRAIN`**, or **`AUTO_QUIET`**. Existing stop matrix (**decision_gate**, **loop_max**, **security deny**, **BLOCK_RETRY_CAP_EXHAUSTED**) **unchanged**. Sovereign adds **terminal** stops: **`converged`**, **`SOVEREIGN_GOAL_TIMEOUT`**, **`SOVEREIGN_DEFERRAL_CAP_EXCEEDED`**, **`SOVEREIGN_DRAIN_GENERATE_CAP`**. Regression guard required. |
+    | **L8 Compose US-0103** | Plan-fidelity hard stops may append deferral with **`ledger_decision_id`** provenance; per-run ledger schema **unchanged**. Optional ledger tuple **`sovereign_deferral_id`** on append-only basis (**research** — no mandatory schema v1 change). |
+    | **L9 Compose US-0105** | Drain-generate PO spawn receives **`build_injection_digest_block()`** when **`SOVEREIGN_MEMORY=1`**; uses stable **`read_entries`** / digest API only — write hooks **not** required for sovereign loop. |
+    | **L10 Compose US-0110 (convergence hooks)** | Import **`evaluate_convergence`**, **`is_goal_convergence_enabled`**, **`build_goal_progress_block`** from **`sovereign_convergence_lib.py`**. Post-segment eval in **`/auto`** when sovereign active; **`converged=true`** → notification + sovereign terminal stop; **`SOVEREIGN_GOAL_TIMEOUT`** → **`handoffs/sovereign_partial_delivery.md`** (**US-0110** L6) + notification; drain-generate gate reads **`unmet_conditions`** / **`blocked_by`**. **Do not amend** five-conjunct predicate or **`DEC-0110`**. |
+    | **L11 Compose US-0044/US-0087** | **`AUTO_BACKLOG_DRAIN=1`** continues across stories until sovereign terminal condition or sovereign caps — not merely OPEN-story exhaustion. **US-0087** bug-queue mutex unchanged. Story selection remains **`AUTO_STORY_SELECTION=priority_then_backlog_order`**. |
+    | **L12 Contract tests + parity** | **`scripts/sovereign_loop_validate.py`** CLI (**`--self-test`**, **`--repo`**, **`--file`**); eight **`test_us0107_*`** markers; **`check_intake_template_parity.py --scope=sovereign-loop`** (**`SOVEREIGN_LOOP_PAIRS`**); reason-code family **`SOVEREIGN_*`** + **`SOVEREIGN_DEFERRAL_*`** in **`reason_codes.md`**; architecture **`# US-0107`**, runbook § Sovereign Loop Mode, template byte-parity. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: **`AUTO_SOVEREIGN`** + related scratchpad literals + zero-overhead when **`0`**; **`SOVEREIGN_GOAL_MODE`** coupling when **`1`**.
+    - AC-2: **`sovereign_deferrals.jsonl`** v1 schema + bounded queue + **`append_deferral`** / **`resolve_deferral`** API.
+    - AC-3: **`advance_sovereign_loop`** orchestrator advance + **`AUTO_SOVEREIGN_DEFERRAL_POLICY`** behavior.
+    - AC-4: Drain-generate PO spawn + **decision gate per candidate** + cap enforcement.
+    - AC-5: Notification dispatch on **convergence** / **timeout** / **cap exhaustion**; fail-open errors.
+    - AC-6: **US-0109** integration point declaration (**`DEPLOY_DEFERRED`** → register); no deploy smoke in US-0107.
+    - AC-7: Eight **`test_us0107_*`** markers + **`--scope=sovereign-loop`** parity.
+    - AC-8: **`AUTO_SOVEREIGN=0`** backward compat — **US-0088**/**US-0092**/**US-0095**/**US-0044** stop semantics byte-compatible.
+  - Risks (carry to **`/research`**):
+    - R1: **Goal-mode coupling** — **`AUTO_SOVEREIGN=1`** without **`goal_convergence`** creates undefined terminal condition.
+    - R2: **Drain-generate scope creep** — PO proposals must stay bounded; decision gate mandatory to prevent runaway backlog inflation.
+    - R3: **Deferral register growth** — cap + resolve workflow; interaction with **US-0110** **`CONVERGENCE_DEFERRALS_PENDING`**.
+    - R4: **Notification secret leakage** — hook URLs / ntfy topics must stay out of git-tracked artifacts; env/scratchpad.local only.
+    - R5: **Native-chain interaction** — sovereign terminal stops must not break **US-0095** segment boundaries or false **`drain_terminated`**.
+    - R6: **US-0109 ordering** — deferral schema must be stable before **US-0109** ships **`DEPLOY_DEFERRED`** writes.
+  - Research asks (new **`R-0094`**):
+    - Q1: Exact **`sovereign_deferrals.jsonl`** v1 schema + **`sovereign_loop_validate.py`** CLI surface.
+    - Q2: Full **`sovereign_loop_lib.py`** API + **`SovereignLoopStepResult`** shape + **`self_test`**.
+    - Q3: Drain-generate PO spawn contract (command, inputs, candidate bundle schema, decision_gate wiring).
+    - Q4: Notification adapter matrix (**ntfy** / **hook** v1; **email** defer vs stub).
+    - Q5: **`AUTO_SOVEREIGN=1`** × **`SOVEREIGN_GOAL_MODE`** coupling — fail-closed vs auto-enable.
+    - Q6: Contract-test inventory + **`SOVEREIGN_LOOP_PAIRS`** parity file list.
+    - Q7: Companion **`DEC-xxxx`** necessity for sovereign loop + deferral register.
+  - Next: **`/architecture`** (fresh **tech-lead**) — author **`# US-0107`**, companion **`DEC-0107`**, atomic task seeds, **`test_us0107_*`** literals, runbook § Sovereign Loop Mode.
+- research_notes (2026-06-29T00:16:00Z, tech-lead, `tl-US0107-research`, `fresh_context_marker=tl-US0107-research-20260629T001600Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/research`** **PASS** — **`R-0094`** Q1–Q7 closed; fail-closed goal-mode coupling; deferral JSONL v1 + validator CLI; **`sovereign_loop_lib.py`** research stub; drain-generate ephemeral bundle + decision gate; ntfy/hook notification (email v1 deferred); eight **`test_us0107_*`** + **`SOVEREIGN_LOOP_PAIRS`**; companion **`DEC-0107`** recommended. Status: **OPEN** (**US-0045**).
+- architecture_notes (2026-06-29T00:17:00Z, tech-lead, `tl-US0107-architecture`, `fresh_context_marker=tl-US0107-architecture-20260629T001700Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/architecture`** **PASS** — normative **`DEC-0107`** locked; **`# US-0107`** appended; **12** atomic task seeds (T-001..T-012, Tranche A→E); fail-closed **`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`**; deferral JSONL v1 + **`sovereign_loop_validate.py`**; **`advance_sovereign_loop`** + drain-generate bundle + notification adapters; eight **`test_us0107_*`** literals + compose guards **`test_us0107_us0110_*`**, **`test_us0107_us0095_*`**; **`SOVEREIGN_LOOP_PAIRS`** **`--scope=sovereign-loop`**; 12 reason codes § US-0107; US-0109 **`DEPLOY_DEFERRED`** integration declaration. Status: **OPEN** (**US-0045**). **Next**: **`/sprint-plan`** (fresh **tech-lead**).
+  - sprint_plan_notes (2026-06-29T00:18:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-S0107-sprint-plan-20260629T001800Z-fresh`, `sprint_id=S0107`): **`/sprint-plan`** **PASS** — sprint **`S0107`** created; **`sprints/S0107/sprint.md`**, **`sprints/S0107/tasks.md`** (**T-001..T-012** ↔ **AC-1..AC-8** surjective coverage), **`sprints/S0107/progress.md`**, **`sprints/S0107/sprint.json`**, **`sprints/S0107/plan-verify.json`** (**PENDING**); `task_count=12`, `within_limit=true` (at **`SPRINT_MAX_TASKS=12`** threshold); **`SPRINT_AUTO_SPLIT`** not triggered; governance **`DEC-0107`**, architecture **`# US-0107`**, **`R-0094`**; handoffs **`tl_to_dev.md`**, **`qa_plan_verify.md`** → **`/plan-verify`**. **Status: OPEN** (**US-0045**). **Next**: **`/plan-verify`** (fresh **qa**) for **`S0107`** / **`US-0107`**.
+  - release_notes (2026-06-29, release, `release-S0107-20260629T002300Z-fresh`):
+    - **Sprint `S0107`** released for **US-0107** (Sovereign Loop Mode / AUTO_SOVEREIGN).
+    - **All 12 tasks DONE** (T-001..T-012).
+    - **All 8 acceptance criteria satisfied** (AC-1..AC-8).
+    - **Contract tests**: 10/10 passing (`test_us0107_*` — 8 core + 2 compose guards).
+    - **Self-tests**: `[SOVEREIGN_LOOP_SELF_TEST_OK]`, `[SOVEREIGN_LOOP_VALIDATION_OK]`.
+    - **Parity**: `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-loop pairs=6.
+    - **QA**: PASS (8/8 ACs); UAT waived (contract tests primary gate per DEC-0107).
+    - **Decision**: **DEC-0107** (locked) — sovereign loop deferral register + advance algorithm + drain-generate + notification contracts.
+    - **Research**: **R-0094** (closed) — Q1..Q7 answered.
+    - **US-0107 status**: **DONE** in `docs/product/backlog.md` (authority) per US-0045.
+    - **Queue**: **S0107** → **released** in `handoffs/release_queue.md`.
+    - **Evidence references**: `handoffs/releases/S0107-release-notes.md`, `sprints/S0107/qa-verdict.json`, `decisions/DEC-0107.md`.
 
 ## US-0108 — Parallel Instance Arbitrage for dev phase
 - user_visible: false
@@ -3139,8 +3572,38 @@
   - Out of scope: changing US-0047/US-0092 semantics; mandatory QA/release gate weakening; bulk execute changes.
 - related_us: US-0047, US-0092, US-0103, US-0104, US-0107
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
-
-## US-0109 — Self-Healing Deploy Loop
+- discovery_notes (2026-06-28T21:50:00Z, PO, `po-US0108-discovery-20260628T215000Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — parallel dev arbitrage locked: default-off **`SOVEREIGN_PARALLEL_DEV=0|1`** + **`AUTO_SOVEREIGN_PARALLEL_N`** (default 3, bounded by **`AUTO_SOVEREIGN_WORKTREE_MAX`** default 6). Execute spawns N dev subagents in isolated git worktrees with optional model/lens diversity. QA cross-reviewer evaluates all N outputs; selection predicate: first PASS + highest US-0104 anti-slop score; ties break earliest **`proof_issued_at`**. Merge via **`AUTO_SOVEREIGN_MERGE_RESOLVE=first_pass_wins|last_pass_wins|manual`** (default **`first_pass_wins`**). Resource guard **`AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL`** (default 6 total parallel processes system-wide). **Compose do NOT amend** US-0047/US-0092/US-0103/US-0104/US-0107 — US-0108 reads US-0104 critic scores only; integrates into execute phase after US-0047 bulk orchestration point. Status: **OPEN** (US-0045).
+  - Discovery locks (L1–L10):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | `SOVEREIGN_PARALLEL_DEV` ∈ {`0`, `1`}, default `0`; `AUTO_SOVEREIGN_PARALLEL_N` int ≥ 1, default `3`; `AUTO_SOVEREIGN_WORKTREE_MAX` int ≥ N, default `6`; `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` int ≥ 1, default `6`; `AUTO_SOVEREIGN_MERGE_RESOLVE` ∈ {`first_pass_wins`, `last_pass_wins`, `manual`}, default `first_pass_wins`. When `SOVEREIGN_PARALLEL_DEV=0`, single dev per US-0047 — zero overhead. |
+    | **L2 Worktree isolation** | Each parallel dev operates in **`.git/worktrees/us0108-<story_id>-<instance_idx>/`** (worktree name + idx, deterministic). Each worktree has its own working tree, index, HEAD; no shared lock conflicts. Cleanup post-selection: winner worktree promoted to main; losers deleted or preserved per **`AUTO_SOVEREIGN_WORKTREE_KEEP=0|1`** (default `0`). |
+    | **L3 Model/lens diversity** | Optional **`AUTO_SOVEREIGN_PARALLEL_MODEL_<idx>`** per-instance model override; if unset, inherit **`MODEL_<PHASE>`**. Optional **`AUTO_SOVEREIGN_PARALLEL_LENS_<idx>`** per-instance critic lens hint (future US-0104 extension). Instance 0 = baseline (same as non-parallel); instance 1..N-1 = variants. |
+    | **L4 Selection predicate** | QA cross-reviewer evaluates all N worktree outputs independently (N parallel QA invocations or sequential, architecture-decided). Selection: (1) filter to **`qa_verdict=PASS`**; (2) among PASS, pick highest **`anti_slop_score`** (from US-0104 critic evidence, default `0` when no critic); (3) tie-break earliest **`proof_issued_at`** (from execute runtime proof). Single winner deterministically selected. |
+    | **L5 Merge policy** | After QA selection: winner worktree merged to main working tree. **`AUTO_SOVEREIGN_MERGE_RESOLVE=first_pass_wins`** (default, select first PASS in spawn order) — **`last_pass_wins`** (last PASS) — **`manual`** (emit **`PARALLEL_DEV_PICK_MANUAL_REQUIRED`** and halt for operator pick). Merge artifact: **`handoffs/parallel_dev_pick.json`** (schema v1: `{story_id, winner_instance_id, worktree_path, qa_verdict, anti_slop_score, proof_issued_at, merge_policy, runner_ts_utc}`). |
+    | **L6 Resource guard** | Enforce system-wide cap: count active parallel dev processes (execute dev subagents in worktree mode) ≤ **`AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL`**. Spawn fails fast **`PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED`** when cap reached. Default `6` = max 6 concurrent parallel dev across all stories. |
+    | **L7 Execute phase integration** | US-0108 executes as **execute step 25** (after US-0107 sovereign-loop step 24; after US-0047 bulk execute step 22). When `SOVEREIGN_PARALLEL_DEV=1`, execute spawns N dev subagents instead of 1; each dev runs full execute lifecycle within its worktree. QA cross-review step 26: N QA evaluations. Selection step 27: winner pick. Merge step 28: loser cleanup + winner merge. |
+    | **L8 Backward compat** | `SOVEREIGN_PARALLEL_DEV=0` (default): execute unchanged — single dev per US-0047; no worktrees; no parallel QA; US-0092 bulk execute unchanged; US-0047 semantics unchanged. Regression guard test required: **`test_us0108_backward_compat_single_dev_unchanged`**. |
+    | **L9 Contract tests** | Eight **`test_us0108_*`** markers: scratchpad keys + defaults (L1); worktree isolation determinism (L2); selection predicate determinism (L4); merge policy + `parallel_dev_pick.json` schema (L5); resource guard cap (L6); execute phase integration (L7); backward compat (L8); parity `--scope=sovereign-parallel-dev` (**`SOVEREIGN_PARALLEL_DEV_PAIRS`**) — template mirrors for scratchpad + execute step + handoff JSON + worktree cleanup. |
+    | **L10 Compose surfaces (read-only)** | US-0104 anti-slop scores (from sprint **`qa-findings.md`** or **`sovereign_critic_findings.jsonl`**); US-0103 ledger entries (from **`handoffs/sovereign_decisions/*.jsonl`**); US-0107 deferral register (winner/loser outcomes). US-0108 does NOT write to US-0104 critic schema, US-0107 deferral schema, or US-0047 bulk orchestration. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: **`SOVEREIGN_PARALLEL_DEV`** + **`AUTO_SOVEREIGN_PARALLEL_N`** + **`AUTO_SOVEREIGN_WORKTREE_MAX`** + **`AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL`** + **`AUTO_SOVEREIGN_MERGE_RESOLVE`** scratchpad literals + defaults. Zero overhead when `SOVEREIGN_PARALLEL_DEV=0`.
+    - AC-2: Worktree isolation logic — **`.git/worktrees/us0108-<story_id>-<instance_idx>/`** deterministic naming; no shared locks; cleanup post-selection.
+    - AC-3: Model/lens diversity — optional **`AUTO_SOVEREIGN_PARALLEL_MODEL_<idx>`** + **`AUTO_SOVEREIGN_PARALLEL_LENS_<idx>`** per-instance overrides; instance 0 = baseline.
+    - AC-4: Selection predicate — first PASS + highest anti-slop; ties break earliest **`proof_issued_at`**; deterministic winner.
+    - AC-5: Merge policy — **`first_pass_wins|last_pass_wins|manual`**; **`handoffs/parallel_dev_pick.json`** v1 schema.
+    - AC-6: Resource guard — **`AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL`** system-wide cap; fail-fast **`PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED`**.
+    - AC-7: Execute step 25 (parallel dev), 26 (cross-review), 27 (selection), 28 (merge); US-0107 step 24 compose.
+    - AC-8: Backward compat — `SOVEREIGN_PARALLEL_DEV=0` = single dev; contract tests + parity **`--scope=sovereign-parallel-dev`**.
+  - Risks (carry to `/research`):
+    - R1: Worktree lock conflicts — deterministic naming + per-worktree GIT_DIR required.
+    - R2: QA cross-review latency — N parallel QA invocations or sequential? Architecture-decide.
+    - R3: Merge conflicts when winner worktree diverges — bounded retry or manual pick.
+    - R4: US-0104 anti-slop score unavailable when critic not deployed — graceful degrade (default `0`).
+    - R5: Resource cap race condition — atomic check-and-increment at spawn time.
+    - R6: US-0047 bulk execute interaction — US-0108 parallel dev inside bulk item or system-wide? System-wide preferred v1.
+  - Research asks (new **`R-0096`**):
+    1. Exact **`worktree_**
 - user_visible: false
 - Title: Post-deploy smoke probe + bounded repair loop; DEPLOY_DEFERRED on failure
 - Summary: Extends RELEASE_PUBLISH_MODE=auto with post-deploy smoke probe + bounded repair loop. After publish PASS, smoke probe runs (health endpoint + key acceptance smoke). On FAIL, bounded retry loop up to AUTO_SOVEREIGN_DEPLOY_RETRY_MAX (default 3). After retries exhausted: DEPLOY_DEFERRED state (work item moves to US-0107 sovereign deferral register). Compose with US-0054/US-0100.
@@ -3158,14 +3621,152 @@
 - Title: Convergence predicate as sovereign-loop terminal condition + goal progress visibility
 - Summary: scripts/sovereign_convergence_lib.py exposes evaluate_convergence(repo, scratchpad) returning {converged, unmet_conditions[], blocked_by[]}. Convergence = all OPEN stories DONE AND 0 deferrals AND all cross-reviewer findings resolved AND smoke probe green AND ledger has no unapproved extensions. SOVEREIGN_GOAL=<text> explicit or auto-derive from docs/product/vision.md. Mid-loop progress emitted in curator refresh-context as goal_progress block. On timeout: SOVEREIGN_GOAL_TIMEOUT with handoffs/sovereign_partial_delivery.md. SOVEREIGN_GOAL_MODE=phase_driven|goal_convergence (default phase_driven). Compose with US-0088/US-0092/US-0095/US-0044.
 - Priority: P0
-- Status: OPEN
-- Acceptance (8 ACs): SOVEREIGN_GOAL_MODE scratchpad flag, convergence evaluator library with evaluate_convergence(repo, scratchpad), goal authoring (explicit text or auto-derive from vision top-N), mid-loop progress emission in curator refresh-context, partial delivery report on SOVEREIGN_GOAL_TIMEOUT, contract tests, backward compat (phase_driven = existing stop matrix), documentation + template parity.
+- Status: DONE (2026-06-28)
+- Acceptance:
+  - [x] AC-1: Scratchpad keys `SOVEREIGN_GOAL_MODE`, `SOVEREIGN_GOAL`, `SOVEREIGN_GOAL_TOP_N`, `SOVEREIGN_GOAL_MAX_CHARS`, `SOVEREIGN_GOAL_TIMEOUT_MAX` with defaults (`phase_driven`/`3`/`512`/`0`); zero overhead when `phase_driven`.
+  - [x] AC-2: `scripts/sovereign_convergence_lib.py` exposes `evaluate_convergence(repo, scratchpad)` returning `{converged, unmet_conditions[], blocked_by[]}` with five-conjunct predicate, degrade matrix, and memoization; `scripts/sovereign_convergence_validate.py` validator CLI.
+  - [x] AC-3: Goal authoring — explicit `SOVEREIGN_GOAL` wins; else vision top-N auto-derive; fail-closed `SOVEREIGN_GOAL_DERIVE_FAILED` when vision empty/unreadable.
+  - [x] AC-4: Mid-loop `goal_progress` JSON block emitted in curator `/refresh-context` (step 3b) with schema v1 shape in `handoffs/resume_brief.md`.
+  - [x] AC-5: Partial delivery on `SOVEREIGN_GOAL_TIMEOUT` — `handoffs/sovereign_partial_delivery.md` with required sections (Goal, Evaluated At, Unmet Conditions, Blocked By, Completed Stories, Open Stories, Deferrals Summary, Remediation).
+  - [x] AC-6: Eight `test_us0110_*` contract markers + `check_intake_template_parity.py --scope=sovereign-convergence` (`SOVEREIGN_CONVERGENCE_PAIRS`, 2 pairs).
+  - [x] AC-7: `SOVEREIGN_GOAL_MODE=phase_driven` backward compat (zero overhead) + compose regression — US-0088/US-0092/US-0095/US-0044 stop-matrix unchanged.
+  - [x] AC-8: Reason codes § US-0110 (10 codes), runbook § Goal-Based Convergence (US-0110), architecture `# US-0110`, template byte-parity.
 - Boundaries:
   - In scope: convergence evaluator library, goal authoring logic, mid-loop progress emission, partial delivery report, contract tests, template parity.
   - Out of scope: changing US-0088/US-0092/US-0095/US-0044 semantics; mandatory QA/release gate weakening; stop matrix changes.
 - related_us: US-0088, US-0092, US-0095, US-0044, US-0103, US-0107
 - intake_evidence_ref: handoffs/intake_evidence/intake-sovereign-20260627-01.json
-## Bug issues (canonical)
+- discovery_notes (2026-06-28T17:00:00Z, PO, `po-US0110-discovery`, `fresh_context_marker=po-US0110-discovery-20260628T170000Z-fresh`, `orchestrator_run_id=auto-20260628-04`): **`/discovery`** **PASS** — goal-based convergence predicate locked as sovereign-loop terminal condition + mid-loop progress visibility. **`SOVEREIGN_GOAL_MODE=phase_driven|goal_convergence`** (default **`phase_driven`**); **`goal_convergence`** enables **`evaluate_convergence(repo, scratchpad)`** as loop stop predicate. **Compose do NOT amend** US-0088/US-0092/US-0095/US-0044/US-0103 — US-0110 reads canonical backlog/deferral/critic/smoke/ledger surfaces only. Foundation contract for **US-0107** drain-generate + notification. Status: **OPEN** (US-0045).
+  - Discovery locks (L1–L12):
+    | Lock | Decision |
+    |------|----------|
+    | **L1 Scratchpad keys** | `SOVEREIGN_GOAL_MODE` ∈ {`phase_driven`, `goal_convergence`}, default `phase_driven`; `SOVEREIGN_GOAL` optional explicit goal text; `SOVEREIGN_GOAL_TOP_N` int default `3` (vision auto-derive); `SOVEREIGN_GOAL_TIMEOUT_MAX` int default `0` (0 = no timeout enforcement). When `phase_driven`, zero overhead — existing **US-0088** stop matrix unchanged. |
+    | **L2 Evaluator library** | `scripts/sovereign_convergence_lib.py` (+ template mirror). Core API: `evaluate_convergence(repo, scratchpad) -> ConvergenceResult` with `{converged: bool, unmet_conditions: list[str], blocked_by: list[str]}`. Supporting: `resolve_goal(scratchpad, repo) -> (goal_text, reason_code)`, `is_goal_convergence_enabled(scratchpad) -> bool`, `build_goal_progress_block(result, goal_text) -> dict`, `write_partial_delivery_report(repo, result, goal_text, timeout_reason) -> Path`, `self_test() -> bool`. |
+    | **L3 Convergence predicate (5 conjuncts)** | `converged=true` iff ALL: (1) **backlog clear** — zero `Status: OPEN` rows in `docs/product/backlog.md` story blocks (canonical per **US-0045**); (2) **zero deferrals** — `handoffs/sovereign_deferrals.jsonl` absent or empty when **US-0107** deferral register exists, else skip with `unmet_conditions` note `deferral_register_not_yet_deployed`; (3) **cross-reviewer findings resolved** — no open blocking findings in latest sprint `qa-findings.md` `cross_reviewer_findings` section OR `handoffs/sovereign_critic_findings.jsonl` tail when **US-0104** deployed, else informational skip; (4) **smoke probe green** — latest `tests/report.md` PASS + most recent UAT smoke step PASS in active sprint `uat.json` when present, else `CONVERGENCE_SMOKE_PROBE_FAIL`; (5) **ledger clean** — when `AI_DECISION_LEDGER=1`, no unapproved `PLAN_FIDELITY_EXTENSION` / `PLAN_FIDELITY_SCOPE_GATE` entries without matching `PLAN_FIDELITY_OVERRIDE` in same `orchestrator_run_id` ledger (compose **US-0103** `decision_ledger_lib.py`). |
+    | **L4 Goal authoring** | Explicit `SOVEREIGN_GOAL` scratchpad text wins; else auto-derive bounded summary from `docs/product/vision.md` top-N non-heading paragraphs (`SOVEREIGN_GOAL_TOP_N`, default 3); fail-closed `SOVEREIGN_GOAL_DERIVE_FAILED` when vision empty/unreadable. |
+    | **L5 Mid-loop progress** | Curator **`/refresh-context`** appends deterministic `goal_progress` JSON block to `handoffs/resume_brief.md` when `SOVEREIGN_GOAL_MODE=goal_convergence` and sovereign loop active (`AUTO_SOVEREIGN=1` or evaluator invoked by `/auto` drain). Shape: `{goal_text, mode, converged, unmet_conditions[], blocked_by[], evaluated_at (ISO UTC), orchestrator_run_id}`. |
+    | **L6 Partial delivery** | On timeout (`SOVEREIGN_GOAL_TIMEOUT_MAX` exhausted without `converged=true`): emit reason code **`SOVEREIGN_GOAL_TIMEOUT`**; write `handoffs/sovereign_partial_delivery.md` with sections: Goal, Evaluated At, Unmet Conditions, Blocked By, Completed Stories (DONE rows), Open Stories, Deferrals Summary, Remediation. Idempotent append-safe write. |
+    | **L7 Backward compat** | `SOVEREIGN_GOAL_MODE=phase_driven` (default): no convergence evaluation, no `goal_progress` block, no partial-delivery artifact — **US-0088**/**US-0092**/**US-0095**/**US-0044** stop semantics unchanged. Regression guard required. |
+    | **L8 Contract tests** | Eight `test_us0110_*` markers: scratchpad keys, evaluator contract, goal authoring, `goal_progress` block shape, partial-delivery on timeout, reason-code inventory, `phase_driven` zero-overhead, compose-no-stop-matrix-change. Parity scope: `check_intake_template_parity.py --scope=sovereign-convergence` (`SOVEREIGN_CONVERGENCE_PAIRS`). |
+    | **L9 Reason codes** | `CONVERGENCE_OPEN_STORIES_REMAIN`, `CONVERGENCE_DEFERRALS_PENDING`, `CONVERGENCE_CROSS_REVIEWER_OPEN`, `CONVERGENCE_SMOKE_PROBE_FAIL`, `CONVERGENCE_LEDGER_EXTENSIONS_UNAPPROVED`, `SOVEREIGN_GOAL_TIMEOUT`, `SOVEREIGN_GOAL_MODE_INVALID`, `SOVEREIGN_GOAL_MISSING`, `SOVEREIGN_GOAL_DERIVE_FAILED`, `CONVERGENCE_EVAL_FAILED` (10 codes). |
+    | **L10 Compose surfaces (read-only)** | Backlog (`docs/product/backlog.md`), deferrals (`handoffs/sovereign_deferrals.jsonl` — **US-0107**), critic findings (sprint QA + future **US-0104** artifact), smoke (`tests/report.md` + sprint `uat.json`), ledger (`handoffs/sovereign_decisions/*.jsonl` via **US-0103**). No writes to composed story files. |
+    | **L11 Performance guard** | Evaluator must be cheap: parse backlog status via line-scoped scan (no full-file AST); bounded ledger tail read (`last_n=100`); cache-friendly for `/auto` drain iterations (**R-0091** Q6). |
+    | **L12 Downstream consumers** | **US-0107** imports convergence predicate for drain-generate gate + notification on convergence/timeout; **US-0103** extended-mode operator report at convergence references `goal_progress` + partial-delivery when applicable. |
+  - Acceptance pointers (discovery emphasis):
+    - AC-1: `SOVEREIGN_GOAL_MODE` + `SOVEREIGN_GOAL` + `SOVEREIGN_GOAL_TOP_N` + `SOVEREIGN_GOAL_TIMEOUT_MAX` scratchpad literals + defaults.
+    - AC-2: `scripts/sovereign_convergence_lib.py` `evaluate_convergence` contract + five-conjunct predicate.
+    - AC-3: Explicit goal + vision top-N auto-derive + `SOVEREIGN_GOAL_DERIVE_FAILED`.
+    - AC-4: Curator `goal_progress` block in `resume_brief.md` shape (L5).
+    - AC-5: `SOVEREIGN_GOAL_TIMEOUT` + `handoffs/sovereign_partial_delivery.md` sections (L6).
+    - AC-6: Eight `test_us0110_*` markers + parity `--scope=sovereign-convergence`.
+    - AC-7: `phase_driven` zero-overhead + compose regression vs **US-0088**/**US-0092**/**US-0095**/**US-0044**.
+    - AC-8: Architecture `# US-0110`, runbook recipe, reason codes, template byte-parity.
+  - Risks (carry to `/research`):
+    - R1: Predicate cost on large backlogs — line-scoped status scan + bounded ledger read required.
+    - R2: Upstream artifacts not yet deployed (**US-0104** critic, **US-0107** deferrals) — graceful degrade vs hard-fail semantics must be research-closed.
+    - R3: Smoke probe source ambiguity (**US-0093** UAT vs **US-0109** deploy smoke) — single canonical probe chain for v1.
+    - R4: `goal_convergence` vs native-chain drain interaction — must not bypass **US-0095** segment boundaries or **US-0044** mutex.
+    - R5: Timeout semantics — iteration count vs wall-clock; default `0` = disabled must remain safe.
+  - Research asks (extend **R-0091**):
+    - Q1: Exact `ConvergenceResult` + `goal_progress` JSON schemas + validator CLI necessity.
+    - Q2: Helper library full API surface + CLI (`--self-test`, `--evaluate`, `--dump-progress`).
+    - Q3: Deferral/critic/smoke probe degrade matrix when upstream stories OPEN (skip vs fail).
+    - Q4: Vision auto-derive algorithm (heading skip rules, paragraph bounds, truncation).
+    - Q5: Contract-test inventory + `SOVEREIGN_CONVERGENCE_PAIRS` parity file list.
+    - Q6: Performance budget + caching strategy for drain-loop re-evaluation.
+    - Q7: Companion `DEC-xxxx` necessity for convergence predicate + partial-delivery artifact.
+  - research_notes (2026-06-28T17:30:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0110-research-20260628T173000Z-fresh`): **`/research`** **PASS** — **`R-0091`** Q1–Q7 closed; companion **`DEC-0110`** authored. Locked: **`ConvergenceResult`** + **`goal_progress`** v1 schemas; **`scripts/sovereign_convergence_lib.py`** API + **`scripts/sovereign_convergence_validate.py`** CLI; five-conjunct degrade matrix (US-0104/US-0107 skip, smoke fail-closed, ledger skip when disabled); vision auto-derive with **`SOVEREIGN_GOAL_MAX_CHARS=512`**; eight **`test_us0110_*`** markers + **`SOVEREIGN_CONVERGENCE_PAIRS`** parity; ≤50ms memoized eval budget; iteration-count timeout (default disabled). Research stub self-test OK. **Status: OPEN** (**US-0045**). **Next**: **`/architecture`**.
+  - architecture_notes (2026-06-28T18:00:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0110-architecture-20260628T180000Z-fresh`): **`/architecture`** **PASS** for **US-0110**. Binding decision **`DEC-0110`** ratified in **`docs/engineering/architecture.md`** **`# US-0110`** (compose do NOT amend US-0088/US-0092/US-0095/US-0044/US-0103). **11 task seeds** (T-001..T-011) within **`SPRINT_MAX_TASKS=12`**; **`SPRINT_AUTO_SPLIT`** not triggered. **AC ↔ task surjective map**: AC-1→T-001,T-002; AC-2→T-003,T-004,T-006; AC-3→T-005; AC-4→T-007; AC-5→T-008; AC-6→T-009,T-010; AC-7→T-011; AC-8→T-002,T-006,T-010,T-011 + architecture pre-satisfied. **Tranche order**: A keys+reason codes → B lib+derive → C validator → D progress+partial-delivery → E tests+parity+runbook. **Status: OPEN** (**US-0045**). **Next**: **`/sprint-plan`**.
+  - sprint_plan_notes (2026-06-28T18:30:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-S0110-US0110-sprint-plan-20260628T183000Z-fresh`, `sprint_id=S0110`): **`/sprint-plan`** **PASS** — sprint **`S0110`** created; **`sprints/S0110/sprint.md`**, **`sprints/S0110/tasks.md`** (**T-001..T-011** ↔ **AC-1..AC-8** surjective coverage), **`sprints/S0110/progress.md`**, **`sprints/S0110/plan-verify.json`** (**PENDING**), **`sprints/S0110/uat.json`**, **`sprints/S0110/uat.md`** placeholders; `task_count=11`, `within_limit=true` (≤ `SPRINT_MAX_TASKS=12`); **`SPRINT_AUTO_SPLIT`** not triggered; governance **`DEC-0110`**, architecture **`# US-0110`**, **`R-0091`**; handoffs **`tl_to_dev.md`**, **`qa_plan_verify.md`**, **`po_to_tl.md`**, **`resume_brief.md`** → **`/plan-verify`**. **Status: OPEN** (**US-0045**). **Next**: **`/plan-verify`** (fresh **qa**) for **`S0110`** / **`US-0110`**.
+  - release_notes (2026-06-28, release, `release-S0110-US0110-release-20260628T210000Z-fresh`):
+    - **Sprint `S0110`** released for **US-0110** (Goal-Based Convergence Loops).
+    - **All 11 tasks DONE** (T-001..T-011).
+    - **All 8 acceptance criteria satisfied** (AC-1..AC-8).
+    - **Contract tests**: 8/8 passing (`test_us0110_*`).
+    - **Self-tests**: `[SOVEREIGN_CONVERGENCE_SELF_TEST_OK]`, `[SOVEREIGN_CONVERGENCE_VALIDATION_OK]`.
+    - **Parity**: `[INTAKE_TEMPLATE_PARITY_OK]` scope=sovereign-convergence pairs=2.
+    - **UAT**: 10/10 PASS; verify-work PASS (zero discrepancies vs `/qa`).
+    - **Decision**: **DEC-0110** (locked) — convergence predicate + goal_progress + partial-delivery contracts.
+    - **Research**: **R-0091** (closed) — Q1..Q7 answered.
+    - **US-0110 status**: **DONE** in `docs/product/backlog.md` (authority) per US-0045.
+    - **Queue**: **S0110** → **released** in `handoffs/release_queue.md`.
+    - **Evidence references**: `handoffs/releases/S0110-release-notes.md`, `sprints/S0110/release-findings.md`, `sprints/S0110/verify-work-verdict.json`, `decisions/DEC-0110.md`, `docs/engineering/architecture.md` `# US-0110`, `tests/us0110_contract_test.py`, `scripts/sovereign_convergence_lib.py`, `scripts/sovereign_convergence_validate.py`.
+
+## US-0111 — Release-trigger-driven version changelog derivation
+- user_visible: true
+- Title: Automatic version changelog generation from release trigger events
+- Summary: Extend US-0100 version-scoped changelog generation to support multiple release trigger sources (GitHub webhook, npm publish, git tag push, manual /release command) beyond the current /release-only path. Detect trigger source automatically, extract version information, compute version diff via release_changelog_lib.compare_versions(), generate handoffs/releases/{semver}-release-notes.md, atomically promote [Unreleased] to [semver] in CHANGELOG.md, and emit (semver, previous_semver, timestamp) event for downstream processing. Maintain backward compatibility with RELEASE_TRIGGER_SOURCE=manual. Integrate with sovereign-loop US-0103 ledger for audit trail.
+- Priority: P2
+- Status: OPEN
+- Decomposition: single story (one vertical slice: trigger adapters + version diff + atomic promotion + ledger integration + backward compat)
+- Overlap/duplicate evaluation:
+  * US-0100 (version-scoped changelog) — composition not duplication. US-0100 provides the derivation engine; US-0111 extends it with trigger-agnostic entry points. US-0100 remains the canonical source for /release-driven changelog generation; US-0111 does not replace or amend US-0100 logic.
+  * US-0040 (canonical release artifacts) — composition: US-0111 consumes the same handoffs/releases/{semver}-release-notes.md and handoffs/release_queue.md structures.
+  * US-0103 (AI decision ledger) — composition: US-0111 logs release trigger decisions to ledger for audit trail.
+  * US-0008 (release-all.sh) — composition: US-0111 does not modify publish target execution; release-all.sh may invoke US-0111 trigger logic when applicable.
+  * US-0054 (publish confirmation gates) — composition: US-0111 does not bypass confirmation; trigger-driven generation still respects RELEASE_PUBLISH_MODE semantics.
+- Intake pack evidence (small-intake-pack):
+  * selected_pack: small-intake-pack
+  * asked_topics: outcome_success_criteria, impacted_components, constraints_compatibility_risks, required_tests_acceptance_checks, done_definition
+  * missing_topics: (none)
+  * assumptions_confirmed: (none)
+  * intake_evidence_ref: handoffs/intake_evidence/US-0111-intake-20260627.json
+- Acceptance:
+  - [ ] AC-1: Trigger adapter registry — implement scripts/release_trigger_adapters.py with extensible adapter system supporting four adapter types: GitHub release webhook (github_release_adapter), npm publish event (npm_publish_adapter), git tag push event (git_tag_adapter), manual /release command (manual_release_adapter). Each adapter extracts (version, previous_version, source, metadata) into standardized TriggerContext structure.
+  - [ ] AC-2: GitHub webhook adapter — parse GitHub webhook payload (action=published), extract tag from release.tag_name, query GitHub API for previous release tag (sorted by created_at descending, skip current), return TriggerContext. Handle missing tag (fail RELEASE_TRIGGER_TAG_MISSING), missing previous (fail RELEASE_TRIGGER_PREVIOUS_MISSING).
+  - [ ] AC-3: npm publish trigger — read package.json version, query npm registry for previous published versions (npm view <pkg> versions --json), compute previous_version via semver comparison. Handle missing package.json (fail RELEASE_TRIGGER_PACKAGE_JSON_MISSING), missing previous (fail RELEASE_TRIGGER_PREVIOUS_MISSING).
+  - [ ] AC-4: Git tag push trigger — parse git tag push event (extract tag name from ref), sort all tags by taggerdate descending, compute previous_version via semver comparison. Handle missing tag (fail RELEASE_TRIGGER_TAG_MISSING), missing previous (fail RELEASE_TRIGGER_PREVIOUS_MISSING).
+  - [ ] AC-5: Manual backward compatibility — preserve existing /release command behavior when RELEASE_TRIGGER_SOURCE=manual (default); no change to manual workflow semantics when flag unset. Existing US-0100 derivation logic unchanged.
+  - [ ] AC-6: Version comparison logic — extend release_changelog_lib.compare_versions(version_a, version_b) to accept TriggerContext and compute diff between versions using release_queue.md sprint linkage. Return list of sprint IDs, story refs, and work items between versions.
+  - [ ] AC-7: Atomic promotion — read handoffs/releases/{semver}-release-notes.md (generated by US-0100 step 19), atomically promote [Unreleased] to [semver] — date in CHANGELOG.md. Write to temp file, verify success, rename temp → CHANGELOG.md (atomic on POSIX, best-effort on Windows). On failure: restore previous CHANGELOG.md, fail with RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED.
+  - [ ] AC-8: Per-version notes generation — generate handoffs/releases/{semver}-release-notes.md with work items, descriptions, and operator hints. Atomic write with rollback on failure. Fail-closed on write errors with RELEASE_TRIGGER_NOTES_WRITE_FAILED.
+  - [ ] AC-9: Sovereign loop integration — emit (semver, previous_semver, timestamp, derivation_decisions[]) event to US-0103 ledger after successful changelog generation. Write JSON event to handoffs/release_events/{timestamp}-{semver}.json. Audit trail includes trigger source, version computation, and derivation decisions.
+  - [ ] AC-10: Fail-closed reason codes — implement RELEASE_TRIGGER_* family: RELEASE_TRIGGER_ADAPTER_FAILED, RELEASE_TRIGGER_TAG_MISSING, RELEASE_TRIGGER_PREVIOUS_MISSING, RELEASE_TRIGGER_PACKAGE_JSON_MISSING, RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED, RELEASE_TRIGGER_NOTES_WRITE_FAILED, RELEASE_TRIGGER_EVENT_EMIT_FAILED, RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED, RELEASE_TRIGGER_SOURCE_INVALID. Each code includes remediation guidance in sprints/Sxxxx/release-findings.md.
+  - [ ] AC-11: Contract tests + template parity — implement test_us0111_* markers in tests/release_trigger_test.py for each trigger adapter (GitHub, npm, git tag, manual), version comparison logic, atomic promotion, backward compatibility, fail-closed reason codes. Implement check_intake_template_parity.py --scope=release-triggers when trigger logic or adapters touched.
+  - [ ] AC-12: Documentation + runbook updates — update docs/engineering/runbook.md with trigger-driven changelog generation workflow. Update .cursor/commands/release.md with --trigger-source flag documentation, adapter priority order, RELEASE_TRIGGER_SOURCE flag semantics. Update templates/commands/release.md (template/ parity).
+- Boundaries:
+  - In scope: trigger adapter system, GitHub/npm/git tag adapters, version comparison logic, atomic changelog promotion, sovereign ledger integration, backward compatibility with manual /release, fail-closed reason codes, contract tests, documentation updates.
+  - Out of scope: changing US-0100 derivation semantics for manual /release; modifying publish target execution (US-0054); altering release gate chain (US-0039); adding new trigger types beyond the four specified.
+- related_us: US-0100, US-0103, US-0008, US-0054
+- intake_evidence_ref: handoffs/intake_evidence/US-0111-intake-20260627.json
+- intake_notes (2026-06-28, PO, `cursor-20260628-US0111-intake`, `INTAKE_GUIDED_MODE=1`, `INTAKE_WORK_ITEM_KIND=story`): **`/intake`** **PASS** — operator request: automatic release-trigger-driven version changelog generation; extend US-0100 with multiple trigger sources (GitHub webhook, npm publish, git tag push, manual /release). **`small-intake-pack`**; all 5 topics covered; validator **`[INTAKE_EVIDENCE_VALIDATION_OK]`**. Decomposition evaluator → **single story**. Overlap vs **US-0100**/**US-0040**/**US-0103** confirms extension not replacement. Backlog block extended (AC-1..AC-12), acceptance checkbox added, po_to_tl.md handoff prepended for architecture phase. **Status: OPEN** per **US-0045**. **Next**: **`/discovery`** (fresh **PO**) for **`US-0111`**.
+
+## US-0112 — Ship model-catalog example presets on install/upgrade
+- user_visible: true
+- Title: Installer delivers all model-catalog.local.example*.json presets on install and upgrade
+- Summary: Close the operator gap after **US-0101** / **US-0102** / **DEC-0086** / **DEC-0087** where eight committed **`template/.cursor/model-catalog.local.example*.json`** presets (base, cursor-only, level 1–4, role-based balanced/highend) exist and are documented in scratchpad comments but **`installer-owned-paths.manifest`** omits them — so **`missing`** and **`upgrade`** installs do not copy examples into consumer **`.cursor/`** repos. Operators enabling **`MODEL_RESOLVE=local_catalog`** or **`role_catalog`** must manually copy presets from the its-magic repo. Ship **framework example delivery**: add all eight example paths to **`[install_include_paths]`**; treat **`model-catalog.local.example*.json`** as **framework** files (refresh on **`upgrade`** when template changed, add on **`missing`** when absent); **never** copy or overwrite gitignored **`.cursor/model-catalog.local.json`** (operator active catalog). Composes with **US-0018** smart upgrade, **US-0075** example-first refresh posture, and **US-0099** install-bootstrap pattern (examples are framework-owned, not copy-when-missing for local catalog).
+- Priority: P2
+- Status: OPEN
+- Decomposition (US-0051):
+  - **Single story** — manifest paths, installer framework classification, triple-installer parity, tests/parity/runbook ship as one vertical slice; splitting manifest from upgrade semantics would leave **`upgrade`** consumers with stale/missing presets.
+  - **Rationale**: Operator pain is entirely at install/upgrade payload boundary; catalog schema and **`model_tier_lib.py`** are already DONE under **US-0101**/**US-0102**.
+- Overlap / duplicate evaluation:
+  - **US-0101 (DONE) / DEC-0086**: shipped base **`.cursor/model-catalog.local.example.json`** in template — **US-0112 completes delivery** via installer manifest; does **not** change tier matrix, **`MODEL_TIER_*`**, or alias resolution.
+  - **US-0102 (DONE) / DEC-0087**: shipped role-based example catalogs — **compose**: same manifest rows; no schema v2 or precedence changes.
+  - **US-0099 (DONE)**: dev-environment copy-when-missing bootstrap — **distinct**: model-catalog examples are **framework examples** (upgrade refresh like **`scratchpad.local.example.md`**), not gitignored local operator files.
+  - **US-0075 (DONE) / DEC-0057**: scratchpad example-first refresh — **compose**: same framework-file semantics for **`.cursor/model-catalog.local.example*.json`**.
+  - **US-0018 (DONE)**: smart **`upgrade`** mode — **compose**: examples update when template version changes without touching **`model-catalog.local.json`**.
+- Intake pack evidence (**small-intake-pack**):
+  - `selected_pack=small-intake-pack`
+  - `asked_topics=` all five small-pack keys covered (synthesized from operator **`/ask`** thread + PO defaults; distinct **`quoted_user_text`** per **BUG-0007**)
+  - `missing_topics=(none)`
+  - `assumptions_confirmed=(none)`
+  - `intake_evidence_ref=handoffs/intake_evidence/US-0112-intake-20260628.json`
+- Acceptance:
+  - [ ] AC-1: **Manifest completeness** — **`docs/engineering/context/installer-owned-paths.manifest`** (active + **`template/`**) lists all eight **`.cursor/model-catalog.local.example*.json`** paths under **`[install_include_paths]`**: base, **`.cursor-only`**, **`level-1-easy`** … **`level-4-super`**, **`role-based-balanced`**, **`role-based-highend`**.
+  - [ ] AC-2: **Missing mode delivery** — **`installer.py`** / **`installer.ps1`** / **`installer.sh`** **`missing`** mode copies each example into target **`.cursor/`** when absent; deterministic log/status per file (names-only).
+  - [ ] AC-3: **Upgrade framework refresh** — **`upgrade`** mode classifies **`model-catalog.local.example*.json`** as **framework** and overwrites when template content differs (same semantics as **`scratchpad.local.example.md`**); unchanged examples counted as unchanged; **never** modifies **`model-catalog.local.json`**.
+  - [ ] AC-4: **Active catalog protection** — **`.cursor/model-catalog.local.json`** remains gitignored and **outside** installer manifest **`install_include_paths`** and **`clean_paths`**; no installer mode copies template examples to that path automatically (operator copies one preset manually after install).
+  - [ ] AC-5: **Triple installer parity** — PS1, Bash, and Python installers share the same manifest-driven file set; **`List-SourceFiles`** / Python equivalent includes all eight examples from packaged **`template/`**.
+  - [ ] AC-6: **Runbook operator recipe** — **`docs/engineering/runbook.md`** § model tier / catalog documents: examples ship on install/upgrade; operator copies chosen preset → **`model-catalog.local.json`**; lists all eight preset filenames and complexity/role intent (pointer to scratchpad comment block).
+  - [ ] AC-7: **Contract tests + parity** — **`test_us0112_*`** markers (manifest lists eight paths, missing adds, upgrade refreshes framework example, local catalog never touched); **`check_intake_template_parity.py --scope=model-catalog-examples`** with **`MODEL_CATALOG_EXAMPLE_PAIRS`** manifest when installer surfaces touched.
+  - [ ] AC-8: **Architecture notes** — **`docs/engineering/architecture.md`** **`# US-0112`** documents framework vs operator catalog boundary, manifest rows, upgrade classification, and composition with **DEC-0086** / **DEC-0087**; active + **`template/`** parity.
+- Boundaries:
+  - In scope: installer manifest rows, framework classification, missing/upgrade delivery, runbook, tests/parity, architecture section.
+  - Out of scope: auto-bootstrap **`model-catalog.local.json`** from a default preset (operator chooses among eight); changing catalog schema v1/v2; **`model_tier_lib.py`** resolution logic; npm **`package.json` `files`** changes (already covered by **`template/`**).
+- related_us: US-0101, US-0102, US-0099, US-0075, US-0018
+- intake_evidence_ref: handoffs/intake_evidence/US-0112-intake-20260628.json
+- intake_notes (2026-06-28, PO, `cursor-20260628-US0112-intake`, `INTAKE_GUIDED_MODE=1`, `INTAKE_WORK_ITEM_KIND=story`): **`/intake`** **PASS** — operator **`/ask`**: model-catalog examples should ship on its-magic update/upgrade; repo survey confirms eight **`template/.cursor/model-catalog.local.example*.json`** files absent from **`installer-owned-paths.manifest`**. **`small-intake-pack`**; all 5 topics covered; validator **`[INTAKE_EVIDENCE_VALIDATION_OK]`**. Decomposition evaluator → **single story**. Alternative considered: US-0099-style auto-copy to **`model-catalog.local.json`** — **rejected** (multiple presets; operator choice). Research stub **`R-0090`**. **Status: OPEN** per **US-0045**. **Next**: **`/architecture`** (fresh **tech-lead**) — scope clear from **US-0099**/**US-0075** precedents; **`/discovery`** optional skip.
 
 Per **`DEC-0061`** / **`US-0079`**: defect work items use **`BUG-####`** ids (**allocator**: next id after highest existing in this section), **`OPEN`/`DONE`** only, and required fields **`environment`**, **`steps_to_reproduce`**, **`expected`**, **`actual`**, **`evidence_refs`** (non-empty). Append new bugs as **`### BUG-#### — Title`** blocks; keep blocks **sorted by id**. Optional link bullets: **`related_us`**, **`blocks_us`**, **`duplicate_of`**, **`supersedes`** (ids only).
 

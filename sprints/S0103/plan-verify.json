@@ -1,0 +1,157 @@
+{
+  "phase_id": "plan-verify",
+  "role": "qa",
+  "sprint_id": "S0103",
+  "story_id": "US-0103",
+  "orchestrator_run_id": "auto-20260628-01",
+  "timestamp": "2026-06-28T14:45:00Z",
+  "fresh_context_marker": "qa-S0103-US0103-plan-verify-20260628T144500Z-fresh",
+  "verdict": "PASS",
+  "verdict_reason": "All 8 acceptance criteria (AC-1..AC-8) are covered by ≥1 task in the canonical tasks.md bijection table. Sprint capacity 11 ≤ SPRINT_MAX_TASKS=12. DEC-0103 Accepted. Composition rules respected. Non-blocking findings documented below.",
+  "plan_integrity": {
+    "ac_coverage_surjective": true,
+    "task_count": 11,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "orphan_acs": [],
+    "orphan_tasks": []
+  },
+  "ac_to_task_mapping": {
+    "source": "tasks.md bijection table (canonical per task-level detail)",
+    "AC-1": ["T-001", "T-011"],
+    "AC-2": ["T-002", "T-003", "T-004", "T-011"],
+    "AC-3": ["T-003", "T-005"],
+    "AC-4": ["T-003"],
+    "AC-5": ["T-003"],
+    "AC-6": ["T-006"],
+    "AC-7": ["T-007"],
+    "AC-8": ["T-008", "T-009", "T-010", "T-011"]
+  },
+  "task_to_ac_mapping": {
+    "T-001": ["AC-1"],
+    "T-002": ["AC-2"],
+    "T-003": ["AC-2", "AC-3", "AC-4", "AC-5"],
+    "T-004": ["AC-2"],
+    "T-005": ["AC-3"],
+    "T-006": ["AC-6"],
+    "T-007": ["AC-7"],
+    "T-008": ["AC-8"],
+    "T-009": ["AC-8"],
+    "T-010": ["AC-8"],
+    "T-011": ["AC-1", "AC-2", "AC-8"]
+  },
+  "sprint_json_coverage_mapping": {
+    "source": "sprint.json acceptance_criteria_coverage section",
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002", "T-003"],
+    "AC-3": ["T-004"],
+    "AC-4": ["T-005"],
+    "AC-5": ["T-006"],
+    "AC-6": ["T-007"],
+    "AC-7": ["T-008", "T-009", "T-010"],
+    "AC-8": ["T-011"]
+  },
+  "sprint_md_coverage_mapping": {
+    "source": "sprint.md AC coverage table",
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002", "T-003", "T-004", "T-005"],
+    "AC-3": ["T-002", "T-003"],
+    "AC-4": ["T-003"],
+    "AC-5": ["T-003"],
+    "AC-6": ["T-006"],
+    "AC-7": ["T-007", "T-008", "T-009", "T-010"],
+    "AC-8": ["T-002", "T-003", "T-006", "T-011"]
+  },
+  "findings": [
+    {
+      "id": "PV-S0103-001",
+      "severity": "minor",
+      "category": "documentation-inconsistency",
+      "description": "sprint.json internal inconsistency: acceptance_criteria_coverage section maps AC-4→[T-005] and AC-5→[T-006], but task_summary section has T-005→[AC-3] and T-006→[AC-6,AC-8]. The two sections within sprint.json disagree on which tasks cover AC-4 and AC-5.",
+      "resolution": "During /execute, reconcile sprint.json sections. The tasks.md bijection table (where T-003 covers AC-2+AC-3+AC-4+AC-5) is treated as canonical."
+    },
+    {
+      "id": "PV-S0103-002",
+      "severity": "minor",
+      "category": "documentation-inconsistency",
+      "description": "sprint.json task_summary vs tasks.md dependency declarations differ. sprint.json T-003 deps=[T-001,T-002]; tasks.md T-003 deps=[T-002]. sprint.json T-004 deps=[T-001,T-002]; tasks.md T-004 deps=[T-002,T-003]. Multiple other divergences.",
+      "resolution": "tasks.md dependency graph (visual appendix) treated as canonical. Consistent ordering T-001→T-002→T-003→...→T-011 is valid topological order in both."
+    },
+    {
+      "id": "PV-S0103-003",
+      "severity": "minor",
+      "category": "documentation-inconsistency",
+      "description": "sprint.md AC coverage table vs tasks.md bijection table differ on task assignments for AC-2, AC-3, AC-7, AC-8. Example: sprint.md says AC-7→[T-007..T-010], tasks.md says AC-7→[T-007].",
+      "resolution": "tasks.md bijection table treated as canonical ground truth. sprint.md and sprint.json coverage sections are summary-level and may lag."
+    },
+    {
+      "id": "PV-S0103-004",
+      "severity": "info",
+      "category": "parity-count",
+      "description": "sprint.md says SOVEREIGN_LEDGER_PAIRS=2 file pairs (T-009 section), but tasks.md T-011 says SOVEREIGN_LEDGER_PAIRS=4 file pairs. Architecture backlog mentions 2 file pairs.",
+      "resolution": "Definitive count locked during /execute when scripts/check_intake_template_parity.py is updated."
+    },
+    {
+      "id": "PV-S0103-005",
+      "severity": "info",
+      "category": "test-count",
+      "description": "sprint.md says 8 test_us0103_* markers (matching DEC-0103 §7), but tasks.md T-007 scope lists only 6 tests. DEC-0103 §7 enumerates 8 markers.",
+      "resolution": "8 markers per DEC-0103 §7 treated as canonical. /execute must implement all 8."
+    }
+  ],
+  "governance": {
+    "dec_0103_status": "Accepted",
+    "dec_0103_status_verified": true,
+    "us_0045_status_authority": "OPEN",
+    "us_0103_canonical_status_open": true,
+    "composition_rules_respected": true,
+    "composition_details": {
+      "US-0070": "Phase selection policy unchanged — US-0103 writes on top of resolved_phase_plan",
+      "US-0069": "Phase role enforcement unchanged — ledger role field records emitter",
+      "US-0048": "Isolation evidence unchanged — ledger entry may reference from_artifact",
+      "US-0092": "Full-autonomy outer driver unchanged — ledger writes as side-effect of phase transitions"
+    },
+    "us_0081_bijection_mandatory": true,
+    "us_0081_bijection_verified": true,
+    "sprint_capacity_check": {
+      "task_count": 11,
+      "sprint_max_tasks": 12,
+      "within_limit": true,
+      "SPRINT_AUTO_SPLIT_triggered": false
+    }
+  },
+  "risk_assessment": {
+    "critical_path": ["T-003", "T-007"],
+    "critical_path_rationale": "T-003 (helper library) is predecessor to T-005, T-006, T-007; T-007 (contract tests) depends on all implementation tasks. Linear execution order T-001→...→T-011 has no parallel opportunities per tasks.md.",
+    "high_risk_tasks": ["T-003", "T-005", "T-006", "T-007"],
+    "high_risk_rationale": {
+      "T-003": "Helper library — core contract for all downstream tasks. HIGH risk in tasks.md.",
+      "T-005": "Plan-fidelity deviation classification — architecture-locked semantics. HIGH risk in tasks.md.",
+      "T-006": "QA cross-check — integration point for /qa phase. HIGH risk in tasks.md.",
+      "T-007": "Contract tests — verifies all prior implementation. HIGH risk in tasks.md."
+    },
+    "risk_mitigation_assessment": "adequate",
+    "risk_mitigation_detail": {
+      "R1_ledger_contention": "Mitigated — one file per run + append-only + fsync per DEC-0103 §10",
+      "R2_token_budget": "Mitigated — summary_digest + last_n=100 bounded reads per DEC-0103 §10",
+      "R3_deviation_ambiguity": "Mitigated — §3 deviation table architecture-locked; classify_deviation() single source of truth",
+      "R4_ledger_corruption": "Mitigated — schema_check fail-closed per line + LEDGER_CORRUPT hard stop",
+      "R5_composition_stability": "Mitigated — test_us0103_us0070_compose_no_schema_change regression guard"
+    }
+  },
+  "key_contracts_verified": [
+    "SPRINT_MAX_TASKS=12: 11 ≤ 12 (PASS)",
+    "DEC-0103 status=Accepted (PASS)",
+    "US-0103 status=OPEN in backlog.md (PASS)",
+    "AC-1..AC-8 all covered by ≥1 task (PASS per tasks.md)",
+    "Every task covers ≥1 AC (PASS — no orphan tasks)",
+    "Composition rules US-0070/US-0069/US-0048/US-0092 unchanged (PASS)",
+    "test_us0103_us0070_compose_no_schema_change regression guard declared (PASS)",
+    "Self-test [LEDGER_VALIDATION_SELF_TEST_OK] declared as post-edit gate (PASS)",
+    "Self-test [DECISION_LEDGER_SELF_TEST_OK] declared as post-edit gate (PASS)",
+    "Parity --scope=sovereign-ledger declared as post-edit gate (PASS)"
+  ],
+  "next_phase": "/execute",
+  "next_phase_role": "dev",
+  "handoff_pointer": "sprints/S0103/tasks.md (canonical task breakdown) — execute in order T-001→T-011; reconcile sprint.json AC-coverage sections to match tasks.md bijection"
+}

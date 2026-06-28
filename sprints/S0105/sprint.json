@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0",
+  "sprint_id": "S0105",
+  "story_id": "US-0105",
+  "title": "Sovereign Memory (project-level learnings substrate + bounded injection)",
+  "status": "planned",
+  "sprint_plan": {
+    "created_at": "2026-06-29T00:08:00Z",
+    "architect": "tech-lead",
+    "fresh_context_marker": "tl-S0105-sprint-plan-20260629T000800Z-fresh",
+    "orchestrator_run_id": "auto-20260628-04",
+    "total_tasks": 11,
+    "task_ids": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007", "T-008", "T-009", "T-010", "T-011"],
+    "acceptance_criteria_coverage": {
+      "AC-1": ["T-001", "T-002"],
+      "AC-2": ["T-003", "T-006"],
+      "AC-3": ["T-004"],
+      "AC-4": ["T-007"],
+      "AC-5": ["T-005", "T-009"],
+      "AC-6": ["T-005", "T-008"],
+      "AC-7": ["T-010", "T-011"],
+      "AC-8": ["T-002", "T-006", "T-010", "T-011"]
+    },
+    "coverage_status": "surjective",
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false
+  },
+  "decisions": ["DEC-0105"],
+  "research_anchor": "R-0093",
+  "architecture_document": {
+    "path": "docs/engineering/architecture.md",
+    "section": "# US-0105: Sovereign Memory (project-level learnings substrate + bounded injection)",
+    "status": "completed"
+  },
+  "task_summary": {
+    "T-001": {
+      "title": "Scratchpad keys SOVEREIGN_MEMORY_*",
+      "acceptance_criteria": ["AC-1"],
+      "risk": "low",
+      "tranche": "A",
+      "dependencies": []
+    },
+    "T-002": {
+      "title": "Scratchpad comment block + reason codes + DEC-0105 template mirror",
+      "acceptance_criteria": ["AC-1", "AC-8"],
+      "risk": "low",
+      "tranche": "A",
+      "dependencies": ["T-001"]
+    },
+    "T-003": {
+      "title": "Directory surface + .gitkeep bootstrap",
+      "acceptance_criteria": ["AC-2"],
+      "risk": "low",
+      "tranche": "A",
+      "dependencies": ["T-001"]
+    },
+    "T-004": {
+      "title": "sovereign_memory_lib.py read/injection core",
+      "acceptance_criteria": ["AC-3"],
+      "risk": "high",
+      "tranche": "B",
+      "dependencies": ["T-001", "T-003"]
+    },
+    "T-005": {
+      "title": "sovereign_memory_lib.py mutations + dedup + rollover + promotion",
+      "acceptance_criteria": ["AC-5", "AC-6"],
+      "risk": "high",
+      "tranche": "C",
+      "dependencies": ["T-004"]
+    },
+    "T-006": {
+      "title": "sovereign_memory_validate.py + template mirror",
+      "acceptance_criteria": ["AC-2", "AC-8"],
+      "risk": "high",
+      "tranche": "C",
+      "dependencies": ["T-004"]
+    },
+    "T-007": {
+      "title": "Phase spawn sovereign_memory_digest block integration",
+      "acceptance_criteria": ["AC-4"],
+      "risk": "medium",
+      "tranche": "D",
+      "dependencies": ["T-004"]
+    },
+    "T-008": {
+      "title": "Mistake-tagging hooks",
+      "acceptance_criteria": ["AC-6"],
+      "risk": "medium",
+      "tranche": "D",
+      "dependencies": ["T-005"]
+    },
+    "T-009": {
+      "title": "Curator retrospective + promote_from_ledger wiring",
+      "acceptance_criteria": ["AC-5"],
+      "risk": "medium",
+      "tranche": "D",
+      "dependencies": ["T-005"]
+    },
+    "T-010": {
+      "title": "Eight test_us0105_* + compose regression guards",
+      "acceptance_criteria": ["AC-7", "AC-8"],
+      "risk": "high",
+      "tranche": "E",
+      "dependencies": ["T-004", "T-005", "T-006", "T-007", "T-008", "T-009"]
+    },
+    "T-011": {
+      "title": "SOVEREIGN_MEMORY_PAIRS parity + runbook",
+      "acceptance_criteria": ["AC-7", "AC-8"],
+      "risk": "medium",
+      "tranche": "E",
+      "dependencies": ["T-006", "T-009"]
+    }
+  },
+  "integration_points": {
+    "US-0029": "research.md unchanged; provenance_ref=R-xxxx only in entries",
+    "US-0080": "Lib-side digest truncation; TOKEN_PROFILE unchanged",
+    "US-0103": "Per-run ledger unchanged; optional promotion at refresh-context",
+    "US-0072": "Triad hot surfaces unchanged; sovereign-memory excluded",
+    "US-0096": "pack.json / active-context.md distinct layer",
+    "US-0107": "Stable read API consumer — drain-generate out of scope",
+    "US-0023": "Fresh-context unchanged; digest is read-only additive"
+  },
+  "orchestration": {
+    "boundary": "sprint_plan_complete",
+    "next_phase": "plan-verify",
+    "next_phase_role": "qa"
+  }
+}

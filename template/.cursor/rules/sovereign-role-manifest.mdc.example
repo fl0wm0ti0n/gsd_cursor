@@ -1,0 +1,27 @@
+---
+description: "Sovereign Role-Behavior Manifest enforcement (US-0106 / DEC-0106)"
+globs:
+---
+
+- When `SOVEREIGN_ROLE_MANIFEST=1` in scratchpad, the sovereign role manifest at
+  `.cursor/sovereign-role-manifest.yaml` is the additive per-role objective and
+  inter-role review obligation layer on top of US-0069 spawn machinery.
+- Review spawns are supplementary post-phase hooks — they never substitute for
+  the US-0069 producer role.
+- Validate manifest with `python scripts/sovereign_role_manifest_validate.py --repo .`.
+- Schema v1 requires 6 sections: `schema_version`, `roles[]`, `review_obligations[]`,
+  `allowed_self_overrides`, `cross_model_policy`, `escalation_rules`.
+- Six role IDs: `po`, `tech-lead`, `dev`, `qa`, `release`, `curator`.
+- Review foci: `user_value_drift`, `testability`, `buildability`, `deployability`.
+- Cross-model default orders: `role_review_first`, `critic_first`, `critic_only`, `role_review_only`.
+- Secret-literal scan: no `api_key`, `token`, `password`, `secret`, `private_key` shaped
+  literals in `objective_function` fields (`SOVEREIGN_ROLE_SECRET_DETECTED`).
+- Objective injection char cap: `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS` (default 512).
+- Obligation dispatch per-phase cap: `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` (default 2).
+- Rework cap: `SOVEREIGN_ROLE_REVIEW_REWORK_MAX` (default 1).
+- Default-off: `SOVEREIGN_ROLE_MANIFEST=0` → zero overhead (no file I/O).
+- Compose guards: US-0069 phase→role matrix unchanged, US-0104 critic schema unchanged.
+- Reason codes: `SOVEREIGN_ROLE_MANIFEST_DISABLED`, `SOVEREIGN_ROLE_MANIFEST_SCHEMA_INVALID`,
+  `SOVEREIGN_ROLE_UNKNOWN_ROLE`, `SOVEREIGN_ROLE_UNKNOWN_PHASE`, `SOVEREIGN_ROLE_SECRET_DETECTED`,
+  `SOVEREIGN_ROLE_OBJECTIVE_OVERFLOW`, `ROLE_REVIEW_DISPATCH_FAILED`, `ROLE_REVIEW_SPAWN_FAILED`,
+  `ROLE_REVIEW_BLOCKED`, `ROLE_REVIEW_DEFERRAL_FAILED`, `ROLE_REVIEW_REWORK_CAP`.

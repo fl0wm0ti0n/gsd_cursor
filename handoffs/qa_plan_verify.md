@@ -1,6 +1,83 @@
 # QA — `/plan-verify` handoff (hot inbox)
 
-## Next — **`S0092` / `US-0102`** (**PASS**)
+## Next — **`S0107` / `US-0107`** (**`/execute`**)
+
+- **Verdict**: **PASS** — **`sprints/S0107/plan-verify.json`** records **`status=PASS`** (`timestamp=2026-06-29T00:19:00Z`, **qa**, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=qa-S0107-plan-verify-20260629T001900Z-fresh`); **AC-1..AC-8** mapped surjectively to **T-001..T-012**; plan integrity confirmed (`task_count=12`, `ac_count=8`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0107`**, **`R-0094`**, **`DEC-0107`**, **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103**, **US-0105**, **US-0110**. **No `PLAN_AC_COVERAGE_GAP`**; **no decision gate**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001, T-002**: Nine **`AUTO_SOVEREIGN_*`** + **`SOVEREIGN_NOTIFY_*`** scratchpad keys + comment block + goal-mode coupling.
+  - **AC-2 / T-003, T-004, T-006**: Deferral JSONL v1 schema + CRUD API + validator CLI.
+  - **AC-3 / T-004, T-005, T-009**: `advance_sovereign_loop` + deferral policy + US-0110 compose.
+  - **AC-4 / T-007**: Drain-generate PO spawn + decision gate + 3-candidate cap.
+  - **AC-5 / T-008**: Notification ntfy/hook adapters; fail-open dispatch.
+  - **AC-6 / T-009, T-012**: US-0109 `DEPLOY_DEFERRED` integration declaration; no deploy smoke.
+  - **AC-7 / T-006, T-010, T-011**: Eight `test_us0107_*` + `SOVEREIGN_LOOP_PAIRS` parity.
+  - **AC-8 / T-002, T-010, T-012**: Reason codes, compose guards, runbook, backward compat; architecture pre-satisfied.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-002 (AC-1+AC-8)** — architecture seed 2 — scratchpad comment block shares surface with reason-code doc.
+  - **T-004 (AC-2+AC-3)** — architecture seed 4 — deferral CRUD shares lib surface with advance algorithm.
+  - **T-009 (AC-3+AC-6)** — architecture seed 9 — US-0110 compose shares surface with US-0109 integration declaration.
+  - **T-012 (AC-6+AC-8)** — architecture seed 12 — runbook shares doc surface with backward-compat prose.
+- **Non-goals confirmed**: no US-0088/US-0092/US-0095/US-0110 amendment; no auto-enable goal mode; no auto-append drain candidates; no US-0109 deploy smoke; research stub finalize-from-stub expected.
+- **Artifacts**: **`sprints/S0107/sprint.md`**, **`sprints/S0107/tasks.md`**, **`sprints/S0107/progress.md`**, **`sprints/S0107/sprint.json`**, **`sprints/S0107/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`**, **`docs/product/backlog.md`** (**`## US-0107`**).
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0107` + **DEC-0107** contracts.
+- **Canonical status**: **`US-0107`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Artifacts**: **`sprints/S0107/qa-findings.md`**, **`sprints/S0107/plan-verify.json`** (PASS), **`handoffs/tl_to_dev.md`**, **`docs/product/backlog.md`** (**`## US-0107`** — status OPEN).
+- **Decision-gate posture**: **none** — plan-verify satisfied; **`/execute`** unblocked.
+- **Canonical status**: **`US-0107`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**); **`state.md`** not modified per instruction.
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0107`** / **`US-0107`**.
+
+## Prior — **`S0107` / `US-0107`** (**`/plan-verify`** PENDING)
+
+- **Verdict**: **PENDING** — superseded by plan-verify **PASS** above (`planned_at=2026-06-29T00:18:00Z`, **tech-lead**, `fresh_context_marker=tl-S0107-sprint-plan-20260629T001800Z-fresh`).
+
+## Prior — **`S0104` / `US-0104`** (**`/execute`**)
+
+- **Verdict**: **PASS** — **`sprints/S0104/plan-verify.json`** records **`status=PASS`** (`timestamp=2026-06-28T23:30:00Z`, **qa**, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=qa-S0104-US0104-plan-verify-20260628T233000Z-fresh`); **AC-1..AC-8** mapped surjectively to **T-001..T-011**; plan integrity confirmed (`task_count=11`, `ac_count=8`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0104`**, **`R-0092`**, **`DEC-0104`**, **US-0048**, **US-0069**, **US-0023**, **US-0110**, **US-0103**. **No `PLAN_AC_COVERAGE_GAP`**; **no decision gate**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001, T-002**: Three **`CROSS_MODEL_*`** scratchpad keys + comment block + defaults.
+  - **AC-2 / T-006**: `/sovereign-critic` command + template mirror + orchestrator hook prose.
+  - **AC-3 / T-003, T-006**: Three-lens enum + all-lenses-per-invocation + `reconcile_findings` core.
+  - **AC-4 / T-008**: Isolation evidence `model_id` v2 additive extension + fail-closed gate.
+  - **AC-5 / T-003, T-004, T-005**: `sovereign_critic_lib.py` core + IO + validator CLI.
+  - **AC-6 / T-007**: Anti-slop aggregate + rework loop + `dev_to_qa.md` `critic_evidence` tuple.
+  - **AC-7 / T-009, T-011**: Degraded single-model-multi-lens fallback + runbook backward-compat path.
+  - **AC-8 / T-002, T-005, T-010, T-011**: Reason codes, validator, contract tests, parity, runbook; architecture pre-satisfied.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-002 (AC-1+AC-8)** — architecture seed 2 — scratchpad comment block shares surface with reason-code doc.
+  - **T-003 (AC-3+AC-5)** — architecture seed 3 — reconciliation core shares lib surface with anti-slop rubric.
+  - **T-005 (AC-5+AC-8)** — architecture seed 5 — validator shares lib schema surface with CI enforce hooks.
+  - **T-006 (AC-2+AC-3)** — architecture seed 6 — command file shares lens enum surface with lib reconciliation.
+  - **T-011 (AC-7+AC-8)** — architecture seed 11 — runbook + parity share doc surface with backward-compat tests.
+- **Non-goals confirmed**: no US-0048/US-0069/US-0023/US-0110 amendment; no always-on critic; no `min(lens_scores)` formula change; no runtime lens invention; research stub finalize-from-stub expected.
+- **Artifacts**: **`sprints/S0104/qa-findings.md`**, **`sprints/S0104/plan-verify.json`** (PASS), **`handoffs/resume_brief.md`** (top pointer → `/execute`), **`docs/product/backlog.md`** (**`## US-0104`** — status OPEN).
+- **Decision-gate posture**: **none** — plan-verify satisfied; **`/execute`** unblocked.
+- **Canonical status**: **`US-0104`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/execute`** (**dev**, fresh context) for **`S0104`** / **`US-0104`**.
+
+## Prior — **`S0110` / `US-0110`** (**PASS**)
+
+- **Verdict**: **PENDING** — **`sprints/S0110/plan-verify.json`** records **`status=PENDING`** (`planned_at=2026-06-28T18:30:00Z`, **tech-lead**, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-S0110-US0110-sprint-plan-20260628T183000Z-fresh`); **AC-1..AC-8** mapped surjectively to **T-001..T-011**; plan integrity pre-check (`task_count=11`, `ac_count=8`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors: **`docs/engineering/architecture.md`** **`# US-0110`**, **`R-0091`**, **`DEC-0110`**, **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103**.
+- **AC ↔ Task map** (locked for verification):
+  - **AC-1 / T-001, T-002**: Five **`SOVEREIGN_GOAL_*`** scratchpad keys + comment block + defaults.
+  - **AC-2 / T-003, T-004, T-006**: `evaluate_convergence` five-conjunct predicate + degrade matrix + validator CLI.
+  - **AC-3 / T-005**: Explicit goal wins + vision top-N auto-derive + `SOVEREIGN_GOAL_DERIVE_FAILED`.
+  - **AC-4 / T-007**: Curator `goal_progress` JSON block in `resume_brief.md`.
+  - **AC-5 / T-008**: `SOVEREIGN_GOAL_TIMEOUT` + `sovereign_partial_delivery.md` sections.
+  - **AC-6 / T-009, T-010**: Eight `test_us0110_*` + `SOVEREIGN_CONVERGENCE_PAIRS` parity `--scope=sovereign-convergence`.
+  - **AC-7 / T-011**: `phase_driven` zero-overhead + compose regression vs US-0088/US-0092/US-0095/US-0044.
+  - **AC-8 / T-002, T-006, T-010, T-011**: Reason codes, validator, parity, runbook; architecture pre-satisfied.
+- **Multi-AC scrutiny** (primary focus):
+  - **T-002 (AC-1+AC-8)** — architecture seed 2 — scratchpad comment block shares surface with reason-code doc.
+  - **T-006 (AC-2+AC-8)** — architecture seed 6 — validator shares lib schema surface with CI enforce hooks.
+  - **T-009+T-010 (AC-6+AC-8)** — architecture seeds 9+10 — contract subtests vs parity manifest sequential.
+  - **T-011 (AC-7+AC-8)** — architecture seed 11 — runbook + compose regression share doc surface.
+- **Non-goals confirmed**: no US-0088/US-0092/US-0095/US-0044/US-0103 amendment; no always-on convergence; no wall-clock timeout; no US-0109 deploy smoke conjunct; read-only composed surfaces.
+- **Artifacts**: **`sprints/S0110/sprint.md`**, **`sprints/S0110/tasks.md`**, **`sprints/S0110/plan-verify.json`** (PENDING), **`handoffs/tl_to_dev.md`**, **`docs/product/backlog.md`** (**`## US-0110`** `sprint_plan_notes`).
+- **Decision-gate posture**: **none** — verify plan satisfies architecture `# US-0110` + **DEC-0110** contracts.
+- **Canonical status**: **`US-0110`** remains **OPEN** in **`docs/product/backlog.md`** (**US-0045**).
+- **Next queue target**: **`/plan-verify`** (**qa**, fresh context) for **`S0110`** / **`US-0110`**.
+
+## Prior — **`S0092` / `US-0102`** (**PASS**)
 
 - **Verdict**: **PASS** — **`sprints/S0092/plan-verify.json`** now records **`status=PASS`** (`plan_verified_at=2026-06-25T20:00:00Z`, **qa**, `orchestrator_run_id=auto-20260615-02`, `fresh_context_marker=qa-S0092-US0102-plan-verify-20260625T200000Z-fresh`); **AC-1..AC-10** surjective via **T-001..T-011** with **task-seed bijection** (11 architecture seeds → 11 tasks); all coverage rows `verified=true`; plan integrity confirmed (`task_count=11`, `ac_count=10`, `task_ac_bijection=false`, `task_seed_bijection=true`, `ac_coverage_surjective=true`, `sprint_max_tasks=12`, `within_limit=true`, `sprint_auto_split_triggered=false`, `ac_coverage_gap=false`); governance anchors validated: **`docs/engineering/architecture.md`** **`# US-0102`**, **`DEC-0087`**, **DEC-0086**, **DEC-0051**, **DEC-0062**, **US-0003**, **US-0017**, **US-0048**, **US-0056**, **DEC-0038**. **No `PLAN_AC_COVERAGE_GAP`**; **No `PLAN_AC_ATOMICITY_VIOLATION`**.
 - **Findings summary** (one per AC):

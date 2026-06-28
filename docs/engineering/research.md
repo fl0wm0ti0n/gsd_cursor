@@ -6093,3 +6093,1085 @@ fi
 - **Delivery closure trailer (2026-06-26T01:00:00Z, curator, `orchestrator_run_id=auto-20260615-02`, `sprint_id=S0092`)**: **`US-0102`** delivered via **`S0092`** / **`DEC-0087`** — extends same research domain (direct slug override + role-based catalog v2 on **`model_tier_lib.py`**); research phase skipped at drain-advance (small **US-0101** refinement; intake evidence sufficient); eight **`test_us0102_*`** markers, harness **§26AA**, `--scope=model-tier-overrides` parity; **`handoffs/releases/S0092-release-notes.md`**; backlog **US-0102** → **DONE**.
 - **Portfolio drain closure signal**: with **US-0102** closed, **`docs/product/backlog.md`** contains **0 OPEN** stories and **0 OPEN** bugs. Backlog-drain run **`auto-20260615-02`** terminates at **`/refresh-context`** (`drain_terminated=true`; `drain_terminated_reason=no_open_stories`; `backlog_drain_stories_remaining_budget=4` of initial **10**; **2** stories consumed on this run: **US-0101**, **US-0102**). Next operator action: **`/intake`**.
 - **Open R-xxxx anchors status (post-closure)**: **R-0088** **delivered** (both trailers). No active forward research stubs for open portfolio work.
+
+---
+
+## R-0089 — US-0103: AI Decision Ledger + Plan Fidelity policy (sovereign-loop foundation)
+
+- **Date**: 2026-06-28
+- **Topic**: Append-only JSONL decision ledger per orchestrator run + plan-fidelity tri-state governance (strict/relaxed/extended) + QA cross-check contract
+- **Query**: How to make every autonomous AI decision auditable via append-only ledger, govern deviation per plan-fidelity tri-state, and integrate QA cross-check — default-off, composable with US-0070/US-0069/US-0048/US-0092?
+- **Status**: **resolved for `/research`** (Q1–Q7 closed — architecture next)
+- **Confidence**: high
+- **Story**: **US-0103**
+- **Linked**: **US-0103**, **US-0070**, **US-0069**, **US-0048**, **US-0092**, **US-0104**, **US-0105**, **US-0107**, **US-0109**, **US-0111**, **US-0045**
+- **Discovery anchor (sovereign-loop foundation)**: `handoffs/po_to_tl.md` (US-0103 discovery handoff, `orchestrator_run_id=sovereign-loop-001`, discovery **PASS**) — discovery locks L1–L10 locked (see backlog `## US-0103` discovery_notes).
+- **Research asks (discovery-locked Q1–Q7)**:
+  1. **Q1**: Exact JSONL ledger schema + validator CLI.
+  2. **Q2**: Helper library API (append/read/schema_check/summary_digest).
+  3. **Q3**: Plan-fidelity deviation classification table (decision_type families per mode).
+  4. **Q4**: QA cross-check `ledger_findings` schema + bounded digest.
+  5. **Q5**: Contract-test inventory `test_us0103_*` (8 markers) + parity file list.
+  6. **Q6**: Reason-code enumeration completeness.
+  7. **Q7**: Companion `DEC-xxxx` necessity — new decision required or discovery locks suffice?
+
+### Research extension
+
+**Research extension (2026-06-28T12:30:00Z, tech-lead, `orchestrator_run_id=auto-20260628-01`, `fresh_context_marker=tl-US0103-research-20260628T123000Z-fresh`)**:
+
+**`/research` PASS** — Q1–Q7 closed; companion **`DEC-0103`** authored; architecture ready.
+
+- **Q1 — Exact JSONL ledger schema v1 (closed)**:
+  12 required fields, no extras, no missing: `ts`, `orchestrator_run_id`, `phase_id`, `role`, `decision_id`, `decision_type`, `from_artifact`, `to_artifact`, `rationale`, `plan_fidelity`, `cross_model_reviewed`, `risk_tier`.
+  - `ts` = ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SS.mmmZ`).
+  - `orchestrator_run_id` = non-empty string, matches file name stem (partition key).
+  - `phase_id` = **DEC-0086** canonical phase id (`intake`, `discovery`, `research`, `architecture`, `execute`, `quick`, `qa`, `verify-work`, `security-review`, `intake`, `release`, `refresh-context`, `memory-audit`, `status-reconcile`, `plan-verify`, `ask`, `pause`, `auto`).
+  - `role` = one of `po`, `tech-lead`, `dev`, `qa`, `qa`, `security`, `release`, `curator`.
+  - `decision_id` = UUIDv4 (globally unique per decision point).
+  - `decision_type` = `PLAN_FIDELITY_VIOLATION` | `PLAN_FIDELITY_OVERRIDE` | `PLAN_FIDELITY_SCOPE_GATE` | `PLAN_FIDELITY_EXTENSION` | `PLAN_FIDELITY_REORDER` | `LEDGER_DECISION` | `LEDGER_DERIVATION` | `LEDGER_PHASE_TRANSITION` | `LEDGER_DELEGATION` (9 decision types).
+  - `from_artifact` / `to_artifact` = artifact path strings; `(none)` sentinel for no-source / no-target.
+  - `rationale` = non-empty free-text (200-char truncation in QA digest).
+  - `plan_fidelity` = `strict` | `relaxed` | `extended`.
+  - `cross_model_reviewed` = bool (false default; true when US-0104 critic has weighed in).
+  - `risk_tier` = `low` | `medium` | `high` | `critical`.
+  - Schema validator: `scripts/ledger_validate.py` (+ template mirror). Exit 0 / 1 / 2 contract mirrors `model_tier_validate.py`.
+
+- **Q2 — Helper library API (closed)**:
+  **`scripts/decision_ledger_lib.py`** (+ template mirror, byte-parity). Core functions:
+  - `append_entry(ledger_path, entry, scratchpad=None) -> AppendResult` — append + fsync; fail-closed on schema mismatch; zero-overhead when `AI_DECISION_LEDGER=0`.
+  - `read_entries(ledger_path, strict=True, last_n=None) -> (entries, reason_code, message)` — bounded read with optional `last_n` tail; strict mode fails on any line schema mismatch; non-strict skips invalid lines and emits `LEDGER_READ_BOUND`.
+  - `schema_check(entry) -> (ok, error_message)` — 12-field validation; returns error details on failure.
+  - `summary_digest(entries) -> dict` — bounded QA digest shape (counts by type, by risk tier, counters for violation/override/scope_gate/extension).
+  - `is_ledger_enabled(scratchpad) -> bool` — `AI_DECISION_LEDGER=1` check; default off.
+  - `resolve_plan_fidelity(scratchpad) -> PlanFidelity` — `AUTO_PLAN_FIDELITY` resolution; default strict.
+  - `resolve_ledger_path(orchestrator_run_id, repo_root=None) -> Path` — canonical `handoffs/sovereign_decisions/<id>.jsonl`.
+  - `classify_deviation(plan_fidelity, deviation_kind) -> (decision_type, reason_code, blocking)` — single source of truth for §3 table.
+  - `build_qa_findings_block(ledger_path, orchestrator_run_id) -> (dict, blocking_reason_code)` — JSON block for `qa-findings.md` + fail-closed code when ledger missing/invalid/empty.
+  - `build_new_entry(...) -> dict` — convenience builder producing valid schema entry.
+  - Enums: `PlanFidelity` (strict/relaxed/extended), `RiskTier` (low/medium/high/critical), `DecisionType` (9 values), `ReasonCode` (11 values: 5 PLAN_FIDELITY_* + 6 LEDGER_*).
+  - `self_test() -> bool` — `[DECISION_LEDGER_SELF_TEST_OK]` / `[SELF_TEST_FAILED]`.
+  - CLI: `--self-test`, `--append-json`, `--ledger` / `--orchestrator-run-id`, `--dump-digest`. Schema check enforced as hard gate on append.
+
+- **Q3 — Plan-fidelity deviation classification table (closed, DEC-0103 §3)**:
+  Single source of truth in `decision_ledger_lib.py::_deviation_table(mode, deviation_kind)`.
+
+  | Mode | deviation_kind | decision_type | blocking? |
+  |------|----------------|---------------|-----------|
+  | **strict** | `drop_ac` / `reorder_ac` | `PLAN_FIDELITY_VIOLATION` | YES |
+  | **strict** | `add_scope` | `PLAN_FIDELITY_SCOPE_GATE` | YES |
+  | **strict** | `operator_override` | `PLAN_FIDELITY_OVERRIDE` | NO |
+  | **relaxed** | `drop_ac` / `reorder_ac` | `PLAN_FIDELITY_REORDER` | NO |
+  | **relaxed** | `add_scope` | `PLAN_FIDELITY_SCOPE_GATE` | YES |
+  | **relaxed** | `operator_override` | `PLAN_FIDELITY_OVERRIDE` | NO |
+  | **extended** | `drop_ac` / `reorder_ac` | `PLAN_FIDELITY_REORDER` | NO |
+  | **extended** | `add_scope` | `PLAN_FIDELITY_EXTENSION` | NO |
+  | **extended** | `operator_override` | `PLAN_FIDELITY_OVERRIDE` | NO |
+  | *any mode* | `generic` | `LEDGER_DECISION` | NO |
+  | *any mode* | `derivation` | `LEDGER_DERIVATION` | NO |
+  | *any mode* | `phase_transition` | `LEDGER_PHASE_TRANSITION` | NO |
+  | *any mode* | `delegation` | `LEDGER_DELEGATION` | NO |
+
+  Deviation kinds not in the table → `DecisionType.LEDGER_DECISION` with `ReasonCode.PLAN_FIDELITY_VIOLATION` (defensive).
+
+- **Q4 — QA cross-check `ledger_findings` schema + bounded digest (closed, DEC-0103 §6)**:
+  `build_qa_findings_block(ledger_path, orchestrator_run_id, scratchpad=None)` → returns `(dict, blocking_reason_code)`.
+
+  Output JSON shape:
+  ```json
+  {
+    "ledger_findings": [
+      {
+        "decision_id": "<UUIDv4>",
+        "decision_type": "PLAN_FIDELITY_VIOLATION",
+        "phase_id": "execute",
+        "rationale_summary": "<first 200 chars>",
+        "risk_tier": "high",
+        "plan_fidelity_mode": "strict",
+        "cross_model_reviewed": false
+      }
+    ],
+    "ledger_summary_digest": {
+      "by_decision_type": {
+        "PLAN_FIDELITY_VIOLATION": 1,
+        "PLAN_FIDELITY_OVERRIDE": 0,
+        "PLAN_FIDELITY_SCOPE_GATE": 0,
+        "PLAN_FIDELITY_EXTENSION": 0,
+        "PLAN_FIDELITY_REORDER": 0,
+        "LEDGER_DECISION": 3,
+        "LEDGER_DERIVATION": 0,
+        "LEDGER_PHASE_TRANSITION": 1,
+        "LEDGER_DELEGATION": 0
+      },
+      "by_risk_tier": { "low": 2, "medium": 1, "high": 1, "critical": 0 },
+      "total_decisions": 5,
+      "violation_count": 1,
+      "override_count": 0,
+      "scope_gate_count": 0,
+      "extension_count": 0
+    },
+    "ledger_source": "handoffs/sovereign_decisions/auto-20260628-01.jsonl",
+    "ledger_orchestrator_run_id": "auto-20260628-01"
+  }
+  ```
+
+  Fail-closed codes emitted by block builder:
+  | reason_code | blocking? |
+  |-------------|-----------|
+  | `LEDGER_FILE_MISSING` | YES — QA hard stop when ledger enabled |
+  | `LEDGER_FILE_EMPTY` | YES — QA hard stop when ledger enabled |
+  | `LEDGER_SCHEMA_INVALID` | YES — fail-closed schema mismatch |
+  | `LEDGER_CORRUPT` | YES — file non-UTF-8 or JSON-broken |
+  | `LEDGER_READ_BOUND` | NO (warn) |
+  | `LEDGER_DISABLED` | NO (informational when `AI_DECISION_LEDGER=0`) |
+
+  Bounded read: `last_n=100` default; 10K lines/run cap; larger → `LEDGER_READ_BOUND` warning (non-fatal).
+
+- **Q5 — Contract-test inventory (closed)**:
+ Eight `test_us0103_*` markers in `tests/auto_command_contract_test.py` (exact names locked in DEC-0103 §7):
+  1. `test_us0103_scratchpad_keys_literals` — `AI_DECISION_LEDGER` enum + default `0`; `AUTO_PLAN_FIDELITY` enum + default `strict`.
+  2. `test_us0103_ledger_jsonl_schema_contract` — 12-field validation accepts valid + rejects invalid entries (missing fields, unknown fields, wrong types, out-of-range enums).
+  3. `test_us0103_strict_mode_hard_stop` — strict mode blocks `drop_ac`, `reorder_ac`, `add_scope` with hard-stop reason codes.
+  4. `test_us0103_relaxed_mode_reorder_with_ledger` — relaxed mode records reorders as non-blocking `PLAN_FIDELITY_REORDER`; `add_scope` still blocks (`PLAN_FIDELITY_SCOPE_GATE`).
+  5. `test_us0103_extended_mode_nonblocking` — extended mode records `add_scope` as non-blocking `PLAN_FIDELITY_EXTENSION`; emits extension report entry.
+  6. `test_us0103_qa_crosscheck_ledger_findings` — `build_qa_findings_block()` shape matches §6 schema; fail-closed codes emit when ledger missing / empty / schema-invalid.
+  7. `test_us0103_reason_code_inventory` — `PLAN_FIDELITY_*` (5) + `LEDGER_*` (6) enumeration parity; total 11 codes.
+  8. `test_us0103_us0070_compose_no_schema_change` — regression guard: resolved_phase_plan, phase selection policy, isolation evidence files UNCHANGED by US-0103.
+
+  Parity scope: `check_intake_template_parity.py --scope=sovereign-ledger` (`SOVEREIGN_LEDGER_PAIRS` manifest). Pair list:
+  - `scripts/decision_ledger_lib.py` ↔ `template/scripts/decision_ledger_lib.py`
+  - `scripts/ledger_validate.py` ↔ `template/scripts/ledger_validate.py`
+  - `decisions/DEC-0103.md` ↔ `template/decisions/DEC-0103.md` (if template copy required)
+
+- **Q6 — Reason-code enumeration (closed)**:
+  11 total:
+  - **`PLAN_FIDELITY_VIOLATION`** — strict-mode hard stop
+  - **`PLAN_FIDELITY_OVERRIDE`** — operator-approved relaxation
+  - **`PLAN_FIDELITY_SCOPE_GATE`** — strict/relaxed new-scope gate
+  - **`PLAN_FIDELITY_EXTENSION`** — extended-mode optional scope extension
+  - **`PLAN_FIDELITY_REORDER`** — relaxed/extended AC reorder/drop (non-blocking)
+  - **`LEDGER_FILE_MISSING`** — ledger enabled but no file for run
+  - **`LEDGER_SCHEMA_INVALID`** — schema mismatch on append/read
+  - **`LEDGER_APPEND_FAILED`** — IO/fsync failure on append
+  - **`LEDGER_CORRUPT`** — file non-UTF-8 or broken JSON parse
+  - **`LEDGER_READ_BOUND`** — bounded-read truncation (warn)
+  - **`LEDGER_DISABLED`** — informational when `AI_DECISION_LEDGER=0`
+
+  Note: discovery L9 listed `PLAN_FIDELITY_MODE_INVALID` and `PLAN_FIDELITY_CONFLICT` + `LEDGER_WRITE_FAILED`/`LEDGER_APPEND_BLOCKED`/`LEDGER_DUPLICATE_DECISION_ID`/`LEDGER_SECRET_DETECTED`. Research refined to the 11-code set above (sufficient for v1; other codes deferred if sovereign-loop descendants require them).
+
+- **Q7 — Companion `DEC-xxxx` necessity (closed)**:
+  **YES — new `DEC-0103` required**. Rationale:
+  - US-0103 introduces a **new artifact surface** (`handoffs/sovereign_decisions/*.jsonl`), a **new scratchpad key pair** (`AI_DECISION_LEDGER` + `AUTO_PLAN_FIDELITY`), a **new schema version** (JSONL 12-field v1), and a **new deviation classification table**. These are NOT trivial extensions of existing decisions — they form a foundation contract that US-0104..US-0110 depend on.
+  - Discovery locks L1–L10 are necessary but insufficient for architecture — they lack the decision-record rationale, rejected alternatives, and composition-vs-US-0070/0069/0048/0092 analysis that DEC-0103 formalizes.
+  - `DEC-0103` authored: `decisions/DEC-0103.md` (12 sections: Context, Decision, Composition, Risks, etc.). Architecture locks from research incorporated into §7–§11.
+
+- **Status**: **`current`** → **`delivered`** (Q1–Q7 closed; architecture-ready). Helper library + validator both self-test OK (`[DECISION_LEDGER_SELF_TEST_OK]`, `[LEDGER_VALIDATION_OK]`) on active and template copies.
+- **Next**: **`/architecture`** (fresh **tech-lead**) — append `# US-0103` to `docs/engineering/architecture.md`, expand task seeds, lock sprint-plan inputs.
+
+**Evidence**:
+- `decisions/DEC-0103.md`
+- `scripts/decision_ledger_lib.py` (+ `template/scripts/` mirror)
+- `scripts/ledger_validate.py` (+ `template/scripts/` mirror)
+- `docs/product/plan-area.md` (new sovereign-loop section)
+- `docs/product/backlog.md` (US-0103 research-notes appended)
+- `handoffs/po_to_tl.md` (US-0103 discovery handoff)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+
+## R-0090 — US-0112: Model-catalog example presets in installer payload
+
+- **Status**: `current` (intake stub — extend in **`/architecture`**)
+- **Story**: **US-0112**
+- **Problem**: Eight **`model-catalog.local.example*.json`** presets ship in **`template/.cursor/`** (**US-0101**/**US-0102**) but **`installer-owned-paths.manifest`** omits them — consumer repos after **`missing`**/**`upgrade`** lack preset files referenced in scratchpad comments.
+- **Recommended approach (intake-locked)**:
+  - Add all eight example paths to **`[install_include_paths]`** (line-based manifest; one row per file).
+  - Classify as **framework** files: **`upgrade`** refreshes when template differs; **`missing`** adds when absent.
+  - **Do not** auto-copy to **`model-catalog.local.json`** — operator picks preset (contrast **US-0099** copy-when-missing for gitignored local profile).
+- **Open questions (architecture)**:
+  - Q1: Explicit **`Classify-File`** prefix vs default framework fallback in **`installer.ps1`**?
+  - Q2: **`MODEL_CATALOG_EXAMPLE_PAIRS`** parity manifest shape (eight template paths only vs active mirror)?
+  - Q3: Upgrade summary line in installer output (mirror scratchpad example status)?
+  - Q4: Contract-test marker inventory (**`test_us0112_*`**) count and harness section id.
+- **Related**: **US-0101**, **US-0102**, **US-0099**, **US-0075**, **DEC-0086**, **DEC-0087**
+- **Evidence**: `handoffs/intake_evidence/US-0112-intake-20260628.json`; operator **`/ask`** thread (2026-06-28)
+
+## R-0091 — US-0110: Goal-Based Convergence Loops (convergence predicate + goal progress)
+
+- **Date**: 2026-06-28
+- **Topic**: Convergence predicate as sovereign-loop terminal condition, goal authoring, mid-loop progress visibility, partial delivery on timeout
+- **Query**: How to implement deterministic `evaluate_convergence(repo, scratchpad)` composing with US-0088/US-0092/US-0095/US-0044/US-0103 without amending their semantics, with default-off backward compat and curator `goal_progress` emission?
+- **Status**: **delivered** (Q1–Q7 closed; **US-0110** / **S0110** released 2026-06-28)
+- **Confidence**: high
+- **Story**: **US-0110**
+- **Linked**: **US-0110**, **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103**, **US-0104**, **US-0107**, **US-0109**, **US-0045**
+- **Discovery anchor**: `handoffs/po_to_tl.md` (US-0110 discovery handoff, `orchestrator_run_id=auto-20260628-04`, discovery **PASS**) — discovery locks L1–L12 in backlog `## US-0110` `discovery_notes`.
+- **Note**: **`R-0090`** allocated to **US-0112**; **US-0110** uses **`R-0091`** per next-available ID policy.
+- **Research asks (discovery-locked Q1–Q7)**:
+  1. **Q1**: Exact `ConvergenceResult` + `goal_progress` JSON schemas; validator CLI (`sovereign_convergence_validate.py`) necessity vs lib-only `schema_check`.
+  2. **Q2**: Full `scripts/sovereign_convergence_lib.py` API — `evaluate_convergence`, `resolve_goal`, `build_goal_progress_block`, `write_partial_delivery_report`, `is_goal_convergence_enabled`, CLI (`--self-test`, `--evaluate`, `--dump-progress`).
+  3. **Q3**: Deferral/critic/smoke degrade matrix when **US-0104**/**US-0107**/**US-0109** artifacts absent — skip with informational `unmet_conditions` vs hard `blocked_by` fail-closed per conjunct.
+  4. **Q4**: Vision auto-derive algorithm — heading/section skip rules, `SOVEREIGN_GOAL_TOP_N` paragraph selection, max char truncation, `SOVEREIGN_GOAL_DERIVE_FAILED` triggers.
+  5. **Q5**: Contract-test inventory `test_us0110_*` (8 markers) + `check_intake_template_parity.py --scope=sovereign-convergence` (`SOVEREIGN_CONVERGENCE_PAIRS` file list).
+  6. **Q6**: Performance budget — line-scoped backlog OPEN scan, ledger `last_n=100` tail, optional memoization key (`backlog_mtime + deferral_mtime + ledger_mtime + uat_mtime`) for drain-loop iterations.
+  7. **Q7**: Companion `DEC-xxxx` necessity — new decision for convergence predicate + partial-delivery artifact surface, or discovery locks suffice for architecture?
+
+### Discovery locks summary (L1–L12)
+
+| Lock | Decision |
+|------|----------|
+| L1 | Scratchpad: `SOVEREIGN_GOAL_MODE`, `SOVEREIGN_GOAL`, `SOVEREIGN_GOAL_TOP_N`, `SOVEREIGN_GOAL_TIMEOUT_MAX` |
+| L2 | Library: `scripts/sovereign_convergence_lib.py` + `evaluate_convergence(repo, scratchpad)` |
+| L3 | Predicate: backlog clear + zero deferrals + critic resolved + smoke green + ledger clean |
+| L4 | Goal: explicit scratchpad or vision top-N auto-derive |
+| L5 | Progress: curator `goal_progress` block in `resume_brief.md` |
+| L6 | Timeout: `SOVEREIGN_GOAL_TIMEOUT` → `handoffs/sovereign_partial_delivery.md` |
+| L7 | Backward compat: `phase_driven` = zero overhead, stop matrix unchanged |
+| L8 | Tests: 8× `test_us0110_*` + parity `--scope=sovereign-convergence` |
+| L9 | Reason codes: 10-code `CONVERGENCE_*` + `SOVEREIGN_GOAL_*` family |
+| L10 | Compose: read-only integration with backlog, deferrals, QA, smoke, ledger |
+| L11 | Performance: cheap evaluation for `/auto` drain loops |
+| L12 | Consumers: **US-0107** drain-generate + notification |
+
+### Reason codes (discovery inventory — research may refine)
+
+| Code | Typical `blocked_by`? | Conjunct |
+|------|----------------------|----------|
+| `CONVERGENCE_OPEN_STORIES_REMAIN` | yes | backlog clear |
+| `CONVERGENCE_DEFERRALS_PENDING` | yes | zero deferrals |
+| `CONVERGENCE_CROSS_REVIEWER_OPEN` | yes | critic resolved |
+| `CONVERGENCE_SMOKE_PROBE_FAIL` | yes | smoke green |
+| `CONVERGENCE_LEDGER_EXTENSIONS_UNAPPROVED` | yes | ledger clean |
+| `SOVEREIGN_GOAL_TIMEOUT` | yes (timeout exit) | cap exhausted |
+| `SOVEREIGN_GOAL_MODE_INVALID` | yes | scratchpad enum |
+| `SOVEREIGN_GOAL_MISSING` | no (warn) | goal resolve |
+| `SOVEREIGN_GOAL_DERIVE_FAILED` | yes | goal resolve |
+| `CONVERGENCE_EVAL_FAILED` | yes | evaluator internal error |
+
+- **Evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json`; `docs/product/backlog.md` (`## US-0110`); `docs/product/vision.md` (Discovery Notes — US-0110)
+
+### Research extension
+
+**Research extension (2026-06-28T17:30:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0110-research-20260628T173000Z-fresh`)**:
+
+**`/research` PASS** — Q1–Q7 closed; companion **`DEC-0110`** authored; architecture ready.
+
+- **Q1 — `ConvergenceResult` + `goal_progress` JSON schemas + validator CLI (closed, DEC-0110 §2–§3, §7)**:
+  - **`ConvergenceResult` v1**: `converged` (bool), `unmet_conditions` (string[]), `blocked_by` (string[]), `conjuncts` (object keyed by five conjunct names with `{status, reason_code|null, skipped}`), `evaluated_at` (ISO UTC), `orchestrator_run_id` (optional), `cache_key` (optional), `schema_version=1`.
+  - **`goal_progress` v1**: wrapper object with nested `goal_progress` containing `goal_text`, `goal_source` (`explicit|vision_derived`), `mode=goal_convergence`, `converged`, `unmet_conditions`, `blocked_by`, `conjuncts`, `evaluated_at`, `orchestrator_run_id`, `schema_version=1`.
+  - **Validator CLI required**: **`scripts/sovereign_convergence_validate.py`** (+ template mirror) with `--convergence-json`, `--goal-progress-json`, `--repo`, `--self-test`, `--enforce`. Mirrors **DEC-0103** pattern; lib-only `schema_check_*` insufficient for CI hooks.
+  - Lib helpers: `schema_check_convergence_result()`, `schema_check_goal_progress()`.
+
+- **Q2 — Helper library API + CLI (closed, DEC-0110 §6)**:
+  **`scripts/sovereign_convergence_lib.py`** (+ template mirror). Core surface:
+  - `is_goal_convergence_enabled(scratchpad) -> bool`
+  - `resolve_goal(scratchpad, repo) -> GoalResolveResult`
+  - `evaluate_convergence(repo, scratchpad, *, orchestrator_run_id=None, iteration=None) -> ConvergenceResult`
+  - `build_goal_progress_block(result, goal_text, goal_source, orchestrator_run_id) -> dict`
+  - `write_partial_delivery_report(repo, result, goal_text, timeout_reason, orchestrator_run_id) -> Path`
+  - `check_timeout(scratchpad, iteration_count) -> (bool, reason_code|None)`
+  - `clear_eval_cache() -> None` (test helper)
+  - `self_test() -> bool` → `[SOVEREIGN_CONVERGENCE_SELF_TEST_OK]`
+  - CLI: `--self-test`, `--evaluate`, `--dump-progress`, `--repo`, `--orchestrator-run-id`. Exit 0/1/2.
+  - Research stub shipped with schemas + self-test; full predicate implementation deferred to execute tranche B.
+
+- **Q3 — Degrade matrix when upstream artifacts absent (closed, DEC-0110 §4)**:
+
+  | Conjunct | Artifact | Absent behavior | Failure behavior |
+  |----------|----------|-----------------|------------------|
+  | backlog clear | `docs/product/backlog.md` | never skip | `CONVERGENCE_OPEN_STORIES_REMAIN` → **blocked_by** |
+  | zero deferrals | `handoffs/sovereign_deferrals.jsonl` | file absent → **skip**; `deferral_register_not_yet_deployed` in **unmet_conditions** only | non-empty → `CONVERGENCE_DEFERRALS_PENDING` → **blocked_by** |
+  | critic resolved | `sovereign_critic_findings.jsonl` OR sprint `qa-findings.md` | both absent → **skip**; `critic_register_not_yet_deployed` in **unmet_conditions** only | open blocking finding → `CONVERGENCE_CROSS_REVIEWER_OPEN` → **blocked_by** |
+  | smoke green | `tests/report.md` + active sprint `uat.json` | either missing → **fail-closed** | probe fail → `CONVERGENCE_SMOKE_PROBE_FAIL` → **blocked_by** |
+  | ledger clean | sovereign ledger via **US-0103** | `AI_DECISION_LEDGER=0` → **skip**; `ledger_disabled_skip` in **unmet_conditions** only | unapproved extensions → `CONVERGENCE_LEDGER_EXTENSIONS_UNAPPROVED` → **blocked_by** |
+
+  **Rule**: US-0104/US-0107 not deployed → **skip** (informational). Missing smoke under `goal_convergence` → **fail-closed**. **US-0109** deploy smoke orthogonal to convergence v1 (R3).
+
+- **Q4 — Vision auto-derive algorithm (closed, DEC-0110 §5)**:
+  1. Explicit `SOVEREIGN_GOAL` wins (truncate to `SOVEREIGN_GOAL_MAX_CHARS`, default 512).
+  2. Read `docs/product/vision.md` UTF-8.
+  3. Skip: headings, code fences, lists, blockquotes, HTML comments, empty lines; skip `## Discovery Notes —` and `## Intake Notes —` sections entirely.
+  4. Collect eligible prose paragraphs; take first `SOVEREIGN_GOAL_TOP_N` (default 3).
+  5. Join with `" — "`; truncate on word boundary.
+  6. Zero eligible paragraphs or unreadable file → `SOVEREIGN_GOAL_DERIVE_FAILED` (**blocked_by**).
+  - Added scratchpad key **`SOVEREIGN_GOAL_MAX_CHARS`** (default 512) for truncation cap.
+
+- **Q5 — Contract-test inventory + parity file list (closed, DEC-0110 §8)**:
+  Eight `test_us0110_*` markers in **`tests/us0110_contract_test.py`**:
+  1. `test_us0110_scratchpad_keys_literals`
+  2. `test_us0110_evaluator_five_conjunct_contract`
+  3. `test_us0110_goal_authoring_explicit_and_derive`
+  4. `test_us0110_goal_progress_block_shape`
+  5. `test_us0110_partial_delivery_timeout`
+  6. `test_us0110_reason_code_inventory`
+  7. `test_us0110_phase_driven_zero_overhead`
+  8. `test_us0110_compose_no_stop_matrix_change`
+
+  **`SOVEREIGN_CONVERGENCE_PAIRS`** manifest for `check_intake_template_parity.py --scope=sovereign-convergence`:
+  - `scripts/sovereign_convergence_lib.py` ↔ `template/scripts/sovereign_convergence_lib.py`
+  - `scripts/sovereign_convergence_validate.py` ↔ `template/scripts/sovereign_convergence_validate.py`
+  - `.cursor/scratchpad.md` ↔ `template/.cursor/scratchpad.md` (SOVEREIGN_GOAL_* key declarations)
+  - `decisions/DEC-0110.md` ↔ `template/decisions/DEC-0110.md`
+
+- **Q6 — Performance budget + memoization (closed, DEC-0110 §9)**:
+  - Target: **≤ 50 ms** p95 per `evaluate_convergence` on 500-story backlog.
+  - Backlog: line-scoped regex scan for `- Status: OPEN` within `## US-xxxx` blocks only (no full markdown parse).
+  - Ledger: `read_entries(last_n=100)` via **US-0103**.
+  - Memoization key: `f"{backlog_mtime}:{deferral_mtime}:{critic_mtime}:{report_mtime}:{uat_mtime}:{ledger_mtime}"`; module-level cache invalidated on any mtime change.
+
+- **Q7 — Companion `DEC-xxxx` necessity (closed)**:
+  **YES — new `DEC-0110` required**. Rationale:
+  - US-0110 introduces **new scratchpad keys** (`SOVEREIGN_GOAL_*`), **new artifact surface** (`handoffs/sovereign_partial_delivery.md`, `goal_progress` block in `resume_brief.md`), **five-conjunct predicate + degrade matrix**, and **10 reason codes** — not trivial extensions of discovery locks.
+  - Discovery L1–L12 necessary but insufficient for architecture — lack rejected alternatives, composition analysis vs **US-0088/0092/0095/0044/0103**, and validator CLI contract.
+  - **`DEC-0110`** authored: `decisions/DEC-0110.md` (13 sections).
+
+- **Next**: **`/architecture`** (fresh **tech-lead**) — append `# US-0110` to `docs/engineering/architecture.md`, expand task seeds, lock sprint-plan inputs.
+
+**Evidence**:
+- `decisions/DEC-0110.md`
+- `scripts/sovereign_convergence_lib.py` (research stub + self-test)
+- `docs/product/backlog.md` (US-0110 `research_notes` appended)
+- `handoffs/po_to_tl.md` (US-0110 research handoff)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+
+### Delivery closure (R-0091 — US-0110, 2026-06-28, curator, auto-20260628-04)
+
+- **Delivery closure (2026-06-28T21:30:00Z, curator, `orchestrator_run_id=auto-20260628-04`)**: **`US-0110`** **DONE**; sprint **`S0110`** **released**; convergence predicate + goal progress + partial-delivery contract delivered per **`DEC-0110`**, **`docs/engineering/architecture.md`** **`# US-0110`**, **`scripts/sovereign_convergence_lib.py`**, **`scripts/sovereign_convergence_validate.py`**, eight **`test_us0110_*`** contract markers, parity **`--scope=sovereign-convergence`**; curator **`/refresh-context`** reconciles research posture with delivery (**`handoffs/releases/S0110-release-notes.md`**, **`docs/engineering/state.md`** refresh-context checkpoint). **`R-0091`** **delivered** (Q1–Q7 closed at research; execute/release satisfied).
+
+## R-0092 — US-0104: Cross-Model Adversarial Critic (three-lens jury + anti-slop + degraded fallback)
+
+- **Date**: 2026-06-28
+- **Topic**: Per-phase cross-model critic subagent, Challenger/Architect/Subtractor lenses, parallel-jury reconciliation, anti-slop scoring, single-model degraded fallback, `model_id` isolation evidence extension
+- **Query**: How to implement default-off cross-model adversarial critique after each sovereign-loop phase without amending US-0048/US-0069/US-0023/US-0110 semantics, populating `handoffs/sovereign_critic_findings.jsonl` for US-0110 conjunct 3 and setting `cross_model_reviewed` on US-0103 ledger entries?
+- **Status**: **delivered** (Q1–Q7 closed — architecture next)
+- **Confidence**: high
+- **Story**: **US-0104**
+- **Linked**: **US-0104**, **US-0048**, **US-0069**, **US-0023**, **US-0101**, **US-0102**, **US-0103**, **US-0110**, **US-0108**, **US-0045**, **R-0088**, **R-0089**, **R-0091**
+- **Discovery anchor**: `handoffs/po_to_tl.md` (US-0104 discovery handoff, `orchestrator_run_id=auto-20260628-04`, discovery **PASS**) — discovery locks L1–L12 in backlog `## US-0104` `discovery_notes`.
+- **Note**: **`R-0090`** = **US-0112**; **`R-0091`** = **US-0110** delivered; **US-0104** uses **`R-0092`** per next-available ID policy.
+- **Research asks (discovery-locked Q1–Q7)**:
+  1. **Q1**: Exact **`sovereign_critic_findings.jsonl`** v1 schema (field types, required/optional, enum literals) + **`scripts/sovereign_critic_validate.py`** CLI surface (`--file`, `--repo`, `--self-test`, `--enforce`, `--open-blocking`).
+  2. **Q2**: Full **`scripts/sovereign_critic_lib.py`** API — `reconcile_findings`, `append_finding`, `read_open_blocking`, `resolve_finding`, `build_qa_cross_reviewer_block`, `select_critic_model`, `compute_anti_slop_aggregate`, `is_cross_model_review_enabled`, `self_test`; issue-normalization key for parallel-jury agreement (e.g. normalized title hash vs semantic cluster — research must pick deterministic v1).
+  3. **Q3**: **`select_critic_model(producer_model_id, scratchpad, phase_id)`** algorithm composing **US-0101** tier aliases + **US-0102** direct slug / role catalog — deterministic rule: prefer different tier (producer `strong` → critic `cheap` or next catalog slug); same slug → **`CROSS_MODEL_DEGRADED_MODE`**; document **R-0088** Cursor routing limitations.
+  4. **Q4**: Anti-slop rubric (deterministic 0–10 per lens checklist in lib or command prose) + aggregate formula (discovery default **`min(lens_scores)`**) + **`/auto`** rework loop wiring + **`dev_to_qa.md`** / isolation evidence tuple extensions when rework triggered.
+  5. **Q5**: Isolation evidence **`model_id`** v2 additive extension — runbook placement, fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`** matrix (only when `CROSS_MODEL_REVIEW=1`), regression guard **`test_us0104_us0048_compose_no_base_schema_change`**.
+  6. **Q6**: Contract-test inventory **`test_us0104_*`** (8 markers) + **`check_intake_template_parity.py --scope=sovereign-critic`** (**`SOVEREIGN_CRITIC_PAIRS`** file list: lib, validator, command, scratchpad comment block).
+  7. **Q7**: Companion **`DEC-xxxx`** necessity — new decision for critic findings artifact + lens enum + anti-slop contract, or discovery locks suffice for architecture?
+
+### Discovery locks summary (L1–L12)
+
+| Lock | Decision |
+|------|----------|
+| L1 | Scratchpad: `CROSS_MODEL_REVIEW`, `CROSS_MODEL_ANTISLOP_THRESHOLD`, `CROSS_MODEL_REWORK_MAX` |
+| L2 | Command: `/sovereign-critic` + orchestrator post-phase hook |
+| L3 | Lenses: `challenger` \| `architect` \| `subtractor` (all three per invocation) |
+| L4 | Artifact: `handoffs/sovereign_critic_findings.jsonl` append-only JSONL v1 |
+| L5 | Library: `scripts/sovereign_critic_lib.py` + parallel-jury reconciliation |
+| L6 | Isolation: additive `model_id` on US-0048 evidence when critic enabled |
+| L7 | Anti-slop: 0–10 per lens; aggregate threshold + bounded rework loop |
+| L8 | Degraded: single-model-multi-lens when no distinct critic slug |
+| L9 | Ledger: set `cross_model_reviewed=true` via US-0103 lib when ledger enabled |
+| L10 | Tests: 8× `test_us0104_*` + parity `--scope=sovereign-critic` |
+| L11 | Reason codes: 10-code `CROSS_MODEL_*` + `ISOLATION_EVIDENCE_MODEL_ID_MISSING` family |
+| L12 | Compose: US-0048/US-0069/US-0023/US-0110 unchanged; populates US-0110 `CRITIC_PATH` |
+
+### Reason codes (discovery inventory — research refined)
+
+| Code | Typical blocking? | Surface |
+|------|-------------------|---------|
+| `CROSS_MODEL_REVIEW_DISABLED` | no (info) | scratchpad gate off |
+| `CROSS_MODEL_CRITIC_SPAWN_FAILED` | yes | orchestrator hook |
+| `CROSS_MODEL_MODEL_COLLISION` | no → degraded | same slug resolved |
+| `CROSS_MODEL_ANTISLOP_FAIL` | yes (rework) | score below threshold |
+| `CROSS_MODEL_REWORK_CAP_EXHAUSTED` | yes (gate) | rework max hit |
+| `CROSS_MODEL_FINDINGS_INVALID` | yes | schema validation |
+| `CROSS_MODEL_RECONCILE_FAILED` | yes | jury merge error |
+| `CROSS_MODEL_DEGRADED_MODE` | no (info) | single-model fallback |
+| `CROSS_MODEL_CRITIC_MODEL_UNAVAILABLE` | yes → degraded | catalog miss |
+| `ISOLATION_EVIDENCE_MODEL_ID_MISSING` | yes | critic enabled, evidence incomplete |
+
+### Upstream composition notes
+
+- **US-0110** (**R-0091** delivered): conjunct 3 reads **`handoffs/sovereign_critic_findings.jsonl`** via **`sovereign_convergence_lib.CRITIC_PATH`**; when file absent → **skip** (`critic_register_not_yet_deployed`). US-0104 delivery **activates** this conjunct for goal-convergence runs.
+- **US-0103** (**R-0089** delivered): ledger field **`cross_model_reviewed`** already in 12-field v1 schema; US-0104 sets `true` after critic weighs in — **no** ledger schema change.
+- **US-0101** / **US-0102** (**R-0088** delivered): model resolution inputs for **`select_critic_model`**; cross-model selection must not amend tier/precedence chains.
+
+### Research extension
+
+**Research extension (2026-06-28T22:00:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0104-research-20260628T220000Z-fresh`)**:
+
+**`/research` PASS** — Q1–Q7 closed; companion **`DEC-0104`** authored; architecture ready.
+
+- **Q1 — Findings JSONL schema v1 + validator CLI (closed, DEC-0104 §2, §9)**:
+  - **15 required fields** (no extras, no missing): `ts`, `orchestrator_run_id`, `phase_id`, `role`, `producer_model_id`, `critic_model_id`, `lens`, `finding_id`, `severity`, `confidence`, `anti_slop_score`, `finding_text`, `status`, `blocking`, `degraded_mode`.
+  - Optional v1: `issue_key`, `single_finder`, `rework_generation`.
+  - Enums: `lens` ∈ {`challenger`,`architect`,`subtractor`}; `severity` ∈ {`low`,`medium`,`high`,`critical`}; `confidence` ∈ {`high`,`medium`,`low`}; `status` ∈ {`open`,`resolved`,`waived`}.
+  - **`scripts/sovereign_critic_validate.py`** (+ template mirror): `--file`, `--repo`, `--self-test`, `--enforce`, `--open-blocking`. Exit 0/1/2 mirrors **DEC-0103** pattern. Success token: **`[SOVEREIGN_CRITIC_VALIDATION_OK]`**.
+
+- **Q2 — Helper library API + reconciliation key (closed, DEC-0104 §3–§4, §8)**:
+  **`scripts/sovereign_critic_lib.py`** (+ template mirror). Core surface:
+  - `is_cross_model_review_enabled(scratchpad) -> bool`
+  - `select_critic_model(producer_model_id, scratchpad, phase_id) -> SelectCriticResult`
+  - `compute_issue_key(finding_text) -> str` — lowercase → strip punctuation → collapse whitespace → truncate 80 chars → SHA-256 prefix `ik_<16hex>`
+  - `reconcile_findings(raw_findings) -> ReconciliationResult` — ≥2 lenses same `issue_key` → `confidence=high`; exactly 1 → `confidence=medium`, `single_finder=true`
+  - `compute_anti_slop_aggregate(lens_scores) -> min(lens_scores)`
+  - `score_lens_antislop(lens, checklist_hits) -> int` — 4 checklist items × 2.5 pts, clamp 0–10
+  - `append_finding`, `read_open_blocking`, `resolve_finding`, `build_qa_cross_reviewer_block`, `schema_check`, `self_test`
+  - Research stub shipped with schemas + self-test (`[SOVEREIGN_CRITIC_SELF_TEST_OK]`); spawn orchestration deferred to execute tranche C.
+
+- **Q3 — `select_critic_model` algorithm (closed, DEC-0104 §5)**:
+  1. Resolve producer slug via caller or **`model_tier_lib.resolve_model_for_phase(phase_id, scratchpad)`**.
+  2. Map producer to tier: `fast`→`cheap`, `inherit`/empty→`balanced`, vendor slug→`strong` (catalog lookup when `local_catalog`).
+  3. Critic tier opposition: `strong`→`cheap`, `balanced`→`cheap`, `cheap`→`strong`.
+  4. Resolve critic slug via tier chain for phase `sovereign-critic`.
+  5. Normalized slug equality → `degraded=True`, **`CROSS_MODEL_DEGRADED_MODE`** (single-model-multi-lens per L8).
+  6. **R-0088** limitations documented: Task tool `model` override, BYOK non-inheritance, `inherit` plan variance — degrade, not hard stop.
+
+- **Q4 — Anti-slop rubric + rework orchestration (closed, DEC-0104 §6)**:
+  - Per-lens 4-item checklist (deterministic 0–10); aggregate **`min(lens_scores)`** locked for **US-0108** stability.
+  - **`/auto`** post-phase: aggregate **< `CROSS_MODEL_ANTISLOP_THRESHOLD`** → rework producer (fresh context, critic summary read-only); cap **`CROSS_MODEL_REWORK_MAX`** → **`CROSS_MODEL_REWORK_CAP_EXHAUSTED`** decision gate.
+  - **`dev_to_qa.md`** additive `critic_evidence` tuple: `producer_model_id`, `critic_model_id`, `anti_slop_aggregate`, `rework_generation`, `degraded_mode`, `findings_path`.
+
+- **Q5 — Isolation evidence `model_id` v2 + fail-closed matrix (closed, DEC-0104 §7)**:
+  - Additive **`model_id`** on **US-0048** evidence tuple; required on producer **and** critic rows when `CROSS_MODEL_REVIEW=1`; omitted when `0`.
+  - **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`** fail-closed only when critic enabled.
+  - Regression: **`test_us0104_us0048_compose_no_base_schema_change`**.
+
+- **Q6 — Contract-test inventory + parity (closed, DEC-0104 §12)**:
+  Eight **`test_us0104_*`** markers in **`tests/us0104_contract_test.py`**:
+  1. `test_us0104_scratchpad_keys_literals`
+  2. `test_us0104_sovereign_critic_command_literals`
+  3. `test_us0104_three_lens_enum_contract`
+  4. `test_us0104_findings_jsonl_schema_contract`
+  5. `test_us0104_reconciliation_agreement_branches`
+  6. `test_us0104_model_id_isolation_evidence_extension`
+  7. `test_us0104_antislop_rework_cap_literals`
+  8. `test_us0104_degraded_fallback_zero_overhead`
+
+  Compose regression guards: `test_us0104_us0048_compose_no_base_schema_change`, `test_us0104_us0110_critic_path_unchanged`.
+
+  **`SOVEREIGN_CRITIC_PAIRS`** for `check_intake_template_parity.py --scope=sovereign-critic`:
+  - `scripts/sovereign_critic_lib.py` ↔ `template/scripts/sovereign_critic_lib.py`
+  - `scripts/sovereign_critic_validate.py` ↔ `template/scripts/sovereign_critic_validate.py`
+  - `.cursor/commands/sovereign-critic.md` ↔ `template/.cursor/commands/sovereign-critic.md`
+  - `.cursor/scratchpad.md` ↔ `template/.cursor/scratchpad.md` (`CROSS_MODEL_*` block)
+  - `decisions/DEC-0104.md` ↔ `template/decisions/DEC-0104.md`
+
+- **Q7 — Companion `DEC-xxxx` necessity (closed)**:
+  **YES — new `DEC-0104` required**. Rationale:
+  - US-0104 introduces **new scratchpad keys** (`CROSS_MODEL_*`), **new artifact surface** (`handoffs/sovereign_critic_findings.jsonl`), **15-field JSONL schema**, **three-lens enum**, **anti-slop rubric + rework contract**, and **10 reason codes** — not trivial extensions of discovery locks.
+  - Discovery L1–L12 necessary but insufficient — lack rejected alternatives, **R-0088** routing analysis, and composition vs **US-0048/0069/0023/0110/0103** formalization.
+  - **`DEC-0104`** authored: `decisions/DEC-0104.md` (15 sections).
+
+- **Status**: **`current`** → **`delivered`** (Q1–Q7 closed; architecture-ready).
+- **Next**: **`/architecture`** (fresh **tech-lead**) — append `# US-0104` to `docs/engineering/architecture.md`, expand task seeds, lock sprint-plan inputs.
+
+**Evidence**:
+- `decisions/DEC-0104.md`
+- `scripts/sovereign_critic_lib.py` (research stub + self-test)
+- `docs/product/backlog.md` (US-0104 `research_notes` appended)
+- `handoffs/po_to_tl.md` (US-0104 research handoff)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+
+- **Delivery closure (2026-06-29T00:04:00Z, curator, `orchestrator_run_id=auto-20260628-04`)**: **`US-0104`** **DONE**; sprint **`S0104`** **released**; cross-model adversarial critic delivered per **`DEC-0104`**, **`docs/engineering/architecture.md`** **`# US-0104`**, **`scripts/sovereign_critic_lib.py`**, **`scripts/sovereign_critic_validate.py`**, ten **`test_us0104_*`** contract markers, parity **`--scope=sovereign-critic`**; curator **`/refresh-context`** reconciles research posture with delivery (**`handoffs/releases/S0104-release-notes.md`**, **`docs/engineering/state.md`** refresh-context checkpoint). **`R-0092`** **delivered** (Q1–Q7 closed at research; execute/release satisfied). **`handoffs/sovereign_critic_findings.jsonl`** now populates **US-0110** conjunct 3.
+
+## R-0093 — US-0105: Sovereign Memory (project-level learnings substrate + bounded injection)
+
+- **Date**: 2026-06-29
+- **Topic**: Institutional memory directory, JSONL artifact schemas, bounded phase-spawn injection
+- **Query**: How to persist cross-run project learnings (decisions, mistakes, patterns, plan drift) and inject bounded digests into phase spawns without amending US-0029 research curation or US-0080 token-cost contracts
+- **Status**: **delivered** (Q1–Q7 closed — architecture next)
+- **Confidence**: high
+- **Story**: **US-0105**
+- **Linked**: **US-0105**, **US-0029**, **US-0080**, **US-0103**, **US-0096**, **US-0072**, **US-0107**, **US-0110**, **DEC-0062**, **DEC-0103**, **US-0045**
+- **Discovery anchor**: `handoffs/archive/po-to-tl-pack-20260628-f.md` (US-0105 discovery handoff, `orchestrator_run_id=auto-20260628-04`, discovery **PASS**) — discovery locks L1–L12 in backlog `## US-0105` `discovery_notes`.
+
+### Discovery locks summary (L1–L12)
+
+| Lock | Decision |
+|------|----------|
+| L1 | Scratchpad: `SOVEREIGN_MEMORY`, `SOVEREIGN_MEMORY_TOP_N`, `SOVEREIGN_MEMORY_TOP_K`, `SOVEREIGN_MEMORY_MAX_CHARS` |
+| L2 | Directory: `docs/engineering/sovereign-memory/` + template mirror |
+| L3 | Four JSONL v1 families + shared base fields |
+| L4 | `build_injection_digest()` — top-N recent + top-K high-impact + char cap |
+| L5 | Phase spawn read-only `sovereign_memory_digest` block (US-0023-safe) |
+| L6 | Curator retrospective + optional ledger promotion |
+| L7 | `decision_key` SHA-256 prefix dedup |
+| L8 | Mistake-tagging on orchestrator-detectable events |
+| L9 | US-0103 compose — optional `promote_from_ledger()` |
+| L10 | US-0029 compose — no research.md schema change |
+| L11 | US-0080 compose — lib-side digest truncation only |
+| L12 | JSONL rollover to `sovereign-memory-archive/` — not triad (**US-0072**) |
+
+### Research extension
+
+**Research extension (2026-06-29T00:06:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0105-research-20260629T000600Z-fresh`)**:
+
+**`/research` PASS** — Q1–Q7 closed; companion **`DEC-0105`** recommended; architecture ready.
+
+#### External references (EARLY_RESEARCH=1)
+
+- [Append-only event log for multi-agent systems](https://munderdiffl.in/blog/append-only-event-log-agents/) — JSONL append-cheap, reference large artifacts by ID not inline, rotate without editing old lines; aligns with L11 char cap + L12 archive rollover.
+- [eml-memory v0.1.0](https://pypi.org/project/eml-memory/) — typed append-only store with `decision`/`fact`/`retraction` kinds and tag query; **rejected** as dependency — its-magic stays stdlib-only; v1 uses closed JSONL schemas + lib-side digest instead of external package.
+- [Memory versioning for regulated agents](https://ninadpathak.com/blog/memory-versioning-and-audit-trails/) — append-only + `status`/`valid_to` supersession pattern; adopted as **`status`** enum (`active`|`superseded`|`archived`) on all families for stale-injection control (R4).
+
+- **Q1 — JSONL v1 schemas + validator CLI (closed, DEC-0105 §2–§3)**:
+  - **Bootstrap policy**: **create-on-first-write** for JSONL files; ship **`docs/engineering/sovereign-memory/.gitkeep`** + **`retrospectives/.gitkeep`** (+ template mirrors) — no empty tracked JSONL seeds.
+  - **Shared base fields** (all four families): `schema_version` (**1**), `ts` (ISO 8601 UTC), `entry_id` (UUIDv4), optional `source_orchestrator_run_id`, optional `source_story_id`, optional `phase_id`, `impact_score` (int **0..100**), `text` (non-empty, max **2000** chars), `tags` (string[], max **10** items × **40** chars), `status` ∈ {`active`,`superseded`,`archived`} (default **`active`**), optional `provenance_ref` (e.g. `R-0093`, `ledger:<decision_id>`).
+  - **`decisions-log.jsonl`** adds required: `decision_key` (SHA-256 prefix **16** hex of normalized `decision_text`), `decision_text`, `rationale` (max **2000** chars).
+  - **`mistakes.jsonl`** adds required: `mistake_tag` ∈ {`fix_failed`,`revert_applied`,`plan_fidelity_violation`,`test_regression`,`scope_creep`}, `failure_reason_code` (orchestrator reason string, e.g. `FIX_FAILED`, `PLAN_FIDELITY_VIOLATION`).
+  - **`patterns.jsonl`** adds required: `pattern_id` (slug max **64**), `applies_to` (string[] — phase ids or story scopes).
+  - **`plan-drift-register.jsonl`** adds required: `drift_type` ∈ {`ac_drop`,`ac_reorder`,`scope_add`,`plan_change`,`acceptance_drift`}, `from_artifact`, `to_artifact`; optional `ledger_decision_id` (UUID).
+  - **Secret scan**: reject append when `text`/`rationale`/`decision_text` match **`SOVEREIGN_MEMORY_SECRET_DETECTED`** patterns (mirror **US-0103** `LEDGER_SECRET_DETECTED` heuristics: `api_key=`, PEM blocks, `sk-`, `ghp_` prefixes).
+  - **`scripts/sovereign_memory_validate.py`** (+ template mirror): `--file`, `--repo`, `--family {decisions|mistakes|patterns|plan-drift|all}`, `--self-test`, `--enforce`. Exit **0/1/2** mirrors **DEC-0103** / **DEC-0104**. Success token: **`[SOVEREIGN_MEMORY_VALIDATION_OK]`**.
+
+- **Q2 — `sovereign_memory_lib.py` API (closed, DEC-0105 §4)**:
+  **`scripts/sovereign_memory_lib.py`** (+ template mirror). Research stub shipped with schemas + injection + self-test (`[SOVEREIGN_MEMORY_SELF_TEST_OK]`); append/rollover/promotion bodies deferred to execute tranche B.
+
+  | Function | Purpose |
+  |----------|---------|
+  | `is_sovereign_memory_enabled(scratchpad) -> bool` | `SOVEREIGN_MEMORY=1` gate |
+  | `resolve_memory_dir(repo_root) -> Path` | `docs/engineering/sovereign-memory/` |
+  | `resolve_jsonl_path(family, repo_root) -> Path` | Per-family JSONL path |
+  | `read_entries(family, *, tail_n, active_only=True) -> (list, reason\|None)` | Bounded tail read; **`SOVEREIGN_MEMORY_READ_BOUND`** when truncated |
+  | `schema_check(entry, family) -> (bool, error\|None)` | Per-family v1 validation + secret scan |
+  | `compute_decision_key(decision_text) -> str` | Normalized SHA-256 prefix |
+  | `dedupe_decision(text, existing_keys) -> (key, is_duplicate)` | Pre-append dedup probe |
+  | `append_decision` / `append_mistake` / `append_pattern` / `append_drift` | Append-only + fsync + pre-append rollover hook |
+  | `build_injection_digest(repo, scratchpad) -> InjectionDigest` | Bounded digest assembly (§Q3) |
+  | `promote_from_ledger(run_id, *, decision_types) -> (entry_ids, reason\|None)` | Refresh-context optional promotion when **`AI_DECISION_LEDGER=1`** |
+  | `write_retrospective(sprint_id, body) -> (path\|None, reason\|None)` | Curator markdown under **`retrospectives/`** |
+  | `maybe_archive_jsonl(family) -> (ok, reason\|None)` | Line-cap rollover (§Q5) |
+  | `scan_secrets(text) -> ReasonCode\|None` | Pre-append secret guard |
+  | `self_test() -> bool` | Contract self-test |
+
+- **Q3 — Injection merge edge cases (closed, DEC-0105 §5)**:
+  1. **`SOVEREIGN_MEMORY=0`** → empty digest (`digest_text=""`, `entry_ids=[]`, `char_count=0`) — zero overhead.
+  2. **Empty corpus** (no files or no `status=active` entries) → placeholder **`(no sovereign memory entries)`**; **non-fatal**; no fail-closed.
+  3. **Read bound**: lib reads at most **`SOVEREIGN_MEMORY_READ_TAIL`** (default **500**) lines per file tail — never full unbounded file into spawn path; emit **`SOVEREIGN_MEMORY_READ_BOUND`** as warning only.
+  4. **Top-N recent**: merge all four families' active entries; sort **`ts` desc**, tie-break **`entry_id` asc**; take first **N** unique `entry_id`s.
+  5. **Top-K high-impact**: from **`patterns`** + **`mistakes`** only; sort **`impact_score` desc**, tie-break **`ts` desc**, then **`entry_id` asc**; skip ids already in recent pool; take **K** more.
+  6. **Digest layout**: `## Recent learnings` section then `## High-impact patterns`; each line names-only: `- [family] entry_id: text` (per-line text truncated to **160** chars before global cap).
+  7. **Global cap**: hard truncate assembled digest to **`SOVEREIGN_MEMORY_MAX_CHARS`** (suffix **`...`** if truncated).
+  8. **Cross-file ordering**: recent pool is time-global (not per-file round-robin); high-impact pool is score-global.
+  9. **Retrospectives**: **not injected v1** (human audit only per L6).
+
+- **Q4 — Mistake-tagging orchestrator wiring (closed, DEC-0105 §6)**:
+  All hooks **no-op when `SOVEREIGN_MEMORY=0`**. Writes call `append_mistake()` with closed **`mistake_tag`** + orchestrator **`failure_reason_code`**.
+
+  | Trigger | `mistake_tag` | `failure_reason_code` | Wiring surface |
+  |---------|---------------|----------------------|----------------|
+  | Execute auto-loop exhausts fix attempts / tests still red | `fix_failed` | `FIX_FAILED` | **`/auto`** post-execute when **`AUTO_IMPLEMENTATION_LOOP=1`** and cycle cap hit with failing tests |
+  | Git revert / rollback recorded in execute findings | `revert_applied` | `REVERT_APPLIED` | **`/execute`** rollback sub-step or execute-findings revert tuple |
+  | Plan-fidelity hard stop | `plan_fidelity_violation` | `PLAN_FIDELITY_VIOLATION` (or sub-code) | Compose hook from **`decision_ledger_lib.classify_deviation`** when blocking + ledger append — **optional import**, no **US-0103** schema change |
+  | QA regression after green execute | `test_regression` | `TEST_REGRESSION` | **`/qa`** fail-closed path (optional v1 — architecture may defer to v1.1) |
+  | Extended-mode scope add without override | `scope_creep` | `PLAN_FIDELITY_SCOPE_GATE` | Same fidelity hook family |
+
+  **Compose **US-0103****: ledger remains per-run audit; mistake hook **reads** ledger context (`decision_id`, `phase_id`) for `provenance_ref=ledger:<id>` but **does not** mutate ledger schema. **`promote_from_ledger()`** runs only at **`/refresh-context`** when both **`SOVEREIGN_MEMORY=1`** and **`AI_DECISION_LEDGER=1`**.
+
+- **Q5 — JSONL rollover vs US-0072 (closed, DEC-0105 §7)**:
+  - **Not triad**: sovereign-memory JSONL is **explicitly excluded** from **US-0072** / **DEC-0054** triad hot surfaces (`state.md`, `po_to_tl.md`, `architecture.md`) per discovery L12.
+  - **New scratchpad key**: **`SOVEREIGN_MEMORY_JSONL_MAX_LINES`** (default **500**, operator override) — distinct from triad line caps.
+  - **Rollover trigger**: on any mutating append when active file line count **>** cap → atomically move to **`docs/engineering/sovereign-memory-archive/<basename>-<YYYYMMDDTHHMMSSZ>.jsonl`**, create fresh empty file at original path, emit verification tuple (`boundary`, `moved`, `retained`, `pack_ref`) in mutating phase log.
+  - **Fail-closed**: rollover I/O failure → **`SOVEREIGN_MEMORY_ARCHIVE_REQUIRED`** (block append).
+  - **Idempotency**: second rollover attempt in same boundary must not duplicate archive packs (check destination exists → fail-closed).
+  - **Retrospectives**: markdown files **not** subject to JSONL line cap v1; curator-owned growth acceptable.
+  - **Contrast with US-0072**: triad rollover compacts **hot phase context**; sovereign-memory archive compacts **cold institutional learnings** — different paths, owners, and reason-code families.
+
+- **Q6 — Contract-test inventory + parity (closed, DEC-0105 §12)**:
+  Eight **`test_us0105_*`** markers in **`tests/us0105_contract_test.py`**:
+  1. `test_us0105_scratchpad_keys_literals`
+  2. `test_us0105_sovereign_memory_directory_contract`
+  3. `test_us0105_jsonl_schema_contract`
+  4. `test_us0105_injection_digest_char_cap`
+  5. `test_us0105_decision_dedup_branch`
+  6. `test_us0105_mistake_tagging_literals`
+  7. `test_us0105_zero_overhead_default`
+  8. `test_us0105_compose_guards`
+
+  Compose regression guards (AC-8): **`test_us0105_us0029_compose_no_research_schema_change`**, **`test_us0105_us0080_injection_respects_char_cap`**.
+
+  **`SOVEREIGN_MEMORY_PAIRS`** for `check_intake_template_parity.py --scope=sovereign-memory`:
+  - `scripts/sovereign_memory_lib.py` ↔ `template/scripts/sovereign_memory_lib.py`
+  - `scripts/sovereign_memory_validate.py` ↔ `template/scripts/sovereign_memory_validate.py`
+  - `.cursor/scratchpad.md` ↔ `template/.cursor/scratchpad.md` (`SOVEREIGN_MEMORY_*` block)
+  - `docs/engineering/sovereign-memory/.gitkeep` ↔ `template/docs/engineering/sovereign-memory/.gitkeep`
+  - `decisions/DEC-0105.md` ↔ `template/decisions/DEC-0105.md`
+
+- **Q7 — Companion `DEC-xxxx` necessity (closed)**:
+  **YES — new `DEC-0105` required**. Rationale:
+  - US-0105 introduces **four new scratchpad keys** (+ rollover key), **new directory surface**, **four distinct JSONL schemas**, **injection algorithm**, **mistake-tagging hook contract**, **ledger promotion compose**, **archive policy distinct from US-0072**, and **8+ reason codes** — not trivial extensions of discovery locks alone.
+  - Discovery L1–L12 necessary but insufficient — lack rejected alternatives (empty JSONL seeds vs create-on-first-write; per-file injection vs global merge; hash-chain integrity vs simple append-only), **US-0072** boundary formalization, and **US-0107** read-API stability notes.
+  - **`DEC-0105`** to be authored at **`/architecture`** (research recommends; not written at research phase).
+
+### Reason codes (research inventory — architecture locks)
+
+| Code | Typical blocking? | Surface |
+|------|-------------------|---------|
+| `SOVEREIGN_MEMORY_DISABLED` | no (info) | scratchpad gate off |
+| `SOVEREIGN_MEMORY_SCHEMA_INVALID` | yes | validator / append |
+| `SOVEREIGN_MEMORY_APPEND_FAILED` | yes | I/O / permission |
+| `SOVEREIGN_MEMORY_DECISION_DUPLICATE` | no (skip append) | dedup on `decision_key` |
+| `SOVEREIGN_MEMORY_SECRET_DETECTED` | yes | pre-append scan |
+| `SOVEREIGN_MEMORY_ARCHIVE_REQUIRED` | yes | rollover fail-closed |
+| `SOVEREIGN_MEMORY_READ_BOUND` | no (warning) | tail read truncated |
+| `SOVEREIGN_MEMORY_PROMOTION_SKIPPED` | no (info) | ledger off or filter empty |
+
+- **Risks** (carry to `/architecture`):
+  - R1: Token bloat — char cap + tail read + lib-side digest mandatory.
+  - R2: Research vs learnings overlap — `provenance_ref` only; no **`research.md`** schema change.
+  - R3: Ledger vs decisions-log confusion — distinct paths/schemas + runbook table.
+  - R4: Stale injection — `status` supersession + optional impact decay at architecture.
+  - R5: Secret leakage — `SOVEREIGN_MEMORY_SECRET_DETECTED` scan on all free-text fields.
+  - R6: **US-0107** read API — stable `read_entries` / `build_injection_digest` surface; version via `schema_version`.
+
+- **Next**: **`/architecture`** (fresh **tech-lead**) — author **`# US-0105`**, companion **`DEC-0105`**, atomic task seeds, **`test_us0105_*`** literals, runbook operator recipes.
+
+**Evidence**:
+- `scripts/sovereign_memory_lib.py` (research stub + self-test)
+- `docs/product/backlog.md` (`## US-0105` — `discovery_notes`)
+- `docs/product/vision.md` (**Discovery Notes — US-0105**)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+- `handoffs/archive/po-to-tl-pack-20260628-f.md` (US-0105 discovery handoff)
+
+### Delivery closure (2026-06-29T00:14:00Z, curator, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=curator-S0105-refresh-20260629T001400Z-fresh`)
+
+- **Status**: **delivered** — Q1–Q7 closed; **`DEC-0105`** locked and shipped via **`S0105`** / **US-0105** release **`2026-06-29T00:13:00Z`**; curator segment closure **`2026-06-29T00:14:00Z`**.
+- **Anchor**: **US-0105** / **S0105** — `handoffs/releases/S0105-release-notes.md`, `docs/engineering/sovereign-memory/retrospectives/S0105.md`.
+- **Compose verified**: US-0029 research schema unchanged; US-0080 char-cap lib-side; US-0103 ledger optional promotion only at refresh-context.
+
+## R-0094 — US-0107: Sovereign Loop Mode (AUTO_SOVEREIGN — deferral register + drain-generate + notification)
+
+- **Date**: 2026-06-29
+- **Topic**: Sovereign loop orchestration — deferral register, drain-generate PO spawn, notification dispatch, convergence hooks
+- **Query**: How to implement AUTO_SOVEREIGN autonomous delivery layer (deferrals, drain-generate, notifications) composing US-0088/US-0092/US-0095/US-0103/US-0105/US-0110 without amending native-chain or stop-matrix contracts
+- **Status**: **delivered** (Q1–Q7 closed — architecture next)
+- **Confidence**: high
+- **Story**: **US-0107**
+- **Linked**: **US-0107**, **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103**, **US-0105**, **US-0109**, **US-0110**, **DEC-0110**, **DEC-0105**, **DEC-0103**, **US-0045**, **US-0069**
+- **Discovery anchor**: `handoffs/po_to_tl.md` (US-0107 discovery handoff, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=po-US0107-discovery-20260629T001500Z-fresh`, discovery **PASS**) — discovery locks L1–L12 in backlog `## US-0107` `discovery_notes`.
+
+### Discovery locks summary (L1–L12)
+
+| Lock | Decision |
+|------|----------|
+| L1 | Scratchpad: `AUTO_SOVEREIGN`, `AUTO_SOVEREIGN_DEFERRAL_MAX`, `AUTO_SOVEREIGN_DRAIN_GENERATE_MAX`, `AUTO_SOVEREIGN_DEFERRAL_POLICY`, `SOVEREIGN_NOTIFY_*` |
+| L2 | Deferral register: `handoffs/sovereign_deferrals.jsonl` JSONL v1 |
+| L3 | `sovereign_loop_lib.py` — `advance_sovereign_loop`, deferral CRUD |
+| L4 | Drain-generate: zero OPEN stories + not converged → PO spawn + decision gate per candidate |
+| L5 | Notification: ntfy/hook v1; fail-open; convergence/timeout/cap events |
+| L6 | US-0109 integration declaration — `DEPLOY_DEFERRED` → register |
+| L7 | US-0088/US-0092/US-0095 compose — layer only; stop matrix unchanged |
+| L8 | US-0103 compose — deferral provenance optional; ledger schema unchanged |
+| L9 | US-0105 compose — drain-generate reads injection digest only |
+| L10 | US-0110 convergence hooks — import `evaluate_convergence`; terminal predicate |
+| L11 | US-0044/US-0087 — drain until sovereign terminal; mutex unchanged |
+| L12 | Contract tests + `SOVEREIGN_LOOP_PAIRS` parity |
+
+### Research extension
+
+**Research extension (2026-06-29T00:16:00Z, tech-lead, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=tl-US0107-research-20260629T001600Z-fresh`)**:
+
+**`/research` PASS** — Q1–Q7 closed; companion **`DEC-0107`** recommended; architecture ready.
+
+#### External references (EARLY_RESEARCH=1)
+
+- [ntfy publish API](https://docs.ntfy.sh/publish/) — stdlib `urllib` POST/PUT to `https://ntfy.sh/{topic}`; topic name acts as password ([-\_A-Za-z0-9]{1,64}); optional `Title`, `Priority`, `Tags` headers — adopted for v1 adapter; topic/base URL from scratchpad.local or env only (R4).
+- [Append-only event log for multi-agent systems](https://munderdiffl.in/blog/append-only-event-log-agents/) — append-only JSONL + latest-state-wins read model for deferral lifecycle; **rejected** hash-chain integrity (overkill v1) and in-place mutation (breaks audit trail).
+- [Webhook notification patterns](https://en.wikipedia.org/wiki/Webhook) — generic JSON POST envelope for `hook` adapter; **rejected** vendor-specific Slack/Discord adapters v1 (scope creep); single schema-neutral payload suffices.
+
+- **Q1 — Deferral JSONL v1 schema + validator CLI (closed, DEC-0107 §2–§3)**:
+  - **Bootstrap policy**: **create-on-first-write** for `handoffs/sovereign_deferrals.jsonl`; ship **`handoffs/sovereign_deferrals/.gitkeep`** (+ template mirror) — no empty tracked JSONL seed.
+  - **Required fields** (each JSONL line): `schema_version` (**1**), `deferral_id` (UUIDv4), `ts` (ISO 8601 UTC), `reason_code` (non-empty orchestrator reason, e.g. `DEPLOY_DEFERRED`, `BLOCK_RETRY_CAP_EXHAUSTED`, `SOVEREIGN_DEFERRAL_CAP_EXCEEDED`), `work_item_kind` ∈ {`story`,`bug`,`deploy`,`block`}, `work_item_ref` (non-empty, max **128** chars — `US-xxxx`, `BUG-xxxx`, deploy target id, phase token), `state` ∈ {`open`,`resolved`,`superseded`}, `source_orchestrator_run_id` (non-empty), `remediation_hint` (non-empty, max **512** chars).
+  - **Optional fields**: `blocked_by_phase` (canonical phase id), `retry_count` (int ≥ 0), `ledger_decision_id` (UUID — compose **US-0103** provenance only; no ledger schema change).
+  - **Lifecycle (append-only)**: `append_deferral` writes `state=open`; `resolve_deferral(deferral_id)` appends new row with same `deferral_id`, `state=resolved`, fresh `ts`; supersede uses `state=superseded` for operator-cancel paths. **Latest-state-wins** per `deferral_id` when computing open set.
+  - **Open-row cap**: reject append when `len(list_open_deferrals()) >= AUTO_SOVEREIGN_DEFERRAL_MAX` → **`SOVEREIGN_DEFERRAL_CAP_EXCEEDED`** (fail-closed on append; sovereign terminal stop on advance when cap hit).
+  - **Secret scan**: reject when `remediation_hint` or `work_item_ref` match secret heuristics (mirror **US-0103** / **US-0105** patterns: `api_key=`, PEM, `sk-`, `ghp_`).
+  - **`scripts/sovereign_loop_validate.py`** (+ template mirror): `--file`, `--repo`, `--self-test`, `--enforce`. Exit **0/1/2** mirrors **DEC-0103** / **DEC-0105**. Success token: **`[SOVEREIGN_LOOP_VALIDATION_OK]`**. Lib helper: `schema_check_deferral(entry) -> (bool, error|None)`.
+
+- **Q2 — `sovereign_loop_lib.py` API + `SovereignLoopStepResult` (closed, DEC-0107 §4–§5)**:
+  **`scripts/sovereign_loop_lib.py`** (+ template mirror at execute). Research stub shipped with schemas, gates, dataclasses + self-test (`[SOVEREIGN_LOOP_SELF_TEST_OK]`); advance/dispatch bodies deferred to execute tranche B.
+
+  **`SovereignLoopStepResult` v1** fields: `schema_version=1`, `action` ∈ {`noop`,`continue`,`defer`,`drain_generate`,`terminal_converged`,`terminal_timeout`,`terminal_cap`,`blocked`}, `reason_code` (optional), `stop_reason` (optional — native-chain breadcrumb), `orchestrator_run_id`, `evaluated_at` (ISO UTC), optional `deferral_id`, optional `drain_generate_bundle` (see Q3), optional `notification_dispatched` (bool), optional `convergence` (embedded **US-0110** `ConvergenceResult.to_dict()` snapshot when evaluated).
+
+  | Function | Purpose |
+  |----------|---------|
+  | `is_sovereign_loop_enabled(scratchpad) -> bool` | `AUTO_SOVEREIGN=1` **and** `is_goal_convergence_enabled(scratchpad)` — see Q5 |
+  | `resolve_deferrals_path(repo_root) -> Path` | `handoffs/sovereign_deferrals.jsonl` |
+  | `schema_check_deferral(entry) -> (bool, error\|None)` | v1 field validation + secret scan |
+  | `list_open_deferrals(repo, *, scratchpad) -> (rows, reason\|None)` | Latest-state-wins open rows; empty when disabled |
+  | `append_deferral(repo, scratchpad, *, fields...) -> (deferral_id\|None, reason\|None)` | Append-only + cap enforcement |
+  | `resolve_deferral(repo, deferral_id, *, orchestrator_run_id) -> (ok, reason\|None)` | Append resolved row |
+  | `count_drain_generate_iterations(repo, orchestrator_run_id) -> int` | Per-run counter (persisted in `handoffs/sovereign_loop_state.json` v1 sidecar) |
+  | `advance_sovereign_loop(repo, scratchpad, *, orchestrator_run_id, iteration=None) -> SovereignLoopStepResult` | Main orchestrator advance — see algorithm below |
+  | `build_drain_generate_spawn_inputs(repo, scratchpad, convergence) -> dict` | Vision narrow-read refs + optional memory digest block |
+  | `dispatch_notification(scratchpad, event_type, payload) -> (ok, reason\|None)` | Fail-open adapters — see Q4 |
+  | `self_test() -> bool` | Contract self-test |
+
+  **`advance_sovereign_loop` algorithm (pseudocode)**:
+  1. If `AUTO_SOVEREIGN≠1` → `action=noop` (zero overhead; do not import convergence).
+  2. If `SOVEREIGN_GOAL_MODE≠goal_convergence` → `action=blocked`, `reason_code=SOVEREIGN_LOOP_GOAL_MODE_REQUIRED` (fail-closed — Q5).
+  3. `result = evaluate_convergence(repo, scratchpad, orchestrator_run_id=...)`.
+  4. If `result.converged` → `action=terminal_converged` + `dispatch_notification(convergence)` + sovereign terminal stop **`converged`**.
+  5. If `check_timeout(scratchpad, iteration)` → `action=terminal_timeout` + `write_partial_delivery_report` (**US-0110**) + notification.
+  6. Apply **`AUTO_SOVEREIGN_DEFERRAL_POLICY`**: `stop` → block advance when open deferrals; `skip` → informational only; `resolve_first` → block until open deferrals empty (default).
+  7. If backlog has OPEN stories → `action=continue` (delegate to native **US-0044** drain — no bypass).
+  8. If OPEN stories **0** and `not result.converged` and iterations `< AUTO_SOVEREIGN_DRAIN_GENERATE_MAX` → `action=drain_generate` + spawn bundle (Q3).
+  9. Else cap/terminal paths → `SOVEREIGN_DRAIN_GENERATE_CAP` or deferral cap + notification.
+
+  **Sovereign terminal stops** (additive to **US-0088**/**US-0092** matrix): `converged`, `SOVEREIGN_GOAL_TIMEOUT`, `SOVEREIGN_DEFERRAL_CAP_EXCEEDED`, `SOVEREIGN_DRAIN_GENERATE_CAP` — do **not** replace `decision_gate`, `loop_max`, `security deny`, or `BLOCK_RETRY_CAP_EXHAUSTED`.
+
+- **Q3 — Drain-generate PO spawn contract + decision gate (closed, DEC-0107 §6)**:
+  - **Trigger** (all required): `is_sovereign_loop_enabled`, backlog OPEN story count **0**, `evaluate_convergence(...).converged=false`, drain-generate iterations `< AUTO_SOVEREIGN_DRAIN_GENERATE_MAX`, no blocking deferral policy conflict.
+  - **Spawn surface**: **`/auto`** outer driver spawns fresh **PO** subagent (spawn-only per **US-0095** / **US-0069**) with ephemeral work item id `drain-gen-{orchestrator_run_id}-{iteration}` — **not** a backlog row until accepted.
+  - **PO inputs** (`build_drain_generate_spawn_inputs`): narrow-read `docs/product/vision.md` (exclude Discovery/Intake note sections — same skip rules as **US-0110** goal derive); optional `sovereign_memory_digest` markdown block when **`SOVEREIGN_MEMORY=1`** via `build_injection_digest_block()` only; attach `unmet_conditions[]`, `blocked_by[]`, `goal_text` from convergence eval.
+  - **`DrainGenerateCandidateBundle` v1** (ephemeral JSON — **not persisted** pre-gate): `schema_version=1`, `orchestrator_run_id`, `iteration`, `generated_at`, `candidates[]` (max **3** per iteration) each with `candidate_id` (UUIDv4), `title` (max **120**), `summary` (max **512**), `ac_sketch` (string[], max **8** items × **256** chars), optional `plan_area_id`, `priority` (default **`P2`**), `provenance` ∈ {`vision`,`memory`,`both`}.
+  - **Decision gate (mandatory per candidate)**: PO output → standard **`decision_gate`** in **`/auto`** — operator accept → **`/intake`** or controlled backlog append; reject → discard candidate (no persistence). **Rejected alternative**: auto-append without gate — violates **US-0092** hard gates (R2).
+  - **Cap exhausted**: `SOVEREIGN_DRAIN_GENERATE_CAP` sovereign terminal + optional `dispatch_notification(drain_generate_cap)`.
+
+- **Q4 — Notification adapters (closed, DEC-0107 §7)**:
+  - **`SOVEREIGN_NOTIFY_TARGET`**: `off` (zero overhead) \| `ntfy` \| `hook` \| `email`.
+  - **Event types**: `convergence`, `timeout`, `deferral_cap`, `drain_generate_cap`.
+  - **Payload envelope v1**: `{schema_version, event_type, ts, orchestrator_run_id, reason_code, unmet_conditions[], blocked_by[], goal_progress}` where `goal_progress` embeds **US-0110** block when available.
+  - **ntfy v1**: stdlib `urllib.request` POST plain-text body to `{SOVEREIGN_NOTIFY_NTFY_BASE or https://ntfy.sh}/{SOVEREIGN_NOTIFY_NTFY_TOPIC}`; headers `Title`, `Priority` (4 for cap/timeout, 3 for convergence), `Tags: sovereign,auto`; timeout **10s**.
+  - **hook v1**: POST `application/json` to `SOVEREIGN_NOTIFY_HOOK_URL` with payload envelope; timeout **10s**.
+  - **email v1**: **deferred** — `dispatch_notification` returns `(False, SOVEREIGN_NOTIFY_TARGET_INVALID)` with info log; runbook documents v1.1 SMTP/`mailto:` stub. **Rejected**: stdlib SMTP in v1 (credential handling + deliverability risk).
+  - **Fail-open**: any adapter exception → log **`SOVEREIGN_NOTIFY_DISPATCH_FAILED`**, return `(True, None)` to caller — notification must not block loop (AC-5).
+  - **Secret handling (R4)**: `SOVEREIGN_NOTIFY_NTFY_TOPIC`, `SOVEREIGN_NOTIFY_HOOK_URL`, `SOVEREIGN_NOTIFY_EMAIL_TO` — **names-only** in committed scratchpad; values in `.cursor/scratchpad.local.md` or env vars only; never write URLs/topics into git-tracked handoffs or JSONL.
+
+- **Q5 — `AUTO_SOVEREIGN=1` × `SOVEREIGN_GOAL_MODE` coupling (closed, DEC-0107 §1)**:
+  - **Decision**: **fail-closed** — `is_sovereign_loop_enabled()` requires **`AUTO_SOVEREIGN=1` AND `SOVEREIGN_GOAL_MODE=goal_convergence`**. When sovereign flag on but goal mode `phase_driven` → `advance_sovereign_loop` returns `action=blocked`, `reason_code=SOVEREIGN_LOOP_GOAL_MODE_REQUIRED` before convergence eval.
+  - **Rejected alternative**: auto-enable `goal_convergence` when `AUTO_SOVEREIGN=1` — silently changes terminal semantics without operator intent; violates **DEC-0110** default-off discipline and creates undefined partial-delivery path (R1).
+  - **US-0110 compose**: import `evaluate_convergence`, `is_goal_convergence_enabled`, `build_goal_progress_block`, `check_timeout`, `write_partial_delivery_report` from `sovereign_convergence_lib.py` — **do not amend** five-conjunct set or **`DEC-0110`** record.
+  - **Deferral read integration**: export `list_open_deferrals()` as stable API for **US-0110** `zero_deferrals` conjunct — execute task wires `_eval_zero_deferrals` to count open rows via shared helper (compose integration only; conjunct name unchanged). Resolves R3 raw-line vs open-state mismatch without predicate redesign.
+  - **Scratchpad block** (architecture adds to `.cursor/scratchpad.md`): `AUTO_SOVEREIGN=0`, `AUTO_SOVEREIGN_DEFERRAL_MAX=50`, `AUTO_SOVEREIGN_DRAIN_GENERATE_MAX=3`, `AUTO_SOVEREIGN_DEFERRAL_POLICY=resolve_first`, `SOVEREIGN_NOTIFY_TARGET=off`, plus config key names for ntfy/hook/email (values local-only).
+
+- **Q6 — Contract-test inventory + parity (closed, DEC-0107 §12)**:
+  Eight **`test_us0107_*`** markers in **`tests/us0107_contract_test.py`**:
+  1. `test_us0107_scratchpad_keys_literals`
+  2. `test_us0107_deferral_jsonl_schema_contract`
+  3. `test_us0107_advance_deferral_policy_literals`
+  4. `test_us0107_drain_generate_gate_contract`
+  5. `test_us0107_notification_fail_open_literals`
+  6. `test_us0107_goal_mode_coupling_fail_closed`
+  7. `test_us0107_zero_overhead_default`
+  8. `test_us0107_compose_no_stop_matrix_change`
+
+  Compose regression guards (AC-8):
+  - `test_us0107_us0110_convergence_import_contract`
+  - `test_us0107_us0095_spawn_only_regression_guard`
+
+  **`SOVEREIGN_LOOP_PAIRS`** for `check_intake_template_parity.py --scope=sovereign-loop`:
+  - `scripts/sovereign_loop_lib.py` ↔ `template/scripts/sovereign_loop_lib.py`
+  - `scripts/sovereign_loop_validate.py` ↔ `template/scripts/sovereign_loop_validate.py`
+  - `.cursor/scratchpad.md` ↔ `template/.cursor/scratchpad.md` (`AUTO_SOVEREIGN_*` + `SOVEREIGN_NOTIFY_*` block)
+  - `handoffs/sovereign_deferrals/.gitkeep` ↔ `template/handoffs/sovereign_deferrals/.gitkeep`
+  - `decisions/DEC-0107.md` ↔ `template/decisions/DEC-0107.md` (post-architecture)
+  - `scripts/check_intake_template_parity.py` ↔ `template/scripts/check_intake_template_parity.py` (scope registration)
+
+- **Q7 — Companion `DEC-xxxx` necessity (closed)**:
+  **YES — new `DEC-0107` required**. Rationale:
+  - US-0107 introduces **five+ scratchpad keys**, **deferral JSONL v1**, **sidecar run-state**, **orchestrator advance algorithm**, **drain-generate ephemeral bundle**, **notification adapter matrix**, **sovereign terminal stop family**, **goal-mode coupling rule**, and **12+ reason codes** — discovery L1–L12 necessary but insufficient.
+  - Rejected alternatives documented: in-place deferral mutation vs append-only; auto-enable goal mode vs fail-closed; email SMTP v1 vs defer; auto-append drain candidates vs mandatory decision gate.
+  - **`DEC-0107`** to be authored at **`/architecture`** (research recommends; not written at research phase).
+
+### Reason codes (research inventory — architecture locks)
+
+| Code | Typical blocking? | Surface |
+|------|-------------------|---------|
+| `SOVEREIGN_LOOP_DISABLED` | no (info) | `AUTO_SOVEREIGN=0` zero overhead |
+| `SOVEREIGN_LOOP_GOAL_MODE_REQUIRED` | yes | sovereign on without `goal_convergence` |
+| `SOVEREIGN_DEFERRAL_CAP_EXCEEDED` | yes | append cap / sovereign terminal |
+| `SOVEREIGN_DEFERRAL_SCHEMA_INVALID` | yes | validator / append |
+| `SOVEREIGN_DEFERRAL_APPEND_FAILED` | yes | I/O |
+| `SOVEREIGN_DRAIN_GENERATE_CAP` | yes | drain-generate iterations exhausted |
+| `SOVEREIGN_DRAIN_GENERATE_BLOCKED` | yes | policy/deferral gate blocks spawn |
+| `SOVEREIGN_NOTIFY_DISPATCH_FAILED` | no (fail-open log) | adapter errors |
+| `SOVEREIGN_NOTIFY_TARGET_INVALID` | no | unknown target / email v1 defer |
+| `SOVEREIGN_NOTIFY_CONFIG_MISSING` | no (skip notify) | target on but config absent |
+| `SOVEREIGN_LOOP_ADVANCE_BLOCKED` | yes | deferral policy `stop`/`resolve_first` |
+| `DEPLOY_DEFERRED` | no (deferral row) | **US-0109** writer (integration) |
+
+- **Risks** (carry to `/architecture`):
+  - R1: Goal-mode coupling — fail-closed **`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`**; document operator recipe to set both flags.
+  - R2: Drain-generate scope creep — max 3 candidates/iteration + mandatory decision gate per candidate.
+  - R3: Deferral cap vs **`CONVERGENCE_DEFERRALS_PENDING`** — shared `list_open_deferrals()` latest-state-wins; cap blocks append, open rows block convergence.
+  - R4: Notification secrets — local-only config; payload excludes hook URLs/topics.
+  - R5: Sovereign terminal vs **US-0095** segments — terminal stops are additive post-segment eval; `drain_terminated` set only on sovereign terminal, not OPEN-story exhaustion alone.
+  - R6: **US-0109** ordering — deferral v1 schema + validator stable in US-0107; **`DEPLOY_DEFERRED`** reason_code reserved.
+
+**Next**: **`/architecture`** (fresh **tech-lead**) — author **`# US-0107`**, companion **`DEC-0107`**, atomic task seeds, **`test_us0107_*`** literals, runbook § Sovereign Loop Mode.
+
+**Evidence**:
+- `docs/product/backlog.md` (`## US-0107` — `discovery_notes`)
+- `docs/product/vision.md` (**Discovery Notes — US-0107**)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+- `scripts/sovereign_loop_lib.py` (research stub + `[SOVEREIGN_LOOP_SELF_TEST_OK]`)
+- Shipped compose surfaces: `scripts/sovereign_convergence_lib.py` (**US-0110**), `scripts/sovereign_memory_lib.py` (**US-0105**), `scripts/decision_ledger_lib.py` (**US-0103**)
+
+### Delivery closure (2026-06-29T00:24:00Z, curator, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=curator-S0107-refresh-20260629T002400Z-fresh`)
+
+- **Status**: **delivered** — Q1–Q7 closed; **`DEC-0107`** locked and shipped via **`S0107`** / **US-0107** release **`2026-06-29T00:23:00Z`**; curator segment closure **`2026-06-29T00:24:00Z`**.
+- **Anchor**: **US-0107** / **S0107** — `handoffs/releases/S0107-release-notes.md`, `scripts/sovereign_loop_lib.py`, `scripts/sovereign_loop_validate.py`.
+- **Compose verified**: US-0088/US-0092/US-0095 stop matrix unchanged; US-0110 `zero_deferrals` via `list_open_deferrals()`; US-0109 `DEPLOY_DEFERRED` reason_code reserved in runbook.
+
+## R-0095 — US-0106: Sovereign Role-Behavior Manifest (per-role objectives + cross-role review obligations)
+
+- **Date**: 2026-06-29
+- **Topic**: Role-behavior manifest — YAML schema, objective injection, cross-role review dispatch, US-0069 compose
+- **Query**: How to implement `.cursor/sovereign-role-manifest.yaml` with per-role objectives and directed review obligations composing US-0069 (matrix unchanged), US-0104 (cross_model_policy), US-0107 (escalation deferrals) without amending phase→role preflight or critic schemas
+- **Status**: **delivered** (research PASS — `/architecture` next)
+- **Confidence**: high (Q1–Q7 closed)
+- **Story**: **US-0106**
+- **Linked**: **US-0106**, **US-0069**, **US-0003**, **US-0023**, **US-0103**, **US-0104**, **US-0105**, **US-0107**, **DEC-0051**, **DEC-0104**, **US-0045**
+- **Discovery anchor**: `handoffs/po_to_tl.md` (US-0106 discovery handoff, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=po-US0106-discovery-20260629T002500Z-fresh`, discovery **PASS**) — discovery locks L1–L12 in backlog `## US-0106` `discovery_notes`.
+
+### Discovery locks summary (L1–L12)
+
+| Lock | Decision |
+|------|----------|
+| L1 | Scratchpad: `SOVEREIGN_ROLE_MANIFEST`, `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`, `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` |
+| L2 | Manifest path: `.cursor/sovereign-role-manifest.yaml` + template example |
+| L3 | YAML v1: `roles[]`, `review_obligations[]`, `allowed_self_overrides`, `cross_model_policy`, `escalation_rules` |
+| L4 | Default graph O1–O4 (PO/QA/dev/release review obligations) |
+| L5 | Objective injection — char-capped `role_objective_block` at spawn |
+| L6 | Cross-role review dispatch — spawn-only, capped, `sovereign_role_reviews.jsonl` |
+| L7 | `allowed_self_overrides` closed enum |
+| L8 | `cross_model_policy` — US-0104 ordering compose |
+| L9 | `escalation_rules` — US-0107 deferral compose |
+| L10 | US-0069 compose — matrix unchanged; review ≠ phase substitute |
+| L11 | US-0103 / US-0105 compose — provenance + injection order |
+| L12 | Contract tests + `SOVEREIGN_ROLE_MANIFEST_PAIRS` parity |
+
+### Research closure (Q1–Q7)
+
+**timestamp=2026-06-28T20:10:00Z**, **fresh_context_marker=tl-US0106-research-20260628T201000Z-fresh**, **orchestrator_run_id=auto-20260628-04**.
+
+**Q1: YAML v1 schema + validator CLI surface**
+
+- **Schema v1** (`.cursor/sovereign-role-manifest.yaml`):
+  - `schema_version`: integer, must equal `1`
+  - `roles[]`: array of role definitions
+    - `role_id`: string ∈ {`po`, `tech-lead`, `dev`, `qa`, `release`, `curator`} (mirrors US-0003 canonical roles)
+    - `objective_function`: string, 1–1024 chars (declares what role optimizes)
+    - `constraints[]`: optional array of immutable strings
+  - `review_obligations[]`: array of review edges
+    - `obligation_id`: unique slug (e.g. `O1`, `O2`)
+    - `reviewer_role`: canonical role_id
+    - `target_role`: canonical role_id
+    - `trigger_phase`: canonical phase_id from US-0069 matrix (e.g. `intake`, `discovery`, `architecture`)
+    - `review_focus`: enum v1 ∈ {`user_value_drift`, `testability`, `buildability`, `deployability`}
+    - `artifact_refs[]`: array of bounded path/glob tokens
+    - `blocking`: optional bool (default `false`)
+  - `allowed_self_overrides`: object with keys ∈ {`verbosity`, `detail_level`, `tone`} (closed enum)
+  - `cross_model_policy`: object
+    - `default_order`: enum ∈ {`role_review_first`, `critic_first`, `critic_only`, `role_review_only`}
+    - `overrides[]`: optional array of per-obligation overrides `{obligation_id, order}`
+  - `escalation_rules`: object
+    - `blocking_review_action`: enum ∈ {`rework_then_gate`, `gate_only`, `defer`}
+    - `rework_max`: integer (default `1`)
+    - `deferral_reason_code`: string (default `ROLE_REVIEW_BLOCKED`)
+
+- **Validator CLI** (`scripts/sovereign_role_manifest_validate.py`):
+  - `--file PATH`: validate single manifest file
+  - `--repo PATH`: validate repo-level manifest (`.cursor/sovereign-role-manifest.yaml`)
+  - `--self-test`: internal self-test (schema literals, default graph, reason codes)
+  - `--enforce`: fail-closed on violations (exit 1); default exit 0 with warnings
+  - **Success token**: `[SOVEREIGN_ROLE_MANIFEST_VALIDATION_OK]`
+  - **Fail-closed conditions**:
+    - Unknown `role_id` (not in canonical set)
+    - Unknown `trigger_phase` (not in US-0069 phase set)
+    - Cyclic obligations without `escalation_rules` path
+    - Secret-shaped literals (keys/tokens matching `API_KEY`, `TOKEN`, etc.)
+    - `objective_function` > 1024 chars
+
+**Q2: `sovereign_role_manifest_lib.py` API**
+
+- `load_manifest(scratchpad) -> dict`: reads `.cursor/sovereign-role-manifest.yaml` when `SOVEREIGN_ROLE_MANIFEST=1`; returns `{}` when `0` (zero overhead)
+- `resolve_role_objective(role_id: str, manifest: dict) -> str`: returns `objective_function` for role_id; raises `ROLE_ID_NOT_FOUND` when absent
+- `build_objective_injection_block(scratchpad: dict, role_id: str) -> str`: reads manifest, resolves objective, hard-truncates to `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS` (default 512); returns read-only `role_objective_block` for spawn context; returns empty string when `SOVEREIGN_ROLE_MANIFEST=0`
+- `list_obligations_for_phase(phase_id: str, target_role: str, manifest: dict) -> list`: returns obligations where `trigger_phase == phase_id` and `target_role == target_role`; capped at `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` (default 2)
+- `dispatch_role_review(obligation: dict, producer_evidence: str, scratchpad: dict) -> dict`: spawn-only per BUG-0006; returns `{obligation_id, reviewer_role, verdict, blocking, findings_ref}`
+- `self_test() -> bool`: validates default bootstrap graph, schema literals, reason codes; returns `[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]` on success
+- **Error handling**: fail-closed on unknown role_id, cyclic obligations without escalation, secret-shaped literals
+
+**Q3: Cross-role review spawn contract**
+
+- **Spawn contract** (post-phase, after US-0069 phase checkpoint passes):
+  - Orchestrator queries `list_obligations_for_phase(completed_phase_id, producer_role, manifest)`
+  - For each obligation (cap `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE`):
+    - Spawn fresh **reviewer** subagent with `reviewer_role` capability preflight
+    - Narrow-read: `artifact_refs[]` + producer evidence ref
+    - **Boundary token**: `role_review` (distinct from US-0069 phase role token)
+    - Isolation evidence: `phase_id=role_review`, `role=reviewer_role`, `obligation_id=...`
+    - **Not** a substitute for producer phase completion (US-0069 matrix unchanged)
+  - Append result to **`handoffs/sovereign_role_reviews.jsonl`** with fields:
+    - `obligation_id`: string (from manifest)
+    - `reviewer_role`: canonical role_id
+    - `target_role`: canonical role_id
+    - `trigger_phase`: canonical phase_id
+    - `orchestrator_run_id`: string
+    - `ts`: ISO-8601 timestamp
+    - `verdict`: enum ∈ {`pass`, `fail`, `waived`}
+    - `blocking`: bool (from obligation)
+    - `findings_ref`: string (path to review findings artifact)
+
+- **Boundary token `role_review`**:
+  - Distinct from US-0069 phase roles (po, tech-lead, dev, qa, release, curator)
+  - Isolation evidence records `role=reviewer_role` (canonical role performing review)
+  - Reason codes: `ROLE_REVIEW_DISPATCH_OK`, `ROLE_REVIEW_BLOCKED`, `ROLE_REVIEW_CAP_EXCEEDED`
+
+**Q4: `cross_model_policy` ordering matrix (US-0104 compose)**
+
+- **Ordering modes** (`default_order`):
+  - `role_review_first`: dispatch role review, then US-0104 critic
+  - `critic_first`: dispatch US-0104 critic, then role review
+  - `critic_only`: skip role review (zero role-review overhead)
+  - `role_review_only`: skip critic (zero critic overhead)
+
+- **Per-obligation override** (`overrides[]`):
+  - `{obligation_id, order}` — overrides `default_order` for specific obligation
+  - Allows fine-grained scheduling when different obligations have different timing needs
+
+- **Compose rules**:
+  - When `CROSS_MODEL_REVIEW=1` and `SOVEREIGN_ROLE_MANIFEST=1`: orchestrator applies policy
+  - When either flag `0`: that branch zero overhead (no reads, no spawns)
+  - **Does NOT merge** critic lenses with role review prompts — separate spawn boundaries
+  - **Does NOT amend** `sovereign_critic_findings.jsonl` schema or US-0104 critic lenses
+
+**Q5: `escalation_rules` + US-0107 deferral compose**
+
+- **Rule chain on `blocking=true` review with verdict `fail`**:
+  1. Bounded same-role rework (`SOVEREIGN_ROLE_REVIEW_REWORK_MAX` default `1`):
+     - Re-dispatch producer phase role with reviewer findings
+     - Cap prevents infinite rework loops
+  2. Operator `decision_gate`:
+     - If rework cap exhausted, escalate to operator with `decision_gate` prompt
+     - Operator decides: approve override, request manual review, or defer
+  3. Optional `append_deferral` (when `AUTO_SOVEREIGN=1` and `blocking_review_action=defer`):
+     - Call `sovereign_loop_lib.append_deferral(reason_code=ROLE_REVIEW_BLOCKED, ...)`
+     - Deferral enters US-0107 register for drain-generate resolution
+     - **Fail-open** on deferral errors (log + continue)
+
+- **Rework cap literals**:
+  - `SOVEREIGN_ROLE_REVIEW_REWORK_MAX`: integer (default `1`)
+  - Prevents oscillation: blocking review → rework → re-review → blocking review
+  - After cap exhausted, mandatory operator `decision_gate`
+
+- **Reason codes**:
+  - `ROLE_REVIEW_BLOCKED`: blocking review failed, rework cap exhausted
+  - `ROLE_REVIEW_REWORK_DISPATCHED`: producer rework triggered
+  - `ROLE_REVIEW_DEFERRED`: deferral appended to US-0107 register
+
+**Q6: Contract-test inventory + parity**
+
+- **Eight `test_us0106_*` markers**:
+  1. `test_us0106_scratchpad_keys_literals`: `SOVEREIGN_ROLE_MANIFEST`, `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS`, `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` default values
+  2. `test_us0106_manifest_schema_v1_literals`: schema_version, role_id enum, trigger_phase enum, review_focus enum, allowed_self_overrides enum
+  3. `test_us0106_objective_injection_char_cap`: truncation to `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS` (default 512)
+  4. `test_us0106_obligation_dispatch_cap`: capping at `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` (default 2)
+  5. `test_us0106_us0069_compose_no_matrix_change`: phase→role matrix unchanged, review spawns supplementary
+  6. `test_us0106_us0104_compose_no_critic_schema_change`: `sovereign_critic_findings.jsonl` schema unchanged
+  7. `test_us0106_zero_overhead_default`: when `SOVEREIGN_ROLE_MANIFEST=0`, no manifest reads, no injections, no dispatches
+  8. `test_us0106_parity_scope`: `check_intake_template_parity.py --scope=sovereign-role-manifest` literal
+
+- **`SOVEREIGN_ROLE_MANIFEST_PAIRS` file list**:
+  - `.cursor/scratchpad.md` (scratchpad keys)
+  - `.cursor/sovereign-role-manifest.yaml` (active manifest)
+  - `template/.cursor/scratchpad.md` (template scratchpad)
+  - `template/.cursor/sovereign-role-manifest.yaml.example` (template manifest example)
+  - `scripts/sovereign_role_manifest_validate.py` (validator)
+  - `scripts/sovereign_role_manifest_lib.py` (lib)
+  - `template/scripts/sovereign_role_manifest_validate.py` (template validator)
+
+**Q7: Companion `DEC-xxxx` necessity**
+
+- **Recommended**: **DEC-0106** — manifest artifact surface + review dispatch contracts
+- **Rationale**: Discovery locks L1–L12 are necessary but insufficient — they lock compose guards and boundary tokens, but do not lock:
+  - YAML v1 schema with field-level enums
+  - Validator CLI surface + fail-closed conditions
+  - Lib API with error handling semantics
+  - Reviews JSONL field contract
+  - Escalation rule chain with rework cap
+  - Contract-test inventory
+- **DEC-0106 scope**: Lock manifest surface (schema, validator, lib, dispatch contract, reviews JSONL, escalation, tests) — architecture-ready for sprint planning
+- **Anchor**: This research closure (R-0095 Q1–Q7)
+
+### Research stub self-test
+
+**[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]** (research stub only; production self-test at `/execute`)
+
+**Evidence**:
+- `docs/product/backlog.md` (`## US-0106` — `discovery_notes` + `research_notes`)
+- `docs/product/vision.md` (**Discovery Notes — US-0106**)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+- `handoffs/po_to_tl.md` (US-0106 discovery handoff, research handoff)
+- `docs/engineering/state.md` (discovery checkpoint, research checkpoint)
+- Shipped compose surfaces: **US-0069** (`auto-orchestration-reference.md` phase→role matrix), **US-0104** (`sovereign_critic_lib.py`), **US-0107** (`sovereign_loop_lib.py`), **US-0105** (`sovereign_memory_lib.py`)
+
+**Next**: **`/architecture`** (fresh **tech-lead**) for **US-0106** — author `# US-0106` section, companion **DEC-0106**, atomic task seeds, contract-test literals, runbook operator recipes.
+
+### Delivery closure (US-0106 / S0106 — curator refresh-context)
+
+- **Status**: **delivered** — Q1–Q7 closed; **`DEC-0106`** locked and shipped via **`S0106`** / **US-0106** release **`2026-06-29T01:35:00Z`**; curator segment closure **`2026-06-29T02:00:00Z`**.
+- **Anchor**: **US-0106** / **S0106** — `handoffs/releases/S0106-release-notes.md`, `scripts/sovereign_role_manifest_lib.py`, `scripts/sovereign_role_manifest_validate.py`.
+- **Compose verified**: US-0069 phase→role matrix unchanged; US-0104 cross_model_policy ordering unchanged; US-0107 escalation deferral compose unchanged; US-0103 / US-0105 provenance + injection order unchanged.
+
+---
+
+## R-0096 — US-0108: Parallel Instance Arbitrage for dev phase
+
+- **Date**: 2026-06-28
+- **Topic**: Parallel dev subagents in isolated git worktrees — worktree spawn, QA cross-review, winner selection, merge policy, resource guard
+- **Query**: How to implement N parallel dev subagents racing in isolated git worktrees with QA critic selection, composing US-0047 (bulk execute), US-0092 (full autonomy), US-0103 (ledger), US-0104 (anti-slop scores) without amending any of them
+- **Status**: **PASS** (research closed — Q1–Q10 closed; architecture-ready)
+- **Confidence**: high (L1–L10 discovery locks validated; R-0096 Q1–Q10 CLOSED)
+- **Story**: **US-0108**
+- **Linked**: **US-0108**, **US-0047**, **US-0092**, **US-0103**, **US-0104**, **US-0107**, **DEC-0104**
+- **Discovery anchor**: `handoffs/po_to_tl.md` (US-0108 discovery handoff, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=po-US0108-discovery-20260628T215000Z-fresh`, discovery **PASS**) — discovery locks L1–L10 in backlog `## US-0108` `discovery_notes`.
+
+### Research closure (Q1–Q10 CLOSED)
+
+| Q | Lock | Decision |
+|---|------|----------|
+| Q1 | Worktree naming + isolation | `.git/worktrees/us0108-<story_id>-<instance_idx>/` deterministic; per-worktree `GIT_DIR` + `GIT_WORK_TREE` env; no shared lock conflicts; gitignore `.git/worktrees/us0108-*` in template |
+| Q2 | Selection predicate | Filter `qa_verdict=PASS`; among PASS pick highest `anti_slop_score` (default `0` when critic absent); ties break earliest `proof_issued_at`; single winner deterministic |
+| Q3 | QA cross-review mode | Sequential N QA invocations v1 (ordered, deterministic, lower latency than parallel); optional `AUTO_SOVEREIGN_PARALLEL_QA=1` for parallel invocations v2 — architecture-locked |
+| Q4 | `parallel_dev_pick.json` v1 schema | `{story_id, winner_instance_id, worktree_path, qa_verdict, anti_slop_score, proof_issued_at, merge_policy, runner_ts_utc, orchestrator_run_id, loser_instance_ids[]}` — write once at selection |
+| Q5 | Merge resolution | `first_pass_wins` (default, first PASS in spawn order); `last_pass_wins` (last PASS); `manual` → emit `PARALLEL_DEV_PICK_MANUAL_REQUIRED` halt; on merge conflict bounded retry ≤2 then manual |
+| Q6 | Resource guard | `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` system-wide cap; atomic check-and-increment at spawn (lockfile `.git/us0108_parallel_dev.lock`); fail-fast `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED`; release on instance exit |
+| Q7 | Execute step integration | Step 25 (parallel dev spawn); step 26 (QA cross-review); step 27 (selection); step 28 (merge + loser cleanup); after US-0107 step 24 and US-0047 step 22 (system-wide cap compose) |
+| Q8 | Backward compat | `SOVEREIGN_PARALLEL_DEV=0` (default) = single dev; no worktrees; no parallel QA; no pick JSON; regression guard `test_us0108_backward_compat_single_dev_unchanged` |
+| Q9 | Contract test inventory + parity | 8 `test_us0108_*` markers (scratchpad, worktree, selection, merge, resource, execute, backward, parity); parity `--scope=sovereign-parallel-dev` (`SOVEREIGN_PARALLEL_DEV_PAIRS`) — `.cursor/scratchpad.md`, `scripts/parallel_dev_arbiter_lib.py`, `scripts/parallel_dev_arbiter_validate.py`, `template/...` mirrors, `decisions/DEC-0108.md` |
+| Q10 | Compose surfaces (read-only) | US-0104 `anti_slop_score` from sprint `qa-findings.md` / `sovereign_critic_findings.jsonl`; US-0103 ledger from `handoffs/sovereign_decisions/*.jsonl`; US-0107 deferrals `handoffs/sovereign_deferrals.jsonl` (winner/loser outcomes read-only); US-0108 does NOT write to US-0104/US-0103/US-0107 schemas |
+
+### Reason code inventory (carry to /architecture)
+
+| Code | Blocking? | Surface |
+|------|-----------|---------|
+| `PARALLEL_DEV_DISABLED` | no (info) | `SOVEREIGN_PARALLEL_DEV=0` zero overhead |
+| `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED` | yes | spawn cap reached |
+| `PARALLEL_DEV_WORKTREE_CREATE_FAILED` | yes | git worktree spawn failure |
+| `PARALLEL_DEV_WORKTREE_CLEANUP_FAILED` | no (fail-open log) | loser deletion error |
+| `PARALLEL_DEV_QA_NO_PASS` | no (all N failed) | no PASS instance → story continues without pick |
+| `PARALLEL_DEV_ANTI_SLOP_UNAVAILABLE` | no (default 0) | critic not deployed — graceful degrade |
+| `PARALLEL_DEV_MERGE_CONFLICT` | bounded retry (≤2) | winner worktree diverges |
+| `PARALLEL_DEV_PICK_MANUAL_REQUIRED` | yes | `manual` merge policy |
+
+### Compose guards confirmed (do NOT amend)
+
+- **US-0047**: bulk execute order unchanged; US-0108 cap is system-wide (not per-bulk-item); `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` checked after bulk execute step 22
+- **US-0092**: full autonomy outer driver unchanged; sovereign loop step 24 (US-0107) compose
+- **US-0103**: ledger schema unchanged; US-0108 reads `handoffs/sovereign_decisions/*.jsonl` only
+- **US-0104**: critic schema unchanged; US-0108 reads `anti_slop_score` from sprint `qa-findings.md` only
+- **US-0107**: deferral register schema unchanged; US-0108 may append winner/loser outcome rows as optional consumer
+
+### Self-test anchor
+
+**[PARALLEL_DEV_ARBITER_SELF_TEST_OK]** (research stub; production self-test at `/execute`)
+
+### Top risks (carry to /architecture)
+
+- **R1** Worktree lock conflicts — deterministic naming + per-worktree GIT_DIR
+- **R2** QA cross-review latency — sequential v1, parallel optional v2
+- **R3** Merge conflicts — bounded retry ≤2 then manual
+- **R4** Anti-slop unavailable — graceful degrade (default 0)
+- **R5** Resource cap race — atomic lockfile check-and-increment
+- **R6** Bulk execute interaction — system-wide cap preferred v1**

@@ -1583,3 +1583,156 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Research anchor**: **`R-0088`** — extend at `/research` with Q1–Q5 answers.
 - **Intake evidence**: `handoffs/intake_evidence/US-0101-intake-20260614.json`.
 - **Next**: **`/research`** (fresh **tech-lead**).
+
+## Discovery Notes — US-0110
+
+- **Discovery date**: 2026-06-28T17:00:00Z
+- **Orchestrator run**: `auto-20260628-04`
+- **Problem framing**: Sovereign-loop autonomous delivery needs a deterministic **terminal condition** beyond per-segment phase exhaustion. Operators enabling goal-driven autonomy must see **mid-loop progress** toward an explicit or auto-derived goal and receive a **partial delivery report** when timeout caps exhaust before convergence. Today **US-0088**/**US-0092**/**US-0095** stop on segment/phase boundaries; **US-0044** drains OPEN stories but has no unified "project complete" predicate.
+- **Recommended approach (discovery-locked)**:
+  - `SOVEREIGN_GOAL_MODE=phase_driven|goal_convergence` (default `phase_driven`) — backward compatible.
+  - `scripts/sovereign_convergence_lib.py` exposes `evaluate_convergence(repo, scratchpad)` returning `{converged, unmet_conditions[], blocked_by[]}`.
+  - Convergence = all OPEN stories DONE + zero deferrals + cross-reviewer findings resolved + smoke probe green + ledger has no unapproved extensions.
+  - Goal text via `SOVEREIGN_GOAL=<text>` or auto-derive from `docs/product/vision.md` top-N paragraphs.
+  - Curator `/refresh-context` emits `goal_progress` block in `handoffs/resume_brief.md` during active goal-convergence loops.
+  - Timeout → `SOVEREIGN_GOAL_TIMEOUT` reason code + `handoffs/sovereign_partial_delivery.md`.
+- **12 discovery locks (L1–L12)**: see `docs/product/backlog.md` `## US-0110` `discovery_notes`.
+- **Compose do NOT amend**: **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103** (read-only integration).
+- **Foundation for**: **US-0107** (drain-generate + notification on convergence/timeout).
+- **Research open questions (carry to `/research` via `R-0091`)**:
+  - Q1: JSON schemas for `ConvergenceResult` + `goal_progress` block.
+  - Q2: Full helper library API + CLI surface.
+  - Q3: Graceful degrade when **US-0104**/**US-0107** artifacts not yet deployed.
+  - Q4: Vision auto-derive algorithm details.
+  - Q5: Contract-test inventory + parity scope.
+  - Q6: Performance budget for drain-loop re-evaluation.
+  - Q7: Companion DEC necessity.
+- **Risks**: R1 predicate cost; R2 upstream artifact absence; R3 smoke probe canonical source; R4 native-chain interaction; R5 timeout semantics.
+- **Research anchor**: **`R-0091`** (note: **`R-0090`** reserved for **US-0112**).
+- **Intake evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json` (batch — skip re-intake).
+- **Next**: **`/research`** (fresh **tech-lead**).
+
+## Discovery Notes — US-0104
+
+- **Discovery date**: 2026-06-28T21:35:00Z
+- **Orchestrator run**: `auto-20260628-04`
+- **Problem framing**: Sovereign-loop autonomous delivery benefits from **adversarial second opinion** at phase boundaries — a critic using a **different model** than the producer reduces single-model blind spots (edge-case misses, boundary violations, over-engineering). Intake locked three evaluation lenses and anti-slop scoring with rework. **US-0103** ledger already reserves **`cross_model_reviewed`**; **US-0110** convergence conjunct 3 already reads **`handoffs/sovereign_critic_findings.jsonl`** — US-0104 **implements** the producer surface those stories consume.
+- **Recommended approach (discovery-locked)**:
+  - Default-off **`CROSS_MODEL_REVIEW=0|1`** scratchpad gate (zero overhead when `0`).
+  - After each producer phase (when enabled), **`/sovereign-critic`** spawns fresh critic subagent with **different `model_id`** (via **US-0101** / **US-0102** resolution).
+  - Three fixed lenses: **Challenger** (edge cases), **Architect** (coupling/boundaries), **Subtractor** (YAGNI/over-engineering).
+  - Parallel-jury reconciliation in **`scripts/sovereign_critic_lib.py`**: agreement → high confidence; single-finder → flagged medium confidence.
+  - **`model_id`** additive field on **US-0048** isolation evidence for producer + critic runs.
+  - Anti-slop: per-lens 0–10 scores; aggregate below threshold → bounded producer rework loop.
+  - Degraded **single-model-multi-lens** when only one model resolvable (informational, not hard stop).
+- **12 discovery locks (L1–L12)**: see `docs/product/backlog.md` `## US-0104` `discovery_notes`.
+- **Compose do NOT amend**: **US-0048**, **US-0069**, **US-0023**, **US-0110** (read/write integration only); **US-0103** ledger field **`cross_model_reviewed`** consumed, not schema-changed.
+- **Downstream consumers**: **US-0110** (critic-resolved conjunct), **US-0108** (anti-slop selection predicate), **US-0107** (sovereign loop orchestration).
+- **Research open questions (carry to `/research` via `R-0092`)**:
+  - Q1: Findings JSONL exact schema + validator CLI.
+  - Q2: Reconciliation library API + issue-normalization key.
+  - Q3: Cross-model selection algorithm (different slug than producer).
+  - Q4: Anti-slop rubric + rework loop orchestration contract.
+  - Q5: Isolation evidence `model_id` v2 extension matrix.
+  - Q6: Contract-test inventory + parity scope.
+  - Q7: Companion DEC necessity.
+- **Risks**: R1 model routing reliability; R2 phase cost; R3 rework oscillation; R4 anti-slop determinism; R5 findings dedup; R6 US-0108 score stability.
+- **Research anchor**: **`R-0092`** (note: **`R-0090`** = **US-0112**, **`R-0091`** = **US-0110** delivered).
+- **Intake evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json` (batch — skip re-intake).
+- **Next**: **`/research`** (fresh **tech-lead**).
+
+## Discovery Notes — US-0105
+
+- **Discovery date**: 2026-06-29T00:05:00Z
+- **Orchestrator run**: `auto-20260628-04`
+- **Problem framing**: Autonomous sovereign-loop delivery accumulates institutional knowledge (decisions, mistakes, patterns, plan drift) across runs, but today that knowledge is scattered across sprint artifacts, ledger files, and operator memory — subagents repeat errors and rediscover patterns. **US-0103** ledger audits per-run decisions; **US-0029** captures external web research — neither provides a **bounded, injectable project-level learnings substrate** for phase spawns. **US-0105** implements that substrate without amending research or token-cost contracts.
+- **Recommended approach (discovery-locked)**:
+  - Default-off **`SOVEREIGN_MEMORY=0|1`** scratchpad gate (zero overhead when `0`).
+  - **`docs/engineering/sovereign-memory/`** with four JSONL artifacts + **`retrospectives/<sprint_id>.md`**.
+  - **`scripts/sovereign_memory_lib.py`** assembles **top-N recent + top-K high-impact** digest capped by **`SOVEREIGN_MEMORY_MAX_CHARS`**.
+  - Phase spawn receives read-only **`sovereign_memory_digest`** block (additive to **US-0023** fresh context).
+  - Curator **`/refresh-context`** writes sprint retrospective after release; optional promotion from **US-0103** ledger.
+  - Dedup on **`decisions-log.jsonl`**; mistake-tagging on failed fix/revert / fidelity violations.
+- **12 discovery locks (L1–L12)**: see `docs/product/backlog.md` `## US-0105` `discovery_notes` (includes directory design-intent table).
+- **Compose do NOT amend**: **US-0029** (external research), **US-0080** / **DEC-0062** (token-cost / slim commands), **US-0096** (per-story lean memory layers), **US-0103** (per-run ledger schema).
+- **Downstream consumers**: **US-0107** (drain-generate reads sovereign memory + vision), **US-0110** (convergence reporting may reference drift register).
+- **Research open questions (carry to `/research` via `R-0093`)**:
+  - Q1: JSONL v1 exact schemas + validator CLI.
+  - Q2: `sovereign_memory_lib.py` full API sketch.
+  - Q3: Injection merge algorithm edge cases.
+  - Q4: Mistake-tagging orchestrator wiring + **US-0103** compose.
+  - Q5: JSONL rollover/archive vs **US-0072**.
+  - Q6: Contract-test inventory + parity scope.
+  - Q7: Companion DEC necessity.
+- **Risks**: R1 token bloat; R2 research vs learnings overlap; R3 ledger vs decisions-log confusion; R4 stale injection; R5 secret leakage; R6 US-0107 API coupling.
+- **Research anchor**: **`R-0093`** (note: **`R-0092`** = **US-0104** delivered).
+- **Intake evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json` (batch — skip re-intake).
+- **Next**: **`/research`** (fresh **tech-lead**).
+
+## Discovery Notes — US-0107
+
+- **Discovery date**: 2026-06-29T00:15:00Z
+- **Orchestrator run**: `auto-20260628-04`
+- **Problem framing**: Sovereign-loop batch foundations (**US-0110** convergence, **US-0103** ledger, **US-0105** memory, **US-0104** critic) are shipped or in flight — but **`/auto`** still stops when the backlog drains without a unified **project-complete** path, when recoverable blocks dead-end the loop, or when the operator must manually enqueue follow-on work. **US-0107** implements **`AUTO_SOVEREIGN`** — the orchestration mode that owns deferrals, drain-generate, notifications, and convergence hooks **on top of** **US-0088**/**US-0092**/**US-0095** (unchanged).
+- **Recommended approach (discovery-locked)**:
+  - Default-off **`AUTO_SOVEREIGN=0|1`** scratchpad gate (orthogonal to **`AUTO_FLOW_MODE=full_autonomy`**).
+  - **`handoffs/sovereign_deferrals.jsonl`** bounded deferral register with orchestrator advance logic.
+  - **Drain-generate**: when zero OPEN stories but **`evaluate_convergence()`** not satisfied → fresh **PO** spawn from **`vision.md`** + sovereign memory → **decision gate per candidate** before backlog persistence.
+  - **Notification**: **`SOVEREIGN_NOTIFY_TARGET`** (ntfy|email|hook) on convergence, timeout, or cap exhaustion — fail-open.
+  - **Convergence hooks**: import **US-0110** **`evaluate_convergence`** as terminal predicate + drain-generate gate; **US-0109** **`DEPLOY_DEFERRED`** writes to register (integration declaration only in US-0107).
+- **12 discovery locks (L1–L12)**: see `docs/product/backlog.md` `## US-0107` `discovery_notes` (includes sovereign loop design-intent table).
+- **Compose do NOT amend**: **US-0088**, **US-0092**, **US-0095**, **US-0044**, **US-0103** (ledger schema), **US-0105** (memory schemas), **US-0110** (five-conjunct predicate / **DEC-0110**).
+- **Upstream dependencies (shipped)**: **US-0110** (convergence lib), **US-0103** (ledger), **US-0105** (memory read API), **US-0104** (critic — convergence conjunct 3).
+- **Downstream consumers**: **US-0109** (writes **`DEPLOY_DEFERRED`** deferrals), **US-0108** (parallel dev — orthogonal v1).
+- **Research open questions (carry to `/research` via `R-0094`)**:
+  - Q1: Deferral JSONL exact schema + validator CLI.
+  - Q2: **`sovereign_loop_lib.py`** full API + **`SovereignLoopStepResult`**.
+  - Q3: Drain-generate PO spawn contract + candidate bundle schema.
+  - Q4: Notification adapter matrix (ntfy/hook v1; email defer).
+  - Q5: **`AUTO_SOVEREIGN=1`** × **`SOVEREIGN_GOAL_MODE`** coupling semantics.
+  - Q6: Contract-test inventory + parity scope.
+  - Q7: Companion DEC necessity.
+- **Risks**: R1 goal-mode coupling; R2 drain-generate scope creep; R3 deferral cap vs convergence; R4 notification secrets; R5 native-chain interaction; R6 US-0109 schema ordering.
+- **Research anchor**: **`R-0094`** (note: **`R-0093`** = **US-0105** delivered).
+- **Intake evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json` (batch — skip re-intake).
+- **Next**: **`/research`** (fresh **tech-lead**).
+
+## Discovery Notes — US-0106
+
+- **Discovery date**: 2026-06-29T00:25:00Z
+- **Orchestrator run**: `auto-20260628-04`
+- **Problem framing**: Sovereign-loop foundations (**US-0110**, **US-0103**, **US-0105**, **US-0104**, **US-0107**) ship deterministic convergence, audit, memory, adversarial critique, and loop orchestration — but **US-0069** enforces *which role runs each phase* without declaring *what each role optimizes for* or *which cross-role reviews are mandatory* at phase boundaries. Operators enabling full autonomy need a **single bootstrappable YAML manifest** for per-role objectives and directed review obligations (PO→architecture user-value, QA→acceptance testability, dev→architecture buildability, release→QA deployability) without amending the phase→role matrix.
+- **Recommended approach (discovery-locked)**:
+  - Default-off **`SOVEREIGN_ROLE_MANIFEST=0|1`** scratchpad gate (zero overhead when **`0`**).
+  - **`.cursor/sovereign-role-manifest.yaml`** with **`roles[]`**, **`review_obligations[]`**, **`allowed_self_overrides`**, **`cross_model_policy`**, **`escalation_rules`**.
+  - Bounded **`role_objective_block`** injection at spawn for **US-0069**-resolved role (compose **US-0105** digest — additive read-only inputs).
+  - Post-phase **cross-role review dispatch** (spawn-only, capped) → **`handoffs/sovereign_role_reviews.jsonl`**.
+  - **`cross_model_policy`** composes **US-0104** critic ordering without amending critic schema.
+- **12 discovery locks (L1–L12)**: see `docs/product/backlog.md` `## US-0106` `discovery_notes` (includes role-behavior design-intent table).
+- **Compose do NOT amend**: **US-0069** / **US-0003** (phase→role matrix + preflight/post checkpoint validation), **US-0104** (critic findings schema), **US-0103** / **US-0105** (ledger/memory schemas), **US-0107** (deferral register schema — compose via **`escalation_rules`** only).
+- **Upstream dependencies (shipped)**: **US-0110**, **US-0103**, **US-0105**, **US-0104**, **US-0107**.
+- **Research open questions (carry to `/research` via `R-0095`)**:
+  - Q1: YAML v1 exact schema + validator CLI.
+  - Q2: **`sovereign_role_manifest_lib.py`** full API sketch.
+  - Q3: Cross-role review spawn contract + reviews JSONL + **US-0069** boundary token.
+  - Q4: **`cross_model_policy`** ordering matrix vs **US-0104**.
+  - Q5: **`escalation_rules`** + **US-0107** deferral compose.
+  - Q6: Contract-test inventory + parity scope.
+  - Q7: Companion DEC necessity.
+- **Risks**: R1 spawn depth/latency; R2 role collapse vs **US-0069**; R3 **US-0104** interaction; R4 manifest/matrix drift; R5 escalation oscillation; R6 secret leakage.
+- **Research anchor**: **`R-0095`** (note: **`R-0094`** = **US-0107** delivered).
+- **Intake evidence**: `handoffs/intake_evidence/intake-sovereign-20260627-01.json` (batch — skip re-intake).
+- **Next**: **`/research`** (fresh **tech-lead**).
+
+## Intake Notes — US-0112
+
+- **Intake date**: 2026-06-28
+- **Operator request**: Model-catalog example presets (eight **`model-catalog.local.example*.json`** files) should ship on its-magic **install/upgrade**, not only live in the its-magic dev repo **`template/`**.
+- **Problem**: **US-0101**/**US-0102** documented and committed examples, but **`installer-owned-paths.manifest`** never included them — operators enabling **`MODEL_RESOLVE=local_catalog`** or **`role_catalog`** must manually copy presets.
+- **Recommended approach (intake-locked)**:
+  - Manifest lists all eight example files under **`.cursor/`**.
+  - **Framework** delivery: refresh on **`upgrade`**, add on **`missing`** — same family as **`scratchpad.local.example.md`** (**US-0075**).
+  - **Never** auto-write **`model-catalog.local.json`** — operator copies chosen preset after install (multiple complexity/role options).
+- **Decomposition**: single story (**US-0051**).
+- **Intake evidence**: `handoffs/intake_evidence/US-0112-intake-20260628.json`
+- **Next**: **`/architecture`** (fresh **tech-lead**)

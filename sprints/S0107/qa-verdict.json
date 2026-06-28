@@ -1,0 +1,51 @@
+{
+  "sprint_id": "S0107",
+  "story_id": "US-0107",
+  "phase_id": "qa",
+  "role": "qa",
+  "verdict": "PASS",
+  "timestamp": "2026-06-29T00:21:00Z",
+  "fresh_context_marker": "qa-S0107-US0107-20260629T002100Z-fresh",
+  "orchestrator_run_id": "auto-20260628-04",
+  "contract_tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "command": "pytest -k us0107 -v",
+    "breakdown": {
+      "core_markers": 8,
+      "compose_guards": 2
+    }
+  },
+  "self_tests": {
+    "sovereign_loop_lib": "[SOVEREIGN_LOOP_SELF_TEST_OK]",
+    "sovereign_loop_validate": "[SOVEREIGN_LOOP_VALIDATION_OK]",
+    "exit_code": 0
+  },
+  "parity_check": {
+    "scope": "sovereign-loop",
+    "result": "[INTAKE_TEMPLATE_PARITY_OK]",
+    "pairs": 6
+  },
+  "acceptance_criteria": {
+    "total": 8,
+    "satisfied": 8,
+    "coverage": "AC-1..AC-8 all PASS"
+  },
+  "blocking_findings": 0,
+  "open_findings": [],
+  "compose_regression": {
+    "us0088_us0092_us0095_stop_matrix": "PASS — test_us0107_compose_no_stop_matrix_change",
+    "us0110_zero_deferrals_import": "PASS — test_us0107_us0110_convergence_import_contract",
+    "us0095_spawn_only_drain_generate": "PASS — test_us0107_us0095_spawn_only_regression_guard"
+  },
+  "status_authority": {
+    "us0107_backlog": "OPEN",
+    "state_md_modified": false,
+    "acceptance_checkbox_flipped": false
+  },
+  "next_phase": "verify-work",
+  "next_role": "qa",
+  "spawn_only": true,
+  "spawn_only_rationale": "BUG-0006"
+}

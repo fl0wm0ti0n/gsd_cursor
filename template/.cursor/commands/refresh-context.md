@@ -56,6 +56,38 @@ description: "its-magic refresh context: compact state and decisions."
    - record verification tuple fields (`boundary`, `moved`, `retained`,
      `pack_ref`) in the new `state.md` checkpoint when any rollover occurred;
      idempotent reruns must not duplicate archived content.
+3b. **Goal progress emission (US-0110 / DEC-0110)**: when merged scratchpad
+    `SOVEREIGN_GOAL_MODE=goal_convergence` and sovereign loop is active, run from repo root:
+
+    ```bash
+    python scripts/sovereign_convergence_lib.py --emit-resume-brief --repo . --orchestrator-run-id <run_id>
+    ```
+
+    Writes a fenced JSON block under **`### goal_progress`** in `handoffs/resume_brief.md`.
+    Placement: after the latest **`## Latest orchestration pointer`** section, before
+    **`## Prior orchestration pointer`**. Skip entirely when `SOVEREIGN_GOAL_MODE=phase_driven`
+    (zero overhead). Validate shape with:
+
+    ```bash
+    python scripts/sovereign_convergence_validate.py --repo . --enforce
+    ```
+
+3c. **Sovereign memory curator retrospective + ledger promotion (US-0105 / DEC-0105)**:
+    after release segment close, when merged scratchpad `SOVEREIGN_MEMORY=1`:
+
+    1. `write_retrospective(sprint_id, body)` →
+       `docs/engineering/sovereign-memory/retrospectives/<sprint_id>.md` with
+       `{sprint_id, story_ids[], release_ref, summary, learnings[], promoted_entry_ids[]}`.
+    2. When **also** `AI_DECISION_LEDGER=1`: `promote_from_ledger(orchestrator_run_id, ...)`
+       copies subset to `decisions-log.jsonl` with `provenance_ref=ledger:<decision_id>`.
+    3. When ledger off or filter empty → informational **`SOVEREIGN_MEMORY_PROMOTION_SKIPPED`**.
+
+    Retrospectives are human audit only — **not injected v1**. Skip entirely when
+    `SOVEREIGN_MEMORY=0` (zero overhead). Validate JSONL when files exist:
+
+    ```bash
+    python scripts/sovereign_memory_validate.py --repo . --enforce
+    ```
 
 ## Deterministic artifact ordering contract (US-0058 / DEC-0040)
 

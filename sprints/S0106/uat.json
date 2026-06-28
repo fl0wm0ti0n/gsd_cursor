@@ -1,0 +1,64 @@
+{
+  "sprint_id": "S0106",
+  "story_id": "US-0106",
+  "orchestrator_run_id": "auto-20260628-04",
+  "timestamp": "2026-06-29T01:30:00Z",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "passed": 8,
+  "failed": 0,
+  "total": 8,
+  "steps": [
+    {
+      "id": "UAT-001",
+      "description": "AC-1: Scratchpad keys SOVEREIGN_ROLE_MANIFEST, SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS, SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE, SOVEREIGN_ROLE_REVIEW_REWORK_MAX present in active and template scratchpad with correct literals",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py::US0106ScratchpadKeysTest::test_us0106_scratchpad_keys_literals"
+    },
+    {
+      "id": "UAT-002",
+      "description": "AC-2: Bootstrap manifest YAML v1 schema with 6 required sections (schema_version, roles, review_obligations, allowed_self_overrides, cross_model_policy, escalation_rules) present in active and template",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py::US0106ManifestSchemaTest::test_us0106_manifest_schema_v1_literals"
+    },
+    {
+      "id": "UAT-003",
+      "description": "AC-3: Validator + command CLI (sovereign_role_manifest_validate.py) with --file, --repo, --self-test, --enforce modes",
+      "result": "pass",
+      "evidence_ref": "scripts/sovereign_role_manifest_validate.py, [SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]"
+    },
+    {
+      "id": "UAT-004",
+      "description": "AC-4: Objective injection lib respects char cap (512 default) and file max (1024)",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py::US0106ObjectiveInjectionTest::test_us0106_objective_injection_char_cap"
+    },
+    {
+      "id": "UAT-005",
+      "description": "AC-5: Review dispatch + reviews JSONL with per-phase cap (2 default) and rework max (1 default)",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py::US0106ObligationDispatchTest::test_us0106_obligation_dispatch_cap, handoffs/sovereign_role_reviews.jsonl"
+    },
+    {
+      "id": "UAT-006",
+      "description": "AC-6: cross_model_policy ordering modes (role_review_first, critic_first, critic_only, role_review_only) resolved correctly",
+      "result": "pass",
+      "evidence_ref": "scripts/sovereign_role_manifest_lib.py::resolve_critic_ordering"
+    },
+    {
+      "id": "UAT-007",
+      "description": "AC-7: Eight contract tests passing + parity scope sovereign-role-manifest registered in check_intake_template_parity.py",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py (8 passed), [INTAKE_TEMPLATE_PARITY_OK] scope=sovereign-role-manifest"
+    },
+    {
+      "id": "UAT-008",
+      "description": "AC-8: Compose guards verified — US-0069 phase-to-role matrix unchanged, US-0104 critic schema unchanged",
+      "result": "pass",
+      "evidence_ref": "tests/us0106_contract_test.py::US0106ComposeUS0069Test::test_us0106_us0069_compose_no_matrix_change, tests/us0106_contract_test.py::US0106ComposeUS0104Test::test_us0106_us0104_compose_no_critic_schema_change"
+    }
+  ],
+  "probe_results": [],
+  "verdict": "PASS",
+  "verdict_reason": "8/8 ACs verified via contract tests + parity + self-test"
+}

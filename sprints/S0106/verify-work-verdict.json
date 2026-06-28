@@ -1,0 +1,35 @@
+{
+  "sprint_id": "S0106",
+  "story_id": "US-0106",
+  "orchestrator_run_id": "auto-20260628-04",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "timestamp": "2026-06-29T01:30:00Z",
+  "verdict": "PASS",
+  "tasks_total": 11,
+  "tasks_completed": 11,
+  "ac_total": 8,
+  "ac_verified": 8,
+  "uat_passed": 8,
+  "uat_failed": 0,
+  "blocking_findings": 0,
+  "evidence_refs": [
+    "sprints/S0106/verify-work-findings.md",
+    "sprints/S0106/uat.json",
+    "sprints/S0106/uat.md",
+    "tests/us0106_contract_test.py (8 passed)",
+    "[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]",
+    "[INTAKE_TEMPLATE_PARITY_OK] scope=sovereign-role-manifest"
+  ],
+  "compose_guards": {
+    "US-0069": "PASS",
+    "US-0104": "PASS"
+  },
+  "next_phase": "release",
+  "spawn_role": "release",
+  "backlog_drain_active": true,
+  "backlog_drain_stories_remaining_budget": 3,
+  "native_chain_continuing": true,
+  "portfolio_open_stories": 4,
+  "portfolio_open_bugs": 0
+}

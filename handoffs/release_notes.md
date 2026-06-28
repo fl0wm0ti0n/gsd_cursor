@@ -13,10 +13,22 @@ Canonical queue state now lives under:
 
 ## Latest finalized release pointer
 
-- **Latest released sprint:** `S0092`
-- **Latest canonical notes:** `handoffs/releases/S0092-release-notes.md`
-- **Latest release date:** 2026-06-26
-- **Latest release work item:** US-0102
+- **Latest released sprint:** `S0107`
+- **Latest canonical notes:** `handoffs/releases/S0107-release-notes.md`
+- **Latest release date:** 2026-06-29
+- **Latest release work item:** US-0107
+
+## Release finalized note (S0107)
+
+- Sprint: `S0107`
+- Story: `US-0107` (Sovereign Loop Mode / AUTO_SOVEREIGN — DEC-0107)
+- Release: **finalized** (`2026-06-29T00:23:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0107-20260629T002300Z-fresh`)
+- Queue: **`handoffs/release_queue.md`** row **`S0107`** = **`released`**
+- **Run / verify:** `pytest -k us0107 tests/us0107_contract_test.py -v` → 10 passed; `python scripts/sovereign_loop_lib.py --self-test` → `[SOVEREIGN_LOOP_SELF_TEST_OK]`; see **`handoffs/releases/S0107-release-notes.md`** **## Run** / **## Verify**
+- Changelog: step **19** appended **US-0107** under **`CHANGELOG.md`** **`[Unreleased]`** (workflow-only; no semver)
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **5** OPEN stories remaining (US-0106, US-0108, US-0109, US-0111, US-0112)
 
 ## Release finalized note (S0092)
 
@@ -378,16 +390,16 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0090`**: `pytest -k us0100 tests/auto_command_contract_test.py -v` — refer to `## Run` in
-  `handoffs/releases/S0090-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0107`**: `pytest -k us0107 tests/us0107_contract_test.py -v` — refer to `## Run` in
+  `handoffs/releases/S0107-release-notes.md`.
 - **Endpoint + port:** N/A (release documentation layer) — refer to `## Connect` in
-  `handoffs/releases/S0090-release-notes.md`.
+  `handoffs/releases/S0107-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0090-release-notes.md`.
+  `handoffs/releases/S0107-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0090-release-notes.md` (env-ref only).
+  `handoffs/releases/S0107-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0090-release-notes.md`.
+  `handoffs/releases/S0107-release-notes.md`.
 
 ## Historical references
 

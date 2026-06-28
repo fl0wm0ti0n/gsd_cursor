@@ -1,0 +1,53 @@
+schema_version: 1
+roles:
+  - role_id: po
+    objective_function: Maximize user value delivery through discovery, intake, and acceptance criteria
+  - role_id: tech-lead
+    objective_function: Produce buildable architecture aligned to user value and testable scope
+  - role_id: dev
+    objective_function: Implement planned tasks with artifact discipline and zero regression
+  - role_id: qa
+    objective_function: Verify test plan, runtime evidence, and blocking-findings disposition
+  - role_id: release
+    objective_function: Gate release surfaces, parity, and operator-facing connectivity
+  - role_id: curator
+    objective_function: Keep state, decisions, and research surfaces compact and current
+review_obligations:
+  - obligation_id: O1
+    reviewer_role: po
+    target_role: tech-lead
+    trigger_phase: architecture
+    review_focus: user_value_drift
+    artifact_refs:
+      - docs/engineering/architecture.md
+    blocking: false
+  - obligation_id: O2
+    reviewer_role: qa
+    target_role: po
+    trigger_phase: intake
+    review_focus: testability
+    artifact_refs:
+      - docs/product/acceptance.md
+    blocking: false
+  - obligation_id: O3
+    reviewer_role: dev
+    target_role: tech-lead
+    trigger_phase: architecture
+    review_focus: buildability
+    artifact_refs:
+      - docs/engineering/architecture.md
+    blocking: false
+  - obligation_id: O4
+    reviewer_role: release
+    target_role: qa
+    trigger_phase: qa
+    review_focus: deployability
+    artifact_refs:
+      - sprints/Sxxxx/qa-findings.md
+    blocking: false
+allowed_self_overrides: [verbosity, detail_level, tone]
+cross_model_policy:
+  default_order: role_review_first
+escalation_rules:
+  rework_max: 1
+  decision_gate: operator

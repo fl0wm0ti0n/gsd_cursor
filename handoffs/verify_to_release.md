@@ -1,118 +1,77 @@
-# Verify-Work-to-Release Handoff — Sprint S0092 / US-0102
+# Verify-Work → Release Handoff — S0107 / US-0107
 
-## Verify-Work Phase Complete
-
-**Story**: US-0102 — Direct per-phase model slug override and role-based catalog presets  
-**Decision**: DEC-0087 (locked; composes DEC-0086 — do not amend)  
-**Sprint**: S0092  
+**Sprint**: S0107  
+**Story**: US-0107 — Sovereign Loop Mode (AUTO_SOVEREIGN)  
 **Phase**: verify-work → release  
-**Timestamp**: 2026-06-25T23:30:00Z  
-**Fresh Context Marker**: `qa-S0092-US0102-verify-work-20260625T233000Z-fresh`  
-**Runtime Proof ID**: `rp-auto-20260615-02-verify-work-qa-20260625T233000Z-S0092-US0102`
+**Role**: qa  
+**Timestamp**: 2026-06-29T00:22:00Z  
+**Orchestrator**: auto-20260628-04  
+**Fresh context marker**: qa-S0107-verify-work-20260629T002200Z-fresh  
+**Verify-work verdict**: **PASS**
 
----
+## Summary
 
-## Verify-Work Verdict: PASS
+Independent `/verify-work` verification of US-0107 completed successfully. All 8 acceptance criteria satisfied. All 10 contract tests passing (8 core + 2 compose guards). Both self-tests green. Parity `sovereign-loop` pairs=6. Zero discrepancies vs `/qa` phase. No `state.md` mutation by prior phases confirmed. No blocking findings. Ready for `/release`.
 
-All verification checks passed. Sprint ready for release.
+## Evidence
 
----
+| Check | Result | Notes |
+|-------|--------|-------|
+| `pytest -k us0107 -v` | 10/10 PASS | 2.05s |
+| `sovereign_loop_lib.py --self-test` | `[SOVEREIGN_LOOP_SELF_TEST_OK]` | exit 0 |
+| `sovereign_loop_validate.py --self-test` | `[SOVEREIGN_LOOP_VALIDATION_OK]` | exit 0 |
+| `check_intake_template_parity.py --scope=sovereign-loop` | `[INTAKE_TEMPLATE_PARITY_OK]` | pairs=6 |
+| Compose regression US-0088/0092/0095 | PASS | stop matrix unchanged |
+| Compose regression US-0110 | PASS | `list_open_deferrals` additive import |
+| Compose regression US-0095 | PASS | spawn-only drain-generate preserved |
+| Zero-overhead default | PASS | `AUTO_SOVEREIGN=0` noop advance, no deferral I/O |
+| Goal-mode coupling | PASS | fail-closed `SOVEREIGN_LOOP_GOAL_MODE_REQUIRED` |
+| Reason codes (12 total) | PASS | § US-0107 in `reason_codes.md` |
+| Documentation (runbook § US-0107) | PASS | operator recipes + US-0109 `DEPLOY_DEFERRED` declaration |
+| `/auto` sovereign loop prose | PASS | advance hook, spawn-only PO drain-generate, decision gate |
+| `state.md` mutation check | PASS | no S0107 checkpoint from execute/qa |
+| Backlog / acceptance prep | unchecked `[ ]` | status OPEN per US-0045 |
 
-## Verification Summary
+## AC Verification (8/8)
 
-| Check | Status | Evidence |
-|-------|--------|----------|
-| QA verdict confirmed | PASS | 10/10 ACs, 0 blockers (`sprints/S0092/qa-findings.md`) |
-| All tasks complete | PASS | 11/11 tasks done (`sprints/S0092/tasks.md`) |
-| US-0102 contract tests | PASS | `pytest -k us0102` → 8 passed |
-| US-0101 backward compat | PASS | `pytest -k us0101` → 8 passed |
-| Model tier validator | PASS | `[MODEL_TIER_VALIDATION_OK]` |
-| Template parity | PASS | `[INTAKE_TEMPLATE_PARITY_OK]` scopes model-tier-overrides + model-tier |
-| UAT matrix | PASS | 10/10 pass (`sprints/S0092/uat.json`) |
-| Artifacts complete | PASS | All required artifacts present |
-| Governance compliance | PASS | US-0102 remains OPEN (US-0045); AC boxes checked for release prep |
-
----
-
-## Contract Test Results (verify-work re-run)
-
-```
-pytest tests/auto_command_contract_test.py -k us0102 -q
-8 passed, 143 deselected in 0.08s
-
-pytest tests/auto_command_contract_test.py -k us0101 -q
-8 passed, 143 deselected in 0.07s
-
-python scripts/model_tier_validate.py --repo .
-[MODEL_TIER_VALIDATION_OK]
-
-python scripts/check_intake_template_parity.py --scope=model-tier-overrides
-[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier-overrides
-
-python scripts/check_intake_template_parity.py --scope=model-tier
-[INTAKE_TEMPLATE_PARITY_OK] scope=model-tier
-```
-
----
-
-## UAT Matrix (AC-1..AC-10)
-
-**Total**: 10 | **Passed**: 10 | **Failed**: 0 | **Status**: populated
-
-All UAT steps pass — see `sprints/S0092/uat.md` and `sprints/S0092/uat.json`.
-
----
+| AC | Verdict |
+|----|---------|
+| AC-1 | PASS — nine scratchpad keys + zero-overhead + goal-mode fail-closed |
+| AC-2 | PASS — deferral JSONL v1 schema + CRUD + validator CLI + bootstrap |
+| AC-3 | PASS — advance_sovereign_loop policy branches + terminal paths |
+| AC-4 | PASS — drain-generate 3-candidate cap + spawn-only PO + decision gate |
+| AC-5 | PASS — notification fail-open; email deferred; local-only secrets |
+| AC-6 | PASS — US-0110 zero_deferrals import + US-0109 integration declaration |
+| AC-7 | PASS — contract tests + parity `--scope=sovereign-loop` |
+| AC-8 | PASS — reason codes, runbook, compose-no-stop-matrix guards |
 
 ## Artifacts
 
-| Artifact | Path | Status |
-|----------|------|--------|
-| Sprint plan | sprints/S0092/sprint.md | Present |
-| Tasks | sprints/S0092/tasks.md | Present |
-| Implementation summary | sprints/S0092/summary.md | Present |
-| Plan-verify | sprints/S0092/plan-verify.json | Present |
-| QA findings | sprints/S0092/qa-findings.md | Present |
-| UAT (machine) | sprints/S0092/uat.json | Populated |
-| UAT (human) | sprints/S0092/uat.md | Populated |
-| Verify-work verdict (json) | sprints/S0092/verify-work-verdict.json | Created |
-| Verify-work verdict (md) | sprints/S0092/verify-work-verdict.md | Created |
-| Dev-to-QA handoff | handoffs/dev_to_qa.md | Present |
-| QA-to-verify handoff | handoffs/qa_to_verify.md | Present |
-| Decision record | decisions/DEC-0087.md | Present |
-| Verify-to-release handoff | handoffs/verify_to_release.md | Created |
+- `sprints/S0107/verify-work-findings.md` — this turn's findings
+- `sprints/S0107/verify-work-verdict.json` — structured PASS verdict
+- `sprints/S0107/qa-findings.md` — QA phase findings
+- `sprints/S0107/qa-verdict.json` — QA PASS verdict
+- `sprints/S0107/summary.md` — execute summary
+- `sprints/S0107/execute-findings.md` — execute gate evidence
+- `tests/us0107_contract_test.py` — 10 contract tests
+- `scripts/sovereign_loop_lib.py` — deferral register, advance, drain-generate, notifications
+- `scripts/sovereign_loop_validate.py` — validator CLI
+- `decisions/DEC-0107.md` — binding decision (+ template mirror)
+- Hook prose: `.cursor/commands/auto.md`, `docs/engineering/auto-orchestration-reference.md`
 
----
+## Governance
 
-## Governance Notes
+- US-0107 status: **OPEN** in `docs/product/backlog.md` (authority per US-0045)
+- Acceptance checkboxes: **unchecked** — `/release` will flip to DONE + `[x]`
+- `docs/product/acceptance.md` US-0107 row: remains unchecked until `/release`
+- `docs/engineering/state.md`: **not modified** by verify-work
 
-- **US-0102** remains **OPEN** in `docs/product/backlog.md` (authority) — status flip to **DONE** at `/release` per **US-0045**
-- AC checkboxes checked in backlog as release prep (verify-work boundary)
-- **DEC-0087** locked — composes **DEC-0086** / **US-0101** (do not amend)
-- **Spawn-only (BUG-0006)**: Verify-work verification persisted; spawn fresh **release** for `/release`
+## Non-Blocking Notes
 
----
+- Email notification v1 deferred per DEC-0107 — `SOVEREIGN_NOTIFY_TARGET=email` returns `SOVEREIGN_NOTIFY_TARGET_INVALID`
+- Drain-generate candidate population is PO subagent responsibility post-spawn
+- Ninth scratchpad key `SOVEREIGN_NOTIFY_NTFY_BASE` extends discovery L1 per DEC-0107
 
-## Resume Brief Update
+## Next Phase
 
-`handoffs/resume_brief.md` updated to point to `/release` phase with:
-- `next_scheduled_phase=release`
-- `intended_resume_phase=release`
-- `default_spawn_role=release`
-- Contract: verify-work **PASS** — 11/11 tasks done; QA PASS 10/10 ACs; UAT 10/10; ready for `/release`
-
----
-
-## State.md Checkpoint
-
-Verify-work checkpoint appended to `docs/engineering/state.md`:
-- `phase_id=verify-work`
-- `role=qa`
-- `fresh_context_marker=qa-S0092-US0102-verify-work-20260625T233000Z-fresh`
-- `timestamp=2026-06-25T23:30:00Z`
-- `verdict=PASS`
-- `evidence_ref=sprints/S0092/verify-work-verdict.json,sprints/S0092/uat.json,sprints/S0092/uat.md,handoffs/verify_to_release.md`
-
----
-
-**Handoff Status**: Ready for `/release` phase  
-**Handoff Timestamp**: 2026-06-25T23:30:00Z
+Spawn fresh **release** subagent for **`/release`** on **S0107** / **US-0107** (spawn-only per BUG-0006; native chain per DEC-0080 / DEC-0081).

@@ -1,0 +1,18 @@
+{
+  "sprint_id": "S0106",
+  "story_id": "US-0106",
+  "governance": "DEC-0106",
+  "architecture_ref": "docs/engineering/architecture.md # US-0106",
+  "research_ref": "R-0095",
+  "task_count": 11,
+  "ac_count": 8,
+  "task_ac_bijection": true,
+  "within_limit": true,
+  "sprint_max_tasks": 12,
+  "sprint_auto_split_triggered": false,
+  "compose_guards_verified": ["US-0069", "US-0003", "US-0023", "US-0103", "US-0104", "US-0105", "US-0107"],
+  "status": "PASS",
+  "plan_verified_at": "2026-06-29T00:40:00Z",
+  "qa_role": "qa",
+  "orchestrator_run_id": "auto-20260628-04"
+}

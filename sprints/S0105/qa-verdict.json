@@ -1,0 +1,52 @@
+{
+  "sprint_id": "S0105",
+  "story_id": "US-0105",
+  "phase_id": "qa",
+  "role": "qa",
+  "verdict": "PASS",
+  "timestamp": "2026-06-29T00:11:00Z",
+  "fresh_context_marker": "qa-S0105-US0105-20260629T001100Z-fresh",
+  "orchestrator_run_id": "auto-20260628-04",
+  "contract_tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "command": "pytest -k us0105 -v",
+    "breakdown": {
+      "core_markers": 8,
+      "compose_guards": 2
+    }
+  },
+  "self_tests": {
+    "sovereign_memory_lib": "[SOVEREIGN_MEMORY_SELF_TEST_OK]",
+    "sovereign_memory_validate": "[SOVEREIGN_MEMORY_VALIDATION_OK]",
+    "exit_code": 0
+  },
+  "parity_check": {
+    "scope": "sovereign-memory",
+    "result": "[INTAKE_TEMPLATE_PARITY_OK]",
+    "pairs": 6
+  },
+  "acceptance_criteria": {
+    "total": 8,
+    "satisfied": 8,
+    "coverage": "AC-1..AC-8 all PASS"
+  },
+  "blocking_findings": 0,
+  "open_findings": [],
+  "compose_regression": {
+    "us0029_research_schema": "PASS — test_us0105_us0029_compose_no_research_schema_change",
+    "us0080_char_cap": "PASS — test_us0105_us0080_injection_respects_char_cap",
+    "us0103_ledger": "PASS — promote_from_ledger read-only compose; ledger schema unchanged",
+    "us0072_triad": "PASS — sovereign-memory archive path distinct from triad hot surfaces"
+  },
+  "status_authority": {
+    "us0105_backlog": "OPEN",
+    "state_md_modified": false,
+    "acceptance_checkbox_flipped": false
+  },
+  "next_phase": "verify-work",
+  "next_role": "qa",
+  "spawn_only": true,
+  "spawn_only_rationale": "BUG-0006"
+}

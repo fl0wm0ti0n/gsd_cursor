@@ -1,0 +1,54 @@
+{
+  "sprint_id": "S0103",
+  "story_id": "US-0103",
+  "phase_id": "qa",
+  "role": "qa",
+  "verdict": "PASS",
+  "timestamp": "2026-06-28T13:20:00Z",
+  "fresh_context_marker": "qa-S0103-US0103-qa-20260628T132000Z-fresh",
+  "contract_tests": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "command": "pytest tests/us0103_contract_test.py -v"
+  },
+  "self_tests": {
+    "decision_ledger_lib": "[DECISION_LEDGER_SELF_TEST_OK]",
+    "ledger_validate": "[DECISION_LEDGER_SELF_TEST_OK] (delegates)",
+    "exit_code": 0
+  },
+  "parity_check": {
+    "scope": "sovereign-ledger",
+    "result": "[INTAKE_TEMPLATE_PARITY_OK]",
+    "pairs": 5
+  },
+  "regression_check": {
+    "claimed": "relaxed mode blocks drop_ac (architecture violation)",
+    "actual": "NO REGRESSION — code matches locked architecture spec",
+    "evidence": "docs/engineering/architecture.md lines 2976-2990 (DEC-0103 §3)",
+    "code_match": "scripts/decision_ledger_lib.py::_deviation_table matches spec exactly",
+    "test_coverage": "test_us0103_strict_mode_hard_stop + test_us0103_relaxed_mode_reorder_with_ledger"
+  },
+  "acceptance_criteria": {
+    "total": 8,
+    "satisfied": 8,
+    "coverage": "AC-1..AC-8 all PASS"
+  },
+  "blocking_findings": 0,
+  "open_findings": [
+    {
+      "severity": "minor",
+      "description": "ledger_validate.py --self-test delegates to library self-test (no dedicated LEDGER_VALIDATION_SELF_TEST_OK message); execute-findings text slightly inaccurate",
+      "blocking": false
+    },
+    {
+      "severity": "minor",
+      "description": ".cursor/scratchpad.local.example.md lacks AI_DECISION_LEDGER/AUTO_PLAN_FIDELITY — not spec-required (local override keys only)",
+      "blocking": false
+    }
+  ],
+  "next_phase": "verify-work",
+  "next_role": "qa",
+  "spawn_only": true,
+  "spawn_only_rationale": "BUG-0006"
+}

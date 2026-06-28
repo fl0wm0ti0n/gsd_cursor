@@ -522,6 +522,96 @@ used for resume/materialization failures):
 8. Sync verdict recording when eligible — reference step 12.
 9. Backlog-drain / bulk per-item summaries when enabled — reference step 13.
 
+## Cross-model adversarial critic post-phase hook (US-0104 / DEC-0104)
+
+**Default-off**: `CROSS_MODEL_REVIEW=0` → **zero overhead** — no critic spawn, no findings
+writes, no anti-slop gate. Existing phase lifecycle unchanged.
+
+When `CROSS_MODEL_REVIEW=1`, after each **producer** phase subagent returns, orchestrator
+**MUST Task-spawn** fresh **`/sovereign-critic`** subagent (spawn-only per **BUG-0006** /
+**US-0048** / **US-0023**). Orchestrator must not execute critic evaluation in-process.
+
+### Hook sequence
+
+1. Resolve `producer_model_id` from phase context or `model_tier_lib.resolve_model_for_phase`.
+2. Call `select_critic_model(producer_model_id, scratchpad, phase_id)`.
+3. If `degraded=True` (`CROSS_MODEL_DEGRADED_MODE`): three **sequential** fresh subagent spawns
+   (same `model_id`, different lens prompts — challenger, architect, subtractor); all findings
+   record `degraded_mode=true`.
+4. Else: parallel jury via single critic subagent running all three lenses.
+5. Append findings to `handoffs/sovereign_critic_findings.jsonl`; validate with
+   `python scripts/sovereign_critic_validate.py --repo . --enforce`.
+6. When `AI_DECISION_LEDGER=1`, call `patch_ledger_cross_model_reviewed(...)`.
+
+### Anti-slop rework loop
+
+After `/sovereign-critic`:
+
+1. Compute `anti_slop_aggregate = compute_anti_slop_aggregate(lens_scores)` (min of lens scores).
+2. Compare against `CROSS_MODEL_ANTISLOP_THRESHOLD` (default **6**).
+3. If aggregate **< threshold** and open **blocking** findings exist:
+   - Increment `rework_generation` for `(orchestrator_run_id, phase_id)`.
+   - If `rework_generation < CROSS_MODEL_REWORK_MAX` (default **2**): re-spawn producer phase
+     with fresh context; pass critic summary as read-only input → **`CROSS_MODEL_ANTISLOP_FAIL`**
+     (rework, not terminal).
+   - Else → **`CROSS_MODEL_REWORK_CAP_EXHAUSTED`** decision gate (operator waive or abort).
+
+### Isolation `model_id` v2
+
+When `CROSS_MODEL_REVIEW=1`, both producer and critic isolation evidence rows require additive
+**`model_id`**. Missing → fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`**.
+
+## Sovereign memory mistake-tagging hooks (US-0105 / DEC-0105)
+
+**Default-off**: `SOVEREIGN_MEMORY=0` → **zero overhead** — no `mistakes.jsonl` writes.
+
+When `SOVEREIGN_MEMORY=1`, orchestrator calls `record_mistake_hook(...)` from
+`scripts/sovereign_memory_lib.py` on detectable failure events (closed `mistake_tag` enum):
+
+| Trigger | `mistake_tag` | `failure_reason_code` |
+|---------|---------------|----------------------|
+| Auto-loop fix exhaust (`AUTO_IMPLEMENTATION_LOOP=1`) | `fix_failed` | `FIX_FAILED` |
+| Execute revert/rollback | `revert_applied` | `REVERT_APPLIED` |
+| Plan-fidelity hard stop (`classify_deviation` blocking) | `plan_fidelity_violation` | `PLAN_FIDELITY_VIOLATION` |
+| Extended-mode scope add without override | `scope_creep` | `PLAN_FIDELITY_SCOPE_GATE` |
+
+**US-0103 compose**: hooks may read ledger context for `provenance_ref` but must not mutate
+ledger schema. Retrospectives under `sovereign-memory/retrospectives/` are **not injected v1**.
+
+## Sovereign Loop Mode (US-0107 / DEC-0107)
+
+**Default-off**: `AUTO_SOVEREIGN=0` → **zero overhead** — no deferral reads/writes, no advance,
+no notifications. Requires **`SOVEREIGN_GOAL_MODE=goal_convergence`** when enabled (fail-closed
+**`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`**).
+
+### Advance hook (post-segment)
+
+After each native-chain segment completes ( **`stop_phase=refresh-context`** ), when
+`AUTO_SOVEREIGN=1` and goal convergence active, orchestrator calls
+`advance_sovereign_loop(repo, scratchpad, orchestrator_run_id=...)` from
+`scripts/sovereign_loop_lib.py`. Sovereign terminal stops are **additive** to the US-0088 /
+US-0092 stop matrix — do not replace `decision_gate`, `loop_max`, or security deny.
+
+### Drain-generate (spawn-only PO / US-0095)
+
+When advance returns `action=drain_generate`:
+
+1. Build PO spawn inputs via `build_drain_generate_spawn_inputs(...)` (vision narrow-read;
+   optional `sovereign_memory_digest` when `SOVEREIGN_MEMORY=1`).
+2. **MUST Task-spawn** fresh **PO** subagent (spawn-only per **US-0069** / **US-0095**) with
+   ephemeral work item id `drain-gen-{orchestrator_run_id}-{iteration}` — **not** a backlog row
+   until accepted.
+3. PO returns up to **3** candidates in `DrainGenerateCandidateBundle` v1.
+4. **Decision gate (mandatory per candidate)**: operator accept → **`/intake`** or controlled
+   backlog append; reject → discard. **No auto-append** without gate (**US-0092** hard gate).
+
+### Deferral register operator path
+
+- Append: `append_deferral(...)` → `handoffs/sovereign_deferrals.jsonl` (create-on-first-write).
+- Resolve: `resolve_deferral(repo, deferral_id, orchestrator_run_id=...)`.
+- Validate: `python scripts/sovereign_loop_validate.py --repo . --enforce`.
+- **US-0109** integration: downstream writer appends `DEPLOY_DEFERRED` rows (`work_item_kind=deploy`).
+
 ## Backward compatibility
 
 Default manual/interactive unchanged; `/resume` remains valid; deterministic precedence

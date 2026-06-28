@@ -1,0 +1,168 @@
+{
+
+  "sprint_id": "S0105",
+
+  "story_id": "US-0105",
+
+  "phase_id": "verify-work",
+
+  "role": "qa",
+
+  "orchestrator_run_id": "auto-20260628-04",
+
+  "dec_id": "DEC-0105",
+
+  "timestamp": "2026-06-29T00:12:00Z",
+
+  "verdict": "PASS",
+
+  "blocking_findings": 0,
+
+  "ac_total": 8,
+
+  "ac_passed": 8,
+
+  "ac_failed": 0,
+
+  "contract_tests_passing": 10,
+
+  "contract_tests_total": 10,
+
+  "contract_test_breakdown": {
+
+    "core_markers": 8,
+
+    "compose_guards": 2
+
+  },
+
+  "self_tests_passing": 2,
+
+  "self_tests_total": 2,
+
+  "parity_scope": "sovereign-memory",
+
+  "parity_pairs": 6,
+
+  "parity_result": "INTAKE_TEMPLATE_PARITY_OK",
+
+  "compose_regression": {
+
+    "us0029_research_schema": "PASS — test_us0105_us0029_compose_no_research_schema_change",
+
+    "us0080_char_cap": "PASS — test_us0105_us0080_injection_respects_char_cap",
+
+    "us0103_ledger": "PASS — promote_from_ledger read-only compose; ledger schema unchanged",
+
+    "us0072_triad": "PASS — sovereign-memory archive path distinct from triad hot surfaces"
+
+  },
+
+  "state_md_modified_by_prior_phases": false,
+
+  "status_authority": {
+
+    "us0105_backlog": "OPEN",
+
+    "acceptance_checkbox": "unchecked",
+
+    "closure_phase": "release"
+
+  },
+
+  "ac_verification": {
+
+    "AC-1": "PASS — five SOVEREIGN_MEMORY_* scratchpad keys + defaults + zero-overhead when 0",
+
+    "AC-2": "PASS — sovereign-memory directory + JSONL v1 schemas + create-on-first-write bootstrap",
+
+    "AC-3": "PASS — top-N/top-K merge + char cap via build_injection_digest",
+
+    "AC-4": "PASS — sovereign_memory_digest spawn hook; US-0023 additive read-only",
+
+    "AC-5": "PASS — refresh-context write_retrospective + promote_from_ledger; retros not injected v1",
+
+    "AC-6": "PASS — decision dedup branch + mistake-tagging closed enum + hook wiring",
+
+    "AC-7": "PASS — eight test_us0105_* markers + parity --scope=sovereign-memory pairs=6",
+
+    "AC-8": "PASS — reason codes, runbook, architecture # US-0105, compose guards US-0029/US-0080"
+
+  },
+
+  "test_results": [
+
+    {"test": "test_us0105_scratchpad_keys_literals", "ac": "AC-1", "result": "PASS"},
+
+    {"test": "test_us0105_sovereign_memory_directory_contract", "ac": "AC-2", "result": "PASS"},
+
+    {"test": "test_us0105_jsonl_schema_contract", "ac": "AC-2", "result": "PASS"},
+
+    {"test": "test_us0105_injection_digest_char_cap", "ac": "AC-3", "result": "PASS"},
+
+    {"test": "test_us0105_decision_dedup_branch", "ac": "AC-6", "result": "PASS"},
+
+    {"test": "test_us0105_mistake_tagging_literals", "ac": "AC-6", "result": "PASS"},
+
+    {"test": "test_us0105_zero_overhead_default", "ac": "AC-1/AC-7", "result": "PASS"},
+
+    {"test": "test_us0105_compose_guards", "ac": "AC-5/AC-8", "result": "PASS"},
+
+    {"test": "test_us0105_us0029_compose_no_research_schema_change", "ac": "AC-8/compose", "result": "PASS"},
+
+    {"test": "test_us0105_us0080_injection_respects_char_cap", "ac": "AC-8/compose", "result": "PASS"}
+
+  ],
+
+  "findings": [],
+
+  "non_blocking_observations": [
+
+    {
+
+      "id": "VW-S0105-001",
+
+      "severity": "info",
+
+      "summary": "test_regression mistake hook in enum but deferred v1.1 per DEC-0105 §6 — acceptable"
+
+    },
+
+    {
+
+      "id": "VW-S0105-002",
+
+      "severity": "info",
+
+      "summary": "JSONL files create-on-first-write; only .gitkeep tracked at bootstrap — per DEC-0105"
+
+    },
+
+    {
+
+      "id": "VW-S0105-003",
+
+      "severity": "info",
+
+      "summary": "Fifth scratchpad key SOVEREIGN_MEMORY_JSONL_MAX_LINES extends backlog AC-1 prose — documented in DEC-0105"
+
+    }
+
+  ],
+
+  "discrepancies_vs_qa": "NONE — zero delta between /qa and /verify-work independent results",
+
+  "ready_for_release": true,
+
+  "fresh_context_marker": "qa-S0105-US0105-verify-work-20260629T001200Z-fresh",
+
+  "next_phase": "release",
+
+  "next_role": "release",
+
+  "spawn_only": true,
+
+  "spawn_only_rationale": "BUG-0006"
+
+}
+

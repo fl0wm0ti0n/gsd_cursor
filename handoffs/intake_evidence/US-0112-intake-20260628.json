@@ -1,0 +1,57 @@
+{
+  "intake_run_id": "cursor-20260628-US0112-intake",
+  "turn_index": 0,
+  "selected_pack": "small-intake-pack",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260628-US0112-intake:0:eb91d0a54ab1993c",
+      "quoted_user_text": "All eight template/.cursor/model-catalog.local.example*.json files appear under .cursor/ after its-magic missing install and upgrade so operators can pick a MODEL_RESOLVE preset without manual copy from the its-magic repo",
+      "intake_run_id": "cursor-20260628-US0112-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260628-US0112-intake:0:fe1e501f8539bfcc",
+      "quoted_user_text": "installer-owned-paths.manifest install_include_paths, Classify-File framework rules in installer.ps1/py/sh, template/ byte-parity, optional MODEL_CATALOG_EXAMPLE_PAIRS in check_intake_template_parity.py — not model_tier_lib or catalog schema v2",
+      "intake_run_id": "cursor-20260628-US0112-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260628-US0112-intake:0:7a07e921063a1c2d",
+      "quoted_user_text": "Examples refresh as framework files on upgrade like scratchpad.local.example.md; never touch gitignored .cursor/model-catalog.local.json; compose with US-0101/US-0102 without amending tier matrix or catalog schema",
+      "intake_run_id": "cursor-20260628-US0112-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260628-US0112-intake:0:5cdf7c95ad8f1a11",
+      "quoted_user_text": "test_us0112_* markers for manifest lists all eight paths, upgrade refreshes stale examples, missing adds absent files, guard that model-catalog.local.json is never installer-managed; parity --scope=model-catalog-examples",
+      "intake_run_id": "cursor-20260628-US0112-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260628-US0112-intake:0:12dcd8feaa127f7c",
+      "quoted_user_text": "Manifest updated, missing and upgrade paths verified locally, check_intake_template_parity PASS, runbook preset-selection recipe documented, template parity — ready for architecture and sprint",
+      "intake_run_id": "cursor-20260628-US0112-intake",
+      "turn_index": 0
+    }
+  ],
+  "validator_status": "PENDING"
+}

@@ -1,0 +1,19 @@
+{
+  "sprint_id": "S0104",
+  "story_ids": ["US-0104"],
+  "story_id": "US-0104",
+  "dec_id": "DEC-0104",
+  "status": "planned",
+  "author": "tech-lead",
+  "timestamp": "2026-06-28T23:00:00Z",
+  "orchestrator_run_id": "auto-20260628-04",
+  "fresh_context_marker": "tl-S0104-US0104-sprint-plan-20260628T230000Z-fresh",
+  "notes": "Placeholder — populated at /qa and verified at /verify-work",
+  "passed": 0,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 0,
+  "preconditions": [],
+  "steps": []
+}

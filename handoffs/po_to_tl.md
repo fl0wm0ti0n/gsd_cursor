@@ -1,4 +1,293 @@
-## --- ##
+## Orchestrated architecture handoff — US-0108 / auto-20260628-04
+
+- `timestamp=2026-06-28T22:00:00Z`
+- `phase_id=architecture`
+- `role=tech-lead`
+- `story_id=US-0108`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=tl-US0108-architecture-20260628T220000Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=sprint-plan`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=3`
+- `drain_terminated=false`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=4` (US-0108, US-0109, US-0111, US-0112)
+- `portfolio_open_bugs=0`
+- `delivery_mode=standard`
+- `token_profile=lean`
+- `caveman_mode=1`
+- `caveman_level=full`
+- `model_tier_default=balanced`
+- `AUTO_QUIET=1`
+
+### Summary
+
+- **`/architecture`** **PASS** — **R-0096** Q1–Q10 closed; companion **DEC-0108** ratified. Locked v1 schema for `parallel_dev_pick.json`, worktree naming `.git/worktrees/us0108-<story_id>-<instance_idx>/`, selection predicate (PASS → anti-slop desc → earliest proof_issued_at), merge resolution (`first_pass_wins|last_pass_wins|manual`), resource guard (`AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL=6` lockfile cap). Compose guards confirmed: DO NOT amend US-0047 / US-0092 / US-0103 / US-0104 / US-0107.
+- **10 task seeds** (T-001..T-010) within **`SPRINT_MAX_TASKS=12`** threshold; **`SPRINT_AUTO_SPLIT`** not triggered.
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Architecture locks (Q1–Q10 closed)
+
+| Q | Lock | Decision |
+|---|------|----------|
+| Q1 | Worktree naming + isolation | `.git/worktrees/us0108-<story_id>-<instance_idx>/` deterministic; per-worktree `GIT_DIR` + `GIT_WORK_TREE` env; gitignore `.git/worktrees/us0108-*` |
+| Q2 | Selection predicate | Filter `qa_verdict=PASS`; highest `anti_slop_score` (default `0`); ties break earliest `proof_issued_at`; single winner deterministic |
+| Q3 | QA cross-review mode | Sequential N QA invocations v1 (ordered, deterministic); optional `AUTO_SOVEREIGN_PARALLEL_QA=1` parallel v2 |
+| Q4 | `parallel_dev_pick.json` v1 schema | `{story_id, winner_instance_id, worktree_path, qa_verdict, anti_slop_score, proof_issued_at, merge_policy, runner_ts_utc, orchestrator_run_id, loser_instance_ids[]}` write-once |
+| Q5 | Merge resolution | `first_pass_wins` (default); `last_pass_wins`; `manual` → `PARALLEL_DEV_PICK_MANUAL_REQUIRED`; conflict bounded retry ≤2 then manual |
+| Q6 | Resource guard | `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` system-wide cap; atomic lockfile `.git/us0108_parallel_dev.lock`; fail-fast `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED`; release on exit |
+| Q7 | Execute step integration | Step 25 (parallel dev); 26 (QA cross-review); 27 (selection); 28 (merge + loser cleanup); after US-0107 step 24 + US-0047 step 22 |
+| Q8 | Backward compat | `SOVEREIGN_PARALLEL_DEV=0` = single dev; no worktrees; regression guard `test_us0108_backward_compat_single_dev_unchanged` |
+| Q9 | Contract test inventory + parity | 8 `test_us0108_*` markers; parity `--scope=sovereign-parallel-dev` (`SOVEREIGN_PARALLEL_DEV_PAIRS`) |
+| Q10 | Compose surfaces (read-only) | US-0104 `anti_slop_score` (read); US-0103 ledger (read); US-0107 deferrals (read); US-0108 writes nothing to upstream schemas |
+
+### AC → Task seed mapping (surjective)
+
+| AC | Task seeds |
+|----|------------|
+| AC-1 (scratchpad keys) | T-001, T-002 |
+| AC-2 (worktree isolation) | T-003 |
+| AC-3 (model/lens diversity) | T-004 |
+| AC-4 (selection predicate) | T-005 |
+| AC-5 (merge policy + pick JSON) | T-006 |
+| AC-6 (resource guard) | T-007 |
+| AC-7 (execute steps 25-28) | T-008 |
+| AC-8 (backward compat + tests + parity) | T-009, T-010 |
+
+### Decision
+
+- Compose guards confirmed: **US-0047/US-0092/US-0103/US-0104/US-0107** — do NOT amend; read-only integration only.
+- **DEC-0108** authored — v1 schema + helper lib API + execute step hooks + resource guard + contract tests + runbook + template parity.
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Top risks (carry to /sprint-plan)
+
+- **R1** Worktree lock conflicts — deterministic naming + per-worktree GIT_DIR mandatory
+- **R2** QA cross-review latency — sequential v1 preferred; parallel opt-in v2
+- **R3** Merge conflicts — bounded retry ≤2; then manual halt
+- **R4** Anti-slop unavailable — graceful degrade default `0`
+- **R5** Resource cap race — atomic lockfile check-and-increment
+- **R6** Bulk execute interaction — system-wide cap preferred; compose guard at step 22
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**R-0096** — Q1–Q10 closed)
+- `docs/product/backlog.md` (`## US-0108` — L1–L10 discovery locks, architecture PASS appended)
+- `decisions/DEC-0108.md` (companion decision)
+- `docs/engineering/architecture.md` (`# US-0108` — normative section)
+- `docs/engineering/state.md` (architecture checkpoint + phase boundary)
+- `handoffs/po_to_tl.md` (this handoff)
+- `handoffs/resume_brief.md` (top pointer)
+- Shipped compose surfaces: **US-0047** (`auto-orchestration-reference.md`), **US-0092** (`auto-orchestration-reference.md`), **US-0103** (`decision_ledger_lib.py`), **US-0104** (`sovereign_critic_lib.py`), **US-0107** (`sovereign_loop_lib.py`)
+
+### Next
+
+- **`/sprint-plan`** (fresh **tech-lead**) for **US-0108** — materialize **S0108** sprint from 10 task seeds; AC-1..AC-8 bijection check.
+
+### Decision gate
+
+- **None** — architecture satisfied; sprint-plan readiness explicit.
+
+---
+
+## Orchestrated research handoff — US-0106 / auto-20260628-04
+
+- `timestamp=2026-06-28T20:10:00Z`
+- `phase_id=research`
+- `role=tech-lead`
+- `story_id=US-0106`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=tl-US0106-research-20260628T201000Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=architecture`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=4`
+- `drain_terminated=false`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=5` (US-0106, US-0108, US-0109, US-0111, US-0112)
+- `portfolio_open_bugs=0`
+- `delivery_mode=standard`
+- `token_profile=lean`
+- `caveman_mode=1`
+- `caveman_level=full`
+- `model_tier_default=balanced`
+- `AUTO_QUIET=1`
+
+### Summary
+
+- **`/research`** **PASS** — **R-0095** Q1–Q7 closed; architecture-ready locks for YAML v1 schema, lib API, review dispatch contract, cross-model policy, escalation rules, contract-test inventory, parity scope.
+- Compose guards confirmed: DO NOT amend US-0069 / US-0003 / US-0104 / US-0103 / US-0105 / US-0107.
+- Companion **DEC-0106** recommended (manifest artifact surface + review dispatch contracts).
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Research locks (Q1–Q7 closed)
+
+| Q | Lock | Decision |
+|---|------|----------|
+| Q1 | YAML v1 schema + validator CLI | `schema_version: 1`, `roles[]`, `review_obligations[]`, `allowed_self_overrides`, `cross_model_policy`, `escalation_rules`; CLI `--file`, `--repo`, `--self-test`, `--enforce`; success `[SOVEREIGN_ROLE_MANIFEST_VALIDATION_OK]`; fail-closed on unknown `role_id`, cyclic obligations without escalation, secret-shaped literals |
+| Q2 | `sovereign_role_manifest_lib.py` API | `load_manifest`, `resolve_role_objective`, `build_objective_injection_block` (char-capped `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS=512`), `list_obligations_for_phase` (capped `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE=2`), `dispatch_role_review`, `self_test` |
+| Q3 | Cross-role review spawn contract | spawn-only per BUG-0006; JSONL `handoffs/sovereign_role_reviews.jsonl` fields `{obligation_id, reviewer_role, target_role, trigger_phase, orchestrator_run_id, ts, verdict, blocking, findings_ref}`; boundary token `role_review` distinct from US-0069 phase role |
+| Q4 | `cross_model_policy` ordering (US-0104 compose) | `default_order` ∈ {`role_review_first`, `critic_first`, `critic_only`, `role_review_only`}; optional per-`obligation_id` override; when `CROSS_MODEL_REVIEW=1` and `SOVEREIGN_ROLE_MANIFEST=1`, orchestrator applies policy — does not merge critic lenses with role review prompts; when either flag `0`, zero overhead |
+| Q5 | `escalation_rules` + US-0107 deferral compose | blocking review (`blocking=true`, verdict `fail`) → (1) bounded same-role rework (`SOVEREIGN_ROLE_REVIEW_REWORK_MAX` default `1`), (2) operator `decision_gate`, (3) optional `append_deferral` with `reason_code=ROLE_REVIEW_BLOCKED` when `AUTO_SOVEREIGN=1`; fail-open on deferral errors |
+| Q6 | Contract-test inventory + parity | 8 markers `test_us0106_{scratchpad_keys_literals, manifest_schema_v1_literals, objective_injection_char_cap, obligation_dispatch_cap, us0069_compose_no_matrix_change, us0104_compose_no_critic_schema_change, zero_overhead_default, parity_scope}`; parity `--scope=sovereign-role-manifest` (`SOVEREIGN_ROLE_MANIFEST_PAIRS`): `.cursor/scratchpad.md`, `.cursor/sovereign-role-manifest.yaml`, `template/.cursor/scratchpad.md`, `template/.cursor/sovereign-role-manifest.yaml.example`, `scripts/sovereign_role_manifest_validate.py`, `scripts/sovereign_role_manifest_lib.py`, `template/scripts/sovereign_role_manifest_validate.py` |
+| Q7 | Companion DEC necessity | **DEC-0106** recommended — locks manifest surface (YAML v1 schema, validator, lib, reviews JSONL, escalation, tests); anchors R-0095 |
+
+### Self-test anchor
+
+**[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]** (research stub; production self-test at `/execute`)
+
+### Top risks (carry to /architecture)
+
+- **R1**: Spawn depth / latency — review obligations multiply subagent spawns per phase; default-off + per-phase cap mandatory.
+- **R2**: Role collapse — review spawn mis-routed as producer phase replacement → US-0069 regression; distinct boundary token + compose guard required.
+- **R3**: US-0104 interaction — critic + role review at same boundary without `cross_model_policy` causes duplicate findings or rework thrash.
+- **R4**: Manifest drift from matrix — operator adds invalid `role_id` or `trigger_phase`; validator must fail-closed with remediation.
+- **R5**: Escalation oscillation — blocking review → rework → re-review loops; cap + `decision_gate` required.
+- **R6**: Secret leakage — free-text objectives/reviews need scan (mirror US-0103 / US-0105 patterns).
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**R-0095** — research closure, Q1–Q7 closed)
+- `docs/product/backlog.md` (`## US-0106` — `discovery_notes` + `research_notes`)
+- `docs/engineering/state.md` (discovery + research checkpoints)
+- `handoffs/po_to_tl.md` (this handoff)
+- `handoffs/resume_brief.md` (top pointer)
+- Shipped compose surfaces: **US-0069** (`auto-orchestration-reference.md`), **US-0104** (`sovereign_critic_lib.py`), **US-0107** (`sovereign_loop_lib.py`), **US-0105** (`sovereign_memory_lib.py`)
+
+### Next
+
+- **`/architecture`** (fresh **tech-lead**) for **US-0106** — author `# US-0106` section, companion **DEC-0106**, atomic task seeds, contract-test literals, runbook operator recipes.
+
+### Decision gate
+
+- **None** — research satisfied; architecture readiness explicit.
+
+---
+
+## Orchestrated discovery validation handoff — US-0106 / auto-20260628-04 (validation pass)
+
+- `timestamp=2026-06-28T18:04:00Z`
+- `phase_id=discovery`
+- `role=po`
+- `story_id=US-0106`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=po-US0106-discovery-20260628T180400Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=research`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=4`
+- `portfolio_open_stories=5` (US-0106, US-0108, US-0109, US-0111, US-0112)
+- `portfolio_open_bugs=0`
+
+### Lock validation summary
+
+L1–L12 validated against upstream DONE stories (US-0103, US-0104, US-0105, US-0107, US-0110). All locks **PASS**. Compose guards confirmed: DO NOT amend US-0069 / US-0003 / US-0104 / US-0103 / US-0105 / US-0107. No new discovery risks surfaced (R1–R6 as captured).
+
+### Evidence refs
+
+- `docs/product/backlog.md` (## US-0106 — `discovery_validation` block)
+- `docs/engineering/state.md` (discovery isolation evidence + phase boundary + runtime proof)
+- `handoffs/resume_brief.md` (top pointer)
+- `handoffs/po_to_tl.md` (this handoff)
+
+### Next
+
+- **`/research`** (fresh **tech-lead**) for **US-0106** — close **R-0095** Q1–Q7; YAML schema + lib + dispatch contract + US-0069 compose guards before `/architecture`.
+
+---
+
+## Orchestrated discovery handoff — US-0106 / auto-20260628-04
+
+### Target
+
+- `story_id=US-0106`
+- `orchestrator_run_id=auto-20260628-04`
+- phase completed: **`discovery`** (**`po`**)
+- `fresh_context_marker=po-US0106-discovery-20260629T002500Z-fresh`
+- `next_scheduled_phase=research`
+- `decomposition=single_story` (sovereign-loop batch per intake-sovereign-20260627-01.json)
+- `priority=P2`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=4`
+
+### Summary
+
+- **`/discovery`** **PASS** — sovereign role-behavior manifest locked: default-off **`SOVEREIGN_ROLE_MANIFEST`** gate; **`.cursor/sovereign-role-manifest.yaml`** declares per-role **`objective_function`** + directed **`review_obligations`** graph (bootstrap O1–O4: PO→arch user-value, QA→acceptance testability, dev→arch buildability, release→QA deployability); bounded **`role_objective_block`** injection at spawn; post-phase cross-role review dispatch (spawn-only, capped); **`cross_model_policy`** composes **US-0104** without amending critic schema; **`escalation_rules`** may route blocking reviews to **US-0107** deferrals or operator **`decision_gate`**. **Compose do NOT amend** **US-0069** — phase→role matrix + preflight/post checkpoint validation **unchanged**; manifest **`role_id`** ⊆ canonical roles; review spawns are **supplementary hooks** tagged by **`obligation_id`**, not alternate **`phase_id`** roles.
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Discovery locks (research inputs)
+
+| Lock | Decision |
+|------|----------|
+| **Scratchpad keys** | `SOVEREIGN_ROLE_MANIFEST=0\|1` (default `0`); `SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS` default `512`; `SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE` default `2` |
+| **Manifest path** | `.cursor/sovereign-role-manifest.yaml` + `template/.cursor/sovereign-role-manifest.yaml.example` |
+| **YAML v1 sections** | `roles[]`, `review_obligations[]`, `allowed_self_overrides`, `cross_model_policy`, `escalation_rules` |
+| **Default graph** | O1 PO→architecture user-value; O2 QA→PO testability; O3 dev→architecture buildability; O4 release→QA deployability |
+| **Objective injection** | Char-capped `role_objective_block` for US-0069-resolved role — additive to US-0105 digest |
+| **Review dispatch** | Post-phase spawn-only reviewer subagents → `handoffs/sovereign_role_reviews.jsonl`; per-phase cap |
+| **US-0069 compose** | Matrix unchanged; review ≠ phase substitute; compose guard required |
+| **US-0104 compose** | `cross_model_policy` ordering vs `/sovereign-critic` — critic schema unchanged |
+| **US-0107 compose** | `escalation_rules` → optional `append_deferral` on blocking review cap exhaustion |
+
+### Acceptance pointers (discovery emphasis)
+
+- **AC-1**: Scratchpad keys + zero-overhead when `SOVEREIGN_ROLE_MANIFEST=0`.
+- **AC-2**: YAML v1 schema + bootstrap example graph O1–O4.
+- **AC-3**: `sovereign_role_manifest_validate.py` CLI + `--self-test`.
+- **AC-4**: Objective injection for US-0069-resolved role only.
+- **AC-5**: Cross-role review dispatch + reviews JSONL + per-phase cap.
+- **AC-6**: `cross_model_policy` vs US-0104 — no critic schema change.
+- **AC-7**: Eight `test_us0106_*` markers + `--scope=sovereign-role-manifest` parity.
+- **AC-8**: Architecture, runbook, US-0069 / US-0104 compose guards.
+
+### Top risks (carry to /research)
+
+- **R1**: Spawn depth/latency — default-off + per-phase cap mandatory.
+- **R2**: Role collapse — review spawn must not substitute producer phase role (US-0069 regression).
+- **R3**: US-0104 interaction — critic + role review at same boundary without policy causes thrash.
+- **R4**: Manifest/matrix drift — invalid `role_id` or `trigger_phase` must fail-closed.
+- **R5**: Escalation oscillation — blocking review rework loops need cap + decision gate.
+- **R6**: Secret leakage in objectives/review text — scan required.
+
+### Research asks (new **`R-0095`**)
+
+1. YAML v1 schema + validator CLI.
+2. `sovereign_role_manifest_lib.py` API sketch.
+3. Cross-role review spawn contract + reviews JSONL + US-0069 boundary token.
+4. `cross_model_policy` ordering matrix vs US-0104.
+5. `escalation_rules` + US-0107 deferral compose.
+6. Contract-test inventory + `SOVEREIGN_ROLE_MANIFEST_PAIRS` parity.
+7. Companion DEC necessity.
+
+### Evidence refs
+
+- `docs/product/backlog.md` (`## US-0106` — `discovery_notes` with L1–L12 + design-intent table)
+- `docs/product/vision.md` (**Discovery Notes — US-0106**)
+- `docs/product/acceptance.md` (`US-0106` row — unchecked, discovery PASS)
+- `docs/engineering/research.md` (**`R-0095`** — discovery stub)
+- `handoffs/intake_evidence/intake-sovereign-20260627-01.json`
+- Shipped compose: **US-0069** (phase→role matrix), **US-0104** (`DEC-0104`, `sovereign_critic_lib.py`), **US-0107** (`DEC-0107`, `sovereign_loop_lib.py`), **US-0105** (`DEC-0105`, `sovereign_memory_lib.py`), **US-0103** (`DEC-0103`)
+- Adjacent (do NOT amend): **US-0003** role definitions, **US-0023** fresh-context, **US-0088**/**US-0092**/**US-0095** orchestration stop matrix
+
+### Next
+
+- **`/research`** (fresh **tech-lead** context) for **`US-0106`** — close **`R-0095`** Q1–Q7; YAML schema + lib + dispatch contract + US-0069 compose guards before **`/architecture`**.
+
+### Decision gate
+
+- **None** — discovery satisfied; research readiness explicit.
+
+---
 
 ## Orchestrated architecture handoff — US-0098 / auto-20260613-01
 

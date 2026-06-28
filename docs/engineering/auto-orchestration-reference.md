@@ -1126,6 +1126,13 @@ when stack cannot be resolved. Connect block fields align with
      `AUTO_ROLE_REFRESH_CONTEXT`), enforce execute default deny / override
      contract, and run the preflight capability gate; on failure stop with
      `PHASE_ROLE_CAPABILITY_MISSING` (no unrelated-role spawn).
+   - **US-0105 / DEC-0105**: When `SOVEREIGN_MEMORY=1`, after phase-context
+     narrow-read and **before** role instructions, append read-only
+     **`sovereign_memory_digest`** block assembled via
+     `build_injection_digest_block(...)` from `scripts/sovereign_memory_lib.py`
+     (bounded top-N/top-K merge; char cap `SOVEREIGN_MEMORY_MAX_CHARS`). When
+     `SOVEREIGN_MEMORY=0` (default), skip with zero overhead — **US-0023**
+     fresh-context boundary unchanged.
    - **US-0069 / DEC-0051**: After each phase completes, validate isolation
      `role` and strict-proof `role` against the preflight-resolved expected
      role; on conflict stop with `PHASE_ROLE_MISMATCH`.

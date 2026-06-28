@@ -1,0 +1,50 @@
+{
+  "sprint_id": "S0104",
+  "story_id": "US-0104",
+  "phase_id": "qa",
+  "role": "qa",
+  "verdict": "PASS",
+  "timestamp": "2026-06-29T00:01:00Z",
+  "fresh_context_marker": "qa-S0104-US0104-20260629T000100Z-fresh",
+  "orchestrator_run_id": "auto-20260628-04",
+  "contract_tests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "command": "pytest -k us0104 -v",
+    "breakdown": {
+      "core_markers": 8,
+      "compose_guards": 2
+    }
+  },
+  "self_tests": {
+    "sovereign_critic_lib": "[SOVEREIGN_CRITIC_SELF_TEST_OK]",
+    "sovereign_critic_validate": "[SOVEREIGN_CRITIC_VALIDATION_OK]",
+    "exit_code": 0
+  },
+  "parity_check": {
+    "scope": "sovereign-critic",
+    "result": "[INTAKE_TEMPLATE_PARITY_OK]",
+    "pairs": 5
+  },
+  "acceptance_criteria": {
+    "total": 8,
+    "satisfied": 8,
+    "coverage": "AC-1..AC-8 all PASS"
+  },
+  "blocking_findings": 0,
+  "open_findings": [],
+  "compose_regression": {
+    "us0048_base_schema": "PASS — test_us0104_us0048_compose_no_base_schema_change",
+    "us0110_critic_path": "PASS — test_us0104_us0110_critic_path_unchanged"
+  },
+  "status_authority": {
+    "us0104_backlog": "OPEN",
+    "state_md_modified": false,
+    "acceptance_checkbox_flipped": false
+  },
+  "next_phase": "verify-work",
+  "next_role": "qa",
+  "spawn_only": true,
+  "spawn_only_rationale": "BUG-0006"
+}

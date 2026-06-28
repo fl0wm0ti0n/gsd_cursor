@@ -297,6 +297,37 @@ DOWNSTREAM_CI_GUARD_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+SOVEREIGN_ROLE_MANIFEST_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        ".cursor/sovereign-role-manifest.yaml",
+        "template/.cursor/sovereign-role-manifest.yaml.example",
+    ),
+    (
+        ".cursor/scratchpad.md",
+        "template/.cursor/scratchpad.md",
+    ),
+    (
+        "scripts/sovereign_role_manifest_validate.py",
+        "template/scripts/sovereign_role_manifest_validate.py",
+    ),
+    (
+        "scripts/sovereign_role_manifest_lib.py",
+        "template/scripts/sovereign_role_manifest_lib.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        "docs/engineering/reason_codes.md",
+        "template/docs/engineering/reason_codes.md",
+    ),
+    (
+        "handoffs/sovereign_role_reviews.jsonl",
+        "template/handoffs/sovereign_role_reviews.jsonl",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
@@ -312,6 +343,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "release-changelog": RELEASE_CHANGELOG_PAIRS,
     "model-tier": MODEL_TIER_PAIRS,
     "model-tier-overrides": MODEL_TIER_OVERRIDES_PAIRS,
+    "sovereign-role-manifest": SOVEREIGN_ROLE_MANIFEST_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -327,6 +359,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + RELEASE_CHANGELOG_PAIRS
         + MODEL_TIER_PAIRS
         + MODEL_TIER_OVERRIDES_PAIRS
+        + SOVEREIGN_ROLE_MANIFEST_PAIRS
     ),
 }
 

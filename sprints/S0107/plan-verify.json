@@ -1,0 +1,178 @@
+{
+  "phase_id": "plan-verify",
+  "role": "qa",
+  "sprint_id": "S0107",
+  "story_id": "US-0107",
+  "orchestrator_run_id": "auto-20260628-04",
+  "planned_at": "2026-06-29T00:18:00Z",
+  "timestamp": "2026-06-29T00:19:00Z",
+  "fresh_context_marker": "qa-S0107-plan-verify-20260629T001900Z-fresh",
+  "status": "PASS",
+  "verdict": "PASS",
+  "verdict_reason": "All 8 acceptance criteria (AC-1..AC-8) are covered by ≥1 task in the canonical tasks.md bijection table. Sprint capacity 12 ≤ SPRINT_MAX_TASKS=12 (at threshold; no auto-split). DEC-0107 Accepted. Composition rules respected (US-0088/US-0092/US-0095/US-0044/US-0103/US-0105/US-0110 additive only). AC-8 architecture # US-0107 pre-satisfied at /architecture. tasks.md / sprint.md / architecture AC maps aligned. /execute unblocked.",
+  "plan_integrity": {
+    "ac_coverage_surjective": true,
+    "task_count": 12,
+    "ac_count": 8,
+    "task_ac_bijection": false,
+    "task_seed_bijection": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false,
+    "orphan_acs": [],
+    "orphan_tasks": []
+  },
+  "ac_to_task_mapping": {
+    "source": "tasks.md bijection table (canonical per task-level detail)",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-004", "T-006"],
+    "AC-3": ["T-004", "T-005", "T-009"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-008"],
+    "AC-6": ["T-009", "T-012"],
+    "AC-7": ["T-006", "T-010", "T-011"],
+    "AC-8": ["T-002", "T-010", "T-012"]
+  },
+  "task_to_ac_mapping": {
+    "T-001": ["AC-1"],
+    "T-002": ["AC-1", "AC-8"],
+    "T-003": ["AC-2"],
+    "T-004": ["AC-2", "AC-3"],
+    "T-005": ["AC-3"],
+    "T-006": ["AC-2", "AC-7"],
+    "T-007": ["AC-4"],
+    "T-008": ["AC-5"],
+    "T-009": ["AC-3", "AC-6"],
+    "T-010": ["AC-7", "AC-8"],
+    "T-011": ["AC-7"],
+    "T-012": ["AC-6", "AC-8"]
+  },
+  "sprint_md_coverage_mapping": {
+    "source": "sprint.md AC coverage table",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-004", "T-006"],
+    "AC-3": ["T-004", "T-005", "T-009"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-008"],
+    "AC-6": ["T-009", "T-012"],
+    "AC-7": ["T-006", "T-010", "T-011"],
+    "AC-8": ["T-002", "T-010", "T-012"]
+  },
+  "architecture_coverage_mapping": {
+    "source": "docs/engineering/architecture.md # US-0107 AC ↔ task bijection map",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-004", "T-006"],
+    "AC-3": ["T-004", "T-005", "T-009"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-008"],
+    "AC-6": ["T-009", "T-012"],
+    "AC-7": ["T-006", "T-010", "T-011"],
+    "AC-8": ["T-002", "T-010", "T-012"]
+  },
+  "findings": [
+    {
+      "id": "PV-S0107-001",
+      "severity": "info",
+      "category": "research-stub",
+      "description": "Research phase stub scripts/sovereign_loop_lib.py exists per DEC-0107 / R-0094. T-004 scope is finalize-from-stub (deferral CRUD); T-005 adds advance/dispatch bodies deferred in architecture.",
+      "resolution": "Expected per research anchor. /execute finalizes lib per T-004..T-008 tranche order."
+    },
+    {
+      "id": "PV-S0107-002",
+      "severity": "info",
+      "category": "test-timing",
+      "description": "T-001..T-009 exit criteria reference test_us0107_* markers before T-010 creates contract tests. Linear execution order T-001→...→T-012 resolves this.",
+      "resolution": "No plan change required. /execute follows tranche order; early-task gates satisfied after T-010."
+    },
+    {
+      "id": "PV-S0107-003",
+      "severity": "info",
+      "category": "pre-execute-artifacts",
+      "description": "Pre-execute deliverables not yet present: AUTO_SOVEREIGN_* scratchpad keys, template/decisions/DEC-0107.md mirror, sovereign_loop_validate.py, us0107_contract_test.py, sovereign_deferrals/.gitkeep trees, runbook § US-0107, SOVEREIGN_LOOP_PAIRS parity scope. Reason codes § US-0107 partially pre-populated in reason_codes.md from architecture phase.",
+      "resolution": "Expected at plan-verify boundary. /execute creates artifacts per tranche A→E order."
+    },
+    {
+      "id": "PV-S0107-004",
+      "severity": "info",
+      "category": "sprint-capacity-at-threshold",
+      "description": "task_count=12 equals SPRINT_MAX_TASKS=12 threshold. No hidden scope identified; SPRINT_AUTO_SPLIT not triggered per architecture.",
+      "resolution": "QA confirmed no scope creep at plan-verify; execute per locked 12-seed inventory."
+    }
+  ],
+  "governance": {
+    "dec_0107_status": "Accepted",
+    "dec_0107_status_verified": true,
+    "us_0045_status_authority": "OPEN",
+    "us_0107_canonical_status_open": true,
+    "composition_rules_respected": true,
+    "composition_details": {
+      "US-0088": "Stop matrix unchanged; sovereign terminal stops additive",
+      "US-0092": "Outer driver unchanged; decision gate preserved",
+      "US-0095": "Spawn-only PO for drain-generate; native chain unchanged",
+      "US-0044": "Drain mutex unchanged",
+      "US-0103": "Optional ledger_decision_id provenance; ledger schema unchanged",
+      "US-0105": "Drain-generate reads build_injection_digest only",
+      "US-0110": "Import evaluate_convergence; do not amend DEC-0110",
+      "US-0017": "Byte-parity scripts/ ↔ template/scripts/"
+    },
+    "ac_8_architecture_pre_satisfied": true,
+    "sprint_capacity_check": {
+      "task_count": 12,
+      "sprint_max_tasks": 12,
+      "within_limit": true,
+      "SPRINT_AUTO_SPLIT_triggered": false
+    }
+  },
+  "risk_assessment": {
+    "critical_path": ["T-004", "T-005", "T-010"],
+    "critical_path_rationale": "T-004 (deferral lib core) is predecessor to T-005..T-009; T-005 (advance algorithm) gates T-007/T-008; T-010 (contract tests) depends on all implementation tasks.",
+    "high_risk_tasks": ["T-004", "T-005", "T-006", "T-007", "T-010"],
+    "high_risk_rationale": {
+      "T-004": "Deferral CRUD + list_open_deferrals + secret scan — shared reader for US-0110 compose.",
+      "T-005": "Advance algorithm — sovereign terminal stops must remain additive.",
+      "T-006": "Validator CLI — CI --enforce hook.",
+      "T-007": "Drain-generate — mandatory decision gate + 3-candidate cap.",
+      "T-010": "Contract tests — verifies all prior implementation."
+    },
+    "risk_mitigation_assessment": "adequate",
+    "risk_mitigation_detail": {
+      "R1_goal_mode_coupling": "Mitigated — fail-closed SOVEREIGN_LOOP_GOAL_MODE_REQUIRED in T-004/T-012 runbook",
+      "R2_drain_generate_scope_creep": "Mitigated — 3-candidate cap + decision gate in T-007",
+      "R3_deferral_cap_vs_convergence": "Mitigated — shared list_open_deferrals in T-004/T-009",
+      "R4_notification_secrets": "Mitigated — local-only config in T-012",
+      "R5_sovereign_terminal_vs_native": "Mitigated — compose guard test_us0107_compose_no_stop_matrix_change in T-010",
+      "R6_us0109_ordering": "Mitigated — stable deferral schema in T-003/T-006 before US-0109"
+    }
+  },
+  "key_contracts_verified": [
+    "SPRINT_MAX_TASKS=12: 12 ≤ 12 at threshold (PASS)",
+    "DEC-0107 status=Accepted (PASS)",
+    "US-0107 status=OPEN in backlog.md (PASS)",
+    "AC-1..AC-8 all covered by ≥1 task (PASS per tasks.md)",
+    "Every task covers ≥1 AC (PASS — no orphan tasks)",
+    "tasks.md / sprint.md / architecture # US-0107 AC maps aligned (PASS)",
+    "Composition rules US-0088/92/95/44/103/105/110 unchanged (PASS)",
+    "AC-8 architecture # US-0107 pre-satisfied (PASS)",
+    "test_us0107_us0110_convergence_import_contract regression guard declared (PASS)",
+    "test_us0107_us0095_spawn_only_regression_guard declared (PASS)",
+    "Self-test [SOVEREIGN_LOOP_SELF_TEST_OK] declared as post-edit gate (PASS)",
+    "Self-test [SOVEREIGN_LOOP_VALIDATION_OK] declared as post-edit gate (PASS)",
+    "Parity --scope=sovereign-loop declared as post-edit gate (PASS)",
+    "Eight test_us0107_* markers per DEC-0107 §10 declared (PASS)"
+  ],
+  "planned_by": {
+    "role": "tech-lead",
+    "orchestrator_run_id": "auto-20260628-04",
+    "fresh_context_marker": "tl-S0107-sprint-plan-20260629T001800Z-fresh"
+  },
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260628-04",
+    "fresh_context_marker": "qa-S0107-plan-verify-20260629T001900Z-fresh",
+    "timestamp": "2026-06-29T00:19:00Z"
+  },
+  "next_phase": "/execute",
+  "next_phase_role": "dev",
+  "handoff_pointer": "sprints/S0107/tasks.md (canonical task breakdown) — execute in order T-001→T-012"
+}

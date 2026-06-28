@@ -1,0 +1,169 @@
+{
+  "phase_id": "plan-verify",
+  "role": "qa",
+  "sprint_id": "S0105",
+  "story_id": "US-0105",
+  "orchestrator_run_id": "auto-20260628-04",
+  "timestamp": "2026-06-29T00:09:00Z",
+  "fresh_context_marker": "qa-S0105-plan-verify-20260629T000900Z-fresh",
+  "status": "PASS",
+  "verdict": "PASS",
+  "verdict_reason": "All 8 acceptance criteria (AC-1..AC-8) are covered by ≥1 task in the canonical tasks.md bijection table. Sprint capacity 11 ≤ SPRINT_MAX_TASKS=12. DEC-0105 Accepted. Composition rules respected (US-0029/US-0080/US-0103/US-0072/US-0096 additive only). AC-8 architecture # US-0105 pre-satisfied at /architecture. tasks.md / sprint.md / architecture AC maps aligned.",
+  "plan_integrity": {
+    "ac_coverage_surjective": true,
+    "task_count": 11,
+    "ac_count": 8,
+    "task_ac_bijection": false,
+    "task_seed_bijection": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false,
+    "orphan_acs": [],
+    "orphan_tasks": []
+  },
+  "ac_to_task_mapping": {
+    "source": "tasks.md bijection table (canonical per task-level detail)",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-006"],
+    "AC-3": ["T-004"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-005", "T-009"],
+    "AC-6": ["T-005", "T-008"],
+    "AC-7": ["T-010", "T-011"],
+    "AC-8": ["T-002", "T-006", "T-010", "T-011"]
+  },
+  "task_to_ac_mapping": {
+    "T-001": ["AC-1"],
+    "T-002": ["AC-1", "AC-8"],
+    "T-003": ["AC-2"],
+    "T-004": ["AC-3"],
+    "T-005": ["AC-5", "AC-6"],
+    "T-006": ["AC-2", "AC-8"],
+    "T-007": ["AC-4"],
+    "T-008": ["AC-6"],
+    "T-009": ["AC-5"],
+    "T-010": ["AC-7", "AC-8"],
+    "T-011": ["AC-7", "AC-8"]
+  },
+  "sprint_md_coverage_mapping": {
+    "source": "sprint.md AC coverage table",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-006"],
+    "AC-3": ["T-004"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-005", "T-009"],
+    "AC-6": ["T-005", "T-008"],
+    "AC-7": ["T-010", "T-011"],
+    "AC-8": ["T-002", "T-006", "T-010", "T-011"]
+  },
+  "architecture_coverage_mapping": {
+    "source": "docs/engineering/architecture.md # US-0105 AC ↔ task bijection map",
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-006"],
+    "AC-3": ["T-004"],
+    "AC-4": ["T-007"],
+    "AC-5": ["T-005", "T-009"],
+    "AC-6": ["T-005", "T-008"],
+    "AC-7": ["T-010", "T-011"],
+    "AC-8": ["T-002", "T-006", "T-010", "T-011"]
+  },
+  "findings": [
+    {
+      "id": "PV-S0105-001",
+      "severity": "info",
+      "category": "research-stub",
+      "description": "Research phase stub scripts/sovereign_memory_lib.py exists per DEC-0105 / R-0093. T-004 scope is finalize-from-stub (read/injection core); T-005 adds mutation bodies deferred in architecture.",
+      "resolution": "Expected per research anchor. /execute finalizes lib per T-004..T-005 tranche order."
+    },
+    {
+      "id": "PV-S0105-002",
+      "severity": "info",
+      "category": "test-timing",
+      "description": "T-001..T-009 exit criteria reference test_us0105_* markers before T-010 creates contract tests. Linear execution order T-001→...→T-011 resolves this.",
+      "resolution": "No plan change required. /execute follows tranche order; early-task gates satisfied after T-010."
+    },
+    {
+      "id": "PV-S0105-003",
+      "severity": "info",
+      "category": "pre-execute-artifacts",
+      "description": "Pre-execute deliverables not yet present: SOVEREIGN_MEMORY_* scratchpad keys, template/decisions/DEC-0105.md mirror, sovereign_memory_validate.py, us0105_contract_test.py, sovereign-memory/.gitkeep trees, runbook § US-0105, SOVEREIGN_MEMORY_PAIRS parity scope. Reason codes § US-0105 partially pre-populated in reason_codes.md from architecture phase.",
+      "resolution": "Expected at plan-verify boundary. /execute creates artifacts per tranche A→E order."
+    },
+    {
+      "id": "PV-S0105-004",
+      "severity": "info",
+      "category": "ac-dec-extension",
+      "description": "Backlog AC-1 prose lists four scratchpad keys; DEC-0105 §1 and T-001 add fifth key SOVEREIGN_MEMORY_JSONL_MAX_LINES (default 500) for JSONL rollover (AC-2). Binding DEC authority; not a coverage gap.",
+      "resolution": "No plan change required. Execute per DEC-0105 §1 five-key inventory."
+    },
+    {
+      "id": "PV-S0105-005",
+      "severity": "info",
+      "category": "optional-hook-defer",
+      "description": "DEC-0105 §6 lists test_regression mistake hook as optional v1.1 defer. T-008 scopes four primary triggers (fix_failed, revert_applied, plan_fidelity_violation, scope_creep) — aligned with mandatory v1 set.",
+      "resolution": "No plan change required. Optional test_regression may ship in v1.1 without blocking execute."
+    }
+  ],
+  "governance": {
+    "dec_0105_status": "Accepted",
+    "dec_0105_status_verified": true,
+    "us_0045_status_authority": "OPEN",
+    "us_0105_canonical_status_open": true,
+    "composition_rules_respected": true,
+    "composition_details": {
+      "US-0029": "research.md unchanged; provenance_ref only in memory entries",
+      "US-0080": "Lib-side digest truncation; TOKEN_PROFILE unchanged",
+      "US-0103": "Per-run ledger unchanged; optional promotion at refresh-context",
+      "US-0072": "Triad hot surfaces unchanged; sovereign-memory excluded",
+      "US-0096": "pack.json / active-context.md distinct layer",
+      "US-0017": "Byte-parity scripts/ ↔ template/scripts/"
+    },
+    "ac_8_architecture_pre_satisfied": true,
+    "sprint_capacity_check": {
+      "task_count": 11,
+      "sprint_max_tasks": 12,
+      "within_limit": true,
+      "SPRINT_AUTO_SPLIT_triggered": false
+    }
+  },
+  "risk_assessment": {
+    "critical_path": ["T-004", "T-005", "T-010"],
+    "critical_path_rationale": "T-004 (lib read/injection core) is predecessor to T-005..T-009; T-005 (mutations) gates T-008/T-009; T-010 (contract tests) depends on all implementation tasks.",
+    "high_risk_tasks": ["T-004", "T-005", "T-006", "T-010"],
+    "high_risk_rationale": {
+      "T-004": "Helper library read/injection core — schemas, digest merge, secret scan. HIGH risk in tasks.md.",
+      "T-005": "Lib mutations — append/dedup/rollover/promotion. HIGH risk in tasks.md.",
+      "T-006": "Validator CLI — CI --enforce hook. HIGH risk in tasks.md.",
+      "T-010": "Contract tests — verifies all prior implementation. HIGH risk in tasks.md."
+    },
+    "risk_mitigation_assessment": "adequate",
+    "risk_mitigation_detail": {
+      "R1_token_bloat": "Mitigated — char cap + tail read + lib-side digest in T-004",
+      "R2_research_vs_learnings_overlap": "Mitigated — provenance_ref only; compose guard in T-010",
+      "R3_ledger_vs_decisions_log_confusion": "Mitigated — distinct schemas + runbook table in T-011",
+      "R4_stale_injection": "Mitigated — status supersession on all entries in T-004",
+      "R5_secret_leakage": "Mitigated — SOVEREIGN_MEMORY_SECRET_DETECTED in T-004",
+      "R6_us0107_read_api_coupling": "Mitigated — stable lib surface; schema_version in T-004"
+    }
+  },
+  "key_contracts_verified": [
+    "SPRINT_MAX_TASKS=12: 11 ≤ 12 (PASS)",
+    "DEC-0105 status=Accepted (PASS)",
+    "US-0105 status=OPEN in backlog.md (PASS)",
+    "AC-1..AC-8 all covered by ≥1 task (PASS per tasks.md)",
+    "Every task covers ≥1 AC (PASS — no orphan tasks)",
+    "tasks.md / sprint.md / architecture # US-0105 AC maps aligned (PASS)",
+    "Composition rules US-0029/US-0080/US-0103/US-0072/US-0096 unchanged (PASS)",
+    "AC-8 architecture # US-0105 pre-satisfied (PASS)",
+    "test_us0105_us0029_compose_no_research_schema_change regression guard declared (PASS)",
+    "test_us0105_us0080_injection_respects_char_cap regression guard declared (PASS)",
+    "Self-test [SOVEREIGN_MEMORY_SELF_TEST_OK] declared as post-edit gate (PASS)",
+    "Self-test [SOVEREIGN_MEMORY_VALIDATION_OK] declared as post-edit gate (PASS)",
+    "Parity --scope=sovereign-memory declared as post-edit gate (PASS)",
+    "Eight test_us0105_* markers per DEC-0105 §12 declared (PASS)"
+  ],
+  "next_phase": "/execute",
+  "next_phase_role": "dev",
+  "handoff_pointer": "sprints/S0105/tasks.md (canonical task breakdown) — execute in order T-001→T-011"
+}

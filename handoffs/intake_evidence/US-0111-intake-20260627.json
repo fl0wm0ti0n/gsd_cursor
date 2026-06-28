@@ -1,0 +1,57 @@
+{
+  "intake_run_id": "cursor-20260627-US0111-intake",
+  "turn_index": 0,
+  "selected_pack": "small-intake-pack",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260627-US0111-intake:0:c9af0a6bb85d25f5",
+      "quoted_user_text": "Any release trigger automatically generates accurate version changelog without human intervention, showing only changes since previous version",
+      "intake_run_id": "cursor-20260627-US0111-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260627-US0111-intake:0:d7f9ce6b39072f69",
+      "quoted_user_text": "/release command, scripts/release_changelog_lib.py, CHANGELOG.md, handoffs/releases/{semver}-release-notes.md, scripts/release-all.sh, GitHub/npm/git integrations",
+      "intake_run_id": "cursor-20260627-US0111-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260627-US0111-intake:0:988bc02f30f5ebae",
+      "quoted_user_text": "Compose with US-0100 (do not amend), maintain backward compatibility for RELEASE_TRIGGER_SOURCE=manual, preserve audit trail for sovereign-loop US-0103",
+      "intake_run_id": "cursor-20260627-US0111-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260627-US0111-intake:0:db524e27c9279a17",
+      "quoted_user_text": "test_us0111_* markers for GitHub trigger, npm trigger, git tag trigger, version comparison, atomic promotion, fallback to manual mode",
+      "intake_run_id": "cursor-20260627-US0111-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260627-US0111-intake:0:9067a29d796dd162",
+      "quoted_user_text": "All trigger sources successfully generate version changelog, CHANGELOG.md updated atomically, per-version notes file created, [Unreleased] promoted, sovereign ledger records derivation decision",
+      "intake_run_id": "cursor-20260627-US0111-intake",
+      "turn_index": 0
+    }
+  ],
+  "validator_status": "PENDING"
+}

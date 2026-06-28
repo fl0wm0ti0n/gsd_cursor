@@ -1,0 +1,122 @@
+{
+  "schema_version": "1.0",
+  "sprint_id": "S0103",
+  "story_id": "US-0103",
+  "title": "AI Decision Ledger + Plan Fidelity Policy",
+  "status": "architecture_complete",
+  "architecture_notes": {
+    "architecture_completed_at": "2026-06-28T13:25:00Z",
+    "architect": "tech-lead",
+    "fresh_context_marker": "tl-US0103-architecture-20260628T132500Z-fresh",
+    "decisions": [
+      "DEC-0103: AI Decision Ledger + Plan Fidelity Policy"
+    ],
+    "architecture_document": {
+      "path": "docs/engineering/architecture.md",
+      "section": "# US-0103: AI Decision Ledger + Plan Fidelity Policy (Sovereign-Loop Foundation)",
+      "status": "completed"
+    },
+    "integration_points": {
+      "US-0070": "Phase selection policy — ledger respects phase_skip/phase_force",
+      "US-0069": "Isolation evidence — ledger entries include isolation context",
+      "US-0048": "Role enforcement — ledger entries track phase role transitions",
+      "US-0092": "Full autonomy outer driver — ledger supports autonomous decision recording"
+    },
+    "security_boundaries": [
+      "No environment variable reads (no secrets in ledger)",
+      "Append-only semantics (no mutation of prior entries)",
+      "No cross-run file access (one file per orchestrator run)"
+    ]
+  },
+  "sprint_plan": {
+    "total_tasks": 11,
+    "task_ids": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007", "T-008", "T-009", "T-010", "T-011"],
+    "acceptance_criteria_coverage": {
+      "AC-1": ["T-001"],
+      "AC-2": ["T-002", "T-003"],
+      "AC-3": ["T-004"],
+      "AC-4": ["T-005"],
+      "AC-5": ["T-006"],
+      "AC-6": ["T-007"],
+      "AC-7": ["T-008", "T-009", "T-010"],
+      "AC-8": ["T-011"]
+    },
+    "coverage_status": "surjective",
+    "sprint_max_tasks": 12,
+    "within_limit": true
+  },
+  "task_summary": {
+    "T-001": {
+      "title": "Scratchpad keys declaration",
+      "acceptance_criteria": ["AC-1"],
+      "risk": "low",
+      "dependencies": []
+    },
+    "T-002": {
+      "title": "Ledger directory structure",
+      "acceptance_criteria": ["AC-2"],
+      "risk": "low",
+      "dependencies": []
+    },
+    "T-003": {
+      "title": "Helper library implementation",
+      "acceptance_criteria": ["AC-1", "AC-2"],
+      "risk": "high",
+      "dependencies": ["T-001", "T-002"]
+    },
+    "T-004": {
+      "title": "Validator CLI implementation",
+      "acceptance_criteria": ["AC-2", "AC-8"],
+      "risk": "high",
+      "dependencies": ["T-001", "T-002"]
+    },
+    "T-005": {
+      "title": "Plan-fidelity deviation classification implementation",
+      "acceptance_criteria": ["AC-3"],
+      "risk": "high",
+      "dependencies": ["T-003"]
+    },
+    "T-006": {
+      "title": "QA cross-check block builder integration",
+      "acceptance_criteria": ["AC-6", "AC-8"],
+      "risk": "medium",
+      "dependencies": ["T-001", "T-002"]
+    },
+    "T-007": {
+      "title": "Runbook operator recipe",
+      "acceptance_criteria": ["AC-8"],
+      "risk": "low",
+      "dependencies": ["T-001", "T-002"]
+    },
+    "T-008": {
+      "title": "Contract tests implementation",
+      "acceptance_criteria": ["AC-7"],
+      "risk": "high",
+      "dependencies": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006"]
+    },
+    "T-009": {
+      "title": "Template parity verification",
+      "acceptance_criteria": ["AC-7", "AC-8"],
+      "risk": "medium",
+      "dependencies": ["T-001", "T-002", "T-003", "T-004"]
+    },
+    "T-010": {
+      "title": "Harness section implementation",
+      "acceptance_criteria": ["AC-7"],
+      "risk": "medium",
+      "dependencies": ["T-008"]
+    },
+    "T-011": {
+      "title": "Architecture # US-0103 documentation",
+      "acceptance_criteria": ["AC-8"],
+      "risk": "low",
+      "dependencies": ["T-001", "T-002"]
+    }
+  },
+  "orchestration": {
+    "orchestrator_run_id": "auto-20260628-01",
+    "boundary": "architecture_complete",
+    "next_phase": "sprint_plan",
+    "sprint_id_target": "S0103"
+  }
+}

@@ -384,3 +384,93 @@ MODEL_PROVIDER_MODE=cursor
 #     MODEL_QA=<your-vendor-slug>
 #     MODEL_REFRESH-CONTEXT=<your-vendor-slug>
 #   MODEL_ASK participates in step 1 like any other phase (no special-case bypass).
+#
+# AI Decision Ledger + Plan Fidelity (US-0103 / DEC-0103)
+# Sovereign-loop foundation. Default-off — zero overhead when AI_DECISION_LEDGER=0.
+# - AI_DECISION_LEDGER: 0|1 (default 0) — when 0: no ledger reads/writes/schema checks.
+# - AUTO_PLAN_FIDELITY: strict|relaxed|extended (default strict) — active only when ledger enabled.
+#   strict   = any unapproved drop/reorder/scope-add → PLAN_FIDELITY_VIOLATION hard stop
+#   relaxed  = drop/reorder allowed (ledger entry); scope-add still hard stop
+#   extended = scope-add allowed (extension report); drop/reorder allowed
+AI_DECISION_LEDGER=0
+AUTO_PLAN_FIDELITY=strict
+#
+# Goal-Based Convergence (US-0110 / DEC-0110)
+# Default-off sovereign-loop terminal predicate. When SOVEREIGN_GOAL_MODE=phase_driven,
+# zero overhead — no evaluation, no goal_progress block, no partial-delivery write.
+# Compose do NOT amend US-0088 / US-0092 / US-0095 / US-0044 / US-0103 (read-only surfaces).
+# - SOVEREIGN_GOAL_MODE: phase_driven|goal_convergence (default phase_driven)
+# - SOVEREIGN_GOAL: explicit goal text (wins over vision auto-derive; default empty)
+# - SOVEREIGN_GOAL_TOP_N: int >= 1 vision paragraph count for auto-derive (default 3)
+# - SOVEREIGN_GOAL_MAX_CHARS: int >= 64 truncation cap (default 512)
+# - SOVEREIGN_GOAL_TIMEOUT_MAX: int >= 0 iteration-count cap (0 = disabled; not wall-clock)
+SOVEREIGN_GOAL_MODE=phase_driven
+SOVEREIGN_GOAL=
+SOVEREIGN_GOAL_TOP_N=3
+SOVEREIGN_GOAL_MAX_CHARS=512
+SOVEREIGN_GOAL_TIMEOUT_MAX=0
+#
+# Cross-Model Adversarial Critic (US-0104 / DEC-0104)
+# Default-off cross-model review. When CROSS_MODEL_REVIEW=0, zero overhead — no critic
+# spawn, no findings writes, no anti-slop gate. Compose do NOT amend US-0048 / US-0069 /
+# US-0023 / US-0110 / US-0103 (additive surfaces only).
+# - CROSS_MODEL_REVIEW: 0|1 (default 0)
+# - CROSS_MODEL_ANTISLOP_THRESHOLD: int 0-10 aggregate floor (default 6)
+# - CROSS_MODEL_REWORK_MAX: int >= 0 producer re-spawns per (run, phase) (default 2)
+CROSS_MODEL_REVIEW=0
+CROSS_MODEL_ANTISLOP_THRESHOLD=6
+CROSS_MODEL_REWORK_MAX=2
+#
+# Sovereign Memory (US-0105 / DEC-0105)
+# Default-off institutional memory. When SOVEREIGN_MEMORY=0, zero overhead —
+# no JSONL writes, no injection reads, no spawn digest assembly.
+# Compose do NOT amend US-0029 / US-0080 / US-0103 / US-0072 / US-0096.
+# - SOVEREIGN_MEMORY: 0|1 (default 0)
+# - SOVEREIGN_MEMORY_TOP_N: int >= 0 (default 5) — global recent pool (all four JSONL families)
+# - SOVEREIGN_MEMORY_TOP_K: int >= 0 (default 3) — high-impact pool (patterns + mistakes only)
+# - SOVEREIGN_MEMORY_MAX_CHARS: int >= 0 (default 2048) — hard cap on assembled digest_text
+# - SOVEREIGN_MEMORY_JSONL_MAX_LINES: int >= 1 (default 500) — active JSONL line cap before archive rollover
+SOVEREIGN_MEMORY=0
+SOVEREIGN_MEMORY_TOP_N=5
+SOVEREIGN_MEMORY_TOP_K=3
+SOVEREIGN_MEMORY_MAX_CHARS=2048
+SOVEREIGN_MEMORY_JSONL_MAX_LINES=500
+#
+# Sovereign Loop Mode (US-0107 / DEC-0107)
+# Default-off project orchestration. When AUTO_SOVEREIGN=0, zero overhead — no deferral
+# reads/writes, no advance, no notifications. Requires SOVEREIGN_GOAL_MODE=goal_convergence
+# when enabled (fail-closed SOVEREIGN_LOOP_GOAL_MODE_REQUIRED). Compose do NOT amend
+# US-0088 / US-0092 / US-0095 / US-0044 / US-0103 / US-0105 / US-0110 (additive hooks only).
+# - AUTO_SOVEREIGN: 0|1 (default 0)
+# - AUTO_SOVEREIGN_DEFERRAL_MAX: int >= 1 (default 50) — max open deferral rows
+# - AUTO_SOVEREIGN_DRAIN_GENERATE_MAX: int >= 0 (default 3) — drain-generate iterations per run
+# - AUTO_SOVEREIGN_DEFERRAL_POLICY: stop|skip|resolve_first (default resolve_first)
+# - SOVEREIGN_NOTIFY_TARGET: off|ntfy|email|hook (default off)
+# - SOVEREIGN_NOTIFY_NTFY_TOPIC: string (default empty — local-only)
+# - SOVEREIGN_NOTIFY_NTFY_BASE: URL (default empty — local-only ntfy base override)
+# - SOVEREIGN_NOTIFY_HOOK_URL: URL (default empty — local-only webhook)
+# - SOVEREIGN_NOTIFY_EMAIL_TO: email (default empty — email v1 deferred)
+AUTO_SOVEREIGN=0
+AUTO_SOVEREIGN_DEFERRAL_MAX=50
+AUTO_SOVEREIGN_DRAIN_GENERATE_MAX=3
+AUTO_SOVEREIGN_DEFERRAL_POLICY=resolve_first
+SOVEREIGN_NOTIFY_TARGET=off
+SOVEREIGN_NOTIFY_NTFY_TOPIC=
+SOVEREIGN_NOTIFY_NTFY_BASE=
+SOVEREIGN_NOTIFY_HOOK_URL=
+SOVEREIGN_NOTIFY_EMAIL_TO=
+#
+# Sovereign Role-Behavior Manifest (US-0106 / DEC-0106)
+# Default-off per-role objective + inter-role review obligations. When SOVEREIGN_ROLE_MANIFEST=0,
+# zero overhead — no manifest reads, no objective injection, no review dispatch.
+# Compose do NOT amend US-0069 (phase→role matrix unchanged; review spawns supplementary),
+# US-0104 (critic lenses + findings schema unchanged; role reviews additive),
+# US-0003 / US-0023 / US-0103 / US-0105 / US-0107 (unchanged surfaces).
+# - SOVEREIGN_ROLE_MANIFEST: 0|1 (default 0)
+# - SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS: int >= 1 (default 512) — hard truncate for injection
+# - SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE: int >= 0 (default 2) — per-phase review cap
+# - SOVEREIGN_ROLE_REVIEW_REWORK_MAX: int >= 0 (default 1) — bounded rework before decision gate
+SOVEREIGN_ROLE_MANIFEST=0
+SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS=512
+SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE=2
+SOVEREIGN_ROLE_REVIEW_REWORK_MAX=1
