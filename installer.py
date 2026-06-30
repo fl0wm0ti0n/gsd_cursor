@@ -145,6 +145,14 @@ FRAMEWORK_PREFIXES = (
 )
 FRAMEWORK_EXACT = {
     ".cursor/hooks.json", ".cursor/scratchpad.local.example.md",
+    ".cursor/model-catalog.local.example.json",
+    ".cursor/model-catalog.local.example.cursor-only.json",
+    ".cursor/model-catalog.local.example.level-1-easy.json",
+    ".cursor/model-catalog.local.example.level-2-complex.json",
+    ".cursor/model-catalog.local.example.level-3-mega.json",
+    ".cursor/model-catalog.local.example.level-4-super.json",
+    ".cursor/model-catalog.local.example.role-based-balanced.json",
+    ".cursor/model-catalog.local.example.role-based-highend.json",
     ".its-magic-version", "its_magic/.its-magic-version", "its_magic/README.md",
 }
 USER_DATA_PREFIXES = (

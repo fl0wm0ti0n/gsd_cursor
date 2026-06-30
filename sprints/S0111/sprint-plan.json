@@ -1,0 +1,136 @@
+{
+  "sprint_id": "S0111",
+  "story_id": "US-0111",
+  "decision_id": "DEC-0111",
+  "status": "OPEN",
+  "orchestrator_run_id": "auto-20260628-04",
+  "max_tasks_allowed": 12,
+  "task_count": 11,
+  "auto_split_triggered": false,
+  "compose_guards": [
+    "US-0100",
+    "US-0054",
+    "US-0103",
+    "US-0040",
+    "US-0008",
+    "US-0107",
+    "US-0110"
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "ac": "AC-1",
+      "title": "Trigger adapter registry",
+      "tranche": "A",
+      "dependencies": [],
+      "description": "Create scripts/release_trigger_adapters.py with TriggerContext dataclass (version, previous_version, source, metadata), abstract ReleaseAdapter base, and dispatch_to_adapter(source, env_vars) registry. Template mirror. Scratchpad key RELEASE_TRIGGER_SOURCE=manual (default). "
+    },
+    {
+      "id": "T-002",
+      "ac": "AC-2",
+      "title": "GitHub webhook adapter",
+      "tranche": "B",
+      "dependencies": ["T-001"],
+      "description": "GithubReleaseAdapter — parse release.tag_name, query GitHub API for previous tag, git ls-remote fallback, GITHUB_TOKEN env, fail-closed RELEASE_TRIGGER_TAG_MISSING / RELEASE_TRIGGER_PREVIOUS_MISSING."
+    },
+    {
+      "id": "T-003",
+      "ac": "AC-3",
+      "title": "npm publish trigger",
+      "tranche": "B",
+      "dependencies": ["T-001"],
+      "description": "NpmPublishAdapter — npm_package_version env, npm view {pkg} versions --json with 10s timeout, offline fallback via RELEASE_TRIGGER_FALLBACK_TO_LOCAL=1 → package-lock.json, fail-closed RELEASE_TRIGGER_REGISTRY_UNREACHABLE."
+    },
+    {
+      "id": "T-004",
+      "ac": "AC-4",
+      "title": "Git tag push trigger",
+      "tranche": "B",
+      "dependencies": ["T-001"],
+      "description": "GitTagAdapter — GITHUB_REF / git describe --tags, semver sort via git for-each-ref, annotated vs lightweight handled by semver sort, fail-closed TAG_MISSING / PREVIOUS_MISSING."
+    },
+    {
+      "id": "T-005",
+      "ac": "AC-5",
+      "title": "Manual backward compatibility",
+      "tranche": "B",
+      "dependencies": ["T-001"],
+      "description": "ManualReleaseAdapter — /release dispatch returns TriggerContext(source=manual); byte-identical to pre-US-0111 behavior. Regression guard test_us0111_manual_backward_compat_byte_identical."
+    },
+    {
+      "id": "T-006",
+      "ac": "AC-6",
+      "title": "Version comparison logic",
+      "tranche": "C",
+      "dependencies": ["T-002", "T-003", "T-004", "T-005"],
+      "description": "Integrate TriggerContext into release_changelog_lib.compare_versions() — semver diff when source != manual. US-0100 compare_versions() signature UNCHANGED (read-only compose)."
+    },
+    {
+      "id": "T-007",
+      "ac": "AC-7",
+      "title": "Atomic promotion",
+      "tranche": "C",
+      "dependencies": ["T-006"],
+      "description": "Generate CHANGELOG-vX.Y.Z.md atomically via os.replace(temp, target); Windows PermissionError retry 0.1s, fail-closed RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED. Reuse promote_unreleased() unchanged."
+    },
+    {
+      "id": "T-008",
+      "ac": "AC-8",
+      "title": "Per-version notes generation",
+      "tranche": "C",
+      "dependencies": ["T-006"],
+      "description": "Emit handoffs/releases/vX.Y.Z-release-notes.md atomically via os.replace(temp, target); reuse release_changelog_lib notes APIs unchanged."
+    },
+    {
+      "id": "T-009",
+      "ac": "AC-9",
+      "title": "Sovereign loop integration",
+      "tranche": "C",
+      "dependencies": ["T-007", "T-008"],
+      "description": "Emit (semver, previous_semver, timestamp, derivation_decisions[]) to US-0103 ledger via append_entry(decision_type=version_derivation); append-only, no schema change. Write handoffs/release_events/{ts}-{semver}.json."
+    },
+    {
+      "id": "T-010",
+      "ac": "AC-10",
+      "title": "Fail-closed reason codes (9 codes)",
+      "tranche": "C",
+      "dependencies": [],
+      "description": "Add 9 codes to docs/engineering/reason_codes.md § US-0111: ADAPTER_FAILED, TAG_MISSING, PREVIOUS_MISSING, PACKAGE_JSON_MISSING, ATOMIC_PROMOTION_FAILED, NOTES_WRITE_FAILED, EVENT_EMIT_FAILED, COMPARE_VERSIONS_FAILED, SOURCE_INVALID. Template mirror."
+    },
+    {
+      "id": "T-011",
+      "ac": "AC-11",
+      "title": "Contract tests + template parity",
+      "tranche": "D",
+      "dependencies": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007", "T-008", "T-009", "T-010"],
+      "description": "tests/us0111_contract_test.py with 12 pytest markers covering all adapters, version comparison, atomic promotion, per-version notes, ledger event shape, 9 reason codes, US-0100/US-0054 compose guards. Parity scope release-trigger-adapter in check_intake_template_parity.py."
+    },
+    {
+      "id": "T-012",
+      "ac": "AC-12",
+      "title": "Documentation + runbook updates",
+      "tranche": "D",
+      "dependencies": ["T-010", "T-011"],
+      "description": "Append section 'US-0111 — Release Trigger Derivation' to docs/engineering/runbook.md (operator recipe: adapter priority, troubleshooting). Append reason code family to docs/engineering/reason_codes.md § US-0111. Template mirror for runbook + reason codes."
+    }
+  ],,
+  "ac_map": {
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002"],
+    "AC-3": ["T-003"],
+    "AC-4": ["T-004"],
+    "AC-5": ["T-005"],
+    "AC-6": ["T-006"],
+    "AC-7": ["T-007"],
+    "AC-8": ["T-008"],
+    "AC-9": ["T-009"],
+    "AC-10": ["T-010"],
+    "AC-11": ["T-011"],
+    "AC-12": ["T-012"]
+  },
+  "resolved_findings": {
+    "F1": "task_count updated to 12 to match architecture AC surjective map",
+    "F2": "T-012 AC-12 added to tasks array",
+    "F3": "sprint.md AC titles and tranche structure aligned with architecture"
+  }
+}

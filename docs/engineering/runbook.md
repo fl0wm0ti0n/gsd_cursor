@@ -938,6 +938,83 @@ If the default set is insufficient, escalate with an explicit note citing
 - If unresolved after bounded expansion, answer with explicit "not found in
   current artifacts" rather than broad speculative reads.
 
+## Model-catalog example preset delivery (US-0112 / DEC-0112)
+
+**Default state**: 8 committed `model-catalog.local.example*.json` presets ship with the
+`its-magic` framework and are delivered to operator repos via the installer manifest
+(`docs/engineering/context/installer-owned-paths.manifest` [install_include_paths]) under
+**framework-file semantics** (US-0018 / US-0057 / US-0075 precedence).
+
+### Eight preset filenames (manifest rows)
+
+1. `.cursor/model-catalog.local.example.json` — base placeholder (three tiers, opaque vendor slugs)
+2. `.cursor/model-catalog.local.example.cursor-only.json` — Cursor-first alias mapping
+3. `.cursor/model-catalog.local.example.level-1-easy.json` — easy complexity tier set
+4. `.cursor/model-catalog.local.example.level-2-complex.json` — moderate complexity tier set
+5. `.cursor/model-catalog.local.example.level-3-mega.json` — heavy complexity tier set
+6. `.cursor/model-catalog.local.example.level-4-super.json` — maximal complexity tier set
+7. `.cursor/model-catalog.local.example.role-based-balanced.json` — role-catalog balanced preset
+8. `.cursor/model-catalog.local.example.role-based-highend.json` — role-catalog high-end preset
+
+### Installer behavior (framework-file semantics)
+
+- **`missing` mode** (default new install): copies the 8 example presets into the target
+  `.cursor/` directory when absent; deterministic status log per file (names only; no content
+  inspection); same semantics as `scratchpad.local.example.md` per US-0075.
+- **`upgrade` mode**: refreshes the example presets when the packaged template version
+  differs (byte-compare); skips byte-identical files; never modifies or removes the active
+  operator-owned `.cursor/model-catalog.local.json` (gitignored; not in manifest).
+- **Triple installer parity**: `installer.py`, `installer.ps1`, `installer.sh` all read the
+  single manifest `[install_include_paths]` as source of truth; framework classification
+  for `.cursor/model-catalog.local.example*.json` is identical across Python / PowerShell /
+  Bash `classify_file` paths.
+
+### Operator usage recipe
+
+1. Inspect the 8 presets under `.cursor/` (shipped automatically by install or upgrade).
+2. Choose a preset matching your intent — complexity-based (levels 1–4) or role-based
+   (balanced / highend) for `MODEL_RESOLVE=role_catalog`; cursor-only alias mapping; or
+   base template for custom tiers.
+3. Copy the chosen preset: `cp .cursor/model-catalog.local.example.<preset>.json .cursor/model-catalog.local.json`.
+4. Edit real vendor slugs into `.cursor/model-catalog.local.json` (placeholder values
+   substituted; vendor-specific).
+5. Set `MODEL_RESOLVE=local_catalog` (or `role_catalog` for role-based presets) in
+   `.cursor/scratchpad.local.md`.
+6. Validate: `python scripts/model_tier_validate.py --repo .`.
+7. Parity: `python scripts/check_intake_template_parity.py --scope=model-catalog-examples`.
+
+**Active catalog protection invariant**: `.cursor/model-catalog.local.json` remains
+gitignored and outside `install_include_paths` + `clean_paths`. The installer never
+auto-populates it. No installer mode copies, merges, or replaces the active catalog.
+This is a DEC-0086 / DEC-0087 boundary (US-0101 catalog schema + US-0102 role precedence
+remain unaltered; US-0112 only completes delivery path).
+
+### Parity scope
+
+```bash
+python scripts/check_intake_template_parity.py --scope=model-catalog-examples
+```
+
+Validates active vs template byte-parity for `installer-owned-paths.manifest` (16 manifest
+rows total across active + template paths). On mismatch → `MODEL_CATALOG_EXAMPLE_PARITY_SCOPE_MISMATCH`.
+On pass → `[MODEL_CATALOG_EXAMPLE_PARITY_SCOPE_OK]`.
+
+### Reason codes
+
+| Code | Trigger |
+|------|---------|
+| `MODEL_CATALOG_EXAMPLE_PARITY_SCOPE_OK` | Active vs template manifest byte-parity pass for 8 model-catalog.example paths |
+| `MODEL_CATALOG_EXAMPLE_PARITY_SCOPE_MISMATCH` | Active vs template manifest byte-parity fail |
+
+### Validation commands
+
+- `python scripts/check_intake_template_parity.py --scope=model-catalog-examples`
+- `pytest -k us0112 tests/us0112_contract_test.py`
+
+Normative architecture: `docs/engineering/architecture.md` (**# US-0112**); decision: **`DEC-0112`** (Accepted).
+
+Binding decision: `decisions/DEC-0112.md`. Research anchor: `docs/engineering/research.md` **R-0090**.
+
 ## Configurable multi-target publish mode (US-0054 / DEC-0036)
 
 Post-release publish orchestration is configurable and default-safe:
@@ -3091,6 +3168,338 @@ Pair table (`SOVEREIGN_ROLE_MANIFEST_PAIRS`): scratchpad keys, manifest YAML, ex
 - **Reason codes**: `docs/engineering/reason_codes.md` § US-0106
 - **Decision record**: `decisions/DEC-0106.md`
 - **Contract tests**: `tests/us0106_contract_test.py` (8 tests + 2 compose guards)
+
+### Parallel Instance Arbitrage (US-0108)
+
+**Default-off parallel execute-phase instance orchestration**. When `SOVEREIGN_PARALLEL_DEV=0` (default),
+zero overhead — no worktrees, no parallel QA, no pick JSON, no resource guard.
+
+#### Scratchpad keys
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `SOVEREIGN_PARALLEL_DEV` | `0` \| `1` | `0` | Master enable gate. |
+| `AUTO_SOVEREIGN_PARALLEL_N` | int ≥ 1 | `3` | Instances per execute cycle. |
+| `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` | int ≥ 1 | `6` | System-wide instance cap. |
+| `AUTO_SOVEREIGN_MERGE_RESOLVE` | `first_pass_wins` \| `last_pass_wins` \| `winner_takes_all` \| `manual` | `first_pass_wins` | Merge policy. |
+| `AUTO_SOVEREIGN_WORKTREE_KEEP` | `0` \| `1` | `0` | Retain loser worktrees for debugging. |
+| `AUTO_SOVEREIGN_PARALLEL_QA` | `0` \| `1` | `0` | Enable parallel QA cross-review (v2). |
+| `AUTO_SOVEREIGN_PARALLEL_QA_ARBITER` | `critic_first_pass` \| `majority_vote` | `critic_first_pass` | QA arbitration strategy. |
+| `AUTO_SOVEREIGN_PARALLEL_ANTI_SLOP_THRESHOLD` | int 0-10 | `6` | Anti-slop floor. |
+| `AUTO_SOVEREIGN_PARALLEL_REWORK_MAX` | int ≥ 0 | `2` | Per-instance rework cap. |
+| `AUTO_SOVEREIGN_PARALLEL_MERGE_TIMEOUT_SEC` | int ≥ 10 | `60` | Merge timeout. |
+| `AUTO_SOVEREIGN_PARALLEL_MODEL_<idx>` | model slug | *(empty)* | Per-instance model override (optional). |
+| `AUTO_SOVEREIGN_PARALLEL_LENS_<idx>` | lens config | *(empty)* | Per-instance lens override (optional). |
+
+#### Enable / disable
+
+```bash
+# Enable parallel dev (N=3 instances)
+echo "SOVEREIGN_PARALLEL_DEV=1" >> .cursor/scratchpad.local.md
+echo "AUTO_SOVEREIGN_PARALLEL_N=3" >> .cursor/scratchpad.local.md
+
+# Disable (zero overhead)
+echo "SOVEREIGN_PARALLEL_DEV=0" >> .cursor/scratchpad.local.md
+```
+
+#### Parallel dev workflow
+
+1. **Create worktrees** (T-002/T-003): `create_worktrees(story_id, n_instances, base_branch)` → isolated
+   `.git/worktrees/us0108-<story_id>-<idx>/` per instance.
+2. **Simulated execute** in each worktree (T-008 step 25).
+3. **Simulated QA** in each worktree (T-008 step 26).
+4. **Select winner** (T-004): `select_winner(qa_results[])` → filter `qa_verdict=pass` → sort `-anti_slop_score`
+   → tie-break earliest `proof_issued_at` → single winner.
+5. **Read anti-slop score** (T-005): `read_anti_slop_score(lens_scores[])` via
+   `sovereign_critic_lib.compute_anti_slop_aggregate` (read-only, US-0104 unchanged).
+6. **Merge winner** (T-006): `merge_winner(winner_ctx, main_branch)` with bounded retry ≤2, then
+   `PARALLEL_DEV_MERGE_CONFLICT` halt. Write-once `handoffs/parallel_dev_pick.json` v1.
+7. **Cleanup** (T-003): winner removed; losers per `AUTO_SOVEREIGN_WORKTREE_KEEP`.
+
+Pick JSON schema v1:
+```json
+{
+  "schema_version": 1,
+  "story_id": "US-0108",
+  "winner_instance_id": "US-0108-inst0",
+  "worktree_path": ".git/worktrees/us0108-US-0108-0",
+  "qa_verdict": "pass",
+  "anti_slop_score": 8,
+  "proof_issued_at": "2026-06-29T22:00:00Z",
+  "merge_policy": "first_pass_wins",
+  "runner_ts_utc": "2026-06-29T22:30:00Z",
+  "orchestrator_run_id": "auto-20260628-04",
+  "loser_instance_ids": ["US-0108-inst1", "US-0108-inst2"]
+}
+```
+
+#### Reason codes
+
+| Code | Meaning |
+|------|---------|
+| `PARALLEL_DEV_DISABLED` | Feature off — backward compat path. |
+| `PARALLEL_DEV_WORKTREE_CREATE_FAILED` | Worktree creation error. |
+| `PARALLEL_DEV_WORKTREE_CLEANUP_FAILED` | Cleanup error (fail-open). |
+| `PARALLEL_DEV_SELECTION_NO_PASS` | No QA pass verdict in any instance. |
+| `PARALLEL_DEV_MERGE_CONFLICT` | Merge conflict after bounded retry. |
+| `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED` | System-wide cap reached. |
+| `PARALLEL_DEV_RESOURCE_LOCK_FAILED` | Lockfile error. |
+| `PARALLEL_DEV_EXECUTE_FAILED` | Instance execution error. |
+| `PARALLEL_DEV_ANTI_SLOP_BELOW_THRESHOLD` | Winner score below floor. |
+| `PARALLEL_DEV_MERGE_TIMEOUT` | Merge operation timeout. |
+| `PARALLEL_DEV_MANUAL_HALT` | Manual intervention required (`merge_resolve=manual`). |
+| `PARALLEL_DEV_PICK_SCHEMA_INVALID` | Pick JSON schema violation. |
+
+#### Resource guard
+
+- Lockfile: `.git/us0108_parallel_dev.lock`
+- `acquire_parallel_slot(slot_id, repo_root, max_total)` / `release_parallel_slot(slot_id, repo_root)`
+- System cap: `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` (default 6)
+- Fail-fast `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED` when cap reached
+
+#### Validator / self-test
+
+```bash
+# Self-test
+python scripts/parallel_dev_arbiter.py --self-test
+
+# Contract tests
+python -m pytest tests/us0108_contract_test.py -v
+
+# Parity check
+python scripts/check_intake_template_parity.py --scope=sovereign-parallel-dev
+```
+
+#### Compose guards (non-negotiable)
+
+| Compose surface | Rule |
+|-----------------|------|
+| US-0047 (bulk execute) | Step 22 unchanged; system cap checked **after** bulk cap. |
+| US-0092 (full autonomy) | Outer driver unchanged; parallel is execute-phase internal. |
+| US-0103 (ledger) | Schema unchanged; US-0108 reads ledger only. |
+| US-0104 (critic) | Schema unchanged; US-0108 reads `anti_slop_score` only. |
+| US-0107 (sovereign loop) | Deferral register unchanged; US-0108 appends winner/loser outcomes as consumer. |
+
+#### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0108`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0108
+- **Decision record**: `decisions/DEC-0108.md`
+- **Contract tests**: `tests/us0108_contract_test.py` (8 tests)
+- **Standalone runbook**: `docs/sovereign-runbook-md/US-0108.md`
+
+---
+
+## Self-Healing Deploy Loop (US-0109 / DEC-0109)
+
+**Default-off** (`AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0`) — zero overhead when off. When enabled,
+adds a post-deploy smoke probe + bounded retry loop on top of US-0054 publish chain.
+
+### Scratchpad keys (schema_v1)
+
+| Key | Values | Default | Notes |
+|-----|--------|---------|-------|
+| `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY` | `0` \| `1` | `0` | Global gate. When `0`, zero overhead — byte-identical US-0054 publish path. |
+| `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX` | int ≥ 1 | `3` | Max retry attempts after probe FAIL. |
+| `AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC` | int ≥ 1 | `30` | Per-stage HTTP timeout for health probe. |
+| `AUTO_SOVEREIGN_DEPLOY_PROBE_KIND` | `health_endpoint` \| `acceptance_smoke` \| `both` | `both` | Which stages run during smoke probe. |
+| `SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH` | repo-relative path | `tests/deploy_smoke/` | Acceptance smoke tests directory (pytest runner). |
+| `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` | names-only env ref | *(empty)* | Key name in `os.environ` — value is a key name, NOT a URL literal. |
+
+Fail-closed `DEPLOY_HEALING_PROBE_TARGET_MISSING` when health endpoint unresolvable.
+
+### Execute steps 29-31
+
+| Step | Action |
+|------|--------|
+| **29 post-deploy smoke probe** | Two-stage chain `[DEPLOY_SMOKE_PROBE_OK]`. Skip when `0`. |
+| **30 retry loop** | Re-enter publish PASS path on probe FAIL; cap exhaustion → step 31. |
+| **31 DEPLOY_DEFERRED** | Via US-0107 `append_deferral(work_item_kind=deploy)`. Orchestrator continues. |
+
+### Operator remediation
+
+| Reason code | Operator action |
+|-------------|-----------------|
+| `DEPLOY_HEALING_DISABLED` | No action; expected default. Set `=1` to enable. |
+| `DEPLOY_HEALING_SMOKE_HEALTH_FAIL` | Verify env key in scratchpad.local resolves to reachable URL. Re-run probe. |
+| `DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL` | Inspect `SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH` smoke tests. Fix failures. |
+| `DEPLOY_HEALING_RETRY_ATTEMPT` | Informational per-attempt log; no action required. |
+| `DEPLOY_HEALING_RETRY_CAP_EXHAUSTED` | Raise `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX` if transient; otherwise resolve root cause. |
+| `DEPLOY_HEALING_DEFERRED` | Resolve in `handoffs/sovereign_deferrals.jsonl`; re-run `/release` after fix. |
+| `DEPLOY_HEALING_PROBE_TARGET_MISSING` | Set `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` to valid env key; ensure env var has URL. |
+| `DEPLOY_HEALING_TIMEOUT` | Raise `AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC`; investigate startup latency. |
+
+### Validate / self-test
+
+```bash
+python scripts/self_healing_deploy_validate.py --self-test
+python scripts/self_healing_deploy_validate.py --repo . --enforce
+```
+
+### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=sovereign-self-healing-deploy
+```
+
+Pair table (`SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS`): scratchpad, lib, validator,
+contract tests, runbook, reason_codes — 6 pairs (active + template).
+
+### Compose surfaces (read-only)
+
+| Composed story | US-0109 boundary |
+|----------------|------------------|
+| US-0054 (publish) | Re-enters publish PASS only; publish targets/schema/release-notes UNCHANGED. |
+| US-0100 (changelog) | No changelog writes triggered by US-0109. |
+| US-0103 (ledger) | Schema UNCHANGED; optional `deploy_deferral_id` additive (v1). |
+| US-0107 (sovereign loop) | Consumer of `append_deferral(...)` API only; `work_item_kind=deploy`. |
+| US-0110 (convergence) | Predicate UNCHANGED; US-0110 reads open deferrals (no new logic). |
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0109`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0109
+- **Decision record**: `decisions/DEC-0109.md`
+- **Library**: `scripts/self_healing_deploy_lib.py`
+- **Validator**: `scripts/self_healing_deploy_validate.py`
+- **Contract tests**: `tests/us0109_contract_test.py` + `tests/us0109_us0110_compose_test.py`
+
+---
+
+## Release Trigger Adapters (US-0111 / DEC-0111)
+
+**Default source**: `RELEASE_TRIGGER_SOURCE=manual` (zero behavior change vs pre-US-0111 /release path — byte-identical).
+
+### Adapter registry and dispatch
+
+`scripts/release_trigger_adapters.py` provides four adapters:
+- **GitHub webhook** (`github`): Parse `release.tag_name`; query GitHub API for previous tag via `GET /repos/{owner}/{repo}/releases?per_page=100` (sorted by `created_at` desc, skip current); fallback `git ls-remote --tags origin` filtered for semver.
+- **npm publish** (`npm`): Read `npm_package_version` env var; query `npm view {pkg} versions --json` with `RELEASE_TRIGGER_TIMEOUT_SEC` (default 10s); offline fallback `package-lock.json` when `RELEASE_TRIGGER_FALLBACK_TO_LOCAL=1`.
+- **Git tag push** (`git_tag`): Parse `GITHUB_REF=refs/tags/vX.Y.Z` or local `git describe --tags --abbrev=0`; compute previous via `git for-each-ref --sort=-version:refname refs/tags` (semver sort, not date — handles annotated vs lightweight tags).
+- **Manual /release** (`manual`): `TriggerContext(source="manual", version=current, previous_version=None)` — byte-identical to pre-US-0111 /release.
+
+Dispatch via `dispatch_to_adapter(source, env_vars)` → `TriggerContext`. Invalid source → `RELEASE_TRIGGER_SOURCE_INVALID` (fail-closed).
+
+### Scratchpad keys
+
+| Key | Values | Default |
+|-----|--------|---------|
+| `RELEASE_TRIGGER_SOURCE` | `manual` \| `github` \| `npm` \| `git_tag` \| `auto` | `manual` |
+| `RELEASE_TRIGGER_TIMEOUT_SEC` | int ≥ 1 | `10` |
+| `RELEASE_TRIGGER_FALLBACK_TO_LOCAL` | `0` \| `1` | `0` |
+
+### TriggerContext dataclass
+
+```python
+@dataclass
+class TriggerContext:
+    version: str
+    previous_version: Optional[str]
+    source: str  # manual | github | npm | git_tag
+    metadata: Dict[str, Any]
+```
+
+### Version comparison integration (AC-6)
+
+`compare_versions_from_trigger(trigger)` normalizes `trigger.version` and `trigger.previous_version` via `release_changelog_lib.normalize_semver()`. Fail-closed: `RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED` on invalid semver.
+
+### Atomic promotion (AC-7, AC-8)
+
+- **CHANGELOG.md promotion**: `promote_changelog_version(semver, sprint_ids, repo_root)` reuses `release_changelog_lib.promote_unreleased()` unchanged (US-0100 compose). Atomic write via `os.replace(temp, target)` with Windows best-effort retry (0.1s × 2). Fail-closed: `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED`.
+- **Per-version notes**: `write_per_version_notes(semver, sprint_ids, repo_root)` writes `handoffs/releases/vX.Y.Z-release-notes.md` atomically. Reuses `release_changelog_lib.build_version_doc()` read-only compose. Fail-closed: `RELEASE_TRIGGER_NOTES_WRITE_FAILED`.
+
+### Ledger event emit (AC-9)
+
+`emit_version_derivation_event(trigger, norm_version, norm_previous, repo_root, scratchpad)`:
+1. Write `handoffs/release_events/{iso-timestamp}-{semver}.json` atomically.
+2. Append to US-0103 ledger via `decision_ledger_lib.append_entry(ledger_path, entry, scratchpad)` with `decision_type="version_derivation"`. Ledger schema unchanged (consumer-only append compose).
+3. Fail-closed: `RELEASE_TRIGGER_EVENT_EMIT_FAILED`.
+
+### Reason codes (9 total — DEC-0111 §7)
+
+| Code | Trigger | Blocking? |
+|------|---------|-----------|
+| `RELEASE_TRIGGER_ADAPTER_FAILED` | Adapter dispatch error | **Yes** |
+| `RELEASE_TRIGGER_TAG_MISSING` | Cannot resolve current tag | **Yes** |
+| `RELEASE_TRIGGER_PREVIOUS_MISSING` | Cannot resolve previous tag | **Yes** |
+| `RELEASE_TRIGGER_PACKAGE_JSON_MISSING` | npm adapter: package.json missing | **Yes** |
+| `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED` | Atomic write failed (Windows lock, I/O) | **Yes** |
+| `RELEASE_TRIGGER_NOTES_WRITE_FAILED` | Per-version notes write failed | **Yes** |
+| `RELEASE_TRIGGER_EVENT_EMIT_FAILED` | Ledger/event emit failed | **Yes** |
+| `RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED` | Semver compare failed | **Yes** |
+| `RELEASE_TRIGGER_SOURCE_INVALID` | Unknown source value | **Yes** |
+
+### Operator troubleshooting
+
+| Symptom | Diagnosis | Remediation |
+|---------|-----------|-------------|
+| `RELEASE_TRIGGER_SOURCE_INVALID` on startup | Invalid `RELEASE_TRIGGER_SOURCE` in scratchpad | Set to `manual` (default), `github`, `npm`, `git_tag`, or `auto` |
+| `RELEASE_TRIGGER_TAG_MISSING` in CI | `GITHUB_REF` not set or non-semver | Ensure CI passes `GITHUB_REF=refs/tags/vX.Y.Z` or run `git tag vX.Y.Z && git push --tags` |
+| `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED` on Windows | File lock or antivirus holding CHANGELOG.md | Close IDE tabs; retry; check antivirus exclusion list |
+| `RELEASE_TRIGGER_EVENT_EMIT_FAILED` with ledger enabled | Ledger file permissions or schema mismatch | Check `handoffs/sovereign_decisions/decisions.jsonl` writable; verify 12-field schema |
+
+### Compose surfaces (read-only)
+
+| Composed story | US-0111 boundary |
+|----------------|------------------|
+| US-0100 (changelog) | Reuses `promote_unreleased()` and `build_version_doc()` unchanged; no API modifications. |
+| US-0054 (publish) | Dispatches before `/release` path; `release-all.sh` UNCHANGED. |
+| US-0103 (ledger) | Consumer of `append_entry()` API only; `decision_type="version_derivation"` additive. |
+| US-0040 (runbook) | No runbook structure changes; adds new section. |
+| US-0008 (release-all.sh) | UNCHANGED; US-0111 is pre-release dispatch. |
+| US-0107 (sovereign loop) | No sovereign loop changes; US-0111 emits events to ledger. |
+| US-0110 (convergence) | `list_open_deferrals` UNCHANGED; no convergence predicate changes. |
+
+### Parity enforcement
+
+```bash
+python scripts/check_intake_template_parity.py --scope=release-trigger-adapter
+```
+
+Pair table (`RELEASE_TRIGGER_ADAPTER_PAIRS`): lib + template lib + contract tests + runbook + reason_codes + scratchpad + parity itself — 7 pairs (active + template).
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0111`
+- **Reason codes**: `docs/engineering/reason_codes.md` § US-0111
+- **Decision record**: `decisions/DEC-0111.md`
+- **Library**: `scripts/release_trigger_adapters.py`
+- **Contract tests**: `tests/us0111_contract_test.py` (12 tests)
+
+---
+
+## Compose Guards: US-0054, US-0100, US-0110 (read-only boundaries)
+
+Contract tests enforce US-0109 does not modify these upstream surfaces:
+
+### US-0054 — Publish Targets
+
+`test_us0109_us0054_compose_no_publish_semantics_change` verifies:
+- No `RELEASE_PUBLISH_OK` token written by US-0109 code
+- No `release_publish` function calls
+- No `publish_targets` schema modifications
+
+US-0109 reads publish status as an observer; publish logic remains in `scripts/release_publish.py`.
+
+### US-0100 — Changelog / Unreleased Promotion
+
+`test_us0109_us0100_compose_no_changelog_change` verifies:
+- No `changelog` string literals in US-0109 code
+- No `[Unreleased]` version promotion
+- No `changelog_lib` or `version_changelog` imports
+
+US-0109 does not write changelog entries or promote versions.
+
+### US-0110 — Convergence Predicate
+
+`test_us0109_us0110_compose_no_convergence_change` verifies:
+- No `convergence` string literals in US-0109 code
+- No `evaluate_convergence` function calls
+- No imports from `sovereign_convergence_lib`
+
+US-0109 does not participate in convergence evaluation.
+
+---
 
 ## Project run steps
 

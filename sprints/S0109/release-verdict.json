@@ -1,0 +1,43 @@
+{
+  "sprint_id": "S0109",
+  "story_id": "US-0109",
+  "verdict": "PASS",
+  "released_at": "2026-06-30T03:00:00Z",
+  "released_by": "release",
+  "orchestrator_run_id": "auto-20260628-04",
+  "blocking_findings": 0,
+  "non_blocking_findings": 0,
+  "gate_chain": {
+    "check_in_test": "PASS",
+    "qa_completion": "PASS",
+    "verify_work_completion": "PASS",
+    "isolation_compliance": "PASS",
+    "compose_guards_us0054": "UNCHANGED",
+    "compose_guards_us0100": "UNCHANGED",
+    "compose_guards_us0103": "UNCHANGED",
+    "compose_guards_us0107": "UNCHANGED",
+    "compose_guards_us0110": "UNCHANGED",
+    "backward_compat": "PASS"
+  },
+  "test_results": {
+    "us0109_contract": "11/11 PASS",
+    "validator": "PASS ([SELF_HEALING_DEPLOY_VALIDATION_OK])",
+    "parity": "PASS ([INTAKE_TEMPLATE_PARITY_OK] scope=sovereign-self-healing-deploy, 6 pairs)",
+    "general_regression": "249 passed, 33 failed (all pre-existing disjoint; no US-0109 regressions)"
+  },
+  "backlog_reconciliation": {
+    "backlog_us0109_status": "DONE",
+    "acceptance_us0109_status": "[x] AC-1..AC-9 (9/9)"
+  },
+  "release_artifacts": {
+    "sprint_notes": "sprints/S0109/release-notes.md",
+    "canonical_notes": "handoffs/releases/S0109-release-notes.md",
+    "queue_transition": "ready -> released"
+  },
+  "publish_snapshot": "skipped_disabled (RELEASE_PUBLISH_MODE=disabled)",
+  "fresh_context_marker": "release-S0109-US0109-auto-20260628-04-20260630T030000Z",
+  "runtime_proof_id": "rp-release-release-auto-20260628-04-US-0109",
+  "stop_phase": "release",
+  "stop_reason": "completed",
+  "next_phase": "refresh-context"
+}

@@ -1,0 +1,162 @@
+{
+  "sprint_id": "S0111",
+  "story_id": "US-0111",
+  "dec_id": "DEC-0111",
+  "status": "verified",
+  "verdict": "PASS",
+  "author": "qa",
+  "timestamp": "2026-06-30T19:45:00Z",
+  "verify_work_executed_at": "2026-06-30T19:45:00Z",
+  "verify_work_role": "qa",
+  "verify_work_fresh_context_marker": "qa-S0111-US0111-verify-work-20260630T194500Z-fresh",
+  "verify_work_verdict": "PASS",
+  "verify_work_notes": "Independent contract/self-test/parity re-run green; UAT-1..UAT-12 confirmed; US-0111 release trigger adapter system verified; compose guards honored; US-0111 remains OPEN per US-0045 (closure at /release).",
+  "qa_verdict_reference": "sprints/S0111/qa-findings.md",
+  "qa_verdict": "PASS",
+  "passed": 12,
+  "failed": 0,
+  "skipped": 0,
+  "pending": 0,
+  "total": 12,
+  "preconditions": [
+    "Python 3.12+ available",
+    "DEC-0111 execute deliverables present (release_trigger_adapters.py, template mirrors)",
+    "Twelve test_us0111_* contract markers in tests/us0111_contract_test.py",
+    "Reason codes documented (9 RELEASE_TRIGGER_* codes)"
+  ],
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac_ref": ["AC-1"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_scratchpad_keys_literals -q",
+      "expected": "Three scratchpad keys (RELEASE_TRIGGER_SOURCE=manual, RELEASE_TRIGGER_TIMEOUT_SEC=10, RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0) in active + template",
+      "result": "pass",
+      "evidence_ref": "test_us0111_scratchpad_keys_literals green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-2",
+      "ac_ref": ["AC-2"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_adapter_registry_dispatch -q",
+      "expected": "Four adapter types (github, npm, git_tag, manual) registered; dispatch_to_adapter returns TriggerContext",
+      "result": "pass",
+      "evidence_ref": "test_us0111_adapter_registry_dispatch green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-3",
+      "ac_ref": ["AC-3"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_github_webhook_adapter -q",
+      "expected": "GitHubReleaseAdapter parses webhook payload; computes previous_version; fail-closed on missing tag",
+      "result": "pass",
+      "evidence_ref": "test_us0111_github_webhook_adapter green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-4",
+      "ac_ref": ["AC-4"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_npm_registry_adapter -q",
+      "expected": "NpmRegistryAdapter queries 'npm view <pkg> versions --json'; computes previous_version via semver; offline fallback",
+      "result": "pass",
+      "evidence_ref": "test_us0111_npm_registry_adapter green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-5",
+      "ac_ref": ["AC-5"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_git_tag_adapter -q",
+      "expected": "GitTagAdapter parses 'git describe --tags'; computes previous_version; annotated vs lightweight tag sorting",
+      "result": "pass",
+      "evidence_ref": "test_us0111_git_tag_adapter green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-6",
+      "ac_ref": ["AC-6"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k test_us0111_manual_adapter_backward_compatible -q",
+      "expected": "ManualReleaseAdapter returns TriggerContext(source=manual); byte-identical to pre-US-0111 behavior",
+      "result": "pass",
+      "evidence_ref": "test_us0111_manual_adapter_backward_compatible green",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-7",
+      "ac_ref": ["AC-7"],
+      "governance_ref": ["DEC-0111", "US-0100"],
+      "command": "pytest -k test_us0111_trigger_context_shape -q",
+      "expected": "TriggerContext dataclass with version, previous_version, source, metadata fields; consumed by release_changelog_lib",
+      "result": "pass",
+      "evidence_ref": "test_us0111_trigger_context_shape green; compose guard US-0100 honored",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-8",
+      "ac_ref": ["AC-8"],
+      "governance_ref": ["DEC-0111", "US-0103"],
+      "command": "pytest -k test_us0111_ledger_integration -q",
+      "expected": "append_event with decision_type=version_derivation; ledger JSON event emitted; US-0103 compose guard honored",
+      "result": "pass",
+      "evidence_ref": "test_us0111_ledger_integration green; compose guard US-0103 honored",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-9",
+      "ac_ref": ["AC-9"],
+      "governance_ref": ["DEC-0111", "US-0040"],
+      "command": "pytest -k test_us0111_release_notes_generation -q",
+      "expected": "Generate handoffs/releases/<version>-notes.md atomically; US-0040 compose guard honored",
+      "result": "pass",
+      "evidence_ref": "test_us0111_release_notes_generation green; compose guard US-0040 honored",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-10",
+      "ac_ref": ["AC-10"],
+      "governance_ref": ["DEC-0111"],
+      "command": "pytest -k us0111 -q",
+      "expected": "12/12 test_us0111_* contract markers PASS",
+      "result": "pass",
+      "evidence_ref": "pytest -k us0111 → 12 passed",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-11",
+      "ac_ref": ["AC-10", "AC-12"],
+      "governance_ref": ["DEC-0111", "US-0017"],
+      "command": "python scripts/check_intake_template_parity.py --scope=release-triggers",
+      "expected": "[INTAKE_TEMPLATE_PARITY_OK] scope=release-triggers pairs=2",
+      "result": "pass",
+      "evidence_ref": "RELEASE_TRIGGERS_PAIRS active/template mirrors",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    },
+    {
+      "id": "UAT-12",
+      "ac_ref": ["AC-11", "AC-12"],
+      "governance_ref": ["DEC-0111"],
+      "command": "python scripts/release_trigger_adapters.py --self-test; Manual: runbook § Release Triggers + reason_codes § US-0111",
+      "expected": "Lib self-test green; 9 reason codes documented; runbook recipe present",
+      "result": "pass",
+      "evidence_ref": "Lib self-test green; reason_codes § US-0111 (9 codes: ADAPTER_FAILED, INVALID_SOURCE, PARSE_PAYLOAD_FAILED, MISSING_TAG, MISSING_PREVIOUS, RATE_LIMITED, VERSION_FORMAT_INVALID, UNKNOWN_ADAPTER, COMPOSE_GUARD_VIOLATION); runbook § Release Triggers (US-0111) present (procedural attestation)",
+      "verified_at": "2026-06-30T19:45:00Z",
+      "verified_by": "verify-work"
+    }
+  ],
+  "probeResults": []
+}

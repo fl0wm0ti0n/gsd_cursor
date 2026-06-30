@@ -1,0 +1,32 @@
+{
+  "phase_id": "verify-work",
+  "role": "qa",
+  "story_id": "US-0108",
+  "sprint_id": "S0108",
+  "orchestrator_run_id": "auto-20260628-04",
+  "timestamp": "2026-06-29T22:30:00Z",
+  "verdict": "PASS",
+  "uat_total": 8,
+  "uat_passed": 8,
+  "uat_failed": 0,
+  "compose_guards_verified": ["US-0047", "US-0092", "US-0103", "US-0104", "US-0107"],
+  "blocking_findings": 0,
+  "non_blocking_findings": 3,
+  "next_phase": "/release",
+  "isolation_evidence": {
+    "phase_id": "verify-work",
+    "role": "qa",
+    "fresh_context_marker": "qa-verify-work-S0108-US0108-auto-20260628-04-20260629T223000Z",
+    "timestamp": "2026-06-29T22:30:00Z",
+    "evidence_ref": "sprints/S0108/uat-plan.md,sprints/S0108/uat-results.md,sprints/S0108/uat-verdict.json,sprints/S0108/verify-work-summary.md"
+  },
+  "strict_runtime_proof": {
+    "orchestrator_run_id": "auto-20260628-04",
+    "runtime_proof_id": "rp-verify-work-qa-auto-20260628-04-US-0108",
+    "phase_id": "verify-work",
+    "role": "qa",
+    "proof_issued_at": "2026-06-29T22:30:00Z",
+    "proof_ttl_seconds": 3600,
+    "proof_hash": "0bd140512a46b8654c99a86a7a375f5e9a787915e4467b50ec3fa654b6075aa8"
+  }
+}

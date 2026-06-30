@@ -11,12 +11,40 @@ Canonical queue state now lives under:
 
 ---
 
-## Latest finalized release pointer
+## Release finalized note (S0112)
 
-- **Latest released sprint:** `S0107`
-- **Latest canonical notes:** `handoffs/releases/S0107-release-notes.md`
-- **Latest release date:** 2026-06-29
-- **Latest release work item:** US-0107
+- Sprint: `S0112`
+- Story: `US-0112` (Ship model-catalog example presets on install/upgrade — DEC-0112)
+- Release: **finalized** (`2026-06-30T23:40:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0112-US0112-20260630T234000Z-fresh`)
+- Queue: **`handoffs/release_queue.md`** row **`S0112`** = **`released`**
+- **Run / verify:** `pytest tests/us0112_contract_test.py -v` -> 12 passed; see **`handoffs/releases/S0112-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** -- deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** -> **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **0** OPEN stories remaining
+
+## Release finalized note (S0111)
+
+- Sprint: `S0111`
+- Story: `US-0111` (Release Trigger-Driven Version Changelog Derivation — DEC-0111)
+- Release: **finalized** (`2026-06-30T19:45:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0111-US0111-auto-20260628-04-20260630T194500Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0111`** = **`released`**
+- **Run / verify:** `pytest tests/us0111_contract_test.py -v` -> 12 passed; `python scripts/release_trigger_adapters.py --self-test` -> `[RELEASE_TRIGGER_SELF_TEST_OK]`; see **`handoffs/releases/S0111-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** -- deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** -> **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **1** OPEN story remaining (US-0112)
+
+## Release finalized note (S0109)
+
+## Release finalized note (S0109)
+
+- Sprint: `S0109`
+- Story: `US-0109` (Self-Healing Deploy Loop -- DEC-0109)
+- Release: **finalized** (`2026-06-30T03:00:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0109-US0109-auto-20260628-04-20260630T030000Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0109`** = **`released`**
+- **Run / verify:** `pytest tests/us0109_contract_test.py -v` -> 11 passed; `python scripts/self_healing_deploy_validate.py --self-test` -> `[SELF_HEALING_DEPLOY_VALIDATION_OK]`; see **`handoffs/releases/S0109-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** -- deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** -> **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **2** OPEN stories remaining (US-0111, US-0112)
 
 ## Release finalized note (S0107)
 
@@ -24,7 +52,7 @@ Canonical queue state now lives under:
 - Story: `US-0107` (Sovereign Loop Mode / AUTO_SOVEREIGN — DEC-0107)
 - Release: **finalized** (`2026-06-29T00:23:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0107-20260629T002300Z-fresh`)
 - Queue: **`handoffs/release_queue.md`** row **`S0107`** = **`released`**
-- **Run / verify:** `pytest -k us0107 tests/us0107_contract_test.py -v` → 10 passed; `python scripts/sovereign_loop_lib.py --self-test` → `[SOVEREIGN_LOOP_SELF_TEST_OK]`; see **`handoffs/releases/S0107-release-notes.md`** **## Run** / **## Verify**
+- **Run / verify:** `pytest tests/us0109_contract_test.py -v` → 10 passed; `python scripts/sovereign_loop_lib.py --self-test` → `[SOVEREIGN_LOOP_SELF_TEST_OK]`; see **`handoffs/releases/S0107-release-notes.md`** **## Run** / **## Verify**
 - Changelog: step **19** appended **US-0107** under **`CHANGELOG.md`** **`[Unreleased]`** (workflow-only; no semver)
 - Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
 - Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
@@ -390,16 +418,16 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0107`**: `pytest -k us0107 tests/us0107_contract_test.py -v` — refer to `## Run` in
-  `handoffs/releases/S0107-release-notes.md`.
+- **Start command:** Last finalized sprint **`S0109`**: `pytest tests/us0109_contract_test.py -v` — refer to `## Run` in
+  `handoffs/releases/S0109-release-notes.md`.
 - **Endpoint + port:** N/A (release documentation layer) — refer to `## Connect` in
-  `handoffs/releases/S0107-release-notes.md`.
+  `handoffs/releases/S0109-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0107-release-notes.md`.
+  `handoffs/releases/S0109-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
   `handoffs/releases/S0107-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0107-release-notes.md`.
+  `handoffs/releases/S0109-release-notes.md`.
 
 ## Historical references
 

@@ -1,0 +1,157 @@
+{
+  "sprint_id": "S0112",
+  "story_id": "US-0112",
+  "decision_id": "DEC-0112",
+  "status": "PLANNED",
+  "orchestrator_run_id": "auto-20260628-04",
+  "max_tasks_allowed": 12,
+  "task_count": 11,
+  "auto_split_triggered": false,
+  "research_anchor": "R-0090",
+  "research_status": "delivered",
+  "compose_guards": [
+    "US-0008",
+    "US-0018",
+    "US-0040",
+    "US-0054",
+    "US-0057",
+    "US-0075",
+    "US-0100",
+    "US-0101",
+    "US-0102",
+    "US-0103",
+    "US-0107",
+    "US-0110"
+  ],
+  "tasks": [
+    {
+      "id": "T-001",
+      "ac": "AC-1",
+      "title": "Add 8 model-catalog.local.example*.json rows to active manifest",
+      "tranche": "A",
+      "dependencies": [],
+      "description": "Add 8 rows to docs/engineering/context/installer-owned-paths.manifest under [install_include_paths]: base, .cursor-only, level-1-easy, level-2-complex, level-3-mega, level-4-super, role-based-balanced, role-based-highend. Classify all 8 as framework files. MUST NOT add .cursor/model-catalog.local.json."
+    },
+    {
+      "id": "T-002",
+      "ac": "AC-1",
+      "title": "Mirror manifest rows in template manifest (byte-parity)",
+      "tranche": "A",
+      "dependencies": ["T-001"],
+      "description": "Byte-parity copy of 8 rows into template/docs/engineering/context/installer-owned-paths.manifest. Both manifests byte-identical in [install_include_paths] section. Total: 16 rows covered (8 active + 8 template)."
+    },
+    {
+      "id": "T-003",
+      "ac": "AC-2, AC-5",
+      "title": "Verify missing-mode installer.py logic adds absent framework files",
+      "tranche": "B",
+      "dependencies": ["T-001", "T-002"],
+      "description": "Verify installer.py missing mode copies all 8 examples into target .cursor/ when absent. Deterministic log/status per file (names-only). Same semantics as scratchpad.local.example.md per US-0075."
+    },
+    {
+      "id": "T-004",
+      "ac": "AC-2, AC-5",
+      "title": "Verify missing-mode installer.ps1 logic adds absent framework files",
+      "tranche": "B",
+      "dependencies": ["T-001", "T-002"],
+      "description": "Verify installer.ps1 missing mode (List-SourceFiles + copy) adds all 8 examples when absent. PS parity with installer.py."
+    },
+    {
+      "id": "T-005",
+      "ac": "AC-2, AC-5",
+      "title": "Verify missing-mode installer.sh logic adds absent framework files",
+      "tranche": "B",
+      "dependencies": ["T-001", "T-002"],
+      "description": "Verify installer.sh missing mode adds all 8 examples when absent. Shell parity."
+    },
+    {
+      "id": "T-006",
+      "ac": "AC-3, AC-4",
+      "title": "Verify upgrade-mode refreshes stale, preserves unchanged, never touches active local.json",
+      "tranche": "B",
+      "dependencies": ["T-001", "T-002"],
+      "description": "Verify upgrade mode across all three installers: refreshes stale framework files (template differs), skips unchanged (byte-identical), NEVER touches .cursor/model-catalog.local.json (gitignored, outside install_include_paths and clean_paths)."
+    },
+    {
+      "id": "T-007",
+      "ac": "AC-5",
+      "title": "Implement --scope=model-catalog-examples with MODEL_CATALOG_EXAMPLE_PAIRS",
+      "tranche": "C",
+      "dependencies": ["T-001", "T-002"],
+      "description": "Add MODEL_CATALOG_EXAMPLE_PAIRS constant (16 row byte-parity) to check_intake_template_parity.py. Implement --scope=model-catalog-examples argument. Token: [MODEL_CATALOG_EXAMPLE_PARITY_SCOPE_OK]."
+    },
+    {
+      "id": "T-008",
+      "ac": "AC-6",
+      "title": "Write runbook §model-catalog preset recipe",
+      "tranche": "C",
+      "dependencies": ["T-001"],
+      "description": "Add section 'Model-Catalog Example Presets' under Model Tier / Catalog in docs/engineering/runbook.md. Document: examples ship on install/upgrade; operator copies chosen preset → model-catalog.local.json; lists all 8 preset filenames + complexity/role intent; pointer to scratchpad comment block lines 351-360."
+    },
+    {
+      "id": "T-009",
+      "ac": "AC-7",
+      "title": "Write 8+ test_us0112_* contract test markers",
+      "tranche": "D",
+      "dependencies": ["T-001", "T-002", "T-003", "T-004", "T-005", "T-006", "T-007", "T-008"],
+      "description": "Write tests/us0112_contract_test.py with 12 pytest markers: manifest 8 paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope. Coverage across AC-1..AC-7."
+    },
+    {
+      "id": "T-010",
+      "ac": "AC-8",
+      "title": "Document architecture notes in docs/engineering/architecture.md # US-0112",
+      "tranche": "A",
+      "dependencies": [],
+      "description": "Architecture notes already locked at docs/engineering/architecture.md # US-0112 (from /architecture phase). Verify persistence at /execute: framework vs operator boundary, manifest rows, upgrade classification, DEC-0086/DEC-0087 compose."
+    },
+    {
+      "id": "T-011",
+      "ac": "AC-8",
+      "title": "Verify template parity for all touched files",
+      "tranche": "D",
+      "dependencies": ["T-009"],
+      "description": "Full template parity sweep: installer-owned-paths.manifest (T-001/T-002), scripts/installer.py/ps1/sh mirror, scripts/check_intake_template_parity.py (T-007), docs/engineering/runbook.md (T-008), docs/engineering/architecture.md # US-0112 (T-010)."
+    }
+  ],
+  "ac_map": {
+    "AC-1": ["T-001", "T-002"],
+    "AC-2": ["T-003", "T-004", "T-005"],
+    "AC-3": ["T-006"],
+    "AC-4": ["T-006"],
+    "AC-5": ["T-003", "T-004", "T-005", "T-007"],
+    "AC-6": ["T-008"],
+    "AC-7": ["T-009"],
+    "AC-8": ["T-010", "T-011"]
+  },
+  "test_markers": [
+    "test_us0112_manifest_lists_eight_paths_active",
+    "test_us0112_manifest_lists_eight_paths_template",
+    "test_us0112_missing_mode_adds_absent_framework_files_python",
+    "test_us0112_missing_mode_adds_absent_framework_files_ps1",
+    "test_us0112_missing_mode_adds_absent_framework_files_shell",
+    "test_us0112_upgrade_mode_refreshes_stale_framework_files",
+    "test_us0112_upgrade_mode_preserves_unchanged_files",
+    "test_us0112_upgrade_mode_never_touches_local_catalog",
+    "test_us0112_active_catalog_protection_invariant",
+    "test_us0112_triple_installer_parity_eight_examples",
+    "test_us0112_runbook_lists_eight_preset_literals",
+    "test_us0112_parity_scope_model_catalog_examples"
+  ],
+  "parity_scope": "model-catalog-examples",
+  "parity_constant": "MODEL_CATALOG_EXAMPLE_PAIRS",
+  "parity_pair_count": 16,
+  "preset_filenames": [
+    ".cursor/model-catalog.local.example.json",
+    ".cursor/model-catalog.local.example.cursor-only.json",
+    ".cursor/model-catalog.local.example.level-1-easy.json",
+    ".cursor/model-catalog.local.example.level-2-complex.json",
+    ".cursor/model-catalog.local.example.level-3-mega.json",
+    ".cursor/model-catalog.local.example.level-4-super.json",
+    ".cursor/model-catalog.local.example.role-based-balanced.json",
+    ".cursor/model-catalog.local.example.role-based-highend.json"
+  ],
+  "framework_classification": "framework",
+  "missing_mode": "copy-when-absent",
+  "upgrade_mode": "refresh-when-template-differs",
+  "active_catalog_protection": "gitignored; outside install_include_paths and clean_paths; installer NEVER copies to .cursor/model-catalog.local.json"
+}

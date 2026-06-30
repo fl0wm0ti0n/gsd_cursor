@@ -1,0 +1,74 @@
+{
+  "phase_id": "release",
+  "role": "release",
+  "story_id": "US-0108",
+  "sprint_id": "S0108",
+  "dec_id": "DEC-0108",
+  "orchestrator_run_id": "auto-20260628-04",
+  "timestamp": "2026-06-29T22:45:00Z",
+  "fresh_context_marker": "release-S0108-US0108-auto-20260628-04-20260629T224500Z",
+  "verdict": "PASS",
+  "release_notes": "sprints/S0108/release-notes.md",
+  "release_findings": "sprints/S0108/release-notes.md",
+  "contract_tests": "PASS",
+  "contract_tests_detail": "9/9 passed in 0.19s",
+  "self_test": "PASS",
+  "self_test_detail": "[SELF_TEST_PASS] self-test OK",
+  "compose_guards": "UNCHANGED",
+  "compose_guards_detail": ["US-0047", "US-0092", "US-0103", "US-0104", "US-0107"],
+  "uat_results": {
+    "total": 8,
+    "pass": 8,
+    "fail": 0
+  },
+  "acceptance_criteria": {
+    "AC-1": "PASS",
+    "AC-2": "PASS",
+    "AC-3": "PASS",
+    "AC-4": "PASS",
+    "AC-5": "PASS",
+    "AC-6": "PASS",
+    "AC-7": "PASS",
+    "AC-8": "PASS"
+  },
+  "blocking_issues": 0,
+  "blocking_findings": 0,
+  "non_blocking_findings": 3,
+  "prior_phases": {
+    "execute": "PASS",
+    "qa": "PASS",
+    "verify-work": "PASS"
+  },
+  "gate_results": {
+    "check_in_test_gate": "PASS",
+    "qa_completion_gate": "PASS",
+    "uat_completion_gate": "PASS",
+    "isolation_compliance_gate": "PASS",
+    "strict_runtime_proof_gate": "PASS"
+  },
+  "isolation_evidence": {
+    "phase_id": "release",
+    "role": "release",
+    "fresh_context_marker": "release-S0108-US0108-auto-20260628-04-20260629T224500Z",
+    "timestamp": "2026-06-29T22:45:00Z",
+    "evidence_ref": [
+      "sprints/S0108/summary.md",
+      "sprints/S0108/qa-verdict.json",
+      "sprints/S0108/verify-work-verdict.json",
+      "sprints/S0108/uat-verdict.json",
+      "sprints/S0108/release-notes.md",
+      "sprints/S0108/release-verdict.json"
+    ]
+  },
+  "strict_runtime_proof": {
+    "orchestrator_run_id": "auto-20260628-04",
+    "runtime_proof_id": "rp-release-release-auto-20260628-04-US-0108",
+    "phase_id": "release",
+    "role": "release",
+    "proof_issued_at": "2026-06-29T22:45:00Z",
+    "proof_ttl_seconds": 3600,
+    "proof_hash": "f48146596f6571fcd838dfc50c11712793c01e70bbe919174a70ccdf68aff4ab"
+  },
+  "next_phase": "BACKLOG_DRAIN_ADVANCE",
+  "stop_condition": "release phase complete, stop and require new subagent for next phase"
+}

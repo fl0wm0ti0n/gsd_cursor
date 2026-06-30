@@ -1,0 +1,16 @@
+{
+  "anti_slop_score": 7,
+  "loser_instance_ids": [
+    "US-0108-inst1",
+    "US-0108-inst2"
+  ],
+  "merge_policy": "first_pass_wins",
+  "orchestrator_run_id": "auto-20260628-04",
+  "proof_issued_at": "2026-06-29T22:50:00Z",
+  "qa_verdict": "pass",
+  "runner_ts_utc": "2026-06-29T22:52:00Z",
+  "schema_version": 1,
+  "story_id": "US-0108",
+  "winner_instance_id": "US-0108-inst0",
+  "worktree_path": ".git/worktrees/us0108-US-0108-0"
+}

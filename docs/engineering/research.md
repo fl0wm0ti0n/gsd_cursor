@@ -6278,20 +6278,34 @@ fi
 
 ## R-0090 — US-0112: Model-catalog example presets in installer payload
 
-- **Status**: `current` (intake stub — extend in **`/architecture`**)
+- **Status**: **delivered** (Q1–Q8 closed; ready for **`/architecture`** / **DEC-0112**)
+- **Date**: 2026-06-30
 - **Story**: **US-0112**
 - **Problem**: Eight **`model-catalog.local.example*.json`** presets ship in **`template/.cursor/`** (**US-0101**/**US-0102**) but **`installer-owned-paths.manifest`** omits them — consumer repos after **`missing`**/**`upgrade`** lack preset files referenced in scratchpad comments.
 - **Recommended approach (intake-locked)**:
   - Add all eight example paths to **`[install_include_paths]`** (line-based manifest; one row per file).
   - Classify as **framework** files: **`upgrade`** refreshes when template differs; **`missing`** adds when absent.
   - **Do not** auto-copy to **`model-catalog.local.json`** — operator picks preset (contrast **US-0099** copy-when-missing for gitignored local profile).
-- **Open questions (architecture)**:
-  - Q1: Explicit **`Classify-File`** prefix vs default framework fallback in **`installer.ps1`**?
-  - Q2: **`MODEL_CATALOG_EXAMPLE_PAIRS`** parity manifest shape (eight template paths only vs active mirror)?
-  - Q3: Upgrade summary line in installer output (mirror scratchpad example status)?
-  - Q4: Contract-test marker inventory (**`test_us0112_*`**) count and harness section id.
-- **Related**: **US-0101**, **US-0102**, **US-0099**, **US-0075**, **DEC-0086**, **DEC-0087**
-- **Evidence**: `handoffs/intake_evidence/US-0112-intake-20260628.json`; operator **`/ask`** thread (2026-06-28)
+- **Research questions (Q1–Q8, closed)**:
+  1. **Q1 (8 preset filenames)** — **CONFIRMED**: `.cursor/model-catalog.local.example.json`, `.cursor/model-catalog.local.example.cursor-only.json`, `.cursor/model-catalog.local.example.level-1-easy.json`, `.cursor/model-catalog.local.example.level-2-complex.json`, `.cursor/model-catalog.local.example.level-3-mega.json`, `.cursor/model-catalog.local.example.level-4-super.json`, `.cursor/model-catalog.local.example.role-based-balanced.json`, `.cursor/model-catalog.local.example.role-based-highend.json` (scratchpad lines 352–359 + glob verify).
+  2. **Q2 (manifest format)** — **CONFIRMED**: `[install_include_paths]` section, line-based relative paths (one row per file); active + template manifests byte-parity (16 files total; both files currently identical).
+  3. **Q3 (missing mode semantics)** — **CONFIRMED**: copy when absent, deterministic log/status per file (names-only); same semantics as `scratchpad.local.example.md` (US-0075).
+  4. **Q4 (upgrade classification)** — **CONFIRMED**: classified as **framework** files (refresh when template differs, skip unchanged); same semantics as US-0075 / US-0018 / US-0057 framework rules; no new classification mechanism.
+  5. **Q5 (triple installer parity)** — **CONFIRMED**: `installer.py` / `installer.ps1` / `installer.sh` all read single `[install_include_paths]` manifest; `List-SourceFiles` / equivalent includes all 8 examples from packaged `template/`.
+  6. **Q6 (runbook section)** — **CONFIRMED**: `docs/engineering/runbook.md` § model tier / catalog subsection; documents: examples ship on install/upgrade; operator copies chosen preset → `model-catalog.local.json`; lists all 8 preset filenames + complexity/role intent (pointer to scratchpad comment block lines 351–360).
+  7. **Q7 (test markers + parity scope)** — **CONFIRMED**: 8+ `test_us0112_*` markers (manifest 8 paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope); `--scope=model-catalog-examples` with `MODEL_CATALOG_EXAMPLE_PAIRS` constant (active vs template manifest byte-parity check).
+  8. **Q8 (companion DEC-0112)** — **CONFIRMED**: recommended at `/architecture` — installer payload decision (manifest rows, framework classification, active-catalog exclusion); composes with DEC-0086 / DEC-0087 without amending schema or precedence.
+- **Top risks (R1–R6, carry to architecture)**:
+  - **R1** Stale upgrade when example filename changes — deterministic manifest list + idempotent upgrade copy prevents prior-version file deletion
+  - **R2** Operator confusion if all 8 land but none selected — runbook recipe mandatory (L7)
+  - **R3** Active catalog accidental install — manifest exclusion invariant (L5) + regression guard test
+  - **R4** Triple installer drift — single manifest-driven source of truth; parity test (L9)
+  - **R5** npm `package.json` files gap — already covered by `template/` glob, verify at architecture
+  - **R6** US-0075 / US-0018 precedence — same framework-file semantics; additive only
+- **Compose guards confirmed (DO NOT amend)**: US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110
+- **Task seeds (11, within SPRINT_MAX_TASKS=12)**: T-001..T-011 (surjective AC map; see `docs/product/backlog.md` `## US-0112` `discovery_task_seeds_T001_T011`)
+- **Related**: US-0101, US-0102, US-0099, US-0075, US-0018, US-0057, DEC-0086, DEC-0087
+- **Evidence**: `handoffs/intake_evidence/US-0112-intake-20260628.json`; `docs/product/backlog.md` (`## US-0112` discovery_locks_L1_L10); `docs/engineering/state.md` (discovery checkpoint); operator `/ask` thread (2026-06-28)
 
 ## R-0091 — US-0110: Goal-Based Convergence Loops (convergence predicate + goal progress)
 
@@ -7174,4 +7188,173 @@ fi
 - **R3** Merge conflicts — bounded retry ≤2 then manual
 - **R4** Anti-slop unavailable — graceful degrade (default 0)
 - **R5** Resource cap race — atomic lockfile check-and-increment
-- **R6** Bulk execute interaction — system-wide cap preferred v1**
+- **R6** Bulk execute interaction — system-wide cap preferred v1
+
+### Delivery-closure trailer (R-0096 — US-0108 research delivery)
+
+- `status=delivered`
+- `anchor=US-0108`
+- `delivered_at=2026-06-29T20:30:00Z`
+- `delivered_by=tech-lead`
+- `fresh_context_marker=tl-US0108-research-20260629T023000Z-fresh`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `Q1–Q10=closed`
+- `handoff_target=/architecture` (fresh tech-lead; spawn-only per BUG-0006)
+- `companion_dec=DEC-0108` (locked, `decisions/DEC-0108.md`)
+- `discovery_locks_validated=L1–L10`
+- `compose_guards=US-0047,US-0092,US-0103,US-0104,US-0107 (DO NOT amend)`
+- `evidence_refs=docs/engineering/research.md (R-0096), decisions/DEC-0108.md, docs/product/backlog.md (## US-0108), handoffs/po_to_tl.md, handoffs/resume_brief.md, docs/engineering/state.md`
+
+---
+
+## R-0097 — US-0109: Self-Healing Deploy Loop (post-deploy smoke probe + bounded repair + DEPLOY_DEFERRED)
+
+- **Date**: 2026-06-30
+- **Topic**: Self-healing deploy loop — scratchpad schema, smoke probe contract, retry orchestration, DEPLOY_DEFERRED tuple via US-0107, compose boundaries, contract tests, validator, parity
+- **Query**: How to extend US-0054 publish chain with post-deploy smoke probe + bounded retry + DEPLOY_DEFERRED fallback without amending US-0054/US-0100/US-0103/US-0107/US-0110
+- **Status**: **PASS** (research closed — Q1–Q11 closed; architecture-ready)
+- **Confidence**: high (L1–L10 discovery locks validated; R-0097 Q1–Q11 CLOSED)
+- **Story**: **US-0109**
+- **Linked**: **US-0109**, **US-0054**, **US-0100**, **US-0103**, **US-0107**, **US-0110**, **DEC-0109** (pending)
+- **Discovery anchor**: `docs/product/backlog.md` (US-0109 discovery_notes, L1–L10 locks, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=po-US0109-discovery-20260629T235000Z-fresh`, discovery **PASS**) — discovery locks L1–L10 in backlog `## US-0109` `discovery_notes`.
+
+### Research closure (Q1–Q11 CLOSED)
+
+| Q | Lock | Decision |
+|---|------|----------|
+| Q1 | Scratchpad key schema | **5 keys**: `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY` in {`0`, `1`} default `0` (zero overhead); `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX` int >= 1 default `3`; `AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC` int >= 1 default `30`; `AUTO_SOVEREIGN_DEPLOY_PROBE_KIND` in {`health_endpoint`, `acceptance_smoke`, `both`} default `both`; `SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH` default `tests/deploy_smoke/`. Fail-closed `DEPLOY_HEALING_PROBE_TARGET_MISSING` when health endpoint ref unresolvable (name-key ref with empty value -> abort probe, emit reason, skip retry, write DEPLOY_DEFERRED). Zero overhead when `0` — US-0054 publish path byte-identical. |
+| Q2 | Smoke probe contract | **Two-stage chain** executed sequentially after US-0054 publish PASS: **(a) health HTTP GET** — target URL from names-only scratchpad/env ref (`AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT`), timeout `AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC`, success = HTTP 2xx (v1 stub accepts any 2xx); **(b) acceptance smoke runner** — execute tests at `SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH` (default `tests/deploy_smoke/`) via `pytest -x --timeout=30 -q` (bounded); both stages emit per-stage reason code (`DEPLOY_HEALING_SMOKE_HEALTH_FAIL` / `DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL`); success token `[DEPLOY_SMOKE_PROBE_OK]` emitted only when both stages pass; health stage runs in-process (HTTP client), acceptance stage runs subprocess (pytest). Output schema: `{probe_kind: two_stage, health_status: pass/fail, health_status_code: 200/null, acceptance_status: pass/fail/skip, acceptance_tests_run: int, acceptance_tests_failed: int, overall: pass/fail, reason_code: string}`. |
+| Q3 | Probe target resolution + names-only secret ref (US-0085 compose) | Health endpoint URL resolved **names-only** from scratchpad key `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` — value is a **key name** (e.g. `DEPLOY_HEALTH_URL`), not a URL literal; the actual URL is read from runtime env (`os.environ[ref]`) at probe execution time. If env key absent -> `DEPLOY_HEALING_PROBE_TARGET_MISSING` (fail-closed). **No secret values in scratchpad or git-tracked files** (US-0085 .env exclusion inherited). Acceptance smoke path is a repo-relative directory path (not a secret). Names-only contract prevents secret leakage. |
+| Q4 | Bounded retry loop orchestration | **Entry point**: post-publish hook in `/release` phase after `[RELEASE_PUBLISH_OK]` token and before changelog commit. **Loop body**: (a) run smoke probe (Q2); (b) if `overall=pass` -> emit `[DEPLOY_SMOKE_PROBE_OK]` and exit loop (deploy green); (c) if `overall=fail` -> emit per-stage reason code, increment retry counter, check `retry_count < AUTO_SOVEREIGN_DEPLOY_RETRY_MAX`; (d) if under max -> emit `DEPLOY_HEALING_RETRY_ATTEMPT` reason log + re-enter publish PASS path (US-0054); (e) if at max -> emit `DEPLOY_HEALING_RETRY_CAP_EXHAUSTED` -> exit loop with DEPLOY_DEFERRED transition (Q6). **Idempotency invariant**: retry re-enters the same publish path with the same artifact set; deploy target may overwrite (HTTP PUT / replace) — no duplicated ledger rows (US-0103 tagged with `deploy_retry_attempt=N` optional; v1: ledger emits one `RELEASE_PUBLISHED` row per publish entry including retries, with `retry_count` field). |
+| Q5 | Execute re-entry semantics | **No execute re-entry required**. The retry loop re-enters only the **publish** path (US-0054), not execute. Execute phase completed before publish. Retry re-invokes the publish subagent (or inline publish handler) with the same artifact set — no fresh subagent spawn, no boundary token reset. Probe failure indicates **deploy-side** failure (target unreachable / smoke tests fail against deployed artifact) — re-publishing ensures artifact is re-deployed cleanly. This aligns with US-0054 publish semantics (publish is re-runnable). |
+| Q6 | DEPLOY_DEFERRED tuple shape via US-0107 `append_deferral` | After retry cap exhaustion: call `sovereign_loop_lib.append_deferral(repo, scratchpad, ...)` with: `work_item_kind="deploy"`, `reason_code="DEPLOY_DEFERRED"` (reserved in US-0107), `work_item_ref="<current_story_id>"`, `source_orchestrator_run_id=<current runner>`, `remediation_hint=<smoke_summary>` (max **512** chars per US-0107 L2 schema — US-0109 truncates smoke summary to fit), `blocked_by_phase="release"`, `retry_count=<retry_max>` (pre-populated to indicate exhausted retries), optional `ledger_decision_id` (optional compose US-0103 — v1 additive). **Does not halt sovereign loop** — `append_deferral` returns success/fail; orchestrator advances per `AUTO_SOVEREIGN_DEFERRAL_POLICY` (US-0107). |
+| Q7 | Compose boundary table | Per-surface read/write + regression guard: (a) **US-0054** — re-enter publish PASS point; does NOT alter publish targets/confirmation gate/release-notes wiring; guard `test_us0109_us0054_compose_no_publish_semantics_change`; (b) **US-0100** — does NOT trigger changelog writes; guard `test_us0109_us0100_compose_no_changelog_change`; (c) **US-0103** — reads `RELEASE_PUBLISHED` schema unchanged; optional `deploy_deferral_id` citation additive (v1); guard optional; (d) **US-0107** — reads `list_open_deferrals`; writes `append_deferral(work_item_kind=deploy)` only — no schema extension; guard `test_us0109_us0107_compose_no_deferral_schema_change`; (e) **US-0110** — reads `evaluate_convergence().zero_deferrals` unchanged; does NOT alter convergence predicate; guard `test_us0109_us0110_compose_no_convergence_change`. |
+| Q8 | Contract-test inventory | **8 core + 2 compose guards** = **10** `test_us0109_*` markers: `test_us0109_scratchpad_keys_and_defaults`, `test_us0109_probe_health_stage`, `test_us0109_probe_acceptance_stage`, `test_us0109_retry_loop_bounded`, `test_us0109_deferred_after_cap_exhaustion`, `test_us0109_us0054_compose_no_publish_semantics_change`, `test_us0109_us0100_compose_no_changelog_change`, `test_us0109_backward_compat_off_path_byte_identical`, `test_us0109_us0107_compose_no_deferral_schema_change`, `test_us0109_us0110_compose_no_convergence_change`. **Success tokens**: `[DEPLOY_SMOKE_PROBE_OK]`, `[SELF_HEALING_DEPLOY_VALIDATION_OK]`. |
+| Q9 | Validator CLI surface | **`scripts/self_healing_deploy_validate.py`** (+ template mirror). Flags: `--self-test` (run internal contract self-test, emit `[SELF_HEALING_DEPLOY_VALIDATION_OK]`), `--repo <path>` (validate repo scratchpad + artifacts), `--file <path>` (validate single artifact), `--enforce` (non-zero exit on fail). Success token `[SELF_HEALING_DEPLOY_VALIDATION_OK]`. Fail-closed conditions: missing scratchpad keys, invalid probe target ref, missing validator mirror. |
+| Q10 | Parity file list + reason-code inventory | **Parity `--scope=sovereign-self-healing-deploy`** — **`SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS`** (6 pairs): scratchpad (active + template), `scripts/self_healing_deploy_validate.py` (active + template), `scripts/self_healing_deploy_lib.py` (active + template), `docs/engineering/architecture.md` (active + template), `docs/engineering/runbook.md` (active + template), `decisions/DEC-0109.md` (active + template). **Section US-0109 reason codes** (8): `DEPLOY_HEALING_DISABLED` (info, non-blocking), `DEPLOY_HEALING_SMOKE_HEALTH_FAIL` (blocking, retry/defer), `DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL` (blocking, retry/defer), `DEPLOY_HEALING_RETRY_ATTEMPT` (info per attempt), `DEPLOY_HEALING_RETRY_CAP_EXHAUSTED` (blocking, defer), `DEPLOY_HEALING_DEFERRED` (deferred, non-blocking), `DEPLOY_HEALING_PROBE_TARGET_MISSING` (fail-closed), `DEPLOY_HEALING_TIMEOUT` (blocking). `DEPLOY_DEFERRED` already reserved in US-0107 — confirmed reuse. |
+| Q11 | Companion `DEC-0109` necessity | **Recommend YES** — companion `DEC-0109` required to bind: probe chain contract (two-stage health+acceptance), retry loop semantics (re-enter publish PASS path, idempotency invariant), DEPLOY_DEFERRED tuple shape (US-0107 `append_deferral` deploy-specific fields), compose boundary table (read/write locks + regression guards), validator CLI spec, parity file list, reason-code inventory. |
+
+### Reason code inventory (carry to /architecture)
+
+| Code | Blocking? | Surface |
+|------|-----------|---------|
+| `DEPLOY_HEALING_DISABLED` | no (info) | `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0` zero overhead |
+| `DEPLOY_HEALING_SMOKE_HEALTH_FAIL` | yes (retry or defer) | HTTP non-2xx or timeout |
+| `DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL` | yes (retry or defer) | pytest exit nonzero |
+| `DEPLOY_HEALING_RETRY_ATTEMPT` | no (info per attempt) | retry loop iteration N |
+| `DEPLOY_HEALING_RETRY_CAP_EXHAUSTED` | yes (to defer) | retry_max reached |
+| `DEPLOY_HEALING_DEFERRED` | no (deferred, non-blocking) | DEPLOY_DEFERRED row written |
+| `DEPLOY_HEALING_PROBE_TARGET_MISSING` | yes (fail-closed) | env key absent |
+| `DEPLOY_HEALING_TIMEOUT` | yes (blocking) | total timeout exceeded |
+
+### Compose guards confirmed (DO NOT amend)
+
+- **US-0054**: publish targets/gates/confirmation gate/release-notes UNCHANGED; US-0109 re-enters publish PASS point only
+- **US-0100**: changelog/[Unreleased]/GitHub notes UNCHANGED; US-0109 does not trigger changelog writes
+- **US-0103**: ledger schema UNCHANGED; optional `deploy_deferral_id` citation additive (v1)
+- **US-0107**: register schema UNCHANGED; US-0109 consumer of `append_deferral(...)` API only (work_item_kind=deploy)
+- **US-0110**: convergence predicate UNCHANGED; US-0110 reads open deferrals (no new logic)
+
+### Self-test anchor
+
+**[SELF_HEALING_DEPLOY_SELF_TEST_OK]** (research stub; production self-test at `/execute`)
+
+### Top risks (carry to /architecture)
+
+- **R1** Smoke probe source ambiguity — US-0109 deploy smoke vs US-0093 UAT browser smoke remain distinct. `probe_kind` enum separation in library.
+- **R2** Secret leakage — names-only ref contract prevents .env values in scratchpad; fail-closed on absent env key.
+- **R3** Retry idempotency — re-enter publish PASS path (no execute re-entry); no duplicate ledger rows (retry_count tag); deploy target overwrite safe.
+- **R4** US-0107 ordering — mitigated (US-0107 DONE, S0107 released; schema frozen).
+- **R5** Convergence interaction — US-0110 reads open deferrals including DEPLOY_DEFERRED rows; no new US-0110 logic.
+- **R6** Deploy-timeout vs sovereign-loop-timeout precedence — deploy-timeout wins concurrent; `DEPLOY_HEALING_TIMEOUT` deferral emitted.
+
+### Delivery-closure trailer (R-0097 — US-0109 research delivery)
+
+- `status=delivered`
+- `anchor=US-0109`
+- `delivered_at=2026-06-30T00:00:00Z`
+- `delivered_by=tech-lead`
+- `fresh_context_marker=tl-US0109-research-20260630T000000Z-fresh`
+- `runtime_proof_id=rp-auto-20260628-04-research-tech-lead-20260630T000000Z-US0109`
+- `proof_hash=<placeholder>`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `Q1-Q11=closed`
+- `handoff_target=/architecture` (fresh tech-lead; spawn-only per BUG-0006)
+- `companion_dec=DEC-0109` (recommended)
+- `discovery_locks_validated=L1-L10`
+- `compose_guards=US-0054,US-0100,US-0103,US-0107,US-0110 (DO NOT amend)`
+- `evidence_refs=docs/engineering/research.md (R-0097), docs/product/backlog.md (## US-0109), docs/engineering/state.md, handoffs/resume_brief.md, scripts/sovereign_loop_lib.py (US-0107 append_deferral API)`
+
+---
+
+## R-0098 — US-0111 Release Trigger Derivation Research
+
+- **story_id**: US-0111
+- **status**: delivered
+- **delivered_at**: 2026-06-30T18:15:00Z
+- **delivered_by**: tech-lead
+- **fresh_context_marker**: tl-US0111-research-20260630T181000Z-fresh
+- **runtime_proof_id**: rp-auto-20260628-04-research-tech-lead-20260630-US0111
+- **orchestrator_run_id**: auto-20260628-04
+- **verdict**: PASS
+- **Q1-Q10**: closed
+- **companion_dec**: DEC-0111 (recommended)
+- **discovery_locks_validated**: L1-L10
+- **compose_guards**: US-0100, US-0054, US-0103, US-0040, US-0008, US-0107, US-0110 (DO NOT amend)
+
+### Questions and Answers
+
+- **Q1**: TriggerContext data structure is `{version: str, previous_version: Optional[str], source: str, metadata: dict}` with abstract ReleaseAdapter interface providing `detect() -> Optional[TriggerContext]` and `get_version_info() -> TriggerContext`.
+
+- **Q2**: GitHub API rate limits: 60/hour unauthenticated, 5000/hour with token. Mitigation: use `requests` with optional `GITHUB_TOKEN` env var (names-only reference); when absent, fall back to parsing webhook payload's `release.assets[0].url` for previous version; for CLI invocations, query `git ls-remote --tags origin` and filter for semver tags. Fail-closed `RELEASE_TRIGGER_RATE_LIMIT` on HTTP 429/403 with guidance to set token.
+
+- **Q3**: npm registry `versions` field is JSON array of strings; private registries return same shape with auth token in `.npmrc`; offline/unreachable registry fails with `RELEASE_TRIGGER_REGISTRY_UNREACHABLE`. Mitigation: try `npm view {pkg} versions --json` with 10s timeout; on failure, consult local `package-lock.json` for last known published version.
+
+- **Q4**: Git tag ordering: annotated tags have `taggerdate` (date of tagging); lightweight tags have `committerdate` (date of commit). Mix of both requires semantic version sort (`git for-each-ref --sort=-version:refname`). Previous version = next-lower semver in sorted list; if no prior version, fail `RELEASE_TRIGGER_PREVIOUS_MISSING`.
+
+- **Q5**: Windows atomic rename: `os.replace()` on Windows is atomic for same-filesystem renames when destination exists (Python 3.3+); cross-filesystem not atomic. Mitigation: write to temp file in same directory as target, then `os.replace(temp, target)`. On Windows, catch `PermissionError` (file-in-use) and retry once after 0.1s sleep.
+
+- **Q6**: Compose boundary with US-0100: US-0111 calls `release_changelog_lib.compare_versions(target_version)` for version diff; US-0111 calls `promote_unreleased()` for CHANGELOG promotion. Both functions remain unchanged; US-0111 extends adapter dispatch layer that sits BEFORE these calls. No US-0100 API changes.
+
+- **Q7**: RELEASE_TRIGGER_* reason codes (9 codes): `RELEASE_TRIGGER_ADAPTER_FAILED`, `RELEASE_TRIGGER_TAG_MISSING`, `RELEASE_TRIGGER_PREVIOUS_MISSING`, `RELEASE_TRIGGER_PACKAGE_JSON_MISSING`, `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED`, `RELEASE_TRIGGER_NOTES_WRITE_FAILED`, `RELEASE_TRIGGER_EVENT_EMIT_FAILED`, `RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED`, `RELEASE_TRIGGER_SOURCE_INVALID`. All listed in `docs/engineering/reason_codes.md` § US-0111.
+
+- **Q8**: Sovereign loop integration: US-0111 emits `(semver, previous_semver, timestamp, derivation_decisions[])` event to US-0103 ledger via `append_entry(decision_type=version_derivation, payload=event_dict)`. Ledger schema unchanged; US-0111 uses existing API. JSON event written to `handoffs/release_events/{iso-timestamp}-{semver}.json` for downstream consumers (US-0110 reads via `list_open_deferrals`).
+
+- **Q9**: Adapter priority resolution (auto-detect mode): GitHub webhook (`GITHUB_EVENT_PATH` env set) > npm publish (`npm_package_version` env set) > git tag push (`GITHUB_REF` starts with `refs/tags/`) > manual fallback (default). First match wins. When `RELEASE_TRIGGER_SOURCE` explicitly set (non-auto), use only that adapter; fail-closed if adapter can't produce `TriggerContext`.
+
+- **Q10**: Backward compatibility contract for `RELEASE_TRIGGER_SOURCE=manual` (default): US-0111 adapter registry dispatches to `ManualReleaseAdapter` which returns `TriggerContext` with `source=manual`; `/release` command logic unchanged — US-0111 adds trigger-layer dispatch BEFORE existing `/release` logic but does not alter existing code paths. When `RELEASE_TRIGGER_SOURCE=manual`, behavior is byte-identical to pre-US-0111. Compose guard `test_us0111_manual_backward_compat` required.
+
+### Risk Summary
+
+- **R1**: GitHub API rate limiting — mitigate with `GITHUB_TOKEN` env var + fallback to `git ls-remote` or local git history
+- **R2**: npm private registry auth — `npm view` inherits `.npmrc`; offline detection short-circuits
+- **R3**: Annotated vs lightweight tag ordering — use `git for-each-ref --sort=-version:refname` with semver sort
+- **R4**: Windows atomic rename — document as best-effort; test fallback path explicitly
+- **R5**: Auto-detection ambiguity in CI — document priority order; recommend explicit `RELEASE_TRIGGER_SOURCE=github`
+- **R6**: Ledger bloat — one ledger row per trigger event; orthogonal to sovereign loop cadence
+
+### Handoff Target
+
+- **next phase**: /architecture (fresh tech-lead; spawn-only per BUG-0006)
+- **evidence_refs**: docs/engineering/research.md (R-0098), docs/product/backlog.md (## US-0111)
+
+### Delivery Closure Trailer (curator refresh-context 2026-06-30T20:00:00Z)
+
+- **status**: delivered (full lifecycle PASS through /release)
+- **story_id**: US-0111 (DONE)
+- **sprint_id**: S0111 (CLOSED)
+- **release_id**: R0111
+- **companion_dec**: DEC-0111 (Accepted)
+- **verdict**: PASS
+- **closed_by**: curator (refresh-context)
+- **closed_at**: 2026-06-30T20:00:00Z
+- **fresh_context_marker**: curator-S0111-US0111-refresh-context-20260630T200000Z-fresh
+- **compose_guards_honored**: US-0100, US-0054, US-0103, US-0040, US-0008, US-0107, US-0110 (unchanged)
+- **test_markers**: 12 contract tests in `tests/us0111_contract_test.py` (all PASS)
+- **parity_scope**: `--scope=release-trigger-adapter` (2 pairs; PASS)
+- **reason_codes**: 9 `RELEASE_TRIGGER_*` codes documented in `docs/engineering/reason_codes.md` § US-0111
+- **segment_closure**: release_verdict PASS; release_queue S0111→released; backlog US-0111→DONE; acceptance AC-1..AC-12 checked
+
+---

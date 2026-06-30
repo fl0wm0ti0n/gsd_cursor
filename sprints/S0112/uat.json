@@ -1,0 +1,28 @@
+{
+  "sprint_id": "S0112",
+  "story_id": "US-0112",
+  "verdict": "PASS",
+  "phase_id": "uat",
+  "role": "qa",
+  "timestamp": "2026-06-30T23:40:00Z",
+  "orchestrator_run_id": "auto-20260628-04",
+  "steps": [
+    {"step_id": 1, "ac_ref": "AC-1", "description": "Manifest completeness: installer-owned-paths.manifest (active + template) lists all 8 .cursor/model-catalog.local.example*.json paths", "result": "pass"},
+    {"step_id": 2, "ac_ref": "AC-2", "description": "Missing mode delivery: installer.py/ps1/sh copies each example when absent with deterministic log/status", "result": "pass"},
+    {"step_id": 3, "ac_ref": "AC-3", "description": "Upgrade framework refresh: upgrade mode classifies examples as framework and overwrites when template content differs", "result": "pass"},
+    {"step_id": 4, "ac_ref": "AC-4", "description": "Active catalog protection: .cursor/model-catalog.local.json remains gitignored and outside installer manifest", "result": "pass"},
+    {"step_id": 5, "ac_ref": "AC-5", "description": "Triple installer parity: PS1, Bash, Python installers share the same manifest-driven file set", "result": "pass"},
+    {"step_id": 6, "ac_ref": "AC-6", "description": "Runbook operator recipe: docs/engineering/runbook.md documents examples ship on install/upgrade, lists 8 filenames", "result": "pass"},
+    {"step_id": 7, "ac_ref": "AC-7", "description": "Contract tests + parity: test_us0112_* markers + --scope=model-catalog-examples parity scope", "result": "pass"},
+    {"step_id": 8, "ac_ref": "AC-8", "description": "Architecture notes: docs/engineering/architecture.md # US-0112 documents framework/operator boundary, manifest rows, DEC-0086/DEC-0087 compose", "result": "pass"},
+    {"step_id": 9, "description": "12/12 test_us0112_* contract tests PASS", "result": "pass"},
+    {"step_id": 10, "description": "Parity scope --scope=model-catalog-examples: INTAKE_TEMPLATE_PARITY_OK", "result": "pass"},
+    {"step_id": 11, "description": "12/12 compose guards UNCHANGED", "result": "pass"},
+    {"step_id": 12, "description": "reason codes preserved (no new US-0112-specific codes; inherits RELEASE_TRIGGER_* from US-0100/US-0111)", "result": "pass"}
+  ],
+  "passed": 12,
+  "failed": 0,
+  "total": 12,
+  "browser_probe_mode": "N/A (no live server; process-based UAT via checklist)",
+  "uat_probe_results": []
+}

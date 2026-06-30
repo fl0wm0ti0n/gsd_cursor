@@ -1,5 +1,9 @@
 # Decisions
 
+## Current context pack (2026-06-30 — **`US-0111`** **DONE** / **`S0111` released** — `auto-20260628-04`, `fresh_context_marker=curator-S0111-US0111-refresh-context-20260630T200000Z-fresh`; binding **`DEC-0111`**; research anchor **`R-0098`** **delivered**; **`backlog_drain_stories_remaining_budget=1`**; **`backlog_drain_active=true`**; **`drain_terminated=false`**; portfolio **1 OPEN** story (**US-0112**); **0 OPEN** bugs — next action `no_active_work` / `/discovery` for **US-0112** when ready).
+
+- **`US-0111`** (**DONE**, **`S0111`**, **released** `2026-06-30T19:45:00Z`): release trigger-driven version changelog derivation on **`auto-20260628-04`** — full lifecycle **PASS** through **`/refresh-context`** **`2026-06-30T20:00:00Z`**; **`handoffs/release_queue.md`** **`S0111`** **`released`**; **`handoffs/releases/S0111-release-notes.md`**; normative **`DEC-0111`** — `scripts/release_trigger_adapters.py` (4-entry adapter registry: GitHub/npm/git-tag/manual), `TriggerContext` dataclass, `ReleaseAdapter` ABC, `RELEASE_TRIGGER_SOURCE=manual` default (byte-identical backward compat), atomic `[Unreleased]→[semver]` promotion via `release_changelog_lib.promote_unreleased()` (US-0100 compose), sovereign loop ledger `version_derivation` events (US-0103 compose), 9 `RELEASE_TRIGGER_*` reason codes, 12/12 contract tests PASS, 7/7 compose guards unchanged, template parity `--scope=release-trigger-adapter` (2 pairs). Curator reconciles **`state.md`**, **`decisions.md`**, **`research.md`** (**`R-0098`** delivered), **`sprints/S0111/summary.md`**, **`handoffs/resume_brief.md`**, **`handoffs/continuation_hygiene.md`**, **`handoffs/portfolio_state.md`**. **Next**: portfolio contains US-0112 only (P2, model-catalog installer presets).
+
 ## Current context pack (2026-06-29 — **`US-0106`** **DONE** / **`S0106` released** — `auto-20260628-04`, `fresh_context_marker=curator-S0106-US0106-refresh-20260629T020000Z-fresh`, `runtime_proof_id=rp-refresh-context-us-0106-auto-20260628-04`, `proof_hash=daf456d657119d0d0a8e76d8303fe2173a8cfac9c2b57b1ed261409ec86d1121`; binding **`DEC-0106`**; research anchor **`R-0095`** **delivered**; **`backlog_drain_stories_remaining_budget=3`**; **`backlog_drain_active=true`**; **`drain_terminated=false`**; **`native_chain_continuing=true`**; **`drain_advance_action=spawned`**; portfolio **4 OPEN** stories (US-0108, US-0109, US-0111, US-0112); **0 OPEN** bugs — next phase **`/auto`** drain-advance → **`/discovery`** for **US-0108**).
 
 - **`US-0106`** (**DONE**, **`S0106`**, **released** `2026-06-29T01:35:00Z`): sovereign role-behavior manifest on **`auto-20260628-04`** — full lifecycle **PASS** through **`/refresh-context`** **`2026-06-29T02:00:00Z`**; **`handoffs/release_queue.md`** **`S0106`** **`released`**; **`handoffs/releases/S0106-release-notes.md`**; normative **`DEC-0106`** — default-off `SOVEREIGN_ROLE_MANIFEST`, YAML v1 schema + validator + `sovereign_role_manifest_lib.py`, per-role objective injection (char-capped), cross-role review dispatch (spawn-only, capped, `sovereign_role_reviews.jsonl`), US-0104 cross_model_policy compose + US-0107 escalation deferrals compose, ten `test_us0106_*` markers + `SOVEREIGN_ROLE_MANIFEST_PAIRS` parity; UAT waived (contract_tests_primary); compose **US-0069** / **US-0003** / **US-0103** / **US-0023** / **US-0104** / **US-0105** / **US-0107** / **US-0110** (unchanged). Curator reconciles **`state.md`**, **`decisions.md`**, **`research.md`** (**`R-0095`** delivery closure), **`sprints/S0106/summary.md`**, **`handoffs/resume_brief.md`**. **Next**: **`/auto`** drain-advance (4 OPEN stories; budget **3**; drain **NOT** terminated; next candidate **US-0108** / P2 Parallel Instance Arbitrage → `/discovery`, intake already complete per `intake-sovereign-20260627-01.json`).
@@ -565,3 +569,25 @@
   goal-mode coupling; 12 `SOVEREIGN_*` reason codes + `DEPLOY_DEFERRED`; eight
   **`test_us0107_*`** markers + **`SOVEREIGN_LOOP_PAIRS`** template parity — see
   **`decisions/DEC-0107.md`** and **`docs/engineering/architecture.md`** **`# US-0107`**.
+- Decision: **`DEC-0109`** — **`US-0109`** self-healing deploy loop (composes on
+  **US-0054** / **US-0100** / **US-0103** / **US-0107** / **US-0110**). Default-off
+  `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY`; post-deploy two-stage smoke probe (health HTTP GET +
+  acceptance smoke runner); bounded retry loop re-entering US-0054 publish PASS path;
+  `DEPLOY_DEFERRED` via US-0107 `append_deferral(work_item_kind=deploy)` on retry-cap
+  exhaustion; 8 `DEPLOY_HEALING_*` reason codes + 2 compose guard tests; validator CLI
+  `self_healing_deploy_validate.py`; 10 `test_us0109_*` markers; parity
+  `--scope=sovereign-self-healing-deploy` — see **`decisions/DEC-0109.md`** and
+  **`docs/engineering/architecture.md`** **`# US-0109`**.
+- Decision: **`DEC-0111`** — **`US-0111`** release trigger-driven version changelog
+  derivation (composes on **US-0100** / **US-0103** / **US-0040** / **US-0008** /
+  **US-0054** / **US-0107** / **US-0110**). Trigger adapter registry
+  (`scripts/release_trigger_adapters.py`) with 4-entry dispatch: GitHub webhook,
+  npm publish, git tag push, manual /release command. `TriggerContext` dataclass
+  + `ReleaseAdapter` ABC. `RELEASE_TRIGGER_SOURCE=manual` default (byte-identical
+  backward compat with pre-US-0111 /release). Atomic `[Unreleased]→[semver]`
+  promotion via `release_changelog_lib.promote_unreleased()` (US-0100 read-only
+  compose). Sovereign loop ledger `version_derivation` events (US-0103 read-only
+  compose). 9 fail-closed `RELEASE_TRIGGER_*` reason codes + remediation guidance.
+  12 contract tests (`test_us0111_*`) + 7 compose guard tests + template parity
+  `--scope=release-trigger-adapter` (2 pairs) — see **`decisions/DEC-0111.md`** and
+  **`docs/engineering/architecture.md`** **`# US-0111`**.

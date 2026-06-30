@@ -1,0 +1,50 @@
+{
+  "sprint_id": "S0111",
+  "story_id": "US-0111",
+  "qa_phase_id": "qa",
+  "qa_role": "qa",
+  "fresh_context_marker": "qa-S0111-US0111-20260630T192200Z-fresh",
+  "timestamp": "2026-06-30T19:22:00Z",
+  "verdict": "approve",
+  "blocking_defects": 0,
+  "non_blocking_findings": 0,
+  "contract_tests": {
+    "total": 12,
+    "passed": 12,
+    "failed": 0,
+    "duration_sec": 1.21,
+    "command": "python -m pytest tests/us0111_contract_test.py -v"
+  },
+  "template_parity": {
+    "scope": "release-trigger-adapter",
+    "token": "[INTAKE_TEMPLATE_PARITY_OK]",
+    "command": "python scripts/check_intake_template_parity.py --scope=release-trigger-adapter"
+  },
+  "reason_codes_inventory": {
+    "expected": 9,
+    "actual_in_lib": 9,
+    "actual_in_docs": 9,
+    "parity": true
+  },
+  "scratchpad_keys": [
+    {"key": "RELEASE_TRIGGER_SOURCE", "value": "manual", "status": "ok"},
+    {"key": "RELEASE_TRIGGER_TIMEOUT_SEC", "value": "10", "status": "ok"},
+    {"key": "RELEASE_TRIGGER_FALLBACK_TO_LOCAL", "value": "0", "status": "ok"}
+  ],
+  "compose_guards": [
+    {"guard": "US-0054", "file": "scripts/release-all.sh", "status": "unchanged"},
+    {"guard": "US-0100", "file": "scripts/release_changelog_lib.py + .cursor/scratchpad.md", "status": "unchanged-lib; additive-keys-scratchpad"},
+    {"guard": "US-0103", "file": "scripts/decision_ledger_lib.py", "status": "consumer-only-append"},
+    {"guard": "US-0040", "file": "docs/engineering/runbook.md", "status": "additive-section-only"},
+    {"guard": "US-0008", "file": "scripts/sovereign_convergence_check.py", "status": "unchanged"},
+    {"guard": "US-0107", "file": "scripts/release_promotion_guard.py", "status": "unchanged"},
+    {"guard": "US-0110", "file": "tests/us0109_contract_test.py", "status": "unchanged"}
+  ],
+  "next_phase": "verify-work",
+  "release_gate_ready": true,
+  "sync_policy_reason_code": "SYNC_PUSHED_ELIGIBLE",
+  "evidence_refs": [
+    "sprints/S0111/qa-findings.md",
+    "sprints/S0111/qa-verdict.json"
+  ]
+}

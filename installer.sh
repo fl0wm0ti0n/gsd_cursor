@@ -182,6 +182,7 @@ classify_file() {
     README.md) echo "mixed" ;;
     .cursor/commands/*|.cursor/rules/*|.cursor/agents/*|.cursor/skills/*) echo "framework" ;;
     .cursor/hooks/*|.cursor/hooks.json|.cursor/scratchpad.local.example.md) echo "framework" ;;
+    .cursor/model-catalog.local.example*.json) echo "framework" ;;
     .github/workflows/*|scripts/validate-and-push*|scripts/sync_push_gates.py|docs/engineering/context/*|its_magic/*) echo "framework" ;;
     .its-magic-version|its_magic/.its-magic-version|its_magic/README.md) echo "framework" ;;
     docs/product/*|docs/engineering/*|docs/user-guides/*) echo "user-data" ;;

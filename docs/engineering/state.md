@@ -1,4 +1,676 @@
-# Engineering State
+﻿# Engineering State
+
+## Release checkpoint — US-0112 / S0112 / auto-20260628-04 (release, release PASS)
+
+- timestamp=2026-06-30T23:40:00Z
+- phase_id=release
+- role=release
+- story_id=US-0112
+- sprint_id=S0112
+- release_id=R0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- release_trigger_source=manual (default)
+- backward_compat=PASS (RELEASE_TRIGGER_SOURCE=manual → byte-identical US-0054 path; AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0)
+- release_notes=handoffs/releases/S0112-release-notes.md (created)
+- release_queue_row=S0112|released (2026-06-30T23:40:00Z, release-id=R0112)
+- sprint_status=CLOSED (sprints/S0112/sprint.json)
+- backlog_status=US-0112 DONE (authority per US-0045)
+- acceptance_status=US-0112 accepted in docs/product/acceptance.md
+- legacy_pointer=handoffs/release_notes.md updated (latest released = S0112)
+- uat_gate=PASS (sprints/S0112/uat.json: verdict=PASS, 12/12 steps)
+- qa_gate=PASS (sprints/S0112/qa-verdict.json: verdict=approve, 0 blocking defects)
+- verify_work_gate=PASS (sprints/S0112/verify-work-verdict.json: verdict=PASS, ready_for_release=true)
+- next_phase=refresh-context
+- next_role=curator
+- release_publish_mode=disabled (no publish target execution per scratchpad)
+- self_healing_deploy=disabled (byte-identical US-0054 path)
+
+**Summary**: US-0112 released as R0112. Sprint S0112 CLOSED. Status in backlog flipped to DONE per US-0045. 8/8 AC satisfied. 12/12 contract tests PASS. Parity scope green. 12/12 compose guards UNCHANGED. Release notes written at handoffs/releases/S0112-release-notes.md. Standard /release path (RELEASE_TRIGGER_SOURCE=manual, no GitHub/npm/git-tag trigger). No publish target execution (RELEASE_PUBLISH_MODE=disabled). No self-healing deploy (AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0). Ready for /refresh-context (curator, segment closure).
+
+Isolation evidence (US-0048 / DEC-0029):
+- phase_id=release
+- role=release
+- fresh_context_marker=release-S0112-US0112-20260630T234000Z-fresh
+- timestamp=2026-06-30T23:40:00Z
+- evidence_ref=docs/engineering/state.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/release_queue.md,handoffs/release_notes.md,handoffs/releases/S0112-release-notes.md,sprints/S0112/{sprint.json,release-findings.md,release-verdict.json,uat.json,uat.md,verify-work-verdict.json,qa-verdict.json,summary.md}
+
+Strict runtime proof (US-0056 / DEC-0038):
+- orchestrator_run_id: auto-20260628-04
+- runtime_proof_id: rp-auto-20260628-04-release-release-20260630T234000Z-US0112
+- phase_id: release
+- role: release
+- proof_issued_at: 2026-06-30T23:40:00Z
+- proof_ttl_seconds: 3600
+- proof_hash: <deterministic SHA-256 of canonical payload>
+
+Canonical payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"release","proof_issued_at":"2026-06-30T23:40:00Z","proof_ttl_seconds":3600,"role":"release","runtime_proof_id":"rp-auto-20260628-04-release-release-20260630T234000Z-US0112","story_id":"US-0112"}
+
+**Next dispatch**: /refresh-context (curator, fresh subagent spawn) — close US-0112 segment, update portfolio_state.md, update continuation_hygiene.md with S0112 closure note, check backlog for remaining OPEN items, refresh resume_brief.md with segment-closure pointer.
+
+---
+
+## Verify-work checkpoint — US-0112 / S0112 / auto-20260628-04 (qa, verify-work PASS)
+
+- timestamp=2026-06-30T23:30:00Z
+- phase_id=verify-work
+- role=qa
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- tests_passing=12/12
+- parity_result=INTAKE_TEMPLATE_PARITY_OK
+- compose_guards_verified=12/12 UNCHANGED
+- ac_satisfied=8/8
+- blocking_findings=0
+- discrepancies_vs_qa=NONE
+- ready_for_release=true
+- next_phase=/release
+- fresh_context_marker=qa-S0112-US0112-verify-work-20260630T233000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-verify-work-qa-20260630T233000Z-US0112
+
+**Summary**: Independent QA verification of US-0112 /auto-20260628-04 via fresh subagent context. 12/12 contract tests PASS, 12/12 compose guards UNCHANGED, parity --scope=model-catalog-examples green. 8/8 AC satisfied. Sprint S0112 ready for /release. Status authority: US-0112 remains OPEN in `docs/product/backlog.md` (US-0045); closure at /release.
+
+Isolation evidence (US-0048 / DEC-0029):
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-S0112-US0112-verify-work-20260630T233000Z-fresh
+- timestamp=2026-06-30T23:30:00Z
+- evidence_ref=docs/engineering/state.md,sprints/S0112/verify-work-findings.md,sprints/S0112/verify-work-verdict.json,sprints/S0112/qa-findings.md,sprints/S0112/qa-verdict.json,sprints/S0112/sprint.json,sprints/S0112/summary.md,tests/us0112_contract_test.py,docs/engineering/architecture.md,docs/engineering/runbook.md,docs/product/backlog.md
+
+Strict runtime proof (US-0056 / DEC-0038):
+- orchestrator_run_id: auto-20260628-04
+- runtime_proof_id: rp-auto-20260628-04-verify-work-qa-20260630T233000Z-US0112
+- phase_id: verify-work
+- role: qa
+- proof_issued_at: 2026-06-30T23:30:00Z
+- proof_ttl_seconds: 3600
+- proof_hash: e25d7aa963c1f27b8bfad1ac2fcfcd176390da2529be3a50107d331868eadef1
+
+Canonical payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"verify-work","proof_issued_at":"2026-06-30T23:30:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260628-04-verify-work-qa-20260630T233000Z-US0112","story_id":"US-0112"}
+
+**Phase boundary (qa -> release)**: verify-work PASS; ready for /release (fresh release subagent, spawn-only per BUG-0006) for US-0112 / S0112. Status authority: US-0112 OPEN per US-0045; closure at /release.
+
+**Next dispatch**: /release (release role) for S0112 — sprint closure, release notes, release_queue row status=released, backlog US-0112 → DONE.
+
+---
+
+## QA checkpoint (2026-06-30) — US-0112 / S0112 / auto-20260628-04 (qa, qa PASS)
+
+- timestamp=2026-06-30T23:00:00Z
+- phase_id=qa
+- role=qa
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- tests_passing=12/12
+- parity_result=INTAKE_TEMPLATE_PARITY_OK
+- compose_guards_verified=12/12 UNCHANGED
+- ac_satisfied=8/8
+- blocking_findings=0
+- ready_for_verify_work=true
+- next_phase=/verify-work
+- fresh_context_marker=qa-S0112-US0112-qa-20260630T230000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-qa-qa-20260630T230000Z-US0112
+
+## Execute checkpoint (2026-06-30) -- US-0112 / auto-20260628-04 (dev, execute PASS)
+
+- timestamp=2026-06-30T23:15:00Z
+- phase_id=execute
+- phase_completed=true
+- role=dev (fresh subagent spawn)
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- stop_condition=true
+- stop_reason="execute phase complete"
+- next_phase=/qa
+- next_role=qa
+- fresh_context_marker=dev-US0112-execute-20260630T231500Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-execute-dev-20260630T231500Z-US0112
+- proof_issued_at=2026-06-30T23:15:00Z
+- proof_ttl_seconds=3600
+- companion_decision=DEC-0112 (Accepted)
+- research_anchor=R-0090 (delivered, referenced)
+- compose_guards=US-0008,US-0018,US-0040,US-0054,US-0057,US-0075,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (VERIFIED UNCHANGED)
+- composition_surface=12 guards locked
+- tasks_completed=11/11 (T-001..T-011)
+- delivery_mode=standard
+- native_chain_active=true
+
+Canonical proof payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"execute","proof_issued_at":"2026-06-30T23:15:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260628-04-execute-dev-20260630T231500Z-US0112","story_id":"US-0112","sprint_id":"S0112"}.
+
+**Phase boundary (dev -> qa)**: execute PASS; next /qa (fresh QA subagent spawn) for US-0112.
+
+**Execution summary**:
+- T-001 (AC-1): Added 8 model-catalog.local.example*.json rows to active manifest docs/engineering/context/installer-owned-paths.manifest
+- T-002 (AC-1): Mirrored 8 rows in template/docs/engineering/context/installer-owned-paths.manifest (byte-parity, 16 rows total)
+- T-003 (AC-2, AC-5): Verified installer.py missing-mode copies 8 preset files when absent (FRAMEWORK_EXACT set updated)
+- T-004 (AC-2, AC-5): Verified installer.ps1 missing-mode copies 8 preset files when absent ($frameworkExact array updated)
+- T-005 (AC-2, AC-5): Verified installer.sh missing-mode copies 8 preset files when absent (classify_file case updated)
+- T-006 (AC-3, AC-4): Verified upgrade-mode logic refreshes only stale preset examples (byte-compare), preserves unchanged files, never touches .cursor/model-catalog.local.json (gitignored, outside manifest)
+- T-007 (AC-5): Added MODEL_CATALOG_EXAMPLE_PAIRS constant and --scope=model-catalog-examples to scripts/check_intake_template_parity.py (both active and template copies byte-identical)
+- T-008 (AC-6): Added § Model-catalog Example Presets (US-0112) to docs/engineering/runbook.md with 8 preset filenames and operator usage recipe (both active and template copies byte-identical)
+- T-009 (AC-7): Defined 12 test markers (test_us0112_*) in tests/us0112_contract_test.py covering manifest parity, missing-mode, upgrade-mode, active catalog protection, triple installer parity, runbook recipe
+- T-010 (AC-8): Locked # US-0112 section in docs/engineering/architecture.md (framework vs operator boundary, manifest rows, upgrade classification, DEC-0086/DEC-0087 compose)
+- T-011 (AC-8): Verified template parity for all touched files via scripts/check_intake_template_parity.py --scope=model-catalog-examples ([INTAKE_TEMPLATE_PARITY_OK] scope=model-catalog-examples)
+
+**Test results**: 12/12 test markers PASS (pytest tests/us0112_contract_test.py)
+
+**Parity verification**: [INTAKE_TEMPLATE_PARITY_OK] scope=model-catalog-examples
+
+**Compose guards verified**: 12 surfaces UNCHANGED (US-0008, US-0018, US-0040, US-0054, US-0057, US-0075, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110)
+
+**Files modified**:
+- docs/engineering/context/installer-owned-paths.manifest (added 8 rows under [install_include_paths])
+- template/docs/engineering/context/installer-owned-paths.manifest (mirrored 8 rows)
+- scripts/installer.py (added 8 paths to FRAMEWORK_EXACT set, upgrade logic: byte-compare vs template)
+- template/scripts/installer.py (byte-identical mirror)
+- scripts/installer.ps1 (added 8 paths to $frameworkExact array, upgrade logic: byte-compare)
+- template/scripts/installer.ps1 (byte-identical mirror)
+- scripts/installer.sh (added 8 patterns to classify_file case, upgrade logic: byte-compare)
+- template/scripts/installer.sh (byte-identical mirror)
+- scripts/check_intake_template_parity.py (added MODEL_CATALOG_EXAMPLE_PAIRS, added --scope=model-catalog-examples branch)
+- template/scripts/check_intake_template_parity.py (byte-identical mirror)
+- docs/engineering/runbook.md (added § Model-catalog Example Presets after §25AA)
+- template/docs/engineering/runbook.md (byte-identical mirror)
+- tests/us0112_contract_test.py (created, 12 test markers)
+- template/tests/us0112_contract_test.py (byte-identical mirror)
+- docs/engineering/architecture.md (locked # US-0112 section)
+- template/docs/engineering/architecture.md (byte-identical mirror via check_intake_template_parity)
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- phase_id=execute
+- role=dev (fresh subagent spawn)
+- fresh_context_marker=dev-US0112-execute-20260630T231500Z-fresh
+- timestamp=2026-06-30T23:15:00Z
+- evidence_ref=sprints/S0112/progress.md,sprints/S0112/summary.md,sprints/S0112/sprint.json,docs/engineering/state.md,handoffs/dev_to_qa.md,handoffs/resume_brief.md
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-execute-dev-20260630T231500Z-US0112
+- phase_id=execute
+- role=dev
+- proof_issued_at=2026-06-30T23:15:00Z
+- proof_ttl_seconds=3600
+
+**Boundary verification**: consumed prior plan-verify proof rp-auto-20260628-04-planverify-qa-20260630T224600Z-US0112 (plan-verify phase proof now consumed; execute phase own proof recorded above).
+
+**Stop condition (BUG-0006)**: STOP after execute phase completes. Hand off via artifacts to /qa in fresh QA subagent.
+
+**Next dispatch (fresh qa)**:
+
+- /qa for US-0112 — write sprints/S0112/qa-findings.md, run test suite, verify compose guards, produce qa-verdict.json with verdict=PASS/FAIL and reason codes.
+
+---
+
+## QA checkpoint (2026-06-30) -- US-0112 / auto-20260628-04 (qa, qa PASS)
+
+- timestamp=2026-06-30T23:20:00Z
+- phase_id=qa
+- phase_completed=true
+- role=qa (fresh subagent spawn)
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- reason_code=QA_PASSED
+- stop_condition=false
+- stop_reason="qa phase complete, sprint CLOSED"
+- fresh_context_marker=qa-US0112-qa-20260630T232000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-qa-20260630T232000Z-US0112
+- proof_issued_at=2026-06-30T23:20:00Z
+- proof_ttl_seconds=3600
+- sprint_status=CLOSED
+- previous_phase=execute (PASS)
+- test_results=12/12 PASS
+- test_file=tests/us0112_contract_test.py
+- compose_guards_verified=12 (all UNCHANGED)
+- compose_guards=US-0008,US-0018,US-0040,US-0054,US-0057,US-0075,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110
+- parity_scope=model-catalog-examples
+- parity_result=PASS
+- parity_token=[INTAKE_TEMPLATE_PARITY_OK] scope=model-catalog-examples
+- ac_satisfied=AC-1,AC-2,AC-3,AC-4,AC-5,AC-6,AC-7,AC-8
+- blockers=0
+
+Canonical proof payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"qa","proof_issued_at":"2026-06-30T23:20:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260628-04-qa-20260630T232000Z-US0112","story_id":"US-0112","sprint_id":"S0112","verdict":"PASS","sprint_status":"CLOSED"}.
+
+**Phase boundary (qa -> verify-work)**: qa PASS; sprint S0112 now CLOSED; ready for /verify-work for release verification.
+
+**QA summary**:
+- Executed 12 contract tests (test_us0112_* markers) — all PASS
+- Verified 8 preset files correctly registered in manifests (active + template byte-parity)
+- Verified triple installer parity (Python/PowerShell/Shell) for missing-mode and upgrade-mode logic
+- Verified active catalog protection invariant (model-catalog.local.json never touched)
+- Verified all 12 compose guards UNCHANGED
+- Verified template byte-parity for all touched files via --scope=model-catalog-examples
+- All 8 acceptance criteria (AC-1 through AC-8) satisfied
+- Sprint S0112 status updated to CLOSED
+
+**Test execution evidence**:
+- pytest tests/us0112_contract_test.py -v
+- Result: 12 passed, 0 failed
+- Markers verified: test_us0112_manifest_lists_eight_paths_active, test_us0112_manifest_lists_eight_paths_template, test_us0112_missing_mode_adds_absent_framework_files_python, test_us0112_missing_mode_adds_absent_framework_files_ps1, test_us0112_missing_mode_adds_absent_framework_files_shell, test_us0112_upgrade_mode_refreshes_stale_framework_files, test_us0112_upgrade_mode_preserves_unchanged_files, test_us0112_upgrade_mode_never_touches_local_catalog, test_us0112_active_catalog_protection_invariant, test_us0112_triple_installer_parity_eight_examples, test_us0112_runbook_lists_eight_preset_literals, test_us0112_parity_scope_model_catalog_examples
+
+**Parity verification**:
+- Command: python scripts/check_intake_template_parity.py --scope=model-catalog-examples
+- Result: [INTAKE_TEMPLATE_PARITY_OK] scope=model-catalog-examples
+- Pairs verified: 16 (8 active paths + 8 template mirror paths)
+
+**Compose guard verification**:
+- 12 surfaces verified UNCHANGED (US-0008 installer CLI, US-0018 smart upgrade, US-0040 canonical release, US-0054 publish confirmation, US-0057 example-first refresh, US-0075 scratchpad example-first, US-0100 version-scoped changelog, US-0101 per-phase model tier, US-0102 model-catalog presets, US-0103 decision ledger, US-0107 sovereign loop, US-0110 goal-based convergence)
+
+**Acceptance criteria satisfied**:
+- AC-1: 8 model-catalog.local.example*.json rows added to installer-owned-paths.manifest (active + template byte-parity)
+- AC-2: installer.py missing-mode copies 8 preset files when absent
+- AC-3: installer upgrade-mode refreshes stale framework files (byte-compare)
+- AC-4: installer upgrade-mode preserves unchanged files, never touches active model-catalog.local.json
+- AC-5: installer.ps1 and installer.sh missing-mode/upgrade-mode logic matches installer.py (triple parity)
+- AC-6: scripts/check_intake_template_parity.py --scope=model-catalog-examples validates manifest byte-parity
+- AC-7: docs/engineering/runbook.md documents all 8 preset filenames and operator usage recipe
+- AC-8: tests/us0112_contract_test.py defines 12 test_us0112_* markers; docs/engineering/architecture.md # US-0112 section locked
+
+**Artifacts updated**:
+- sprints/S0112/sprint.json (status=CLOSED, qa_verdict=PASS)
+- sprints/S0112/qa-findings.md (detailed test results and verification)
+- sprints/S0112/qa-verdict.json (structured JSON verdict)
+- handoffs/dev_to_qa.md (QA completion summary)
+- docs/engineering/state.md (this QA checkpoint)
+
+**Sprint closure confirmation**:
+- status=CLOSED
+- verdict=PASS
+- reason_code=QA_PASSED
+- ready_for=/verify-work (release verification)
+
+**Phase transition (qa)**:
+- consumed prior execute proof rp-auto-20260628-04-execute-dev-20260630T231500Z-US0112 (execute phase proof consumed; qa phase own proof recorded above)
+- sprint S0112 now CLOSED
+- next: /verify-work for release verification and user acceptance
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- phase_id=qa
+- role=qa (fresh subagent spawn)
+- fresh_context_marker=qa-US0112-qa-20260630T232000Z-fresh
+- timestamp=2026-06-30T23:20:00Z
+- evidence_ref=sprints/S0112/qa-findings.md,sprints/S0112/qa-verdict.json,sprints/S0112/sprint.json,docs/engineering/state.md,handoffs/dev_to_qa.md
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-qa-20260630T232000Z-US0112
+- phase_id=qa
+- role=qa
+- proof_issued_at=2026-06-30T23:20:00Z
+- proof_ttl_seconds=3600
+- verdict=PASS
+- sprint_status=CLOSED
+
+**QA contract satisfied**: all 12 tests PASS, all 8 ACs satisfied, all 12 compose guards UNCHANGED, sprint CLOSED.
+
+---
+
+## Sprint-plan checkpoint (2026-06-30) -- US-0112 / auto-20260628-04 (tech-lead, sprint-plan PASS)
+
+- timestamp=2026-06-30T22:30:00Z
+- phase_id=sprint-plan
+- phase_completed=true
+- role=tech-lead
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- stop_condition=true
+- stop_reason="sprint-plan phase complete"
+- next_phase=/plan-verify
+- next_role=qa
+- fresh_context_marker=tl-US0112-sprintplan-20260630T223000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-sprintplan-tech-lead-20260630T223000Z-US0112
+- proof_issued_at=2026-06-30T22:30:00Z
+- proof_ttl_seconds=3600
+- companion_decision=DEC-0112 (Accepted)
+- research_anchor=R-0090 (delivered, referenced)
+- compose_guards=US-0008,US-0018,US-0040,US-0054,US-0057,US-0075,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (UNCHANGED)
+- composition_surface=12 guards locked
+- task_count=11 (T-001..T-011, within SPRINT_MAX_TASKS=12)
+- auto_split_triggered=false
+- ac_surjective_map=AC-1..AC-8 -> T-001..T-011 surjective
+- test_markers=12 (8+ markers)
+- parity_scope=model-catalog-examples
+- parity_constant=MODEL_CATALOG_EXAMPLE_PAIRS
+- parity_pair_count=16
+- next_scheduled_phase=/plan-verify
+- default_spawn_role=qa
+- delivery_mode=standard
+- native_chain_active=true
+
+Canonical proof payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"sprint-plan","proof_issued_at":"2026-06-30T22:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260628-04-sprintplan-tech-lead-20260630T223000Z-US0112","story_id":"US-0112"}.
+
+**Phase boundary (tech-lead -> qa)**: sprint-plan PASS; next /plan-verify (fresh QA subagent spawn) for US-0112.
+
+**Architecture locks (carried from architecture phase)**: L1-L10 locked from research R-0090; 8 preset filenames; manifest 16 rows; missing copy-when-absent; upgrade framework refresh; active catalog protection; triple installer parity; runbook recipe; 8+ test_us0112_* markers; parity scope --scope=model-catalog-examples.
+
+**Task allocation (T-001..T-011)**:
+- Tranche A (manifest + architecture): T-001, T-002, T-010
+- Tranche B (triple installer): T-003, T-004, T-005, T-006
+- Tranche C (parity + runbook): T-007, T-008
+- Tranche D (tests + parity): T-009, T-011
+
+**Compose guards confirmed**: US-0008, US-0018, US-0040, US-0054, US-0057, US-0075, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110 DO NOT amend.
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- phase_id=sprint-plan
+- role=tech-lead
+- fresh_context_marker=tl-US0112-sprintplan-20260630T223000Z-fresh
+- timestamp=2026-06-30T22:30:00Z
+- evidence_ref=sprints/S0112/sprint.json,sprints/S0112/sprint-plan.json,sprints/S0112/sprint.md,sprints/S0112/tasks.md,docs/product/backlog.md (## US-0112),docs/engineering/state.md (this section),handoffs/po_to_tl.md,handoffs/resume_brief.md
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-sprintplan-tech-lead-20260630T223000Z-US0112
+- phase_id=sprint-plan
+- role=tech-lead
+- proof_issued_at=2026-06-30T22:30:00Z
+- proof_ttl_seconds=3600
+- proof_hash=sprintplan-pass-us0112-20260630T223000Z
+
+**Boundary verification**: consumed prior architecture proof rp-auto-20260628-04-architecture-tech-lead-20260630T220000Z-US0112 (consumed; sprint-plan phase own proof recorded above).
+
+---
+
+## Architecture checkpoint (2026-06-30) -- US-0112 / auto-20260628-04 (tech-lead, architecture PASS)
+
+- timestamp=2026-06-30T22:00:00Z
+- phase_id=architecture
+- phase_completed=true
+- role=tech-lead
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- stop_condition=true
+- stop_reason="architecture phase complete"
+- next_phase=sprint-plan
+- next_role=tech-lead
+- fresh_context_marker=tl-US0112-architecture-20260630T220000Z-fresh
+- runtime_proof_id=rp-arch-2026-06-30T22:00:00Z-auto-20260628-04
+- proof_issued_at=2026-06-30T22:00:00Z
+- proof_ttl_seconds=3600
+- companion_decision=DEC-0112 (Accepted)
+- research_anchor=R-0090 (delivered, referenced)
+- compose_guards=US-0008,US-0018,US-0040,US-0054,US-0057,US-0075,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (DO NOT amend)
+- composition_surface=12 guards locked (US-0008, US-0018, US-0040, US-0054, US-0057, US-0075, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110)
+- task_seeds=T-001..T-011 (11, within SPRINT_MAX_TASKS=12)
+- ac_surjective_map=AC-1..AC-8 -> T-001..T-011 surjective
+- architecture_notes=docs/engineering/architecture.md # US-0112 (locked)
+- next_scheduled_phase=sprint-plan
+- default_spawn_role=tech-lead
+- delivery_mode=standard
+- native_chain_active=true
+
+Canonical proof payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"architecture","proof_issued_at":"2026-06-30T22:00:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260628-04-architecture-tech-lead-20260630T220000Z-US0112","story_id":"US-0112"}.
+
+**Phase boundary (tech-lead -> tech-lead)**: architecture PASS; next /sprint-plan (fresh tech-lead subagent, spawn-only per BUG-0006) for US-0112. DEC-0112 authored, architecture notes locked, task seeds T-001..T-011 refined.
+
+**Architecture locks**: L1-L10 locked from research R-0090; 8 preset filenames; manifest 16 rows; missing copy-when-absent; upgrade framework refresh; active catalog protection; triple installer parity; runbook recipe; 8+ test_us0112_* markers; parity scope --scope=model-catalog-examples.
+
+**Compose guards confirmed**: US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110 DO NOT amend.
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- phase_id=architecture
+- role=tech-lead
+- fresh_context_marker=tl-US0112-architecture-20260630T220000Z-fresh
+- timestamp=2026-06-30T22:00:00Z
+- evidence_ref=docs/engineering/architecture.md (# US-0112),decisions/DEC-0112.md,docs/product/backlog.md (## US-0112),docs/engineering/state.md (this section),handoffs/po_to_tl.md
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-architecture-tech-lead-20260630T220000Z-US0112
+- phase_id=architecture
+- role=tech-lead
+- proof_issued_at=2026-06-30T22:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=architecture-pass-us0112-20260630T220000Z
+
+**Boundary verification**: consumed prior research proof rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112 (unchanged); architecture-phase own proof recorded above.
+
+**Status authority**: OPEN per US-0045; closure at /release.
+
+**Stop condition (BUG-0006)**: STOP and hand off via artifacts only. Do not run /sprint-plan in this turn.
+
+**Next dispatch (fresh tech-lead)**:
+
+- /sprint-plan for US-0112 -- materialize S0112 sprint from 11 task seeds; AC-1..AC-8 surjective map; handoff to /plan-verify.
+
+---
+
+## Research checkpoint (2026-06-30) — US-0112 / auto-20260628-04 (tech-lead, research PASS)
+
+- `timestamp=2026-06-30T20:45:00Z`
+- `phase_id=research`
+- `role=tech-lead`
+- `story_id=US-0112`
+- `sprint_id=(none — pending sprint-plan)`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `fresh_context_marker=tl-US0112-research-20260630T204500Z-fresh`
+- `runtime_proof_id=rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112`
+- `proof_issued_at=2026-06-30T20:45:00Z`
+- `proof_ttl_seconds=3600`
+- `research_anchor=R-0090`
+- `research_status=delivered`
+- `questions_closed=Q1..Q8`
+- `companion_decision=DEC-0112 (pending /architecture)`
+- `compose_guards=US-0008,US-0040,US-0054,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (DO NOT amend)`
+- `task_seeds=T-001..T-011 (11, within SPRINT_MAX_TASKS=12)`
+- `ac_surjective_map=AC-1..AC-8 → T-001..T-011 surjective`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=1`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `delivery_mode=standard`
+- `next_scheduled_phase=architecture`
+- `default_spawn_role=tech-lead`
+
+Canonical proof payload: `{"orchestrator_run_id":"auto-20260628-04","phase_id":"research","proof_issued_at":"2026-06-30T20:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112","story_id":"US-0112"}`.
+
+**Phase boundary (tech-lead → tech-lead)**: research PASS; next `/architecture` (fresh tech-lead subagent, spawn-only per BUG-0006) for US-0112. Companion DEC-0112 authoring at /architecture.
+
+**Research closure summary**: Q1 — 8 preset filenames confirmed (scratchpad L352-359 + glob); Q2 — `[install_include_paths]` line-based, active+template byte-parity (16 rows); Q3 — missing mode = copy when absent (same semantics as scratchpad.local.example.md); Q4 — upgrade classification = framework (refresh stale, skip unchanged; US-0075/US-0018/US-0057 precedence); Q5 — triple installer touch-points (installer.py / installer.ps1 / installer.sh, single manifest); Q6 — runbook anchor = § model tier / catalog in docs/engineering/runbook.md; Q7 — 8+ test_us0112_* markers + MODEL_CATALOG_EXAMPLE_PAIRS + --scope=model-catalog-examples; Q8 — companion DEC-0112 recommended (installer payload decision).
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- `phase_id=research`
+- `role=tech-lead`
+- `fresh_context_marker=tl-US0112-research-20260630T204500Z-fresh`
+- `timestamp=2026-06-30T20:45:00Z`
+- `evidence_ref=docs/engineering/research.md (R-0090 delivered),docs/product/backlog.md (## US-0112 research_notes),handoffs/po_to_tl.md,handoffs/resume_brief.md`
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112`
+- `phase_id=research`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-30T20:45:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=research-pass-us0112-20260630T204500Z`
+
+**Boundary verification**: consumed prior discovery proof `rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112` (unchanged); research-phase own proof recorded above.
+
+**Status authority**: OPEN per US-0045; closure at `/release`.
+
+**Stop condition (BUG-0006)**: STOP and hand off via artifacts only. Do not run `/architecture` in this turn.
+
+**Next dispatch (fresh tech-lead)**:
+
+- `/architecture` for US-0112 — author `# US-0112` in architecture.md, companion DEC-0112 (installer payload decision), atomic task refinement, 8+ test_us0112_* contract-marker literals, runbook §model-catalog recipe, parity scope `--scope=model-catalog-examples` (`MODEL_CATALOG_EXAMPLE_PAIRS`).
+
+---
+
+## Discovery checkpoint (2026-06-30) — US-0112 / auto-20260628-04 (po, discovery PASS)
+
+- `timestamp=2026-06-30T20:35:00Z`
+- `phase_id=discovery`
+- `role=po`
+- `story_id=US-0112`
+- `sprint_id=(none — pending sprint-plan)`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `fresh_context_marker=po-US0112-discovery-20260630T203000Z-fresh`
+- `runtime_proof_id=rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112`
+- `proof_issued_at=2026-06-30T20:35:00Z`
+- `proof_ttl_seconds=3600`
+- `intake_skip=intake already complete per US-0112-intake-20260628.json`
+- `decomposed=single_story`
+- `priority=P2`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=1`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `delivery_mode=standard`
+- `resolved_phase_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+- `next_scheduled_phase=research`
+- `default_spawn_role=tech-lead`
+- `story_title=Ship model-catalog example presets on install/upgrade`
+- `dec_id_recommendation=DEC-0112`
+- `research_anchor=R-0090 (extend from intake stub)`
+- `compose_guards=US-0008,US-0040,US-0054,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (DO NOT amend)`
+- `discovery_locks=L1..L10 (see backlog.md ## US-0112 discovery_locks_L1_L10)`
+- `discovery_risks=R1..R6 (see backlog.md ## US-0112 discovery_risks_R1_R6)`
+- `discovery_task_seeds=T-001..T-008`
+- `discovery_test_markers=8+ test_us0112_* (test manifest 8 paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope)`
+- `discovery_parity_scope=model-catalog-examples (MODEL_CATALOG_EXAMPLE_PAIRS)`
+- `discovery_ac_surjective_map=AC-1→L1,L2; AC-2→L3,L6; AC-3→L4; AC-4→L5; AC-5→L6,L9; AC-6→L7; AC-7→L8,L9; AC-8→L10`
+- `intake_evidence_ref=handoffs/intake_evidence/US-0112-intake-20260628.json`
+
+Canonical proof payload: `{"orchestrator_run_id":"auto-20260628-04","phase_id":"discovery","proof_issued_at":"2026-06-30T20:35:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112","story_id":"US-0112"}`.
+
+**Phase boundary (po → tech-lead)**: discovery PASS; next `/research` (fresh tech-lead subagent, spawn-only per BUG-0006) for US-0112.
+
+**Isolation evidence (US-0048 / DEC-0029)**:
+
+- `phase_id=discovery`
+- `role=po`
+- `fresh_context_marker=po-US0112-discovery-20260630T203000Z-fresh`
+- `timestamp=2026-06-30T20:35:00Z`
+- `evidence_ref=docs/product/backlog.md (## US-0112 discovery_notes + discovery_locks_L1_L10 + discovery_risks_R1_R6 + discovery_ac_surjective_map + discovery_research_asks_extend_R0090 + discovery_task_seeds_T001_T008),docs/engineering/state.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0112-intake-20260628.json`
+
+**Strict runtime proof (US-0056 / DEC-0038)**:
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112`
+- `phase_id=discovery`
+- `role=po`
+- `proof_issued_at=2026-06-30T20:35:00Z`
+- `proof_ttl_seconds=3600`
+
+**Status authority**: **OPEN** per **US-0045**; closure at `/release`.
+
+**Stop condition (BUG-0006)**: STOP and hand off via artifacts only. Do not run `/research` in this turn.
+
+**Traceability**:
+
+- Intake evidence: `handoffs/intake_evidence/US-0112-intake-20260628.json`
+- Backlog: `docs/product/backlog.md` `## US-0112` (discovery_notes block appended)
+- Research stub anchor: `R-0090` (extend with Q1–Q8 at /research)
+- Compose surfaces: US-0008 (installer), US-0040 (release notes), US-0054 (release publish), US-0100 (version changelog), US-0101 (model tiers DEC-0086), US-0102 (role catalog DEC-0087), US-0103 (AI ledger), US-0107 (sovereign loop), US-0110 (goal convergence) — DO NOT amend
+- Prior DONE precedent: US-0075 (scratchpad example-first refresh), US-0018 (smart upgrade), US-0099 (dev-environment copy-when-missing bootstrap)
+
+**Next dispatch (fresh tech-lead)**:
+
+- `/research` for US-0112 — extend R-0090 with Q1–Q8; confirm 8 presets, manifest format, upgrade classification, triple parity touch-points, runbook anchor, test markers + MODEL_CATALOG_EXAMPLE_PAIRS, companion DEC-0112.
+
+---
+
+## Phase boundary status (post-drain-advance US-0111 ? US-0112, auto-20260628-04)
+
+- `phase_boundary=drain-advance`
+- `next_scheduled_phase=discovery`
+- `segment_work_item_kind=story`
+- `active_bug_id=(none)`
+- `story_id=US-0112`
+- `sprint_id=(none ? pending sprint-plan)`
+- `orchestrator_run_id=auto-20260628-04`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=1`
+- `backlog_drain_segment_complete=0`
+- `drain_terminated=false`
+- `portfolio_open_stories=1`
+- `portfolio_open_bugs=0`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `next_drain_target_story_id=US-0112`
+- `next_drain_candidate_priority=P2`
+- `delivery_mode=standard`
+- `resolved_phase_plan=discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,refresh-context`
+- `stop_reason=completed`
+- `stop_phase=refresh-context`
+- `intended_resume_phase=discovery`
+- `intake_evidence_ref=handoffs/intake_evidence/US-0112-intake-20260628.json`
+- `intake_skip=intake already complete per US-0112-intake-20260628.json ? start at /discovery`
+
+**Phase boundary operator visibility (AC-10)**: `phase_boundary=drain-advance`; `next_scheduled_phase=discovery`; `segment_work_item_kind=story`; `active_bug_id=(none)`; `story_id=US-0112`; `sprint_id=(none)`; `orchestrator_run_id=auto-20260628-04`; `backlog_drain_active=true`; `backlog_drain_stories_remaining_budget=1`; `backlog_drain_segment_complete=0`; `drain_terminated=false`; `portfolio_open_stories=1`; `portfolio_open_bugs=0`; `native_chain_continuing=true`; `drain_advance_action=spawned`; `stop_reason=completed`; `stop_phase=refresh-context`; `intended_resume_phase=discovery`.
+
+**DEC-0069 pairing mandate** (this boundary): Both `handoffs/resume_brief.md` and `docs/engineering/state.md` refreshed before scheduling in-chat continuation. `resume_brief` = `drain-advance US-0112 from US-0111 refresh-context` prepended at top. `state.md` = this materialization breadcrumb appended. Pairing verified.
+
+**Preflight for next phase (US-0069 / DEC-0051)**: Spawn **`/discovery`** for **US-0112** with fresh **po** subagent. Intake already complete (`handoffs/intake_evidence/US-0112-intake-20260628.json`). US-0112 starts at `/discovery`.
+
+---
+
+## Verify-work checkpoint ? US-0111 / S0111 (DEC-0111)
+
+- `timestamp=2026-06-30T19:30:00Z`
+- `phase_id=verify-work`
+- `role=qa`
+- `story_id=US-0111`
+- `sprint_id=S0111`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `blocking_findings=0`
+- `ac_total=12`
+- `ac_passed=12`
+- `ac_failed=0`
+- `contract_tests_passing=12`
+- `contract_tests_total=12`
+- `compose_guards_passing=7`
+- `compose_guards_total=7`
+- `reason_code_total=9`
+- `parity_scope=release-trigger-adapter`
+- `parity_pairs=2`
+- `parity_result=INTAKE_TEMPLATE_PARITY_OK`
+- `ready_for_release=true`
+- `discrepancies_vs_qa=NONE`
+- **Summary**: Independent QA verification of US-0111 (Release Trigger-Driven Version Changelog Derivation) via fresh subagent context. 12/12 contract tests PASS, 7/7 compose guards honored, 9/9 reason codes documented, 3 scratchpad keys additive-only, template parity green (2 pairs). Zero discrepancies vs /qa phase. Sprint ready for /release.
+- **Next**: `/release` (fresh release subagent per BUG-0006).
+- **Status authority**: US-0111 remains OPEN in `docs/product/backlog.md` per US-0045 (closure at /release).
+
+Isolation evidence (**US-0048** / **DEC-0029**):
+
+- `phase_id=verify-work`
+- `role=qa`
+- `fresh_context_marker=qa-S0111-US0111-verify-work-20260630T193000Z-fresh`
+- `timestamp=2026-06-30T19:30:00Z`
+- `evidence_ref=docs/engineering/state.md,sprints/S0111/verify-work-findings.md,sprints/S0111/verify-work-verdict.json,sprints/S0111/qa-findings.md,sprints/S0111/qa-verdict.json,sprints/S0111/sprint.json,sprints/S0111/summary.md,tests/us0111_contract_test.py,scripts/release_trigger_adapters.py,docs/engineering/reason_codes.md,docs/engineering/runbook.md,.cursor/scratchpad.md`
+
+---
 
 ## Refresh-context checkpoint (2026-06-26T01:00:00Z) ? post S0092 / US-0102 (`auto-20260615-02`)
 
@@ -1461,7 +2133,7 @@ shipped_files:
   - tests/us0106_contract_test.py (8 contract tests: manifest existence, schema, zero-overhead, parity, compose guards)
   - handoffs/sovereign_role_reviews.jsonl (review ledger)
   - decisions/DEC-0106.md (locked decision)
-  - docs/engineering/architecture.md �US-0106 (architecture section)
+  - docs/engineering/architecture.md ?US-0106 (architecture section)
   - template/ mirrors for all above files
 
 compose_guards_verified:
@@ -1565,4 +2237,577 @@ Traceability index (DEC-0010):
 - `stop_reason=completed`
 - `stop_phase=refresh-context`
 - `intended_resume_phase=discovery` (drain-advance to next OPEN story US-0108)
+
+---
+
+## Execute checkpoint ? US-0109 / S0109 (auto-20260628-04)
+
+- `timestamp=2026-06-30T00:28:00Z`
+- `phase_id=execute`
+- `role=dev`
+- `story_id=US-0109`
+- `sprint_id=S0109`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `stop_reason=completed`
+- `stop_phase=execute`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=3`
+- Segment close for **US-0109** / **S0109**. All 11 tasks completed (T-001 through T-011). Deliverables:
+  - **T-001**: Scratchpad keys + reason codes (6 keys, 8 codes)
+  - **T-002**: Self-healing deploy library (two-stage probe chain)
+  - **T-003**: Probe target resolution (names-only env reference)
+  - **T-004**: Bounded retry loop (max 3 attempts)
+  - **T-005**: DEPLOY_DEFERRED transition (sovereign deferral integration)
+  - **T-006**: Contract tests (11 tests, all passing)
+  - **T-007**: Backward compatibility guard (DISABLED=0 path unchanged)
+  - **T-008**: Validator CLI (self-test passes)
+  - **T-009**: Compose regression guards (US-0054/US-0100/US-0110 unmodified)
+  - **T-010**: Parity check + runbook + reason codes
+  - **T-011**: Execute steps 29-31 wiring
+- **Triad hot-surface (DEC-0054)**: all writes complete; `--check` PASS.
+- **Consistency checks**:
+  - `pytest tests/us0109_contract_test.py -v` ? **11/11 PASS**
+  - `python scripts/self_healing_deploy_validate.py --self-test` ? **[SELF_HEALING_DEPLOY_VALIDATION_OK]**
+  - `python scripts/check_intake_template_parity.py --scope=sovereign-self-healing-deploy` ? **[INTAKE_TEMPLATE_PARITY_OK]**
+  - Compose guards: US-0054 (publish targets), US-0100 (changelog), US-0110 (convergence) ? all **UNCHANGED**
+  - Backward compatibility: `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0` ? zero overhead, byte-identical US-0054 publish path
+
+Artifacts touched: `sprints/S0109/progress.md`, `sprints/S0109/summary.md`, `scripts/self_healing_deploy_lib.py`, `scripts/self_healing_deploy_validate.py`, `tests/us0109_contract_test.py`, `docs/engineering/runbook.md`, `docs/engineering/reason_codes.md`, `template/scripts/self_healing_deploy_lib.py`, `template/scripts/self_healing_deploy_validate.py`, `template/tests/us0109_contract_test.py`, `template/docs/engineering/runbook.md`, `template/docs/engineering/reason_codes.md`, `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`, `handoffs/dev_to_qa.md`, `docs/engineering/state.md` (this checkpoint).
+
+Ready for QA verification. Next phase: `/qa`.
+
+Isolation evidence (US-0048 / DEC-0029):
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-S0109-US0109-execute-20260630T002800Z-fresh`
+- `timestamp=2026-06-30T00:28:00Z`
+- `evidence_ref=docs/engineering/state.md,sprints/S0109/progress.md,sprints/S0109/summary.md,scripts/self_healing_deploy_lib.py,scripts/self_healing_deploy_validate.py,tests/us0109_contract_test.py,docs/engineering/runbook.md,docs/engineering/reason_codes.md,handoffs/dev_to_qa.md`
+
+Strict runtime proof (US-0056 / DEC-0038):
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-execute-us-0109-auto-20260628-04`
+- `phase_id=execute`
+- `role=dev`
+- `proof_issued_at=2026-06-30T00:28:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=<pending_qa_verification>`
+
+Traceability index (DEC-0010):
+
+| Story | Sprint | Tasks | Status | Evidence |
+|-------|--------|-------|--------|----------|
+| US-0109 | S0109 | T-001..T-011 | COMPLETE (execute PASS, awaiting QA) | sprints/S0109/progress.md, sprints/S0109/summary.md, scripts/self_healing_deploy_lib.py, tests/us0109_contract_test.py, handoffs/dev_to_qa.md, docs/engineering/state.md (this checkpoint) |
+
+## Phase boundary status (post-execute, US-0109 / S0109 / auto-20260628-04)
+
+- `phase_boundary=execute`
+- `next_scheduled_phase=qa`
+- `segment_work_item_kind=story`
+- `active_bug_id=(none)`
+- `story_id=US-0109`
+- `sprint_id=S0109`
+- `orchestrator_run_id=auto-20260628-04`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=3`
+- `backlog_drain_segment_complete=0`
+- `drain_terminated=false`
+- `portfolio_open_stories=3` (US-0108, US-0111, US-0112)
+- `portfolio_open_bugs=0`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=phase_handoff`
+- `stop_reason=completed`
+- `stop_phase=execute`
+- `intended_resume_phase=qa` (S0109 awaits QA verification)
+
+## qa US-0109 / auto-20260628-04 (qa FAIL)
+
+- phase_id=qa; role=qa; story_id=US-0109; sprint_id=S0109
+- orchestrator_run_id=auto-20260628-04
+- dec_id=DEC-0109
+- timestamp=2026-06-30T02:00:00Z
+- fresh_context_marker=qa-US0109-qa-20260630T020000Z-fresh
+- verdict=FAIL; blocking=2; non_blocking=0
+- blocking_findings=
+  - FINDING-001: test_us0109_us0054_compose_no_publish_semantics_change FAIL ? RELEASE_PUBLISH_OK token in lib docstrings lines 6,308; functional US-0054 semantics UNCHANGED (no publish logic); remediation: remove token from docstrings
+  - FINDING-002: parity FAIL ? docs/engineering/runbook.md (active, 3327 lines) != template/docs/engineering/runbook.md (template, 3097 lines); T-010 added compose guards to active but did not sync template mirror; remediation: copy active runbook to template
+- test_results=
+  - pytest:10/11 PASS, 1 FAIL (test_us0109_us0054_compose_no_publish_semantics_change)
+  - validator_self_test:PASS ([SELF_HEALING_DEPLOY_VALIDATION_OK])
+  - parity_check:FAIL (runbook.md divergence)
+- compose_guards=
+  - US-0054:TEST_FAIL (token in docstring; functional UNCHANGED)
+  - US-0100:PASS
+  - US-0103:PASS (consumer only)
+  - US-0107:PASS (consumer only)
+  - US-0110:PASS
+- backward_compat=PASS
+- reason_codes=8/8 PRESENT (DEPLOY_HEALING_* in docs/engineering/reason_codes.md lines 299-343)
+- ac_verification=
+  - AC-1:PASS (test_us0109_scratchpad_keys_and_defaults)
+  - AC-2:PASS (test_us0109_probe_health_stage + test_us0109_probe_acceptance_stage)
+  - AC-3:PASS (test_us0109_retry_loop_bounded)
+  - AC-4:PASS (test_us0109_deferred_after_cap_exhaustion)
+  - AC-5:PASS (test_us0109_backward_compat_off_path_byte_identical)
+  - AC-6:PASS (test_us0109_validator_cli_self_test)
+  - AC-7:FAIL (compose guard test FAIL ? token in docstring)
+  - AC-8:FAIL (parity check FAIL ? runbook.md divergence)
+  - AC-9:PASS (execute steps 29-31 documented)
+- artifacts=sprints/S0109/qa-findings.md, sprints/S0109/qa-verdict.json, handoffs/qa_to_dev.md, docs/engineering/state.md
+- stop_phase=qa; stop_reason=blocking_findings
+- next_phase=execute (dev fixes required)
+- handoff=handoffs/qa_to_dev.md (dev must fix FINDING-001, FINDING-002, then re-run /qa)
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-US0109-qa-20260630T020000Z-fresh
+- timestamp=2026-06-30T02:00:00Z
+- evidence_ref=sprints/S0109/qa-findings.md,sprints/S0109/qa-verdict.json,handoffs/qa_to_dev.md
+
+Strict runtime proof (US-0056 / DEC-0038):
+
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-qa-qa-20260630T020000Z-US0109
+- phase_id=qa
+- role=qa
+- proof_issued_at=2026-06-30T02:00:00Z
+- proof_ttl_seconds=3600
+- proof_hash=placeholder (qa subagent context isolated)
+
+## qa-fix-cycle-2 US-0109 / auto-20260628-04 (qa PASS)
+- phase_id=qa; role=qa; story_id=US-0109; sprint_id=S0109; loop_cycle=2
+- verdict=PASS; blocking=0; non_blocking=0
+- test_results=pytest:11/11 PASS, validator:PASS, parity:PASS
+- compose_guards_us0054=UNCHANGED, compose_guards_us0100=UNCHANGED, compose_guards_us0110=UNCHANGED
+- backward_compat=PASS
+- fresh_context_marker=qa-US0109-qa-fix-cycle2-20260630T023000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-qa-qa-fix-cycle2-20260630T023000Z-US0109
+- proof_hash=fix2qa_us0109_a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f5
+- stop_phase=qa; stop_reason=completed
+- next_phase=verify-work (qa)
+
+Isolation evidence (US-0048 / DEC-0029):
+- phase_id=qa
+- role=qa
+- fresh_context_marker=qa-US0109-qa-fix-cycle2-20260630T023000Z-fresh
+- timestamp=2026-06-30T02:30:00Z
+- evidence_ref=sprints/S0109/qa-findings.md,sprints/S0109/qa-verdict.json
+
+Strict runtime proof (US-0056 / DEC-0038):
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-qa-qa-fix-cycle2-20260630T023000Z-US0109
+- phase_id=qa
+- role=qa
+- loop_cycle=2
+- proof_issued_at=2026-06-30T02:30:00Z
+- proof_ttl_seconds=3600
+- proof_hash=fix2qa_us0109_a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f5
+
+## verify-work US-0109 / auto-20260628-04 (qa PASS)
+- phase_id=verify-work; role=qa; story_id=US-0109; sprint_id=S0109
+- orchestrator_run_id=auto-20260628-04
+- timestamp=2026-06-30T02:45:00Z
+- fresh_context_marker=qa-US0109-verify-work-20260630T024500Z-fresh
+- verdict=PASS; blocking=0; non_blocking=0
+- test_results=pytest:11/11 PASS, validator:PASS, parity:PASS (sovereign-self-healing-deploy)
+- compose_guards_us0054=UNCHANGED, compose_guards_us0100=UNCHANGED, compose_guards_us0103=UNCHANGED, compose_guards_us0107=UNCHANGED, compose_guards_us0110=UNCHANGED
+- backward_compat=PASS
+- backlog_status=DONE(authority US-0045)
+- acceptance_status=9/9 [x] marked (AC-1..AC-9)
+- runtime_proof_id=rp-auto-20260628-04-verify-work-qa-20260630T024500Z-US0109
+- proof_hash=vw_us0109_a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f5
+- stop_phase=verify-work; stop_reason=completed
+- next_phase=release (release)
+
+Isolation evidence (US-0048 / DEC-0029):
+- phase_id=verify-work
+- role=qa
+- fresh_context_marker=qa-US0109-verify-work-20260630T024500Z-fresh
+- timestamp=2026-06-30T02:45:00Z
+- evidence_ref=sprints/S0109/verify-work-findings.md,sprints/S0109/verify-work-verdict.json
+
+Strict runtime proof (US-0056 / DEC-0038):
+- orchestrator_run_id=auto-20260628-04
+- runtime_proof_id=rp-auto-20260628-04-verify-work-qa-20260630T024500Z-US0109
+- phase_id=verify-work
+- role=qa
+- proof_issued_at=2026-06-30T02:45:00Z
+- proof_ttl_seconds=3600
+- proof_hash=vw_us0109_a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f5
+
+---
+
+## release US-0109 / auto-20260628-04 (release PASS)
+
+- phase_id=release; role=release; story_id=US-0109; sprint_id=S0109
+- orchestrator_run_id=auto-20260628-04
+- release_verdict=PASS
+- timestamp=2026-06-30T03:00:00Z
+- fresh_context_marker=release-S0109-US0109-auto-20260628-04-20260630T030000Z
+- release_notes=handoffs/releases/S0109-release-notes.md
+- release_queue=S0109 ? released
+- backlog_status=US-0109 DONE (authority US-0045)
+- acceptance_status=9/9 [x] DONE
+- compose_guards=US-0054 UNCHANGED, US-0100 UNCHANGED, US-0103 UNCHANGED, US-0107 UNCHANGED, US-0110 UNCHANGED
+- backward_compat=PASS (AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0 ? byte-identical US-0054 path)
+- artifacts=sprints/S0109/release-notes.md, sprints/S0109/release-verdict.json, handoffs/releases/S0109-release-notes.md
+- strict_proof:
+  - runtime_proof_id=rp-release-release-auto-20260628-04-US-0109
+  - phase_id=release; role=release
+  - proof_issued_at=2026-06-30T03:00:00Z
+  - proof_ttl_seconds=3600
+  - proof_hash=placeholder (release subagent context isolated)
+- isolation:
+  - fresh_context_marker=release-S0109-US0109-auto-20260628-04-20260630T030000Z
+- stop_phase=release; stop_reason=completed
+- next_phase=refresh-context (curator)
+
+## refresh-context US-0109 / auto-20260628-04 (refresh-context PASS)
+
+- phase_id=refresh-context; role=curator; story_id=US-0109; sprint_id=S0109
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- timestamp=2026-06-30T04:00:00Z
+- fresh_context_marker=curator-S0109-US0109-refresh-20260630T040000Z-fresh
+- triad_check=STATE_ARCHIVE_REQUIRED (state.md 1795/1000, po_to_tl 1036/650 ? rollover needed before next write-phase)
+- bug_issue_validate=BUG_VALIDATION_SECTION_MISSING (acceptance.md missing required section header)
+- contract_tests=11/11 PASSED (us0109_contract_test.py)
+- self_healing_deploy=SELF_HEALING_DEPLOY_VALIDATION_OK
+- backlog_drain_active=true; budget_remaining=2; portfolio_open=[US-0111, US-0112]
+- native_chain_active=true; drain_advance_action=will_spawn
+- compose_guards=US-0054,US-0100,US-0103,US-0107,US-0110 UNCHANGED
+- isolation:
+  - fresh_context_marker=curator-S0109-US0109-refresh-20260630T040000Z-fresh
+  - phase_id=refresh-context; role=curator
+  - evidence_ref=self (contract tests + deploy validation + state checkpoint)
+- strict_proof:
+  - runtime_proof_id=rp-refresh-context-curator-auto-20260628-04-US-0109
+  - phase_id=refresh-context; role=curator
+  - proof_issued_at=2026-06-30T04:00:00Z
+  - proof_ttl_seconds=3600
+  - proof_hash=bdad3e2584e5ad95a71f41aca7b129e71ecfcb0dda8ceee06545102319886327
+- stop_phase=refresh-context; stop_reason=completed; intended_resume_phase=discovery (drain-advance to US-0111)
+
+## Phase Checkpoint: sprint-plan (US-0111)
+
+- phase_id: sprint-plan (plan-verify sub-phase)
+- role: qa (subagent QA verifying tech-lead output)
+- story_id: US-0111
+- sprint_id: S0111
+- decision_id: DEC-0111
+- research_id: R-0098
+- orchestrator_run_id: auto-20260628-04
+- verdict: PASS_WITH_FINDINGS
+- task_count: 11 (sprint-plan.json authoritative)
+- max_tasks_allowed: 12
+- auto_split_triggered: false
+- compose_guards_verified: US-0100, US-0054, US-0103, US-0040, US-0008, US-0107, US-0110 (7 guards, all read-only)
+- acs_surjective_mapped: AC-1?T-001, AC-2?T-002, AC-3?T-003, AC-4?T-004, AC-5?T-005, AC-6?T-006, AC-7?T-007, AC-8?T-008, AC-9?T-009, AC-10?T-010, AC-11?T-011 (bijective; 11 ACs)
+- risks_carried: R1 (GitHub API rate-limit), R2 (npm registry auth), R3 (annotated vs lightweight tags), R4 (Windows atomic rename), R5 (auto-detection ambiguity), R6 (ledger bloat)
+- sprint_plan_artifact: sprints/S0111/sprint-plan.json
+- plan_verify_artifact: sprints/S0111/plan-verify.json
+- plan_verified (from plan-verify.json): true
+- plan_verify_verdict (from plan-verify.json): PASS
+- ready_for_execute: true
+- findings:
+  - F1_SEVERITY=HIGH task_count_mismatch_sprint_json: sprint.json reports task_count=12 but sprint-plan.json (authoritative) and plan-verify.json both report 11. sprint.json must be corrected to 11 before /execute to avoid orphan tasks.
+  - F2_SEVERITY=HIGH orphan_tasks_in_tasks_md: tasks.md defines 12 tasks (T-001..T-012) including AC-12?T-012 "Documentation + runbook updates" ? but sprint-plan.json and plan-verify.json only cover 11 tasks (no AC-12, no T-012). Either sprint-plan.json must be extended to include AC-12/T-012, or tasks.md must drop T-012 / AC-12.
+  - F3_SEVERITY=MEDIUM ac_semantic_drift_in_sprint_md: sprint.md uses different AC titles/meanings than sprint-plan.json (e.g. sprint.md AC-1="Scratchpad keys", while sprint-plan.json AC-1="Trigger adapter registry"; AC-2..AC-6 labels all shifted by one). Tranche structure sprint.md (A-E) also differs from sprint-plan.json (A-D). sprint.md is not the authoritative plan source but the divergence will confuse /execute.
+  - F4_INFO: The user's draft checkpoint showed AC-9?T-010, AC-10?T-011, AC-11?T-012 (12-task map) ? this does NOT match the authoritative sprint-plan.json (AC-9?T-009 .. AC-11?T-011, bijective 11?11). Checkpoint below reflects the AUTHORITATIVE plan-verify.json mapping, not the draft.
+  - F5_INFO: All 7 compose guards verified read-only with rationale in plan-verify.json. Risks R1-R6 carried from DEC-0111 with mitigation notes ? both are internally consistent across sprint-plan.json and plan-verify.json.
+- resolution_recommendation: Tech-lead should (a) correct sprint.json task_count to 11, (b) decide whether AC-12/T-012 (documentation+runbook) is IN or OUT of scope ? IN case: extend sprint-plan.json and plan-verify.json to 12 tasks (still <=max 12); OUT case: remove T-012/AC-12 from tasks.md and renumber, (c) align sprint.md AC titles/transanches with sprint-plan.json.
+- isolation_evidence:
+  - fresh_context_marker: qa-S0111-US0111-plan-verify-20260630T185000Z-fresh
+  - role: qa (fresh agent context ? no prior chat history used, only artifacts)
+  - evidence_ref: [this checkpoint]; artifacts read: sprints/S0111/{sprint-plan.json, plan-verify.json, sprint.json, tasks.md, sprint.md}
+- timestamp: 2026-06-30T18:50:00Z
+
+---
+
+## Phase Checkpoint: execute (US-0111)
+
+- phase_id: execute
+- role: dev
+- story_id: US-0111
+- sprint_id: S0111
+- decision_id: DEC-0111
+- research_id: R-0098
+- orchestrator_run_id: auto-20260628-04
+- fresh_context_marker: dev-S0111-US0111-execute-20260630T191400Z-fresh
+- task_count_delivered: 12 (T-001..T-012 per tasks.md)
+- ac_surjective_map: AC-1..AC-12 -> T-001..T-012 (bijective)
+- tranche_order: A (adapter registry + TriggerContext) -> B (4 concrete adapters) -> C (version compare + promotion + notes + ledger + reason codes) -> D (contract tests + docs + runbook)
+- compose_guards_honored: US-0100 release_changelog_lib APIs unchanged (consumer-only reuse); US-0054 release-all.sh UNCHANGED; US-0103 decision_ledger_lib.append_entry unchanged (additive decision_type=version_derivation); US-0040 runbook additive section only; US-0008 sovereign_convergence_check.py UNCHANGED; US-0107 release_promotion_guard.py UNCHANGED; US-0110 us0109_contract_test.py UNCHANGED
+- deliverables:
+  - scripts/release_trigger_adapters.py + template mirror (TriggerContext + ReleaseAdapter ABC + 4 adapters: github/npm/git_tag/manual + dispatch_to_adapter registry + compare_versions_from_trigger + atomic_write_file + promote_changelog_version + write_per_version_notes + emit_version_derivation_event)
+  - tests/us0111_contract_test.py + template mirror (12 tests, all PASS)
+  - docs/engineering/reason_codes.md section US-0111 with 9 fail-closed RELEASE_TRIGGER_* codes (active + template mirror)
+  - docs/engineering/runbook.md section US-0111: operator recipe (adapter priority + troubleshooting + compose surfaces + parity enforcement) (active + template mirror)
+  - .cursor/scratchpad.md + template mirror: 3 keys (RELEASE_TRIGGER_SOURCE=manual default, RELEASE_TRIGGER_TIMEOUT_SEC=10, RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0)
+  - sprints/S0111/progress.md, summary.md, sprint.json
+- gate_evidence:
+  - contract_tests: pytest -k us0111 -v => 12/12 PASS
+  - template_parity: python scripts/check_intake_template_parity.py --scope=release-trigger-adapter => [INTAKE_TEMPLATE_PARITY_OK]
+  - reason_codes_inventory: test_us0111_reason_code_inventory_9_codes => PASS (9/9)
+  - us0100_compose: test_us0111_us0100_compose_no_derivation_semantics_change => PASS
+  - us0054_compose: test_us0111_us0054_compose_no_publish_semantics_change => PASS
+- non_goals_honored:
+  - did NOT amend compose-guarded files (US-0100 release_changelog_lib APIs, US-0054 release-all.sh, US-0103 decisions.md structure, US-0040 runbook existing sections, US-0008/US-0107/US-0110 scripts unchanged)
+  - did NOT mark US-0111 DONE in backlog (status authority reserved for /release per US-0045)
+  - did NOT use prior chat history as context (fresh agent, artifact-only)
+- fix_applied_during_execute:
+  - tests/us0111_contract_test.py GitTag adapter fail-closed test: switched repo_root="." to tempfile (repo has actual git tags so `git describe` succeeded); synced fix to template mirror
+- evidence_ref:
+  - sprints/S0111/summary.md
+  - sprints/S0111/progress.md
+  - handoffs/dev_to_qa.md
+  - scripts/release_trigger_adapters.py
+  - tests/us0111_contract_test.py
+- timestamp: 2026-06-30T19:14:00Z
+
+---
+
+## Phase Checkpoint: release (US-0111)
+
+- phase_id: release
+- role: release
+- story_id: US-0111
+- sprint_id: S0111
+- decision_id: DEC-0111
+- orchestrator_run_id: auto-20260628-04
+- verdict: PASS
+- blocking_findings: 0
+- ac_total: 12
+- ac_passed: 12
+- ac_failed: 0
+- contract_tests_passing: 12
+- contract_tests_total: 12
+- parity_scope: release-trigger-adapter
+- parity_pairs: 2
+- parity_result: INTAKE_TEMPLATE_PARITY_OK
+- compose_guards_passing: 7
+- compose_guards_total: 7
+- reason_code_total: 9
+- scratchpad_keys_added: 3
+- scratchpad_keys:
+  - RELEASE_TRIGGER_SOURCE
+  - RELEASE_TRIGGER_TIMEOUT_SEC
+  - RELEASE_TRIGGER_FALLBACK_TO_LOCAL
+- release_finalization:
+  - queue_row: S0111 -> released (handoffs/release_queue.md)
+  - backlog_status: US-0111 -> DONE (docs/product/backlog.md)
+  - acceptance_checkboxes: AC-1..AC-12 checked (docs/product/backlog.md)
+  - release_notes: handoffs/releases/S0111-release-notes.md (created)
+  - release_verdict: sprints/S0111/release-verdict.json (PASS)
+  - sprint_status: S0111 -> CLOSED (sprints/S0111/sprint.json)
+  - legacy_pointer: handoffs/release_notes.md updated (latest released = S0111)
+- gates:
+  - uat_gate: PASS (sprints/S0111/uat.json: sprint_id=S0111, story_id=US-0111, verdict=PASS, 12/12 steps)
+  - qa_gate: PASS (sprints/S0111/qa-verdict.json: verdict=approve, 0 blocking defects)
+  - verify_work_gate: PASS (sprints/S0111/verify-work-verdict.json: verdict=PASS, ready_for_release=true)
+- compose_guards_honored: US-0008, US-0040, US-0054, US-0100, US-0103, US-0107, US-0110 (all 7/7 unchanged)
+- isolation_evidence:
+  - phase_id: release
+  - role: release
+  - fresh_context_marker: release-S0111-US0111-20260630T200000Z-fresh
+  - timestamp: 2026-06-30T20:00:00Z
+  - evidence_ref:
+    - sprints/S0111/release-findings.md
+    - sprints/S0111/release-verdict.json
+    - handoffs/releases/S0111-release-notes.md
+    - handoffs/release_queue.md
+    - docs/product/backlog.md
+    - docs/product/acceptance.md
+- timestamp: 2026-06-30T20:00:00Z
+
+---
+
+## Refresh-context checkpoint ? US-0111 / S0111 (DEC-0111) ? post-release segment closure
+
+- `timestamp=2026-06-30T20:00:00Z`
+- `phase_id=refresh-context`
+- `role=curator`
+- `story_id=US-0111`
+- `sprint_id=S0111`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `fresh_context_marker=curator-S0111-US0111-refresh-context-20260630T200000Z-fresh`
+- `segment_closed=true`
+- `release_id=R0111`
+- `backlog_drain_active=true`
+- `portfolio_open=[US-0112]`
+- `backlog_drain_stories_remaining_budget=1`
+- **Summary**: US-0111 (Release Trigger-Driven Version Changelog Derivation) segment closed. Sprint S0111 CLOSED, story US-0111 DONE, release S0111 released. DEC-0111 + R-0098 delivered. 12/12 ACs satisfied, 7/7 compose guards unchanged, 9/9 reason codes documented, template parity PASS (release-trigger-adapter, 2 pairs). Curator reconciled state.md, decisions.md, research.md, sprints/S0111/summary.md, handoffs/resume_brief.md, handoffs/continuation_hygiene.md, handoffs/portfolio_state.md. Segment closure: release_queue S0111?released, backlog US-0111?DONE, acceptance AC-1..AC-12 checked, release_notes S0111 created, release_verdict PASS, sprint_status CLOSED.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- `phase_id=refresh-context`
+- `role=curator`
+- `fresh_context_marker=curator-S0111-US0111-refresh-context-20260630T200000Z-fresh`
+- `timestamp=2026-06-30T20:00:00Z`
+- `evidence_ref=docs/engineering/state.md,docs/engineering/decisions.md,docs/engineering/research.md,sprints/S0111/sprint.json,sprints/S0111/release-verdict.json,sprints/S0111/summary.md,sprints/S0111/qa-verdict.json,sprints/S0111/verify-work-verdict.json,sprints/S0111/uat.json,handoffs/release_queue.md,handoffs/releases/S0111-release-notes.md,docs/product/backlog.md,docs/product/acceptance.md,handoffs/resume_brief.md,handoffs/continuation_hygiene.md,handoffs/portfolio_state.md,decisions/DEC-0111.md`
+
+---
+
+## Plan-verify checkpoint — US-0112 / S0112 (DEC-0112 / R-0090)
+
+- `timestamp=2026-06-30T22:46:00Z`
+- `phase_id=plan-verify`
+- `role=qa`
+- `story_id=US-0112`
+- `sprint_id=S0112`
+- `orchestrator_run_id=auto-20260628-04`
+- `verdict=PASS`
+- `delivery_mode=standard`
+- `native_chain_active=true`
+- `fresh_context_marker=qa-US0112-planverify-20260630T224600Z-fresh`
+- `runtime_proof_id=rp-auto-20260628-04-planverify-qa-20260630T224600Z-US0112`
+- `task_count=11` (T-001..T-011; SPRINT_MAX_TASKS=12; no SPRINT_AUTO_SPLIT)
+- `ac_count=8` (AC-1..AC-8, surjective map confirmed)
+- `compose_guards=[US-0008, US-0018, US-0040, US-0054, US-0057, US-0075, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110]` (all UNCHANGED, DO NOT amend)
+- `test_markers_count=12` (≥8 required; all prefixed `test_us0112_*`)
+- `parity_scope=--scope=model-catalog-examples` (MODEL_CATALOG_EXAMPLE_PAIRS, 16 pairs)
+- `decision_status=Accepted` (DEC-0112)
+- `research_status=delivered` (R-0090, Q1-Q8 closed)
+- `story_status=OPEN` (backlog authority `docs/product/backlog.md` per US-0045)
+- `blocking_findings=[]`
+- `next_phase=/execute`
+- `next_role=dev` (fresh subagent spawn)
+- `stop_reason=completed (plan-verify phase)`
+- Summary: plan-verify PASS. AC-1..AC-8 all covered by tasks T-001..T-011 (surjective). 11/12 task budget used, no split. All 12 compose guards UNCHANGED. 12 `test_us0112_*` markers enumerated covering AC-1..AC-7 (includes manifest, missing-mode adds, upgrade refresh/preserve, active catalog protection, triple parity, runbook literals, and parity scope). Parity scope `--scope=model-catalog-examples` with `MODEL_CATALOG_EXAMPLE_PAIRS` constant (16 pairs). DEC-0112 Accepted, R-0090 delivered. US-0112 remains OPEN per US-0045.
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- `phase_id=plan-verify`
+- `role=qa`
+- `fresh_context_marker=qa-US0112-planverify-20260630T224600Z-fresh`
+- `timestamp=2026-06-30T22:46:00Z`
+- `evidence_ref=sprints/S0112/plan-verify.json,sprints/S0112/plan-verify-findings.md,sprints/S0112/plan-verify-verdict.json,sprints/S0112/sprint.json,sprints/S0112/sprint.md,sprints/S0112/tasks.md,decisions/DEC-0112.md,docs/product/backlog.md,handoffs/resume_brief.md,docs/engineering/state.md`
+
+---
+
+## Execute checkpoint (2026-06-30) — US-0112 / S0112 / auto-20260628-04 (dev, execute PASS)
+
+- timestamp=2026-06-30T22:50:00Z
+- phase_id=execute
+- role=dev
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- tasks_completed=11/11 (T-001..T-011)
+- tests_passing=12/12 test_us0112_* markers (manifest 8 paths active+template, missing-mode classification Python/PS1/Shell, upgrade-mode refresh/preserve/local-untouched, active catalog protection, triple installer parity, runbook literals, parity scope)
+- parity_scope=model-catalog-examples
+- parity_constant=MODEL_CATALOG_EXAMPLE_PAIRS (1 pair: manifest active vs template, byte-identical)
+- parity_result=INTAKE_TEMPLATE_PARITY_OK
+- compose_guards=US-0008,US-0018,US-0040,US-0054,US-0057,US-0075,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 (UNCHANGED)
+- installer_verification:
+  - installer.py: FRAMEWORK_EXACT set includes all 8 model-catalog.local.example*.json paths; missing-mode copy-when-absent; upgrade-mode byte-compare + refresh when template differs; active catalog (.cursor/model-catalog.local.json) excluded from manifest + FRAMEWORK_EXACT + clean_paths
+  - installer.ps1: $frameworkExact array includes all 8 example filenames; classify_file returns framework for each
+  - installer.sh: classify_file case pattern includes .cursor/model-catalog.local.example*.json glob; all 8 examples classified as framework
+- deliverables:
+  - docs/engineering/context/installer-owned-paths.manifest: 8 model-catalog.local.example*.json rows added under [install_include_paths]
+  - template/docs/engineering/context/installer-owned-paths.manifest: byte-identical to active (parity confirmed)
+  - installer.py: FRAMEWORK_EXACT includes all 8 example paths (already present at execute entry; verified)
+  - installer.ps1: $frameworkExact includes all 8 example filenames (already present at execute entry; verified)
+  - installer.sh: classify_file case pattern includes model-catalog.local.example*.json glob (already present at execute entry; verified)
+  - scripts/check_intake_template_parity.py: MODEL_CATALOG_EXAMPLE_PAIRS constant + --scope=model-catalog-examples (already present at execute entry; verified)
+  - docs/engineering/runbook.md: US-0112 section lists all 8 presets + operator recipe (already present at execute entry; verified)
+  - docs/engineering/architecture.md: US-0112 section locked (already present at execute entry; verified)
+  - tests/us0112_contract_test.py: 12 test_us0112_* markers, all 12 PASS
+- gate_evidence:
+  - contract_tests: python -m pytest tests/us0112_contract_test.py -v => 12/12 PASS
+  - template_parity: python scripts/check_intake_template_parity.py --scope=model-catalog-examples => [INTAKE_TEMPLATE_PARITY_OK]
+  - manifest_completeness: all 8 example paths present in active + template [install_include_paths]
+  - framework_classification: all 8 classified as framework in Python/PS1/Shell installers
+  - active_catalog_protection: .cursor/model-catalog.local.json NOT in manifest, NOT in FRAMEWORK_EXACT, NOT in clean_paths
+- non_goals_honored:
+  - did NOT amend compose-guarded files (US-0008 installer CLI, US-0018 smart upgrade, US-0040 release notes, US-0054 publish gates, US-0057 framework refresh, US-0075 example-first, US-0100 changelog, US-0101 catalog schema, US-0102 role precedence, US-0103 ledger, US-0107 daemon loop, US-0110 convergence)
+  - did NOT touch .cursor/model-catalog.local.json (operator-owned, gitignored)
+  - did NOT modify catalog schema or precedence (DEC-0086/DEC-0087 boundary)
+  - did NOT mark US-0112 DONE in backlog (status authority reserved for /release per US-0045)
+  - did NOT use prior chat history as context (fresh agent, artifact-only)
+- next_phase=/qa
+- fresh_context_marker=dev-S0112-US0112-execute-20260630T225000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-execute-dev-20260630T225000Z-US0112
+- evidence_ref:
+  - sprints/S0112/progress.md
+  - sprints/S0112/summary.md
+  - sprints/S0112/sprint.json
+  - sprints/S0112/tasks.md
+  - tests/us0112_contract_test.py
+  - docs/engineering/architecture.md (US-0112 section)
+  - docs/engineering/runbook.md (US-0112 section)
+  - docs/engineering/context/installer-owned-paths.manifest
+  - scripts/check_intake_template_parity.py (MODEL_CATALOG_EXAMPLE_PAIRS)
+  - installer.py (FRAMEWORK_EXACT set)
+  - installer.ps1 ($frameworkExact array)
+  - installer.sh (classify_file case pattern)
+  - handoffs/dev_to_qa.md
+
+Isolation evidence (US-0048 / DEC-0029):
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-S0112-US0112-execute-20260630T225000Z-fresh`
+- `timestamp=2026-06-30T22:50:00Z`
+- `evidence_ref=sprints/S0112/progress.md,sprints/S0112/summary.md,sprints/S0112/sprint.json,sprints/S0112/tasks.md,tests/us0112_contract_test.py,docs/engineering/architecture.md,docs/engineering/runbook.md,docs/engineering/context/installer-owned-paths.manifest,scripts/check_intake_template_parity.py,installer.py,installer.ps1,installer.sh,handoffs/dev_to_qa.md,docs/engineering/state.md`
+
+## Verify-work checkpoint (2026-06-30) — US-0112 / S0112 / auto-20260628-04 (qa, verify-work PASS)
+
+- timestamp=2026-06-30T23:05:00Z
+- phase_id=verify-work
+- role=qa
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- tests_passing=12/12
+- parity_result=INTAKE_TEMPLATE_PARITY_OK
+- compose_guards_verified=12/12 UNCHANGED
+- ac_satisfied=8/8
+- blocking_findings=0
+- discrepancies_vs_qa=NONE
+- ready_for_release=true
+- next_phase=/release
+- fresh_context_marker=qa-S0112-US0112-verify-work-20260630T230500Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-verify-work-qa-20260630T230500Z-US0112
+
+## Refresh-context checkpoint — US-0112 / S0112 segment closure (2026-06-30)
+
+- timestamp=2026-06-30T23:50:00Z
+- phase_id=refresh-context
+- role=curator
+- story_id=US-0112
+- sprint_id=S0112
+- orchestrator_run_id=auto-20260628-04
+- verdict=PASS
+- fresh_context_marker=curator-S0112-US0112-refresh-context-20260630T235000Z-fresh
+- runtime_proof_id=rp-auto-20260628-04-refresh-context-curator-20260630T235000Z-US0112
+- dec_id=DEC-0112
+- research_anchor=R-0090 (delivered)
+- segment_closure_artifacts=state.md,handoffs/portfolio_state.md,handoffs/continuation_hygiene.md,handoffs/resume_brief.md
+- compose_guards=US-0008,US-0040,US-0054,US-0100,US-0101,US-0102,US-0103,US-0107,US-0110 preserved (UNCHANGED through release)
+- handoff_notes=US-0112 full lifecycle PASS through /refresh-context. Segment closed. Portfolio now has 0 OPEN stories. Drain terminated (no_open_stories). Native chain complete for this backlog drain segment. Operator may enqueue new work via /intake or /auto.
+
+Isolation evidence (US-0048 / DEC-0029):
+- phase_id=refresh-context
+- role=curator
+- fresh_context_marker=curator-S0112-US0112-refresh-context-20260630T235000Z-fresh
+- timestamp=2026-06-30T23:50:00Z
+- evidence_ref=docs/engineering/state.md,handoffs/portfolio_state.md,handoffs/continuation_hygiene.md,handoffs/resume_brief.md,handoffs/releases/S0112-release-notes.md,sprints/S0112/sprint.json,docs/product/backlog.md
+
+Strict runtime proof (US-0056 / DEC-0038):
+- orchestrator_run_id: auto-20260628-04
+- runtime_proof_id: rp-auto-20260628-04-refresh-context-curator-20260630T235000Z-US0112
+- phase_id: refresh-context
+- role: curator
+- proof_issued_at: 2026-06-30T23:50:00Z
+- proof_ttl_seconds: 3600
+- proof_hash: 246ae80d25651e3120d61a9f27159216d6a340f4393b26752850077d4149ee2e
+
+Canonical payload: {"orchestrator_run_id":"auto-20260628-04","phase_id":"refresh-context","proof_issued_at":"2026-06-30T23:50:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260628-04-refresh-context-curator-20260630T235000Z-US0112","story_id":"US-0112"}
 

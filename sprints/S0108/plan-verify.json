@@ -1,0 +1,36 @@
+{
+  "sprint_id": "S0108",
+  "story_id": "US-0108",
+  "governance": "DEC-0108",
+  "architecture_ref": "docs/engineering/architecture.md # US-0108",
+  "research_ref": "R-0096",
+  "task_count": 11,
+  "ac_count": 8,
+  "task_ac_bijection": true,
+  "within_limit": true,
+  "sprint_max_tasks": 12,
+  "sprint_auto_split_triggered": false,
+  "compose_guards_verified": ["US-0047", "US-0092", "US-0103", "US-0104", "US-0107"],
+  "ac_task_map": {
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002", "T-003"],
+    "AC-3": ["T-004", "T-005"],
+    "AC-4": ["T-006"],
+    "AC-5": ["T-007"],
+    "AC-6": ["T-008"],
+    "AC-7": ["T-009", "T-010"],
+    "AC-8": ["T-011"]
+  },
+  "tranche_order": ["A", "B", "C", "D", "E"],
+  "status": "READY_FOR_VERIFY",
+  "plan_verified_at": null,
+  "qa_role": "qa",
+  "orchestrator_run_id": "auto-20260628-04",
+  "sprint_artifacts": [
+    "sprints/S0108/sprint.md",
+    "sprints/S0108/tasks.md",
+    "sprints/S0108/progress.md",
+    "sprints/S0108/sprint.json",
+    "sprints/S0108/plan-verify.json"
+  ]
+}

@@ -296,6 +296,104 @@ Normative: **`decisions/DEC-0107.md`** §9; architecture **`# US-0107`**.
 
 ---
 
+## US-0109 — Self-Healing Deploy Loop (`DEPLOY_HEALING_*` / `DEPLOY_SMOKE_*`)
+
+Default-off post-deploy smoke probe + bounded retry loop (`AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0`) → zero
+overhead, byte-identical US-0054 publish path. When enabled, after `[RELEASE_PUBLISH_OK]`, a two-stage
+smoke probe (health HTTP GET + acceptance smoke runner) validates the deployed artifact. On probe FAIL,
+publish PASS path re-entered idempotently up to `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX`. After retry-cap
+exhaustion, US-0107 `append_deferral(work_item_kind=deploy)` writes DEPLOY_DEFERRED row.
+Normative: **`decisions/DEC-0109.md`** §7; architecture **`# US-0109`**.
+
+### DEPLOY_HEALING_* / DEPLOY_SMOKE_* (8 codes)
+
+| Reason code | Meaning | Blocking? |
+|-------------|---------|-----------|
+| **`DEPLOY_HEALING_DISABLED`** | `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0` (default) — informational, zero overhead | **No** |
+| **`DEPLOY_HEALING_SMOKE_HEALTH_FAIL`** | Health HTTP GET non-2xx or connection refused | **Yes** (retry or defer) |
+| **`DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL`** | Acceptance smoke pytest runner non-zero exit | **Yes** (retry or defer) |
+| **`DEPLOY_HEALING_RETRY_ATTEMPT`** | Per-attempt log entry during retry loop (`retry_count` tag) | **No** (info) |
+| **`DEPLOY_HEALING_RETRY_CAP_EXHAUSTED`** | `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX` reached — proceed to DEPLOY_DEFERRED | **Yes** (to defer) |
+| **`DEPLOY_HEALING_DEFERRED`** | DEPLOY_DEFERRED tuple written via US-0107 `append_deferral` | **No** (deferral row) |
+| **`DEPLOY_HEALING_PROBE_TARGET_MISSING`** | `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` unresolvable from env — **fail-closed** | **Yes** (fail-closed) |
+| **`DEPLOY_HEALING_TIMEOUT`** | Total bounded timeout exceeded (smoke HTTP timeout or pytest runner timeout) | **Yes** (blocking) |
+
+`DEPLOY_DEFERRED` already reserved in US-0107 runbook — confirmed reuse.
+
+### Operator remediation
+
+| Reason code | Operator action |
+|-------------|-----------------|
+| `DEPLOY_HEALING_DISABLED` | Set `AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=1` to enable self-healing deploy |
+| `DEPLOY_HEALING_SMOKE_HEALTH_FAIL` | Check target health endpoint reachability; verify `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` env key resolves; run `self_healing_deploy_validate.py --self-test` |
+| `DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL` | Inspect smoke test logs in `SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH`; fix failing acceptance tests |
+| `DEPLOY_HEALING_RETRY_ATTEMPT` | Informational per-attempt log; no action needed unless cap exhausted |
+| `DEPLOY_HEALING_RETRY_CAP_EXHAUSTED` | Review `sprints/Sxxxx/summary.md` smoke probe output; raise `AUTO_SOVEREIGN_DEPLOY_RETRY_MAX` if transient; or resolve root cause |
+| `DEPLOY_HEALING_DEFERRED` | Resolve DEPLOY_DEFERRED row in `handoffs/sovereign_deferrals.jsonl`; re-run `/release` after fix |
+| `DEPLOY_HEALING_PROBE_TARGET_MISSING` | Set `AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT` to a valid env key name in scratchpad.local; ensure env var contains URL |
+| `DEPLOY_HEALING_TIMEOUT` | Raise `AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC` for slow targets; investigate startup latency |
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0109`
+- **Decision record**: `decisions/DEC-0109.md` §7
+- **Library**: `scripts/self_healing_deploy_lib.py` — `ReasonCode` enum (8 values)
+- **Validator**: `scripts/self_healing_deploy_validate.py` — CLI exit codes map to reason codes
+- **Contract tests**: `tests/us0109_contract_test.py` — 8 core markers + 2 compose guards
+
+## US-0111 — Release trigger adapter family (trigger source dispatch, atomic version-file promotion)
+
+Dispatch release flow by trigger source (GitHub webhook, npm publish, Git tag push, manual /release). Default source is `RELEASE_TRIGGER_SOURCE=manual` (zero behavior change vs pre-US-0111 /release path — byte-identical). Compose with existing release pipeline (US-0100); reuses `release_changelog_lib.compare_versions()` and `promote_unreleased()` without modification.
+
+### RELEASE_TRIGGER_* (9 codes)
+
+| Code | Meaning | Blocking |
+|------|---------|----------|
+| **`RELEASE_TRIGGER_ADAPTER_FAILED`** | Trigger adapter dispatch failed (unknown source value) — unknown adapter name in registry. | **Yes** |
+| **`RELEASE_TRIGGER_TAG_MISSING`** | Trigger source is git/github but no semantic version tag was found in the repository. | **Yes** |
+| **`RELEASE_TRIGGER_PREVIOUS_MISSING`** | Cannot resolve previous version tag (required for diff-based changelog derivation). | **Yes** |
+| **`RELEASE_TRIGGER_PACKAGE_JSON_MISSING`** | npm trigger source selected but `package.json` is absent from repository root. | **Yes** |
+| **`RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED`** | Atomic rename (mv) of temporary version file to production path failed. | **Yes** |
+| **`RELEASE_TRIGGER_NOTES_WRITE_FAILED`** | Per-version release notes write to `handoffs/releases/vX.Y.Z/release-notes.md` failed. | **Yes** |
+| **`RELEASE_TRIGGER_EVENT_EMIT_FAILED`** | Failed to emit canonical `version_derivation` event to sovereign decision ledger (US-0107). | **Yes** |
+| **`RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED`** | Semver comparison between current and previous version failed (invalid format or equality check error). | **Yes** |
+| **`RELEASE_TRIGGER_SOURCE_INVALID`** | `RELEASE_TRIGGER_SOURCE` in scratchpad is neither `auto` nor one of the four registered adapters (`github_webhook`, `npm_publish`, `git_tag_push`, `manual_release`). | **Yes** |
+
+### Operator remediation
+
+| Reason code | Operator action |
+|-------------|------------------|
+| `RELEASE_TRIGGER_ADAPTER_FAILED` | Verify scratchpad `RELEASE_TRIGGER_SOURCE`; must be one of: `auto`, `github_webhook`, `npm_publish`, `git_tag_push`, `manual_release`. If `auto`, ensure only one trigger artifact exists in environment. |
+| `RELEASE_TRIGGER_TAG_MISSING` | Tag current commit with a semantic version (`git tag vX.Y.Z && git push --tags`). |
+| `RELEASE_TRIGGER_PREVIOUS_MISSING` | For initial releases, explicitly set `RELEASE_TRIGGER_PREVIOUS_VERSION=` in scratchpad. For subsequent releases, ensure at least one prior version tag exists in git history. |
+| `RELEASE_TRIGGER_PACKAGE_JSON_MISSING` | Restore `package.json` to repository root (npm trigger requires it for version discovery). |
+| `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED` | Check filesystem permissions on target directory; verify no concurrent hold on the file; retry after resolving lock. |
+| `RELEASE_TRIGGER_NOTES_WRITE_FAILED` | Check disk quota and directory permissions for `handoffs/releases/`; ensure no concurrent hold on target file. |
+| `RELEASE_TRIGGER_EVENT_EMIT_FAILED` | Check ledger file permissions; ensure `handoffs/sovereign_decisions.jsonl` is writable; verify ledger schema compatibility. |
+| `RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED` | Verify both current and previous versions are valid semver (major.minor.patch); resolve any non-numeric suffixes or malformed tags. |
+| `RELEASE_TRIGGER_SOURCE_INVALID` | Update scratchpad `RELEASE_TRIGGER_SOURCE` to `auto` or an explicit adapter name. Run `scripts/release_trigger_adapters.py --list` to see registered source names. |
+
+### Exit-code mapping
+
+All 9 codes map to exit code `1` (fail-closed) — execution halts and requires operator intervention before proceeding.
+
+### Usage in CLI tools
+
+- **`scripts/release_trigger_adapters.py`**: Adapter registry + dispatch logic; emits `RELEASE_TRIGGER_ADAPTER_FAILED` / `RELEASE_TRIGGER_SOURCE_INVALID` on invalid source.
+- **`scripts/release_changelog_lib.py`**: Consumes `TriggerContext.version` and `TriggerContext.previous_version`; emits `RELEASE_TRIGGER_COMPARE_VERSIONS_FAILED` / `RELEASE_TRIGGER_PREVIOUS_MISSING` when version diff fails.
+- **`scripts/release_promote_atomic.py`**: Orchestrates atomic promotion; emits `RELEASE_TRIGGER_ATOMIC_PROMOTION_FAILED` on rename failure.
+- **`scripts/release_notes_emit.py`**: Writes per-version notes; emits `RELEASE_TRIGGER_NOTES_WRITE_FAILED` on I/O error.
+- **Ledger integration**: Emits `version_derivation` decision type via `append_decision()` in `scripts/decision_ledger_lib.py`; emits `RELEASE_TRIGGER_EVENT_EMIT_FAILED` on ledger write failure.
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0111` (trigger adapter family + atomic version-file promotion)
+- **Decision record**: `decisions/DEC-0111.md` (release trigger dispatch design)
+- **Library**: `scripts/release_trigger_adapters.py` — adapter registry + `TriggerContext` dataclass
+- **Contract tests**: `tests/us0111_contract_test.py` — adapter dispatch, previous-version resolution, atomic promotion, reason-code inventory
+
+---
+
 ## Other stories
 
 Reason codes for other stories live in their respective architecture sections:

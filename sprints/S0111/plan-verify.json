@@ -1,0 +1,86 @@
+{
+  "sprint_id": "S0111",
+  "story_id": "US-0111",
+  "decision_id": "DEC-0111",
+  "research_id": "R-0098",
+  "plan_verified": true,
+  "verdict": "PASS",
+  "ready_for_execute": true,
+  "task_count": 12,
+  "max_tasks_allowed": 12,
+  "auto_split_triggered": false,
+  "task_count_within_limit": true,
+  "ac_surjective_map": true,
+  "ac_surjective_map_detail": "Each AC (AC-1..AC-12) maps to at least one task (T-001..T-012). Map is bijective — exactly one task per acceptance criterion.",
+  "ac_to_task_map": {
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002"],
+    "AC-3": ["T-003"],
+    "AC-4": ["T-004"],
+    "AC-5": ["T-005"],
+    "AC-6": ["T-006"],
+    "AC-7": ["T-007"],
+    "AC-8": ["T-008"],
+    "AC-9": ["T-009"],
+    "AC-10": ["T-010"],
+    "AC-11": ["T-011"],
+    "AC-12": ["T-012"]
+  },
+  "findings_resolved": {
+    "F1": "task_count corrected from 11 to 12 to match architecture",
+    "F2": "T-012 (AC-12 Documentation + runbook) added to plan-verify",
+    "F3": "sprint.md AC titles aligned with architecture"
+  },
+  "compose_guards_verified": [
+    {
+      "story": "US-0100",
+      "status": "Read-only",
+      "reason": "release_changelog_lib.compare_versions() and promote_unreleased() unchanged; US-0111 calls existing APIs without modification"
+    },
+    {
+      "story": "US-0054",
+      "status": "Read-only",
+      "reason": "/release command logic unchanged; US-0111 dispatches before existing /release path via adapter layer"
+    },
+    {
+      "story": "US-0103",
+      "status": "Read-only",
+      "reason": "Ledger append_entry() API exists; US-0111 consumer-only append, no schema changes"
+    },
+    {
+      "story": "US-0040",
+      "status": "Read-only",
+      "reason": "Release notes structure unchanged; per-version notes reuse US-0040 format"
+    },
+    {
+      "story": "US-0008",
+      "status": "Read-only",
+      "reason": "release-all.sh publish logic unchanged; US-0111 operates upstream of publish"
+    },
+    {
+      "story": "US-0107",
+      "status": "Read-only",
+      "reason": "sovereign_loop_lib unchanged; US-0111 emits events to ledger without modifying loop"
+    },
+    {
+      "story": "US-0110",
+      "status": "Read-only",
+      "reason": "sovereign_convergence_lib list_open_deferrals unchanged; US-0110 deferral register not modified"
+    }
+  ],
+  "risks_carried": [
+    {"id": "R1", "description": "GitHub API rate limiting — mitigate with GITHUB_TOKEN + git ls-remote fallback", "source": "DEC-0111"},
+    {"id": "R2", "description": "npm private registry auth — npm view inherits .npmrc; offline detection short-circuits", "source": "DEC-0111"},
+    {"id": "R3", "description": "Annotated vs lightweight tag ordering — git for-each-ref with semver sort handles both", "source": "DEC-0111"},
+    {"id": "R4", "description": "Windows atomic rename — best-effort os.replace with PermissionError retry; fallback documented", "source": "DEC-0111"},
+    {"id": "R5", "description": "Auto-detection ambiguity in CI — priority order documented; explicit RELEASE_TRIGGER_SOURCE recommended", "source": "DEC-0111"},
+    {"id": "R6", "description": "Ledger bloat — one ledger row per trigger event; orthogonal to sovereign loop cadence", "source": "DEC-0111"}
+  ],
+  "tranche_order": {
+    "A": {"title": "Adapter registry + TriggerContext", "tasks": ["T-001"]},
+    "B": {"title": "Four trigger adapters", "tasks": ["T-002", "T-003", "T-004", "T-005"]},
+    "C": {"title": "Version compare + promotion + notes + ledger + reason codes", "tasks": ["T-006", "T-007", "T-008", "T-009", "T-010"]},
+    "D": {"title": "Contract tests + template parity + docs/runbook", "tasks": ["T-011", "T-012"]}
+  },
+  "verification_notes": "All 12 ACs have surjective task coverage. 12 tasks at max_tasks=12 limit, no split needed. 7 compose guards confirmed read-only per DEC-0111. 6 risks carried from DEC-0111 architecture decision."
+}

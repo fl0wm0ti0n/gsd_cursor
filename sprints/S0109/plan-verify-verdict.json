@@ -1,0 +1,10 @@
+{
+  "sprint_id": "S0109",
+  "story_id": "US-0109",
+  "verdict": "PASS",
+  "blocking_findings": 0,
+  "non_blocking_findings": 3,
+  "verified_at": "2026-06-30T00:45:00Z",
+  "verified_by": "qa",
+  "orchestrator_run_id": "auto-20260628-04"
+}

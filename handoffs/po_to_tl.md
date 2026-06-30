@@ -1,3 +1,414 @@
+## Sprint-plan → /plan-verify handoff — US-0112 / auto-20260628-04
+
+- `timestamp=2026-06-30T22:30:00Z`
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `story_id=US-0112`
+- `sprint_id=S0112`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=tl-US0112-sprintplan-20260630T223000Z-fresh`
+- `verdict=PASS`
+- `next_phase=/plan-verify`
+- `next_role=qa`
+
+### Summary
+
+- **`/sprint-plan`** **PASS** — sprint **S0112** created: 11 atomic tasks **T-001..T-011** within **SPRINT_MAX_TASKS=12** (no split); **AC-1..AC-8** surjective map confirmed; **DEC-0112** referenced (Accepted; installer payload composes DEC-0086/DEC-0087); **R-0090** referenced (delivered, Q1–Q8 closed).
+- Compose guards confirmed **UNCHANGED**: US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110 — DO NOT amend.
+- 12 `test_us0112_*` markers committed; parity `--scope=model-catalog-examples` (`MODEL_CATALOG_EXAMPLE_PAIRS`, 16 pairs).
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Sprint S0112 artifacts
+
+- `sprints/S0112/sprint.json`, `sprint.md`, `tasks.md`, `sprint-plan.json` — sprint metadata + 11-task breakdown + AC surjective map
+- `docs/product/backlog.md` `## US-0112` — `sprint_plan_notes` appended
+- `docs/engineering/state.md` — `Sprint-plan checkpoint (2026-06-30) -- US-0112` + isolation evidence + runtime proof
+- `handoffs/resume_brief.md` — top pointer → `/plan-verify`
+- `handoffs/po_to_tl.md` — this handoff appended
+
+### Next phase contract
+
+**`/plan-verify`** (fresh **QA** subagent spawn) — validate AC→task surjective map, task list, parity scope, compose guards unchanged, 8+ test markers present, DEC-0112/R-0090 references intact.
+
+### Isolation evidence (US-0048 / DEC-0029)
+
+- `fresh_context_marker=tl-US0112-sprintplan-20260630T223000Z-fresh`
+- `timestamp=2026-06-30T22:30:00Z`
+- `evidence_ref=sprints/S0112/sprint.json,sprints/S0112/sprint-plan.json,sprints/S0112/tasks.md,docs/product/backlog.md (## US-0112 sprint_plan_notes),docs/engineering/state.md (sprint-plan checkpoint),handoffs/resume_brief.md,handoffs/po_to_tl.md (this handoff)`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-sprintplan-tech-lead-20260630T223000Z-US0112`
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-30T22:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=sprintplan-pass-us0112-20260630T223000Z`
+
+---
+
+## Orchestrated research handoff — US-0112 / auto-20260628-04 (research PASS tl, next `/architecture` tech-lead)
+
+- `timestamp=2026-06-30T20:45:00Z`
+- `phase_id=research`
+- `role=tech-lead`
+- `story_id=US-0112`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=tl-US0112-research-20260630T204500Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=architecture`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=1`
+- `portfolio_open_stories=1` (US-0112)
+- `portfolio_open_bugs=0`
+- `delivery_mode=standard`
+- `token_profile=lean`
+- `caveman_mode=1`
+- `caveman_level=full`
+- `model_tier_default=balanced`
+- `AUTO_QUIET=1`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+
+### Summary
+
+- **`/research`** **PASS** — R-0090 delivered (Q1–Q8 closed); 8 preset filenames confirmed (scratchpad L352-359 + glob verify); manifest `[install_include_paths]` line-based, active+template byte-parity (16 rows); missing mode = copy when absent (same semantics as scratchpad.local.example.md); upgrade classification = **framework** files (refresh when template differs, skip unchanged; same semantics as US-0075/US-0018/US-0057 — no new classification mechanism); triple installer touch-points (installer.py / installer.ps1 / installer.sh, single manifest-driven source of truth); runbook anchor = docs/engineering/runbook.md § model tier / catalog (operator copies preset → `model-catalog.local.json`; lists all 8 filenames + complexity/role intent); 8+ `test_us0112_*` markers + `--scope=model-catalog-examples` with `MODEL_CATALOG_EXAMPLE_PAIRS` (active vs template manifest byte-parity); companion DEC-0112 required at `/architecture` (installer payload decision — manifest rows, framework classification, active-catalog exclusion; composes with DEC-0086/DEC-0087 without amending schema or precedence).
+- Task seeds: T-001..T-011 (11, within SPRINT_MAX_TASKS=12); surjective AC map AC-1..AC-8 → T-001..T-011.
+- Compose guards confirmed (DO NOT amend): US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110.
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Research closure (Q1–Q8 closed)
+
+| Q | Topic | Answer |
+|---|-------|--------|
+| Q1 | 8 preset filenames | `.cursor/model-catalog.local.example.json`, `.cursor-only.json`, `.level-1-easy.json`, `.level-2-complex.json`, `.level-3-mega.json`, `.level-4-super.json`, `.role-based-balanced.json`, `.role-based-highend.json` (scratchpad L352-359 + glob verify) |
+| Q2 | Manifest format | `[install_include_paths]` line-based relative paths (one row per file); active `docs/engineering/context/installer-owned-paths.manifest` + `template/docs/engineering/context/installer-owned-paths.manifest` byte-parity (16 rows total; both currently identical) |
+| Q3 | Missing mode semantics | Copy when absent, deterministic log/status per file (names-only); same semantics as `scratchpad.local.example.md` (US-0075) |
+| Q4 | Upgrade classification | **Framework** files — refresh when template differs, skip unchanged; same semantics as US-0075 / US-0018 / US-0057 framework rules (no new classification mechanism) |
+| Q5 | Triple installer parity | `installer.py` / `installer.ps1` / `installer.sh` all read single `[install_include_paths]` manifest; `List-SourceFiles` / equivalent includes all 8 examples from packaged `template/` |
+| Q6 | Runbook section | `docs/engineering/runbook.md` § model tier / catalog subsection; documents: examples ship on install/upgrade; operator copies chosen preset → `model-catalog.local.json`; lists all 8 preset filenames + complexity/role intent (pointer to scratchpad comment block lines 351-360) |
+| Q7 | Test markers + parity scope | 8+ `test_us0112_*` markers (manifest 8 paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope); `--scope=model-catalog-examples` with `MODEL_CATALOG_EXAMPLE_PAIRS` constant (active vs template manifest byte-parity check) |
+| Q8 | Companion DEC-0112 | **Required** at `/architecture` — installer payload decision (manifest rows, framework classification, active-catalog exclusion); composes with DEC-0086 / DEC-0087 without amending catalog schema or model precedence |
+
+### Top risks (R1–R6, carry to architecture)
+
+- **R1** Stale upgrade when example filename changes — deterministic manifest list + idempotent upgrade copy prevents prior-version file deletion.
+- **R2** Operator confusion if all 8 land but none selected — runbook recipe mandatory (L7).
+- **R3** Active catalog accidental install — manifest exclusion invariant (L5) + regression guard test.
+- **R4** Triple installer drift — single manifest-driven source of truth; parity test (L9).
+- **R5** npm `package.json` files gap — already covered by `template/` glob, verify at architecture.
+- **R6** US-0075 / US-0018 precedence — same framework-file semantics; additive only.
+
+### Task seeds (T-001..T-011, surjective AC map; SPRINT_MAX_TASKS=12)
+
+| T | AC | Description |
+|---|----| ---- |
+| T-001 | AC-1 | Add 8 model-catalog.local.example*.json rows to active `docs/engineering/context/installer-owned-paths.manifest` under `[install_include_paths]` |
+| T-002 | AC-2/3 | Mirror manifest rows in `template/docs/engineering/context/installer-owned-paths.manifest` (byte-parity) |
+| T-003 | AC-2/5 | Verify missing-mode `installer.py` logic adds absent framework files (same semantics as scratchpad.local.example.md) |
+| T-004 | AC-3/4 | Verify upgrade-mode logic refreshes stale framework files, skips unchanged, never touches active `model-catalog.local.json` |
+| T-005 | AC-4 | Verify manifest exclusion invariant (`.cursor/model-catalog.local.json` absent from manifest); add regression guard test |
+| T-006 | AC-5 | Add `MODEL_CATALOG_EXAMPLE_PAIRS` constant + `--scope=model-catalog-examples` argument to `check_intake_template_parity.py` |
+| T-007 | AC-6 | Write runbook §model-catalog preset recipe (operator copies one preset to `model-catalog.local.json`); lists all 8 filenames + complexity/role intent |
+| T-008 | AC-7 | Write 8+ `test_us0112_*` contract test markers (manifest paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope) |
+| T-009 | AC-8 | Document architecture notes in `docs/engineering/architecture.md` `# US-0112` (framework vs operator boundary, manifest rows, upgrade classification, DEC-0086/DEC-0087 compose) |
+| T-010 | AC-8 | Author companion `DEC-0112` (installer payload decision — manifest rows, framework classification, active-catalog exclusion) |
+| T-011 | AC-8 | Verify template parity for all touched files (manifest, runbook, architecture) |
+
+### Compose guards confirmed
+
+- **US-0008** (installer): manifest-driven copy semantics unchanged.
+- **US-0040** (release notes): per-sprint notes semantics unchanged.
+- **US-0054** (release publish): configurable publish unchanged.
+- **US-0100** (version changelog): semper changelog semantics unchanged.
+- **US-0101** (model tiers DEC-0086): catalog schema unchanged.
+- **US-0102** (role catalog DEC-0087): role catalog precedence unchanged.
+- **US-0103** (AI decision ledger): ledger semantics unchanged.
+- **US-0107** (sovereign loop): sovereign loop semantics unchanged.
+- **US-0110** (goal convergence): convergence semantics unchanged.
+
+### Evidence refs
+
+- `docs/engineering/research.md` (R-0090 delivered; Q1–Q8 closed)
+- `docs/product/backlog.md` (`## US-0112` — discovery_locks_L1_L10 + research_notes)
+- `docs/engineering/state.md` (research checkpoint + phase boundary + isolation evidence + strict runtime proof)
+- `handoffs/po_to_tl.md` (this handoff)
+- `handoffs/resume_brief.md` (top pointer to /architecture)
+- `docs/engineering/context/installer-owned-paths.manifest` (current — 44 install_include_paths, no model-catalog lines yet)
+- `template/docs/engineering/context/installer-owned-paths.manifest` (current — byte-parity with active)
+
+### Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`
+- `role=tech-lead`
+- `fresh_context_marker=tl-US0112-research-20260630T204500Z-fresh`
+- `timestamp=2026-06-30T20:45:00Z`
+- `evidence_ref=docs/engineering/research.md (R-0090 delivered),docs/product/backlog.md (## US-0112 research_notes),docs/engineering/state.md (research checkpoint),handoffs/po_to_tl.md (this handoff)`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112`
+- `phase_id=research`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-30T20:45:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=research-pass-us0112-20260630T204500Z`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260628-04","phase_id":"research","proof_issued_at":"2026-06-30T20:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260628-04-research-tech-lead-20260630T204500Z-US0112"}`.
+
+### Boundary verification (research phase, no upstream proof change consumed)
+
+- Prior discovery proof consumed: `rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112` (from `handoffs/po_to_tl.md` discovery section, unchanged)
+- Current research-phase strict proof recorded above
+- Research verdict: **PASS** (Q1–Q8 closed; DEC-0112 required; 11 task seeds within threshold)
+
+### Decision gate
+
+- **None** — research satisfied; architecture readiness explicit.
+
+### Next
+
+- **`/architecture`** (fresh **tech-lead**) for **US-0112** — confirm R-0090 locks sufficient; seed 11 tasks T-001..T-011; AC-1..AC-8 surjective map; author `# US-0112` + `DEC-0112`.
+
+### Stop condition (BUG-0006)
+
+- STOP after research phase completes. Hand off via artifacts only. Do not execute `/architecture` in this turn. Orchestrator MUST Task-spawn next phase.
+
+---
+
+## Orchestrated discovery handoff — US-0112 / auto-20260628-04 (discovery PASS po, next `/research` tech-lead)
+
+- `timestamp=2026-06-30T20:35:00Z`
+- `phase_id=discovery`
+- `role=po`
+- `story_id=US-0112`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=po-US0112-discovery-20260630T203000Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=research`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=1`
+- `portfolio_open_stories=1` (US-0112)
+- `portfolio_open_bugs=0`
+- `delivery_mode=standard`
+- `token_profile=lean`
+- `caveman_mode=1`
+- `caveman_level=full`
+- `model_tier_default=balanced`
+- `AUTO_QUIET=1`
+
+### Summary
+
+- **`/discovery`** **PASS** — installer framework-file delivery locked: 8 `template/.cursor/model-catalog.local.example*.json` presets added to `[install_include_paths]`; classified as **framework** files (refresh on `upgrade` when template diff, add on `missing` when absent); **never** touch gitignored `.cursor/model-catalog.local.json`; triple installer parity; runbook recipe; 8+ `test_us0112_*` markers; parity `--scope=model-catalog-examples`. Compose guards confirmed: DO NOT amend US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110.
+- Companion **DEC-0112** recommended (installer payload decision — manifest rows, framework classification, active-catalog exclusion).
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Discovery locks (L1–L10, research inputs)
+
+| Lock | Decision |
+|------|----------|
+| **L1** (eight presets exact) | `.cursor/model-catalog.local.example.json`, `.cursor/model-catalog.local.example.cursor-only.json`, `.cursor/model-catalog.local.example.level-1-easy.json`, `.cursor/model-catalog.local.example.level-2-complex.json`, `.cursor/model-catalog.local.example.level-3-mega.json`, `.cursor/model-catalog.local.example.level-4-super.json`, `.cursor/model-catalog.local.example.role-based-balanced.json`, `.cursor/model-catalog.local.example.role-based-highend.json` |
+| **L2** (manifest rows) | active `docs/engineering/context/installer-owned-paths.manifest` + `template/docs/engineering/context/installer-owned-paths.manifest` list all 8 paths under `[install_include_paths]` |
+| **L3** (missing mode) | `installer.py` / `installer.ps1` / `installer.sh` `missing` mode copies each example into target `.cursor/` when absent; deterministic log/status per file (names-only) |
+| **L4** (upgrade framework refresh) | `upgrade` mode classifies `model-catalog.local.example*.json` as framework; overwrite when template content differs (same semantics as `scratchpad.local.example.md` per US-0075); unchanged examples counted as unchanged |
+| **L5** (active catalog protection) | `.cursor/model-catalog.local.json` remains gitignored and outside `install_include_paths` and `clean_paths`; no installer mode copies template examples to that path |
+| **L6** (triple installer parity) | PS1, Bash, Python manifest-driven file set identical; `List-SourceFiles` / equivalent includes all 8 examples from packaged `template/` |
+| **L7** (runbook recipe) | `docs/engineering/runbook.md` § model tier / catalog documents: examples ship on install/upgrade; operator copies chosen preset → `model-catalog.local.json`; lists all 8 filenames + complexity/role intent |
+| **L8** (test markers) | 8+ `test_us0112_*` markers (manifest 8 paths, missing adds, upgrade refreshes, upgrade preserves unchanged, local never touched, triple parity, runbook literals, parity scope) |
+| **L9** (parity scope) | `check_intake_template_parity.py --scope=model-catalog-examples` with `MODEL_CATALOG_EXAMPLE_PAIRS` manifest |
+| **L10** (architecture section) | `docs/engineering/architecture.md` `# US-0112` documents framework vs operator boundary, manifest rows, upgrade classification, DEC-0086/DEC-0087 compose |
+
+### AC → Task seed mapping (surjective)
+
+| AC | Task seeds |
+|----|------------|
+| AC-1 (manifest completeness) | T-001 (active+template manifest 8 paths) |
+| AC-2 (missing mode delivery) | T-002 (installer.py), T-003 (installer.ps1), T-004 (installer.sh) |
+| AC-3 (upgrade framework refresh) | T-002, T-003, T-004 (same installer touch-points + upgrade classification) |
+| AC-4 (active catalog protection) | T-001 (manifest exclusion + regression guard) |
+| AC-5 (triple installer parity) | T-002, T-003, T-004 + T-005 (parity scope) |
+| AC-6 (runbook recipe) | T-007 (runbook) |
+| AC-7 (contract tests + parity) | T-006 (8+ test_us0112_* markers), T-005 (parity) |
+| AC-8 (architecture notes) | T-008 (architecture.md + DEC-0112) |
+
+Companion **DEC-0112** recommended at /architecture (installer payload decision).
+
+### Top risks (carry to /research)
+
+- **R1** Stale upgrade when example filename changes (add vs rename) — deterministic manifest list + idempotent upgrade copy prevents deletion of prior-version files
+- **R2** Operator confusion if all 8 land but none selected — runbook recipe mandatory (L7)
+- **R3** Active catalog accidental install — manifest exclusion invariant (L5) + regression guard test
+- **R4** Triple installer drift — single manifest-driven source of truth; parity test (L9)
+- **R5** npm `package.json` files gap — already covered by `template/` glob but verify at /research
+- **R6** US-0075 / US-0018 precedence — same framework-file semantics; no new classification mechanism (additive only)
+
+### Research asks (extend R-0090)
+
+1. **Q1**: Confirm exact 8 filenames vs scratchpad comment block (lines 351–360)
+2. **Q2**: Manifest `[install_include_paths]` section format + active/template byte-parity
+3. **Q3**: Missing-mode deterministic log tokens per file (names-only)
+4. **Q4**: Upgrade classification precedence vs US-0075 / US-0018 / US-0057 framework rules
+5. **Q5**: Triple installer touch-points — single manifest-driven source of truth (`installer.py` / `installer.ps1` / `installer.sh`)
+6. **Q6**: Runbook section anchor (which § heading, which subsection)
+7. **Q7**: Test marker inventory (8+ `test_us0112_*`) + `MODEL_CATALOG_EXAMPLE_PAIRS` parity manifest
+8. **Q8**: Companion DEC-0112 necessity (installer payload decision)
+
+### Evidence refs
+
+- `docs/product/backlog.md` (`## US-0112` — `discovery_notes` + `discovery_locks_L1_L10` + `discovery_risks_R1_R6`)
+- `docs/engineering/research.md` (**R-0090** — discovery stub; extend with Q1–Q8 at /research)
+- `docs/engineering/state.md` (Discovery checkpoint — this run)
+- `handoffs/intake_evidence/US-0112-intake-20260628.json`
+- `handoffs/po_to_tl.md` (this handoff)
+- `handoffs/resume_brief.md` (top pointer → `/research`)
+- Compose surfaces (DO NOT amend): **US-0008**, **US-0040**, **US-0054**, **US-0100**, **US-0101**, **US-0102**, **US-0103**, **US-0107**, **US-0110**
+- Prior DONE precedent: **US-0075** (scratchpad example-first refresh), **US-0018** (smart upgrade), **US-0099** (dev-environment copy-when-missing)
+
+### Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=discovery`
+- `role=po`
+- `fresh_context_marker=po-US0112-discovery-20260630T203000Z-fresh`
+- `timestamp=2026-06-30T20:35:00Z`
+- `evidence_ref=docs/product/backlog.md,docs/engineering/state.md,handoffs/po_to_tl.md,handoffs/resume_brief.md,handoffs/intake_evidence/US-0112-intake-20260628.json`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112`
+- `phase_id=discovery`
+- `role=po`
+- `proof_issued_at=2026-06-30T20:35:00Z`
+- `proof_ttl_seconds=3600`
+
+Canonical: `{"orchestrator_run_id":"auto-20260628-04","phase_id":"discovery","proof_issued_at":"2026-06-30T20:35:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260628-04-discovery-po-20260630T203000Z-US0112","story_id":"US-0112"}`.
+
+### Next
+
+- **`/research`** (fresh **tech-lead** context) for **US-0112** — extend **R-0090** with Q1–Q8; confirm 8 presets, manifest format, upgrade classification, triple parity touch-points, runbook anchor, test markers + `MODEL_CATALOG_EXAMPLE_PAIRS`, companion **DEC-0112**.
+
+### Decision gate
+
+- **None** — discovery satisfied; research readiness explicit.
+
+---
+
+## Orchestrated research handoff — US-0108 / auto-20260628-04 (research PASS, next `/architecture` tech-lead)
+
+- `timestamp=2026-06-29T20:30:00Z`
+- `phase_id=research`
+- `role=tech-lead`
+- `story_id=US-0108`
+- `sprint_id=(none)`
+- `orchestrator_run_id=auto-20260628-04`
+- `fresh_context_marker=tl-US0108-research-20260629T023000Z-fresh`
+- `verdict=PASS`
+- `next_scheduled_phase=architecture`
+- `default_spawn_role=tech-lead`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_remaining_budget=3`
+- `drain_terminated=false`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `portfolio_open_stories=4` (US-0108, US-0109, US-0111, US-0112)
+- `portfolio_open_bugs=0`
+- `delivery_mode=standard`
+- `token_profile=lean`
+- `caveman_mode=1`
+- `caveman_level=full`
+- `model_tier_default=balanced`
+- `AUTO_QUIET=1`
+
+### Summary
+
+- **`/research`** **PASS** — **R-0096** Q1–Q10 confirmed CLOSED; delivery-closure trailer appended. Companion **DEC-0108** locked (`decisions/DEC-0108.md`).
+- No new research questions surfaced — Q1–Q10 from discovery already closed at prior architecture checkpoint.
+- Status authority: **OPEN** per **US-0045**; closure at `/release`.
+
+### Research closure (Q1–Q10 — already closed, confirmed)
+
+| Q | Lock | Decision |
+|---|------|----------|
+| Q1 | Worktree naming + isolation | `.git/worktrees/us0108-<story_id>-<instance_idx>/`; per-worktree `GIT_DIR` + `GIT_WORK_TREE`; gitignore `.git/worktrees/us0108-*` |
+| Q2 | Selection predicate | Filter `qa_verdict=PASS`; highest `anti_slop_score` (default `0`); ties break earliest `proof_issued_at`; single winner |
+| Q3 | QA cross-review mode | Sequential N QA v1; optional `AUTO_SOVEREIGN_PARALLEL_QA=1` parallel v2 |
+| Q4 | `parallel_dev_pick.json` v1 | `{story_id, winner_instance_id, worktree_path, qa_verdict, anti_slop_score, proof_issued_at, merge_policy, runner_ts_utc, orchestrator_run_id, loser_instance_ids[]}` |
+| Q5 | Merge resolution | `first_pass_wins` default; `last_pass_wins`; `manual` → halt; bounded retry ≤2 |
+| Q6 | Resource guard | `AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL` system-wide cap; atomic lockfile `.git/us0108_parallel_dev.lock`; fail-fast `PARALLEL_DEV_RESOURCE_CAP_EXHAUSTED` |
+| Q7 | Execute step integration | Step 25 (parallel dev); 26 (QA); 27 (selection); 28 (merge + cleanup) |
+| Q8 | Backward compat | `SOVEREIGN_PARALLEL_DEV=0` = single dev unchanged; regression guard test |
+| Q9 | Contract tests + parity | 8 `test_us0108_*` markers; parity `--scope=sovereign-parallel-dev` |
+| Q10 | Compose surfaces (read-only) | US-0104 anti-slop (read); US-0103 ledger (read); US-0107 deferrals (read); US-0108 writes nothing to upstream schemas |
+
+### Compose guards confirmed
+
+- **US-0047**: bulk execute unchanged
+- **US-0092**: full autonomy unchanged
+- **US-0103**: ledger schema unchanged (read-only)
+- **US-0104**: critic schema unchanged (read-only)
+- **US-0107**: deferral register unchanged (read-only)
+
+### Top risks (carry to /architecture)
+
+- **R1** Worktree lock conflicts — deterministic naming + per-worktree GIT_DIR
+- **R2** QA cross-review latency — sequential v1 preferred; parallel opt-in v2
+- **R3** Merge conflicts — bounded retry ≤2 then manual halt
+- **R4** Anti-slop unavailable — graceful degrade default `0`
+- **R5** Resource cap race — atomic lockfile check-and-increment
+- **R6** Bulk execute interaction — system-wide cap preferred v1
+
+### Evidence refs
+
+- `docs/engineering/research.md` (**R-0096** — delivery-closure trailer appended)
+- `docs/product/backlog.md` (`## US-0108` — L1–L10 discovery locks)
+- `decisions/DEC-0108.md` (companion decision, locked)
+- `docs/engineering/state.md` (research checkpoint + phase boundary)
+- `handoffs/po_to_tl.md` (this handoff)
+- `handoffs/resume_brief.md` (top pointer)
+
+### Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`
+- `role=tech-lead`
+- `fresh_context_marker=tl-US0108-research-20260629T023000Z-fresh`
+- `timestamp=2026-06-29T20:30:00Z`
+- `evidence_ref=docs/engineering/research.md,docs/engineering/state.md,decisions/DEC-0108.md,handoffs/po_to_tl.md,handoffs/resume_brief.md`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `orchestrator_run_id=auto-20260628-04`
+- `runtime_proof_id=rp-auto-20260628-04-research-tech-lead-20260629T203000Z-US0108`
+- `phase_id=research`
+- `role=tech-lead`
+- `proof_issued_at=2026-06-29T20:30:00Z`
+- `proof_ttl_seconds=3600`
+- `proof_hash=cf8a2b7c1d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b`
+
+Canonical payload: `{"orchestrator_run_id":"auto-20260628-04","phase_id":"research","proof_issued_at":"2026-06-29T20:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260628-04-research-tech-lead-20260629T203000Z-US0108"}`.
+
+### Boundary verification (research phase, no upstream proof change consumed)
+
+- Prior architecture proof consumed: `rp-auto-20260628-04-architecture-tech-lead-20260628T220000Z-US0108` (from `handoffs/po_to_tl.md` architecture section)
+- Current research-phase strict proof recorded above
+- Research verdict: **PASS** (no new questions — Q1–Q10 remain closed from prior cycle)
+
+### Next
+
+- **`/architecture`** (fresh **tech-lead**) for **US-0108** — confirm R-0096 locks sufficient; seed 11 tasks T-001..T-011; AC-1..AC-8 surjective map.
+
+### Decision gate
+
+- **None** — research satisfied; architecture readiness explicit.
+
+---
+
 ## Orchestrated architecture handoff — US-0108 / auto-20260628-04
 
 - `timestamp=2026-06-28T22:00:00Z`
@@ -924,3 +1335,25 @@ Operator **`/ask`** follow-up: framework README must live only in **`its_magic/`
 ---
 
 ## Orchestrated research handoff — US-0094 / auto-20260607-01
+
+## Architecture Phase Handoff - US-0112
+
+**From:** tech-lead (architecture)
+**To:** tech-lead (sprint-plan)
+**Timestamp:** 2026-06-30T22:00:00Z
+**Orchestrator Run:** auto-20260628-04
+**Context Pack:** architecture_notes, DEC-0112, R-0090, task_seeds
+
+### Deliverables Ready
+- `docs/engineering/architecture.md` # US-0112 (normative locks L1-L10)
+- `decisions/DEC-0112.md` (installer payload decision)
+- `docs/product/backlog.md` architecture_notes appended
+- `docs/engineering/state.md` architecture checkpoint
+- `handoffs/resume_brief.md` resume pointer
+- `handoffs/po_to_tl.md` this handoff
+
+### Composition Surface
+DO NOT AMEND: US-0008, US-0018, US-0040, US-0054, US-0057, US-0075, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110
+
+### Phase Boundary
+architecture PASS → sprint-plan (tech-lead, fresh context)

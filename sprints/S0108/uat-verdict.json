@@ -1,0 +1,35 @@
+{
+  "$schema": "uat-verdict-v1",
+  "story_id": "US-0108",
+  "sprint_id": "S0108",
+  "orchestrator_run_id": "auto-20260628-04",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "fresh_context_marker": "qa-verify-work-S0108-US0108-auto-20260628-04-20260629T223000Z",
+  "timestamp": "2026-06-29T22:30:00Z",
+  "verdict": "PASS",
+  "passed": 8,
+  "failed": 0,
+  "total": 8,
+  "steps": [
+    {"id": "UAT-1", "ac": "AC-1", "description": "Scratchpad keys declared with zero-overhead default", "result": "pass"},
+    {"id": "UAT-2", "ac": "AC-2", "description": "Worktree isolation naming and cleanup", "result": "pass"},
+    {"id": "UAT-3", "ac": "AC-3", "description": "Selection predicate determinism", "result": "pass"},
+    {"id": "UAT-4", "ac": "AC-4", "description": "Merge policy + pick artifact schema v1", "result": "pass"},
+    {"id": "UAT-5", "ac": "AC-5", "description": "Resource guard cap enforcement", "result": "pass"},
+    {"id": "UAT-6", "ac": "AC-6", "description": "Execute steps 25-28 integration pipeline", "result": "pass"},
+    {"id": "UAT-7", "ac": "AC-7", "description": "Backward compat when disabled", "result": "pass"},
+    {"id": "UAT-8", "ac": "AC-8", "description": "Parity scope + runbook", "result": "pass"}
+  ],
+  "probe_results": [],
+  "compose_guards": {
+    "US-0047": "UNCHANGED",
+    "US-0092": "UNCHANGED",
+    "US-0103": "UNCHANGED",
+    "US-0104": "UNCHANGED",
+    "US-0107": "UNCHANGED"
+  },
+  "blocking_findings": 0,
+  "next_phase": "/release",
+  "stop_condition": "verify-work complete, all UAT steps PASS"
+}

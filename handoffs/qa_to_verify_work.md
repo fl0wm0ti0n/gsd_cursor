@@ -1,3 +1,37 @@
+# QA → Verify-Work Handoff — S0108 / US-0108 (QA PASS, next `/verify-work` fresh qa subagent)
+
+**Sprint**: S0108
+**Story**: US-0108 — Parallel Instance Arbitrage for dev phase
+**QA role**: qa
+**Timestamp**: 2026-06-29T21:45:00Z
+**Orchestrator run ID**: auto-20260628-04
+**Fresh context marker**: qa-verify-work-S0108-US0108-auto-20260628-04-20260629T214500Z-fresh
+**Plan-verify verdict**: **PASS**
+
+## Summary
+
+Plan-verify for US-0108 / S0108 completed. AC-1..AC-8 surjective map to T-001..T-011 confirmed. 11 tasks ≤ SPRINT_MAX_TASKS=12. Compose guards (US-0047/US-0092/US-0103/US-0104/US-0107) verified — no modifications required. DEC-0108 locked (Accepted). R-0096 referenced (delivered, Q1–Q10 CLOSED). No blocking findings.
+
+## Verification criteria
+
+- [x] AC-1..AC-8 surjective map confirmed in sprint artifacts
+- [x] 11 tasks T-001..T-011 within SPRINT_MAX_TASKS=12
+- [x] Compose guards verified (no US-0047/US-0092/US-0103/US-0104/US-0107 modifications required)
+- [x] DEC-0108 locked and referenced
+- [x] R-0096 referenced as research anchor
+
+## Artifacts
+
+- `sprints/S0108/plan-verify-findings.md` — verification results
+- `sprints/S0108/plan-verify-verdict.json` — structured PASS verdict
+- `sprints/S0108/sprint.md`, `tasks.md`, `progress.md`, `sprint.json`, `plan-verify.json`
+
+## Next phase
+
+Spawn fresh **dev** subagent for **`/execute`** on **S0108 / US-0108**.
+
+---
+
 # QA → Verify-Work Handoff — S0107 / US-0107
 
 **Sprint**: S0107  

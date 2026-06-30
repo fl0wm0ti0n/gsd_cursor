@@ -474,3 +474,66 @@ SOVEREIGN_ROLE_MANIFEST=0
 SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS=512
 SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE=2
 SOVEREIGN_ROLE_REVIEW_REWORK_MAX=1
+#
+# Parallel Instance Arbitrage (US-0108 / DEC-0108)
+# Default-off parallel execute-phase instance orchestration. When SOVEREIGN_PARALLEL_DEV=0,
+# zero overhead — no worktrees, no parallel QA, no pick JSON, no resource guard.
+# Compose do NOT amend US-0047 (bulk execute unchanged), US-0092 (full autonomy unchanged),
+# US-0103 (ledger schema unchanged; read-only consumer), US-0104 (critic schema unchanged;
+# read-only anti_slop_score consumer), US-0107 (sovereign loop unchanged; consumer only).
+# - SOVEREIGN_PARALLEL_DEV: 0|1 (default 0) — global enable gate
+# - AUTO_SOVEREIGN_PARALLEL_N: int >= 1 (default 3) — instances per execute cycle
+# - AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL: int >= 1 (default 6) — system-wide instance cap
+# - AUTO_SOVEREIGN_MERGE_RESOLVE: first_pass_wins|last_pass_wins|winner_takes_all|manual (default first_pass_wins)
+# - AUTO_SOVEREIGN_WORKTREE_KEEP: 0|1 (default 0) — retain loser worktrees for debugging
+# - AUTO_SOVEREIGN_PARALLEL_QA: 0|1 (default 0) — enable parallel QA cross-review (v2)
+# - AUTO_SOVEREIGN_PARALLEL_QA_ARBITER: critic_first_pass|majority_vote (default critic_first_pass)
+# - AUTO_SOVEREIGN_PARALLEL_ANTI_SLOP_THRESHOLD: int 0-10 (default 6) — anti-slop floor
+# - AUTO_SOVEREIGN_PARALLEL_REWORK_MAX: int >= 0 (default 2) — per-instance rework cap
+# - AUTO_SOVEREIGN_PARALLEL_MERGE_TIMEOUT_SEC: int >= 10 (default 60) — merge timeout
+# - AUTO_SOVEREIGN_PARALLEL_MODEL_<idx>: model slug per instance (optional)
+# - AUTO_SOVEREIGN_PARALLEL_LENS_<idx>: lens config per instance (optional)
+SOVEREIGN_PARALLEL_DEV=0
+AUTO_SOVEREIGN_PARALLEL_N=3
+AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL=6
+AUTO_SOVEREIGN_MERGE_RESOLVE=first_pass_wins
+AUTO_SOVEREIGN_WORKTREE_KEEP=0
+AUTO_SOVEREIGN_PARALLEL_QA=0
+AUTO_SOVEREIGN_PARALLEL_QA_ARBITER=critic_first_pass
+AUTO_SOVEREIGN_PARALLEL_ANTI_SLOP_THRESHOLD=6
+AUTO_SOVEREIGN_PARALLEL_REWORK_MAX=2
+AUTO_SOVEREIGN_PARALLEL_MERGE_TIMEOUT_SEC=60
+#
+# Self-Healing Deploy Loop (US-0109 / DEC-0109)
+# Default-off auto-heal post-publish probe + bounded retry + DEPLOY_DEFERRED.
+# When AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0 zero overhead, byte-identical US-0054 publish path —
+# no probe, no retry, no deferral, no execute steps 29-31. Compose do NOT amend US-0054 / US-0100 /
+# US-0103 / US-0107 / US-0110 (US-0109 consumer-only hook after US-0054 publish PASS).
+# - AUTO_SOVEREIGN_SELF_HEALING_DEPLOY: 0|1 (default 0) — global gate
+# - AUTO_SOVEREIGN_DEPLOY_RETRY_MAX: int >= 1 (default 3) — max retry attempts after probe FAIL
+# - AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC: int >= 1 (default 30) — per-stage probe HTTP timeout
+# - AUTO_SOVEREIGN_DEPLOY_PROBE_KIND: health_endpoint|acceptance_smoke|both (default both)
+# - SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH: repo-relative path (default tests/deploy_smoke/)
+# - AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT: names-only env ref (US-0085 compose); empty = unresolvable
+# Reason codes (DEC-0109 §7): DEPLOY_HEALING_DISABLED (info), DEPLOY_HEALING_SMOKE_HEALTH_FAIL,
+#   DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL, DEPLOY_HEALING_RETRY_ATTEMPT,
+#   DEPLOY_HEALING_RETRY_CAP_EXHAUSTED, DEPLOY_HEALING_DEFERRED,
+#   DEPLOY_HEALING_PROBE_TARGET_MISSING, DEPLOY_HEALING_TIMEOUT.
+AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0
+AUTO_SOVEREIGN_DEPLOY_RETRY_MAX=3
+AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC=30
+AUTO_SOVEREIGN_DEPLOY_PROBE_KIND=both
+SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH=tests/deploy_smoke/
+AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT=
+#
+# Release Trigger Adapters (US-0111 / DEC-0111)
+# Dispatch release flow by trigger source (GitHub webhook, npm publish, Git tag
+# push, manual /release). Default source is manual (zero behavior change vs
+# pre-US-0111 /release path — byte-identical). Compose with US-0100; reuses
+# release_changelog_lib APIs without modification.
+# - RELEASE_TRIGGER_SOURCE: manual|github|npm|git_tag|auto (default manual)
+# - RELEASE_TRIGGER_TIMEOUT_SEC: int >= 1 (default 10; adapter subprocess timeout)
+# - RELEASE_TRIGGER_FALLBACK_TO_LOCAL: 0|1 (default 0; npm adapter offline fallback)
+RELEASE_TRIGGER_SOURCE=manual
+RELEASE_TRIGGER_TIMEOUT_SEC=10
+RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0

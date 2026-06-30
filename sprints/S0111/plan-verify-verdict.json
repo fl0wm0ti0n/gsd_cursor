@@ -1,0 +1,16 @@
+{
+  "sprint_id": "S0111",
+  "story_id": "US-0111",
+  "verdict": "PASS",
+  "checked_at": "2026-06-30T18:25:00Z",
+  "findings": [],
+  "checks": {
+    "ac_map_surjective": true,
+    "compose_guards_listed": true,
+    "task_count_within_limit": true,
+    "tranche_order_defined": true,
+    "decision_anchor": true,
+    "research_anchor": true
+  },
+  "orchestrator_run_id": "auto-20260628-04"
+}

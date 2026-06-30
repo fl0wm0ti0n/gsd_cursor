@@ -1,0 +1,13 @@
+{
+  "sprint_id": "S0108",
+  "story_id": "US-0108",
+  "dec_id": "DEC-0108",
+  "status": "OPEN",
+  "created_at": "2026-06-29T21:32:00Z",
+  "task_count": 11,
+  "within_limit": true,
+  "sprint_max_tasks": 12,
+  "sprint_auto_split_triggered": false,
+  "orchestrator_run_id": "auto-20260628-04",
+  "research_anchor": "R-0096"
+}

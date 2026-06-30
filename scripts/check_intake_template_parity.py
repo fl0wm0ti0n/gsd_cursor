@@ -13,6 +13,9 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=us-0096               DEC-0082 delivery modes surfaces (US-0096).
   --scope=project-readme        DEC-0083 project README bootstrap surfaces (US-0097).
   --scope=dev-environment       DEC-0084 dev auto-launch profile surfaces (US-0098).
+  --scope=sovereign-parallel-dev DEC-0108 parallel instance arbitrage surfaces (US-0108).
+  --scope=sovereign-self-healing-deploy DEC-0109 self-healing deploy loop surfaces (US-0109).
+  --scope=release-trigger-adapter DEC-0111 release trigger adapter surfaces (US-0111).
   --scope=all              union of all tables.
 """
 
@@ -328,6 +331,92 @@ SOVEREIGN_ROLE_MANIFEST_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+SOVEREIGN_PARALLEL_DEV_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        ".cursor/scratchpad.md",
+        "template/.cursor/scratchpad.md",
+    ),
+    (
+        "scripts/parallel_dev_arbiter.py",
+        "template/scripts/parallel_dev_arbiter.py",
+    ),
+    (
+        "tests/us0108_contract_test.py",
+        "template/tests/us0108_contract_test.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        "docs/engineering/reason_codes.md",
+        "template/docs/engineering/reason_codes.md",
+    ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
+SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        ".cursor/scratchpad.md",
+        "template/.cursor/scratchpad.md",
+    ),
+    (
+        "scripts/self_healing_deploy_lib.py",
+        "template/scripts/self_healing_deploy_lib.py",
+    ),
+    (
+        "scripts/self_healing_deploy_validate.py",
+        "template/scripts/self_healing_deploy_validate.py",
+    ),
+    (
+        "tests/us0109_contract_test.py",
+        "template/tests/us0109_contract_test.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        "docs/engineering/reason_codes.md",
+        "template/docs/engineering/reason_codes.md",
+    ),
+)
+
+# US-0111 release trigger adapter parity pairs
+RELEASE_TRIGGER_ADAPTER_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/release_trigger_adapters.py",
+        "template/scripts/release_trigger_adapters.py",
+    ),
+    (
+        "tests/us0111_contract_test.py",
+        "template/tests/us0111_contract_test.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        "docs/engineering/reason_codes.md",
+        "template/docs/engineering/reason_codes.md",
+    ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
+# US-0112 model-catalog example preset delivery manifest byte-parity
+MODEL_CATALOG_EXAMPLE_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
@@ -344,6 +433,10 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "model-tier": MODEL_TIER_PAIRS,
     "model-tier-overrides": MODEL_TIER_OVERRIDES_PAIRS,
     "sovereign-role-manifest": SOVEREIGN_ROLE_MANIFEST_PAIRS,
+    "sovereign-parallel-dev": SOVEREIGN_PARALLEL_DEV_PAIRS,
+    "sovereign-self-healing-deploy": SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS,
+    "release-trigger-adapter": RELEASE_TRIGGER_ADAPTER_PAIRS,
+    "model-catalog-examples": MODEL_CATALOG_EXAMPLE_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -360,6 +453,9 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + MODEL_TIER_PAIRS
         + MODEL_TIER_OVERRIDES_PAIRS
         + SOVEREIGN_ROLE_MANIFEST_PAIRS
+        + SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS
+        + RELEASE_TRIGGER_ADAPTER_PAIRS
+        + MODEL_CATALOG_EXAMPLE_PAIRS
     ),
 }
 
