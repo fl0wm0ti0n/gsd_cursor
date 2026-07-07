@@ -1946,6 +1946,15 @@ Multi-segment operator E2E recipe — validates native-chain orchestrator compli
 Normative detail: **`.cursor/commands/auto.md`** § **Orchestrator post-subagent continuation
 mandate (BUG-0012)** and architecture **`# BUG-0012`**.
 
+### Scratchpad example parity
+
+Verifies `template/.cursor/scratchpad.local.example.md` stays byte-identical with canonical `.cursor/scratchpad.md`:
+
+- **Single-source-of-truth**: canonical is `.cursor/scratchpad.md`; template example is the consumer-shipped packaged copy.
+- **Sync procedure**: copy canonical `.cursor/scratchpad.md` to `template/.cursor/scratchpad.local.example.md`, preserving the example-only header (first 5 lines) and excluding project-local override section (consumer-specific `#MODEL_TIER_*`, `# Per-phase tier overrides for this project`, etc.).
+- **Verification**: `pytest tests/scratchpad_example_parity_test.py -v`
+- **Installer contract**: `installer.py materialize_scratchpad_example()` reads from `template/.cursor/scratchpad.local.example.md` on every install/upgrade, ensuring consumers get the latest framework defaults without overwriting their personal overrides in `.cursor/scratchpad.local.md`.
+
 ### Full-autonomy outer driver (US-0092) — fallback
 
 Opt-in **`AUTO_FLOW_MODE=full_autonomy`** (exact literal, default-off) also enables
@@ -3501,6 +3510,63 @@ US-0109 does not participate in convergence evaluation.
 
 ---
 
+## Scratchpad Example Parity (BUG-0013)
+
+**Goal**: `template/.cursor/scratchpad.local.example.md` must stay in structural parity with the canonical `.cursor/scratchpad.md` (current source of truth), while preserving the example-only header (L1–L5) and excluding project-local flag overrides (which belong in consumer `.cursor/scratchpad.local.md`).
+
+### Single source of truth
+
+- Canonical scratchpad: `.cursor/scratchpad.md` (read-only for installers).
+- Template example: `template/.cursor/scratchpad.local.example.md` (mirror — must stay in sync structurally; project-local value overrides must be reset to safe defaults).
+- Active example: `.cursor/scratchpad.local.example.md` (body must be byte-identical to template mirror from L6 onwards).
+
+### When to re-sync
+
+Whenever `.cursor/scratchpad.md` gains a new `## Section` / key block, the template example must be refreshed (copy canonical, then reset project-local values):
+
+- Copy canonical to template.
+- Preserve the example-only header comment (first 5 lines).
+- Reset framework/project-local keys to their safe example defaults:
+
+| Key | Example default | Canonical (framework) value |
+|---|---|---|
+| `FRAMEWORK_KIT_REPO` | `0` | `1` |
+| `CAVEMAN_LEVEL` | *(empty)* | `full` |
+| `TOKEN_PROFILE` | `balanced` | `lean` |
+| `CAVEMAN_MODE` | `0` | `1` |
+
+### Verification command
+
+```bash
+python -m pytest tests/scratchpad_example_parity_test.py -v
+```
+
+Three regression test markers cover this contract:
+
+- `test_bug0013_parity_check`: all canonical keys present in template (canonical keys ⊆ template example keys).
+- `test_bug0013_header_preserved`: example-only header comment (L1–L5) intact.
+- `test_bug0013_local_overrides_preserved`: no project-local override values leak into the template example.
+
+### Reason codes
+
+| Reason | Meaning |
+|---|---|
+| `SCRATCHPAD_EXAMPLE_OUT_OF_SYNC` | Template example is missing one or more canonical sections/keys. |
+| `SCRATCHPAD_HEADER_DRIFT` | Example-only header (L1–L5) was overwritten or drifted. |
+| `SCRATCHPAD_LOCAL_VALUES_LEAKED` | Project-local override values (e.g. `FRAMEWORK_KIT_REPO=1`, `CAVEMAN_LEVEL=full`) are present in the template example. |
+
+### Normative architecture
+
+- **Backlog**: `docs/product/backlog.md` § `BUG-0013` (scratchpad-example-stale).
+- **Sprint**: `sprints/S-BUG0013/`.
+- **Test**: `tests/scratchpad_example_parity_test.py`.
+
+### Compose guards (unchanged)
+
+US-0008, US-0040, US-0054, US-0100, US-0101, US-0102, US-0103, US-0107, US-0110 (as per sprint constraints — all UNCHANGED during BUG-0013).
+
+---
+
 ## Project run steps
 
 ### Prerequisites
@@ -3508,3 +3574,296 @@ US-0109 does not participate in convergence evaluation.
 ### Local run
 
 ### Tests
+
+
+## Work-kind routing (US-0118 / DEC-0118)
+
+Per-story work-kind classification + tiered delivery routing. Default-off
+(`WORK_KIND_ROUTING=0` â€” zero overhead when off; byte-identical to
+pre-US-0118). When enabled, the classifier derives
+`(delivery_mode, phase_plan)` from the story shape using the L8
+precedence chain.
+
+### Work-kind enumeration
+
+| work_kind | recommended_delivery_mode | recommended_phase_plan | Rule |
+|-----------|---------------------------|------------------------|------|
+| `doc`     | `ultra_lean`              | `[intake, execute, release]` | All touched files match `dev_environment_lib.TIER_C_SKIP_PREFIXES` or are `*.md`/`README*` under skip prefixes. |
+| `mini`    | `ultra_lean` or `mega_quick` | `[spec, plan, build+verify, ship]` or `[quick]` | Single component, ACs â‰¤ 3, no companion DEC required. `mega_quick` only when US-0096 eligibility passes. |
+| `code`    | `standard`                | Full canonical lifecycle (DEC-0052 chain) | Otherwise (tier A or any non-skip-prefix source path). |
+
+Tie-break (Q1 LOCKED): when a story touches both `docs/` and `src/`
+(mixed tier), **highest tier wins** (`code` > `mini` > `doc`) per
+`dev_environment_lib.classify_touched_files` tier_rank A>B>C.
+
+### L8 precedence chain
+
+1. `start-from=<phase>` (always wins â€” intersects with the active plan).
+2. Explicit `DELIVERY_MODE` (US-0096 / DEC-0082).
+3. Explicit `AUTO_PHASE_*` (US-0070 / DEC-0052).
+4. `WORK_KIND_ROUTING`-derived `recommended_delivery_mode` (US-0118).
+5. Current default lifecycle (`standard` delivery mode).
+
+Conflict rule: work-kind recommends `X` but explicit `DELIVERY_MODE=Y`
+set and they differ â†’ `WORK_KIND_DELIVERY_MODE_CONFLICT` (fail-closed;
+explicit wins per L8). Mid-story `DELIVERY_MODE` switch forbidden per
+DEC-0082 Â§2 (`DELIVERY_MODE_SWITCH_MID_STORY`).
+
+### Reason codes (R-0106 Q2 LOCKED)
+
+| Reason code | Fail-closed? | Remediation |
+|-------------|--------------|-------------|
+| `WORK_KIND_ROUTING_OFF` | no (info) | Set `WORK_KIND_ROUTING=1` to enable per-story routing; current behavior unchanged. |
+| `WORK_KIND_DELIVERY_MODE_CONFLICT` | yes | Explicit `DELIVERY_MODE` wins per L8; unset `DELIVERY_MODE` to allow work-kind routing OR update the backlog row; mid-story switch forbidden. |
+| `WORK_KIND_CLASSIFY_FAILED` | yes | Re-run `/intake` with explicit `work_kind` override; inspect `--explain` trace; file bug if rule engine is at fault. |
+| `WORK_KIND_UNKNOWN_ROUTE` | yes | Re-run classifier; if persistent, set `DELIVERY_MODE` explicitly or add `AUTO_PHASE_*` override; default to `standard` lifecycle. |
+| `WORK_KIND_PLAN_COVERAGE_MISSING` | yes | Re-run classifier; if persistent, set `DELIVERY_MODE` explicitly or add `AUTO_PHASE_*` override; default to `standard` lifecycle. |
+| `WORK_KIND_TIE_BREAK_APPLIED` | no (info) | Mixed-tier story resolved by highest-tier-wins. Inspect `--explain` trace to override. |
+
+### Operator recipes
+
+**Force full lifecycle on a `doc` story** â€” set `DELIVERY_MODE=standard`
+in `.cursor/scratchpad.local.md` (or pass `delivery-mode=standard` to
+`/auto`). Explicit `DELIVERY_MODE` wins per L8 #2 regardless of the
+classifier recommendation.
+
+**Inspect the classifier trace** â€” run
+`python scripts/work_kind_classify_lib.py --explain --story-prose "..." --ac AC-1 AC-2 --touched docs/foo.md src/index.ts --component-scope web`.
+The `rule_trace` field shows `(rule_id, matched_signal, contribution)`
+tuples so operators can override with confidence (R5).
+
+**Self-test** (AC-12) â€” `python scripts/work_kind_classify_lib.py --self-test`
+exits 0 with `[WORK_KIND_CLASSIFY_SELF_TEST_OK]`;
+`python scripts/work_kind_routing_lib.py --self-test` exits 0 with
+`[WORK_KIND_ROUTING_SELF_TEST_OK]`.
+
+### Intake evidence schema extension (AC-9 / R-0106 Q9)
+
+When `WORK_KIND_ROUTING=1` and the classifier runs at `/intake` step 5
+(after ACs drafted, after US-0051 decomposition evaluator, before
+persistence), the intake evidence JSON (`handoffs/intake_evidence/US-xxxx-intake.json`)
+gains three optional fields:
+
+| Field | Values | When present |
+|-------|-------|--------------|
+| `work_kind` | `doc` \| `mini` \| `code` | When `WORK_KIND_ROUTING=1` and classifier ran at `/intake` step 5. |
+| `recommended_delivery_mode` | `standard` \| `ultra_lean` \| `mega_quick` | When `WORK_KIND_ROUTING=1` and classifier ran at `/intake` step 5. |
+| `work_kind_operator_decision` | `accept` \| `override` | When `WORK_KIND_ROUTING=1` and operator made an explicit decision. |
+
+Existing intake evidence files are NOT modified â€” only the schema
+contract is documented. US-0078 evidence gate still runs before any
+backlog/acceptance write (L10 unchanged).
+
+### Compose, do not amend
+
+US-0118 is additive-only across all 6 read-only compose consumers:
+US-0096 (delivery modes â€” explicit `DELIVERY_MODE` still wins per L8),
+US-0070 (phase selection â€” `AUTO_PHASE_*` remains explicit override),
+US-0078 (intake evidence â€” gate still runs before any write), US-0051
+(decomposition â€” classifier runs after the decomposition evaluator),
+US-0069 (phaseâ†’role matrix â€” classifier only selects which phases run,
+not who runs them), US-0103 (AI decision ledger â€” read-only consumer
+for audit trail). 23 compose guards UNCHANGED.
+
+## Autonomy preset keys (US-0119 / DEC-0119)
+
+**Default-off**: `AUTONOMY_PRESET=none` (default) and `AUTONOMY_STOP_POLICY=block` (default) — zero overhead when off; byte-identical to pre-US-0119 baseline.
+
+### `AUTONOMY_PRESET` enum (R-0107 Q7 LOCKED)
+
+| Value | Expansion | Rationale |
+|-------|-----------|-----------|
+| `none` (default) | `{}` — empty flag set | Full backward compatibility; zero autonomy relaxation. |
+| `balanced` | 8 flags per DEC-0119 §7 (see table below) | Moderate autonomy — auto-refresh brief, work-kind auto-accept, release auto-confirm, drain auto-accept. |
+| `full` | 12 flags per DEC-0119 §7 (see table below) | Maximum autonomy — adds intake-auto, cross-model-skip, goal-convergence-interval-1. |
+
+**Merge precedence (R-0107 Q7 LOCKED)**: explicit per-flag value in scratchpad (or via preset expansion) > scratchpad default (empty for off keys) > `AUTONOMY_PRESET` expansion > consumer default.
+
+### `AUTONOMY_STOP_POLICY` enum (DEC-0119 §3)
+
+| Value | Dispatch behavior |
+|-------|-------------------|
+| `block` (default) | Strict fail-closed — any stop code halts execution. Pre-US-0119 behavior. |
+| `auto_repair_then_block` | Attempt `auto_repair_kind` from stop-matrix; if repair succeeds, continue; if repair fails or cap exhausted, hard stop. |
+| `auto_repair_then_skip` | Same as `auto_repair_then_block`, but on cap exhaustion skip the current phase (emit stop-mark, not hard stop). |
+
+### 12 per-feature flags
+
+| Flag | Preset (balanced/full) | Consumer | Pre-US-0119 surface |
+|------|------------------------|----------|---------------------|
+| `AUTO_REFRESH_BRIEF` | `1`/`1` | `/auto`, `/qa`, `/release` | Pre-US-0119: manual refresh only. |
+| `WORK_KIND_AUTO_ACCEPT` | `1`/`1` | `/intake` step 5 | Pre-US-0119: manual accept required. |
+| `RELEASE_AUTO_CONFIRM_ACCEPTANCE` | `1`/`1` | `/release` gate | Pre-US-0119: manual confirmation required. |
+| `SOVEREIGN_DRAIN_AUTO_ACCEPT` | `1`/`1` | `/drain` gate | Pre-US-0119: manual accept required. |
+| `CROSS_MODEL_REWORK_EXHAUSTION_POLICY` | `block`/`skip` | `/qa`, `/sovereign-critic` | Pre-US-0119: block only. |
+| `CROSS_MODEL_SKIP_PHASES` | `verify-work,release`/`release` | `/sovereign-critic` | Pre-US-0119: all phases required. |
+| `INTAKE_AUTONOMY_MODE` | —/`derived` | `/intake` step 5 | Pre-US-0119: manual derivation. |
+| `INTAKE_MINIMAL_PACK` | —/`1` | `/intake` | Pre-US-0119: full pack only. |
+| `INTAKE_ASSUME_STACK_CONTEXT` | —/`1` | `/intake` | Pre-US-0119: explicit stack context required. |
+| `RUNTIME_PROOF_KIND` | `lightweight`/`lightweight` | `/auto`, `/execute`, `/qa`, `/release` | Pre-US-0119: strict SHA-256 only. |
+| `GOAL_CONVERGENCE_INTERVAL` | `3`/`1` | `/qa`, `/sovereign-convergence` | Pre-US-0119: phase-by-phase evaluation. |
+| `AUTONOMY_STOP_POLICY` | (stop-policy enum, not a flag) | `/auto` phase dispatch | Pre-US-0119: implicit `block`. |
+
+### Bounded auto-repair ledger (DEC-0119 §5)
+
+Per-run append-only ledger tracks `auto_repair` attempts:
+
+- **Path**: `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl`
+- **Schema**: `{"reason_code": "<code>", "auto_repair_kind": "<kind>", "attempt": <n>, "outcome": "success|fail", "repair_evidence": "<path>"}`
+- **Cap**: Per `(run, reason_code)` = 3 attempts (Q3 LOCKED).
+- **Exhaustion**: Terminal stop code `AUTONOMY_REPAIR_CAP_EXHAUSTED` (run-level; distinct from story-level `BLOCK_RETRY_CAP_EXHAUSTED`).
+- **Operator override**: `AUTONOMY_REPAIR_CAP_OVERRIDE=<int>` per-run scratchpad key (default: matrix-default 3).
+- **Ledger audit**: `python scripts/autonomy_repair_ledger_lib.py --self-test` exits 0 with `[AUTONOMY_REPAIR_LEDGER_SELF_TEST_OK]`.
+
+### Stop-matrix manifest
+
+- **Path**: `docs/engineering/autonomy-stop-matrix.md` (operator-facing documentation)
+- **Machine-readable**: `scripts/data/autonomy_stop_matrix.yaml`
+- **Validator**: `python scripts/validate_autonomy_stop_matrix.py --self-test` exits 0 with `[MATRIX_VALID]`.
+- **Structure**: 2-tier classification — `security_hard` (18+ codes, `auto_repair_kind=n/a`, `cap=0`) and `autonomy_resolvable` (9 codes, `auto_repair_kind` per DEC-0119 §4, `cap` from matrix).
+
+### Autonomy breadcrumb (AC-9, Q10 LOCKED)
+
+At phase boundary, after a soft-stop is actually softened, emit one-line breadcrumb in `docs/engineering/state.md`:
+
+```markdown
+autonomy_relaxed: <reason_code> -> <auto_repair_kind>
+```
+
+**One line per soft-stop** (not aggregated per phase). Breadcrumb is operator-audit trail — not a governance gate.
+
+### Operator recipe
+
+1. Set `AUTONOMY_PRESET=balanced` for moderate autonomy (8 flags).
+2. Set `AUTONOMY_PRESET=full` for maximum autonomy (12 flags).
+3. Set `AUTONOMY_STOP_POLICY=auto_repair_then_block` for repair + block on exhaustion.
+4. Set `AUTONOMY_STOP_POLICY=auto_repair_then_skip` for repair + skip on exhaustion.
+5. Override individual flags via explicit scratchpad entries (precedence over preset expansion).
+
+### Troubleshooting
+
+| Symptom | Likely cause | Remedy |
+|---------|--------------|--------|
+| `AUTONOMY_PRESET=none` but flags still expanded | Explicit per-flag values in scratchpad override preset=none. | Remove explicit per-flag values or set `AUTONOMY_STOP_POLICY=block`. |
+| `AUTONOMY_REPAIR_CAP_EXHAUSTED` terminal stop | 3 repair attempts failed for the same reason code. | Raise `AUTONOMY_REPAIR_CAP_OVERRIDE` or investigate root cause. |
+| `RUNTIME_PROOF_KIND=lightweight` rejected | Consumer does not support lightweight proofs. | Verify consumer supports lightweight kind (DEC-0038 §5); fallback to strict. |
+| Parity broken `scripts/validate_autonomy_stop_matrix.py` | Active ≠ template byte-identical. | Re-sync `cp scripts/validate_autonomy_stop_matrix.py template/scripts/validate_autonomy_stop_matrix.py`. |
+
+### Compose guards (read-only consumers — UNCHANGED by US-0119)
+
+- US-0092 (delivery confirmation) — relaxed stop policy additive only.
+- US-0095 (native auto-chain) — preset expansion additive only.
+- US-0056 (strict runtime proof) — `RUNTIME_PROOF_KIND=lightweight` is opt-in lighter attestation; strict unchanged.
+- US-0068 (mandatory intake packs) — evidence gate NEVER bypassed; `INTAKE_AUTONOMY_MODE=1` auto-derives answers only.
+- US-0096 (delivery modes) — preset additive relaxation layer above explicit `DELIVERY_MODE`.
+- BUG-0007 (truthfulness) — `INTAKE_ASSUME_STACK_CONTEXT=1` preserves `assumption_confirmation_ref` contract.
+
+### Byte-stability surface
+
+US-0119 adds one new sub-block in `its_magic/README.md` (§"### Autonomy preset keys (US-0119)") and is additive-only to the 6-block byte-stability surface (US-0113..US-0118). All prior blocks remain byte-identical between `active` and `template/`.
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0119`
+- **Decision**: `decisions/DEC-0119.md`
+- **Research**: `docs/engineering/research.md` `## R-0107`
+- **Scripts**: `scripts/autonomy_preset_lib.py`, `scripts/validate_autonomy_stop_matrix.py`, `scripts/autonomy_repair_ledger_lib.py`
+- **Matrix YAML**: `scripts/data/autonomy_stop_matrix.yaml`
+- **Tests**: `tests/us0119_autonomy_preset_test.py` (10 markers)
+- **Ledger path**: `handoffs/autonomy_repair_ledger/*.jsonl`
+
+## Story closure (US-0120)
+
+**Goal:** Dedicated `/closure` phase after `/release` to perform backlog status flip, acceptance tick, and state checkpoint append. Extracts these responsibilities from `/release` into a phase with exclusive ownership.
+
+### When to run
+
+- **Trigger:** `/closure` runs automatically after `/release` PASS verdict.
+- **Phase order:** ship macro = `release` → `closure` → `refresh-context` (3 phases).
+- **Orchestrator spawn:** `/auto` orchestrator spawns `/closure` subagent with `role=qe` (default) or `role=curator` (override via `AUTO_ROLE_CLOSURE`).
+- **Manual trigger:** For in-flight stories at US-0120 boundary, run `/closure` directly with `story_id=<US-xxxx>`.
+
+### How to verify
+
+1. **Check state.md closure checkpoint:**
+   ```bash
+   rg "phase_id=closure" docs/engineering/state.md
+   ```
+   Expected: checkpoint with `phase_id=closure`, `role=qe|curator`, `story_id=<US-xxxx>`, `evidence_ref=sprints/Sxxxx/closure-verification.md`.
+
+2. **Check runtime proof:**
+   ```bash
+   rg "runtime_proof_id.*US-0120" docs/engineering/state.md
+   ```
+   Expected: strict proof tuple with `phase_id=closure`, `role=qe|curator`, `proof_hash=<sha256>`.
+
+3. **Check backlog status flip:**
+   ```bash
+   rg "^- Status: DONE$" docs/product/backlog.md
+   ```
+   Expected: target story block shows `Status: DONE` (was `OPEN`).
+
+4. **Check acceptance checkbox tick:**
+   ```bash
+   rg "^\- \[x\] US-xxxx:" docs/product/acceptance.md
+   ```
+   Expected: target row shows `[x]` (was `[ ]`).
+
+5. **Check closure-verification.md artifact:**
+   ```bash
+   ls sprints/Sxxxx/closure-verification.md
+   ```
+   Expected: file exists with `story_id`, `closure_date`, `release_evidence_refs[]`, `isolation_evidence{}`, `runtime_proof{}`.
+
+### How to manually trigger (in-flight stories)
+
+For stories that completed `/release` before US-0120 ship:
+
+1. **Verify release evidence exists:**
+   - `handoffs/release_queue.md` contains row with `status=released`.
+   - `handoffs/releases/Sxxxx-release-notes.md` exists with PASS verdict.
+   - `sprints/Sxxxx/qa-findings.md` exists.
+
+2. **Run `/closure` with explicit story_id:**
+   ```bash
+   /closure story_id=US-xxxx
+   ```
+   Or let orchestrator detect via drain hook (3-signal: release_queue=released + backlog=OPEN + acceptance=[ ]).
+
+3. **Verify closure artifacts:**
+   - `sprints/Sxxxx/closure-verification.md` created.
+   - `docs/product/backlog.md` target story `Status: DONE`.
+   - `docs/product/acceptance.md` target row `[x]`.
+   - `docs/engineering/state.md` closure checkpoint appended.
+
+### Troubleshooting
+
+| Symptom | Likely cause | Remedy |
+|---------|--------------|--------|
+| `CLOSURE_RELEASE_EVIDENCE_MISSING` | Release evidence incomplete (no release_queue row, no release-notes, no qa-findings). | Complete `/release` first; verify artifacts exist. |
+| `CLOSURE_VERIFICATION_FAILED` | Orchestrator post-verification rg check failed (status not flipped or checkbox not ticked). | Re-run `/closure`; check for permission errors or concurrent mutations. |
+| `CANONICAL_STATUS_CONFLICT` | Backlog status contradicts release evidence (e.g., release=released but backlog=OPEN). | Resolve contradiction manually; verify release_queue row `status=released` is correct. |
+| `BACKLOG_STATUS_DRIFT` | Backlog not reconciled after closure (status remains OPEN). | Re-run `/closure`; check closure-verification.md for `post_closure_status=DONE`. |
+| `PHASE_OWNERSHIP_VIOLATION` | `/closure` tried to mutate non-owned artifact (release notes, qa findings, execute summary). | Check cross-phase ownership guard; `/closure` owns ONLY backlog.md flip, acceptance.md tick, state.md checkpoint, closure-verification.md. |
+| `PHASE_OVERRIDE_EVIDENCE_MISSING` | Override path configured (AUTO_ROLE_CLOSURE=curator) but evidence missing. | Provide override evidence or disable override (set `AUTO_ROLE_CLOSURE=` empty). |
+| `CLOSURE_LEGACY_DRIFT` | Pre-US-0120 story with all 3 signals (released+OPEN+[ ]) detected by drain hook. | Run `/closure` backfill for in-flight stories; document in closure-verification.md `backward_compat_note`. |
+
+### Compose guards (read-only consumers — UNCHANGED by US-0120)
+
+- US-0043 (backlog reconciliation) — `/closure` executes existing contract; does not amend.
+- US-0045 (canonical status source) — backlog.md remains canonical; `/closure` flips status only.
+- US-0040 (release artifacts) — `/release` still owns release notes, queue, legacy pointer; `/closure` consumes only.
+- US-0048 (isolation evidence) — `/closure` appends its own checkpoint; prior phases unchanged.
+- US-0056 (strict runtime proof) — `/closure` appends its own proof tuple; prior phases unchanged.
+- US-0096 (delivery modes) — ship macro extended to 3 phases; `standard`/`ultra_lean`/`mega_quick` semantics unchanged.
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0120` at L2125.
+- **Decision**: `decisions/DEC-0120.md` (not yet written; companion DEC for US-0120).
+- **Commands**: `.cursor/commands/closure.md` (active + template byte-identical).
+- **Validator**: `scripts/validate_closure_verification.py` (schema validator).
+- **Tests**: `tests/us0120_closure_phase_test.py` (10 markers).
+- **Manifest**: `docs/engineering/context/installer-owned-paths.manifest` (closure paths in `install_include_paths` + `clean_paths`).
+- **Parity checker**: `scripts/check_intake_template_parity.py --scope=us-0120` (closure-phase surfaces).
+

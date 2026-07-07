@@ -241,6 +241,32 @@ and assumption binding. **Do not** mutate `docs/product/backlog.md` or
      `assumptions_confirmed`, `topic_coverage`, assumption ref fields per
      **DEC-0060**, and first-intake coverage fields (`plan_area_inventory`,
      `plan_area_coverage`, `coverage_complete`) in relevant intake artifacts.
+
+4b. **Work-kind classifier hook (US-0118 / DEC-0118)** — after the
+    decomposition evaluator (step 4) and before persistence (step 5+):
+    - Read `WORK_KIND_ROUTING` from `.cursor/scratchpad.md` (`0|1`, default
+      `0`). When `0`, skip the classifier proposal entirely (zero overhead —
+      byte-identical to pre-US-0118). When `1`, proceed.
+    - Run `scripts/work_kind_classify_lib.classify_work_kind(story_prose,
+      acceptance_criteria, touched_file_hints, component_scope)` — pure
+      stdlib, no LLM, no network, no `.env` reads (Q3 LOCKED).
+    - Present the proposed `work_kind` (`doc|mini|code`) and
+      `recommended_delivery_mode` (`standard|ultra_lean|mega_quick`) to the
+      operator for accept/override (Q9 LOCKED). Operator decision recorded in
+      the intake evidence bundle.
+    - On `accept`: persist `- work_kind: <value>` and
+      `- recommended_delivery_mode: <value>` rows in the backlog story block
+      + `work_kind`, `recommended_delivery_mode`,
+      `work_kind_operator_decision=accept` in the intake evidence bundle.
+    - On `override`: operator may set a different
+      `work_kind`/`recommended_delivery_mode` (or leave both unset to defer
+      routing to `DELIVERY_MODE`/`AUTO_PHASE_*`); record
+      `work_kind_operator_decision=override` in the evidence bundle.
+    - Absence of `work_kind`/`recommended_delivery_mode` is valid (classifier
+      not run or operator declined) — no forced reclassification.
+    - **US-0078 evidence gate still runs before any backlog/acceptance
+      write** (step 5 — L10 unchanged).
+
 6. Optional fresh-project ID namespace bootstrap (US-0052 / DEC-0034):
    - Read `ID_NAMESPACE_BOOTSTRAP` from `.cursor/scratchpad.md` (`0|1`,
      default `0`).

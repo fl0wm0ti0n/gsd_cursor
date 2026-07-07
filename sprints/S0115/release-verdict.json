@@ -1,0 +1,58 @@
+{
+  "story_id": "US-0115",
+  "orchestrator_run_id": "auto-20260704-01",
+  "phase": "release (ship macro — first canonical phase per ultra_lean)",
+  "role": "release",
+  "delivery_mode": "ultra_lean",
+  "verdict": "PASS",
+  "ac_coverage": "8/8",
+  "qa_verdict_confirmed": true,
+  "qa_blocking_findings": 0,
+  "qa_non_blocking_findings": 3,
+  "qa_non_blocking_severity": ["cosmetic", "cosmetic", "pre-existing"],
+  "verify_work_verdict_confirmed": true,
+  "byte_stability_preserved": true,
+  "byte_stability_note": "US-0113 L1682 + US-0114 L1806 blocks byte-identical between its_magic/README.md and template/its_magic/README.md (3rd-story cumulative surface); PARITY_OK 128660 128660 authoritative end-to-end proof",
+  "parity_preserved": true,
+  "parity_proofs": [
+    "PARITY_OK 128660 128660 (binary compare)",
+    "[INTAKE_TEMPLATE_PARITY_OK] scope=intake (exit 0)"
+  ],
+  "validators_rerun_green": [
+    "[README_FEATURE_COVERAGE_VALIDATE_OK] exit 0 (coverage_missing=[])",
+    "[DOC_PROFILE_VALIDATE_OK] exit 0",
+    "check-user-visible-metadata.py exit 0 (silent PASS)",
+    "[INTAKE_TEMPLATE_PARITY_OK] scope=intake exit 0",
+    "PARITY_OK 128660 128660 exit 0"
+  ],
+  "regression_tests": "4/4 pytest PASSED in 0.06s (tests/scratchpad_example_parity_test.py)",
+  "story_closed": true,
+  "story_closed_backlog": "docs/product/backlog.md US-0115 block L3929-3945 OPEN -> DONE",
+  "acceptance_checked": true,
+  "acceptance_checked_row": "docs/product/acceptance.md US-0115 row [ ] -> [x]",
+  "release_notes_appended": true,
+  "release_notes_refs": [
+    "handoffs/releases/S0115-release-notes.md (new sprint-scoped canonical)",
+    "handoffs/release_notes.md (US-0115 entry prepended above S0114 — cumulative)"
+  ],
+  "release_queue_updated": true,
+  "release_queue_note": "US-0115 was NOT pre-queued; appended as out-of-band release (documentation-only, no version bump, no sync/push)",
+  "version_bump": false,
+  "version_bump_reason": "US-0115 is documentation-only; no its_magic/.its-magic-version bump, no chocolatey/homebrew packaging changes",
+  "compose_guards_unchanged": "23/23",
+  "compose_guards_list": [
+    "US-0091", "US-0097", "US-0017", "US-0040", "US-0100", "US-0101", "US-0102",
+    "US-0103", "US-0104", "US-0105", "US-0107", "US-0108", "US-0109", "US-0110",
+    "US-0111", "US-0112", "US-0034", "US-0084", "US-0086", "US-0093", "US-0096",
+    "US-0041", "US-0062"
+  ],
+  "dc3_deferral_status": "7 missing # US-xxxx h1 anchors in architecture.md (US-0034/US-0084/US-0086/US-0093/US-0096/US-0101/US-0102) deferred to US-0117; US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) = 14 total; correctly noted in execute-summary + dev_to_qa.md + qa-findings + state.md checkpoints; NOT appended to sovereign_deferrals.jsonl (orchestrator segment-boundary advance hook handles it)",
+  "publish_snapshot": "skipped_disabled (RELEASE_PUBLISH_MODE=disabled)",
+  "sync_pushed": false,
+  "sync_decision": "push_decision=not_eligible, reason_code=SYNC_DISABLED (SYNC_POLICY_MODE=disabled per DEC-0018)",
+  "trigger_source": "manual (RELEASE_TRIGGER_SOURCE=manual; no adapter subprocess)",
+  "fresh_context_marker": "release-US0115-release-20260704T084700Z-fresh",
+  "runtime_proof_id": "rp-auto-20260704-01-release-release-20260704T084700Z-US-0115",
+  "timestamp": "2026-07-04T08:47:00Z",
+  "next_scheduled_phase": "refresh-context"
+}

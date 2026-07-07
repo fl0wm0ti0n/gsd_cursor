@@ -1,0 +1,194 @@
+# Autonomy stop matrix — US-0119 / DEC-0119
+# Single source of truth for stop-code classification.
+#
+# Two-tier stop classification (DEC-0119 §3):
+#   security_hard       — NEVER auto-repaired under any preset/policy; block immediately
+#   autonomy_resolvable — bounded auto-repair permitted when policy != block
+#
+# auto_repair_kind taxonomy (9 values — DEC-0119 §4 / R-0107 Q2):
+#   reorder_anchors, fix_timestamp, truncate_hot_surface, reset_retry_counter,
+#   disambiguate_state, auto_refresh_brief, approve_plan_deviation,
+#   regenerate_isolation_evidence, skip_confirmation_gate
+#
+# For security_hard rows: auto_repair_kind MUST be n/a, cap MUST be 0
+# For autonomy_resolvable rows: auto_repair_kind MUST be one of 9 values, cap >= 1 (default 3)
+
+version: "1.0"
+story_ref: US-0119
+dec_ref: DEC-0119
+
+reason_codes:
+  # ─────────────────────────────────────────────────────────────────────────
+  # security_hard codes — NEVER auto-repaired (auto_repair_kind=n/a, cap=0)
+  # ─────────────────────────────────────────────────────────────────────────
+  - code: PHASE_CONTEXT_ISOLATION_VIOLATION
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Context isolation is a fundamental security boundary
+
+  - code: PHASE_CONTEXT_ISOLATION_MISSING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Missing isolation evidence = untrusted context
+
+  - code: ISOLATION_EVIDENCE_STALE
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Stale evidence = untrusted context
+
+  - code: RUNTIME_PROOF_MISSING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Proof absence = unverifiable execution
+
+  - code: RUNTIME_PROOF_REUSED
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Proof reuse = unverifiable execution
+
+  - code: RUNTIME_PROOF_STALE
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Stale proof = unverifiable execution
+
+  - code: RUNTIME_PROOF_AMBIGUOUS_LINK
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Ambiguous link = unverifiable execution
+
+  - code: PHASE_ROLE_CAPABILITY_MISSING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Role capability is a security boundary
+
+  - code: PHASE_ROLE_MISMATCH
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Role mismatch is a security boundary
+
+  - code: PHASE_OWNERSHIP_VIOLATION
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Ownership is a security boundary
+
+  - code: PHASE_OVERRIDE_EVIDENCE_MISSING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Override evidence is a security boundary
+
+  - code: INTAKE_BUG_ROUTING_REQUIRED
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Bug routing is a structural gate
+
+  - code: INTAKE_ANSWER_REF_NOT_TOPIC_DISTINCT
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Topic distinctness is a truthfulness boundary
+
+  - code: INTAKE_REQUIRED_TOPIC_MISSING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Required topic absence blocks intake
+
+  - code: INTAKE_PERSISTENCE_BLOCKED
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Persistence failure = unreliable state
+
+  - code: AUTO_SCHEDULER_CONFLICT
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Scheduler conflict = unreliable sequencing
+
+  - code: RESUME_BRIEF_STALE
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: "Stale brief = unreliable context (when RESUME_BRIEF_AUTO_REFRESH != 1)"
+
+  - code: SECURITY_REVIEW_CRITICAL_FINDING
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Security review critical = security boundary
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # autonomy_resolvable codes — bounded auto-repair (cap default 3)
+  # ─────────────────────────────────────────────────────────────────────────
+  - code: ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS
+    stop_class: autonomy_resolvable
+    auto_repair_kind: reorder_anchors
+    cap: 3
+    rationale: Sorting H1s by story ID is a safe mechanical fix
+
+  - code: STATE_TIMESTAMP_NON_MONOTONIC
+    stop_class: autonomy_resolvable
+    auto_repair_kind: fix_timestamp
+    cap: 3
+    rationale: Replacing stale timestamp with now() is safe
+
+  - code: ARTIFACT_HOT_SURFACE_OVERSIZE
+    stop_class: autonomy_resolvable
+    auto_repair_kind: truncate_hot_surface
+    cap: 3
+    rationale: Archive rollover is a safe mechanical fix
+
+  - code: BLOCK_RETRY_CAP_EXHAUSTED
+    stop_class: autonomy_resolvable
+    auto_repair_kind: reset_retry_counter
+    cap: 3
+    rationale: Reset to 0 is safe for story-level retry cap
+
+  - code: STATE_PHASE_AMBIGUOUS
+    stop_class: autonomy_resolvable
+    auto_repair_kind: disambiguate_state
+    cap: 3
+    rationale: Pick last-known phase is safe when unambiguous
+
+  - code: RESUME_BRIEF_MISSING
+    stop_class: autonomy_resolvable
+    auto_repair_kind: auto_refresh_brief
+    cap: 3
+    rationale: Regenerate brief from state.md is safe (when RESUME_BRIEF_AUTO_REFRESH=1)
+
+  - code: PLAN_FIDELITY_VIOLATION
+    stop_class: autonomy_resolvable
+    auto_repair_kind: approve_plan_deviation
+    cap: 3
+    rationale: Ledger waiver is safe with bounded audit trail
+
+  - code: ISOLATION_EVIDENCE_INVALID
+    stop_class: autonomy_resolvable
+    auto_repair_kind: regenerate_isolation_evidence
+    cap: 3
+    rationale: Re-run context-refresh is safe
+
+  - code: RELEASE_PUBLISH_MODE
+    stop_class: autonomy_resolvable
+    auto_repair_kind: skip_confirmation_gate
+    cap: 3
+    rationale: Allowlist-gated skip is safe (when target in RELEASE_TARGETS_ALLOWLIST)
+
+  # Terminal stop reasons (emitted by ledger, not in matrix per se)
+  - code: AUTONOMY_REPAIR_CAP_EXHAUSTED
+    stop_class: autonomy_resolvable
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Terminal stop — cap exhaustion escalates to operator (distinct from BLOCK_RETRY_CAP_EXHAUSTED)

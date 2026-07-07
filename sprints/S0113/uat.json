@@ -1,0 +1,74 @@
+{
+  "story_id": "US-0113",
+  "sprint_id": "S0113",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "phase": "qa (merged plan-verify + qa + verify-work)",
+  "timestamp": "2026-07-04T02:40:00Z",
+  "verdict": "PASS",
+  "total_steps": 4,
+  "passed_steps": 4,
+  "failed_steps": 0,
+  "steps": [
+    {
+      "step_id": 1,
+      "name": "AC-1/2/3 visual + grep verification",
+      "description": "Verify umbrella section (AC-1), 9 per-feature subsections in US-id-ascending order (AC-2), and scratchpad reference extension in canonical mirror order (AC-3) via heading inventory and content read.",
+      "result": "PASS",
+      "evidence": [
+        "its_magic/README.md L940 `### Sovereign-loop era (US-0103–US-0112) umbrella section` under L350 `## Commands and workflow`",
+        "9 `#### US-xxxx` subsections at L982, L1005, L1025, L1050, L1077, L1114, L1141, L1166, L1191 (US-id-ascending)",
+        "US-0111 (L1166) + US-0112 (L1191) carry 'See US-0114' pointers (L1173, L1199)",
+        "US-0112 references existing delivery/catalog keys (L1203-L1213)",
+        "`### Sovereign-loop era keys (US-0103–US-0112)` at L1242 inside `### Full scratchpad reference (detailed)` (L1225)",
+        "9 sub-sub-sections at L1250, L1259, L1271, L1279, L1289, L1303, L1323, L1338, L1348 (canonical mirror: US-0103 → US-0110 → US-0104 → US-0105 → US-0107 → US-0108 → US-0109 → US-0111 → US-0112)"
+      ]
+    },
+    {
+      "step_id": 2,
+      "name": "AC-4 coverage validator",
+      "description": "Run `python scripts/validate_readme_feature_coverage.py --repo . --enforce`. Expect pre-existing US-0117 gap (out-of-scope per DC-1 deferred to US-0117) and no new gaps introduced by US-0113.",
+      "result": "PASS",
+      "command": "python scripts/validate_readme_feature_coverage.py --repo . --enforce",
+      "exit_code": 1,
+      "stdout": "coverage_missing=[\"US-0117\"], coverage_total=105, coverage_present includes US-0103..US-0112",
+      "note": "exit=1 reflects pre-existing US-0117 gap, not a US-0113 regression. AC-4 preservation contract satisfied (no new gaps)."
+    },
+    {
+      "step_id": 3,
+      "name": "AC-5 framework README parity",
+      "description": "Run `cmd /c fc /b its_magic\\README.md template\\its_magic\\README.md` (expect no differences) and `python scripts/check_intake_template_parity.py` (expect [INTAKE_TEMPLATE_PARITY_OK]).",
+      "result": "PASS",
+      "commands": [
+        "cmd /c fc /b its_magic\\README.md template\\its_magic\\README.md",
+        "python scripts/check_intake_template_parity.py"
+      ],
+      "exit_codes": [0, 0],
+      "stdout": [
+        "FC: no differences encountered",
+        "[INTAKE_TEMPLATE_PARITY_OK] scope=intake"
+      ]
+    },
+    {
+      "step_id": 4,
+      "name": "AC-6/7/8 validators + tests",
+      "description": "Run doc profile validator (AC-6), metadata sanitizer (AC-6), verify 9 runbook cross-links exist (AC-7), and run regression tests (AC-8).",
+      "result": "PASS",
+      "commands": [
+        "python scripts/validate_doc_profile.py",
+        "python scripts/check-user-visible-metadata.py",
+        "python -m pytest tests/scratchpad_example_parity_test.py -v"
+      ],
+      "exit_codes": [0, 0, 0],
+      "stdout": [
+        "[DOC_PROFILE_VALIDATE_OK]",
+        "metadata sanitizer exit 0",
+        "4 passed in 0.07s (test_bug0013_parity_check, test_bug0013_header_preserved, test_bug0013_local_overrides_preserved, test_bug0013_active_example_mirror_in_sync)"
+      ],
+      "ac7_evidence": "9 runbook cross-links (L1002, L1022, L1047, L1074, L1111, L1138, L1163, L1188, L1222) target existing anchors in docs/engineering/runbook.md (L2668, L2855, L2930, L3009, L3181, L3302, L2764, L3378, L941). No new runbook content added."
+    }
+  ],
+  "runtime_proof_id": "rp-auto-20260704-01-qa-qa-2026-07-04T02-40Z-US-0113",
+  "fresh_context_marker": "qa-US0113-qa-2026-07-04T02-25Z-fresh"
+}

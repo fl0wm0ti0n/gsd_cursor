@@ -1,4 +1,4 @@
-# its-magic scratchpad (framework default catalog — Model B / DEC-0055)
+# its-magic scratchpad (framework default catalog â€” Model B / DEC-0055)
 #
 # Copy this file to `.cursor/scratchpad.local.md` for personal overrides (gitignored).
 # Merge precedence: local > materialized `.cursor/scratchpad.md` > this example
@@ -14,9 +14,9 @@
 # - AUTO_PAUSE_POLICY: after_task|after_phase (safe stop boundary)
 # - DONE: 0|1 (stop hook loops)
 MAGIC_CONTEXT_STRICT=1
-LOOP_UNTIL_GREEN=0
-RUN_TESTS_ON_EDIT=0
-AUTO_IMPLEMENTATION_LOOP=0
+LOOP_UNTIL_GREEN=1
+RUN_TESTS_ON_EDIT=1
+AUTO_IMPLEMENTATION_LOOP=1
 AUTO_LOOP_MAX_CYCLES=5
 AUTO_PAUSE_REQUEST=0
 AUTO_PAUSE_POLICY=after_phase
@@ -49,46 +49,48 @@ MAGIC_BENCH_SESSION=
 # - AUTO_EXECUTE_ON_BLOCK: stop|skip (behavior when a planned item blocks)
 # - AUTO_EXECUTE_SELECTION: planned_then_priority
 # - AUTO_TEAM_SCOPE_ENFORCE: 0|1 (when TEAM_MODE=1, enforce TEAM_MEMBER + ACTIVE_TASK_IDS)
-# Optional bug-queue mode (US-0087) — default-off when absent/unset after merge
+# Optional bug-queue mode (US-0087) â€” default-off when absent/unset after merge
 # - AUTO_BUG_QUEUE: 0|1 (1 = enable bug-targeted /auto; mutex vs AUTO_BACKLOG_DRAIN without bug-target argv)
 # - AUTO_BUG_TARGET: all-open|BUG-#### (required when AUTO_BUG_QUEUE=1 unless bug-target= argv supplies target)
 # - AUTO_BUG_MAX_ITEMS: non-negative integer (0 or unset = no cap for all-open queue per run)
 # - AUTO_BUG_ON_BLOCK: stop|skip (bug segment pause/stop boundary)
-# Quiet mode (US-0088) — suppress routine per-phase success chatter only
+# Quiet mode (US-0088) â€” suppress routine per-phase success chatter only
 # - AUTO_QUIET: 0|1 (default 0; 1 = quiet routine notifications)
 #   Non-suppressible: decision_gate, errors, pause, loop_max, blocked, missing inputs.
-#   Orthogonal to TOKEN_PROFILE (DEC-0035 / US-0080) — TOKEN_PROFILE controls
+#   Orthogonal to TOKEN_PROFILE (DEC-0035 / US-0080) â€” TOKEN_PROFILE controls
 #   context breadth / token cost, not notification policy.
-AUTO_QUIET=0
-AUTO_FLOW_MODE=auto_until_decision
-PHASE_MODE=interactive
-PERMISSION_MODE=interactive
-AUTO_INSTALL_DEPS=0
+AUTO_QUIET=1
+AUTO_FLOW_MODE=full_autonomy
+PHASE_MODE=auto
+PERMISSION_MODE=auto
+AUTO_INSTALL_DEPS=1
 AUTO_RELEASE_NOTES=1
-AUTO_BACKLOG_DRAIN=0
-AUTO_BACKLOG_MAX_STORIES=1
-AUTO_BACKLOG_ON_BLOCK=stop
+AUTO_BACKLOG_DRAIN=1
+AUTO_BACKLOG_MAX_STORIES=10
+AUTO_BACKLOG_ON_BLOCK=skip
 AUTO_STORY_SELECTION=priority_then_backlog_order
 AUTO_EXECUTE_BULK=0
 AUTO_EXECUTE_MAX_ITEMS=1
-AUTO_EXECUTE_ON_BLOCK=stop
+AUTO_EXECUTE_ON_BLOCK=skip
 AUTO_EXECUTE_SELECTION=planned_then_priority
 AUTO_TEAM_SCOPE_ENFORCE=1
 AUTO_BUG_QUEUE=0
 AUTO_BUG_TARGET=
 AUTO_BUG_MAX_ITEMS=0
-AUTO_BUG_ON_BLOCK=stop
-AUTO_BLOCK_RETRY_MAX=3
+AUTO_BUG_ON_BLOCK=skip
+AUTO_BLOCK_RETRY_MAX=5
 #
 # `/auto` phase role policy (US-0069 / DEC-0051)
 # - AUTO_ROLE_RESEARCH: po|tech-lead (empty -> default tech-lead)
 # - AUTO_ROLE_PLAN_VERIFY: qa|tech-lead (empty -> default qa)
 # - AUTO_ROLE_REFRESH_CONTEXT: curator|po (empty -> default curator)
+# - AUTO_ROLE_CLOSURE: qe|curator (empty -> default qe) (US-0120 / DEC-0051)
 # - AUTO_EXECUTE_ROLE_OVERRIDE: empty or allowed_non_dev_execute (execute default is dev)
 # - EXECUTE_OVERRIDE_GOVERNANCE_REF: parseable waiver pointer (DEC-xxxx / state anchor) when override set
 AUTO_ROLE_RESEARCH=
 AUTO_ROLE_PLAN_VERIFY=
 AUTO_ROLE_REFRESH_CONTEXT=
+AUTO_ROLE_CLOSURE=
 AUTO_EXECUTE_ROLE_OVERRIDE=
 EXECUTE_OVERRIDE_GOVERNANCE_REF=
 #
@@ -142,10 +144,10 @@ AUTO_REMOTE_ENVIRONMENT_LABEL=local
 # - ALLOW_AUTO_PUSH: 0|1 (default off; explicit opt-in required)
 # - AUTO_PUSH_BRANCH_ALLOWLIST: comma-separated branches/patterns eligible for
 #   auto-push. Protected/default branches are denied unless allowlisted.
-SYNC_POLICY_MODE=manual
+SYNC_POLICY_MODE=disabled
 SYNC_CUSTOM_PHASES=
-ALLOW_AUTO_PUSH=0
-AUTO_PUSH_BRANCH_ALLOWLIST=
+ALLOW_AUTO_PUSH=1
+AUTO_PUSH_BRANCH_ALLOWLIST=main
 #
 # Knowledge curation
 # - EARLY_RESEARCH: 0|1 (PO/TL search web during intake/architecture)
@@ -177,13 +179,27 @@ AUTO_PUSH_BRANCH_ALLOWLIST=
 # - LEAN_COLD_READ_MAX_SECTIONS: int >= 1 (default 4)
 # - LEAN_STATE_INDEX_ROWS: int >= 30 (default 80)
 # - AUTO_DELIVERY_ROUTING: scratchpad_only|backlog_then_scratchpad (default scratchpad_only)
-# Tranche A default hot caps (US-0096): 1000/650/3000 — explicit values override.
+# Tranche A default hot caps (US-0096): example uses 1000/650/3000; explicit values here override.
 DELIVERY_MODE=standard
 LEAN_MEMORY_READ=1
 LEAN_MEMORY_WRITE=1
 LEAN_COLD_READ_MAX_SECTIONS=4
 LEAN_STATE_INDEX_ROWS=80
 AUTO_DELIVERY_ROUTING=scratchpad_only
+#
+# Work-kind routing (US-0118 / DEC-0118)
+# Default-off per-story work-kind classifier. When WORK_KIND_ROUTING=0,
+# /auto resolve_delivery_mode step 0 + /intake step 5 skip the classifier
+# entirely (zero overhead â€” byte-identical to pre-US-0118). When 1, the
+# classifier derives (delivery_mode, phase_plan) per the L8 precedence
+# chain: explicit DELIVERY_MODE > AUTO_PHASE_* > WORK_KIND_ROUTING-derived
+# > current default. Merge precedence (US-0078 model B): local > baseline
+# > example. Reuses scripts/dev_environment_lib.classify_touched_files.
+# - WORK_KIND_ROUTING: 0|1 (default 0; absence = 0)
+# - WORK_KIND_TIE_BREAK: highest_tier_wins (default; LOCKED Q1 â€” code > mini > doc)
+WORK_KIND_ROUTING=0
+WORK_KIND_TIE_BREAK=highest_tier_wins
+
 EARLY_RESEARCH=1
 INTAKE_GUIDED_MODE=1
 INTAKE_SUBAGENT_FALLBACK=deny
@@ -204,7 +220,7 @@ ARCH_HOT_MAX_STORY_SECTIONS=120
 #   - auto: allow publish without confirmation (explicit opt-in)
 # - RELEASE_TARGETS_FILE: canonical target config path
 # - RELEASE_TARGETS_DEFAULT: comma-separated default target IDs (optional)
-RELEASE_PUBLISH_MODE=confirm
+RELEASE_PUBLISH_MODE=disabled
 RELEASE_TARGETS_FILE=docs/engineering/release-targets.json
 RELEASE_TARGETS_DEFAULT=
 
@@ -251,6 +267,7 @@ DOC_DETAIL_LEVEL=balanced
 
 # README feature coverage gate (US-0091 / DEC-0074)
 # - README_FEATURE_COVERAGE_ENFORCE: 0|1 (default 0 until backfill + --report green)
+#   When 0, /release step 3f skips (grandfathering). When 1, static coverage is blocking.
 README_FEATURE_COVERAGE_ENFORCE=1
 
 #
@@ -258,7 +275,7 @@ README_FEATURE_COVERAGE_ENFORCE=1
 # Project-owned root README bootstrap + per-story catalog growth.
 # - PROJECT_README_ENFORCE: 0|1 (default 1 post-bootstrap)
 #   When 0, /release step 3g skips (migration/grandfathering only). When 1, blocking.
-#   Flip 0→1 only after validate_project_readme_coverage.py --report shows coverage_missing: [].
+#   Flip 0â†’1 only after validate_project_readme_coverage.py --report shows coverage_missing: [].
 # - FRAMEWORK_KIT_REPO: 0|1 (default 0)
 #   When 1 (its-magic dev kit repo only), skip execute 23a/23b and project validator root check.
 #   Consumer repos never set FRAMEWORK_KIT_REPO=1.
@@ -270,9 +287,9 @@ FRAMEWORK_KIT_REPO=0
 # Two-tier browser probe: stdlib lib classifies + agent owns Cursor browser MCP (BUG-0006).
 # - UAT_BROWSER_PROBE_MODE: cursor|http_fallback|playwright_fallback (default cursor)
 #   - cursor: agent executes MCP sequence; lib emits plan + UAT_PROBE_UNRESOLVED until evidence
-#   - http_fallback: stdlib HTTP GET (CI recipe — set this in CI)
+#   - http_fallback: stdlib HTTP GET (CI recipe â€” set this in CI)
 #   - playwright_fallback: subprocess Playwright primary; HTTP fallback when missing
-# - UAT_BROWSER_FALLBACK_CHAIN: 0|1 (default 1; enable HTTP → Playwright after MCP unavailable)
+# - UAT_BROWSER_FALLBACK_CHAIN: 0|1 (default 1; enable HTTP â†’ Playwright after MCP unavailable)
 # - UAT_PROCESS_HEALTH_POLL_SECONDS: positive int (default 60; process_health readiness cap)
 # - UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS: positive int (default 2; poll interval)
 # - DEV_SERVER_PORT: int (optional; URL/port inference override)
@@ -288,7 +305,7 @@ DEV_SERVER_COMMAND=
 
 #
 # ## Dev environment auto-launch (US-0098 / DEC-0084)
-# Execute-phase bounded rebuild/relaunch + Connect surfacing — distinct from US-0065 phase QA,
+# Execute-phase bounded rebuild/relaunch + Connect surfacing â€” distinct from US-0065 phase QA,
 # US-0086 test routing, and US-0067 release hints. Orthogonal to AUTO_REMOTE_AUTOMATION_PROFILE.
 # When off, execute step 24 skipped with zero overhead.
 # - DEV_AUTO_LAUNCH_PROFILE: off|deterministic_v1 (default off)
@@ -325,54 +342,296 @@ CAVEMAN_FILE_SCOPE=
 #
 # ## Per-phase model tier selection (US-0101 / DEC-0086)
 # MODEL_TIER selects LLM model strength (which model runs).
-# MODEL_TIER ≠ TOKEN_PROFILE ≠ DELIVERY_MODE — these are independent axes;
+# MODEL_TIER â‰  TOKEN_PROFILE â‰  DELIVERY_MODE â€” these are independent axes;
 #   none substitutes for the other (DEC-0062 / US-0080 / US-0096).
 # - MODEL_TIER_DEFAULT: cheap|balanced|strong (default balanced)
 # - MODEL_TIER_<PHASE>: cheap|balanced|strong (per-phase override; PHASE = canonical phase id)
+#   Examples: MODEL_TIER_EXECUTE=cheap, MODEL_TIER_QA=strong, MODEL_TIER_RESEARCH=balanced
+#   Set in .cursor/scratchpad.local.md to override per phase without touching committed defaults.
 #   Default matrix (architecture-locked):
-#     cheap    — ask, refresh-context, memory-audit, status-reconcile, pause
-#     balanced — intake, discovery, research, release, plan-verify
-#     strong   — architecture, execute, quick, qa, verify-work, security-review
-#     (inherit parent) — auto (orchestrator always inherits parent model)
+#     cheap    â€” ask, refresh-context, memory-audit, status-reconcile, pause
+#     balanced â€” intake, discovery, research, release, plan-verify
+#     strong   â€” architecture, execute, quick, qa, verify-work, security-review
+#     (inherit parent) â€” auto (orchestrator always inherits parent model)
 # - MODEL_CATALOG: path to local slug catalog (default .cursor/model-catalog.local.json)
 # - MODEL_RESOLVE: alias_only|local_catalog|role_catalog (default alias_only)
+#   alias_only    = use Cursor-stable aliases (cheap->fast, balanced->inherit, strong->omit model:)
+#   local_catalog = look up vendor model slugs from MODEL_CATALOG; requires valid JSON catalog
+#   role_catalog  = opt-in phaseâ†’roleâ†’catalog slug lookup (US-0102 / DEC-0087); falls through on miss
 # - MODEL_FALLBACK: fallback when catalog lookup fails (default inherit)
 # - MODEL_PROVIDER_MODE: cursor|api (default cursor)
 #   cursor = all subagents route through Cursor-managed infrastructure
-#   api = operator uses BYOK via Cursor Settings → Models → API Key
+#   api = operator uses BYOK via Cursor Settings â†’ Models â†’ API Key
 #   Known limitation: subagents do NOT inherit custom API keys/base URLs.
 #
-# ## Direct per-phase model slug override (US-0102 / DEC-0087) — set in this local file only
-# Precedence: MODEL_<PHASE> > MODEL_TIER_<PHASE> > MODEL_TIER_DEFAULT > Cursor alias
-# - MODEL_<PHASE>: direct vendor slug (e.g. MODEL_EXECUTE=<your-vendor-slug>, MODEL_ASK=<your-vendor-slug>)
-# - MODEL_RESOLVE=role_catalog enables phase→role→catalog slug lookup (requires v2 catalog with roles section)
+# Example catalogs for 4 software-complexity levels + a Cursor-only variant:
+#   .cursor/model-catalog.local.example.json                           â€” minimal placeholder template
+#   .cursor/model-catalog.local.example.cursor-only.json             â€” only Cursor-integrated Composer models
+#   .cursor/model-catalog.local.example.level-1-easy.json            â€” small/simple apps
+#   .cursor/model-catalog.local.example.level-2-complex.json         â€” complex multi-service apps
+#   .cursor/model-catalog.local.example.level-3-mega.json            â€” mega-complex / modular monoliths
+#   .cursor/model-catalog.local.example.level-4-super.json            â€” super-high-sophisticated / mission-critical
+#   .cursor/model-catalog.local.example.role-based-balanced.json     â€” v2 role preset (balanced)
+#   .cursor/model-catalog.local.example.role-based-highend.json      â€” v2 role preset (high-end)
+# Copy one to .cursor/model-catalog.local.json and set MODEL_RESOLVE=local_catalog or role_catalog to activate.
 MODEL_TIER_DEFAULT=balanced
 MODEL_CATALOG=.cursor/model-catalog.local.json
 MODEL_RESOLVE=alias_only
 MODEL_FALLBACK=inherit
 MODEL_PROVIDER_MODE=cursor
-
-# Per-phase tier overrides for this project (uncomment and adjust as needed):
-#MODEL_TIER_INTAKE=balanced
-#MODEL_TIER_DISCOVERY=cheap
-#MODEL_TIER_RESEARCH=balanced
-#MODEL_TIER_ARCHITECTURE=strong
-#MODEL_TIER_SPRINT-PLAN=strong
-#MODEL_TIER_PLAN-VERIFY=balanced
-#MODEL_TIER_EXECUTE=cheap
-#MODEL_TIER_QA=strong
-#MODEL_TIER_VERIFY-WORK=strong
-#MODEL_TIER_RELEASE=balanced
-#MODEL_TIER_REFRESH-CONTEXT=cheap
-
-# Direct per-phase slug overrides (US-0102 — uncomment and set vendor slugs):
-#MODEL_ASK=<your-vendor-slug>
-#MODEL_EXECUTE=<your-vendor-slug>
-#MODEL_QA=<your-vendor-slug>
-
-# Use a vendor catalog instead of Cursor aliases:
-#   cp .cursor/model-catalog.local.example.level-2-complex.json .cursor/model-catalog.local.json
-#MODEL_RESOLVE=local_catalog
-# Role-based catalog preset (US-0102):
-#   cp .cursor/model-catalog.local.example.role-based-balanced.json .cursor/model-catalog.local.json
-#MODEL_RESOLVE=role_catalog
+#
+# ## Direct per-phase model slug override + role catalog (US-0102 / DEC-0087)
+# Composes on US-0101 / DEC-0086 â€” tier baseline unchanged; overlays are optional.
+# Precedence chain (deterministic, per canonical phase_id):
+#   1. MODEL_<PHASE>           â€” direct vendor slug override (highest priority)
+#   2. MODEL_TIER_<PHASE>      â€” DEC-0086 tierâ†’alias / local_catalog chain
+#   3. role_catalog lookup     â€” only when MODEL_RESOLVE=role_catalog; miss falls through
+#   4. MODEL_TIER_DEFAULT      â€” DEC-0086 tier chain
+#   5. Cursor stable alias     â€” DEC-0086 built-in mapping (fast / inherit / omit)
+# Scratchpad merge precedence for all MODEL_* keys: MODEL_<PHASE> > MODEL_TIER_<PHASE> > MODEL_TIER_DEFAULT
+# - MODEL_<PHASE>: direct vendor slug; <PHASE> = canonical phase id (same list as MODEL_TIER_<PHASE>)
+#   Set in .cursor/scratchpad.local.md only â€” use <your-vendor-slug> placeholders in committed files.
+#   Canonical phase ids: ask, refresh-context, memory-audit, status-reconcile, pause,
+#     intake, discovery, research, release, plan-verify, architecture, execute, quick,
+#     qa, verify-work, security-review, auto
+#   Examples (placeholders â€” replace in scratchpad.local.md):
+#     MODEL_ASK=<your-vendor-slug>
+#     MODEL_EXECUTE=<your-vendor-slug>
+#     MODEL_QA=<your-vendor-slug>
+#     MODEL_REFRESH-CONTEXT=<your-vendor-slug>
+#   MODEL_ASK participates in step 1 like any other phase (no special-case bypass).
+#
+# AI Decision Ledger + Plan Fidelity (US-0103 / DEC-0103)
+# Sovereign-loop foundation. Default-off â€” zero overhead when AI_DECISION_LEDGER=0.
+# - AI_DECISION_LEDGER: 0|1 (default 0) â€” when 0: no ledger reads/writes/schema checks.
+# - AUTO_PLAN_FIDELITY: strict|relaxed|extended (default strict) â€” active only when ledger enabled.
+#   strict   = any unapproved drop/reorder/scope-add â†’ PLAN_FIDELITY_VIOLATION hard stop
+#   relaxed  = drop/reorder allowed (ledger entry); scope-add still hard stop
+#   extended = scope-add allowed (extension report); drop/reorder allowed
+AI_DECISION_LEDGER=0
+AUTO_PLAN_FIDELITY=strict
+#
+# Goal-Based Convergence (US-0110 / DEC-0110)
+# Default-off sovereign-loop terminal predicate. When SOVEREIGN_GOAL_MODE=phase_driven,
+# zero overhead â€” no evaluation, no goal_progress block, no partial-delivery write.
+# Compose do NOT amend US-0088 / US-0092 / US-0095 / US-0044 / US-0103 (read-only surfaces).
+# - SOVEREIGN_GOAL_MODE: phase_driven|goal_convergence (default phase_driven)
+# - SOVEREIGN_GOAL: explicit goal text (wins over vision auto-derive; default empty)
+# - SOVEREIGN_GOAL_TOP_N: int >= 1 vision paragraph count for auto-derive (default 3)
+# - SOVEREIGN_GOAL_MAX_CHARS: int >= 64 truncation cap (default 512)
+# - SOVEREIGN_GOAL_TIMEOUT_MAX: int >= 0 iteration-count cap (0 = disabled; not wall-clock)
+SOVEREIGN_GOAL_MODE=phase_driven
+SOVEREIGN_GOAL=
+SOVEREIGN_GOAL_TOP_N=3
+SOVEREIGN_GOAL_MAX_CHARS=512
+SOVEREIGN_GOAL_TIMEOUT_MAX=0
+#
+# Cross-Model Adversarial Critic (US-0104 / DEC-0104)
+# Default-off cross-model review. When CROSS_MODEL_REVIEW=0, zero overhead â€” no critic
+# spawn, no findings writes, no anti-slop gate. Compose do NOT amend US-0048 / US-0069 /
+# US-0023 / US-0110 / US-0103 (additive surfaces only).
+# - CROSS_MODEL_REVIEW: 0|1 (default 0)
+# - CROSS_MODEL_ANTISLOP_THRESHOLD: int 0-10 aggregate floor (default 6)
+# - CROSS_MODEL_REWORK_MAX: int >= 0 producer re-spawns per (run, phase) (default 2)
+CROSS_MODEL_REVIEW=0
+CROSS_MODEL_ANTISLOP_THRESHOLD=6
+CROSS_MODEL_REWORK_MAX=2
+#
+# Sovereign Memory (US-0105 / DEC-0105)
+# Default-off institutional memory. When SOVEREIGN_MEMORY=0, zero overhead â€”
+# no JSONL writes, no injection reads, no spawn digest assembly.
+# Compose do NOT amend US-0029 / US-0080 / US-0103 / US-0072 / US-0096.
+# - SOVEREIGN_MEMORY: 0|1 (default 0)
+# - SOVEREIGN_MEMORY_TOP_N: int >= 0 (default 5) â€” global recent pool (all four JSONL families)
+# - SOVEREIGN_MEMORY_TOP_K: int >= 0 (default 3) â€” high-impact pool (patterns + mistakes only)
+# - SOVEREIGN_MEMORY_MAX_CHARS: int >= 0 (default 2048) â€” hard cap on assembled digest_text
+# - SOVEREIGN_MEMORY_JSONL_MAX_LINES: int >= 1 (default 500) â€” active JSONL line cap before archive rollover
+SOVEREIGN_MEMORY=0
+SOVEREIGN_MEMORY_TOP_N=5
+SOVEREIGN_MEMORY_TOP_K=3
+SOVEREIGN_MEMORY_MAX_CHARS=2048
+SOVEREIGN_MEMORY_JSONL_MAX_LINES=500
+#
+# Sovereign Loop Mode (US-0107 / DEC-0107)
+# Default-off project orchestration. When AUTO_SOVEREIGN=0, zero overhead â€” no deferral
+# reads/writes, no advance, no notifications. Requires SOVEREIGN_GOAL_MODE=goal_convergence
+# when enabled (fail-closed SOVEREIGN_LOOP_GOAL_MODE_REQUIRED). Compose do NOT amend
+# US-0088 / US-0092 / US-0095 / US-0044 / US-0103 / US-0105 / US-0110 (additive hooks only).
+# - AUTO_SOVEREIGN: 0|1 (default 0)
+# - AUTO_SOVEREIGN_DEFERRAL_MAX: int >= 1 (default 50) â€” max open deferral rows
+# - AUTO_SOVEREIGN_DRAIN_GENERATE_MAX: int >= 0 (default 3) â€” drain-generate iterations per run
+# - AUTO_SOVEREIGN_DEFERRAL_POLICY: stop|skip|resolve_first (default resolve_first)
+# - SOVEREIGN_NOTIFY_TARGET: off|ntfy|email|hook (default off)
+# - SOVEREIGN_NOTIFY_NTFY_TOPIC: string (default empty â€” local-only)
+# - SOVEREIGN_NOTIFY_NTFY_BASE: URL (default empty â€” local-only ntfy base override)
+# - SOVEREIGN_NOTIFY_HOOK_URL: URL (default empty â€” local-only webhook)
+# - SOVEREIGN_NOTIFY_EMAIL_TO: email (default empty â€” email v1 deferred)
+AUTO_SOVEREIGN=0
+AUTO_SOVEREIGN_DEFERRAL_MAX=50
+AUTO_SOVEREIGN_DRAIN_GENERATE_MAX=3
+AUTO_SOVEREIGN_DEFERRAL_POLICY=resolve_first
+SOVEREIGN_NOTIFY_TARGET=off
+SOVEREIGN_NOTIFY_NTFY_TOPIC=
+SOVEREIGN_NOTIFY_NTFY_BASE=
+SOVEREIGN_NOTIFY_HOOK_URL=
+SOVEREIGN_NOTIFY_EMAIL_TO=
+#
+# Sovereign Role-Behavior Manifest (US-0106 / DEC-0106)
+# Default-off per-role objective + inter-role review obligations. When SOVEREIGN_ROLE_MANIFEST=0,
+# zero overhead â€” no manifest reads, no objective injection, no review dispatch.
+# Compose do NOT amend US-0069 (phaseâ†’role matrix unchanged; review spawns supplementary),
+# US-0104 (critic lenses + findings schema unchanged; role reviews additive),
+# US-0003 / US-0023 / US-0103 / US-0105 / US-0107 (unchanged surfaces).
+# - SOVEREIGN_ROLE_MANIFEST: 0|1 (default 0)
+# - SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS: int >= 1 (default 512) â€” hard truncate for injection
+# - SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE: int >= 0 (default 2) â€” per-phase review cap
+# - SOVEREIGN_ROLE_REVIEW_REWORK_MAX: int >= 0 (default 1) â€” bounded rework before decision gate
+SOVEREIGN_ROLE_MANIFEST=0
+SOVEREIGN_ROLE_OBJECTIVE_MAX_CHARS=512
+SOVEREIGN_ROLE_REVIEW_MAX_PER_PHASE=2
+SOVEREIGN_ROLE_REVIEW_REWORK_MAX=1
+#
+# Parallel Instance Arbitrage (US-0108 / DEC-0108)
+# Default-off parallel execute-phase instance orchestration. When SOVEREIGN_PARALLEL_DEV=0,
+# zero overhead â€” no worktrees, no parallel QA, no pick JSON, no resource guard.
+# Compose do NOT amend US-0047 (bulk execute unchanged), US-0092 (full autonomy unchanged),
+# US-0103 (ledger schema unchanged; read-only consumer), US-0104 (critic schema unchanged;
+# read-only anti_slop_score consumer), US-0107 (sovereign loop unchanged; consumer only).
+# - SOVEREIGN_PARALLEL_DEV: 0|1 (default 0) â€” global enable gate
+# - AUTO_SOVEREIGN_PARALLEL_N: int >= 1 (default 3) â€” instances per execute cycle
+# - AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL: int >= 1 (default 6) â€” system-wide instance cap
+# - AUTO_SOVEREIGN_MERGE_RESOLVE: first_pass_wins|last_pass_wins|winner_takes_all|manual (default first_pass_wins)
+# - AUTO_SOVEREIGN_WORKTREE_KEEP: 0|1 (default 0) â€” retain loser worktrees for debugging
+# - AUTO_SOVEREIGN_PARALLEL_QA: 0|1 (default 0) â€” enable parallel QA cross-review (v2)
+# - AUTO_SOVEREIGN_PARALLEL_QA_ARBITER: critic_first_pass|majority_vote (default critic_first_pass)
+# - AUTO_SOVEREIGN_PARALLEL_ANTI_SLOP_THRESHOLD: int 0-10 (default 6) â€” anti-slop floor
+# - AUTO_SOVEREIGN_PARALLEL_REWORK_MAX: int >= 0 (default 2) â€” per-instance rework cap
+# - AUTO_SOVEREIGN_PARALLEL_MERGE_TIMEOUT_SEC: int >= 10 (default 60) â€” merge timeout
+# - AUTO_SOVEREIGN_PARALLEL_MODEL_<idx>: model slug per instance (optional)
+# - AUTO_SOVEREIGN_PARALLEL_LENS_<idx>: lens config per instance (optional)
+SOVEREIGN_PARALLEL_DEV=0
+AUTO_SOVEREIGN_PARALLEL_N=3
+AUTO_SOVEREIGN_PARALLEL_MAX_TOTAL=6
+AUTO_SOVEREIGN_MERGE_RESOLVE=first_pass_wins
+AUTO_SOVEREIGN_WORKTREE_KEEP=0
+AUTO_SOVEREIGN_PARALLEL_QA=0
+AUTO_SOVEREIGN_PARALLEL_QA_ARBITER=critic_first_pass
+AUTO_SOVEREIGN_PARALLEL_ANTI_SLOP_THRESHOLD=6
+AUTO_SOVEREIGN_PARALLEL_REWORK_MAX=2
+AUTO_SOVEREIGN_PARALLEL_MERGE_TIMEOUT_SEC=60
+#
+# Self-Healing Deploy Loop (US-0109 / DEC-0109)
+# Default-off auto-heal post-publish probe + bounded retry + DEPLOY_DEFERRED.
+# When AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0 zero overhead, byte-identical US-0054 publish path â€”
+# no probe, no retry, no deferral, no execute steps 29-31. Compose do NOT amend US-0054 / US-0100 /
+# US-0103 / US-0107 / US-0110 (US-0109 consumer-only hook after US-0054 publish PASS).
+# - AUTO_SOVEREIGN_SELF_HEALING_DEPLOY: 0|1 (default 0) â€” global gate
+# - AUTO_SOVEREIGN_DEPLOY_RETRY_MAX: int >= 1 (default 3) â€” max retry attempts after probe FAIL
+# - AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC: int >= 1 (default 30) â€” per-stage probe HTTP timeout
+# - AUTO_SOVEREIGN_DEPLOY_PROBE_KIND: health_endpoint|acceptance_smoke|both (default both)
+# - SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH: repo-relative path (default tests/deploy_smoke/)
+# - AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT: names-only env ref (US-0085 compose); empty = unresolvable
+# Reason codes (DEC-0109 Â§7): DEPLOY_HEALING_DISABLED (info), DEPLOY_HEALING_SMOKE_HEALTH_FAIL,
+#   DEPLOY_HEALING_SMOKE_ACCEPTANCE_FAIL, DEPLOY_HEALING_RETRY_ATTEMPT,
+#   DEPLOY_HEALING_RETRY_CAP_EXHAUSTED, DEPLOY_HEALING_DEFERRED,
+#   DEPLOY_HEALING_PROBE_TARGET_MISSING, DEPLOY_HEALING_TIMEOUT.
+AUTO_SOVEREIGN_SELF_HEALING_DEPLOY=0
+AUTO_SOVEREIGN_DEPLOY_RETRY_MAX=3
+AUTO_SOVEREIGN_DEPLOY_SMOKE_TIMEOUT_SEC=30
+AUTO_SOVEREIGN_DEPLOY_PROBE_KIND=both
+SOVEREIGN_DEPLOY_ACCEPTANCE_SMOKE_PATH=tests/deploy_smoke/
+AUTO_SOVEREIGN_DEPLOY_HEALTH_ENDPOINT=
+#
+# Release Trigger Adapters (US-0111 / DEC-0111)
+# Dispatch release flow by trigger source (GitHub webhook, npm publish, Git tag
+# push, manual /release). Default source is manual (zero behavior change vs
+# pre-US-0111 /release path â€” byte-identical). Compose with US-0100; reuses
+# release_changelog_lib APIs without modification.
+# - RELEASE_TRIGGER_SOURCE: manual|github|npm|git_tag|auto (default manual)
+# - RELEASE_TRIGGER_TIMEOUT_SEC: int >= 1 (default 10; adapter subprocess timeout)
+# - RELEASE_TRIGGER_FALLBACK_TO_LOCAL: 0|1 (default 0; npm adapter offline fallback)
+RELEASE_TRIGGER_SOURCE=manual
+RELEASE_TRIGGER_TIMEOUT_SEC=10
+RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0
+#
+# Autonomy presets (US-0119 / DEC-0119)
+# Configurable autonomy presets and per-feature autonomy flags.
+# Default-off; byte-identical pre-US-0119 when AUTONOMY_PRESET=none.
+#
+# Merge precedence (LOCKED):
+#   1. Explicit per-flag value (in scratchpad or scratchpad.local)
+#   2. AUTONOMY_PRESET expansion (via scripts/autonomy_preset_lib.py)
+#   3. Scratchpad defaults (this file)
+#
+# AUTONOMY_PRESET: none|balanced|full (default=none)
+#   none:    empty {} â€” byte-identical pre-US-0119
+#   balanced: 8 flags â€” moderate autonomy
+#   full:     12 flags â€” maximum autonomy (superset of balanced)
+#
+# AUTONOMY_STOP_POLICY: block|auto_repair_then_block|auto_repair_then_skip (default=block)
+#   block:                  all fail-closed codes block (pre-US-0119 behavior)
+#   auto_repair_then_block: autonomy_resolvable codes get bounded repair; cap exhaustion -> BLOCK
+#   auto_repair_then_skip:  autonomy_resolvable codes get bounded repair; cap exhaustion -> SKIP
+#
+# Per-feature autonomy flags (12 total â€” DEC-0119 Â§7):
+#
+# INTAKE_AUTONOMY_MODE: 0|1 (default=0)
+# balanced: OFF | full: ON
+# Auto-derives intake answers on known-stack repeat projects (US-0068 compose).
+#
+# INTAKE_MINIMAL_PACK: 0|1 (default=0)
+# balanced: OFF | full: ON
+# Shrinks follow-up intake on established projects (Q7: MAX_US_ID >= US-0100 AND STACK_KNOWN = true).
+#
+# INTAKE_ASSUME_STACK_CONTEXT: 0|1 (default=0)
+# balanced: OFF | full: ON
+# Auto-fills stack/runtime from backlog history with assumption_confirmation_ref contract (BUG-0007 compose).
+#
+# WORK_KIND_AUTO_ACCEPT: 0|1 (default=0)
+# balanced: ON | full: ON
+# Auto-accepts classifier output when WORK_KIND_ROUTING=1.
+#
+# CROSS_MODEL_REWORK_EXHAUSTED_POLICY: block|downgrade (default=block)
+# balanced: downgrade | full: downgrade
+# Converts decision gate to warning when critic rework cap exhausted (US-0104 compose).
+#
+# CROSS_MODEL_SKIP_PHASES: csv (default=empty)
+# balanced: empty | full: empty
+# Skips critic for low-risk phases (e.g., refresh-context,release) (US-0104 compose).
+#
+# RESUME_BRIEF_AUTO_REFRESH: 0|1 (default=0)
+# balanced: ON | full: ON
+# Auto-refreshes stale brief; RESUME_BRIEF_STALE becomes autonomy_resolvable when ON.
+#
+# RUNTIME_PROOF_KIND: strict|lightweight (default=strict)
+# balanced: lightweight | full: lightweight
+# Counter+timestamp attestation instead of SHA-256; TTL unchanged (Q4: 3600s) (US-0056 compose).
+#
+# GOAL_CONVERGENCE_INTERVAL: int >= 1 (default=3)
+# balanced: 3 | full: 1
+# Evaluates goal every N phases (3 = balanced cadence; 1 = every phase) (US-0107 compose).
+#
+# SOVEREIGN_DRAIN_AUTO_ACCEPT: 0|1 (default=0)
+# balanced: ON | full: ON
+# Auto-accepts drain candidates below medium risk tier (Q5) (US-0107 compose).
+#
+# RELEASE_PUBLISH_AUTO_CONFIRM: 0|1 (default=0)
+# balanced: OFF | full: OFF
+# Auto-confirms publish targets when in RELEASE_TARGETS_ALLOWLIST (Q6) (US-0054 compose).
+#
+# AUTONOMY_REPAIR_CAP_OVERRIDE: int >= 1 or empty (default=empty)
+# Operator override for per-run repair cap (empty = use matrix default cap=3 per DEC-0119 Â§5).
+AUTONOMY_PRESET=none
+AUTONOMY_STOP_POLICY=block
+INTAKE_AUTONOMY_MODE=0
+INTAKE_MINIMAL_PACK=0
+INTAKE_ASSUME_STACK_CONTEXT=0
+WORK_KIND_AUTO_ACCEPT=0
+CROSS_MODEL_REWORK_EXHAUSTED_POLICY=block
+CROSS_MODEL_SKIP_PHASES=
+RESUME_BRIEF_AUTO_REFRESH=0
+RUNTIME_PROOF_KIND=strict
+GOAL_CONVERGENCE_INTERVAL=3
+SOVEREIGN_DRAIN_AUTO_ACCEPT=0
+RELEASE_PUBLISH_AUTO_CONFIRM=0
+AUTONOMY_REPAIR_CAP_OVERRIDE=

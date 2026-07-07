@@ -1,0 +1,34 @@
+{
+  "story_id": "US-0115",
+  "orchestrator_run_id": "auto-20260704-01",
+  "phase": "uat (qa-phase, documentation story)",
+  "verdict": "PASS",
+  "uat_steps": [
+    {
+      "id": "UAT-1",
+      "description": "All internal anchor links in new sections resolve (no broken #anchor references)",
+      "status": "PASS",
+      "detail": "7 #### US-xxxx subsections nest correctly under ### Integration & observability umbrella (L1476/L1498/L1521/L1548/L1569/L1601/L1636); ### Integration & observability keys sub-block nests under ### Full scratchpad reference (L1878 after US-0114's ### Release & distribution keys at L1806); cross-link pointers reference real sibling blocks (### Release & distribution keys at L1806, ### Sovereign-loop era keys at L1682). No broken #anchor references detected (cross-links use prose references to section titles)."
+    },
+    {
+      "id": "UAT-2",
+      "description": "README renders without markdown errors",
+      "status": "PASS",
+      "detail": "Heading hierarchy consistent: ## Commands and workflow (h2) -> ### Integration & observability (h3 umbrella) -> #### US-xxxx (h4 subsections). No h-level jumps. ### Integration & observability keys sub-block uses #### US-xxxx — <topic> keys (h4) — consistent with US-0113 and US-0114 conventions. Bullet lists, code spans, and emphasis render correctly (visual inspection)."
+    },
+    {
+      "id": "UAT-3",
+      "description": "Table of contents includes new umbrella section (if TOC present)",
+      "status": "PASS",
+      "detail": "README does not ship a generated TOC; the catalog anchor <!-- readme-feature-coverage-catalog --> (L63) remains UNCHANGED per US-0091 compose guard. New narrative sections live outside the catalog block (per sprint plan). No TOC update required."
+    },
+    {
+      "id": "UAT-4",
+      "description": "Cross-link pointer rows reference canonical blocks without duplicating key documentation",
+      "status": "PASS",
+      "detail": "DELIVERY_MODE overlap cross-link pointer (L2008-L2015) references US-0114's ### Release & distribution keys block without re-documenting DELIVERY_MODE defaults. MODEL_TIER overlap cross-link pointer (L2017-L2024) references US-0113's ### Sovereign-loop era keys block without re-documenting MODEL_TIER. REMOTE_EXECUTION family grouped cross-link (L1983-L1990) references main reference list above L1410 without duplicate rows."
+    }
+  ],
+  "fresh_context_marker": "qa-US0115-qa-20260704T063749Z-fresh",
+  "timestamp": "2026-07-04T06:37:49Z"
+}

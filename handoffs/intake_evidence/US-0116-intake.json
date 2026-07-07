@@ -1,0 +1,32 @@
+{
+  "work_item_id": "US-0116",
+  "intake_timestamp": "2026-07-03T21:09:30Z",
+  "original_request": "Add operator documentation for delivery & lifecycle features",
+  "refined_request": "(decomposed from US-0113 scope broadening request)",
+  "clarifying_questions": [],
+  "questions_asked": [
+    "Which delivery & lifecycle features are missing operator documentation?",
+    "What is the scope of the documentation gap?"
+  ],
+  "evidence": [
+    {
+      "type": "quoted_user_text",
+      "content": "erweitere den letzten intake die US-113 darum, das alle fehlenden erweiterten feature beschriebungen ins readme erweitert werdden müssen, nicht nur die 'sovereign-loop era (US-0103–US-0112)'"
+    },
+    {
+      "type": "analysis",
+      "content": "Feature audit identified delivery & lifecycle family: US-0092 (full-autonomy mode), US-0095 (auto-continue), US-0098 (auto-bootstrap dev-environment), US-0099 (dev-environment auto-launch profile) need operator-facing documentation in the framework README"
+    }
+  ],
+  "acceptance_criteria": [
+    "AC-1: Delivery & lifecycle umbrella section under Commands & workflow",
+    "AC-2: Per-feature operator subsections for US-0092/US-0095/US-0098/US-0099",
+    "AC-3: Full scratchpad reference extension with delivery & lifecycle keys",
+    "AC-4: Coverage preserved",
+    "AC-5: Framework README parity (active = template)",
+    "AC-6: Audience & metadata hygiene",
+    "AC-7: Runbook cross-links",
+    "AC-8: Regression tests"
+  ],
+  "decomposition_rationale": "Vertical slice by functional family; delivery & lifecycle shares operator workflows"
+}

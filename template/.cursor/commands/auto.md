@@ -287,6 +287,19 @@ Role reason codes: `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`.
 from precedence: argv `delivery-mode=` → backlog row `delivery_mode` (when
 `AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`) → scratchpad `DELIVERY_MODE` → **`standard`**.
 
+### Work-kind routing hook (US-0118 / DEC-0118) — step 0a
+
+When `WORK_KIND_ROUTING=1` (default `0` — zero overhead when off), step 0
+calls `scripts/work_kind_routing_lib.resolve_delivery_mode_with_work_kind(...)`
+**after** the existing delivery-mode resolver. The hook implements the **L8
+precedence chain**: `start-from` (always wins) > explicit `DELIVERY_MODE` >
+explicit `AUTO_PHASE_*` > `WORK_KIND_ROUTING`-derived > current default.
+When `WORK_KIND_ROUTING=0`, the hook is a no-op (early-return
+`(standard, full_plan, "WORK_KIND_ROUTING_OFF")` — byte-identical to
+pre-US-0118). When both `WORK_KIND_ROUTING=1` and explicit `DELIVERY_MODE`
+are set, explicit wins and `WORK_KIND_DELIVERY_MODE_CONFLICT` is emitted.
+The classifier reuses `scripts/dev_environment_lib.classify_touched_files`
+(tier A/B/C + `TIER_C_SKIP_PREFIXES`) — import, do not reinvent (Q9 LOCKED).
 | `delivery_mode` | `resolved_phase_plan` | `reinstatement_mode` | `memory_layer` |
 |-----------------|----------------------|---------------------|----------------|
 | `standard` | Full **DEC-0052** chain | `dec0052_default` | `standard` |
@@ -311,7 +324,7 @@ Four macro-phases — **no** eleven-phase reinstatement when `delivery_mode=ultr
 | **`spec`** | intake + discovery | **po** |
 | **`plan`** | research + architecture + sprint-plan | **tech-lead** |
 | **`build+verify`** | execute + qa + verify-work | **dev** / **qa** |
-| **`ship`** | release + refresh-context | **release** / **curator** |
+| **`ship`** | release + closure + refresh-context | **release** / **qe** / **curator** |
 
 **`AUTO_IMPLEMENTATION_LOOP`** preserved inside **`build+verify`**. QA merges AC checklist + UAT
 in one spawn.
@@ -340,7 +353,7 @@ Treat **resolved phase plan** as fail-closed schedule from merged scratchpad **b
 resume / `start-from` intersection. Canonical lifecycle:
 
 `intake` → `discovery` → `research` → `architecture` → `sprint-plan` →
-`plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+`plan-verify` → `execute` → `qa` → `verify-work` → `release` → `closure` → `refresh-context`
 
 Selectors and reinstatement: see reference. Phase-plan reason codes include
 `PHASE_POLICY_CONFLICT`, `PHASE_PLAN_UNKNOWN_PHASE`, `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`.
@@ -447,7 +460,7 @@ Phase-completion boundary evaluation only. **Guarded auto-push eligibility chain
 ## Canonical `start-from` phase IDs
 
 `intake`, `discovery`, `research`, `architecture`, `sprint-plan`, `plan-verify`,
-`execute`, `qa`, `verify-work`, `release`, `refresh-context` — aliases invalid.
+`execute`, `qa`, `verify-work`, `release`, `closure`, `refresh-context` — aliases invalid.
 
 ## Deterministic resume-source precedence
 
@@ -621,3 +634,34 @@ applies for `/auto` continuation.
 
 Follow `docs/engineering/artifact-ordering-policy.md` (`state.md` append-bottom, etc.);
 `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` fail-closed.
+
+## Autonomy presets (US-0119 / DEC-0119)
+
+Default-off autonomy preset expansion + stop-policy dispatch layer.
+
+When `AUTONOMY_PRESET={none|balanced|full}` is set (default `none`), the orchestrator
+calls `scripts/autonomy_preset_lib.expand_autonomy_preset(preset, overrides)` before
+phase dispatch to expand the single preset flag into 8 (balanced) or 12 (full) per-feature
+autonomy flags. Precedence: explicit per-flag override in scratchpad always wins over
+preset expansion. Expansion is deterministic; no LLM, no network, no `.env` reads
+(R-0107 Q3 LOCKED).
+
+When `AUTONOMY_STOP_POLICY={block|auto_repair_then_block|auto_repair_then_skip}` is
+set (default `block`), stop dispatch classifies every fail-closed reason code as
+`security_hard` (never auto-resolved; block immediately — `auto_repair_kind=n/a`; cap=0)
+or `autonomy_resolvable` (bounded auto-repair permitted when policy != `block`; cap per
+(run, reason_code) from `scripts/data/autonomy_stop_matrix.yaml`; default 3 per Q3 LOCKED).
+
+When `AUTONOMY_STOP_POLICY != block`, bounded auto-repair attempts are logged to
+append-only ledger at `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl`.
+Cap exhaustion emits terminal stop `AUTONOMY_REPAIR_CAP_EXHAUSTED` (distinct from
+`BLOCK_RETRY_CAP_EXHAUSTED`; run-level vs story-level per Q9 LOCKED).
+
+Operator audit breadcrumb: `autonomy_relaxed: <reason_code> -> <auto_repair_kind>`
+emitted in `docs/engineering/state.md` at phase boundary (one line per soft-stop per
+Q10 LOCKED — not aggregated).
+
+Compose do-not-amend guards: `/intake`, `/execute`, `/qa`, `/release` consume US-0119
+flags additively; their pre-existing contract surfaces are NOT rewritten.
+`scripts/validate_autonomy_stop_matrix.py --self-test` enforces matrix invariants.
+Byte-stability surface at `its_magic/README.md` 7th sub-block `### Autonomy preset keys`.

@@ -1,0 +1,32 @@
+{
+  "work_item_id": "US-0115",
+  "intake_timestamp": "2026-07-03T21:09:30Z",
+  "original_request": "Add operator documentation for integration & observability features",
+  "refined_request": "(decomposed from US-0113 scope broadening request)",
+  "clarifying_questions": [],
+  "questions_asked": [
+    "Which integration & observability features are missing operator documentation?",
+    "What is the scope of the documentation gap?"
+  ],
+  "evidence": [
+    {
+      "type": "quoted_user_text",
+      "content": "erweitere den letzten intake die US-113 darum, das alle fehlenden erweiterten feature beschriebungen ins readme erweitert werdden müssen, nicht nur die 'sovereign-loop era (US-0103–US-0112)'"
+    },
+    {
+      "type": "analysis",
+      "content": "Feature audit identified integration & observability family: US-0034 (cross-repo observability), US-0084 (codebase map), US-0086 (multi-repo contracts), US-0093 (scratchpad drift), US-0096 (active context handoff), US-0101 (model tier), US-0102 (role-based model catalog) need operator-facing documentation in the framework README"
+    }
+  ],
+  "acceptance_criteria": [
+    "AC-1: Integration & observability umbrella section under Commands & workflow",
+    "AC-2: Per-feature operator subsections for US-0034/US-0084/US-0086/US-0093/US-0096/US-0101/US-0102",
+    "AC-3: Full scratchpad reference extension with integration & observability keys",
+    "AC-4: Coverage preserved",
+    "AC-5: Framework README parity (active = template)",
+    "AC-6: Audience & metadata hygiene",
+    "AC-7: Runbook cross-links",
+    "AC-8: Regression tests"
+  ],
+  "decomposition_rationale": "Vertical slice by functional family; integration & observability shares operator workflows"
+}

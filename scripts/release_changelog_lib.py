@@ -19,6 +19,15 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Sequence, Tuple
 
+# AUTONOMY_PRESET consumer wiring (US-0119 / DEC-0119):
+# RELEASE_AUTO_CONFIRM_ACCEPTANCE and RELEASE_PUBLISH_AUTO_CONFIRM are autonomy
+# flags controlled by AUTONOMY_PRESET. When AUTONOMY_PRESET != none,
+# expand_autonomy_preset merges per-feature defaults. Default AUTONOMY_PRESET=none
+# produces empty dict (byte-identical pre-US-0119 behaviour).
+AUTONOMY_PRESET_DEFAULT = "none"
+RELEASE_AUTO_CONFIRM_ACCEPTANCE = "RELEASE_AUTO_CONFIRM_ACCEPTANCE"
+RELEASE_PUBLISH_AUTO_CONFIRM = "RELEASE_PUBLISH_AUTO_CONFIRM"
+
 # Derivation precedence (documented L4 order — do not reorder without DEC revision)
 DERIVATION_PRECEDENCE: Tuple[str, ...] = (
     "sprint_notes_whats_new",

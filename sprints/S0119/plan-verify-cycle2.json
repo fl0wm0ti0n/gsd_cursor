@@ -1,0 +1,38 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa (plan-verify merged per ultra_lean)",
+  "role": "qa",
+  "qa_cycle": 2,
+  "fresh_context_marker": "qa-US0119-cycle2-20260705T234200Z-fresh",
+  "timestamp": "2026-07-05T23:42:00Z",
+  "verdict": "FAIL",
+  "task_tally": {
+    "pass": 4,
+    "partial": 3,
+    "fail": 5,
+    "total": 12,
+    "pass_rate": "33.3%"
+  },
+  "tasks": {
+    "T-anch": {"plan": "NO-OP", "cycle_1": "PASS", "cycle_2": "PASS", "delta": "NO_CHANGE"},
+    "T-001": {"plan": "autonomy_preset_lib.py", "cycle_1": "PASS", "cycle_2": "PASS", "delta": "NO_CHANGE"},
+    "T-002": {"plan": "scratchpad flags", "cycle_1": "PASS", "cycle_2": "PASS", "delta": "NO_CHANGE"},
+    "T-003": {"plan": "stop-matrix + YAML + validator", "cycle_1": "FAIL", "cycle_2": "PARTIAL", "delta": "IMPROVED (template mirrors now exist; validator still FAILS 350 violations, down from 1316)"},
+    "T-004": {"plan": "consumer wiring", "cycle_1": "FAIL", "cycle_2": "FAIL", "delta": "NO_CHANGE"},
+    "T-005": {"plan": "repair ledger", "cycle_1": "FAIL", "cycle_2": "FAIL", "delta": "NO_CHANGE"},
+    "T-006": {"plan": "breadcrumb", "cycle_1": "PASS", "cycle_2": "PASS", "delta": "NO_CHANGE"},
+    "T-007": {"plan": "contract tests 10 markers", "cycle_1": "FAIL", "cycle_2": "PARTIAL", "delta": "IMPROVED (file exists, 8/10 tests pass, 2/10 fail due to validator)"},
+    "T-008": {"plan": "README sub-block + parity --scope", "cycle_1": "FAIL", "cycle_2": "FAIL", "delta": "NO_CHANGE (README not modified; --scope not registered; parity script BROKEN in cycle 2)"},
+    "T-009": {"plan": "runbook + auto.md anchor + template", "cycle_1": "FAIL", "cycle_2": "FAIL", "delta": "NO_CHANGE"},
+    "T-010": {"plan": "installer manifest", "cycle_1": "FAIL", "cycle_2": "FAIL", "delta": "NO_CHANGE"},
+    "T-011": {"plan": "regression tests + byte proof", "cycle_1": "PARTIAL", "cycle_2": "PARTIAL", "delta": "NO_CHANGE (scratchpad parity still 2/4 FAIL pre-existing; parity script now BROKEN — new regression)"}
+  },
+  "composite_verdict": "FAIL",
+  "improvement_over_cycle_1": {
+    "tasks_moved_fail_to_partial": 2,
+    "tasks_moved_pass": 0,
+    "new_regressions": 1,
+    "note": "T-003 and T-007 moved FAIL → PARTIAL. T-008 regression introduced (parity script BROKEN)."
+  }
+}

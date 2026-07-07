@@ -1,0 +1,26 @@
+{
+  "sprint_id": "S-BUG0014",
+  "bug_id": "BUG-0014",
+  "orchestrator_run_id": "auto-20260703-01",
+  "verdict": "PASS",
+  "phase_id": "release",
+  "role": "release",
+  "timestamp": "2026-07-03T20:10:00Z",
+  "fresh_context_marker": "release-SBUG0014-BUG0014-20260703T201000Z-fresh",
+  "runtime_proof_id": "rp-auto-20260703-01-release-release-20260703T201000Z-BUG-0014",
+  "gates": {
+    "check_in_test": "pass",
+    "qa_completion": "pass",
+    "uat_completion": "pass",
+    "isolation_compliance": "pass",
+    "strict_runtime_proof": "pass",
+    "readme_feature_coverage_3f": "pass",
+    "project_readme_3g": "skipped"
+  },
+  "backlog_status": "DONE",
+  "acceptance_checked": true,
+  "queue_status": "released",
+  "blocking_findings": 0,
+  "next_phase": "/refresh-context",
+  "next_role": "curator"
+}

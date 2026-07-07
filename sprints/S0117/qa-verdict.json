@@ -1,0 +1,32 @@
+{
+  "story_id": "US-0117",
+  "sprint_id": "S0117",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "phase_id": "qa",
+  "verdict": "PASS",
+  "ac_coverage": "8/8",
+  "plan_verify_verdict": "PASS",
+  "execute_qa_verdict": "PASS",
+  "verify_work_verdict": "PASS",
+  "uat_verdict": "PASS",
+  "blocking_findings": [],
+  "non_blocking_findings": [
+    "T-anch NO-OP — 36 DC anchors + ## US-0117 section already added in /architecture phase per R-0105 Q-2 LOCKED; no execute-phase write to architecture.md (1-deletion in numstat is pre-existing line-ending change at L570)",
+    "R-0105 labeling discrepancy — backlog.md US-0117 summary line L3969 appears to swap US-0082 / US-0090 labels; dev followed runbook + DEC + architecture lock as canonical; no backlog.md edit (closure only at /release per US-0045); QA re-verified README labeling matches authoritative runbook + DEC + architecture lock",
+    "Encoding hygiene prerequisite carried from US-0114 — 185 stray 0xa7 bytes in working-tree backlog.md; did NOT block validator in QA re-verification; not a US-0117 blocker",
+    "Pre-existing fixture-path test failures (template/tests/scratchpad_example_parity_test.py + tests/readme_feature_coverage_fixtures_test.py 2 of 3 tests) — NOT introduced by US-0117, NOT US-0117 regression targets per T-006"
+  ],
+  "byte_stability_preserved": true,
+  "byte_stability_surface": "5th-story cumulative (US-0113 L2421 + US-0114 L2545 + US-0115 L2617 + US-0116 L2765 keys sub-blocks; US-0113 L940 + US-0114 L1225 + US-0115 L1410 + US-0116 L1665 umbrella sections — all 8 prior-released blocks byte-identical between its_magic and template)",
+  "parity_preserved": true,
+  "parity_proof": "PARITY_OK 191091 191091",
+  "scope_creep": "NONE",
+  "dc_resolution_verified": true,
+  "labeling_corrections_applied": 2,
+  "us_id_collision_resolved": 1,
+  "fresh_context_marker": "qa-US0117-qa-20260704T180010Z-fresh",
+  "timestamp": "2026-07-04T18:00:10Z",
+  "next_scheduled_phase": "release"
+}

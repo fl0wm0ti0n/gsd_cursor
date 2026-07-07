@@ -1,0 +1,116 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-05",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "cycle": 4,
+  "fresh_context_marker": "qa-US0119-cycle4-qa-20260705T222729Z-fresh",
+  "timestamp": "2026-07-05T22:27:29Z",
+  "timestamp_utc": "2026-07-05T22:27:29Z",
+  "verdict": "FAIL",
+  "blocking_findings_count": 7,
+  "non_blocking_findings_count": 3,
+
+  "test_gates": {
+    "gate_1_us0119_pytest": "PASS (10/10)",
+    "gate_2_scratchpad_parity_pytest": "FAIL (2/4)",
+    "gate_3_validate_autonomy_stop_matrix": "PASS (0 violations)",
+    "gate_4_autonomy_preset_lib_self_test": "PASS (6/6)",
+    "gate_5_autonomy_repair_ledger_self_test": "PASS",
+    "gate_6_validate_readme_feature_coverage": "PASS",
+    "gate_7_check_intake_template_parity": "FAIL (20083b vs 19994b)",
+    "gate_8_check_intake_template_parity_scope_us0119": "PASS",
+    "gate_9_validate_doc_profile": "PASS",
+    "gate_10_check_user_visible_metadata": "PASS (silent exit 0)",
+    "summary": "8/10 PASS, 2 FAIL"
+  },
+
+  "file_existence": {
+    "execute_summary_cycle4": "MISSING",
+    "execute_summary": "MISSING",
+    "repair_ledger_gitignore": "EXISTS",
+    "dev_to_qa_us0119_block": "MISSING (file has US-0118 not US-0119)",
+    "summary": "1/4 PASS, 3 FAIL"
+  },
+
+  "byte_parity": {
+    "its_magic_readme": "PARITY_OK 208101 208101",
+    "runbook": "PARITY_OK 185919 185919",
+    "auto_md": "PARITY_OK 37667 37667",
+    "installer_owned_paths_manifest": "PARITY_OK 3615 3615",
+    "check_intake_template_parity_py": "PARITY_FAIL 20083 19994",
+    "validate_autonomy_stop_matrix_py": "PARITY_OK 16535 16535",
+    "us0119_test_py": "PARITY_OK 7304 7304",
+    "summary": "6/7 PASS, 1 FAIL"
+  },
+
+  "consumer_wiring": {
+    "auto_md_heading": "PASS (found with extended DEC-0119 heading)",
+    "template_auto_md_heading": "PASS (PARITY_OK with active)",
+    "runbook_heading": "PASS (found with extended heading)",
+    "template_runbook_heading": "PASS (PARITY_OK with active)",
+    "sovereign_loop_lib_wiring": "FAIL (ZERO matches)",
+    "release_changelog_lib_wiring": "FAIL (ZERO matches)",
+    "installer_manifest_active": "PASS (4/4 rows)",
+    "installer_manifest_template": "PASS (4/4 rows PARITY_OK)",
+    "summary": "6/8 PASS (if strict heading match), 2 FAIL — or 8/8 PASS (if extended headings accepted)"
+  },
+
+  "compose_guards": {
+    "us0092": "UNCHANGED",
+    "us0095": "UNCHANGED",
+    "us0056": "UNCHANGED",
+    "us0068": "UNCHANGED",
+    "us0096": "UNCHANGED",
+    "bug0007": "UNCHANGED",
+    "summary": "6/6 UNCHANGED"
+  },
+
+  "ac_coverage": {
+    "pass": 10,
+    "partial": 1,
+    "fail": 1,
+    "total": 12,
+    "details": {
+      "AC-1": "PASS", "AC-2": "PASS", "AC-3": "PASS", "AC-4": "PASS",
+      "AC-5": "PARTIAL (sovereign_loop_lib + release_changelog_lib un-wired)",
+      "AC-6": "PASS", "AC-7": "PASS", "AC-8": "PASS", "AC-9": "PASS",
+      "AC-10": "FAIL (scratchpad parity 2/4 FAIL + intake parity FAIL)",
+      "AC-11": "PASS", "AC-12": "PASS"
+    }
+  },
+
+  "task_tally": {
+    "pass": 8,
+    "partial": 0,
+    "fail": 4,
+    "total": 12,
+    "failed_tasks": ["T-004 (wiring)", "T-008 (parity)", "T-011 (regression)", "execute-summary (MISSING)"]
+  },
+
+  "blocking_findings": [
+    "B1: scratchpad_example_parity_test.py 2/4 FAIL (BUG-0013 regression at line 181)",
+    "B2: check_intake_template_parity.py active vs template PARITY_FAIL (20083b vs 19994b)",
+    "B3: execute-summary.md MISSING",
+    "B4: handoffs/dev_to_qa.md NOT updated for US-0119 cycle 4",
+    "B5: sovereign_loop_lib.py has ZERO autonomy preset wiring",
+    "B6: release_changelog_lib.py has ZERO autonomy preset wiring",
+    "B7: scratchpad.local.example.md active/template 82-line divergence (regression)"
+  ],
+
+  "non_blocking_findings": [
+    "N1: Heading format variance (US-0119 / DEC-0119 included in heading — cosmetic)",
+    "N2: BUG-0013 test failures pre-existing but US-0119 did not restore parity regression target",
+    "N3: execute-summary naming convention (no cycle suffix for canonical file)"
+  ],
+
+  "decision_gate": true,
+  "next_scheduled_phase": "/execute (dev cycle 5 — FINAL cycle)",
+  "escalation_note": "Cycle 5 is final per AUTO_LOOP_MAX_CYCLES=5. If cycle 5 QA also FAIL → decision gate escalation to operator for manual intervention or relaxed acceptance criteria.",
+
+  "runtime_proof_id": "rp-us0119-s0119-qa-cycle4-qa-2026-07-05T22:27:29Z",
+  "proof_hash": "f5f2abced05b6c2488a0142d913085ab4f84384b190f2b950457d1d0b9a2db33"
+}

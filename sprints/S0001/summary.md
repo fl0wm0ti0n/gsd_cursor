@@ -1,5 +1,19 @@
 # Sprint S0001 — Summary
 
+## Context refresh pack (2026-07-03 — post S-BUG0014 / BUG-0014)
+
+- Latest released sprint: **`S-BUG0014`** for **`BUG-0014`** (README feature coverage catalog + legacy
+  release_notes backfill; **`R-0100`** delivered; no companion DEC); lifecycle completed under
+  `orchestrator_run_id=auto-20260703-01`.
+- Triad **`/refresh-context`**: two-pass rollover — pass-1 moved 15 state units →
+  `docs/engineering/state-archive/state-pack-20260703.md` and 1 po_to_tl unit →
+  `handoffs/archive/po-to-tl-pack-20260703.md`; pass-2 moved 2 state units →
+  `state-pack-20260703-a.md`; final **`--check`** **PASS** (see refresh-context terminal
+  checkpoint in `docs/engineering/state.md`).
+- Portfolio: **0 OPEN** bugs, **0 OPEN** stories — drain **terminated**; **`next_action=no_active_work`**.
+- Compact decision index: `docs/engineering/decisions.md` — **Current context pack
+  (2026-07-03 — post-release S-BUG0014 / BUG-0014)**.
+
 ## Goal
 
 Implement Smart Upgrade Mode (US-0018) and document empty runbook commands (US-0015).

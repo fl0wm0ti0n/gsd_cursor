@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "tiers": {
+    "cheap": "qwen-3.7-plus",
+    "balanced": "qwen-3.7-plus",
+    "strong": "glm-5.2"
+  },
+  "roles": {
+    "po": "glm-5.2",
+    "sa": "glm-5.2",
+    "dev": "qwen-3.7-plus",
+    "dev_difficult": "kimi-k2.7-code",
+    "qa": "glm-5.2",
+    "security": "glm-5.2",
+    "release": "glm-5.2"
+  },
+  "notes": "Role-based budget preset (US-0102 / DEC-0087). Maximum price/performance: Qwen3.7 Plus for DEV (cheapest option), GLM-5.2 for all quality gates (PO/SA/QA/Security/Release), Kimi K2.7 Code only for difficult DEV tasks. Based on ai_modell_auslegung_cursor_highend.md 'Beste Preis/Leistungs-Variante'. Copy to .cursor/model-catalog.local.json and set MODEL_RESOLVE=role_catalog."
+}

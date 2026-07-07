@@ -16,6 +16,7 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=sovereign-parallel-dev DEC-0108 parallel instance arbitrage surfaces (US-0108).
   --scope=sovereign-self-healing-deploy DEC-0109 self-healing deploy loop surfaces (US-0109).
   --scope=release-trigger-adapter DEC-0111 release trigger adapter surfaces (US-0111).
+  --scope=us-0119               DEC-0119 autonomous-autonomy preset surfaces (US-0119).
   --scope=all              union of all tables.
 """
 
@@ -409,12 +410,51 @@ RELEASE_TRIGGER_ADAPTER_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
-# US-0112 model-catalog example preset delivery manifest byte-parity
-MODEL_CATALOG_EXAMPLE_PAIRS: tuple[tuple[str, str], ...] = (
+# DEC-0118 §6 / US-0118 — Work-kind routing surface pairs. Contents must
+# be byte-identical between active and template paths; installer delivers
+# template copies (BUG-0003 / DEC-0066). 6 surface pairs per R-0106 Q6
+# LOCKED. Note: scratchpad key parity is structural (key presence) via
+# BUG-0013 test, NOT byte-parity (active scratchpad carries project-local
+# overrides like DELIVERY_MODE=ultra_lean that must not leak to template).
+WORK_KIND_ROUTING_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/work_kind_classify_lib.py",
+        "template/scripts/work_kind_classify_lib.py",
+    ),
+    (
+        "scripts/work_kind_routing_lib.py",
+        "template/scripts/work_kind_routing_lib.py",
+    ),
+    (
+        "tests/us0118_contract_test.py",
+        "template/tests/us0118_contract_test.py",
+    ),
+    (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+    (".cursor/commands/intake.md", "template/.cursor/commands/intake.md"),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
     (
         "docs/engineering/context/installer-owned-paths.manifest",
         "template/docs/engineering/context/installer-owned-paths.manifest",
     ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
+# DEC-0119 §6 / US-0119 — Autonomous-autonomy preset surfaces. Contents must
+# be byte-identical between active and template paths. 8 surface pairs.
+AUTONOMY_PRESET_PAIRS: tuple[tuple[str, str], ...] = (
+    ("scripts/autonomy_preset_lib.py", "template/scripts/autonomy_preset_lib.py"),
+    ("scripts/validate_autonomy_stop_matrix.py", "template/scripts/validate_autonomy_stop_matrix.py"),
+    ("docs/engineering/autonomy-stop-matrix.md", "template/docs/engineering/autonomy-stop-matrix.md"),
+    ("docs/engineering/context/installer-owned-paths.manifest", "template/docs/engineering/context/installer-owned-paths.manifest"),
+    ("docs/engineering/runbook.md", "template/docs/engineering/runbook.md"),
+    (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+    ("tests/us0119_autonomy_preset_test.py", "template/tests/us0119_autonomy_preset_test.py"),
 )
 
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
@@ -436,7 +476,8 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "sovereign-parallel-dev": SOVEREIGN_PARALLEL_DEV_PAIRS,
     "sovereign-self-healing-deploy": SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS,
     "release-trigger-adapter": RELEASE_TRIGGER_ADAPTER_PAIRS,
-    "model-catalog-examples": MODEL_CATALOG_EXAMPLE_PAIRS,
+    "work-kind-routing": WORK_KIND_ROUTING_PAIRS,
+    "us-0119": AUTONOMY_PRESET_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -455,7 +496,8 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + SOVEREIGN_ROLE_MANIFEST_PAIRS
         + SOVEREIGN_SELF_HEALING_DEPLOY_PAIRS
         + RELEASE_TRIGGER_ADAPTER_PAIRS
-        + MODEL_CATALOG_EXAMPLE_PAIRS
+        + WORK_KIND_ROUTING_PAIRS
+        + AUTONOMY_PRESET_PAIRS
     ),
 }
 

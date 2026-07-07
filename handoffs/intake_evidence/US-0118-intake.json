@@ -1,0 +1,103 @@
+{
+  "selected_pack": "first-intake-pack",
+  "intake_run_id": "cursor-20260704-US0118-intake",
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Operator pain: every US-xxxx story currently runs the full canonical lifecycle (architecture, qa, verify-work, ...) even for a simple README update. Need work-kind classification so small items skip overhead.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260704-US0118-intake:0:1e2ed061db745e29"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Target: this its-magic repo (Cursor IDE) plus consumer repos installed via its-magic; CI/headless parity preserved via existing outer-driver fallback.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260704-US0118-intake:1:261c16c9b5b05e5e"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Pure Python stdlib scripts (scripts/*.py) plus markdown command files (.cursor/commands/*.md) plus scratchpad flags plus backlog/acceptance row fields. No new runtime.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260704-US0118-intake:2:1e43e29def83707a"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Default-off additive WORK_KIND_ROUTING scratchpad flag; composes with US-0096 delivery modes, US-0070 phase selection, US-0078 intake evidence, US-0051 decomposition. Operator accept/override before write.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260704-US0118-intake:3:3b9a998abed3541a"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "No GUI. Operator surface = backlog row fields (work_kind, recommended_delivery_mode) + state.md breadcrumb + intake-time accept/override prompt + CLI classifier self-test.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260704-US0118-intake:4:d934a5f9cb346a1f"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Standard its-magic hygiene only: no .env reads, no secret surface; classifier sees prose + touched-file hints (names-only); optional audit trail via US-0103 AI decision ledger.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 5,
+      "ref": "ie:cursor-20260704-US0118-intake:5:4e16d8db91661155"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Deterministic + fail-closed reason codes; zero overhead when WORK_KIND_ROUTING=0; explicit precedence vs DELIVERY_MODE and AUTO_PHASE_* (explicit operator flags win).",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 6,
+      "ref": "ie:cursor-20260704-US0118-intake:6:8274784440d6cce2"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story, one vertical slice: classifier lib + scratchpad flag + intake integration + /auto integration + reason codes + tests + parity shipped together.",
+      "intake_run_id": "cursor-20260704-US0118-intake",
+      "turn_index": 7,
+      "ref": "ie:cursor-20260704-US0118-intake:7:c3a068a22f6bfdb2"
+    }
+  ],
+  "candidate_story_ids": [
+    "US-0118"
+  ],
+  "story_ids": [
+    "US-0118"
+  ],
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "work-kind-classifier",
+      "title": "Work-kind classifier + tiered delivery routing (US-0118)"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "work-kind-classifier",
+      "story_ids": [
+        "US-0118"
+      ]
+    }
+  ],
+  "coverage_complete": true
+}

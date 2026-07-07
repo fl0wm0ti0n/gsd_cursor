@@ -22,6 +22,7 @@ At the end of `/execute`, append an isolation evidence entry to
 - `fresh_context_marker=<new marker for this subagent>`
 - `timestamp=<ISO UTC>`
 - `evidence_ref=<primary output ref>` (recommended: `handoffs/dev_to_qa.md` and the target sprint `sprints/Sxxxx/summary.md`)
+- `model_id=<resolved model slug or alias>` — **required when `CROSS_MODEL_REVIEW=1`** (US-0104 v2 additive extension); omit when `CROSS_MODEL_REVIEW=0`. Missing → fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`**.
 
 In an execute↔QA implementation loop (`AUTO_IMPLEMENTATION_LOOP=1`), each new
 `/execute` cycle must have a new `fresh_context_marker` (marker reuse is treated
@@ -32,6 +33,10 @@ as stale isolation evidence).
 - **Narrow-read (US-0053 / US-0096 Tranche A)**: Start at docs/engineering/phase-context.md
   and the story section anchor in vision/architecture/decisions when a heading exists; forbid
   full-file reads when a section heading exists.
+- **Sovereign memory digest (US-0105 / DEC-0105)**: When merged scratchpad `SOVEREIGN_MEMORY=1`,
+  spawn assembler appends read-only **`sovereign_memory_digest`** block after phase-context
+  narrow-read and before role instructions via `build_injection_digest_block(...)` from
+  `scripts/sovereign_memory_lib.py`. Zero overhead when `SOVEREIGN_MEMORY=0` (default).
 - `sprints/S0001/tasks.md`
 - `handoffs/tl_to_dev.md`
 - Optional: `handoffs/qa_to_dev.md` when fixing QA findings
@@ -340,4 +345,25 @@ Reason codes: **`UAT_BROWSER_UNAVAILABLE`**, **`UAT_BROWSER_PROBE_FAILED`**,
    - Orthogonal to step **18** (**US-0065**) runtime QA autopilot and step **17** (**US-0084**)
      remote cues (compose when both fire).
    - Active + `template/.cursor/commands/execute.md` byte-identical step **24** block.
+
+25. Cross-model critic evidence tuple (US-0104 / DEC-0104):
+   - **25 preamble**: Read merged scratchpad `CROSS_MODEL_REVIEW` (default `0`). When `0`,
+     skip **25a** with zero overhead — no `critic_evidence` block required.
+   - **25a Handoff block**: When `CROSS_MODEL_REVIEW=1`, append fenced JSON under
+     **`### critic_evidence`** in `handoffs/dev_to_qa.md` using
+     `build_critic_evidence_block(...)` from `scripts/sovereign_critic_lib.py`:
+     `producer_model_id`, `critic_model_id`, `anti_slop_aggregate`, `rework_generation`,
+     `degraded_mode`, `findings_path`.
+   - Isolation evidence for `/execute` must include **`model_id`** on the producer row when
+     critic is enabled (see Isolation evidence write requirement above).
+   - Active + `template/.cursor/commands/execute.md` byte-identical step **25** block.
+
+26. Sovereign memory mistake hook — revert/rollback (US-0105 / DEC-0105):
+   - **26 preamble**: Read merged scratchpad `SOVEREIGN_MEMORY` (default `0`). When `0`, skip
+     with zero overhead.
+   - **26a Revert path**: When git revert or rollback is applied during execute findings
+     remediation, call `record_mistake_hook(mistake_tag="revert_applied", ...)` from
+     `scripts/sovereign_memory_lib.py` with `failure_reason_code=REVERT_APPLIED`. Optional
+     `provenance_ref` may cite ledger context (**US-0103** read-only — do not mutate ledger schema).
+   - Active + `template/.cursor/commands/execute.md` byte-identical step **26** block.
 

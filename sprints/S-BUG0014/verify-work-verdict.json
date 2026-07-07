@@ -1,0 +1,21 @@
+{
+  "sprint_id": "S-BUG0014",
+  "bug_id": "BUG-0014",
+  "verdict": "PASS",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "blocking_findings": 0,
+  "ac_satisfied": 4,
+  "ac_total": 4,
+  "ac_list": ["AC-1", "AC-2", "AC-3", "AC-4"],
+  "compose_guards_verified": 16,
+  "compose_guards_total": 16,
+  "compose_guards": ["US-0091", "US-0097", "US-0040", "US-0100", "US-0101", "US-0102", "US-0103", "US-0104", "US-0105", "US-0106", "US-0107", "US-0108", "US-0109", "US-0110", "US-0111", "US-0112"],
+  "discrepancies_vs_qa": "NONE",
+  "ready_for_release": true,
+  "next_phase": "/release",
+  "timestamp": "2026-07-03T20:05:00Z",
+  "orchestrator_run_id": "auto-20260703-01",
+  "fresh_context_marker": "qa-BUG0014-verify-work-20260703T200500Z-fresh",
+  "runtime_proof_id": "rp-auto-20260703-01-verify-work-qa-20260703T200500Z-BUG-0014"
+}

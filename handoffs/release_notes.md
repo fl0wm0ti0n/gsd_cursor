@@ -11,6 +11,126 @@ Canonical queue state now lives under:
 
 ---
 
+## Release finalized note (S0118)
+
+- Sprint: `S0118`
+- Story: `US-0118` (Work-kind classification + tiered delivery routing per story)
+- Release: **finalized** (`2026-07-05T00:20:00Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-US0118-release-20260705T002000Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260705T002000Z-US-0118`)
+- Queue: **`handoffs/release_queue.md`** row **`S0118`** = **`released`** (out-of-band; documentation+code story, default-off feature, no version bump)
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed in 0.10s; `python -m pytest tests/us0118_contract_test.py -v` → 13 passed in 0.10s (17 total); `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` exit 0 (`coverage_missing=[]`); `python scripts/validate_doc_profile.py --repo .` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check-user-visible-metadata.py --repo .` → exit 0 (silent PASS); `python scripts/check_intake_template_parity.py --repo .` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `python scripts/check_intake_template_parity.py --scope work-kind-routing --repo .` → `[INTAKE_TEMPLATE_PARITY_OK] scope=work-kind-routing`; `python scripts/work_kind_classify_lib.py --self-test` → `[WORK_KIND_CLASSIFY_SELF_TEST_OK]` exit 0; `python scripts/work_kind_routing_lib.py --self-test` → `[WORK_KIND_ROUTING_SELF_TEST_OK]` exit 0; `python -c "...PARITY_OK..."` → `PARITY_OK 203287 203287` (byte-identical). See **`handoffs/releases/S0118-release-notes.md`** **## Validator outputs**.
+- ACs satisfied: **12/12** (AC-1 classifier lib, AC-2 doc/mini/code rules + Q1 tie-break, AC-3 `WORK_KIND_ROUTING=0` default-off + zero-overhead-when-off, AC-4 backlog row fields, AC-5 `/intake` step 4b hook + operator accept/override, AC-6 `/auto` step 0a hook + L8 precedence, AC-7 6 `WORK_KIND_*` reason codes + remediation, AC-8 compose-do-not-amend 6/6 read-only consumers + 23/23 compose guards UNCHANGED + `dev_environment_lib.py` IMPORT only (Q9 LOCKED), AC-9 13 `test_us0118_*` markers + `--scope=work-kind-routing` parity, AC-10 `## US-0118` h1 anchor at architecture.md L1713 (T-anch NO-OP / verification), AC-11 runbook h2 + `/auto` + `/intake` prose, AC-12 `--self-test` exits 0 + installer manifest triple-installer parity)
+- Compose guards: **23/23 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062 — additive-only; US-0118 itself does NOT become a NEW compose guard — it's a routing primitive)
+- Files shipped: `scripts/work_kind_classify_lib.py` (NEW) + `template/scripts/work_kind_classify_lib.py` (NEW), `scripts/work_kind_routing_lib.py` (NEW) + `template/scripts/work_kind_routing_lib.py` (NEW), `tests/us0118_contract_test.py` (NEW) + `template/tests/us0118_contract_test.py` (NEW), `its_magic/README.md` (umbrella + operator subsection + scratchpad ref extension; pure addition +2333 / 0 deletions), `template/its_magic/README.md` (byte-sync per AC-5/AC-9), `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` (`## Work-kind routing (US-0118 / DEC-0118)` h2 L3579), `.cursor/commands/auto.md` + `template/.cursor/commands/auto.md` (step 0a hook L292–L300), `.cursor/commands/intake.md` + `template/.cursor/commands/intake.md` (step 4b hook L246+), `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md` + `.cursor/scratchpad.local.example.md` (`WORK_KIND_ROUTING=0` + `WORK_KIND_TIE_BREAK=highest_tier_wins` keys L188–L199), `docs/engineering/context/installer-owned-paths.manifest` + `template/docs/engineering/context/installer-owned-paths.manifest` (both new scripts listed in `[install_include_paths]` + `[clean_paths]` + `[required_install_script_paths]`), `scripts/check_intake_template_parity.py` + `template/scripts/check_intake_template_parity.py` (`WORK_KIND_ROUTING_PAIRS` (8 byte-identical pairs) + `--scope=work-kind-routing` flag)
+- US-0113/US-0114/US-0115/US-0116/US-0117 byte-stability preserved (**6th-story cumulative surface — first 6-cumulative-surface story**; US-0118 adds net-new-keys-only + cross-link-pointers + reason-code-only entries to its own 6th sub-block; never edits US-0113's L2421, US-0114's L2545, US-0115's L2617, US-0116's L2765, or US-0117's L2856 blocks; pure addition 2333 insertions / 0 deletions confirmed via `git diff --stat HEAD -- its_magic/README.md`; `PARITY_OK 203287 203287` authoritative end-to-end proof; pattern now scales from quint to sextet)
+- `## US-0118` section resolved in `/architecture` phase (T-anch NO-OP / verification per R-0105 Q-2 LOCKED — no execute-phase write to architecture.md; anchor confirmed at L1713)
+- `dev_environment_lib.py` NOT modified (Q9 LOCKED import contract — `TIER_C_SKIP_PREFIXES` + `classify_touched_files` imported, not reimplemented; contract test `test_us0118_classify_touched_files_reuse` enforces the boundary; PASS)
+- Backward compatibility: `WORK_KIND_ROUTING=0` default-off + early-return + `/intake` step 5 skip; contract test `test_us0118_default_off_zero_overhead` asserts byte-identical-to-pre-US-0118 behavior — PASS
+- No packaging version bump (documentation+code story released out-of-band; default-off feature — no installer-visible behavior change; S0117 precedent — S0113..S0117 all shipped without bump); no `its_magic/.its-magic-version` change (remains `0.1.3-3`); no chocolatey `.nupkg`/`.nuspec` changes; no homebrew `.rb` formula changes
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- Drain-advance note: 1 story shipped this cycle; backlog drain active. **US-0108 status-drift** flagged as non-blocking finding for operator awareness (US-0108 shipped via `sprints/S0108/release-verdict.json` but its `docs/product/backlog.md` row was never flipped OPEN→DONE — US-0045 status authority drift; reconcile separately)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase per ultra_lean) for segment closeout; backlog drain continues with drain-advance to next OPEN story or drain-complete terminal
+
+## Release finalized note (S0117)
+
+- Sprint: `S0117`
+- Story: `US-0117` (Phase & role governance operator documentation in framework README)
+- Release: **finalized** (`2026-07-04T20:12:10Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-US0117-release-20260704T201210Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260704T201210Z-US-0117`)
+- Queue: **`handoffs/release_queue.md`** row **`S0117`** = **`released`** (out-of-band; documentation-only, no version bump)
+- **Drain-complete note**: **5/5 stories shipped** (US-0113, US-0114, US-0115, US-0116, US-0117). All 5 documentation families complete. Drain queue now EMPTY (0 stories remaining).
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed in 0.10s; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` exit 0 (`coverage_missing=[]`); `python scripts/validate_doc_profile.py --repo .` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check-user-visible-metadata.py --repo .` → exit 0 (silent PASS); `python scripts/check_intake_template_parity.py --repo .` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `python -c "...PARITY_OK..."` → `PARITY_OK 191091 191091` (AC-5 byte-identical). See **`handoffs/releases/S0117-release-notes.md`** **## Validator outputs**.
+- ACs satisfied: **8/8** (AC-1 umbrella `### Phase & role governance` at L1864, AC-2 18 subsections US-0069→US-0090, AC-3 scratchpad ref extension 46 net-new keys + 9 reason-code-only + 7 prose-only + cross-link pointers at L2856, AC-4 coverage preserved, AC-5 framework README parity, AC-6 metadata hygiene, AC-7 18 runbook cross-links, AC-8 regression tests)
+- Compose guards: **23/23 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062 — documentation-only)
+- Files shipped: `its_magic/README.md` (umbrella + 18 subsections + scratchpad ref extension; pure addition +2188 / 0 deletions), `template/its_magic/README.md` (byte-sync per AC-5)
+- US-0113/US-0114/US-0115/US-0116 byte-stability preserved (5th-story cumulative surface — first 5-cumulative-surface story; net-new keys + cross-link pointers + reason-code-only + prose-only entries only; no edits to US-0113's L2421, US-0114's L2545, US-0115's L2617, or US-0116's L2765 blocks)
+- 36 DC anchors + `## US-0117` section resolved in `/architecture` phase (final deferred-candidate resolution point — T-anch in S0117 = NO-OP / verification)
+- 2 labeling corrections applied (US-0082 = "Codebase map" NOT "Input compression"; US-0090 = "Caveman input compression" NOT "Phase governance integration")
+- 1 US-id collision resolved (US-0089 = "Auto orchestration" NOT "Caveman mode" per `/architecture` lock)
+- No packaging version bump (documentation-only); no `its_magic/.its-magic-version` change; no chocolatey/homebrew changes
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase) for segment closeout; backlog drain queue **EMPTY** (0 stories remaining — final story in 5-story drain shipped)
+
+## Release finalized note (S0116)
+
+- Sprint: `S0116`
+- Story: `US-0116` (Delivery & lifecycle operator documentation in framework README)
+- Release: **finalized** (`2026-07-04T17:51:00Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-US0116-release-20260704T175100Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260704T175100Z-US-0116`)
+- Queue: **`handoffs/release_queue.md`** row **`S0116`** = **`released`** (out-of-band; documentation-only, no version bump)
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed in 0.09s; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` exit 0 (`coverage_missing=[]`); `python scripts/validate_doc_profile.py --repo .` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check-user-visible-metadata.py --repo .` → exit 0 (silent PASS); `python scripts/check_intake_template_parity.py --repo .` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `python -c "...PARITY_OK..."` → `PARITY_OK 145485 145485` (AC-5 byte-identical). See **`handoffs/releases/S0116-release-notes.md`** **## Validator outputs**.
+- ACs satisfied: **8/8** (AC-1 umbrella `### Delivery & lifecycle` at L1665, AC-2 4 subsections US-0092→US-0095→US-0098→US-0099, AC-3 scratchpad ref extension 2 net-new keys + 5 reason-code-only entries + grouped cross-link pointers + cross-link to US-0114 L1806 + cross-link to US-0115 L1878 at L2225, AC-4 coverage preserved, AC-5 framework README parity, AC-6 metadata hygiene, AC-7 4 runbook cross-links, AC-8 regression tests)
+- Compose guards: **23/23 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062 — documentation-only)
+- Files shipped: `its_magic/README.md` (umbrella + 4 subsections + scratchpad ref extension; pure addition +1370 / 0 deletions), `template/its_magic/README.md` (byte-sync per AC-5)
+- US-0113/US-0114/US-0115 byte-stability preserved (4th-story cumulative surface — first 4-cumulative-surface story; cross-link pointers + reason-code-only entries + 2 net-new US-0098 key rows only; no edits to US-0113's L1682, US-0114's L1806, or US-0115's L1878 blocks)
+- DC-4 deferred to US-0117 (4 missing `# US-0092`/`# US-0095`/`# US-0098`/`# US-0099` h1 anchors in `architecture.md`; US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) + DC-4 (4) = 18 total)
+- No packaging version bump (documentation-only); no `its_magic/.its-magic-version` change; no chocolatey/homebrew changes
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase) for segment closeout; backlog drain continues with US-0117 (1 story remaining — inherits 18 architecture.md triad hygiene anchors)
+
+## Release finalized note (S0115)
+
+- Sprint: `S0115`
+- Story: `US-0115` (Integration & observability operator documentation in framework README)
+- Release: **finalized** (`2026-07-04T08:47:00Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-US0115-release-20260704T084700Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260704T084700Z-US-0115`)
+- Queue: **`handoffs/release_queue.md`** row **`S0115`** = **`released`** (out-of-band; documentation-only, no version bump)
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed in 0.06s; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` exit 0 (`coverage_missing=[]`); `python scripts/validate_doc_profile.py --repo .` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check-user-visible-metadata.py --repo .` → exit 0 (silent PASS); `python scripts/check_intake_template_parity.py --repo .` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `python -c "...PARITY_OK..."` → `PARITY_OK 128660 128660` (AC-5 byte-identical). See **`handoffs/releases/S0115-release-notes.md`** **## Validator outputs**.
+- ACs satisfied: **8/8** (AC-1 umbrella `### Integration & observability` at L1410, AC-2 7 subsections US-0034→US-0084→US-0086→US-0093→US-0096→US-0101→US-0102, AC-3 scratchpad ref extension net-new keys + cross-link pointers + reason-code-only entries at L1878, AC-4 coverage preserved, AC-5 framework README parity, AC-6 metadata hygiene, AC-7 7 runbook cross-links, AC-8 regression tests)
+- Compose guards: **23/23 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062 — documentation-only)
+- Files shipped: `its_magic/README.md` (umbrella + 7 subsections + scratchpad ref extension), `template/its_magic/README.md` (byte-sync per AC-5)
+- US-0113/US-0114 byte-stability preserved (3rd-story cumulative surface; cross-link pointers only; no edits to US-0113's L1682 or US-0114's L1806 blocks)
+- DC-3 deferred to US-0117 (7 missing `# US-xxxx` h1 anchors in `architecture.md`; US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) = 14 total)
+- No packaging version bump (documentation-only); no `its_magic/.its-magic-version` change; no chocolatey/homebrew changes
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase) for segment closeout; backlog drain continues with US-0116, US-0117 (2 stories remaining)
+
+## Release finalized note (S0114)
+
+- Sprint: `S0114`
+- Story: `US-0114` (Release & distribution operator documentation in framework README)
+- Release: **finalized** (`2026-07-04T07:12:00Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-S0114-US0114-20260704T071200Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260704T071200Z-US-0114`)
+- Queue: **`handoffs/release_queue.md`** row **`S0114`** = **`released`**
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` exit 0 (no new gaps); `python scripts/validate_doc_profile.py` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check_intake_template_parity.py` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `cmd /c fc /b its_magic\README.md template\its_magic\README.md` → no differences (AC-5 byte-identical). See **`handoffs/releases/S0114-release-notes.md`** **## Run** / **## Verify**.
+- ACs satisfied: **8/8** (AC-1 umbrella, AC-2 4 subsections US-0041→US-0062→US-0111→US-0112, AC-3 scratchpad ref extension net-new keys + cross-link pointers, AC-4 coverage preserved, AC-5 framework README parity, AC-6 metadata hygiene, AC-7 runbook cross-links, AC-8 regression tests)
+- Compose guards: **18/18 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0041, US-0062 — documentation-only)
+- Files shipped: `its_magic/README.md` (umbrella + 4 subsections + scratchpad ref extension), `template/its_magic/README.md` (byte-sync per AC-5)
+- US-0113 byte-stability preserved (cross-link pointers only; no edits to US-0113's umbrella or sovereign-loop keys block)
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase) for segment closeout; backlog drain continues with US-0115, US-0116, US-0117 (3 stories remaining)
+
+## Release finalized note (S0113)
+
+- Sprint: `S0113`
+- Story: `US-0113` (Sovereign-loop operator documentation in framework README)
+- Release: **finalized** (`2026-07-04T03:00:00Z`, `orchestrator_run_id=auto-20260704-01`, `fresh_context_marker=release-S0113-US0113-20260704T030000Z-fresh`, `runtime_proof_id=rp-auto-20260704-01-release-release-20260704T030000Z-US-0113`)
+- Queue: **`handoffs/release_queue.md`** row **`S0113`** = **`released`**
+- **Run / verify:** `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed; `python scripts/validate_doc_profile.py` → `[DOC_PROFILE_VALIDATE_OK]`; `python scripts/check_intake_template_parity.py` → `[INTAKE_TEMPLATE_PARITY_OK] scope=intake`; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → exit 1 only on pre-existing US-0117 gap (out-of-scope DC-1; no NEW gaps — AC-4 preservation satisfied); `fc /b its_magic\README.md template\its_magic\README.md` → no differences (AC-5 byte-identical). See **`handoffs/releases/S0113-release-notes.md`** **## Run** / **## Verify**.
+- ACs satisfied: **8/8** (AC-1 umbrella, AC-2 9 subsections, AC-3 scratchpad ref extension, AC-4 coverage preserved, AC-5 framework README parity, AC-6 metadata hygiene, AC-7 runbook cross-links, AC-8 regression tests)
+- Compose guards: **16/16 UNCHANGED** (US-0091, US-0097, US-0017, US-0040, US-0100..US-0112 — documentation-only)
+- Files shipped: `its_magic/README.md` (umbrella + 9 subsections + scratchpad ref extension), `template/its_magic/README.md` (byte-sync per AC-5)
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- Release trigger: **`RELEASE_TRIGGER_SOURCE=manual`** (no adapter subprocess)
+- **Next**: **`/refresh-context`** (fresh **curator** context, ship macro — second canonical phase) for segment closeout; backlog drain continues with US-0114..US-0117 (4 stories remaining)
+
+## Release finalized note (S-BUG0014)
+
+- Sprint: `S-BUG0014`
+- Bug: `BUG-0014` (Sovereign-loop era features missing from README feature coverage catalog and legacy release_notes.md)
+- Release: **finalized** (`2026-07-03T20:10:00Z`, `orchestrator_run_id=auto-20260703-01`, `fresh_context_marker=release-SBUG0014-BUG0014-20260703T201000Z-fresh`)
+- Queue: **`handoffs/release_queue.md`** row **`S-BUG0014`** = **`released`**
+- **Run / verify:** `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → `[README_FEATURE_COVERAGE_VALIDATE_OK]` (117/117); `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` → `[BUG_VALIDATION_OK]`; see **`handoffs/releases/S-BUG0014-release-notes.md`** **## Run** / **## Verify**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; bug queue **empty**
+
 ## Release finalized note (S0112)
 
 - Sprint: `S0112`
@@ -45,6 +165,61 @@ Canonical queue state now lives under:
 - Publish: **`RELEASE_PUBLISH_MODE=disabled`** -- deterministic no-op (`publish_snapshot=skipped_disabled`)
 - Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** -> **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
 - **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio **2** OPEN stories remaining (US-0111, US-0112)
+
+## Release finalized note (S0108)
+
+- Sprint: `S0108`
+- Story: `US-0108` (Parallel Instance Arbitrage for dev phase — DEC-0108)
+- Release: **finalized** (`2026-06-29T23:00:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0108-US0108-auto-20260628-04-20260629T230000Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0108`** = **`released`**
+- **Run / verify:** `pytest tests/us0108_contract_test.py -v` → 9 passed; see **`sprints/S0108/release-notes.md`** **## Summary**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout
+
+## Release finalized note (S0106)
+
+- Sprint: `S0106`
+- Story: `US-0106` (Sovereign Role-Behavior Manifest — DEC-0106)
+- Release: **finalized** (`2026-06-29T01:35:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0106-US0106-auto-20260628-04-20260629T013500Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0106`** = **`released`**
+- **Run / verify:** `pytest tests/us0106_contract_test.py -v` → 8 passed; `python scripts/sovereign_role_manifest_validate.py --self-test` → `[SOVEREIGN_ROLE_MANIFEST_SELF_TEST_OK]`; see **`handoffs/releases/S0106-release-notes.md`** **## Summary**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio OPEN stories remain
+
+## Release finalized note (S0105)
+
+- Sprint: `S0105`
+- Story: `US-0105` (Sovereign Memory — DEC-0105)
+- Release: **finalized** (`2026-06-29T00:13:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0105-US0105-auto-20260628-04-20260629T001300Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0105`** = **`released`**
+- **Run / verify:** `pytest tests/us0105_contract_test.py -v` → 10 passed; see **`handoffs/releases/S0105-release-notes.md`** **## Summary**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio OPEN stories remain
+
+## Release finalized note (S0104)
+
+- Sprint: `S0104`
+- Story: `US-0104` (Cross-Model Adversarial Critic — DEC-0104)
+- Release: **finalized** (`2026-06-29T00:03:00Z`, `orchestrator_run_id=auto-20260628-04`, `fresh_context_marker=release-S0104-US0104-auto-20260628-04-20260629T000300Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0104`** = **`released`**
+- **Run / verify:** `pytest tests/us0104_contract_test.py -v` → 10 passed; `python scripts/sovereign_critic_validate.py --self-test` → `[SOVEREIGN_CRITIC_SELF_TEST_OK]`; see **`handoffs/releases/S0104-release-notes.md`** **## Summary**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio OPEN stories remain
+
+## Release finalized note (S0103)
+
+- Sprint: `S0103`
+- Story: `US-0103` (AI Decision Ledger + Plan Fidelity policy — DEC-0103)
+- Release: **finalized** (`2026-06-28T15:00:00+02:00`, `orchestrator_run_id=auto-20260628-03`, `fresh_context_marker=release-S0103-US0103-auto-20260628-03-20260628T150000Z`)
+- Queue: **`handoffs/release_queue.md`** row **`S0103`** = **`released`**
+- **Run / verify:** `pytest tests/us0103_contract_test.py -v` → 8 passed; `python scripts/ledger_validate.py --self-test` → `[LEDGER_SELF_TEST_OK]`; see **`handoffs/releases/S0103-release-notes.md`** **## Summary**
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — deterministic no-op (`publish_snapshot=skipped_disabled`)
+- Sync (**DEC-0018**): **`SYNC_POLICY_MODE=disabled`** → **`push_decision=not_eligible`**, **`reason_code=SYNC_DISABLED`**
+- **Next**: **`/refresh-context`** (fresh **curator** context) for segment closeout; portfolio OPEN stories remain
 
 ## Release finalized note (S0107)
 
@@ -418,16 +593,16 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S0109`**: `pytest tests/us0109_contract_test.py -v` — refer to `## Run` in
-  `handoffs/releases/S0109-release-notes.md`.
+- **Start command:** Last finalized sprint **`S-BUG0014`**: `python scripts/validate_readme_feature_coverage.py --repo . --enforce` — refer to `## Run` in
+  `handoffs/releases/S-BUG0014-release-notes.md`.
 - **Endpoint + port:** N/A (release documentation layer) — refer to `## Connect` in
-  `handoffs/releases/S0109-release-notes.md`.
+  `handoffs/releases/S-BUG0014-release-notes.md`.
 - **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S0109-release-notes.md`.
+  `handoffs/releases/S-BUG0014-release-notes.md`.
 - **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S0107-release-notes.md` (env-ref only).
+  `handoffs/releases/S-BUG0014-release-notes.md` (env-ref only).
 - **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S0109-release-notes.md`.
+  `handoffs/releases/S-BUG0014-release-notes.md`.
 
 ## Historical references
 

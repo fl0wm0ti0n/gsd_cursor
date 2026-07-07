@@ -1,0 +1,84 @@
+{
+  "sprint_id": "S0114",
+  "story_refs": ["US-0114"],
+  "phase": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "timestamp": "2026-07-04T07:10:00Z",
+  "fresh_context_marker": "qa-US0114-qa-20260704T071000Z-fresh",
+  "runtime_proof_id": "rp-auto-20260704-01-qa-qa-20260704T071000Z-US-0114",
+  "verdict": "QA_PASS",
+  "blocking_findings": 0,
+  "non_blocking_findings": 0,
+  "ready_for_release": true,
+  "ac_results": {
+    "AC-1": "PASS",
+    "AC-2": "PASS",
+    "AC-3": "PASS",
+    "AC-4": "PASS",
+    "AC-5": "PASS",
+    "AC-6": "PASS",
+    "AC-7": "PASS",
+    "AC-8": "PASS"
+  },
+  "ac_count_total": 8,
+  "ac_count_pass": 8,
+  "ac_count_fail": 0,
+  "compose_guards_unchanged": 18,
+  "compose_guards_list": [
+    "US-0091", "US-0097", "US-0017", "US-0040", "US-0100",
+    "US-0101", "US-0102", "US-0103", "US-0104", "US-0105",
+    "US-0107", "US-0108", "US-0109", "US-0110", "US-0111",
+    "US-0112", "US-0041", "US-0062"
+  ],
+  "validator_outputs": {
+    "validate_readme_feature_coverage": {
+      "exit_code": 0,
+      "marker": "[README_FEATURE_COVERAGE_VALIDATE_OK]",
+      "status": "PASS"
+    },
+    "fc_byte_compare": {
+      "exit_code": 0,
+      "marker": "FC: no differences encountered"
+    },
+    "check_intake_template_parity": {
+      "exit_code": 0,
+      "marker": "[INTAKE_TEMPLATE_PARITY_OK] scope=intake"
+    },
+    "validate_doc_profile": {
+      "exit_code": 0,
+      "marker": "[DOC_PROFILE_VALIDATE_OK]"
+    },
+    "check_user_visible_metadata": {
+      "exit_code": 0,
+      "marker": "(silent PASS)"
+    }
+  },
+  "test_results": {
+    "pytest_scratchpad_example_parity": {
+      "exit_code": 0,
+      "passed": 4,
+      "failed": 0,
+      "tests": [
+        "test_bug0013_parity_check",
+        "test_bug0013_header_preserved",
+        "test_bug0013_local_overrides_preserved",
+        "test_bug0013_active_example_mirror_in_sync"
+      ]
+    }
+  },
+  "parity_state": {
+    "its_magic_readme_vs_template": "byte-identical",
+    "us_0113_sovereign_loop_blocks": "byte-stable"
+  },
+  "carry_overs_preserved": {
+    "DC-2_us0041_us0062_h1_anchors": "DEFERRED_TO_US_0117",
+    "scratchpad_reference_extension": "LOCKED_NET_NEW_KEYS_PLUS_CROSS_LINK_POINTERS"
+  },
+  "next_scheduled_phase": "release",
+  "next_scheduled_role": "release",
+  "stop_condition": "STOP after qa artifacts written; orchestrator Task-spawns release",
+  "evidence_ref": "sprints/S0114/qa-findings.md"
+}

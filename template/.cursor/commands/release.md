@@ -331,31 +331,22 @@ Guardrails:
 9. On successful finalization, transition only target sprint:
    `unreleased -> released`.
    - Update `last_updated`, `release_version` (when available), and gate summary.
-10. Reconcile target story backlog status + acceptance checkboxes in
-    `docs/product/backlog.md` using US-0043 and US-0045 contracts.
-    - Apply only to target sprint-linked stories.
-    - If contradictory states remain after reconciliation attempt, fail closed
-      with `BACKLOG_STATUS_DRIFT` or `CANONICAL_STATUS_CONFLICT`, write
-      remediation guidance, and stop.
-11. Reconcile derived status views from canonical backlog status:
-    - update linked rows/checklists in `docs/product/acceptance.md`,
-    - append deterministic status checkpoint in `docs/engineering/state.md`,
-    - preserve non-target entries unchanged.
-12. If one-time normalization baseline is missing, run the documented
-    normalization pass and write auditable report rows to
-    `docs/engineering/status-normalization-report.md` (story id, prior values,
-    resolved values, evidence refs, timestamp).
-13. Update backward-compatible legacy file `handoffs/release_notes.md` as
+10. Backlog reconciliation is now handled by the dedicated `/closure` phase —
+    see `.cursor/commands/closure.md`. Story Closure holds exclusive responsibility
+    for status flip (OPEN→DONE in `docs/product/backlog.md`), acceptance tick
+    ([ ]→[x] in `docs/product/acceptance.md`), closure checkpoint append to
+    `docs/engineering/state.md`, and creation of `sprints/Sxxxx/closure-verification.md`.
+11. Update backward-compatible legacy file `handoffs/release_notes.md` as
     latest-release pointer and summary:
     - include latest released sprint id,
     - include pointer to canonical sprint-scoped notes file,
     - include visibility section for unreleased queue entries.
-14. Update runbook/state readiness and evidence references for release outcome.
+12. Update runbook/state readiness and evidence references for release outcome.
     - On pass, ensure `sprints/Sxxxx/release-findings.md` records release outcome
       (`PASS`) and references final evidence artifacts.
-15. If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generation logic must
+13. If `AUTO_RELEASE_NOTES=1` in `.cursor/scratchpad.md`, generation logic must
     still target sprint-scoped notes first and update legacy pointer second.
-16. Optional configurable publish targets (US-0054 / DEC-0036):
+14. Optional configurable publish targets (US-0054 / DEC-0036):
     - Read `.cursor/scratchpad.md`:
       - `RELEASE_PUBLISH_MODE=disabled|confirm|auto`
       - `RELEASE_TARGETS_FILE`
@@ -379,7 +370,7 @@ Guardrails:
       `PUBLISH_TARGET_CONFIG_INVALID`.
     - If target execution fails, emit `PUBLISH_TARGET_EXECUTION_FAILED` with
       target ID and remediation; do not mutate unrelated release artifacts.
-17. Remote runtime connectivity contract (US-0064 / DEC-0044):
+15. Remote runtime connectivity contract (US-0064 / DEC-0044):
     - Extend target interpretation with runtime metadata from
       `RELEASE_TARGETS_FILE`:
       - `runtime.mode` (`local|remote`),
@@ -394,7 +385,7 @@ Guardrails:
       and local vs remote execution context.
     - In release output/handoffs, include operator connection guidance
       (where hosted, how to connect) without exposing secrets.
-18. Release operator Run/Connect/Verify hints contract (US-0067 / DEC-0049):
+16. Release operator Run/Connect/Verify hints contract (US-0067 / DEC-0049):
     - `handoffs/releases/Sxxxx-release-notes.md` must include a deterministic
       operator section order and required fields:
       1) `## Run`:
@@ -425,20 +416,20 @@ Guardrails:
       - `RELEASE_OPERATOR_HINTS_SECRET_EXPOSURE`
     - Remediation: populate required fields in canonical sprint notes with
       sanitized env-ref-only credential guidance, then rerun `/release`.
-19. Version changelog derivation (US-0100 / DEC-0085):
+17. Version changelog derivation (US-0100 / DEC-0085):
     - Runs **only after** step **9** successful finalization (`unreleased → released`)
-      and step **18** operator hints (**US-0067**). Doc writes are **not** publish
+      and step **16** operator hints (**US-0067**). Doc writes are **not** publish
       execution — **`RELEASE_PUBLISH_MODE=disabled`** remains valid (**US-0054**).
-    - **19a — Resolve semver**: read target queue row **`release_version`**; when
+    - **17a — Resolve semver**: read target queue row **`release_version`**; when
       blank, workflow-only release → **`[Unreleased]`** path only (no per-version file).
-    - **19b — Derive work items**: `derive_work_items` for target sprint + coalesce
+    - **17b — Derive work items**: `derive_work_items` for target sprint + coalesce
       peer **`released`** rows sharing normalized semver when semver known
       (`coalesce_sprints_by_semver`).
-    - **19c — Write docs**: when semver known → `build_version_doc` +
+    - **17c — Write docs**: when semver known → `build_version_doc` +
       `promote_unreleased` + `bind_queue_release_version`; else `append_unreleased`
       only. Per-version SOT = `handoffs/releases/{semver}-release-notes.md` (stem
       without leading **`v`**). Never pass `Sxxxx-release-notes.md` to **`gh -F`**.
-    - **19d — Validate (optional enforce)**: when scratchpad
+    - **17d — Validate (optional enforce)**: when scratchpad
       **`RELEASE_CHANGELOG_ENFORCE=1`** (default **`1`** post-bootstrap), run
       `python scripts/release_changelog_validate.py --repo . --enforce`; record
       outcome in `sprints/Sxxxx/release-findings.md` § version-doc gates. When

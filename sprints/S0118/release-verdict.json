@@ -1,0 +1,106 @@
+{
+  "story_id": "US-0118",
+  "sprint_id": "S0118",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "ship",
+  "phase_id": "release",
+  "role": "release",
+  "verdict": "RELEASE_PASS",
+  "ac_coverage": "12/12",
+  "story_closed": true,
+  "acceptance_checked": true,
+  "release_notes_appended": true,
+  "release_queue_updated": true,
+  "version_bump": false,
+  "version_bump_rationale": "out-of-band; RELEASE_PUBLISH_MODE=disabled + SYNC_POLICY_MODE=disabled; default-off feature (WORK_KIND_ROUTING=0); contract test test_us0118_default_off_zero_overhead enforces byte-identical-to-pre-US-0118; S0117 precedent (S0113..S0117 all shipped without bump); its_magic/.its-magic-version remains 0.1.3-3; nuspec version 0.1.3-beta3 UNCHANGED; homebrew version 0.1.3-3 UNCHANGED",
+  "sync_pushed": false,
+  "sync_decision": {
+    "push_decision": "not_eligible",
+    "reason_code": "SYNC_DISABLED",
+    "policy_mode": "disabled",
+    "publish_snapshot": "skipped_disabled",
+    "release_publish_mode": "disabled",
+    "release_trigger_source": "manual"
+  },
+  "compose_guards": "23 UNCHANGED",
+  "compose_guards_list": ["US-0091", "US-0097", "US-0017", "US-0040", "US-0100", "US-0101", "US-0102", "US-0103", "US-0104", "US-0105", "US-0107", "US-0108", "US-0109", "US-0110", "US-0111", "US-0112", "US-0034", "US-0084", "US-0086", "US-0093", "US-0096", "US-0041", "US-0062"],
+  "byte_stability": {
+    "parity_ok": "PARITY_OK 203287 203287",
+    "surface": "6th-story cumulative (US-0113 L2421 + US-0114 L2545 + US-0115 L2617 + US-0116 L2765 + US-0117 L2856 blocks byte-identical; US-0118 adds net-new-keys-only + cross-link-pointers + reason-code-only entries to its own 6th sub-block — pure addition; 2333 insertions / 0 deletions confirmed via git diff --stat HEAD -- its_magic/README.md)",
+    "pattern_scale": "quint_to_sextet",
+    "first_6_cumulative_surface_story": true,
+    "prior_released_blocks_byte_stable": true,
+    "git_diff_summary": "2333 insertions, 0 deletions (pure addition in post-US-0117 range)"
+  },
+  "parity": {
+    "framework_readme_parity": "PARITY_OK 203287 203287",
+    "intake_template_parity_intake": "[INTAKE_TEMPLATE_PARITY_OK] scope=intake",
+    "intake_template_parity_work_kind_routing": "[INTAKE_TEMPLATE_PARITY_OK] scope=work-kind-routing",
+    "parity_preserved": true
+  },
+  "dc_anchors_resolved": "clean",
+  "dc_anchor_resolution_detail": "## US-0118 h1 anchor confirmed at architecture.md L1713 (added in /architecture phase per R-0105 Q-2 LOCKED; T-anch in S0118 = NO-OP / verification; no execute-phase or release-phase write to architecture.md; US-0118 inherits clean deferral register — US-0117 was final deferred-candidate resolution point with 36 anchors)",
+  "dev_environment_lib_reuse": {
+    "q9_locked": true,
+    "import_only": true,
+    "contract_test": "test_us0118_classify_touched_files_reuse",
+    "contract_test_pass": true
+  },
+  "backward_compat": {
+    "work_kind_routing_default": "0",
+    "zero_overhead_when_off": true,
+    "contract_test": "test_us0118_default_off_zero_overhead",
+    "contract_test_pass": true
+  },
+  "test_results": {
+    "canonical_regression": "4 passed (tests/scratchpad_example_parity_test.py — BUG-0013 baseline)",
+    "us0118_contract": "13 passed (tests/us0118_contract_test.py — 13 test_us0118_* markers)",
+    "total": "17 passed in 0.10s"
+  },
+  "validator_results": {
+    "validate_readme_feature_coverage": "[README_FEATURE_COVERAGE_VALIDATE_OK] exit 0 (coverage_missing=[])",
+    "validate_doc_profile": "[DOC_PROFILE_VALIDATE_OK] exit 0",
+    "check-user-visible-metadata": "silent PASS exit 0",
+    "check_intake_template_parity_intake": "[INTAKE_TEMPLATE_PARITY_OK] scope=intake exit 0",
+    "check_intake_template_parity_work_kind_routing": "[INTAKE_TEMPLATE_PARITY_OK] scope=work-kind-routing exit 0",
+    "work_kind_classify_lib_self_test": "[WORK_KIND_CLASSIFY_SELF_TEST_OK] exit 0",
+    "work_kind_routing_lib_self_test": "[WORK_KIND_ROUTING_SELF_TEST_OK] exit 0"
+  },
+  "qa_verdict": "PASS",
+  "verify_work_verdict": "PASS",
+  "uat_verdict": "PASS",
+  "blocking_findings": 0,
+  "non_blocking_findings": 5,
+  "non_blocking_findings_list": [
+    "T-anch NO-OP — ## US-0118 section already added in /architecture phase per R-0105 Q-2 LOCKED; no execute-phase write to architecture.md",
+    "Pre-existing test failures (31) in full pytest suite — NOT introduced by US-0118, NOT US-0118 regression targets per T-006 (project-local scratchpad overrides + model-catalog-examples scope missing + architecture linkage failures from prior stories); canonical 4 BUG-0013 + 13 US-0118 contract tests ran green (17 passed)",
+    "Pre-existing fixture-path test failures (template/tests/scratchpad_example_parity_test.py + tests/readme_feature_coverage_fixtures_test.py FileNotFoundError) — carried from US-0114",
+    "Encoding hygiene prerequisite — 185 stray 0xa7 (§) bytes in working-tree docs/product/backlog.md carried from US-0114 per R-0102/R-0103/R-0104/R-0105; did NOT block validate_readme_feature_coverage.py --enforce in release re-verification",
+    "US-0108 status-drift — US-0108 shipped via sprints/S0108/release-verdict.json but its docs/product/backlog.md row was never flipped OPEN→DONE (US-0045 status authority drift; flagged by orchestrator drain-advance 2026-07-04T19:42:08Z); reconcile separately"
+  ],
+  "drain_advance_note": {
+    "stories_shipped_this_cycle": 1,
+    "drain_active": true,
+    "us0108_status_drift_flagged": true
+  },
+  "stop_conditions_met": true,
+  "fresh_context_marker": "release-US0118-release-20260705T002000Z-fresh",
+  "timestamp": "2026-07-05T00:20:00Z",
+  "isolation_evidence": {
+    "phase_id": "release",
+    "role": "release",
+    "fresh_context_marker": "release-US0118-release-20260705T002000Z-fresh",
+    "timestamp": "2026-07-05T00:20:00Z",
+    "evidence_ref": "sprints/S0118/release-findings.md + sprints/S0118/release-verdict.json + handoffs/releases/S0118-release-notes.md + handoffs/release_notes.md (US-0118 entry) + handoffs/release_queue.md (S0118 row) + docs/product/backlog.md (US-0118 OPEN->DONE) + docs/product/acceptance.md (US-0118 [ ]->[x]) + docs/engineering/state.md (release checkpoint)"
+  },
+  "strict_runtime_proof": {
+    "runtime_proof_id": "rp-auto-20260704-01-release-release-20260705T002000Z-US-0118",
+    "proof_issued_at": "2026-07-05T00:20:00Z",
+    "proof_ttl_seconds": 3600,
+    "proof_ttl": "2026-07-05T01:20:00Z"
+  },
+  "decision_gate": false,
+  "next_scheduled_phase": "/refresh-context",
+  "next_scheduled_role": "curator"
+}

@@ -1,0 +1,59 @@
+{
+  "verdict": "RELEASE_PASS",
+  "ac_satisfied": "8/8",
+  "ac_results": {
+    "AC-1": "PASS",
+    "AC-2": "PASS",
+    "AC-3": "PASS",
+    "AC-4": "PASS",
+    "AC-5": "PASS",
+    "AC-6": "PASS",
+    "AC-7": "PASS",
+    "AC-8": "PASS"
+  },
+  "compose_guards_verified": "16/16",
+  "compose_guards_unchanged": [
+    "US-0091", "US-0097", "US-0017", "US-0040",
+    "US-0100", "US-0101", "US-0102", "US-0103",
+    "US-0104", "US-0105", "US-0107", "US-0108",
+    "US-0109", "US-0110", "US-0111", "US-0112"
+  ],
+  "blocking_findings": 0,
+  "non_blocking_findings": 0,
+  "check_in_tests": "4/4 PASS (pytest tests/scratchpad_example_parity_test.py)",
+  "qa_verdict_ref": "sprints/S0113/qa-verdict.json (QA_PASS, 8/8 ACs, 0 blockers)",
+  "verify_work_verdict_ref": "sprints/S0113/verify-work-verdict.json (VERIFY_WORK_PASS, ready_for_release=true)",
+  "validators": {
+    "validate_readme_feature_coverage": "exit=1 (US-0117 pre-existing gap; no NEW gaps — AC-4 preservation satisfied)",
+    "validate_doc_profile": "exit=0 ([DOC_PROFILE_VALIDATE_OK])",
+    "check_intake_template_parity": "exit=0 ([INTAKE_TEMPLATE_PARITY_OK] scope=intake)",
+    "check_user_visible_metadata": "exit=0 (per QA findings, AC-6)",
+    "fc_its_magic_vs_template": "no differences (AC-5 byte-identical)"
+  },
+  "release_notes_ref": "handoffs/releases/S0113-release-notes.md",
+  "release_queue_ref": "handoffs/release_queue.md (S0113 row → released)",
+  "files_shipped": [
+    "its_magic/README.md",
+    "template/its_magic/README.md"
+  ],
+  "release_publish_mode": "disabled",
+  "publish_snapshot": "skipped_disabled",
+  "release_trigger_source": "manual",
+  "sync_policy_mode": "disabled",
+  "push_decision": "not_eligible",
+  "reason_code": "SYNC_DISABLED",
+  "framework_kit_repo": 1,
+  "project_readme_step": "skipped (kit_repo)",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "ship (release — first canonical phase)",
+  "story_id": "US-0113",
+  "sprint_id": "S0113",
+  "role": "release",
+  "phase_id": "release",
+  "fresh_context_marker": "release-S0113-US0113-20260704T030000Z-fresh",
+  "runtime_proof_id": "rp-auto-20260704-01-release-release-20260704T030000Z-US-0113",
+  "timestamp": "2026-07-04T03:00:00Z",
+  "release_date": "2026-07-04",
+  "next_scheduled_phase": "refresh-context (curator, ship macro — second canonical phase)"
+}

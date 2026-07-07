@@ -1,0 +1,37 @@
+{
+  "story_id": "US-0117",
+  "sprint_id": "S0117",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "phase_id": "uat",
+  "story_type": "documentation",
+  "verdict": "PASS",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "name": "Internal anchor links resolve",
+      "status": "PASS",
+      "detail": "All ### and #### anchor references in the new ### Phase & role governance umbrella section (L1864-L1994) and ### Phase & role governance keys sub-block (L2856-L3132) point to existing README/runbook sections verified by grep."
+    },
+    {
+      "id": "UAT-2",
+      "name": "README renders without markdown errors",
+      "status": "PASS",
+      "detail": "No malformed headings; consistent h3/h4 nesting (umbrella at h3, per-feature subsections at h4); 18-step enable order list well-formed; prose-only / runbook-cross-link-only entries block well-formed; cross-link pointers block well-formed."
+    },
+    {
+      "id": "UAT-3",
+      "name": "TOC contract honored",
+      "status": "PASS",
+      "detail": "Catalog anchor <!-- readme-feature-coverage-catalog --> (L63) UNCHANGED; US-0117 appends narrative sections outside the catalog block per US-0091 compose guard."
+    },
+    {
+      "id": "UAT-4",
+      "name": "Cross-link pointer rows reference canonical blocks without duplicating key documentation",
+      "status": "PASS",
+      "detail": "Cross-link to US-0114 block (DELIVERY_MODE), US-0115 block (LEAN_MEMORY_*), main ref + US-0080 subsection (TOKEN_PROFILE), and US-0082 subsection (CODEBASE_MAP_REFRESH_ON_ROLLOVER) all reference canonical rows without duplication."
+    }
+  ],
+  "fresh_context_marker": "qa-US0117-qa-20260704T180010Z-fresh",
+  "timestamp": "2026-07-04T18:00:10Z"
+}

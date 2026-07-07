@@ -1,0 +1,36 @@
+{
+  "story_id": "US-0118",
+  "sprint_id": "S0118",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "phase_id": "uat",
+  "story_type": "documentation+code",
+  "verdict": "PASS",
+  "total": 12,
+  "pass": 12,
+  "fail": 0,
+  "ac_results": [
+    {"ac": "AC-1", "status": "PASS", "evidence": "scripts/work_kind_classify_lib.py:classify_work_kind(...) per R-0106 Q10 signature; pure stdlib; self-test [WORK_KIND_CLASSIFY_SELF_TEST_OK] exit 0; contract test test_us0118_doc_kind_routes_to_lean_plan + test_us0118_code_kind_routes_to_standard PASS"},
+    {"ac": "AC-2", "status": "PASS", "evidence": "DOC/MINI/CODE rules per AC-2 + Q1 LOCKED tie-break (highest tier wins); contract tests test_us0118_doc_kind_routes_to_lean_plan + test_us0118_mini_kind_routes_to_ultra_lean + test_us0118_mini_kind_routes_to_mega_quick_when_eligible + test_us0118_code_kind_routes_to_standard + test_us0118_tie_break_code_wins PASS"},
+    {"ac": "AC-3", "status": "PASS", "evidence": ".cursor/scratchpad.md WORK_KIND_ROUTING=0 default-off + WORK_KIND_TIE_BREAK=highest_tier_wins; contract tests test_us0118_routing_off_is_noop + test_us0118_default_off_zero_overhead PASS; README umbrella + scratchpad ref sub-block document the flag"},
+    {"ac": "AC-4", "status": "PASS", "evidence": "/intake step 4b hook documents backlog row fields (- work_kind, - recommended_delivery_mode) + operator accept/override gate; contract test test_us0118_intake_evidence_records_work_kind PASS"},
+    {"ac": "AC-5", "status": "PASS", "evidence": "/intake step 4b hook after ACs + after US-0051 decomposition evaluator, before persistence; contract test test_us0118_intake_evidence_records_work_kind PASS; intake evidence schema extension (3 optional fields) documented"},
+    {"ac": "AC-6", "status": "PASS", "evidence": "/auto step 0a hook + L8 precedence (explicit DELIVERY_MODE > AUTO_PHASE_* > WORK_KIND_ROUTING-derived > current default); contract tests test_us0118_explicit_delivery_mode_wins_over_work_kind + test_us0118_auto_phase_wins_over_work_kind PASS"},
+    {"ac": "AC-7", "status": "PASS", "evidence": "6 WORK_KIND_* reason codes (R-0106 Q2 LOCKED) + REASON_CODE_REMEDIATION; contract test test_us0118_reason_codes_preserved verifies all 6 codes + remediation + WORK_KIND_REASON_CODES tuple"},
+    {"ac": "AC-8", "status": "PASS", "evidence": "6 read-only compose consumers unedited; 23 compose guards UNCHANGED; dev_environment_lib.py IMPORT only (Q9 LOCKED); contract test test_us0118_classify_touched_files_reuse PASS"},
+    {"ac": "AC-9", "status": "PASS", "evidence": "13 test_us0118_* markers in tests/us0118_contract_test.py (Q4 LOCKED 12 + tie-break Q1); all PASS; check_intake_template_parity.py --scope=work-kind-routing PASS; active + template/ parity for new script + scratchpad lines + command docs + runbook + manifest"},
+    {"ac": "AC-10", "status": "PASS", "evidence": "## US-0118 h1 anchor confirmed at docs/engineering/architecture.md L1713 (added in /architecture phase per R-0105 Q-2 LOCKED); T-anch NO-OP / verification"},
+    {"ac": "AC-11", "status": "PASS", "evidence": "## Work-kind routing (US-0118 / DEC-0118) h2 appended to docs/engineering/runbook.md L3579; .cursor/commands/auto.md step 0a hook + .cursor/commands/intake.md step 4b hook documented; template/ parity byte-identical"},
+    {"ac": "AC-12", "status": "PASS", "evidence": "python scripts/work_kind_classify_lib.py --self-test -> [WORK_KIND_CLASSIFY_SELF_TEST_OK] exit 0; python scripts/work_kind_routing_lib.py --self-test -> [WORK_KIND_ROUTING_SELF_TEST_OK] exit 0; installer-owned-paths.manifest [install_include_paths] + [clean_paths] + [required_install_script_paths] list both new scripts; triple-installer parity (PS1/Bash/Python)"}
+  ],
+  "regression_baseline": {
+    "test": "tests/scratchpad_example_parity_test.py (BUG-0013)",
+    "passed": 4,
+    "failed": 0
+  },
+  "contract_test_total": 13,
+  "contract_test_passed": 13,
+  "contract_test_failed": 0,
+  "fresh_context_marker": "qa-US0118-qa-20260704T230900Z-fresh",
+  "timestamp": "2026-07-04T23:09:00Z"
+}

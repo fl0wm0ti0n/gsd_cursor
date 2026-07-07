@@ -1,0 +1,39 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "plan-verify",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-us0119-build-verify",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 1,
+  "fresh_context_marker": "qa-US0119-build-verify-20260705T212000Z-fresh",
+  "timestamp": "2026-07-05T21:20:00Z",
+  "timestamp_utc": "2026-07-05T19:20:00Z",
+  "verdict": "CANNOT_RUN",
+  "reason": "DEPENDENCY_FAIL",
+
+  "plan_verification_matrix": [
+    {"task": "T-anch",  "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "NO-OP / verify ## US-0119 anchor + compose-do-not-amend 6/6",    "executed": "PARTIAL (anchor verified L1925; compose-do-not-amend verification step skipped)"},
+    {"task": "T-001",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "scripts/autonomy_preset_lib.py + template mirror + --self-test + --explain",        "executed": "DONE (lib + template exist; --self-test 6/6 PASS)"},
+    {"task": "T-002",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "14 scratchpad keys in .cursor/scratchpad.md + template mirror + precedence note",   "executed": "DONE (AUTONOMY_PRESET + AUTONOMY_STOP_POLICY present in both files)"},
+    {"task": "T-003",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "docs md + template md + scripts/data YAML + scripts validator + template validator", "executed": "PARTIAL MD/YAML/validator (active-side only); template md + template validator MISSING; validator --self-test FAIL 1316 violations (validator bug)"},
+    {"task": "T-004",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "wire 12 per-feature flags into .cursor/commands/auto.md + intake.md + release.md + execute.md", "executed": "NOT DONE (0 grep matches)"},
+    {"task": "T-005",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "handoffs/autonomy_repair_ledger/ directory + gitignore + cap logic + AUTONOMY_REPAIR_CAP_EXHAUSTED", "executed": "NOT DONE (directory MISSING)"},
+    {"task": "T-006",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "autonomy_relaxed breadcrumb format sub-section in state.md",                          "executed": "PARTIAL (one-line architecture reference exists at L769; no dedicated breadcrumb format sub-section)"},
+    {"task": "T-007",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "tests/us0119_autonomy_preset_test.py with 10 contract markers",                      "executed": "NOT DONE (file MISSING)"},
+    {"task": "T-008",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "README sub-block + template mirror + check_intake_template_parity.py --scope=us-0119", "executed": "NOT DONE (0 grep matches in README; argparse scope absent)"},
+    {"task": "T-009",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "runbook h2 + auto.md anchor + template parities for both",                           "executed": "NOT DONE (0 grep matches)"},
+    {"task": "T-010",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "4 installer-manifest rows for new scripts",                                          "executed": "NOT DONE (0 grep matches in installer-owned-paths.manifest)"},
+    {"task": "T-011",   "plan_ref": "sprints/S0119/tasks.md", "planned_scope": "regression tests pytest scratchpad_example_parity_test.py PARITY_OK byte-stability", "executed": "PARTIAL (README PARITY_OK 203287/203287 by inaction; scratchpad_example_parity_test 2/4 FAIL pre-existing BUG-0013)"}
+  ],
+
+  "plan_vs_execute_delta": {
+    "completed_as_planned": 3,
+    "partial": 3,
+    "not_started": 6,
+    "deviation_note": "execute phase dev stopped after T-002/T-003/T-001 (core lib + flags + partial stop-matrix); did not continue to consumer wiring (T-004), repair ledger (T-005), breadcrumb format (T-006 partial), contract tests (T-007), README parity (T-008), runbook/auto.md docs (T-009), installer manifest (T-010), or regression verification (T-011). No execute-summary.md authored, so deviation self-assessment not recoverable."
+  },
+
+  "next_phase_after_plan_verify": "/execute (dev cycle 2) — must complete T-004..T-011 + execute-summary.md"
+}

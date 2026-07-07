@@ -1,5 +1,9 @@
 # Decisions
 
+## Current context pack (2026-07-03 — **`BUG-0014`** **DONE** / **`S-BUG0014` released** — `auto-20260703-01`, `fresh_context_marker=curator-SBUG0014-BUG0014-refresh-20260703T201500Z-fresh`; research anchor **`R-0100`** **delivered**; **no companion DEC** (documentation backfill only); **`backlog_drain_active=false`**; **`drain_terminated=true`** (`no_open_stories`); portfolio **0 OPEN** stories; **0 OPEN** bugs — next action **`no_active_work`**).
+
+- **`BUG-0014`** (**DONE**, **`S-BUG0014`**, **released** `2026-07-03T20:10:00Z`): sovereign-loop README catalog + legacy release_notes backfill on **`auto-20260703-01`** — full lifecycle **PASS** through **`/refresh-context`** **`2026-07-03T20:15:00Z`**; **`handoffs/release_queue.md`** **`S-BUG0014`** **`released`**; **`handoffs/releases/S-BUG0014-release-notes.md`**; **`R-0100`** resolved scope — full 117-row validator backfill across `its_magic/README.md` + `docs/developer/README.md` + template parity + 5 legacy release_notes entries; 4/4 ACs satisfied; 16/16 compose guards unchanged; triad rollover → `state-pack-20260703.md`, `po-to-tl-pack-20260703.md`. Curator reconciles **`state.md`**, **`decisions.md`** (no-op), **`handoffs/portfolio_state.md`**, **`handoffs/resume_brief.md`**, **`handoffs/continuation_hygiene.md`**, **`sprints/S-BUG0014/summary.md`**. **Next**: portfolio empty; drain terminated; operator may **`/intake`** or **`/intake-bug`**.
+
 ## Current context pack (2026-06-30 — **`US-0111`** **DONE** / **`S0111` released** — `auto-20260628-04`, `fresh_context_marker=curator-S0111-US0111-refresh-context-20260630T200000Z-fresh`; binding **`DEC-0111`**; research anchor **`R-0098`** **delivered**; **`backlog_drain_stories_remaining_budget=1`**; **`backlog_drain_active=true`**; **`drain_terminated=false`**; portfolio **1 OPEN** story (**US-0112**); **0 OPEN** bugs — next action `no_active_work` / `/discovery` for **US-0112** when ready).
 
 - **`US-0111`** (**DONE**, **`S0111`**, **released** `2026-06-30T19:45:00Z`): release trigger-driven version changelog derivation on **`auto-20260628-04`** — full lifecycle **PASS** through **`/refresh-context`** **`2026-06-30T20:00:00Z`**; **`handoffs/release_queue.md`** **`S0111`** **`released`**; **`handoffs/releases/S0111-release-notes.md`**; normative **`DEC-0111`** — `scripts/release_trigger_adapters.py` (4-entry adapter registry: GitHub/npm/git-tag/manual), `TriggerContext` dataclass, `ReleaseAdapter` ABC, `RELEASE_TRIGGER_SOURCE=manual` default (byte-identical backward compat), atomic `[Unreleased]→[semver]` promotion via `release_changelog_lib.promote_unreleased()` (US-0100 compose), sovereign loop ledger `version_derivation` events (US-0103 compose), 9 `RELEASE_TRIGGER_*` reason codes, 12/12 contract tests PASS, 7/7 compose guards unchanged, template parity `--scope=release-trigger-adapter` (2 pairs). Curator reconciles **`state.md`**, **`decisions.md`**, **`research.md`** (**`R-0098`** delivered), **`sprints/S0111/summary.md`**, **`handoffs/resume_brief.md`**, **`handoffs/continuation_hygiene.md`**, **`handoffs/portfolio_state.md`**. **Next**: portfolio contains US-0112 only (P2, model-catalog installer presets).
@@ -591,3 +595,9 @@
   12 contract tests (`test_us0111_*`) + 7 compose guard tests + template parity
   `--scope=release-trigger-adapter` (2 pairs) — see **`decisions/DEC-0111.md`** and
   **`docs/engineering/architecture.md`** **`# US-0111`**.
+
+## DEC-0119
+
+- Story: US-0119 (Autonomous-autonomy presets and configurable hard-stop relaxation)
+- Status: stub (awaiting `/architecture` phase — full entry in `decisions/DEC-0119.md`)
+- Topic: AUTONOMY_PRESET determinism flag + AUTONOMY_STOP_POLICY stop-class matrix + 12 per-feature autonomy flags + bounded auto-repair ledger + backward-compatible default

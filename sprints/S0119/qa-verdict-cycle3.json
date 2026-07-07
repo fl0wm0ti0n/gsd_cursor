@@ -1,0 +1,99 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-us0119-build-verify",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 3,
+  "fresh_context_marker": "qa-US0119-cycle3-20260706T002105Z-fresh",
+  "timestamp": "2026-07-06T00:21:05Z",
+  "timestamp_utc": "2026-07-05T22:21:05Z",
+  "verdict": "FAIL",
+  "cycle_2_reference": "sprints/S0119/qa-verdict-cycle2.json",
+  "cycle_3_findings_anchor": "sprints/S0119/qa-findings-cycle3.md",
+  "dev_cycle_3_claim": {
+    "dev_verdict": "PASS",
+    "dev_artifacts_claimed": 32,
+    "qa_verification_result": "UNSUBSTANTIATED (no cycle-3 artifacts visible in sprint directory; no execute-summary.md; sprint directory unchanged from cycle 2 content)"
+  },
+  "blocking_findings": [
+    "B1-no-execute-summary",
+    "B3-check_intake_template_parity_script_template_parity_broken",
+    "B4-no-consumer-wiring",
+    "B5-no-repair-ledger",
+    "B6-no-runbook-h2",
+    "B7-no-auto-md-anchor",
+    "B8-no-installer-manifest-rows"
+  ],
+  "regressions": [
+    "REGRESSION-PERSISTENT-SCRIPT: active scripts/check_intake_template_parity.py 20083b vs template 19035b (diff 1048b — AUTONOMY_PRESET_PAIRS + --scope=us-0119 entry NOT synced to template)",
+    "REGRESSION-NEW-VALIDATOR: active scripts/validate_autonomy_stop_matrix.py 16535b vs template 13175b (diff 3360b — template-side validator not updated)",
+    "REGRESSION-TEST-TEMPLATE-MISSING: tests/us0119_autonomy_preset_test.py exists on active but MISSING on template (cycle-2 qa-verdict claimed 'autonomy_stop_matrix_template: byte_identical' and 'validate_autonomy_stop_matrix_template: byte_identical' — cycle 3 contradicts, validator now diverged)"
+  ],
+  "improvements_from_cycle_2": {
+    "B2_test_execution": "10/10 PASS (up from 8/10)",
+    "B9_validator_self_test": "0 violations exit 0 (up from 350 violations)",
+    "note": "two cycle-2 findings improved on active side only; template parity work incomplete"
+  },
+  "task_tally": {
+    "pass": 6,
+    "partial": 1,
+    "fail": 5,
+    "total": 12,
+    "pass_rate": "50.0%"
+  },
+  "tasks": {
+    "T-anch": {"plan": "verify anchor + compose", "cycle_1": "PASS", "cycle_2": "PASS", "cycle_3": "PASS", "delta": "NO_CHANGE"},
+    "T-001": {"plan": "autonomy_preset_lib.py", "cycle_1": "PASS", "cycle_2": "PASS", "cycle_3": "PASS", "delta": "NO_CHANGE"},
+    "T-002": {"plan": "scratchpad flags", "cycle_1": "PASS", "cycle_2": "PASS", "cycle_3": "PASS", "delta": "NO_CHANGE"},
+    "T-003": {"plan": "stop-matrix + validator", "cycle_1": "FAIL", "cycle_2": "PARTIAL", "cycle_3": "PARTIAL", "delta": "NO_CHANGE (active validator now 0 violations; template parity broken)"},
+    "T-004": {"plan": "consumer wiring", "cycle_1": "FAIL", "cycle_2": "FAIL", "cycle_3": "FAIL", "delta": "NO_CHANGE"},
+    "T-005": {"plan": "repair ledger", "cycle_1": "FAIL", "cycle_2": "FAIL", "cycle_3": "FAIL", "delta": "NO_CHANGE"},
+    "T-006": {"plan": "breadcrumb", "cycle_1": "PASS", "cycle_2": "PASS", "cycle_3": "PASS", "delta": "NO_CHANGE"},
+    "T-007": {"plan": "contract tests", "cycle_1": "FAIL", "cycle_2": "PARTIAL", "cycle_3": "PASS", "delta": "IMPROVED (10/10 tests PASS; template mirror PENDING)"},
+    "T-008": {"plan": "README sub-block + parity", "cycle_1": "FAIL", "cycle_2": "FAIL", "cycle_3": "FAIL", "delta": "NO_CHANGE"},
+    "T-009": {"plan": "runbook + auto.md anchor", "cycle_1": "FAIL", "cycle_2": "FAIL", "cycle_3": "FAIL", "delta": "NO_CHANGE"},
+    "T-010": {"plan": "installer manifest", "cycle_1": "FAIL", "cycle_2": "FAIL", "cycle_3": "FAIL", "delta": "NO_CHANGE"},
+    "T-011": {"plan": "regression tests", "cycle_1": "PARTIAL", "cycle_2": "PARTIAL", "cycle_3": "PASS", "delta": "IMPROVED (README byte-stability preserved; scratchpad 2/4 FAIL pre-existing BUG-0013 not US-0119 regression)"}
+  },
+  "test_gates": {
+    "us0119_autonomy_preset_test": "PASS (10/10)",
+    "scratchpad_example_parity_test": "FAIL (2/4 — pre-existing BUG-0013 residue)",
+    "validate_readme_feature_coverage": "PASS (vacuous PASS)",
+    "validate_doc_profile": "PASS",
+    "check_user_visible_metadata": "PASS (silent exit 0)",
+    "check_intake_template_parity_default": "FAIL (PARITY_ERROR exit 2)",
+    "check_intake_template_parity_scope_us_0119": "FAIL (PARITY_ERROR exit 2)",
+    "autonomy_preset_lib_self_test": "PASS (6/6)",
+    "validate_autonomy_stop_matrix_self_test": "PASS (0 violations)"
+  },
+  "test_gate_tally": {
+    "pass": 6,
+    "fail": 3,
+    "total": 9,
+    "pass_rate": "66.7%"
+  },
+  "byte_stability": {
+    "README_PARITY": "PARITY_OK 203287 203287 (preserved by inaction)",
+    "auto_md_PARITY": "PARITY_OK 35783 35783",
+    "runbook_PARITY": "PARITY_OK 178620 178620",
+    "installer_manifest_PARITY": "PARITY_OK 3466 3466 (both files lack US-0119 rows)",
+    "scratchpad_local_example_PARITY": "PARITY_MISMATCH 31112/34651 (active smaller)",
+    "check_intake_template_parity_PARITY": "PARITY_MISMATCH 20083/19035 (active larger)",
+    "validate_autonomy_stop_matrix_PARITY": "PARITY_MISMATCH 16535/13175 (active larger)"
+  },
+  "ac_coverage": {
+    "pass": 7,
+    "partial": 1,
+    "fail": 4,
+    "total": 12,
+    "pass_rate": "58.3%"
+  },
+  "compose_guards_unchanged": 6,
+  "decision_gate": true,
+  "critical_observation": "Dev cycle-3 verdict=PASS claim is UNSUBSTANTIATED. Sprint directory has 0 cycle-3 artifacts; no execute-summary.md; T-004..T-010 tasks unchanged from cycle-2 FAIL state. Orchestration appears to have executed a phantom cycle 3, or executed for a different target. QA cannot verify dev's claimed progress.",
+  "recommendation": "ESCALATE to orchestrator for manual review of cycle-3 execution evidence. Do NOT proceed to cycle 4 without (a) evidence of real cycle-3 execution and (b) resolution of sprint-directory artifact gap. After orchestrator review, options: (1) re-run /execute for S0119 with explicit task checklist and artifact audit, (2) investigate orchestrator false-positive verdict pathway, (3) escalate to manual intervention per cycle-4 final-chance rule.",
+  "next_scheduled_phase": "/execute (manual orchestrator review required before automated re-execution) OR /release (if orchestrator accepts current state despite QA FAIL — not recommended)"
+}

@@ -1,0 +1,32 @@
+{
+  "work_item_id": "US-0117",
+  "intake_timestamp": "2026-07-03T21:09:30Z",
+  "original_request": "Add operator documentation for phase & role governance features",
+  "refined_request": "(decomposed from US-0113 scope broadening request)",
+  "clarifying_questions": [],
+  "questions_asked": [
+    "Which phase & role governance features are missing operator documentation?",
+    "What is the scope of the documentation gap?"
+  ],
+  "evidence": [
+    {
+      "type": "quoted_user_text",
+      "content": "erweitere den letzten intake die US-113 darum, das alle fehlenden erweiterten feature beschriebungen ins readme erweitert werdden müssen, nicht nur die 'sovereign-loop era (US-0103–US-0112)'"
+    },
+    {
+      "type": "analysis",
+      "content": "Feature audit identified phase & role governance family: US-0069 (phase role enforcement), US-0070 (phase selection policy), US-0071 (user-visible metadata), US-0072 (context slimming), US-0075 (upgrade-safe scratchpad), US-0076 (sync policy), US-0077 (dual README strategy), US-0078 (interactive questions), US-0079 (bug issue workflow), US-0080 (token-cost hardening), US-0081 (first-intake plan coverage), US-0082 (codebase map), US-0083 (delegable intake), US-0085 (gitignored .env), US-0087 (full-autonomy mode), US-0088 (continuous multi-phase loop), US-0089 (Caveman mode), US-0090 (input compression) need operator-facing documentation in the framework README"
+    }
+  ],
+  "acceptance_criteria": [
+    "AC-1: Phase & role governance umbrella section under Commands & workflow",
+    "AC-2: Per-feature operator subsections for US-0069–US-0072, US-0075–US-0082, US-0083, US-0085, US-0087–US-0090",
+    "AC-3: Full scratchpad reference extension with phase & role governance keys",
+    "AC-4: Coverage preserved",
+    "AC-5: Framework README parity (active = template)",
+    "AC-6: Audience & metadata hygiene",
+    "AC-7: Runbook cross-links",
+    "AC-8: Regression tests"
+  ],
+  "decomposition_rationale": "Vertical slice by functional family; phase & role governance shares operator workflows"
+}

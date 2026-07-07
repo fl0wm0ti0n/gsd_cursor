@@ -1,0 +1,101 @@
+# Plan-Verify Cycle 4 — S0119 / US-0119
+
+**Story ID**: US-0119 — Autonomous-autonomy presets + configurable hard-stop relaxation (AUTONOMY_PRESET + AUTONOMY_STOP_POLICY)  
+**Sprint ID**: S0119  
+**Phase**: Plan-Verify (merged into qa per ultra_lean delivery_mode)  
+**Cycle**: 4  
+**Verdict**: FAIL  
+**Fresh Context Marker**: qa-US0119-cycle4-qa-2026-07-05T222729Z-fresh  
+**Orchestrator Run ID**: auto-20260705-05  
+**Timestamp**: 2026-07-05T22:27:29Z  
+**Runtime Proof ID**: rp-us0119-s0119-qa-cycle4-qa-2026-07-05T22:27:29Z  
+**Proof Hash**: f5f2abced05b6c2488a0142d913085ab4f84384b190f2b950457d1d0b9a2db33  
+
+---
+
+## Task Status (12 tasks)
+
+| Anchor | Task | Title | Cycle 1 Verdict | Cycle 2 Verdict | Cycle 3 Verdict | Cycle 4 Verdict | Cycle 4 Evidence |
+|--------|------|-------|-----------------|-----------------|-----------------|-----------------|-----------------|
+| T-anch | Architecture anchor preservation | PASS | PASS | PASS | PASS | `## US-0119` anchor present in architecture.md; 5/6 compose guards have h2 anchors; US-0056/US-0068 verified in sprint.md compose table |
+| T-001 | AUTONOMY_PRESET scratchpad flag addition | PARTIAL | PASS | PASS | PASS | Flag present in scratchpad.md + template; value `none` (default) |
+| T-002 | AUTONOMY_STOP_POLICY scratchpad flag addition | PARTIAL | PASS | PASS | PASS | Flag present in scratchpad.md + template; value `block` (default) |
+| T-003 | Autonomy stop matrix manifest + validator | FAIL | FAIL | PASS | PASS | `docs/engineering/autonomy-stop-matrix.md` + `scripts/data/autonomy_stop_matrix.yaml` + `scripts/validate_autonomy_stop_matrix.py` all exist; validator --self-test exits 0 with 28 codes (18 security_hard, 10 autonomy_resolvable) |
+| T-004 | Consumer wiring (12 per-feature flags wired into consumers) | FAIL | FAIL | FAIL | FAIL | auto.md heading present; scratchpad flags present; **sovereign_loop_lib.py has ZERO autonomy preset matches**; **release_changelog_lib.py has ZERO autonomy preset matches**; installer manifest 4/4 rows |
+| T-005 | Autonomous stop policy validator + repair ledger lib | FAIL | FAIL | PASS | PASS | `scripts/validate_autonomy_stop_matrix.py --self-test` exits 0; `scripts/autonomy_repair_ledger_lib.py` EXISTS + self-test exits 0; contract test PASS; repair ledger dir EXISTS + .gitignore with `*` |
+| T-006 | Autonomy breadcrumb in state.md | PASS | PASS | PASS | PASS | Breadcrumb format `autonomy_relaxed: <reason> -> <kind>` documented in auto.md; state.md breadcrumb section exists (verified via `rg "autonomy_relaxed"`) |
+| T-007 | Contract test suite + parity tests | FAIL | PARTIAL | PASS | PASS | `tests/us0119_autonomy_preset_test.py` 10/10 PASS; template parity PASS (7304 bytes) |
+| T-008 | Scratchpad example parity (BUG-0013) + intake parity | FAIL | FAIL | FAIL | FAIL | **scratchpad_example_parity_test.py 2/4 FAIL** (BUG-0013 regression at line 181: `DELIVERY_MODE=standard` in scratchpad.local.example.md vs `DELIVERY_MODE=ultra_lean` in template); **check_intake_template_parity.py PARITY_FAIL 20083b vs 19994b** (template missing us-0119 scope); active scratchpad.local.example.md = 553 lines, template = 635 lines (82-line divergence) |
+| T-009 | Documentation (runbook h2, auto.md h2, architecture anchor, DEC-0119) | FAIL | FAIL | FAIL | PASS | runbook.md has `## Autonomy presets (US-0119 / DEC-0119)` + `## Autonomy preset keys (US-0119 / DEC-0119)`; auto.md has `## Autonomy presets (US-0119 / DEC-0119)`; architecture.md has `## US-0119`; DEC-0119.md EXISTS; template parities PASS |
+| T-010 | Installer manifest update (4 rows: autonomy_preset_lib.py, autonomy_repair_ledger_lib.py, autonomy_stop_matrix.yaml, validate_autonomy_stop_matrix.py) | FAIL | FAIL | FAIL | PASS | Active manifest has all 4 rows; template manifest PARITY_OK 3615 bytes |
+| T-011 | Regression gate (scratchpad parity + intake parity regression tests) | FAIL | FAIL | FAIL | FAIL | **scratchpad_example_parity_test.py 2/4 FAIL** (BUG-0013 regression); **check_intake_template_parity.py default scope FAIL** (PARITY_FAIL); both are regression targets |
+
+---
+
+## Blocking Findings (7)
+
+### B1: scratchpad_example_parity_test.py 2/4 FAIL (BUG-0013 regression)
+- Test: `test_bug0013_local_overrides_preserved` FAIL — template scratchpad.local.example.md contains project-local overrides
+- Test: `test_bug0013_active_example_mirror_in_sync` FAIL — active body diverges from template at line 181
+- Root cause: active scratchpad.local.example.md has `DELIVERY_MODE=standard` (line 181), template has `DELIVERY_MODE=ultra_lean`
+- Line count divergence: active=553 lines, template=635 lines (82-line difference)
+- Impact: BUG-0013 contract broken — scratchpad.local.example.md active must mirror template from line 6 onward
+
+### B2: check_intake_template_parity.py PARITY_FAIL (20083b vs 19994b)
+- Active: 20083 bytes; template: 19994 bytes
+- Active has 8 surface pairs (added `--scope=us-0119`); template has 7 surface pairs
+- Dev did not copy active script to template in execute cycle 4
+- Impact: Installer will ship stale template; template mirror is out of sync
+
+### B3: execute-summary.md MISSING
+- File `sprints/S0119/execute-summary.md` does not exist
+- Dev did not create execute-summary for cycle 4 (or any cycle)
+- Impact: No evidence trail of dev work; cannot verify per-task status from dev's perspective
+
+### B4: dev_to_qa.md NOT updated for US-0119 cycle 4
+- File `handoffs/dev_to_qa.md` exists but contains NO US-0119 or S0119 references
+- Still has US-0118 content from prior release phase
+- Impact: QA cycle 4 has no dev-authored handoff to validate against
+
+### B5: sovereign_loop_lib.py has NO autonomy preset wiring
+- `rg "AUTONOMY_PRESET|AUTONOMY_STOP_POLICY|SOVEREIGN_DRAIN_AUTO_ACCEPT" scripts/sovereign_loop_lib.py` returned ZERO matches
+- Expected: sovereign_loop_lib.py should import/call autonomy_preset_lib.py and dispatch via AUTONOMY_STOP_POLICY
+- Impact: AC-5 not satisfied — sovereign loop is a primary consumer of autonomy presets but is not wired
+
+### B6: release_changelog_lib.py has NO autonomy preset wiring
+- `rg "AUTONOMY_PRESET|RELEASE_AUTO_CONFIRM_ACCEPTANCE|RELEASE_PUBLISH_AUTO_CONFIRM" scripts/release_changelog_lib.py` returned ZERO matches
+- Expected: release_changelog_lib.py should respect AUTONOMY_PRESET expansion for release automation
+- Impact: AC-5 not satisfied — release changelog is a consumer of autonomy presets but is not wired
+
+### B7: scratchpad.local.example.md active/template divergence (regression)
+- Active: 553 lines; template: 635 lines
+- First divergence: line 181 (`DELIVERY_MODE` value mismatch)
+- Pre-US-0119 baseline: 4/4 PASS for scratchpad_example_parity_test.py
+- US-0119 introduced regression — did not maintain byte-identity
+- Impact: T-011 regression gate FAIL; AC-10 tests+parity FAIL
+
+---
+
+## Task Tally
+
+- PASS: 8/12 (T-anch, T-001, T-002, T-003, T-005, T-006, T-007, T-009, T-010)
+- PARTIAL: 0/12
+- FAIL: 4/12 (T-004, T-008, T-011, execute-summary-MISSING)
+
+## AC Coverage
+
+- PASS: 10/12 (AC-1, AC-2, AC-3, AC-4, AC-6, AC-7, AC-8, AC-9, AC-11, AC-12)
+- PARTIAL: 1/12 (AC-5 — consumer wiring incomplete: 6/8 checks pass, 2 fail)
+- FAIL: 1/12 (AC-10 — tests+parity: 2/4 scratchpad parity FAIL + intake parity FAIL)
+
+## Compose Guards
+
+- 5/6 compose guards have `## US-xxxx` h2 anchors in architecture.md
+- US-0056, US-0068 verified in sprint.md compose table (no h2 anchor pattern used)
+- All 6 compose guards verified UNCHANGED
+
+## Decision Gate
+
+**decision_gate = true**  
+**next_phase = /execute (dev cycle 5 — FINAL cycle per AUTO_LOOP_MAX_CYCLES=5)**  
+If cycle 5 QA also FAIL → decision gate escalation to operator for manual intervention or relaxed acceptance criteria.

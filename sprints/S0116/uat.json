@@ -1,0 +1,37 @@
+{
+  "story_id": "US-0116",
+  "sprint_id": "S0116",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "phase_id": "uat",
+  "story_type": "documentation",
+  "verdict": "PASS",
+  "steps": [
+    {
+      "id": "UAT-1",
+      "name": "Internal anchor links resolve",
+      "status": "PASS",
+      "detail": "All ### and #### anchor references in the new ### Delivery & lifecycle umbrella section (L1665-L1861) and ### Delivery & lifecycle keys sub-block (L2225-L2314) point to existing README/runbook sections verified by grep."
+    },
+    {
+      "id": "UAT-2",
+      "name": "README renders without markdown errors",
+      "status": "PASS",
+      "detail": "No malformed headings; consistent h3/h4 nesting; boundary table at L1770-L1775 well-formed."
+    },
+    {
+      "id": "UAT-3",
+      "name": "TOC contract honored",
+      "status": "PASS",
+      "detail": "Catalog anchor <!-- readme-feature-coverage-catalog --> (L63) UNCHANGED; US-0116 appends narrative sections outside the catalog block per US-0091 compose guard."
+    },
+    {
+      "id": "UAT-4",
+      "name": "Cross-link pointer rows reference canonical blocks without duplicating key documentation",
+      "status": "PASS",
+      "detail": "Cross-link to US-0114 block (L2295) and US-0115 block (L2305) and grouped cross-link (L2278) all reference canonical rows without duplication."
+    }
+  ],
+  "fresh_context_marker": "qa-US0116-qa-20260704T174300Z-fresh",
+  "timestamp": "2026-07-04T17:43:00Z"
+}

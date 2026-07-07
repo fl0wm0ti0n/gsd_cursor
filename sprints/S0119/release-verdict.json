@@ -1,0 +1,101 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "release",
+  "role": "release",
+  "orchestrator_run_id": "auto-20260705-05",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "ship",
+  "fresh_context_marker": "release-US0119-20260706T210300Z-fresh",
+  "timestamp": "2026-07-06T21:03:00Z",
+  "timestamp_utc": "2026-07-06T19:03:00Z",
+  "runtime_proof_id": "rp-auto-20260706-release-release-20260706T210200Z-US-0119",
+  "proof_issued_at": "2026-07-06T21:02:00Z",
+  "proof_ttl_seconds": 3600,
+  "verdict": "PASS",
+  "release_finalized": true,
+  "queue_status_transition": "unreleased -> released",
+  "release_version": "(none — out-of-band; AUTONOMY_PRESET=none default-off, no installer-visible behavior change; S0118 precedent)",
+  "publish_snapshot": "skipped_disabled",
+  "publish_mode": "disabled",
+  "sync_decision": "not_eligible",
+  "sync_reason_code": "SYNC_DISABLED",
+  "release_trigger_source": "manual",
+  "backlog_drain": {
+    "stories_shipped_this_cycle": 1,
+    "drain_budget_remaining": 9
+  },
+  "decision_gate": false,
+  "companion_dec": "DEC-0119",
+  "companion_dec_status": "Accepted",
+  "architecture_anchor": "docs/engineering/architecture.md ## US-0119 L1925 (approach_locked=A1)",
+  "ac_coverage": {
+    "pass": 12,
+    "partial": 0,
+    "fail": 0,
+    "total": 12
+  },
+  "test_gates_summary": {
+    "us0119_pytest": "10/10 PASS",
+    "scratchpad_parity_pytest": "4/4 PASS",
+    "autonomy_preset_lib_self_test": "6/6 PASS",
+    "validate_autonomy_stop_matrix_self_test": "PASS (0 violations)",
+    "check_intake_template_parity_default": "PASS",
+    "check_intake_template_parity_scope_us_0119": "PASS",
+    "validate_readme_feature_coverage": "PASS",
+    "validate_doc_profile": "PASS",
+    "check_user_visible_metadata": "PASS (silent exit 0)",
+    "consolidated": "17/17 PASS"
+  },
+  "byte_parity": {
+    "check_intake_template_parity_py": "PARITY_OK 20083 20083",
+    "its_magic_readme": "PARITY_OK (fc no-differences)",
+    "sovereign_loop_lib_AUTONOMY_PRESET_refs": 10,
+    "release_changelog_lib_AUTONOMY_PRESET_refs": "present",
+    "execute_summary_cycle_5_lines": 178,
+    "dev_to_qa_us0119_cycle_5": "valid"
+  },
+  "compose_guards": {
+    "us0092": "UNCHANGED",
+    "us0095": "UNCHANGED",
+    "us0056": "UNCHANGED",
+    "us0068": "UNCHANGED",
+    "us0096": "UNCHANGED",
+    "bug0007": "UNCHANGED",
+    "summary": "6/6 UNCHANGED"
+  },
+  "blocking_findings_count": 0,
+  "non_blocking_findings_count": 5,
+  "non_blocking_findings": [
+    "T-anch NO-OP (## US-0119 anchor at architecture.md L1925 confirmed)",
+    "Pre-existing baseline disjoint test failures (orthogonal to US-0119)",
+    "Pre-existing fixture-path issues (orthogonal to US-0119)",
+    "Encoding hygiene prerequisite (orthogonal to US-0119)",
+    "US-0108 status-drift (carried from S0117/S0118; reconcile separately)"
+  ],
+  "isolation_evidence": {
+    "phase_id": "release",
+    "role": "release",
+    "fresh_context_marker": "release-US0119-20260706T210300Z-fresh",
+    "timestamp": "2026-07-06T21:03:00Z",
+    "evidence_ref": [
+      "sprints/S0119/release-findings.md",
+      "handoffs/releases/S0119-release-notes.md"
+    ]
+  },
+  "status_authority_updates": {
+    "backlog_us0119_status": "OPEN -> DONE",
+    "acceptance_us0119_checkbox": "[ ] -> [x]"
+  },
+  "next_scheduled_phase": "/refresh-context (curator; ship macro; second canonical phase per ultra_lean)",
+  "artifact_refs": [
+    "sprints/S0119/release-findings.md",
+    "sprints/S0119/release-verdict.json",
+    "handoffs/releases/S0119-release-notes.md",
+    "handoffs/release_notes.md",
+    "handoffs/release_queue.md",
+    "docs/product/backlog.md",
+    "docs/product/acceptance.md",
+    "docs/engineering/state.md"
+  ]
+}

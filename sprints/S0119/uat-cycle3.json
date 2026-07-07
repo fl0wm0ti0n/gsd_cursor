@@ -1,0 +1,22 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-us0119-build-verify",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 3,
+  "fresh_context_marker": "qa-US0119-cycle3-20260706T002105Z-fresh",
+  "timestamp": "2026-07-06T00:21:05Z",
+  "timestamp_utc": "2026-07-05T22:21:05Z",
+  "verdict": "FAIL",
+  "reason": "cycle-3 dev verdict=PASS unsubstantiated (no execute-summary.md; sprint directory unchanged; T-004 through T-010 all still FAIL; 7 blocking findings from cycle 2 persist + 2 new template-parity regressions)",
+  "blocking_findings_count": 7,
+  "regression_findings_count": 2,
+  "partial_findings_count": 0,
+  "task_tally": {"pass": 6, "partial": 1, "fail": 5},
+  "test_gate_tally": {"pass": 6, "fail": 3, "total": 9},
+  "ac_coverage_tally": {"pass": 7, "partial": 1, "fail": 4, "total": 12},
+  "next_scheduled_phase": "/execute (dev cycle 4) OR manual orchestrator review"
+}

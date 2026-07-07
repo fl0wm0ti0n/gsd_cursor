@@ -1,0 +1,45 @@
+{
+  "story_id": "US-0115",
+  "orchestrator_run_id": "auto-20260704-01",
+  "phase": "qa (merged plan-verify + execute QA + verify-work per ultra_lean)",
+  "verdict": "PASS",
+  "ac_coverage": "8/8",
+  "ac_status": {
+    "AC-1": "PASS — ### Integration & observability umbrella section under ## Commands and workflow at L1410 in both READMEs",
+    "AC-2": "PASS — 7 per-feature #### US-xxxx subsections (US-0034/US-0084/US-0086/US-0093/US-0096/US-0101/US-0102) US-id-ascending under umbrella",
+    "AC-3": "PASS — ### Integration & observability keys sub-block at L1878 with net-new keys + cross-link pointers + reason-code-only entries; US-0113 L1682 + US-0114 L1806 byte-stability preserved",
+    "AC-4": "PASS — [README_FEATURE_COVERAGE_VALIDATE_OK] exit 0; coverage_missing=[] unchanged from pre-execute baseline",
+    "AC-5": "PASS — PARITY_OK 128660 128660 + [INTAKE_TEMPLATE_PARITY_OK] scope=intake exit 0",
+    "AC-6": "PASS — [DOC_PROFILE_VALIDATE_OK] exit 0 + check-user-visible-metadata.py exit 0",
+    "AC-7": "PASS — 7 runbook cross-links verified (US-0034 L1167, US-0084 L1441/L1459, US-0086 L1398/L1471, US-0093 L1999, US-0096 L591, US-0101 L653, US-0102 L771); all pre-exist",
+    "AC-8": "PASS — 4/4 pytest PASSED in 0.07s; no test weakenings"
+  },
+  "blocking_findings": [],
+  "non_blocking_findings": [
+    {
+      "id": "NB-1",
+      "severity": "cosmetic",
+      "description": "Sprint.md baseline anticipated coverage_missing=[\"US-0117\"] but actual validator output is coverage_missing=[] (US-0117 queued, not yet OPEN in-scope). Unchanged from pre-execute baseline; AC-4 gate holds.",
+      "recommendation": "Orchestrator reconcile sprint.md plan text with actual validator behavior at segment close (cosmetic)."
+    },
+    {
+      "id": "NB-2",
+      "severity": "cosmetic",
+      "description": "US-0084 README cross-link text reads '### Published npm installer.sh / POSIX dash (US-0084)' but actual runbook heading is '### Published npm `installer.sh` / POSIX dash (US-0084)' (with backticks). L1441 cited correctly; anchor recognizable.",
+      "recommendation": "Future cosmetic touch-up to match exact heading text (deferred — not a US-0115 AC violation)."
+    },
+    {
+      "id": "NB-3",
+      "severity": "pre-existing",
+      "description": "Pre-existing fixture-path test failures (NOT introduced by US-0115, NOT US-0115 regression targets per T-006): template/tests/scratchpad_example_parity_test.py FileNotFoundError (designed to run from inside template/), tests/readme_feature_coverage_fixtures_test.py 2 of 3 tests FileNotFoundError (fixture directory missing).",
+      "recommendation": "Future fix-it story to repair fixture paths or document the run-from-repo-root vs run-from-template-directory contract."
+    }
+  ],
+  "dc3_deferral": "DC-3 (7 missing # US-xxxx h1 anchors) deferred to US-0117; correctly noted in execute-summary + dev_to_qa.md + state.md checkpoint; NOT appended to sovereign_deferrals.jsonl (correct). US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) = 14 total.",
+  "byte_stability": "PRESERVED — all 4 US-0113/US-0114 blocks byte-identical between its_magic/README.md and template/its_magic/README.md (3rd-story cumulative surface).",
+  "parity": "PRESERVED — PARITY_OK 128660 128660 + [INTAKE_TEMPLATE_PARITY_OK] scope=intake.",
+  "scope_creep": "NONE — only its_magic/README.md + template/its_magic/README.md modified; no edits to scratchpad canonical, backlog.md, runbook.md, architecture.md (beyond US-0115 anchor), installer.*, scripts/*, test files.",
+  "fresh_context_marker": "qa-US0115-qa-20260704T063749Z-fresh",
+  "timestamp": "2026-07-04T06:37:49Z",
+  "next_scheduled_phase": "release"
+}

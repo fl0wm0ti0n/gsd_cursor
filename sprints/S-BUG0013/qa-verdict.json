@@ -1,0 +1,46 @@
+{
+  "sprint_id": "S-BUG0013",
+  "bug_id": "BUG-0013",
+  "orchestrator_run_id": "auto-20260701-01",
+  "verdict": "PASS",
+  "phase": "qa",
+  "role": "qa",
+  "timestamp": "2026-07-02T00:30:00Z",
+  "fresh_context_marker": "qa-BUG0013-qa-20260702T003000Z-fresh",
+  "blocking_findings": 0,
+  "non_blocking_findings": 0,
+  "ac_results": {
+    "AC-1": "PASS",
+    "AC-2": "PASS",
+    "AC-3": "PASS",
+    "AC-4": "PASS",
+    "AC-5": "PASS",
+    "AC-6": "PASS"
+  },
+  "test_results": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0,
+    "tests": [
+      {"marker": "test_bug0013_parity_check", "result": "PASS"},
+      {"marker": "test_bug0013_header_preserved", "result": "PASS"},
+      {"marker": "test_bug0013_local_overrides_preserved", "result": "PASS"},
+      {"marker": "test_bug0013_active_example_mirror_in_sync", "result": "PASS"}
+    ]
+  },
+  "bug_validate": "[BUG_VALIDATION_OK]",
+  "compose_guards": {
+    "total": 9,
+    "unchanged": 9,
+    "guards": ["US-0008", "US-0040", "US-0054", "US-0100", "US-0101", "US-0102", "US-0103", "US-0107", "US-0110"]
+  },
+  "template_sync": {
+    "template_lines": 526,
+    "canonical_lines": 526,
+    "section_count": 9,
+    "all_sections_present": true,
+    "project_local_values_excluded": true
+  },
+  "runbook_section": "docs/engineering/runbook.md L3513 '## Scratchpad Example Parity (BUG-0013)'",
+  "next_phase": "/verify-work"
+}

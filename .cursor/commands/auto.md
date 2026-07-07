@@ -271,13 +271,19 @@ override governance is satisfied.
 | `qa` | `qa` | `qa` |
 | `verify-work` | `qa` | `qa` |
 | `release` | `release` | `release` |
+| `closure` | `qe`, `curator` | `qe` |
 | `refresh-context` | `curator`, `po` | `curator` |
 
 Alternate-role keys (merged scratchpad): `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`,
-`AUTO_ROLE_REFRESH_CONTEXT` — single-valued resolution per **DEC-0051** (see reference).
+`AUTO_ROLE_REFRESH_CONTEXT`, `AUTO_ROLE_CLOSURE` — single-valued resolution per **DEC-0051** (see reference).
 
 Execute override: requires `AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` **and**
 parseable `EXECUTE_OVERRIDE_GOVERNANCE_REF`.
+
+Closure role (US-0120): `AUTO_ROLE_CLOSURE` scratchpad key accepts `qe` (default) or
+`curator` override. When empty, default is `qe`. `curator` override must not write
+qa-owned surfaces per DEC-0051 §3 preflight capability gate. Fail-closed:
+`PHASE_CAPABILITY_MISSING` when role cannot perform closure duties.
 
 Role reason codes: `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`.
 
@@ -287,6 +293,19 @@ Role reason codes: `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`.
 from precedence: argv `delivery-mode=` → backlog row `delivery_mode` (when
 `AUTO_DELIVERY_ROUTING=backlog_then_scratchpad`) → scratchpad `DELIVERY_MODE` → **`standard`**.
 
+### Work-kind routing hook (US-0118 / DEC-0118) — step 0a
+
+When `WORK_KIND_ROUTING=1` (default `0` — zero overhead when off), step 0
+calls `scripts/work_kind_routing_lib.resolve_delivery_mode_with_work_kind(...)`
+**after** the existing delivery-mode resolver. The hook implements the **L8
+precedence chain**: `start-from` (always wins) > explicit `DELIVERY_MODE` >
+explicit `AUTO_PHASE_*` > `WORK_KIND_ROUTING`-derived > current default.
+When `WORK_KIND_ROUTING=0`, the hook is a no-op (early-return
+`(standard, full_plan, "WORK_KIND_ROUTING_OFF")` — byte-identical to
+pre-US-0118). When both `WORK_KIND_ROUTING=1` and explicit `DELIVERY_MODE`
+are set, explicit wins and `WORK_KIND_DELIVERY_MODE_CONFLICT` is emitted.
+The classifier reuses `scripts/dev_environment_lib.classify_touched_files`
+(tier A/B/C + `TIER_C_SKIP_PREFIXES`) — import, do not reinvent (Q9 LOCKED).
 | `delivery_mode` | `resolved_phase_plan` | `reinstatement_mode` | `memory_layer` |
 |-----------------|----------------------|---------------------|----------------|
 | `standard` | Full **DEC-0052** chain | `dec0052_default` | `standard` |
@@ -311,7 +330,7 @@ Four macro-phases — **no** eleven-phase reinstatement when `delivery_mode=ultr
 | **`spec`** | intake + discovery | **po** |
 | **`plan`** | research + architecture + sprint-plan | **tech-lead** |
 | **`build+verify`** | execute + qa + verify-work | **dev** / **qa** |
-| **`ship`** | release + refresh-context | **release** / **curator** |
+| **`ship`** | release + closure + refresh-context | **release** / **qe** / **curator** |
 
 **`AUTO_IMPLEMENTATION_LOOP`** preserved inside **`build+verify`**. QA merges AC checklist + UAT
 in one spawn.
@@ -340,7 +359,7 @@ Treat **resolved phase plan** as fail-closed schedule from merged scratchpad **b
 resume / `start-from` intersection. Canonical lifecycle:
 
 `intake` → `discovery` → `research` → `architecture` → `sprint-plan` →
-`plan-verify` → `execute` → `qa` → `verify-work` → `release` → `refresh-context`
+`plan-verify` → `execute` → `qa` → `verify-work` → `release` → `closure` → `refresh-context`
 
 Selectors and reinstatement: see reference. Phase-plan reason codes include
 `PHASE_POLICY_CONFLICT`, `PHASE_PLAN_UNKNOWN_PHASE`, `START_FROM_PHASE_PLAN_EMPTY_INTERSECTION`.
@@ -447,7 +466,7 @@ Phase-completion boundary evaluation only. **Guarded auto-push eligibility chain
 ## Canonical `start-from` phase IDs
 
 `intake`, `discovery`, `research`, `architecture`, `sprint-plan`, `plan-verify`,
-`execute`, `qa`, `verify-work`, `release`, `refresh-context` — aliases invalid.
+`execute`, `qa`, `verify-work`, `release`, `closure`, `refresh-context` — aliases invalid.
 
 ## Deterministic resume-source precedence
 
@@ -522,6 +541,96 @@ used for resume/materialization failures):
 8. Sync verdict recording when eligible — reference step 12.
 9. Backlog-drain / bulk per-item summaries when enabled — reference step 13.
 
+## Cross-model adversarial critic post-phase hook (US-0104 / DEC-0104)
+
+**Default-off**: `CROSS_MODEL_REVIEW=0` → **zero overhead** — no critic spawn, no findings
+writes, no anti-slop gate. Existing phase lifecycle unchanged.
+
+When `CROSS_MODEL_REVIEW=1`, after each **producer** phase subagent returns, orchestrator
+**MUST Task-spawn** fresh **`/sovereign-critic`** subagent (spawn-only per **BUG-0006** /
+**US-0048** / **US-0023**). Orchestrator must not execute critic evaluation in-process.
+
+### Hook sequence
+
+1. Resolve `producer_model_id` from phase context or `model_tier_lib.resolve_model_for_phase`.
+2. Call `select_critic_model(producer_model_id, scratchpad, phase_id)`.
+3. If `degraded=True` (`CROSS_MODEL_DEGRADED_MODE`): three **sequential** fresh subagent spawns
+   (same `model_id`, different lens prompts — challenger, architect, subtractor); all findings
+   record `degraded_mode=true`.
+4. Else: parallel jury via single critic subagent running all three lenses.
+5. Append findings to `handoffs/sovereign_critic_findings.jsonl`; validate with
+   `python scripts/sovereign_critic_validate.py --repo . --enforce`.
+6. When `AI_DECISION_LEDGER=1`, call `patch_ledger_cross_model_reviewed(...)`.
+
+### Anti-slop rework loop
+
+After `/sovereign-critic`:
+
+1. Compute `anti_slop_aggregate = compute_anti_slop_aggregate(lens_scores)` (min of lens scores).
+2. Compare against `CROSS_MODEL_ANTISLOP_THRESHOLD` (default **6**).
+3. If aggregate **< threshold** and open **blocking** findings exist:
+   - Increment `rework_generation` for `(orchestrator_run_id, phase_id)`.
+   - If `rework_generation < CROSS_MODEL_REWORK_MAX` (default **2**): re-spawn producer phase
+     with fresh context; pass critic summary as read-only input → **`CROSS_MODEL_ANTISLOP_FAIL`**
+     (rework, not terminal).
+   - Else → **`CROSS_MODEL_REWORK_CAP_EXHAUSTED`** decision gate (operator waive or abort).
+
+### Isolation `model_id` v2
+
+When `CROSS_MODEL_REVIEW=1`, both producer and critic isolation evidence rows require additive
+**`model_id`**. Missing → fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`**.
+
+## Sovereign memory mistake-tagging hooks (US-0105 / DEC-0105)
+
+**Default-off**: `SOVEREIGN_MEMORY=0` → **zero overhead** — no `mistakes.jsonl` writes.
+
+When `SOVEREIGN_MEMORY=1`, orchestrator calls `record_mistake_hook(...)` from
+`scripts/sovereign_memory_lib.py` on detectable failure events (closed `mistake_tag` enum):
+
+| Trigger | `mistake_tag` | `failure_reason_code` |
+|---------|---------------|----------------------|
+| Auto-loop fix exhaust (`AUTO_IMPLEMENTATION_LOOP=1`) | `fix_failed` | `FIX_FAILED` |
+| Execute revert/rollback | `revert_applied` | `REVERT_APPLIED` |
+| Plan-fidelity hard stop (`classify_deviation` blocking) | `plan_fidelity_violation` | `PLAN_FIDELITY_VIOLATION` |
+| Extended-mode scope add without override | `scope_creep` | `PLAN_FIDELITY_SCOPE_GATE` |
+
+**US-0103 compose**: hooks may read ledger context for `provenance_ref` but must not mutate
+ledger schema. Retrospectives under `sovereign-memory/retrospectives/` are **not injected v1**.
+
+## Sovereign Loop Mode (US-0107 / DEC-0107)
+
+**Default-off**: `AUTO_SOVEREIGN=0` → **zero overhead** — no deferral reads/writes, no advance,
+no notifications. Requires **`SOVEREIGN_GOAL_MODE=goal_convergence`** when enabled (fail-closed
+**`SOVEREIGN_LOOP_GOAL_MODE_REQUIRED`**).
+
+### Advance hook (post-segment)
+
+After each native-chain segment completes ( **`stop_phase=refresh-context`** ), when
+`AUTO_SOVEREIGN=1` and goal convergence active, orchestrator calls
+`advance_sovereign_loop(repo, scratchpad, orchestrator_run_id=...)` from
+`scripts/sovereign_loop_lib.py`. Sovereign terminal stops are **additive** to the US-0088 /
+US-0092 stop matrix — do not replace `decision_gate`, `loop_max`, or security deny.
+
+### Drain-generate (spawn-only PO / US-0095)
+
+When advance returns `action=drain_generate`:
+
+1. Build PO spawn inputs via `build_drain_generate_spawn_inputs(...)` (vision narrow-read;
+   optional `sovereign_memory_digest` when `SOVEREIGN_MEMORY=1`).
+2. **MUST Task-spawn** fresh **PO** subagent (spawn-only per **US-0069** / **US-0095**) with
+   ephemeral work item id `drain-gen-{orchestrator_run_id}-{iteration}` — **not** a backlog row
+   until accepted.
+3. PO returns up to **3** candidates in `DrainGenerateCandidateBundle` v1.
+4. **Decision gate (mandatory per candidate)**: operator accept → **`/intake`** or controlled
+   backlog append; reject → discard. **No auto-append** without gate (**US-0092** hard gate).
+
+### Deferral register operator path
+
+- Append: `append_deferral(...)` → `handoffs/sovereign_deferrals.jsonl` (create-on-first-write).
+- Resolve: `resolve_deferral(repo, deferral_id, orchestrator_run_id=...)`.
+- Validate: `python scripts/sovereign_loop_validate.py --repo . --enforce`.
+- **US-0109** integration: downstream writer appends `DEPLOY_DEFERRED` rows (`work_item_kind=deploy`).
+
 ## Backward compatibility
 
 Default manual/interactive unchanged; `/resume` remains valid; deterministic precedence
@@ -531,3 +640,34 @@ applies for `/auto` continuation.
 
 Follow `docs/engineering/artifact-ordering-policy.md` (`state.md` append-bottom, etc.);
 `ARTIFACT_ORDERING_ANCHOR_AMBIGUOUS` fail-closed.
+
+## Autonomy presets (US-0119 / DEC-0119)
+
+Default-off autonomy preset expansion + stop-policy dispatch layer.
+
+When `AUTONOMY_PRESET={none|balanced|full}` is set (default `none`), the orchestrator
+calls `scripts/autonomy_preset_lib.expand_autonomy_preset(preset, overrides)` before
+phase dispatch to expand the single preset flag into 8 (balanced) or 12 (full) per-feature
+autonomy flags. Precedence: explicit per-flag override in scratchpad always wins over
+preset expansion. Expansion is deterministic; no LLM, no network, no `.env` reads
+(R-0107 Q3 LOCKED).
+
+When `AUTONOMY_STOP_POLICY={block|auto_repair_then_block|auto_repair_then_skip}` is
+set (default `block`), stop dispatch classifies every fail-closed reason code as
+`security_hard` (never auto-resolved; block immediately — `auto_repair_kind=n/a`; cap=0)
+or `autonomy_resolvable` (bounded auto-repair permitted when policy != `block`; cap per
+(run, reason_code) from `scripts/data/autonomy_stop_matrix.yaml`; default 3 per Q3 LOCKED).
+
+When `AUTONOMY_STOP_POLICY != block`, bounded auto-repair attempts are logged to
+append-only ledger at `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl`.
+Cap exhaustion emits terminal stop `AUTONOMY_REPAIR_CAP_EXHAUSTED` (distinct from
+`BLOCK_RETRY_CAP_EXHAUSTED`; run-level vs story-level per Q9 LOCKED).
+
+Operator audit breadcrumb: `autonomy_relaxed: <reason_code> -> <auto_repair_kind>`
+emitted in `docs/engineering/state.md` at phase boundary (one line per soft-stop per
+Q10 LOCKED — not aggregated).
+
+Compose do-not-amend guards: `/intake`, `/execute`, `/qa`, `/release` consume US-0119
+flags additively; their pre-existing contract surfaces are NOT rewritten.
+`scripts/validate_autonomy_stop_matrix.py --self-test` enforces matrix invariants.
+Byte-stability surface at `its_magic/README.md` 7th sub-block `### Autonomy preset keys`.

@@ -1,0 +1,118 @@
+{
+  "intake_run_id": "auto-20260705-us0119-intake",
+  "turn_index": 1,
+  "writer_id": "po-cursor-20260705",
+  "selected_pack": "first-intake-pack",
+  "requested_mode": "story",
+  "decomposition_verdict": "single_story",
+  "decomposition_rationale": "Alle 5 Prioritaetsgruppen (A-E) beschreiben ein kohaerentes Feature-Set unter einem einzigen Preset-Expansion-Mechanismus (AUTONOMY_PRESET). Ein Split wuerde inkohaerente Feature-Oberflaechen erzeugen.",
+  "duplicate_check_pass": true,
+  "duplicate_check_notes": "Keine Ueberlappung mit US-0092 oder US-0095. US-0119 ergaenzt konfigurierbare Relaxation von non-security hard stops und confirmation gates. Compose, nicht duplicate.",
+  "assumptions_confirmed": "Operator confirmed: Stack ist Python+Node.js; AUTONOMY_PRESET default=none ist byte-identisch zu pre-US-0119; Security hard gates blockieren unter jedem Preset; Template-Paritaet erhalten; Sovereign-loop composes read-only; US-0092/US-0095/US-0056/US-0068/BUG-0007/US-0096 unveraendert.",
+  "assumption_confirmation_ref": "ie:auto-20260705-us0119-intake:1:ffe4a156323b9eb5",
+  "assumption_confirmation_intake_run_id": "auto-20260705-us0119-intake",
+  "assumption_confirmation_turn_index": 1,
+  "assumption_confirmation_quoted": "Operator confirmed: Stack ist Python+Node.js; AUTONOMY_PRESET default=none ist byte-identisch zu pre-US-0119; Security hard gates blockieren unter jedem Preset; Template-Paritaet erhalten; Sovereign-loop composes read-only; US-0092/US-0095/US-0056/US-0068/BUG-0007/US-0096 unveraendert.",
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:7ea3c58c45a18a27",
+      "quoted_user_text": "Gemischtes Problem: einige Blocker + einige UX-Huerden + Governance-Overhead, das zusammengenommen den Flow killt",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:8707ff8b5ce31b03",
+      "quoted_user_text": "Cursor IDE + merged scratchpad + volle sovereign-loop-Features aktiv (AI_DECISION_LEDGER=1, CROSS_MODEL_REVIEW=1, AUTO_SOVEREIGN=1, SOVEREIGN_MEMORY=1, SOVEREIGN_GOAL_MODE=goal_convergence)",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "delegation_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:f5564ed4ea5b1b15",
+      "quoted_user_text": "Delegation auf Backlog-History: gleicher Stack wie US-0118 und alle vorherigen sovereign-loop-Features (Python + Node.js, Cursor IDE)",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1,
+      "delegation_scope": "backlog history",
+      "delegation_rationale": "Sprach-/Runtime-Flaeche ueber US-0001..US-0118 vollstaendig etabliert: Python + Node.js fuer Installer/CI/sovereign Scripts; Cursor IDE Agent Runtime.",
+      "delegation_confidence": "high"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:64adda04f6cede44",
+      "quoted_user_text": "AUTONOMY_PRESET=none|balanced|full als Scratchpad-Umbrella mit DEC-0078-geschuetzter Hard-Gate-Matrix + AUTONOMY_STOP_POLICY als Orchestrator-Entscheidung",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:20f9030fa8c0ee5a",
+      "quoted_user_text": "Kein UI. Scratchpad-flag-driven. Dokumentation: Feature-coverage im README + Runbook + Architecture-Section",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:970e1cfcbba15812",
+      "quoted_user_text": "Voller DEC-0078-Gateschutz: decision_gate, PHASE_CONTEXT_ISOLATION, RUNTIME_PROOF, security_deny, AUTO_SCHEDULER_CONFLICT, PHASE_OWNERSHIP_VIOLATION, COMPATIBILITY_CRITICAL_OPEN, PHASE_ROLE_CAPABILITY_MISSING, BACKLOG_STATUS_DRIFT, CANONICAL_STATUS_CONFLICT bleiben immer blockierend",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:86dff9cce149b0c7",
+      "quoted_user_text": "Prioritaet 1: Konfigurierbarkeit + Rueckwaertskompatibilitaet. P2: Operator-Reibung. P3: Governance-Overhead. P4: Tests+Paritaet+Installer",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:auto-20260705-us0119-intake:1:c069689dffbcb724",
+      "quoted_user_text": "Single vertical slice: 1 Sprint, 1 Release (US-0119), 1 DEC (DEC-0119). Research-Stub R-0107. Out of scope wie oben beschrieben",
+      "intake_run_id": "auto-20260705-us0119-intake",
+      "turn_index": 1
+    }
+  ],
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "candidate_story_ids": ["US-0119"],
+  "story_ids": ["US-0119"],
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "autonomy-preset",
+      "plan_area_description": "Configurable conversion of framework hard stops to bounded auto-repair for full_autonomy runs"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "autonomy-preset",
+      "story_ids": ["US-0119"]
+    }
+  ],
+  "coverage_complete": true,
+  "story_persisted": true,
+  "backlog_ref": "docs/product/backlog.md ## US-0119",
+  "acceptance_ref": "docs/product/acceptance.md US-0119 row",
+  "dec_ref": "decisions/DEC-0119.md",
+  "research_ref": "docs/engineering/research.md ## R-0107",
+  "handoff_ref": "handoffs/po_to_tl.md ## US-0119",
+  "resume_brief_ref": "handoffs/resume_brief.md"
+}

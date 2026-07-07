@@ -48,6 +48,13 @@ from sovereign_convergence_lib import (  # noqa: E402
     write_partial_delivery_report,
 )
 
+# AUTONOMY_PRESET consumer wiring (US-0119 / DEC-0119):
+# When AUTONOMY_PRESET is set (balanced/full), expand_autonomy_preset merges
+# per-feature flag defaults into the active scratchpad bundle. Default AUTONOMY_PRESET=none
+# produces empty dict (byte-identical pre-US-0119 behaviour). SOVEREIGN_DRAIN_AUTO_ACCEPT
+# is one of the 12 per-feature flags controlled by AUTONOMY_PRESET.
+from autonomy_preset_lib import expand_autonomy_preset  # noqa: E402
+
 SCHEMA_VERSION = 1
 DEFERRALS_PATH = Path("handoffs/sovereign_deferrals.jsonl")
 LOOP_STATE_PATH = Path("handoffs/sovereign_loop_state.json")

@@ -48,6 +48,13 @@ scripts/auto_outer_driver.py
 scripts/uat_probe_lib.py
 scripts/project_readme_coverage_lib.py
 scripts/validate_project_readme_coverage.py
+scripts/work_kind_classify_lib.py
+scripts/work_kind_routing_lib.py
+scripts/autonomy_preset_lib.py
+scripts/autonomy_repair_ledger_lib.py
+scripts/data/autonomy_stop_matrix.yaml
+scripts/validate_closure_verification.py
+scripts/validate_autonomy_stop_matrix.py
 .github/workflows
 its_magic
 
@@ -82,6 +89,9 @@ scripts/auto_outer_driver.py
 scripts/uat_probe_lib.py
 scripts/project_readme_coverage_lib.py
 scripts/validate_project_readme_coverage.py
+scripts/work_kind_classify_lib.py
+scripts/work_kind_routing_lib.py
+scripts/validate_closure_verification.py
 .github/workflows/ci.yml
 .github/workflows/deploy.yml
 its_magic
@@ -102,3 +112,5 @@ scripts/remote_config_summary.py
 scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
 scripts/caveman_compress_input.py
+scripts/work_kind_classify_lib.py
+scripts/work_kind_routing_lib.py

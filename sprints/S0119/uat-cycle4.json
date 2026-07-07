@@ -1,0 +1,39 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "uat",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-05",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "cycle": 4,
+  "fresh_context_marker": "qa-US0119-cycle4-qa-20260705T222729Z-fresh",
+  "timestamp_utc": "2026-07-05T22:27:29Z",
+
+  "verdict": "FAIL",
+
+  "uat_scenarios": {
+    "AC-1_scratchpad_flag_pass": "PASS — AUTONOMY_PRESET=none present in scratchpad + template",
+    "AC-2_preset_expansion_pass": "PASS — expand_autonomy_preset self-test 6/6 PASS + 10 pytest PASS",
+    "AC-3_stop_policy_pass": "PASS — AUTONOMY_STOP_POLICY=block in scratchpad + template",
+    "AC-4_matrix_manifest_pass": "PASS — MD+YAML+validator all exist + validator 0 violations",
+    "AC-5_consumer_wiring_fail": "FAIL — sovereign_loop_lib.py (ZERO) + release_changelog_lib.py (ZERO) un-wired; auto.md+runbook+installer OK",
+    "AC-6_backward_compat_pass": "PASS — test_us0119_preset_none_is_noop PASS",
+    "AC-7_security_gates_pass": "PASS — test_us0119_security_hard_gates_never_auto_repaired PASS + 18 security_hard codes",
+    "AC-8_bounded_ledger_pass": "PASS — dir EXISTS + gitignore + repair_ledger_lib self-test PASS + ledger cap test PASS",
+    "AC-9_breadcrumb_pass": "PASS — autonomy_relaxed breadcrumb in auto.md",
+    "AC-10_tests_and_parity_fail": "FAIL — US-0119 tests PASS, BUT scratchpad parity 2/4 FAIL + check_intake_template PARITY_FAIL",
+    "AC-11_documentation_pass": "PASS — runbook h2 + auto.md h2 + architecture anchor + DEC-0119 + template parities pass",
+    "AC-12_compose_pass": "PASS — 6/6 compose guards UNCHANGED + test_us0119_preset_expansion_uses_known_keys_only PASS"
+  },
+
+  "uat_scenarios_pass": 10,
+  "uat_scenarios_fail": 2,
+  "total": 12,
+
+  "decision_gate": true,
+  "next_phase": "/execute (dev cycle 5 — FINAL cycle)",
+
+  "runtime_proof_id": "rp-us0119-s0119-qa-cycle4-qa-2026-07-05T22:27:29Z",
+  "proof_hash": "f5f2abced05b6c2488a0142d913085ab4f84384b190f2b950457d1d0b9a2db33"
+}

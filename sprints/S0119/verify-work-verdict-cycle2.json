@@ -1,0 +1,13 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa (verify-work merged per ultra_lean)",
+  "role": "qa",
+  "qa_cycle": 2,
+  "fresh_context_marker": "qa-US0119-cycle2-20260705T234200Z-fresh",
+  "timestamp": "2026-07-05T23:42:00Z",
+  "timestamp_utc": "2026-07-05T21:42:00Z",
+  "verdict": "CANNOT_RUN",
+  "reason": "execute-summary.md STILL MISSING after cycle 2; no execute plan summary to cross-check against actual execution",
+  "next_scheduled_phase": "/execute-cycle-3"
+}

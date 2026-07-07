@@ -1,0 +1,100 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-us0119-build-verify",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 1,
+  "auto_loop_max_cycles": 5,
+  "fresh_context_marker": "qa-US0119-build-verify-20260705T212000Z-fresh",
+  "timestamp": "2026-07-05T21:20:00Z",
+  "timestamp_utc": "2026-07-05T19:20:00Z",
+  "companion_dec": "DEC-0119",
+  "verdict": "FAIL",
+  "decision_gate": true,
+  "next_scheduled_phase": "/execute",
+  "ac_coverage": {
+    "total": 12,
+    "pass": 1,
+    "partial_pass": 5,
+    "fail": 6,
+    "per_ac": [
+      {"ac": "AC-1", "status": "PARTIAL_PASS", "task": "T-002", "notes": "AUTONOMY_PRESET flag present in scratchpad + template mirror, but consumer wiring missing so end-to-end not verifiable"},
+      {"ac": "AC-2", "status": "PASS", "task": "T-001", "notes": "autonomy_preset_lib.py expand_autonomy_preset() exists; self-test 6/6 PASS; deterministic; pure stdlib; known-keys-only guard"},
+      {"ac": "AC-3", "status": "PARTIAL_PASS", "task": "T-002", "notes": "AUTONOMY_STOP_POLICY flag present in scratchpad + template mirror, but no consumer wiring to consume it"},
+      {"ac": "AC-4", "status": "PARTIAL_PASS", "task": "T-003", "notes": "Active-side md + YAML + validator exist, BUT template mirror MISSING + validator --self-test FAILS 1316 violations (validator over-broad bug)"},
+      {"ac": "AC-5", "status": "FAIL", "task": "T-004", "notes": "No consumer wiring in .cursor/commands/auto.md / intake.md / release.md / execute.md (0 grep matches)"},
+      {"ac": "AC-6", "status": "FAIL", "task": "T-007, T-011", "notes": "test file tests/us0119_autonomy_preset_test.py MISSING; cannot verify preset=none byte-identical pre-US-0119 behavior"},
+      {"ac": "AC-7", "status": "FAIL", "task": "T-003, T-007", "notes": "Contract test test_us0119_security_hard_gates_never_auto_repaired MISSING; validator --self-test FAILS"},
+      {"ac": "AC-8", "status": "FAIL", "task": "T-005", "notes": "handoffs/autonomy_repair_ledger/ directory MISSING + gitignore MISSING + cap logic MISSING + AUTONOMY_REPAIR_CAP_EXHAUSTED terminal stop MISSING"},
+      {"ac": "AC-9", "status": "PARTIAL_PASS", "task": "T-006", "notes": "Autonomy breadcrumb format documented in state.md L769 (architecture reference), but no runtime breadcrumbs emitted (no consumer wiring)"},
+      {"ac": "AC-10", "status": "FAIL", "task": "T-007, T-008, T-010, T-011", "notes": "Contract tests MISSING; parity script --scope=us-0119 MISSING; validator --self-test FAILS"},
+      {"ac": "AC-11", "status": "FAIL", "task": "T-008, T-009, T-anch", "notes": "Runbook h2 MISSING; auto.md anchor MISSING; template parities for both MISSING. Architecture anchor EXISTS at L1925 (T-anch NO-OP verified)"},
+      {"ac": "AC-12", "status": "PARTIAL_PASS", "task": "T-anch, T-007", "notes": "6/6 compose targets UNCHANGED verified by grep + task-seed audit, BUT contract test test_us0119_preset_expansion_uses_known_keys_only MISSING"}
+    ]
+  },
+  "blocking_findings": [
+    {"id": "B1", "severity": "CRITICAL", "description": "sprints/S0119/execute-summary.md MISSING — dev did not author execute summary", "task": "execute-phase deliverable"},
+    {"id": "B2", "severity": "CRITICAL", "description": "tests/us0119_autonomy_preset_test.py MISSING — T-007 not executed (10 contract markers absent)", "task": "T-007"},
+    {"id": "B3", "severity": "HIGH", "description": "check_intake_template_parity.py --scope=us-0119 argparse choice NOT added — T-008 not executed", "task": "T-008"},
+    {"id": "B4", "severity": "HIGH", "description": "Consumer wiring in .cursor/commands/auto.md + intake.md + release.md + execute.md NOT executed — 0 grep matches (T-004 skipped)", "task": "T-004"},
+    {"id": "B5", "severity": "HIGH", "description": "handoffs/autonomy_repair_ledger/ directory + gitignore + cap logic NOT executed — AC-8 FAIL (T-005 skipped)", "task": "T-005"},
+    {"id": "B6", "severity": "HIGH", "description": "docs/engineering/runbook.md ## Autonomy presets (US-0119) h2 MISSING + template mirror MISSING (T-009 skipped)", "task": "T-009"},
+    {"id": "B7", "severity": "HIGH", "description": ".cursor/commands/auto.md ## Autonomy presets (US-0119) anchor MISSING + template mirror MISSING (T-009 skipped)", "task": "T-009"},
+    {"id": "B8", "severity": "MEDIUM", "description": "docs/engineering/context/installer-owned-paths.manifest 4 US-0119 rows NOT added (T-010 skipped)", "task": "T-010"},
+    {"id": "B9", "severity": "HIGH", "description": "docs/engineering/autonomy-stop-matrix.md template mirror MISSING + scripts/validate_autonomy_stop_matrix.py template mirror MISSING + validator --self-test FAILS 1316 violations (validator over-broad bug, T-003 partial)", "task": "T-003"}
+  ],
+  "non_blocking_findings": [
+    {"id": "NB1", "description": "Pre-existing tests/scratchpad_example_parity_test.py 2/4 FAIL — BUG-0013 residue (CAVEMAN_LEVEL/FRAMEWORK_KIT_REPO/TOKEN_PROFILE leak into template). NOT a US-0119 regression target."},
+    {"id": "NB2", "description": "T-anch compose-do-not-amend verification properly completed: 6/6 UNCHANGED confirmed by grep + task-seed audit"},
+    {"id": "NB3", "description": "handoffs/dev_to_qa.md still references US-0118/S0118 — no US-0119 execute->qa handoff block prepended (dev did not produce execute-summary.md, so formal handoff was skipped)"}
+  ],
+  "test_gates": [
+    {"gate": "autonomy_preset_lib.py --self-test", "result": "PASS", "exit_code": 0, "detail": "[PASS] Test 1..6, 6/6 tests passed"},
+    {"gate": "validate_autonomy_stop_matrix.py --self-test", "result": "FAIL", "exit_code": 1, "detail": "[MATRIX_INVALID] 1316 violation(s) — validator over-broad"},
+    {"gate": "pytest tests/us0119_autonomy_preset_test.py -v", "result": "FAIL", "exit_code": 4, "detail": "ERROR: file or directory not found"},
+    {"gate": "pytest tests/scratchpad_example_parity_test.py -v", "result": "FAIL", "exit_code": 1, "detail": "2 passed, 2 failed — PRE-EXISTING BUG-0013 residue"},
+    {"gate": "check_intake_template_parity.py --repo .", "result": "PASS", "exit_code": 0, "detail": "[INTAKE_TEMPLATE_PARITY_OK] scope=intake"},
+    {"gate": "check_intake_template_parity.py --repo . --scope=us-0119", "result": "FAIL", "exit_code": 2, "detail": "argparse invalid choice: us-0119"},
+    {"gate": "validate_readme_feature_coverage.py --repo . --enforce", "result": "PASS", "exit_code": 0, "detail": "coverage_total=0 (vacuous — no US-0119 feature entry)"}
+  ],
+  "parity": {
+    "its_magic_readme_pair": {"active_size": 203287, "template_size": 203287, "status": "PARITY_OK", "note": "by inaction (T-008 skipped)"},
+    "git_diff_HEAD_readme": {"insertions": 2333, "deletions": 0, "status": "PURE_ADDITION", "note": "includes all post-last-commit additions (US-0113..US-0119), not US-0119-specific"},
+    "cumulative_byte_stability_surface": "US-0113..US-0118 (6 sub-blocks) PRESERVED. US-0119 7th sub-block NOT YET ADDED (T-008 skipped)."
+  },
+  "compose_guards": {
+    "unchanged": 6,
+    "total": 6,
+    "verification_basis": "Confirmed by grep + task-seed audit. 6/6 UNCHANGED (US-0092, US-0095, US-0056, US-0068, US-0096, BUG-0007)."
+  },
+  "plan_verify": {
+    "verdict": "FAIL",
+    "tasks_pass": ["T-anch", "T-001", "T-002", "T-006"],
+    "tasks_partial_pass": ["T-003", "T-011"],
+    "tasks_fail": ["T-004", "T-005", "T-007", "T-008", "T-009", "T-010"]
+  },
+  "verify_work": {
+    "verdict": "CANNOT_RUN",
+    "reason": "execute-summary.md missing; no execute-summary to cross-check"
+  },
+  "uat": {
+    "verdict": "CANNOT_RUN",
+    "reason": "qa-verdict FAIL; cannot perform UAT on FAIL build; gated on qa-verdict PASS"
+  },
+  "artifacts_written": [
+    "sprints/S0119/qa-findings.md (NEW)",
+    "sprints/S0119/qa-verdict.json (NEW)",
+    "sprints/S0119/verify-work-findings.md (NEW — CANNOT_RUN)",
+    "sprints/S0119/verify-work-verdict.json (NEW — CANNOT_RUN)",
+    "sprints/S0119/uat.md (NEW — CANNOT_RUN)",
+    "sprints/S0119/uat.json (NEW — CANNOT_RUN)",
+    "sprints/S0119/plan-verify.json (NEW — FAIL)",
+    "sprints/S0119/plan-verify-findings.md (NEW — FAIL)",
+    "handoffs/qa_to_dev.md (UPDATED — US-0119 block prepended)",
+    "docs/engineering/state.md (APPENDED — qa checkpoint + isolation evidence + strict runtime proof + decision gate)",
+    "handoffs/resume_brief.md (PREPENDED — drain-advance block for /execute cycle 2)"
+  ]
+}

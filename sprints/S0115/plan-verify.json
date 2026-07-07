@@ -1,0 +1,59 @@
+{
+  "story_id": "US-0115",
+  "orchestrator_run_id": "auto-20260704-01",
+  "phase": "plan-verify (merged into qa per ultra_lean)",
+  "verdict": "PASS",
+  "checks": [
+    {
+      "name": "task_count_within_limit",
+      "status": "PASS",
+      "detail": "6 tasks T-001..T-006 <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered (mirror US-0113/US-0114 sibling pattern)."
+    },
+    {
+      "name": "ac_coverage_surjective",
+      "status": "PASS",
+      "detail": "8/8 ACs mapped to tasks (AC-1->T-001, AC-2->T-002, AC-3->T-003, AC-4->T-005, AC-5->T-004, AC-6->T-005, AC-7->T-002, AC-8->T-006). Multi-AC tasks: T-002 (AC-2+AC-7), T-005 (AC-4+AC-6). No PLAN_AC_COVERAGE_GAP."
+    },
+    {
+      "name": "dependency_order_acyclic",
+      "status": "PASS",
+      "detail": "Acyclic chain T-001 (umbrella) -> T-002 (7 subsections) -> T-003 (scratchpad ref extension) -> T-004 (template byte-sync) -> T-005 (validators) -> T-006 (regression tests)."
+    },
+    {
+      "name": "files_to_touch_consistent",
+      "status": "PASS",
+      "detail": "Files to touch = its_magic/README.md + template/its_magic/README.md (parity via T-004 one-way copy). Files NOT to touch enumerated (scratchpad canonical, backlog.md, runbook.md, docs/developer/README.md, architecture.md beyond US-0115 anchor, installer.*, scripts/*, test files)."
+    },
+    {
+      "name": "no_dec_required",
+      "status": "PASS",
+      "detail": "companion_dec=none; US-0115 documentation-only; mirrors US-0113/US-0114 sibling precedent. R-0103 Decision-gate check confirmed no DEC candidate."
+    },
+    {
+      "name": "dc3_deferral_noted",
+      "status": "PASS",
+      "detail": "DC-3 (7 missing # US-0034/# US-0084/# US-0086/# US-0093/# US-0096/# US-0101/# US-0102 h1 anchors in active architecture.md) deferred to US-0117. US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) = 14 total. Not a US-0115 blocker (AC-7 satisfied via runbook cross-links — all 7 anchors pre-exist)."
+    },
+    {
+      "name": "byte_stability_contract_present",
+      "status": "PASS",
+      "detail": "Sprint plan + tasks mandate: do NOT modify US-0113's ### Sovereign-loop era / ### Sovereign-loop era keys blocks (L940/L1427) or US-0114's ### Release & distribution / ### Release & distribution keys blocks (L1225/L1551) in its_magic/README.md. T-003 mandates net-new-keys-only + cross-link-pointer shape. Execute-phase must verify git diff shows pure addition in post-L1551 range. QA re-verifies."
+    },
+    {
+      "name": "compose_guards_23_unchanged",
+      "status": "PASS",
+      "detail": "23 compose guards UNCHANGED (cumulative): US-0091, US-0097, US-0017, US-0040, US-0100, US-0101, US-0102, US-0103, US-0104, US-0105, US-0107, US-0108, US-0109, US-0110, US-0111, US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062. US-0115 documentation-only; lives entirely outside the compose surface."
+    },
+    {
+      "name": "test_markers_locked",
+      "status": "PASS",
+      "detail": "5 test markers locked (no new tests proposed): tests/scratchpad_example_parity_test.py (4 markers, AC-5 indirect, AC-8), validate_readme_feature_coverage.py --enforce (AC-4), check_intake_template_parity.py (AC-5), validate_doc_profile.py (AC-6), check-user-visible-metadata.py (AC-6)."
+    },
+    {
+      "name": "encoding_hygiene_prerequisite_flagged",
+      "status": "PASS",
+      "detail": "Working-tree docs/product/backlog.md has 185 stray 0xa7 (section) bytes per R-0102/R-0103 (Windows-1252 corruption). Flagged to orchestrator; NOT a US-0115 blocker. QA re-verification confirmed validator did not block on this in the execute run."
+    }
+  ],
+  "timestamp": "2026-07-04T06:37:49Z"
+}

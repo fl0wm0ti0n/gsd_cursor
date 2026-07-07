@@ -1,0 +1,29 @@
+{
+  "story_id": "US-0115",
+  "orchestrator_run_id": "auto-20260704-01",
+  "phase": "verify-work (merged into qa per ultra_lean)",
+  "verdict": "PASS",
+  "execute_summary_accurate": true,
+  "discrepancies_vs_execute_summary": [],
+  "scope_creep": "none",
+  "files_modified_by_us0115": [
+    "its_magic/README.md",
+    "template/its_magic/README.md"
+  ],
+  "byte_stability_preserved": true,
+  "byte_stability_blocks": [
+    "### Sovereign-loop era keys (US-0103-US-0112) — byte-identical between its_magic/README.md and template/its_magic/README.md",
+    "### Release & distribution keys (US-0041 / US-0062 / US-0111 / US-0112) — byte-identical (4115 chars)",
+    "### Sovereign-loop era (US-0103-US-0112) umbrella section — byte-identical (13700 chars)",
+    "### Release & distribution (US-0041 / US-0062 / US-0111 / US-0112) umbrella section — byte-identical (10418 chars)"
+  ],
+  "parity_preserved": true,
+  "parity_proofs": [
+    "PARITY_OK 128660 128660 (binary compare)",
+    "[INTAKE_TEMPLATE_PARITY_OK] scope=intake (exit 0)"
+  ],
+  "dc3_deferral_status": "correctly noted in execute-summary + dev_to_qa.md + state.md checkpoint; NOT appended to sovereign_deferrals.jsonl (correct — orchestrator's segment-boundary advance hook handles it); US-0117 inherits DC-1 (5) + DC-2 (2) + DC-3 (7) = 14 total",
+  "fresh_context_marker": "qa-US0115-qa-20260704T063749Z-fresh",
+  "timestamp": "2026-07-04T06:37:49Z",
+  "next_scheduled_phase": "release"
+}

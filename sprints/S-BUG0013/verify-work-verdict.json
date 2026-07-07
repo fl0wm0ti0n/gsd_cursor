@@ -1,0 +1,28 @@
+{
+  "sprint_id": "S-BUG0013",
+  "bug_id": "BUG-0013",
+  "verdict": "PASS",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "blocking_findings": 0,
+  "tests_passing": 4,
+  "tests_total": 4,
+  "compose_guards_verified": 9,
+  "compose_guards_total": 9,
+  "compose_guards": ["US-0008", "US-0040", "US-0054", "US-0100", "US-0101", "US-0102", "US-0103", "US-0107", "US-0110"],
+  "ac_satisfied": 6,
+  "ac_total": 6,
+  "ac_list": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6"],
+  "discrepancies_vs_qa": "NONE",
+  "informational_findings": [
+    {"id": "INFO-001", "description": "bug_issue_validate.py does not accept --bug-id; auto-detects from acceptance file", "status": "acknowledged"},
+    {"id": "INFO-002", "description": "4th test (test_bug0013_active_example_mirror_in_sync) beyond originally specified 3 — additional coverage", "status": "acknowledged"},
+    {"id": "INFO-003", "description": "intake_bug_resume_brief_refresh.py --validate-file literal invocation returns exit code 1 (format drift between orchestrator resume_brief writer and intake validator parser); substantive BUG-0013 chain in resume_brief is correct and consistent; pre-existing framework issue, not a BUG-0013 regression", "status": "acknowledged", "classification": "framework-level latent format drift – does not block BUG-0013"}
+  ],
+  "ready_for_release": true,
+  "next_phase": "/release",
+  "timestamp": "2026-07-02T00:45:00Z",
+  "orchestrator_run_id": "auto-20260701-01",
+  "fresh_context_marker": "qa-BUG0013-verify-work-20260702T004500Z-fresh",
+  "runtime_proof_id": "rp-auto-20260701-01-verify-work-qa-20260702T004500Z-BUG0013"
+}

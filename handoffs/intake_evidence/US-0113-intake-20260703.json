@@ -1,0 +1,55 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260703-US0113-intake",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Extend template/its_magic/README.md with the missing feature descriptions — what each feature is, what it can do, and how to use it; scratchpad key documentation is the priority (sovereign-loop era features currently only have one-line US-0091 catalog rows).",
+      "intake_run_id": "cursor-20260703-US0113-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260703-US0113-intake:0:3a4f1ca5df76445b"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Primary surface: its_magic/README.md and template/its_magic/README.md (byte-identical framework README per US-0097); add operator subsections under Commands and workflow / Full scratchpad reference mirroring Automation modes and Sync policy depth; optional runbook cross-links only.",
+      "intake_run_id": "cursor-20260703-US0113-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260703-US0113-intake:1:83b3c25e57d0f4dd"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Compose on BUG-0014 (catalog traceability already DONE) and US-0091/DEC-0074 — must not remove or break existing US-xxxx/BUG-xxxx catalog anchors; preserve DEC-0059 USER_* H2 vocabulary; default-off sovereign flags stay default-off in prose; docs/developer/README.md stays traceability-dense unless a single cross-link is added.",
+      "intake_run_id": "cursor-20260703-US0113-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260703-US0113-intake:2:e2412664032f1a59"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "python scripts/validate_readme_feature_coverage.py --repo . --enforce must remain [README_FEATURE_COVERAGE_VALIDATE_OK]; its_magic/README.md == template/its_magic/README.md byte parity; scripts/check-user-visible-metadata.py and scripts/validate_doc_profile.py green; each US-0103..US-0112 narrative section documents master enable flag + at least one operator recipe.",
+      "intake_run_id": "cursor-20260703-US0113-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260703-US0113-intake:3:f4ba84106892804e"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "Single story US-0113: sovereign-loop operator guide sections + extended Full scratchpad reference shipped in framework README family; coverage validator and template parity green; release flips story to DONE per US-0045.",
+      "intake_run_id": "cursor-20260703-US0113-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260703-US0113-intake:4:8c6f94eb4cc7ad62"
+    }
+  ]
+}

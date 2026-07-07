@@ -1,0 +1,16 @@
+{
+  "story_id": "US-0119",
+  "sprint_id": "S0119",
+  "phase_id": "qa",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260705-us0119-build-verify",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 3,
+  "fresh_context_marker": "qa-US0119-cycle3-20260706T002105Z-fresh",
+  "timestamp": "2026-07-06T00:21:05Z",
+  "timestamp_utc": "2026-07-05T22:21:05Z",
+  "verdict": "FAIL",
+  "reason": "qa-verdict FAIL (7 blocking findings; 2 regressions; dev cycle-3 verdict=PASS unsubstantiated); cannot perform UAT; UAT requires qa-verdict PASS + verify-work-verdict PASS",
+  "next_scheduled_phase": "/execute-again"
+}

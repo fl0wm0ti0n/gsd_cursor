@@ -1,0 +1,23 @@
+{
+  "story_id": "US-0118",
+  "sprint_id": "S0118",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "phase_id": "plan-verify",
+  "verdict": "PASS",
+  "checks": [
+    {"name": "task_count_within_limit", "status": "PASS", "detail": "10 tasks (T-anch NO-OP + T-001..T-009) <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered"},
+    {"name": "ac_coverage_surjective", "status": "PASS", "detail": "12/12 ACs mapped to 10 tasks; multi-AC tasks T-007 (AC-1+AC-2), T-008 (AC-4+AC-5+AC-6), T-009 (AC-7+AC-9+AC-12 partial), T-006 (AC-8+AC-9 regression), T-anch (AC-8+AC-10); every AC has >=1 task; no PLAN_AC_COVERAGE_GAP"},
+    {"name": "dependency_order_acyclic", "status": "PASS", "detail": "T-anch->T-007->T-008->T-009->T-001->T-002->T-003->T-004->T-005->T-006 acyclic (code-first ordering per architecture dependency chain)"},
+    {"name": "t_anch_no_op_documented", "status": "PASS", "detail": "T-anch correctly documented as NO-OP / verification — ## US-0118 section already added in /architecture phase at architecture.md L1713 per R-0105 Q-2 LOCKED; no execute-phase write to architecture.md; verified independently by QA via grep ^## US-0118 architecture.md -> L1713 match"},
+    {"name": "files_to_touch_consistent", "status": "PASS", "detail": "Files-to-touch table covers 10 entries (work_kind_classify_lib.py, us0118_contract_test.py, README, runbook, auto.md, intake.md, scratchpad, installer-owned-paths.manifest, check_intake_template_parity.py, architecture.md verification-only); non-goals hard-listed (backlog.md, acceptance.md, prior US-0113..US-0117 README blocks, dev_environment_lib.py, scratchpad_example_parity_test.py, 23 compose guards)"},
+    {"name": "companion_dec_referenced", "status": "PASS", "detail": "DEC-0118 Required -> Accepted; authored in /architecture phase at decisions/DEC-0118.md; locks 3-tier enumeration + L8 precedence chain + dev_environment_lib reuse boundary + zero-overhead-when-off; mirrors DEC-0082/DEC-0052 precedent"},
+    {"name": "architecture_notes_locked", "status": "PASS", "detail": "docs/engineering/architecture.md ## US-0118 — Work-kind classification + tiered delivery routing per story locked at L1713 (added in /architecture phase per R-0105 Q-2 LOCKED); approach_locked=A1; documents classifier contract + work-kind enum + precedence chain + fail-closed codes + composition + dev_environment_lib.classify_touched_files reuse anchor"},
+    {"name": "byte_stability_contract_present", "status": "PASS", "detail": "6th-story cumulative surface LOCKED (first 6-cumulative-surface story); prior 5 released blocks US-0113 L2421 + US-0114 L2545 + US-0115 L2617 + US-0116 L2765 + US-0117 L2856 byte-stability preserved; US-0118 adds net-new-keys-only + cross-link-pointer + reason-code-only shape to its own 6th sub-block, never edits prior released blocks"},
+    {"name": "compose_guards_23_unchanged", "status": "PASS", "detail": "23 cumulative guards UNCHANGED (same 23 as US-0117); US-0118 is additive-only — new flag, new lib, new row fields, new precedence clause, new README sub-block, new runbook h2; does NOT amend any existing compose-surface feature; US-0118 itself does NOT become a NEW compose guard (routing primitive, not guard)"},
+    {"name": "test_markers_locked", "status": "PASS", "detail": "13 test_us0118_* markers locked (Q4 LOCKED 12 + tie-break Q1); pytest stdlib only; covers DOC/MINI/CODE classification + each recommended phase plan + default-off zero-overhead + L8 precedence vs DELIVERY_MODE/AUTO_PHASE_* + operator override path + each fail-closed reason code + --explain rule_trace + classify_touched_files reuse boundary"},
+    {"name": "parity_scope_defined", "status": "PASS", "detail": "WORK_KIND_ROUTING_PAIRS (8 byte-identical pairs) + --scope=work-kind-routing flag added to check_intake_template_parity.py; scratchpad files explicitly excluded (intentional non-byte-identical — structural key parity covered by bug0013 test); active + template/ parity for new script + scratchpad lines + command docs + runbook + manifest"}
+  ],
+  "timestamp": "2026-07-04T23:09:00Z"
+}

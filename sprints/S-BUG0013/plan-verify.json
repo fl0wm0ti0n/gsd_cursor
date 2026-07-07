@@ -1,0 +1,95 @@
+{
+  "sprint_id": "S-BUG0013",
+  "bug_refs": ["BUG-0013"],
+  "status": "PASS",
+  "reason": "PLAN_VERIFY_OK",
+  "verdict_reason_codes": ["PLAN_VERIFY_OK"],
+  "planned_at": "2026-07-01T23:31:00Z",
+  "plan_verified_at": "2026-07-01T23:37:00Z",
+  "role_planned": "tech-lead",
+  "role_verified": "qa",
+  "planned_by": {
+    "role": "tech-lead",
+    "orchestrator_run_id": "auto-20260701-01",
+    "fresh_context_marker": "tl-SBUG0013-BUG0013-sprint-plan-20260701T233100Z-fresh"
+  },
+  "verified_by": {
+    "role": "qa",
+    "orchestrator_run_id": "auto-20260701-01",
+    "fresh_context_marker": "qa-S-BUG0013-planverify-20260701T233700Z-fresh",
+    "verified_at": "2026-07-01T23:37:00Z"
+  },
+  "verification_proof_ref": "sprints/S-BUG0013/plan-verify-findings.md",
+  "verification_proof_hash": "pv-bug0013-qa-auto2026070101-20260701T233700Z",
+  "orchestrator_run_id": "auto-20260701-01",
+  "dec_id": null,
+  "dec_rationale": "Packaging defect; R-0099 Q6 confirms no DEC required (compose guards honored, no architectural decision surface).",
+  "research_anchor": "R-0099",
+  "architecture_anchor": "docs/engineering/architecture.md#BUG-0013",
+  "acs_covered": ["AC-1", "AC-2", "AC-3", "AC-4", "AC-5", "AC-6"],
+  "ac_coverage": [
+    {"ac": "AC-1", "tasks": ["T-001"], "verified": false, "notes": "PENDING — Template byte-identical to canonical except header + local overrides."},
+    {"ac": "AC-2", "tasks": ["T-001"], "verified": false, "notes": "PENDING — Installer already correct per R-0099 Q2; verify no regression."},
+    {"ac": "AC-3", "tasks": ["T-002"], "verified": false, "notes": "PENDING — New parity test with 3 markers."},
+    {"ac": "AC-4", "tasks": ["T-003"], "verified": false, "notes": "PENDING — Runbook § 'Scratchpad example parity'."},
+    {"ac": "AC-5", "tasks": ["T-001", "T-002", "T-003"], "verified": false, "notes": "PENDING — bug_issue_validate.py --check-acceptance -> [BUG_VALIDATION_OK]."},
+    {"ac": "AC-6", "tasks": ["T-001", "T-002", "T-003"], "verified": false, "notes": "PENDING — intake_bug_resume_brief_refresh.py --validate-file -> PASS."}
+  ],
+  "coverage": [
+    {"ac": "AC-1", "tasks": ["T-001"], "verified": false},
+    {"ac": "AC-2", "tasks": ["T-001"], "verified": false},
+    {"ac": "AC-3", "tasks": ["T-002"], "verified": false},
+    {"ac": "AC-4", "tasks": ["T-003"], "verified": false},
+    {"ac": "AC-5", "tasks": ["T-001", "T-002", "T-003"], "verified": false},
+    {"ac": "AC-6", "tasks": ["T-001", "T-002", "T-003"], "verified": false}
+  ],
+  "plan_integrity": {
+    "task_count": 3,
+    "ac_count": 6,
+    "task_ac_bijection": false,
+    "task_seed_bijection": true,
+    "ac_coverage_surjective": true,
+    "sprint_max_tasks": 12,
+    "within_limit": true,
+    "sprint_auto_split_triggered": false,
+    "ac_coverage_gap": false
+  },
+  "governance_alignment": {
+    "decision_ref": null,
+    "decision_rationale": "No DEC required (R-0099 Q6; packaging defect)",
+    "composed_decisions": [],
+    "architecture_anchor": "docs/engineering/architecture.md#BUG-0013",
+    "research_anchor": "R-0099",
+    "out_of_scope_guard": "Pure file-copy sync + parity test + runbook docs; no compose-surface files touched; no installer changes.",
+    "non_goals_respected": [
+      "no modification of .cursor/scratchpad.md (canonical source)",
+      "no modification of installer.py / installer.ps1 / installer.sh",
+      "no amendment of 9 compose guards",
+      "no new DEC record",
+      "no data migration"
+    ]
+  },
+  "gates_passed": [],
+  "gates_pending": [
+    "AC_COVERAGE_SURJECTIVE: AC-1..AC-6 all >=1 task via T-001..T-003 (planned)",
+    "TASK_SEED_BIJECTION: T-001..T-003 map 1:1 to architecture # BUG-0013 § Sprint task seeds",
+    "TASK_ATOMICITY: each task is atomic (T-001 file sync, T-002 test file, T-003 runbook section)",
+    "ACCEPTANCE_CHECKS_TESTABLE: each task has concrete acceptance_check bullets",
+    "TASK_COUNT_WITHIN_LIMIT: task_count=3 <= sprint_max_tasks=12",
+    "ORDERING_NO_CYCLES: T-001 -> T-002 -> T-003 (no circular dependencies)",
+    "NON_GOALS_PRESERVED: all non-goals from architecture documented",
+    "COMPOSE_GUARDS_UNCHANGED: 9 guards enumerated and untouched",
+    "STATUS_AUTHORITY_PRESERVED: BUG-0013 stays OPEN (US-0045)"
+  ],
+  "checks_performed": [],
+  "gates_failed": [],
+  "remediation_required": [],
+  "governance_refs": [
+    "R-0099",
+    "architecture.md#BUG-0013",
+    "US-0045",
+    "US-0017",
+    "US-0048",
+    "US-0056"
+  ]
+}

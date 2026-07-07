@@ -1,0 +1,56 @@
+{
+  "sprint_id": "S0114",
+  "story_refs": ["US-0114"],
+  "phase": "plan-verify",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260704-01",
+  "delivery_mode": "ultra_lean",
+  "timestamp": "2026-07-04T07:10:00Z",
+  "status": "PASS",
+  "ac_coverage_surjective": true,
+  "ac_count_total": 8,
+  "ac_count_covered": 8,
+  "task_count": 6,
+  "within_limit": true,
+  "sprint_max_tasks": 12,
+  "sprint_auto_split_triggered": false,
+  "task_atomicity": true,
+  "ordering_acyclic": true,
+  "ordering_chain": "T-001 → T-002 → T-003 → T-004 → T-005 → T-006",
+  "test_markers_aligned": true,
+  "test_markers": [
+    "tests/scratchpad_example_parity_test.py (4 markers — AC-5 indirect, AC-8)",
+    "scripts/validate_readme_feature_coverage.py --enforce (AC-4)",
+    "scripts/check_intake_template_parity.py (AC-5)",
+    "scripts/validate_doc_profile.py (AC-6)",
+    "scripts/check-user-visible-metadata.py (AC-6)"
+  ],
+  "compose_guards_count": 18,
+  "compose_guards_unchanged": true,
+  "governance": {
+    "architecture_anchor_exists": true,
+    "architecture_anchor_ref": "docs/engineering/architecture.md#US-0114 (L914)",
+    "research_anchor_exists": true,
+    "research_anchor_ref": "docs/engineering/research.md R-0102",
+    "companion_dec": "none",
+    "companion_dec_justified": true,
+    "status_authority_open_per_us_0045": true
+  },
+  "non_goals_preserved": true,
+  "runtime_proof_id": "rp-auto-20260704-01-qa-qa-20260704T071000Z-US-0114",
+  "ac_to_task_map": {
+    "AC-1": ["T-001"],
+    "AC-2": ["T-002"],
+    "AC-3": ["T-003"],
+    "AC-4": ["T-005"],
+    "AC-5": ["T-004"],
+    "AC-6": ["T-005"],
+    "AC-7": ["T-002"],
+    "AC-8": ["T-006"]
+  },
+  "multi_ac_tasks": {
+    "T-002": ["AC-2", "AC-7"],
+    "T-005": ["AC-4", "AC-6"]
+  },
+  "evidence_ref": "sprints/S0114/sprint.md, sprints/S0114/tasks.md"
+}
