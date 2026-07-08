@@ -4074,7 +4074,7 @@ elaxed mode (AI may drop/reorder ACs with ledger entry + QA-verifiable; new ACs/
 - Title: Separate `/closure` phase after `/release` with exclusive Story Closure responsibility
 - Summary: Story Closure (Status DONE in `docs/product/backlog.md` + acceptance checkbox `[ ]`→`[x]` in `docs/product/acceptance.md` + state checkpoint traceability) is currently embedded in `/release` step 10–12. During the US-0119 lifecycle, the Release subagent claimed to have performed closure but the actual files were NOT modified (backlog.md remained OPEN, acceptance.md remained unchecked). This is the same "subagent execution fidelity" issue that blocked the Execute cycle. By extracting closure into a dedicated `/closure` phase with exclusive responsibility, we (1) reduce the scope of the release subagent so it focuses on release artifacts only, (2) give the orchestrator a verifiable closure checkpoint (similar to how we fixed execute-cycle fidelity), and (3) enforce "one phase, one responsibility" consistency across the lifecycle. New lifecycle structure (ultra_lean ship macro): `release → closure → refresh-context` (3 phases instead of 2). Compose (read-only) with US-0043/US-0045/US-0040/US-0048/US-0056/US-0096: `/closure` executes what US-0043 defines (reconciliation), follows US-0045 ownership rules (canonical status authority), operates after US-0040 release artifacts are written, produces its own US-0048 isolation evidence and US-0056 runtime proof, and applies to all delivery modes per US-0096.
 - Priority: P1
-- Status: OPEN
+- Status: DONE
 - work_kind: doc
 - recommended_delivery_mode: ultra_lean
 - Decomposition (US-0051):

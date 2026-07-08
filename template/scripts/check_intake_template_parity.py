@@ -17,6 +17,7 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=sovereign-self-healing-deploy DEC-0109 self-healing deploy loop surfaces (US-0109).
   --scope=release-trigger-adapter DEC-0111 release trigger adapter surfaces (US-0111).
   --scope=us-0119               DEC-0119 autonomous-autonomy preset surfaces (US-0119).
+  --scope=us-0120               US-0120 dedicated /closure phase surfaces.
   --scope=all              union of all tables.
 """
 
@@ -457,6 +458,22 @@ AUTONOMY_PRESET_PAIRS: tuple[tuple[str, str], ...] = (
     ("tests/us0119_autonomy_preset_test.py", "template/tests/us0119_autonomy_preset_test.py"),
 )
 
+# US-0120 — Dedicated /closure phase surfaces. Contents must be byte-identical
+# between active and template paths.
+CLOSURE_PHASE_PAIRS: tuple[tuple[str, str], ...] = (
+    (".cursor/commands/closure.md", "template/.cursor/commands/closure.md"),
+    (".cursor/commands/release.md", "template/.cursor/commands/release.md"),
+    (".cursor/commands/auto.md", "template/.cursor/commands/auto.md"),
+    (
+        "scripts/validate_closure_verification.py",
+        "template/scripts/validate_closure_verification.py",
+    ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
@@ -478,6 +495,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "release-trigger-adapter": RELEASE_TRIGGER_ADAPTER_PAIRS,
     "work-kind-routing": WORK_KIND_ROUTING_PAIRS,
     "us-0119": AUTONOMY_PRESET_PAIRS,
+    "us-0120": CLOSURE_PHASE_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -498,6 +516,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + RELEASE_TRIGGER_ADAPTER_PAIRS
         + WORK_KIND_ROUTING_PAIRS
         + AUTONOMY_PRESET_PAIRS
+        + CLOSURE_PHASE_PAIRS
     ),
 }
 

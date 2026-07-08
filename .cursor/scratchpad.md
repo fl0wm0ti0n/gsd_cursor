@@ -375,8 +375,8 @@ CAVEMAN_FILE_SCOPE=
 #   .cursor/model-catalog.local.example.role-based-highend.json      â€” v2 role preset (high-end)
 # Copy one to .cursor/model-catalog.local.json and set MODEL_RESOLVE=local_catalog or role_catalog to activate.
 MODEL_TIER_DEFAULT=balanced
-MODEL_CATALOG=.cursor/model-catalog.local.example.role-based-budget
-MODEL_RESOLVE=alias_only
+MODEL_CATALOG=.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json
+MODEL_RESOLVE=role_catalog
 MODEL_FALLBACK=inherit
 MODEL_PROVIDER_MODE=cursor
 #
@@ -621,7 +621,7 @@ RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0
 #
 # AUTONOMY_REPAIR_CAP_OVERRIDE: int >= 1 or empty (default=empty)
 # Operator override for per-run repair cap (empty = use matrix default cap=3 per DEC-0119 Â§5).
-AUTONOMY_PRESET=none
+AUTONOMY_PRESET=full
 AUTONOMY_STOP_POLICY=block
 INTAKE_AUTONOMY_MODE=0
 INTAKE_MINIMAL_PACK=0

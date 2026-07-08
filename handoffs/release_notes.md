@@ -11,6 +11,21 @@ Canonical queue state now lives under:
 
 ---
 
+## Release finalized note (S0120)
+
+- Sprint: `S0120`
+- Story: `US-0120` (Dedicated `/closure` phase with exclusive Story Closure responsibility)
+- Release: **finalized** (`2026-07-08T19:45:00Z`, `orchestrator_run_id=auto-20260708-01`, `fresh_context_marker=release-US0120-release-20260708T194500Z-fresh`, `runtime_proof_id=rp-auto-20260708-01-release-release-20260708T194500Z-US-0120`)
+- Queue: **`handoffs/release_queue.md`** row **`S0120`** = **`released`** (governance-only; backlog reconciliation deferred to `/closure`)
+- **Run / verify:** `python -m pytest tests/us0120_closure_phase_test.py -v` → 10 passed in 0.08s; `python scripts/validate_closure_verification.py --self-test` → `[VALIDATE_CLOSURE_VERIFICATION_SELF_TEST_OK]` exit 0; `python scripts/check_intake_template_parity.py --repo . --scope=us-0120` → `[INTAKE_TEMPLATE_PARITY_OK]` exit 0. See **`handoffs/releases/S0120-release-notes.md`**.
+- ACs satisfied: **12/12** (closure command, DEC-0052/DEC-0082, auto orchestration, release.md step removal, closure-verification schema, isolation/runtime proof contracts, 10 contract tests, drain hook, documentation, compose guards)
+- Compose guards: **6/6 UNCHANGED** (US-0043, US-0045, US-0040, US-0048, US-0056, US-0096)
+- **Backlog status**: US-0120 remains **OPEN** — closure deferred to `/closure` per US-0120 design
+- **Acceptance**: US-0120 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — `publish_snapshot=skipped_disabled`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Next**: **`/closure`** (fresh **qe** context, ship macro — second canonical phase per DEC-0082)
+
 ## Release finalized note (S0118)
 
 - Sprint: `S0118`

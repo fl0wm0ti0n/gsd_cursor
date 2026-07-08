@@ -6,8 +6,8 @@
 - **Story**: US-0120
 - **Delivery mode**: ultra_lean
 - **Macro phase plan**: [spec, plan, build+verify, ship]
-- **Current phase**: /research (plan macro — first canonical phase)
-- **Status**: DISCOVERED (ready for /research)
+- **Current phase**: CLOSED (refresh-context complete — segment terminal)
+- **Status**: RELEASED / CLOSED
 - **Intake evidence**: handoffs/intake_evidence/US-0120-intake.json
 - **Discovery locks**: sprints/S0120/discovery-locks.md
 - **Companion DEC**: DEC-0120 (Required → Accepted; locks phase ownership, phase ordering, input prerequisites, output artifacts, compose relationships, template parity, orchestrator verification, backward compat)

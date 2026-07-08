@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "tiers": {
-    "cheap": "qwen-3.7-plus",
-    "balanced": "composer-2.5-standard",
-    "strong": "glm-5.2"
+    "cheap": "<your-cheap-model-slug>",
+    "balanced": "<your-balanced-model-slug>",
+    "strong": "<your-strong-model-slug>"
   },
-  "notes": "Default tier preset. Qwen3.7 Plus for cheap mass DEV, Composer 2.5 Standard for Cursor-DEV, GLM-5.2 for architecture/QA/release gates. Copy to .cursor/model-catalog.local.json and enable with MODEL_RESOLVE=local_catalog in .cursor/scratchpad.local.md."
+  "notes": "Copy this file to .cursor/model-catalog.local.json and replace placeholder slugs with vendor-specific model IDs. Enable with MODEL_RESOLVE=local_catalog in .cursor/scratchpad.local.md. All three tier keys are required."
 }

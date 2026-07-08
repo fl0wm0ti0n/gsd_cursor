@@ -271,13 +271,19 @@ override governance is satisfied.
 | `qa` | `qa` | `qa` |
 | `verify-work` | `qa` | `qa` |
 | `release` | `release` | `release` |
+| `closure` | `qe`, `curator` | `qe` |
 | `refresh-context` | `curator`, `po` | `curator` |
 
 Alternate-role keys (merged scratchpad): `AUTO_ROLE_RESEARCH`, `AUTO_ROLE_PLAN_VERIFY`,
-`AUTO_ROLE_REFRESH_CONTEXT` — single-valued resolution per **DEC-0051** (see reference).
+`AUTO_ROLE_REFRESH_CONTEXT`, `AUTO_ROLE_CLOSURE` — single-valued resolution per **DEC-0051** (see reference).
 
 Execute override: requires `AUTO_EXECUTE_ROLE_OVERRIDE=allowed_non_dev_execute` **and**
 parseable `EXECUTE_OVERRIDE_GOVERNANCE_REF`.
+
+Closure role (US-0120): `AUTO_ROLE_CLOSURE` scratchpad key accepts `qe` (default) or
+`curator` override. When empty, default is `qe`. `curator` override must not write
+qa-owned surfaces per DEC-0051 §3 preflight capability gate. Fail-closed:
+`PHASE_CAPABILITY_MISSING` when role cannot perform closure duties.
 
 Role reason codes: `PHASE_ROLE_CAPABILITY_MISSING`, `PHASE_ROLE_MISMATCH`.
 

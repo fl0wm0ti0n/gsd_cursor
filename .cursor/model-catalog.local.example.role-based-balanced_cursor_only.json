@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "tiers": {
+    "cheap": "composer-2.5-fast",
+    "balanced": "composer-2.5-standard",
+    "strong": "claude-opus-4.8"
+  },
+  "roles": {
+    "po": "claude-sonnet",
+    "sa": "glm-5.2",
+    "dev": "composer-2.5-standard",
+    "dev_difficult": "gpt-5.3-codex",
+    "qa": "gemini-3.1-pro",
+    "security": "claude-opus-4.8",
+    "release": "glm-5.2"
+  },
+  "notes": "Role-based balanced preset — Cursor subscription models only (US-0102 / DEC-0087). No custom API key required; slugs must match your Cursor Settings → Models list. Elite-balanced mix: Claude Sonnet (PO), GLM-5.2 (SA/Release), Gemini 3.1 Pro (QA), Composer 2.5 Standard (mass DEV), GPT-5.3 Codex (difficult DEV), Claude Opus 4.8 (Security + strong tier). Based on ai_modell_auslegung_cursor_highend.md 'Elite Balanced Setup', adapted for Cursor-native routing. Copy to .cursor/model-catalog.local.json and set MODEL_RESOLVE=role_catalog."
+}

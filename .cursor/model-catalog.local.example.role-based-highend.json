@@ -1,18 +1,18 @@
 {
   "schema_version": 2,
   "tiers": {
-    "cheap": "deepseek-v4-pro",
-    "balanced": "kimi-k2.7-code",
-    "strong": "gpt-5.5"
+    "cheap": "<your-cheap-highend-slug>",
+    "balanced": "<your-balanced-highend-slug>",
+    "strong": "<your-strong-highend-slug>"
   },
   "roles": {
-    "po": "gpt-5.5",
-    "sa": "claude-opus-4.8",
-    "dev": "kimi-k2.7-code",
-    "dev_difficult": "claude-opus-4.8",
-    "qa": "gpt-5.5",
-    "security": "gpt-5.5",
-    "release": "gpt-5.5"
+    "po": "<your-po-highend-slug>",
+    "sa": "<your-sa-highend-slug>",
+    "dev": "<your-dev-highend-slug>",
+    "dev_difficult": "<your-dev-difficult-highend-slug>",
+    "qa": "<your-qa-highend-slug>",
+    "security": "<your-security-highend-slug>",
+    "release": "<your-release-highend-slug>"
   },
-  "notes": "Role-based high-end preset (US-0102 / DEC-0087). Max quality: GPT-5.5 and Claude Opus as chief architects and gates for PO/SA/QA/Security/Release, Kimi K2.7 Code for difficult DEV, DeepSeek V4 Pro for cheap scale. Based on ai_modell_auslegung_cursor_highend.md 'High-End-Setup' and 'Max-Quality Setup'. Enable with MODEL_RESOLVE=role_catalog."
+  "notes": "Role-based high-end preset (US-0102 / DEC-0087). See ai_modell_auslegung_cursor_highend.md for non-normative role recommendations. Enable with MODEL_RESOLVE=role_catalog."
 }

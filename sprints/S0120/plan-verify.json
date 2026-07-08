@@ -1,0 +1,45 @@
+{
+  "story_id": "US-0120",
+  "sprint_id": "S0120",
+  "phase_id": "plan-verify",
+  "role": "qa",
+  "orchestrator_run_id": "auto-20260708-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "qa_cycle": 1,
+  "fresh_context_marker": "qa-US0120-qa-20260708T193500Z-fresh",
+  "timestamp": "2026-07-08T19:35:00Z",
+  "verdict": "PASS",
+  "checks": [
+    {"name": "task_count_within_limit", "status": "PASS", "detail": "10 tasks (T-anch NO-OP + T-001..T-010) <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered"},
+    {"name": "ac_coverage_surjective", "status": "PASS", "detail": "12/12 ACs mapped surjectively to 10 test markers in tests/us0120_closure_phase_test.py; no PLAN_AC_COVERAGE_GAP"},
+    {"name": "dependency_order_acyclic", "status": "PASS", "detail": "T-anch -> {T-001,T-003,T-004} -> {T-002,T-005,T-006} -> T-007 -> T-008 -> T-009 -> T-010 acyclic per sprint-plan.md"},
+    {"name": "t_anch_no_op_documented", "status": "PASS", "detail": "T-anch NO-OP / verification — # US-0120 H1 anchor at architecture.md L2125 (added in /architecture phase); no execute-phase write to architecture.md"},
+    {"name": "compose_guards_6_unchanged", "status": "PASS", "detail": "6/6 UNCHANGED (US-0043/US-0045/US-0040/US-0048/US-0056/US-0096); test_us0120_compose_guards_unchanged PASS"},
+    {"name": "parity_scope_defined", "status": "PASS", "detail": "CLOSURE_PHASE_PAIRS + --scope=us-0120 in check_intake_template_parity.py; closure.md, release.md, auto.md, validator, parity script covered"},
+    {"name": "ship_macro_closure_inserted", "status": "PASS", "detail": "DEC-0082 ship macro [release, closure, refresh-context] (3 phases); test_us0120_dec_0082_ship_macro_includes_closure PASS"},
+    {"name": "release_reconciliation_removed", "status": "PASS", "detail": "release.md steps 10-12 removed; pointer to /closure at step 10; test_us0120_release_md_steps_10_12_removed PASS"},
+    {"name": "execute_summary_present", "status": "PASS", "detail": "sprints/S0120/execute-summary.md exists with verdict=PASS and 10/10 task results"},
+    {"name": "test_markers_locked", "status": "PASS", "detail": "10 test_us0120_* markers; independent QA re-run 10/10 PASS in 0.09s"}
+  ],
+  "plan_verification_matrix": [
+    {"task": "T-anch", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "NO-OP / verify # US-0120 anchor + compose 6/6", "executed": "DONE (anchor L2125 verified; compose 6/6 UNCHANGED)"},
+    {"task": "T-001", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "NEW .cursor/commands/closure.md (active)", "executed": "DONE (8949b; full contract present)"},
+    {"task": "T-002", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "template closure.md byte-identical + --scope=us-0120 parity", "executed": "DONE (PARITY_OK 8949/8949; scope=us-0120 PASS)"},
+    {"task": "T-003", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "DEC-0052 closure|qe row + AUTO_ROLE_CLOSURE scratchpad", "executed": "DONE (additive row; scratchpad key present)"},
+    {"task": "T-004", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "DEC-0082 ship macro + auto.md closure spawn", "executed": "DONE (3-phase ship macro; auto.md PARITY_OK 38089/38089)"},
+    {"task": "T-005", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "release.md step 10-12 removal + renumber", "executed": "DONE (PARITY_OK 29082/29082; reconciliation removed)"},
+    {"task": "T-006", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "validate_closure_verification.py + template mirror", "executed": "DONE (--self-test 4/4 PASS; PARITY_OK 9960/9960)"},
+    {"task": "T-007", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "closure.md isolation + runtime proof sections", "executed": "DONE (US-0048 + DEC-0038 contracts in closure.md)"},
+    {"task": "T-008", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "tests/us0120_closure_phase_test.py (10 markers)", "executed": "DONE (10/10 PASS independent QA re-run)"},
+    {"task": "T-009", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "drain hook + installer manifest rows", "executed": "DONE (manifest updated; test_us0120_backward_compat_drain_hook PASS)"},
+    {"task": "T-010", "plan_ref": "sprints/S0120/tasks.md", "planned_scope": "runbook ## Story closure (US-0120) h2", "executed": "DONE (h2 at runbook.md L3775)"}
+  ],
+  "plan_vs_execute_delta": {
+    "completed_as_planned": 11,
+    "partial": 0,
+    "not_started": 0,
+    "deviation_note": "All 10 tasks + T-anch match sprint-plan; execute-summary.md present; no scope drift detected."
+  },
+  "next_phase_after_plan_verify": "/release (merged qa+verify-work complete per ultra_lean)"
+}
