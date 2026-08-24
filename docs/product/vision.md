@@ -1736,3 +1736,308 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Decomposition**: single story (**US-0051**).
 - **Intake evidence**: `handoffs/intake_evidence/US-0112-intake-20260628.json`
 - **Next**: **`/architecture`** (fresh **tech-lead**)
+
+## Intake Notes — US-0121
+
+- **Intake date**: 2026-08-22T21:15:00Z
+- **Orchestrator / run**: `cursor-20260822-opencode-adapter-intake` (`writer_id=po-cursor-20260822`)
+- **Operator request**: German “führe einen intake mit diesem plan aus” with `docs/product/opencode-adapter-masterplan.md`.
+- **Epic**: **US-0121..US-0126** (OpenCode host adapter in this repo). First slice **US-0121** (pack + installer). Siblings **US-0122** (role agents + permissions), **US-0123** (model slug routing), **US-0124** (orchestrator plugin spawn), **US-0125** (thin commands + validator bridge), **US-0126** (docs + contract tests) are **OPEN**.
+- **Problem framing**: Cursor rules are advisory; BYOK keys do not apply to Cursor subagents; per-role models are aliases. Operators need host-enforced spawn, own provider keys (including Chinese APIs), and the same Python fail-closed kernel on **stock OpenCode**.
+- **Recommended approach (intake-locked)**:
+  - Host-adapter on unmodified OpenCode (kernel + `.opencode/` pack + one orchestrator plugin). Cursor pack stays.
+  - Default install host remains **cursor-only** until explicit `--host opencode|both`.
+  - Layer 1 plugin + permissions + Python > Layer 2 short agent prompts > Layer 3 thin commands.
+  - Plugin API v1 vs v2 deferred to **`/research`** (**R-0109**).
+  - Standalone runtime is a **separate program** (`docs/product/standalone-runtime-masterplan.md`) — not this intake.
+- **Decomposition (US-0051)**: six vertical workflow-step slices (operator accepted via submitting the masterplan). Do not clone US-0001–US-0119.
+- **Assumptions confirmed**: Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research`.
+- **Intake evidence**: `handoffs/intake_evidence/US-0121-intake-20260822.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`, `first-intake-pack`, `coverage_complete=true`).
+- **Research stub**: **R-0109**.
+- **Next**: **`/discovery`** (fresh **PO**) for **US-0121**, with epic context that US-0122–US-0126 remain OPEN siblings.
+
+## Discovery Notes — US-0121
+
+- **Story**: OpenCode template pack and installer `--host cursor|opencode|both` (first epic slice; siblings US-0122..US-0126 remain OPEN).
+- **References**: `docs/product/opencode-adapter-masterplan.md` (brief — pack + installer + coexistence only; not shipped architecture); intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json`; research stub **R-0109** (deepen in `/research`; do not treat Q1–Q5 as architecture locks).
+- **Operator UX**:
+  - No new its-magic GUI. Operators use stock OpenCode TUI / desktop / IDE; Cursor users keep the existing Cursor pack unless they opt in.
+  - Installer `--help` documents `--host cursor|opencode|both`. Omitted `--host` means **cursor**. Unknown values fail closed with `INSTALL_HOST_INVALID` (ASCII/CLI diagnostics, not a GUI).
+  - Default install remains **cursor-only**. OpenCode files appear only after explicit `--host opencode` or `--host both`.
+  - Dual-host (`--host both`) leaves `.cursor/` and `.opencode/` side by side. `--host opencode` must not mutate `.cursor/`.
+  - Empty-but-valid pack: a consumer repo can receive `.opencode/` before role agents (US-0122) or the orchestrator plugin (US-0124) exist. Kit slash-command names stay; this slice does not clone Cursor command bodies.
+- **Pack UX**: `template/.opencode/` ships `agents/`, `commands/`, `plugins/` (or a documented equivalent) plus gitignore so local model catalogs and auth files are not copied into git. Examples must not embed API keys, `.env` contents, or vendor model slugs (US-0102).
+- **Compose**: Additive host switch on US-0008 only. No VS Code contrib rewrite. No OpenCode fork. Kernel paths (`docs/`, `scripts/`, `its_magic/`, …) stay host-agnostic unless `/research` proves otherwise.
+- **Out of scope for this slice**: US-0122 role agents, US-0123 model slugs, US-0124 plugin spawn, US-0125 thin command bodies beyond placeholders, US-0126 full runbook, standalone runtime.
+- **Next**: `/research` (tech-lead) to deepen **R-0109** (Q1–Q5 remain open; add pack/manifest/gitignore questions from discovery).
+
+## Discovery Notes — US-0122
+
+- **Story**: OpenCode role agents and Layer-1 permission table (second OpenCode adapter slice; US-0121 is DONE, siblings US-0123..US-0126 remain OPEN).
+- **References**: `docs/product/opencode-adapter-masterplan.md`; intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json` (`role-agents-permissions` → US-0122, `coverage_complete=true`); research anchor **R-0109**.
+- **Operator UX**:
+  - Operators can manually invoke `@po`, `@dev`, etc. (or OpenCode equivalent) before the US-0124 orchestrator plugin exists.
+  - Role prompts stay short and readable; the visible UX is role names plus clear permission failures, not copied Cursor command manuals.
+  - Permission denial should produce deterministic, actionable diagnostics suitable for ASCII CLI/TUI workflows.
+- **Layer-1 permission expectation**: host permissions enforce who can edit product docs, engineering docs, code, release artifacts, and child tasks. A prompt-ignoring PO must still be unable to write production code when `edit` is denied.
+- **Compose**: reuse the US-0003 role set and US-0023/BUG-0006 spawn-isolation posture; do not clone `.cursor/agents`, `.cursor/rules`, skills, or command bodies as enforcement.
+- **Open questions for `/research` (8)**: exact project file form; `edit` allow/deny precedence; deny-over-allow glob behavior; `task` allow-list syntax; hidden/manual settings for primary vs subagents; security findings-only write surface; contract harness for prompt-ignoring denial; whether active kit mirrors stay template-only until US-0126.
+- **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0122, then `/architecture` to lock the permission matrix.
+
+## Intake Notes — US-0123
+
+- **Intake date**: 2026-08-24T15:48:00Z (UTC)
+- **Orchestrator / run**: `auto-20260824-01` (drain-advance from US-0122 DONE; spec macro = intake + discovery merged, ultra_lean)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- **Story**: US-0123 — Per-role OpenCode model slug routing (multi-provider). **Status: OPEN**. No new story ID allocated (reuse existing US-0123).
+- **Intake evidence (reused, program bundle)**: `handoffs/intake_evidence/US-0121-intake-20260822.json` — `model-slug-routing` → [US-0123], `coverage_complete=true`, `selected_pack=first-intake-pack`, `missing_topics=[]`. Intake evidence JSON was NOT mutated (security: never mutate prior intake evidence).
+- **AC contract**: AC-1..AC-10 remain the contract (unchanged). Acceptance checkboxes remain **unchecked**. Status remains **OPEN**. Do not mark US-0123 DONE.
+- **Source-of-truth question for `/research` (AC-1)**: where does the kit-tier/role/phase → OpenCode `provider/slug` mapping live? Three candidates: (a) `.cursor/scratchpad.local.md` `MODEL_*` keys (kit-owned, operator-overridable); (b) `model:` YAML frontmatter in `template/.opencode/agents/<role>.md` (per-role, but risks vendor slug leakage in template — US-0102 family); (c) a **local-only** catalog file (e.g. `.opencode/model-catalog.local.json`, gitignored, never in `template/`). Architecture must pick **one** source of truth and tests must assert that choice; the other two become either fail-closed fallbacks or forbidden surfaces. This question is **not** locked here — it is the primary DQ for `/research`.
+- **Assumptions confirmed (carried from US-0121 program intake)**: Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research` (R-0109). US-0123 inherits both.
+- **Compose guards (intake-locked, read-only vs sibling stories)**:
+  - **US-0101 / DEC-0086**: **compose** — keep tier *names* if useful; do **not** use Cursor `fast`/`inherit` as the OpenCode runtime. OpenCode path is additive.
+  - **US-0102 / DEC-0087**: **compose** — same volatile-ID rule for `template/`; local catalog / `scratchpad.local.md` holds real vendor slugs. `template/` must not contain live vendor slugs.
+  - **US-0003**: agents gain `model:` on OpenCode; Cursor agent files unchanged.
+  - **US-0122 / DEC-0122**: US-0122 ships `template/.opencode/agents/<role>.md` with **no** `model:` vendor slug (AC-7). US-0123 owns the **real slug resolution**; US-0122's `model:` frontmatter (if any) stays placeholder/omitted until US-0123 lands. Additive only — US-0123 does not amend US-0122's permission matrix.
+  - **US-0080**: `TOKEN_PROFILE` is orthogonal — slug routing must not be substituted for token-cost profile.
+- **Boundaries (intake-locked)**:
+  - In scope: OpenCode model resolution (kit tier/role/phase → `provider/slug`), local catalog/examples, fail-closed codes, template hygiene, `test_us0123_*`, multi-provider examples including Chinese APIs (DeepSeek, Moonshot, Z.AI/GLM, DashScope/Qwen) without vendor IDs in `template/`.
+  - Out of scope: Cursor BYOK fixes, kit-operated proxy, embedding keys, plugin spawn (US-0124), permission matrix (US-0122), thin commands (US-0125), runbook (US-0126).
+- **Risks (intake-identified, to be deepened in `/research`)**:
+  - R1: vendor slug leakage into `template/` (US-0102 family; AC-3).
+  - R2: unknown/empty slug silently falls back to a random model (AC-4 fail-closed).
+  - R3: source-of-truth ambiguity between scratchpad, agent frontmatter, and local catalog (AC-1).
+  - R4: Chinese API examples committed with live vendor IDs / keys (AC-2, AC-5).
+  - R5: per-role vs per-phase granularity mismatch with US-0101/US-0102 tier/phase keys (AC-1, AC-7).
+  - R6: kit accidentally proxies provider traffic (AC-2 — kit must not proxy).
+- **Next**: `/discovery` (same fresh PO subagent, spec macro) to author D1–D10 discovery notes and DQ1+ open questions for `/research`.
+
+## Discovery Notes — US-0123
+
+- **Story**: Per-role OpenCode model slug routing (multi-provider) — third OpenCode adapter slice; US-0121 DONE, US-0122 DONE, siblings US-0124..US-0126 remain OPEN.
+- **Discovery date**: 2026-08-24T15:52:00Z (UTC)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1)
+- **References**: `docs/product/opencode-adapter-masterplan.md`; intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json` (`model-slug-routing` → US-0123, `coverage_complete=true`); `docs/engineering/architecture.md # US-0122` (permission matrix + no-vendor-slug AC-7 — read-only compose); `decisions/DEC-0086.md` / `DEC-0087.md` (US-0101/US-0102 — read-only compose); research anchor **R-0109**.
+- **Discovery locks D1–D10**:
+  - **D1 (Resolution chain shape)**: documented mapping from kit tier/role/phase keys → OpenCode `provider/slug`. Chain must be deterministic, single-source-of-truth, and testable. Architecture picks the source; tests assert it.
+  - **D2 (Multi-provider examples)**: operator-local examples cover ≥ DeepSeek, Moonshot, Z.AI/GLM, and one Western provider (Anthropic / OpenAI-compatible). Examples live in **local-only** files (gitignored), never in `template/`.
+  - **D3 (No vendor IDs in template)**: `template/` contains placeholders only. `test_us0123_no_vendor_slugs_in_template` greps for `deepseek|moonshot|kimi|glm|claude|gpt|sonnet|opus|haiku|o1|o3|sk-` (US-0102 family) and fails on any hit.
+  - **D4 (Unknown slug fail-closed)**: invalid/empty slug emits a documented reason code (reuse `MODEL_SLUG_UNKNOWN` / `MODEL_OVERRIDE_SLUG_UNKNOWN` analogue). No silent fallback to a random model.
+  - **D5 (Auth store)**: keys live in OpenCode `/connect` / host auth store. Never in plugin logs, git, or `template/`. `test_us0123_auth_store_contract` asserts the documented posture.
+  - **D6 (Compose US-0101/US-0102)**: Cursor alias runtime unchanged; this story does not amend DEC-0086/0087 Cursor behavior. OpenCode path is additive. Tier *names* may be reused as labels; `fast`/`inherit` are not OpenCode runtime slugs.
+  - **D7 (Per-role assignment)**: ≥ two roles can be configured to different providers in a local catalog without editing `template/`. `test_us0123_per_role_assignment` asserts two-role divergence.
+  - **D8 (Contract tests)**: `test_us0123_*` cover placeholder-only template, fail-closed unknown slug, example catalog schema, and non-substitution vs `TOKEN_PROFILE`.
+  - **D9 (Chinese APIs as capability)**: per-role assignment is in scope; kit-operated proxy is out of scope. Chinese API quality is operator model choice (AC-10 tool-calling note owned with US-0126 if needed).
+  - **D10 (Tool-calling quality note)**: runbook note (owned with US-0126 if needed) that QA/dev should default to a tool-reliable slug; kit does not endorse a single vendor.
+- **Open questions for `/research` (DQ1..DQ10)** — all routed to tech-lead, anchor **R-0109**:
+  - **DQ1 (Source of truth, AC-1)**: where do slugs live — `.cursor/scratchpad.local.md` `MODEL_*` keys, `model:` frontmatter in `template/.opencode/agents/<role>.md`, or a **local-only** catalog file (e.g. `.opencode/model-catalog.local.json`, gitignored)? Architecture must pick one; tests assert that choice. (Primary DQ.)
+  - **DQ2 (Placeholder vs omit `model:`)**: should `template/.opencode/agents/<role>.md` ship a `model:` key with a placeholder (e.g. `model: <your-vendor-slug>`), or omit `model:` entirely until the operator configures a local catalog? US-0122 AC-7 currently forbids real vendor slugs; does it also forbid placeholder strings?
+  - **DQ3 (Fail-closed code family)**: reuse `MODEL_SLUG_UNKNOWN` / `MODEL_OVERRIDE_SLUG_UNKNOWN` analogue, or introduce an `OPENCODE_MODEL_SLUG_UNKNOWN` namespaced code? What is the exact reason-code string and where is it documented (runbook vs decisions)?
+  - **DQ4 (Catalog file path)**: if a local catalog is the source of truth, what is the canonical path — `.opencode/model-catalog.local.json` (local only, gitignored) or `.cursor/model-catalog.local.json` (kit-existing, US-0101/US-0102)? Can US-0123 reuse the kit-existing catalog path so US-0101/US-0102 and US-0123 share one file, or must OpenCode have its own?
+  - **DQ5 (Per-role vs per-phase)**: US-0101/US-0102 keys are per-phase (`MODEL_TIER_<PHASE>`, `MODEL_<PHASE>`); US-0123 AC-7 says "per-role". How do per-role OpenCode agents map to per-phase kit keys? Is there a role→phase matrix (US-0069) that bridges them, or does US-0123 introduce per-role keys (`MODEL_ROLE_PO`, etc.)?
+  - **DQ6 (Chinese API examples without vendor IDs)**: how do we ship working DeepSeek/Moonshot/Z.AI/GLM/DashScope examples in `template/` (or in a `template/.opencode/examples/` directory) without committing live vendor IDs or keys? What is the placeholder convention (e.g. `provider: deepseek`, `slug: <your-deepseek-slug>`)?
+  - **DQ7 (Compose with US-0122 agents)**: US-0122 ships `template/.opencode/agents/<role>.md` with no `model:` vendor slug. US-0123 owns the real slug resolution. Is the integration additive (US-0123 adds `model:` to existing agent files after US-0122 lands) or does US-0123 introduce a separate catalog that agents reference by name?
+  - **DQ8 (Provider mode)**: `MODEL_PROVIDER_MODE=cursor|api` (US-0101) — does OpenCode host always imply `api` mode (BYOK via `/connect`), or can OpenCode also route through Cursor-managed infrastructure? How does this interact with `MODEL_RESOLVE=role_catalog`?
+  - **DQ9 (Validator surface)**: do we need a new `scripts/model_slug_validate.py` (or extend `scripts/model_catalog_validate.py`) to enforce fail-closed unknown slug + placeholder-only template + per-role divergence? Or do existing US-0101/US-0102 validators cover US-0123 ACs?
+  - **DQ10 (Tool-calling quality note ownership)**: AC-10 says "runbook note (owned with US-0126 if needed)". Does US-0123 ship a stub runbook line now, or defer entirely to US-0126? What is the exact wording so US-0126 can inherit without re-deriving?
+- **Compose**: additive on US-0101/US-0102/US-0003; do not amend DEC-0086/0087 Cursor behavior. US-0122 permission matrix unchanged. US-0121 host default remains cursor-only until explicit `--host opencode|both`. No vendor IDs in `template/`.
+- **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0123 (DQ1..DQ10 remain open; do not treat as architecture locks), then `/architecture` to lock the resolution chain + source of truth.
+
+## Intake Notes — US-0124
+
+- **Intake date**: 2026-08-24T15:55:00Z (UTC)
+- **Orchestrator / run**: `auto-20260824-01` (drain-advance from US-0123 DONE; spec macro = intake + discovery merged, ultra_lean)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- **Story**: US-0124 — OpenCode orchestrator plugin spawn-only `/auto` (plugin **is** the OpenCode native chain; do **not** port US-0095 Cursor Task-loop). **Status: OPEN**. No new story ID allocated (reuse existing US-0124).
+- **Intake evidence (reused, program bundle)**: `handoffs/intake_evidence/US-0121-intake-20260822.json` — `orchestrator-plugin-spawn` + `headless-invoke-cmd` → [US-0124], `coverage_complete=true`, `selected_pack=first-intake-pack`, `missing_topics=[]`. Intake evidence JSON was **NOT** mutated (security: never mutate prior intake evidence).
+- **AC contract**: AC-1..AC-11 remain the contract (unchanged). Acceptance checkboxes remain **unchecked** (`docs/product/acceptance.md` L152). Status remains **OPEN**. Do not mark US-0124 DONE. Do not mutate US-0121/US-0122/US-0123 DONE.
+- **Spawn-only posture (intake-locked)**:
+  - On OpenCode the plugin **is** the native chain. US-0095 Cursor Task-loop is **not** ported; `.cursor/commands/auto.md` Cursor prose is **not** copied into the plugin (AC-9).
+  - `/auto` is spawn-only: resolve phase→role via **US-0069**, spawn an isolated child session, write isolation evidence, honor the **US-0092** stop matrix, and refuse orchestrator (or any role) performing another role's artifact writes.
+  - Headless path uses **US-0092** `--invoke-cmd`; when native in-session chain is unavailable, emit `NATIVE_CHAIN_UNAVAILABLE` analogue rather than roleplay.
+  - Plugin API v1 vs v2 is **research-locked** (**R-0109** Q1 — already LOCKED for /architecture as v2 `ctx.session.*` + `ctx.tool.hook("execute.before", …)`), not this intake.
+  - Success tests (a)(d): a model that ignores its prompt still cannot skip spawn isolation (a) or continue `/auto` without the next role's fresh session (d).
+- **Assumptions confirmed (carried from US-0121 program intake)**: Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research` (R-0109). US-0124 inherits both.
+- **Compose guards (intake-locked, read-only vs sibling stories)**:
+  - **US-0069 / DEC-0051**: **compose** — same phase→role matrix; wrong-role spawn fails closed (`PHASE_ROLE_MISMATCH` analogue).
+  - **US-0092 / DEC-0078**: **compose** — reuse outer driver + `--invoke-cmd` + stop reasons; do **not** reimplement the state machine in TypeScript.
+  - **US-0095 / DEC-0080**: **do not port** — Cursor native chain is replaced by the plugin. Cursor `/auto` remains for the Cursor host.
+  - **US-0023 / US-0048 / BUG-0006**: **compose** — spawn-only; fail closed if stock OpenCode cannot isolate child sessions (thin fork is deferred `opencode-fork`, not silent same-session roleplay per R-0001).
+  - **US-0005**: hook-equivalent enforcement moves into the plugin + permissions (do not port Cursor hook JSON as-is).
+  - **US-0121 / DEC-0121**: host default remains cursor-only until explicit `--host opencode|both`; plugin lives in `template/.opencode/plugins/` (US-0121 reserved slot).
+  - **US-0122 / DEC-0122**: `template/.opencode/agents/auto.md` already ships `mode: primary`, `edit: deny`, `bash: deny`, `task` allow-list to seven role agents. The US-0124 plugin **composes with** that agent — see Discovery D9 (agent vs plugin boundary).
+  - **US-0125**: thin commands are Layer 3 dispatch only; missing a convenience command must not disable plugin spawn (US-0125 AC-7). US-0124 must not own command bodies.
+- **Boundaries (intake-locked)**:
+  - In scope: orchestrator plugin, spawn/isolation, US-0069 mapping, stop matrix, `--invoke-cmd`, fail-closed codes, `test_us0124_*`.
+  - Out of scope: reimplementing Python validators (US-0125), installer (US-0121), forking OpenCode unless research proves isolation impossible, sovereign-loop-on-opencode (deferred plan area), model slug routing (US-0123), permission matrix authoring (US-0122 — plugin consumes, does not author).
+- **Risks (intake-identified, to be deepened in `/research`)**:
+  - R1: V2 `subtask`/`ctx.session.create` ignored or unavailable at runtime → spawn no-ops; must fail closed (`OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` analogue), never same-session roleplay (R-0001 / R-0109 Q1–Q2).
+  - R2: Spawn isolation gap — if stock OpenCode cannot isolate child sessions, deferred `opencode-fork` or stop; do not silently continue.
+  - R3: Plugin cannot call Task/session client as assumed — architecture must confirm `ctx.session.create` vs tool intercept only.
+  - R4: Dual-host parity cost — `.cursor/commands/auto.md` and plugin diverge; mitigate by treating them as two host surfaces, not a copy.
+  - R5: Subtask-ignored fail-closed — if OpenCode V2 `subtask` (or equivalent) is ignored and child sessions cannot be isolated, fail closed with documented `OPENCODE_*` reason code; do not degrade to one-chat multi-role.
+  - R6: Headless `--invoke-cmd` surface unknown on OpenCode (R-0109 Q3 LOCKED for /architecture) — may require `opencode run` stdin pipe or plugin `ctx.session.prompt`.
+- **Next**: `/discovery` (same fresh PO subagent, spec macro) to author D1–D10 discovery notes and DQ1+ open questions for `/research`.
+
+## Discovery Notes — US-0124
+
+- **Story**: OpenCode orchestrator plugin spawn-only `/auto` (fourth OpenCode adapter slice; US-0121 DONE, US-0122 DONE, US-0123 DONE, siblings US-0125..US-0126 remain OPEN).
+- **Discovery date**: 2026-08-24T15:58:00Z (UTC)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1)
+- **References**: `docs/product/opencode-adapter-masterplan.md`; intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json` (`orchestrator-plugin-spawn` + `headless-invoke-cmd` → US-0124, `coverage_complete=true`); `template/.opencode/agents/auto.md` (US-0122 — read-only compose); `template/.opencode/plugins/README.md` (US-0121 reserved slot); `decisions/DEC-0051.md` (US-0069 — read-only compose); `decisions/DEC-0078.md` (US-0092 — read-only compose); `decisions/DEC-0080.md` (US-0095 — do-not-port); research anchor **R-0109** (Q1 v1 vs v2 LOCKED for /architecture as v2; Q2 Task isolation LOCKED; Q3 headless LOCKED for /architecture).
+- **Discovery locks D1–D10**:
+  - **D1 (Plugin location)**: orchestrator plugin lives in `template/.opencode/plugins/` (US-0121 reserved slot; `template/.opencode/plugins/README.md` already documents US-0124 ownership). Plugin file naming + entry-point shape (v2 `Plugin.define({ id, setup })`) is `/architecture`-locked per R-0109 Q1. US-0124 populates the directory; it does not create a second plugin location.
+  - **D2 (Plugin API v1 vs v2 lock)**: per R-0109 Q1 (LOCKED for /architecture), US-0124 targets **v2** — `Plugin.define({ id, setup })` with `ctx.tool.hook("execute.before", …)` for write-guards and `ctx.session.create / prompt / wait` for spawn. v1 hooks (`@opencode-ai/plugin` default export) remain a documented fallback only if `/architecture` confirms v2 `ctx.session.*` is unavailable at runtime; fallback must fail closed with `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` rather than silently degrade. US-0124 does not lock v1 vs v2 in `template/` — that is `/architecture`'s call.
+  - **D3 (Spawn isolation: static vs runtime proof)**: isolation is enforced by `Session.create({ parentID, … })` + deny-list (R-0109 Q2 LOCKED). **Static proof** = contract test asserts the plugin calls `ctx.session.create` (or v1 equivalent) with a fresh `parentID` and never reuses the orchestrator session id. **Runtime proof** = a harness that runs the plugin against a stub OpenCode and asserts the spawned session id ≠ orchestrator session id. US-0124 ships both: `test_us0124_spawn_isolation_static` (grep/AST on plugin source) + `test_us0124_spawn_isolation_runtime` (stub harness). Architecture must lock the stub-harness contract.
+  - **D4 (Analogue reason codes `OPENCODE_*`)**: US-0124 emits `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` (v2 `ctx.session.create` unavailable), `OPENCODE_SUBTASK_IGNORED` (V2 `subtask` equivalent ignored — child session not isolated), `OPENCODE_HEADLESS_UNSUPPORTED` (US-0092 `--invoke-cmd` cannot resolve a non-interactive session CLI), and reuses `AUTO_ORCHESTRATOR_PHASE_EXECUTION` (orchestrator performing phase writes) + `PHASE_ROLE_MISMATCH` (wrong-role spawn) + `NATIVE_CHAIN_UNAVAILABLE` (headless fallback). Codes are documented in US-0126 runbook; US-0124 ships a stub reason-code table (US-0126 owns full text).
+  - **D5 (Subtask-ignored fail-closed)**: if OpenCode V2 `subtask` (or equivalent spawn primitive) is ignored — i.e. the plugin calls spawn but the host returns without creating an isolated child session — the plugin must fail closed with `OPENCODE_SUBTASK_IGNORED` and stop `/auto`. **Forbidden**: degrading to one-chat multi-role (R-0001 / R-0109). `test_us0124_subtask_ignored_fail_closed` asserts the plugin does not continue `/auto` after a no-op spawn.
+  - **D6 (No copy of `.cursor/commands/auto.md`)**: US-0124 plugin source must not paste `.cursor/commands/auto.md` Cursor Task-loop prose. `test_us0124_no_cursor_auto_clone` greps the plugin source for unique-to-Cursor phrases (e.g. `## Spawn-boundary integrity (BUG-0006)` heading, `AUTO_LOOP_MAX_CYCLES` prose) and fails on hit. Cursor `/auto` remains for the Cursor host; the OpenCode plugin is a separate implementation that **composes** US-0069 + US-0092 semantics, not a prose port.
+  - **D7 (Stop-matrix wiring)**: plugin/outer-driver honors US-0092 stop reasons (decision_gate, loop_max, blocked, pause). No silent continue. `test_us0124_stop_matrix` asserts each stop reason maps to a documented plugin action (spawn next phase, hard stop, ledger write, pause boundary). The plugin does not reimplement the state machine in TypeScript; it calls into the existing `scripts/auto_outer_driver.py` reason-code family (subprocess or import — `/architecture` locks).
+  - **D8 (Headless `--invoke-cmd`)**: US-0092 outer driver can invoke OpenCode non-interactive/session API. Per R-0109 Q3 (LOCKED for /architecture), the public CLI surface is uncertain — candidates are (a) a future `opencode run --prompt` flag, (b) `opencode` with stdin piping, (c) the US-0124 plugin invoking `ctx.session.prompt` programmatically. US-0124 owns the runtime path; if `/architecture` cannot confirm a headless CLI surface, US-0092 `--invoke-cmd` on OpenCode must fail closed with `OPENCODE_HEADLESS_UNSUPPORTED`. `test_us0124_invoke_cmd_hook` asserts the wiring (or the fail-closed path) — not a live OpenCode probe.
+  - **D9 (Compose with US-0122 `auto.md` agent vs plugin)**: `template/.opencode/agents/auto.md` (US-0122) already ships the orchestrator **agent** — `mode: primary`, `edit: deny`, `bash: deny`, `task` allow-list to seven role agents. The US-0124 **plugin** is the **enforcement layer** that intercepts tool calls and spawns sessions; the agent is the **prompt layer** that tells the model "you are the auto orchestrator; spawn Task subagents only". Boundary: agent owns *who the model is* + permission allow-list; plugin owns *what the host does* (spawn, write-guard, stop-matrix, isolation evidence). They compose — the plugin does not replace the agent. `test_us0124_agent_plugin_compose` asserts both files exist and the plugin does not duplicate the agent's permission array.
+  - **D10 (Contract tests)**: `test_us0124_*` cover spawn-only deny (AC-1), isolation evidence fields (AC-3), stop-matrix wiring (AC-6), `--invoke-cmd` hook (AC-7), subtask-ignored fail-closed (AC-8), no Cursor auto.md clone (AC-9), success tests (a)(d) (AC-4, AC-5), and secrets-no-logging (AC-11). Tests are static + stub-harness; no live OpenCode runtime probe in this slice.
+- **Open questions for `/research` (DQ1..DQ8)** — all routed to tech-lead, anchor **R-0109** (US-0124-specific subsection; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 locks PRESERVED — not wiped):
+  - **DQ1 (Plugin entry-point shape, AC-1)**: what is the exact v2 `Plugin.define({ id, setup })` file naming + entry point — `template/.opencode/plugins/orchestrator.ts`? `index.ts`? Does OpenCode auto-load `.opencode/plugins/*.ts` or does it require a `plugins[]` entry in `opencode.json`? (R-0109 Q1 deepens — /architecture locks.)
+  - **DQ2 (Spawn API surface, AC-1, AC-4)**: is `ctx.session.create / prompt / wait` the correct v2 spawn API, or is there a dedicated `ctx.task` / `ctx.agent.spawn` handle? What is the exact signature (parentID, agent, prompt, fresh-context flag)? (R-0109 Q2 deepens.)
+  - **DQ3 (Static vs runtime isolation proof, AC-3, AC-4)**: what is the minimum stub-harness contract for `test_us0124_spawn_isolation_runtime`? Can the plugin be loaded in a JS/TS test harness without a live OpenCode, or does the test require a mock `ctx`? Does OpenCode ship a test harness / mock `ctx`?
+  - **DQ4 (Reason-code namespace, AC-8)**: should US-0124 emit `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`, `OPENCODE_SUBTASK_IGNORED`, `OPENCODE_HEADLESS_UNSUPPORTED` as new codes, or reuse existing `NATIVE_CHAIN_UNAVAILABLE` / `AUTO_ORCHESTRATOR_PHASE_EXECUTION` / `PHASE_ROLE_MISMATCH`? Where is the canonical reason-code table (runbook vs decisions vs `scripts/reason_codes.py`)?
+  - **DQ5 (Subtask-ignored detection, AC-8)**: how does the plugin **detect** that a spawn was ignored — does `ctx.session.create` return `null`/`undefined`, throw, or return a session id identical to the parent? What is the deterministic signal? `test_us0124_subtask_ignored_fail_closed` needs a stub that returns each case.
+  - **DQ6 (Stop-matrix integration, AC-6)**: does the plugin call `scripts/auto_outer_driver.py` as a subprocess, import it as a Python module from TS (unlikely), or reimplement the stop-matrix in TS (forbidden by AC-6 + D7)? If subprocess, what is the exact argv contract? If the driver must be invoked from TS, does US-0124 need a JSON-over-stdio bridge?
+  - **DQ7 (Headless CLI surface, AC-7)**: which of the three R-0109 Q3 candidates (future `opencode run --prompt`, stdin pipe, plugin `ctx.session.prompt`) is the /architecture-locked headless path for US-0092 `--invoke-cmd` on OpenCode? Is there a public, stable, non-interactive CLI in current OpenCode that the kit can shell out to?
+  - **DQ8 (Agent vs plugin ownership boundary, AC-1, AC-9)**: US-0122 ships `auto.md` agent with `task` allow-list; US-0124 ships the plugin. Is there any overlap that risks double-enforcement (both agent prompt and plugin refuse the same write)? Does the plugin need to read the agent's permission array, or are they fully independent surfaces? `test_us0124_agent_plugin_compose` needs the exact ownership boundary.
+- **Compose**: additive on US-0069/US-0092/US-0023/US-0048/BUG-0006; do **not** port US-0095; do **not** clone `.cursor/commands/auto.md`. US-0122 `auto.md` agent unchanged. US-0121 host default remains cursor-only until explicit `--host opencode|both`. US-0125 thin commands are Layer 3 (plugin must not own command bodies). No vendor slugs in `template/` (US-0102 family).
+- **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0124 (DQ1..DQ8 remain open; do not treat as architecture locks), then `/architecture` to lock the plugin entry-point + spawn API + reason-code namespace + headless path + agent/plugin boundary.
+
+## Intake Notes — US-0125
+
+- **Intake date**: 2026-08-24T19:58:00Z (UTC)
+- **Orchestrator / run**: `auto-20260824-02` (drain-advance from US-0124 DONE; spec macro = intake + discovery merged, ultra_lean)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- **Story**: US-0125 — Thin OpenCode commands + Python validator bridge (Layer 3 `.opencode/commands/*.md` are dispatch-only; plugin/CLI invokes existing `scripts/*_validate.py`; do not reimplement validators in TS). **Status: OPEN**. No new story ID allocated (reuse existing US-0125).
+- **Intake evidence (reused, program bundle)**: `handoffs/intake_evidence/US-0121-intake-20260822.json` — `validator-bridge` + `thin-commands` → [US-0125], `coverage_complete=true`, `selected_pack=first-intake-pack`, `missing_topics=[]`. Intake evidence JSON was **NOT** mutated (security: never mutate prior intake evidence).
+- **AC contract**: AC-1..AC-10 remain the contract (unchanged). Acceptance checkboxes remain **unchecked** (`docs/product/acceptance.md` L153). Status remains **OPEN**. Do not mark US-0125 DONE. Do not mutate US-0121/US-0122/US-0123/US-0124 DONE.
+- **Dispatch-only posture (intake-locked)**:
+  - Layer 3 `.opencode/commands/*.md` are named entry points (`/intake`, `/execute`, `/auto`, `/release`, …) that select the role agent, pass a short phase id + artifact path list, then **STOP**. They must not clone Cursor 200-line command bodies (AC-1, AC-9).
+  - The plugin/CLI invokes existing `scripts/*_validate.py` gates; validators are **not** reimplemented in TypeScript (AC-3). Persistence-blocking gates remain Python CLIs (`intake_evidence_validate.py`, `bug_issue_validate.py`, and other fail-closed validators already in the kit).
+  - Success test (b): a model that ignores its prompt still cannot run `/release` after a failing validator (AC-4). Validator non-zero exit surfaces existing kit reason codes (or a documented `OPENCODE_*` wrapper that still names the Python code) — no silent skip (AC-5).
+  - Missing a convenience command must not disable US-0124 plugin spawn or Python CLIs — commands are Layer 3 (AC-7).
+  - No new npm runtime in consumer app code — validator bridge is kit scripts + plugin subprocess, not a dependency of the operator's application (AC-10).
+- **Assumptions confirmed (carried from US-0121 program intake)**: Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research` (R-0109). US-0125 inherits both.
+- **Compose guards (intake-locked, read-only vs sibling stories)**:
+  - **US-0001**: **compose** — keep phase *names* and artifact outputs; do not triple-copy command files (AC-9). Cursor command files unchanged.
+  - **US-0078 / DEC-0060**: **compose** — `intake_evidence_validate.py` remains the persistence-blocking gate; thin commands must not reimplement its rules.
+  - **US-0121 / DEC-0121**: host default remains cursor-only until explicit `--host opencode|both`; thin commands live in `template/.opencode/commands/` (US-0121 reserved slot; `.gitkeep` already exists).
+  - **US-0122 / DEC-0122**: thin commands dispatch to the seven role agents; they do not own permission arrays or role prompts.
+  - **US-0124 / DEC-0124**: plugin may call the same Python CLIs; US-0125 owns the command files + the "Python is source of truth" contract. Missing a convenience command must not disable plugin spawn (US-0124 AC-7 ↔ US-0125 AC-7). Plugin must not own command bodies.
+  - **US-0126**: owns the full OpenCode host runbook + reason-code table + `--scope=opencode-adapter` parity. US-0125 ships stub reason-code references only; US-0126 owns full text.
+- **Boundaries (intake-locked)**:
+  - In scope: thin `.opencode/commands/`, Python CLI bridge, clone/size guards, success test (b), `test_us0125_*`.
+  - Out of scope: rewriting validators, porting full Cursor command prose, installer host flag (US-0121), model catalog (US-0123), full runbook (US-0126), plugin spawn mechanics (US-0124).
+- **Risks (intake-identified, to be deepened in `/research`)**:
+  - R1: Clone drift — `.opencode/commands/` accidentally copies `.cursor/commands/` bodies above threshold; mitigate with clone-guard metric + contract test (AC-2, AC-6).
+  - R2: Validator reimplementation temptation — a rule that should be a Python CLI check leaks into command prose; mitigate with grep/test for policy text duplicating validator logic (AC-6).
+  - R3: Reason-code ambiguity — validator non-zero exit surfaces existing kit codes vs a new `OPENCODE_*` wrapper; boundary with US-0126 reason-code namespace must be locked (AC-5).
+  - R4: Optional-command fragility — missing a convenience command disables plugin spawn or Python CLIs; mitigate with AC-7 contract test.
+  - R5: Success test (b) harness — `/release` after failing validator must be blocked even when the command/agent prompt says to continue; harness contract must be locked (AC-4, AC-8).
+  - R6: Dual-host parity cost — `.cursor/commands/` and `.opencode/commands/` diverge; mitigate by treating them as two host surfaces, not a copy (AC-9).
+- **Next**: `/discovery` (same fresh PO subagent, spec macro) to author D1–D10 discovery notes and DQ1+ open questions for `/research`.
+
+## Discovery Notes — US-0125
+
+- **Story**: Thin OpenCode commands + Python validator bridge (fifth OpenCode adapter slice; US-0121 DONE, US-0122 DONE, US-0123 DONE, US-0124 DONE, sibling US-0126 remains OPEN).
+- **Discovery date**: 2026-08-24T20:01:00Z (UTC)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1)
+- **References**: `docs/product/opencode-adapter-masterplan.md`; intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json` (`validator-bridge` + `thin-commands` → US-0125, `coverage_complete=true`); `template/.opencode/commands/.gitkeep` (US-0121 reserved slot); `template/.opencode/agents/auto.md` (US-0122 — read-only compose); `template/.opencode/plugins/README.md` (US-0124 — read-only compose); `scripts/intake_evidence_validate.py` + `scripts/bug_issue_validate.py` (Python SOT — read-only consume); `docs/product/backlog.md ## US-0125` (AC-1..AC-10); research anchor **R-0109** (US-0124 subsection; US-0125 inherits v2 plugin + headless locks but owns the command/validator-bridge surface).
+- **Discovery locks D1–D10**:
+  - **D1 (Command location)**: thin commands live in `template/.opencode/commands/` (US-0121 reserved slot; `.gitkeep` already exists). US-0125 populates the directory with named `.md` files; it does not create a second command location. File naming + frontmatter shape (OpenCode `description` + dispatch prose) is `/architecture`-locked per DQ5/DQ6.
+  - **D2 (Named command inventory)**: commands are phase names from US-0001 (e.g. `/intake`, `/discovery`, `/research`, `/architecture`, `/sprint-plan`, `/execute`, `/qa`, `/verify-work`, `/release`, `/closure`, `/refresh-context`, `/auto`, `/ask`, `/quick`, `/pause`, `/resume`, `/status-reconcile`, `/memory-audit`, `/milestone-start`, `/milestone-complete`, `/plan-verify`, `/phase-context`, `/map-codebase`, `/security-review`, `/sovereign-critic`), **not** 200-line clones of `.cursor/commands/*.md`. Each command file is dispatch-only: select role + phase id + artifact path list, then STOP. Exact file list is `/architecture`-locked per DQ1.
+  - **D3 (Clone-guard metric)**: `test_us0125_clone_guard` enforces a documented size and/or similarity threshold vs `.cursor/commands/`. Candidate metric: (a) per-file byte/line cap (e.g. ≤ N lines, where N << 200), (b) normalized-text similarity score vs the matching `.cursor/commands/<name>.md` below a documented threshold, or (c) both. Exact threshold + algorithm is `/architecture`-locked per DQ2. The test fails on hit (AC-2).
+  - **D4 (Python validators remain SOT)**: persistence-blocking gates stay as existing Python CLIs — `intake_evidence_validate.py`, `bug_issue_validate.py`, and other fail-closed validators already in the kit. Plugin/command may subprocess them; must not reimplement rules (AC-3, AC-6). The set of in-scope validators for US-0125 (vs US-0126 runbook) is `/architecture`-locked per DQ3.
+  - **D5 (Success test (b) mechanism)**: `/release` (or release persistence path) after a failing validator is blocked even if the command/agent prompt says to continue. Mechanism: the plugin/command subprocess calls the Python CLI; non-zero exit → fail-closed (no persistence). `test_us0125_release_blocked_after_failing_validator` asserts the wiring (or the fail-closed path) — not a live release probe. Exact subprocess contract (plugin vs command prose) is `/architecture`-locked per DQ4.
+  - **D6 (Reason-code wrapping)**: validator non-zero exit surfaces existing kit reason codes (e.g. `INTAKE_PERSISTENCE_BLOCKED`, `INTAKE_REQUIRED_TOPIC_MISSING`, `BUG_ISSUE_VALIDATION_FAILED`) **or** a documented `OPENCODE_*` wrapper that still names the Python code (e.g. `OPENCODE_VALIDATOR_FAILED: INTAKE_PERSISTENCE_BLOCKED`). No silent skip (AC-5). The wrapper-vs-reuse boundary + canonical reason-code table location is `/architecture`-locked per DQ4 + DQ6 (coordinate with US-0126, which owns the full reason-code table).
+  - **D7 (Missing convenience command must not disable US-0124 plugin)**: commands are Layer 3. `test_us0125_missing_command_does_not_disable_plugin` asserts that deleting/renaming a convenience command does not break plugin spawn (US-0124) or Python CLI execution. The plugin and CLIs must run independently of the command files (AC-7).
+  - **D8 (Compose US-0001 — Cursor commands unchanged)**: `.cursor/commands/*.md` are not modified by US-0125. OpenCode commands are additive. `test_us0125_cursor_commands_unchanged` asserts byte-parity of `.cursor/commands/` against the pre-US-0125 git state (or a hash manifest) (AC-9).
+  - **D9 (No new npm runtime)**: the validator bridge is kit scripts (`scripts/*.py`) + plugin subprocess, not a dependency of the operator's application. `test_us0125_no_new_npm_runtime` asserts that `template/package.json` (if any) and consumer `package.json` do not gain a new runtime dependency for the validator bridge (AC-10).
+  - **D10 (`test_us0125_*` inventory)**: `test_us0125_*` cover thin-command inventory (AC-1), clone guard (AC-2), validator subprocess fail-closed (AC-3), success test (b) (AC-4), reason-code wrapping (AC-5), no-policy-in-commands (AC-6), missing-command-does-not-disable-plugin (AC-7), and full `test_us0125_*` inventory (AC-8). Tests are static + stub-harness; no live OpenCode runtime probe in this slice.
+- **Open questions for `/research` (DQ1..DQ8+)** — all routed to tech-lead, anchor **R-0109** (US-0125-specific subsection; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 + US-0124 DQ1..DQ8 locks PRESERVED — not wiped):
+  - **DQ1 (Exact command file list, AC-1)**: what is the exact set of named `.opencode/commands/*.md` files US-0125 ships — every US-0001 phase name, or a curated subset? Is there a 1:1 mapping to `.cursor/commands/`, or a dispatch-only subset? (R-0109 deepens — /architecture locks.)
+  - **DQ2 (Clone-guard threshold, AC-2)**: what is the exact per-file size cap (lines/bytes) and/or similarity threshold vs `.cursor/commands/<name>.md`? Is the metric byte-cap, normalized-text similarity, AST-shape, or a combination? What is the deterministic pass/fail boundary?
+  - **DQ3 (Validators in-scope vs US-0126, AC-3)**: which Python validators are in-scope for US-0125 (subprocess bridge) vs documented in the US-0126 runbook? Is `intake_evidence_validate.py` + `bug_issue_validate.py` the full in-scope set, or are there other persistence-blocking CLIs (e.g. `closure-verification`, `enforce-triad-hot-surface`, `model_tier_validate`, `release_changelog_lib`)?
+  - **DQ4 (How command invokes validator, AC-3, AC-4)**: does the thin command prose tell the agent to subprocess the Python CLI, or does the US-0124 plugin intercept the command and subprocess the validator itself? If the plugin owns the subprocess, what is the exact argv/stdout/exit-code contract? If the command prose owns it, how is success test (b) enforced against a prompt-ignoring model?
+  - **DQ5 (`/auto` command vs US-0124 plugin ownership, AC-1, AC-7)**: `/auto` is special — US-0124 owns the orchestrator plugin. Does US-0125 ship a `/auto` command file at all, or does `/auto` go directly through the plugin? If US-0125 ships `/auto`, is it dispatch-only ("invoke the orchestrator agent + plugin") with no spawn logic?
+  - **DQ6 (Command frontmatter shape for OpenCode, AC-1)**: what is the exact frontmatter shape OpenCode expects for `.opencode/commands/*.md` — `description` only (like Cursor), or `agent`/`mode`/`permission` fields? Does a command bind to a single role agent, or is the agent selected by prose?
+  - **DQ7 (Reason-code wrapper vs reuse, AC-5)**: should US-0125 emit `OPENCODE_VALIDATOR_FAILED: <python_code>` as a wrapper, or surface the raw Python reason code (e.g. `INTAKE_PERSISTENCE_BLOCKED`)? Where is the canonical reason-code table — runbook (US-0126), decisions, or `scripts/reason_codes.py`? How does US-0125 avoid pre-empting US-0126's reason-code namespace?
+  - **DQ8 (Success test (b) harness contract, AC-4, AC-8)**: what is the minimum stub-harness contract for `test_us0125_release_blocked_after_failing_validator`? Does the test stub the Python CLI (deterministic non-zero exit) and assert the command/plugin does not proceed to release persistence? Does OpenCode ship a test harness, or does US-0125 build a mock?
+- **Compose**: additive on US-0001/US-0078/US-0121/US-0122/US-0124; do **not** clone `.cursor/commands/`; do **not** reimplement Python validators. US-0124 plugin unchanged (commands are Layer 3; plugin must not own command bodies). US-0121 host default remains cursor-only until explicit `--host opencode|both`. US-0122 role agents unchanged. US-0126 owns full runbook + reason-code table. No vendor slugs in `template/` (US-0102 family).
+- **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0125 (DQ1..DQ8 remain open; do not treat as architecture locks), then `/architecture` to lock the command file list + clone-guard threshold + validator subprocess contract + `/auto` vs plugin ownership + frontmatter shape + reason-code wrapper boundary.
+
+## Intake Notes — US-0126
+
+- **Intake date**: 2026-08-24T21:55:00Z (UTC)
+- **Orchestrator / run**: `auto-20260824-02` (drain-advance from US-0125 / S0125 DONE; spec macro = intake + discovery merged, ultra_lean; `drain_advance_action=spawned`; native chain continuing)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- **Story**: US-0126 — Operator runbook for OpenCode host plus contract tests and `--scope=opencode-adapter` parity (sixth and final OpenCode adapter slice). Program DoD: an operator with stock OpenCode + `/connect`ed keys can run intake→…→release on a fresh install **without Cursor**, PO/Dev/QA as different sessions (optionally different providers), validators blocking persistence the same as today. **Status: OPEN**. No new story ID allocated (reuse existing US-0126).
+- **Intake evidence (reused, program bundle)**: `handoffs/intake_evidence/US-0121-intake-20260822.json` — `docs-runbook-parity` → [US-0126], `coverage_complete=true`, `selected_pack=first-intake-pack`, `missing_topics=[]`. Validator re-run: `[INTAKE_EVIDENCE_VALIDATION_OK]`. Intake evidence JSON was **NOT** mutated (security: never mutate prior intake evidence; US-0121 program bundle is the canonical record for the whole epic).
+- **AC contract**: AC-1..AC-10 remain the contract (unchanged). Acceptance checkbox remains **unchecked** (`docs/product/acceptance.md` L154). Status remains **OPEN**. Do not mark US-0126 DONE. Do not tick acceptance. Do not reopen US-0121..US-0125 DONE.
+- **Runbook + parity posture (intake-locked)**:
+  - `docs/engineering/runbook.md` (active + `template/` parity) documents stock OpenCode TUI/desktop/IDE as the UI, `--host` opt-in, `/connect` keys, and that kit UX is slash commands + reason codes (no new its-magic GUI) (AC-1).
+  - Reason-code catalog documents the `OPENCODE_*` family and reuses/analogues `NATIVE_CHAIN_UNAVAILABLE`, `AUTO_ORCHESTRATOR_PHASE_EXECUTION`, spawn-isolation failures. Each code has remediation text (AC-2). US-0126 owns the full reason-code table; US-0125 ships stub references only.
+  - `check_intake_template_parity.py --scope=opencode-adapter` covers pack, installer host help/manifest, agents/commands/plugin, and runbook surfaces this epic owns (AC-3).
+  - `test_us0126_*` (and/or a checklist that per-story `test_us0121_*`..`test_us0125_*` exist) fail if the OpenCode pack ships without the documented test markers (AC-4).
+  - README hygiene: user-visible OpenCode host blurb; no leaked DEC ids in operator sentences (US-0071 sanitization). UI is OpenCode; kit is the workflow (AC-5).
+  - Program DoD documented in runbook (intake→release without Cursor; different sessions/providers; validators still block) (AC-6).
+  - Default host reminder: docs state cursor-only default until `--host opencode|both` (AC-7).
+  - Out-of-scope list: runbook/README explicitly exclude standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman, Cursor-browser-as-primary-UAT (AC-8).
+  - Sanitization + template parity: new doc files mirrored under `template/` where installer-owned (AC-9).
+  - Compose: do not delete Cursor kit docs; OpenCode is additive (AC-10).
+- **Assumptions confirmed (carried from US-0121 program intake)**: Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research` (R-0109). US-0126 inherits both.
+- **Compose guards (intake-locked, read-only vs sibling stories)**:
+  - **US-0071 sanitization**: operator sentences must not leak DEC ids.
+  - **US-0113..US-0117 operator docs**: **compose** — add an OpenCode host section; do not rewrite Cursor command catalogs.
+  - **US-0121 / DEC-0121**: host default remains cursor-only until explicit `--host opencode|both`; runbook + parity live alongside installer-owned paths; `--scope=opencode-adapter` extends the existing parity script.
+  - **US-0122 / DEC-0122**: runbook references the seven role agents; does not redefine permissions.
+  - **US-0123 / DEC-0123**: runbook references `/connect` keys + provider/slug routing; does not re-list vendor slugs.
+  - **US-0124 / DEC-0124**: runbook documents the orchestrator plugin spawn contract + `OPENCODE_*` reason codes; does not reimplement plugin logic.
+  - **US-0125 / DEC-0125**: runbook documents thin commands + validator-bridge reason-code wrapping; US-0126 owns the full reason-code table that US-0125 stubs reference.
+- **Boundaries (intake-locked)**:
+  - In scope: runbook, README blurb, reason-code list, `--scope=opencode-adapter`, `test_us0126_*`, template doc parity, program DoD documentation.
+  - Out of scope: implementing the plugin (US-0124), inventing a GUI, Cursor browser UAT as primary, standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman, rewriting validators.
+- **Risks (intake-identified, to be deepened in `/research`)**:
+  - R1: Reason-code namespace collision with US-0125 stub references — mitigate by US-0126 owning the canonical table and US-0125 pointing to it (AC-2, AC-5).
+  - R2: Parity-scope drift — `--scope=opencode-adapter` coverage gaps leave epic surfaces unverified; mitigate with explicit surface inventory in `/architecture` (AC-3).
+  - R3: Operator-sentence DEC leakage — mitigate with US-0071 sanitization grep/test (AC-5).
+  - R4: Template-parity gap — new doc files not mirrored under `template/`; mitigate with installer-owned-paths manifest + parity check (AC-9).
+  - R5: Program-DoD ambiguity — "without Cursor" + "different sessions/providers" + "validators still block" must be operationally testable; mitigate with explicit DoD test contract in `/architecture` (AC-6).
+  - R6: Cursor-kit deletion temptation — mitigate with AC-10 compose test (do not delete Cursor docs).
+- **Next**: `/discovery` (same fresh PO subagent, spec macro) to author D1–D10 discovery notes and DQ1..DQ8+ open questions for `/research`.
+
+## Discovery Notes — US-0126
+
+- **Story**: Operator runbook for OpenCode host plus contract tests and `--scope=opencode-adapter` parity (sixth OpenCode adapter slice; US-0121 DONE, US-0122 DONE, US-0123 DONE, US-0124 DONE, US-0125 DONE; this is the final epic slice).
+- **Discovery date**: 2026-08-24T21:58:00Z (UTC)
+- **Role / model**: po / `glm-5.2-high` (CROSS_MODEL_REVIEW=1)
+- **References**: `docs/product/opencode-adapter-masterplan.md`; intake evidence `handoffs/intake_evidence/US-0121-intake-20260822.json` (`docs-runbook-parity` → US-0126, `coverage_complete=true`); `docs/engineering/runbook.md` (active + `template/` parity — read-only compose); `scripts/check_intake_template_parity.py` (parity CLI — read-only extend); `docs/engineering/context/installer-owned-paths.manifest` (installer-owned doc paths); `docs/product/backlog.md ## US-0126` (AC-1..AC-10); research anchor **R-0109** (epic-level; US-0126 inherits v2 plugin + headless + reason-code locks and owns the runbook + parity + reason-code table surface).
+- **Discovery locks D1–D10**:
+  - **D1 (Runbook location + active/template parity)**: runbook lives at `docs/engineering/runbook.md` (active) and `template/docs/engineering/runbook.md` (parity). US-0126 adds an "OpenCode host" section to both; it does not create a second runbook file. Section anchor + heading shape is `/architecture`-locked per DQ1.
+  - **D2 (Reason-code catalog location)**: the canonical `OPENCODE_*` / analogue reason-code table lives in the runbook (US-0126 owns it). US-0125 stub references point here. Codes: `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`, `OPENCODE_SUBTASK_IGNORED`, `OPENCODE_HEADLESS_UNSUPPORTED` (from US-0124), `OPENCODE_VALIDATOR_FAILED: <python_code>` wrapper (from US-0125), plus analogues of `NATIVE_CHAIN_UNAVAILABLE`, `AUTO_ORCHESTRATOR_PHASE_EXECUTION`, `PHASE_ROLE_MISMATCH`, `INTAKE_PERSISTENCE_BLOCKED` family. Exact code list + remediation text is `/architecture`-locked per DQ2 (coordinate with US-0124 + US-0125).
+  - **D3 (Parity scope surface)**: `check_intake_template_parity.py --scope=opencode-adapter` covers: (a) `template/.opencode/` pack (agents/commands/plugins), (b) installer host help/manifest (`--host cursor|opencode|both`), (c) runbook active+template parity, (d) reason-code table presence, (e) `test_us0121_*`..`test_us0126_*` marker presence. Exact surface inventory + pass/fail predicate is `/architecture`-locked per DQ3.
+  - **D4 (Contract-test inventory)**: `test_us0126_*` cover: runbook "OpenCode host" section presence (AC-1), reason-code catalog presence + each code has remediation text (AC-2), `--scope=opencode-adapter` parity green (AC-3), per-story `test_us0121_*`..`test_us0125_*` marker checklist (AC-4), README hygiene + no-DEC-leak in operator sentences (AC-5), program DoD documented (AC-6), default-host reminder (AC-7), out-of-scope list present (AC-8), template doc parity (AC-9), Cursor docs not deleted (AC-10). Tests are static + grep-based; no live OpenCode runtime probe in this slice. Exact test list is `/architecture`-locked per DQ4.
+  - **D5 (README hygiene + sanitization)**: user-visible OpenCode host blurb in README; US-0071 sanitization grep asserts no DEC ids in operator-facing sentences. UI is OpenCode; kit is the workflow. `test_us0126_readme_no_dec_leak` + `test_us0126_runbook_no_dec_leak` enforce AC-5.
+  - **D6 (Program DoD operational test)**: runbook states the epic done-test: intake→release without Cursor; PO/Dev/QA as different sessions (optionally different providers); validators still block persistence. `test_us0126_program_dod_documented` asserts the DoD text is present and operationally worded (not a live end-to-end probe). Exact DoD wording is `/architecture`-locked per DQ5.
+  - **D7 (Default host reminder)**: docs state cursor-only default until `--host opencode|both`. `test_us0126_default_host_reminder` asserts the reminder is present in runbook + README. Wording is `/architecture`-locked per DQ6.
+  - **D8 (Out-of-scope list)**: runbook/README explicitly exclude standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman, Cursor-browser-as-primary-UAT. `test_us0126_out_of_scope_listed` asserts each excluded item is named. Exact exclusion phrasing is `/architecture`-locked per DQ7.
+  - **D9 (Template doc parity)**: new doc files (or new runbook sections) are mirrored under `template/` where installer-owned. `installer-owned-paths.manifest` (active + `template/`) updated. `test_us0126_template_doc_parity` asserts active↔template parity for installer-owned doc paths touched by this slice.
+  - **D10 (Compose — Cursor docs not deleted)**: `.cursor/commands/`, `.cursor/agents/`, existing Cursor kit docs are not deleted by US-0126. `test_us0126_cursor_docs_not_deleted` asserts byte-parity (or hash manifest) of `.cursor/` against the pre-US-0126 git state. OpenCode is additive (AC-10).
+- **Open questions for `/research` (DQ1..DQ8+)** — all routed to tech-lead, anchor **R-0109** (US-0126-specific subsection; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 + US-0124 DQ1..DQ8 + US-0125 DQ1..DQ8 locks PRESERVED — not wiped):
+  - **DQ1 (Runbook section anchor + heading, AC-1)**: what is the exact heading text and anchor for the "OpenCode host" section in `docs/engineering/runbook.md` (active + template)? Does it live under an existing "Hosts" heading or as a new top-level section? (R-0109 deepens — /architecture locks.)
+  - **DQ2 (Reason-code catalog exact list, AC-2)**: what is the exhaustive `OPENCODE_*` + analogue code list US-0126 documents? Which codes are reused from US-0124/US-0125, which are new, and which are analogues of existing kit codes? What is the canonical remediation text per code? (Coordinate with US-0124 DQ4 + US-0125 DQ6/DQ7.)
+  - **DQ3 (Parity scope surface inventory, AC-3)**: what is the exact surface inventory `--scope=opencode-adapter` covers — every file/glob under `template/.opencode/`, installer host help, runbook active+template, reason-code table, test markers? What is the deterministic pass/fail predicate? Does it reuse `check_intake_template_parity.py` infrastructure or add a sibling scope flag?
+  - **DQ4 (`test_us0126_*` exact test list, AC-4)**: what is the exhaustive `test_us0126_*` test list — one test per AC, or a smaller curated set? Is the per-story `test_us0121_*`..`test_us0125_*` marker checklist a single aggregate test or per-story tests? Are tests static/grep-based or do any require a stub harness?
+  - **DQ5 (Program DoD wording, AC-6)**: what is the exact operational DoD sentence the runbook must contain? "without Cursor" — does that mean no `.cursor/` directory loaded, or no Cursor IDE process? "different sessions/providers" — does that mean distinct OpenCode sessions, distinct `/connect` profiles, or distinct provider slugs? "validators still block" — which validator set is the regression baseline?
+  - **DQ6 (Default host reminder wording, AC-7)**: what is the exact reminder sentence? Does it appear in runbook, README, or both? Does it cross-reference US-0121 `--host` flag help text?
+  - **DQ7 (Out-of-scope phrasing, AC-8)**: what is the exact exclusion list phrasing? Does each excluded item cross-reference its owning masterplan (standalone-runtime-masterplan, opencode-adapter-masterplan) or decision (DEC-0055 Caveman)?
+  - **DQ8 (Template parity manifest update, AC-9)**: which installer-owned doc paths does US-0126 add to `installer-owned-paths.manifest` (active + template)? Is the runbook itself already installer-owned, or only the new "OpenCode host" section? Does the manifest need a new entry per new doc file, or a single runbook entry covers both active + template?
+- **Compose**: additive on US-0071/US-0113..US-0117/US-0121/US-0122/US-0123/US-0124/US-0125; do **not** delete Cursor kit docs; do **not** reimplement plugin or validators; do **not** invent a GUI; do **not** make Cursor-browser primary UAT. US-0126 owns the full runbook + reason-code table + `--scope=opencode-adapter` parity. No vendor slugs in `template/` (US-0102 family).
+- **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0126 (DQ1..DQ8 remain open; do not treat as architecture locks), then `/architecture` to lock the runbook section anchor + reason-code catalog + parity scope surface + `test_us0126_*` list + program DoD wording + default-host reminder + out-of-scope phrasing + template-parity manifest updates. Do NOT add `# US-0126` to architecture.md from PO discovery — `/architecture` (tech-lead) owns that H1 after `# US-0125`.
+
+

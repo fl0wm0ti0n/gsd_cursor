@@ -1,0 +1,18 @@
+{
+  "schema_version": 2,
+  "tiers": {
+    "cheap": "<your-cheap-highend-slug>",
+    "balanced": "<your-balanced-highend-slug>",
+    "strong": "<your-strong-highend-slug>"
+  },
+  "roles": {
+    "po": "<your-po-highend-slug>",
+    "sa": "<your-sa-highend-slug>",
+    "dev": "<your-dev-highend-slug>",
+    "dev_difficult": "<your-dev-difficult-highend-slug>",
+    "qa": "<your-qa-highend-slug>",
+    "security": "<your-security-highend-slug>",
+    "release": "<your-release-highend-slug>"
+  },
+  "notes": "Role-based high-end preset (US-0102 / DEC-0087). See ai_modell_auslegung_cursor_highend.md for non-normative role recommendations. Enable with MODEL_RESOLVE=role_catalog."
+}

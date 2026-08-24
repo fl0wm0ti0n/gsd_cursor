@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "qwen-3.7-plus",
+    "balanced": "kimi-k2.7-code",
+    "strong": "claude-opus-4.8"
+  },
+  "notes": "Level 4 — super-high-sophisticated / mission-critical (AI operating systems, critical infrastructure, long-horizon agent systems, high-risk security/privacy/finance). Chief-architect quality: Claude Opus 4.8 for critical gates, Kimi K2.7 Code for difficult long-horizon DEV, Qwen for cheap mass work. Based on ai_modell_auslegung_cursor_highend.md 'Super-High-Sophisticated Projects'. Enable with MODEL_RESOLVE=local_catalog."
+}

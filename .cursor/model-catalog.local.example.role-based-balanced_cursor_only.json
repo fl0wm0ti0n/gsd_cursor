@@ -1,18 +1,18 @@
 {
   "schema_version": 2,
   "tiers": {
-    "cheap": "composer-2.5-fast",
-    "balanced": "composer-2.5-standard",
+    "cheap": "composer-2.5",
+    "balanced": "grok-4-6-high",
     "strong": "claude-opus-4.8"
   },
   "roles": {
-    "po": "claude-sonnet",
-    "sa": "glm-5.2",
-    "dev": "composer-2.5-standard",
-    "dev_difficult": "gpt-5.3-codex",
-    "qa": "gemini-3.1-pro",
+    "po": "claude-opus-4.8",
+    "sa": "claude-opus-4.8",
+    "dev": "grok-4-6-high",
+    "dev_difficult": "claude-opus-4.8",
+    "qa": "grok-4-6-high",
     "security": "claude-opus-4.8",
-    "release": "glm-5.2"
+    "release": "composer-2.5-fast"
   },
-  "notes": "Role-based balanced preset — Cursor subscription models only (US-0102 / DEC-0087). No custom API key required; slugs must match your Cursor Settings → Models list. Elite-balanced mix: Claude Sonnet (PO), GLM-5.2 (SA/Release), Gemini 3.1 Pro (QA), Composer 2.5 Standard (mass DEV), GPT-5.3 Codex (difficult DEV), Claude Opus 4.8 (Security + strong tier). Based on ai_modell_auslegung_cursor_highend.md 'Elite Balanced Setup', adapted for Cursor-native routing. Copy to .cursor/model-catalog.local.json and set MODEL_RESOLVE=role_catalog."
+  "notes": "Role-based balanced preset — Cursor subscription Task/subagent slugs only (US-0102 / DEC-0087), aligned 2026-08-24. No custom API key. These are machine IDs (kebab-case), not Settings display names (Composer 2.5 Fast ≠ composer-2.5-fast). Mix: Claude Opus 4.8 (PO, SA, difficult DEV, Security, strong tier); Grok 4.6 High (DEV, QA, balanced tier); Composer 2.5 (cheap tier); Composer 2.5 Fast (Release). Copy to .cursor/model-catalog.local.json and set MODEL_RESOLVE=role_catalog. Confirm IDs in Settings → Models if your Cursor build differs."
 }

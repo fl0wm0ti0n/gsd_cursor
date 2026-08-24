@@ -6,12 +6,57 @@ import os
 import re
 import shlex
 import shutil
+import subprocess
 import sys
 from datetime import datetime
 
 REPO_URL = "https://github.com/fl0wm0ti0n/its-magic"
 MANIFEST_RELATIVE_PATH = os.path.join("docs", "engineering", "context", "installer-owned-paths.manifest")
 MANIFEST_REQUIRED_SCRIPTS_SECTION = "required_install_script_paths"
+
+HOST_VALUES = ("cursor", "opencode", "both")
+HOST_DEFAULT = "cursor"
+
+
+class _HostAction(argparse.Action):
+    """argparse action that normalizes, validates, and rejects duplicate --host."""
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        current = getattr(namespace, "host_seen", 0) or 0
+        if current >= 1:
+            parser.error(
+                "[INSTALL_HOST_INVALID] duplicate --host argv (no last-wins). "
+                "Accepted: cursor | opencode | both (default: cursor)."
+            )
+        setattr(namespace, "host_seen", current + 1)
+        normalized = str(values).lower().strip()
+        if normalized not in HOST_VALUES:
+            parser.error(
+                f"[INSTALL_HOST_INVALID] unknown host value '{normalized}'. "
+                "Accepted: cursor | opencode | both (default: cursor)."
+            )
+        setattr(namespace, "host", normalized)
+
+
+def host_gates_cursor_row(rel, host):
+    """Return True if the row should be SKIPPED for this host.
+
+    Shared interface contract across installer.py / installer.ps1 / installer.sh
+    (host-scoped mixed-section skip predicate).
+
+    host is normalized lowercase+trim and one of HOST_VALUES.
+    """
+    if host == "opencode":
+        return rel.startswith(".cursor/")
+    return False
+
+
+def host_includes_opencode(host):
+    return host in ("opencode", "both")
+
+
+def host_includes_cursor(host):
+    return host in ("cursor", "both")
 
 
 def normalize(path):
@@ -68,6 +113,8 @@ def load_ownership_manifest(source_root, script_dir):
             continue
         install_paths = read_manifest_paths(path, "install_include_paths")
         clean_paths = read_manifest_paths(path, "clean_paths")
+        opencode_install_paths = read_manifest_paths(path, "opencode_install_include_paths")
+        opencode_clean_paths = read_manifest_paths(path, "opencode_clean_paths")
         required_script_paths = read_manifest_paths(path, MANIFEST_REQUIRED_SCRIPTS_SECTION)
         if not install_paths or not clean_paths:
             raise RuntimeError(f"[INSTALL_MANIFEST_ERROR] {path} is missing required sections or entries.")
@@ -75,8 +122,58 @@ def load_ownership_manifest(source_root, script_dir):
             raise RuntimeError(
                 f"[INSTALL_MANIFEST_ERROR] {path} is missing [{MANIFEST_REQUIRED_SCRIPTS_SECTION}] entries."
             )
-        return install_paths, clean_paths, required_script_paths, path
+        return (
+            install_paths,
+            clean_paths,
+            opencode_install_paths,
+            opencode_clean_paths,
+            required_script_paths,
+            path,
+        )
     raise RuntimeError("[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic package.")
+
+
+def build_effective_include_paths(install_paths, opencode_install_paths, host):
+    """Apply host_gates_cursor_row predicate + opencode section gating."""
+    effective = []
+    for rel in install_paths:
+        if host_gates_cursor_row(rel, host):
+            continue
+        effective.append(rel)
+    if host_includes_opencode(host):
+        effective.extend(opencode_install_paths)
+    return effective
+
+
+def build_effective_clean_paths(clean_paths, opencode_clean_paths, host):
+    """Host-scoped clean paths."""
+    effective = []
+    if host_includes_cursor(host):
+        effective.extend(clean_paths)
+    if host_includes_opencode(host):
+        effective.extend(opencode_clean_paths)
+    return effective
+
+
+def emit_host_shrink_diagnostics(target_root, host):
+    """Emit orphan/stale diagnostics when shrinking from `both` to a single host.
+
+    Shrinking does NOT silently delete the other-host tree.
+    """
+    opencode_present = os.path.exists(os.path.join(target_root, ".opencode"))
+    cursor_present = os.path.isdir(os.path.join(target_root, ".cursor"))
+    if host == "cursor" and opencode_present:
+        print(
+            "[OPENCODE_ORPHANED_BY_CLEAN_CURSOR] .opencode/ exists from a prior "
+            "--host both install; --host cursor does not remove it. Run "
+            "`its-magic --clean-repo --host opencode|both` to remove it."
+        )
+    if host == "opencode" and cursor_present:
+        print(
+            "[CURSOR_ORPHANED_BY_CLEAN_OPENCODE] .cursor/ exists from a prior "
+            "--host both install; --host opencode does not remove it. Run "
+            "`its-magic --clean-repo --host cursor|both` to remove it."
+        )
 
 
 def validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
@@ -446,6 +543,64 @@ def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
     return ok
 
 
+def run_cursor_surface_postinstall_hooks(target_root, source_root, mode, host, print_ok=True):
+    """Run Cursor-surface post-install hooks only when --host includes cursor.
+
+    `--host opencode` must not materialize `.cursor/` via Model B scratchpad
+    or the default `.cursor/dev-environment.json` bootstrap.
+    Explicit `--scratchpad-postinstall` stays ungated (operator recovery).
+    """
+    if not host_includes_cursor(host):
+        if print_ok:
+            print(
+                "[CURSOR_HOST_HOOKS_SKIPPED] --host opencode does not materialize "
+                ".cursor/ (scratchpad Model B + dev-env profile)."
+            )
+        return True
+    if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=print_ok):
+        return False
+    if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+        return False
+    return True
+
+
+def run_opencode_model_catalog_hook(target_root, source_root, host, print_ok=True):
+    """Invoke OpenCode catalog materializer when host includes opencode and catalog exists."""
+    if not host_includes_opencode(host):
+        return True
+    catalog_path = os.path.join(target_root, ".opencode", "model-catalog.local.json")
+    if not os.path.isfile(catalog_path):
+        if print_ok:
+            print(
+                "[OPENCODE_MODEL_CATALOG_SKIPPED] no .opencode/model-catalog.local.json "
+                "at install target (optional catalog)."
+            )
+        return True
+    script_candidates = [
+        os.path.join(source_root, "scripts", "opencode_model_catalog_apply.py"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts", "opencode_model_catalog_apply.py"),
+    ]
+    script = next((p for p in script_candidates if os.path.isfile(p)), None)
+    if not script:
+        print(
+            "[OPENCODE_MODEL_CATALOG_ERROR] scripts/opencode_model_catalog_apply.py "
+            "not found in kit source."
+        )
+        return False
+    proc = subprocess.run(
+        [sys.executable, script, "--target", target_root],
+        capture_output=True,
+        text=True,
+    )
+    if proc.stdout:
+        print(proc.stdout.rstrip())
+    if proc.returncode != 0:
+        if proc.stderr:
+            print(proc.stderr.rstrip())
+        return False
+    return True
+
+
 def classify_file(rel_path):
     normalized = rel_path.replace(os.sep, "/")
     if normalized in MIXED_FILES:
@@ -483,13 +638,36 @@ def write_installed_version(target_root, ver):
         os.remove(legacy)
 
 
-def sync_root_readme_to_its_magic(target_root):
-    root_readme = os.path.join(target_root, "README.md")
+_README_MIRROR_MARKER = "intent contract:"
+
+
+def _pick_readme_mirror_source(target_root, fallback_readme):
+  """Prefer kit-root README when target still has the template stub."""
+  root_readme = os.path.join(target_root, "README.md")
+  if fallback_readme and os.path.isfile(fallback_readme):
     if not os.path.isfile(root_readme):
+      return fallback_readme
+    try:
+      with open(root_readme, "r", encoding="utf-8") as f:
+        target_text = f.read()
+    except OSError:
+      target_text = ""
+    if _README_MIRROR_MARKER not in target_text:
+      return fallback_readme
+  if os.path.isfile(root_readme):
+    return root_readme
+  if fallback_readme and os.path.isfile(fallback_readme):
+    return fallback_readme
+  return None
+
+
+def sync_root_readme_to_its_magic(target_root, fallback_readme=None):
+    src_readme = _pick_readme_mirror_source(target_root, fallback_readme)
+    if not src_readme:
         return False
     its_magic_readme = os.path.join(target_root, "its_magic", "README.md")
     ensure_parent(its_magic_readme)
-    shutil.copy2(root_readme, its_magic_readme)
+    shutil.copy2(src_readme, its_magic_readme)
     return True
 
 
@@ -611,6 +789,25 @@ def validate_bootstrap_command(target_root, key, command):
     return True, "OK"
 
 
+KIT_TEMPLATE_TEST_COMMANDS = (
+    'powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"',
+    "powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1",
+)
+
+
+def should_bootstrap_test_command(current, candidate):
+    if not candidate:
+        return False
+    if not current:
+        return True
+    if candidate.startswith("npm run test") or candidate.startswith("sh tests/run-tests"):
+        normalized = current.strip().lower()
+        for kit_default in KIT_TEMPLATE_TEST_COMMANDS:
+            if normalized == kit_default.lower():
+                return True
+    return False
+
+
 def bootstrap_runbook_commands(target_root):
     runbook_path = os.path.join(target_root, "docs", "engineering", "runbook.md")
     if not os.path.isfile(runbook_path):
@@ -622,9 +819,12 @@ def bootstrap_runbook_commands(target_root):
 
     for key in ("TEST_COMMAND", "LINT_COMMAND", "TYPECHECK_COMMAND"):
         current = read_runbook_key(runbook_path, key)
-        if current:
-            continue
         candidate = defaults.get(key, "")
+        if key == "TEST_COMMAND":
+            if not should_bootstrap_test_command(current, candidate):
+                continue
+        elif current:
+            continue
         if not candidate:
             if key == "TEST_COMMAND":
                 diagnostics.append(
@@ -709,6 +909,13 @@ def show_help(version):
     print("  --backup          Before overwriting, save existing files to backups/<timestamp>/.")
     print("                    Ignored when mode is 'missing' (nothing gets replaced).")
     print("  --create          Create the target directory if it does not exist.")
+    print("  --host <value>    Host-surface switch: cursor | opencode | both (default: cursor).")
+    print("                    Normalized case-insensitive and whitespace-trimmed before validate.")
+    print("                    Unknown value -> exit with INSTALL_HOST_INVALID.")
+    print("                    Duplicate --host argv -> fail closed INSTALL_HOST_INVALID (no last-wins).")
+    print("                    --host gates ONLY .cursor/ and .opencode/ trees; kernel paths")
+    print("                    (docs/, scripts/, its_magic/, handoffs/, decisions/, sprints/,")
+    print("                    .github/workflows/) always install regardless of --host.")
     print("  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands")
     print("        from OS+stack detection; unresolved TEST_COMMAND fails fast with")
     print("        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.")
@@ -767,6 +974,13 @@ def main():
     parser.add_argument("--create", action="store_true", help="Create target directory if missing")
     parser.add_argument("--clean-repo", action="store_true", help="Remove installed workflow artifacts")
     parser.add_argument("--yes", action="store_true", help="Skip clean confirmation prompt")
+    parser.add_argument(
+        "--host",
+        action=_HostAction,
+        default=HOST_DEFAULT,
+        help="Host-surface switch: cursor | opencode | both (default: cursor). "
+             "Gates only .cursor/ and .opencode/ trees; kernel paths always install.",
+    )
     parser.add_argument("--help", "-h", action="store_true", help="Show help")
     parser.add_argument("--version", "-v", action="store_true", help="Show version")
     parser.add_argument(
@@ -780,6 +994,7 @@ def main():
         action="store_true",
         help=argparse.SUPPRESS,
     )
+    parser.set_defaults(host_seen=0)
     args = parser.parse_args()
 
     if len(sys.argv) == 1 or args.help:
@@ -820,9 +1035,14 @@ def main():
             print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
             return 1
         try:
-            _install_paths, _clean_paths, required_script_paths, manifest_path = load_ownership_manifest(
-                source_root, script_dir
-            )
+            (
+                _install_paths,
+                _clean_paths,
+                _opencode_install_paths,
+                _opencode_clean_paths,
+                required_script_paths,
+                manifest_path,
+            ) = load_ownership_manifest(source_root, script_dir)
         except RuntimeError as exc:
             print(str(exc))
             return 1
@@ -833,12 +1053,27 @@ def main():
         print("[INSTALL_SOURCE_ERROR] template directory is missing. Reinstall its-magic package.")
         return 1
     try:
-        include_paths, clean_paths, required_script_paths, manifest_path = load_ownership_manifest(
-            source_root, script_dir
-        )
+        (
+            install_paths,
+            clean_paths,
+            opencode_install_paths,
+            opencode_clean_paths,
+            required_script_paths,
+            manifest_path,
+        ) = load_ownership_manifest(source_root, script_dir)
     except RuntimeError as exc:
         print(str(exc))
         return 1
+
+    host = getattr(args, "host", HOST_DEFAULT) or HOST_DEFAULT
+    if host not in HOST_VALUES:
+        print(
+            f"[INSTALL_HOST_INVALID] unknown host value '{host}'. "
+            "Accepted: cursor | opencode | both (default: cursor)."
+        )
+        return 1
+    effective_include_paths = build_effective_include_paths(install_paths, opencode_install_paths, host)
+    effective_clean_paths = build_effective_clean_paths(clean_paths, opencode_clean_paths, host)
 
     target_root = normalize(args.target) if args.target else None
 
@@ -851,7 +1086,9 @@ def main():
         if not args.yes and not prompt_yes_no(f"Clean its-magic workflow artifacts in {target_root}?", default=False):
             print("Aborted.")
             return 1
-        clean_repo(target_root, clean_paths)
+        clean_repo(target_root, effective_clean_paths)
+        if host != "both":
+            emit_host_shrink_diagnostics(target_root, host)
         return 0
 
     if not target_root:
@@ -869,7 +1106,7 @@ def main():
     if mode in ("overwrite", "interactive") and not args.backup:
         backup_enabled = prompt_yes_no("Backup existing files before overwrite?", False)
 
-    files = list_source_files(source_root, include_paths)
+    files = list_source_files(source_root, effective_include_paths)
     if not files:
         print("No source files found to install.")
         return 1
@@ -935,15 +1172,30 @@ def main():
                     review.append(rel)
                 continue
 
-        if not run_scratchpad_postinstall(target_root, source_root, "upgrade", print_ok=True):
+        if not run_cursor_surface_postinstall_hooks(
+            target_root, source_root, "upgrade", host, print_ok=True
+        ):
             return 1
-        if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+        if not run_opencode_model_catalog_hook(target_root, source_root, host, print_ok=True):
             return 1
         if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
             return 1
 
+        if host == "cursor" and os.path.exists(os.path.join(target_root, ".opencode")):
+            print(
+                "[OPENCODE_STALE_BY_UPGRADE_CURSOR] .opencode/ exists from a prior "
+                "--host both install; --host cursor upgrade does not refresh it. Run "
+                "`its-magic --target <repo> --mode upgrade --host opencode|both` to refresh it."
+            )
+        if host == "opencode" and os.path.isdir(os.path.join(target_root, ".cursor")):
+            print(
+                "[CURSOR_STALE_BY_UPGRADE_OPENCODE] .cursor/ exists from a prior "
+                "--host both install; --host opencode upgrade does not refresh it. Run "
+                "`its-magic --target <repo> --mode upgrade --host cursor|both` to refresh it."
+            )
+
         write_installed_version(target_root, version)
-        sync_root_readme_to_its_magic(target_root)
+        sync_root_readme_to_its_magic(target_root, os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.md"))
         runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
         for note in runbook_notes:
             print(note)
@@ -1017,15 +1269,17 @@ def main():
                 ensure_parent(dst)
                 shutil.copy2(src, dst)
 
-    if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
+    if not run_cursor_surface_postinstall_hooks(
+        target_root, source_root, mode, host, print_ok=True
+    ):
         return 1
-    if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):
+    if not run_opencode_model_catalog_hook(target_root, source_root, host, print_ok=True):
         return 1
     if not validate_install_completeness(target_root, source_root, required_script_paths, manifest_path):
         return 1
 
     write_installed_version(target_root, version)
-    sync_root_readme_to_its_magic(target_root)
+    sync_root_readme_to_its_magic(target_root, os.path.join(os.path.dirname(os.path.abspath(__file__)), "README.md"))
     runbook_ok, runbook_notes = bootstrap_runbook_commands(target_root)
     for note in runbook_notes:
         print(note)

@@ -365,6 +365,47 @@ Generated test scaffolding + auto-run behavior (US-0066):
 - `/pause`, `/resume`, `/refresh-context`.
 - `/auto`: orchestration mode that spawns a fresh subagent per phase.
 
+### OpenCode host mode (US-0121)
+
+- Installer `--host cursor|opencode|both` ships the `template/.opencode/` pack into
+  consumer repos; default remains cursor-only until explicit opt-in.
+
+### OpenCode role agents (US-0122)
+
+- Eight markdown agents under `template/.opencode/agents/` map the seven its-magic
+  roles plus orchestrator `auto` with host-enforced Layer-1 permission tables
+  (`edit`/`bash`/`task`); template agents omit `model:` (US-0003). See
+  `decisions/DEC-0122.md`.
+
+### OpenCode model slug routing (US-0123)
+
+- Per-role `provider/slug` routing via operator-local
+  `.opencode/model-catalog.local.json` (gitignored) with committed placeholders in
+  `template/.opencode/model-catalog.local.example.json`; materializer
+  `scripts/opencode_model_catalog_apply.py` injects `model:` into installed
+  `.opencode/agents/<role>.md` only (template agents omit `model:`). See
+  `decisions/DEC-0123.md`.
+
+### OpenCode orchestrator plugin (US-0124)
+
+- Spawn-only `/auto` on the OpenCode host via `template/.opencode/plugins/orchestrator.ts`
+  (v2 `Plugin.define({ id: "its-magic.orchestrator", setup })`). Resolves
+  `phase_id → role` via the US-0069 matrix, spawns an isolated child session
+  with `ctx.session.create({ parentID, agent, prompt })`, asserts
+  `sessionID !== parentID`, persists isolation evidence, and delegates
+  stop-matrix decisions to `scripts/auto_outer_driver.py` (Python SOT) via
+  subprocess. Fail-closed reason codes: `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`,
+  `OPENCODE_SUBTASK_IGNORED`, `OPENCODE_HEADLESS_UNSUPPORTED`,
+  `OPENCODE_DRIVER_INVOKE_FAILED`. See `decisions/DEC-0124.md`.
+
+### OpenCode thin commands + validator bridge (US-0125)
+
+- 15 dispatch-only markdown commands at `template/.opencode/commands/<name>.md`
+  (12 lifecycle phases + `/auto` + `/quick` + `/ask`); each ≤ 20 lines, no
+  200-line Cursor clones. Python validators remain the single source of truth
+  for persistence-blocking gates; the plugin `ctx.tool.hook("execute.before")`
+  enforces persistence (defense in depth). See `decisions/DEC-0125.md`.
+
 ### Guided intake behavior (US-0033)
 
 `/intake` supports two PO interaction modes via `.cursor/scratchpad.md`:

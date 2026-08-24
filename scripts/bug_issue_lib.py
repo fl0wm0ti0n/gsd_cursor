@@ -10,7 +10,7 @@ import re
 from dataclasses import dataclass
 
 BUG_SECTION_HEADER = "## Bug issues (canonical)"
-BUG_BLOCK_HEADER = re.compile(r"^### (BUG-(\d{4}))\s*[—-]\s*(.*)\s*$")
+BUG_BLOCK_HEADER = re.compile(r"^### (BUG-(\d{4}))\s*[—\-?]\s*(.*)\s*$")
 STATUS_LINE = re.compile(r"^-\s*Status:\s*(OPEN|DONE)\s*$", re.IGNORECASE)
 # Field keys: line starts with "- key:" (optional ** around key)
 FIELD_LINE = re.compile(

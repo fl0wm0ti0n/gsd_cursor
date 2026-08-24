@@ -1,0 +1,57 @@
+{
+  "story_id": "US-0121",
+  "sprint_id": "S0121",
+  "phase_id": "plan-verify",
+  "role": "tech-lead",
+  "orchestrator_run_id": "auto-20260823-01",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "plan",
+  "fresh_context_marker": "tl-US0121-sprint-plan-20260823T112200Z-fresh",
+  "timestamp": "2026-08-23T11:22:00Z",
+  "verdict": "PASS",
+  "checks": [
+    {"name": "task_count_within_limit", "status": "PASS", "detail": "10 tasks (T-anch NO-OP + T-001..T-009) <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT not triggered"},
+    {"name": "ac_coverage_surjective", "status": "PASS", "detail": "10/10 ACs mapped surjectively to 14 contract-test markers in tests/us0121_host_mode_test.py + compose guards; no PLAN_AC_COVERAGE_GAP"},
+    {"name": "dependency_order_acyclic", "status": "PASS", "detail": "T-anch -> {T-001, T-002, T-003 parallel} -> {T-004, T-005, T-006 parallel} -> T-008 -> T-009 -> T-007 acyclic per sprint-plan.md"},
+    {"name": "t_anch_no_op_documented", "status": "PASS", "detail": "T-anch NO-OP / verification — # US-0121 H1 anchor in architecture.md (added in /architecture phase); DEC-0120 Accepted; compose guards 5/5; no execute-phase write to architecture.md or DEC-0120"},
+    {"name": "compose_guards_5_unchanged", "status": "PASS", "detail": "5/5 UNCHANGED (US-0008, DEC-0045, US-0102, US-0001, US-0018); additive --host only"},
+    {"name": "critic_carry_ins_routed", "status": "PASS", "detail": "3 non-blocking critic findings explicitly routed to task notes: ik_us0121_missing_overwrite_host_gap -> T-006 (YAGNI), ik_us0121_parity_active_mirror_contradiction -> T-008, ik_us0121_ac9_help_test_yagni -> T-007"},
+    {"name": "manifest_sections_locked", "status": "PASS", "detail": "[opencode_install_include_paths] + [opencode_clean_paths] locked per DEC-0120 §2 + architecture Q7; existing sections unchanged"},
+    {"name": "host_predicate_locked", "status": "PASS", "detail": "host_gates_cursor_row shared predicate locked as interface contract across PS/Bash/Python per DEC-0120 §4 + architecture"},
+    {"name": "host_scoped_diagnostics_locked", "status": "PASS", "detail": "OPENCODE_ORPHANED_BY_CLEAN_CURSOR, OPENCODE_STALE_BY_UPGRADE_CURSOR, CURSOR_ORPHANED_BY_CLEAN_OPENCODE, CURSOR_STALE_BY_UPGRADE_OPENCODE locked per DEC-0120 §5"},
+    {"name": "kernel_vs_host_filter_locked", "status": "PASS", "detail": "--host gates only .cursor/ and .opencode/; kernel paths install regardless per DEC-0120 §3 + architecture Q8"},
+    {"name": "test_markers_locked", "status": "PASS", "detail": "14 test_us0121_* markers locked per architecture AC-7 contract-test list; every AC has >=1 marker"}
+  ],
+  "plan_verification_matrix": [
+    {"task": "T-anch", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "NO-OP / verify # US-0121 anchor + DEC-0120 + compose 5/5 + predicate + 14-marker list", "ac_refs": "AC-8, AC-7 baseline"},
+    {"task": "T-001", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "NEW template/.opencode/ pack (agents/.gitkeep, commands/.gitkeep, plugins/README.md, .gitignore Q10, README.md)", "ac_refs": "AC-1, AC-10"},
+    {"task": "T-002", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "NEW manifest [opencode_install_include_paths] + [opencode_clean_paths] (active + template byte-identical)", "ac_refs": "AC-5"},
+    {"task": "T-003", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "bin/its-magic.js additive --host argv parser + normalize/validate/duplicate fail-closed + forward + --help", "ac_refs": "AC-2, AC-9"},
+    {"task": "T-004", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "installer.ps1 -Host parameter + predicate + opencode sections + diagnostics", "ac_refs": "AC-2, AC-3, AC-5"},
+    {"task": "T-005", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "installer.sh --host argparse + predicate + opencode sections + diagnostics", "ac_refs": "AC-2, AC-3, AC-5"},
+    {"task": "T-006", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "installer.py --host argparse (manifest authority) + predicate + opencode sections + diagnostics; YAGNI missing-after-both diagnostic", "ac_refs": "AC-3, AC-7"},
+    {"task": "T-007", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "NEW tests/us0121_host_mode_test.py (14 markers); --help grep is marker 9 (no 15th marker)", "ac_refs": "AC-7"},
+    {"task": "T-008", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "check_intake_template_parity.py --scope=opencode-adapter + US0121_PARITY_PAIRS; no kit active mirror (Q9)", "ac_refs": "AC-6"},
+    {"task": "T-009", "plan_ref": "sprints/S0121/tasks.md", "planned_scope": "Runbook ## OpenCode host mode (US-0121) h2 + --help line (minimal docs hook)", "ac_refs": "AC-9"}
+  ],
+  "ac_coverage_matrix": [
+    {"ac": "AC-1", "tasks": ["T-001"], "test_markers": ["test_us0121_manifest_lists_opencode_pack", "test_us0121_no_secrets_in_pack"], "covered": true},
+    {"ac": "AC-2", "tasks": ["T-003", "T-004", "T-005", "T-006"], "test_markers": ["test_us0121_default_host_cursor_when_omitted", "test_us0121_host_cursor_installs_cursor_and_kernel_no_opencode", "test_us0121_host_opencode_skips_cursor_installs_opencode_and_kernel", "test_us0121_host_both_installs_both_trees", "test_us0121_invalid_host_fails_closed_install_host_invalid", "test_us0121_host_normalize_case_and_whitespace", "test_us0121_duplicate_host_argv_fails_closed"], "covered": true},
+    {"ac": "AC-3", "tasks": ["T-004", "T-005", "T-006"], "test_markers": ["test_us0121_host_cursor_installs_cursor_and_kernel_no_opencode", "test_us0121_host_opencode_skips_cursor_installs_opencode_and_kernel", "test_us0121_host_both_installs_both_trees", "test_us0121_clean_host_cursor_after_both_emits_orphan_diagnostic", "test_us0121_upgrade_host_cursor_after_both_emits_stale_diagnostic"], "covered": true},
+    {"ac": "AC-4", "tasks": ["T-007"], "test_markers": ["test_us0121_host_cursor_installs_cursor_and_kernel_no_opencode", "test_us0121_host_opencode_skips_cursor_installs_opencode_and_kernel", "test_us0121_host_both_installs_both_trees"], "covered": true},
+    {"ac": "AC-5", "tasks": ["T-002", "T-004", "T-005", "T-006"], "test_markers": ["test_us0121_mixed_section_cursor_skip_when_host_opencode", "test_us0121_manifest_lists_opencode_pack", "test_us0121_triple_installer_host_parity"], "covered": true},
+    {"ac": "AC-6", "tasks": ["T-008"], "test_markers": ["test_us0121_parity_scope_opencode_adapter_registered"], "covered": true},
+    {"ac": "AC-7", "tasks": ["T-007"], "test_markers": ["test_us0121_clean_host_cursor_after_both_emits_orphan_diagnostic", "test_us0121_upgrade_host_cursor_after_both_emits_stale_diagnostic", "test_us0121_mixed_section_cursor_skip_when_host_opencode"], "covered": true},
+    {"ac": "AC-8", "tasks": ["T-anch"], "test_markers": ["test_us0121_compose_guards_unchanged (implicit via T-anch baseline)"], "covered": true},
+    {"ac": "AC-9", "tasks": ["T-003", "T-009"], "test_markers": ["test_us0121_default_host_cursor_when_omitted (--help grep via marker 9 contract)"], "covered": true},
+    {"ac": "AC-10", "tasks": ["T-001"], "test_markers": ["test_us0121_no_secrets_in_pack"], "covered": true}
+  ],
+  "gaps": [],
+  "plan_vs_execute_delta": {
+    "completed_as_planned": 0,
+    "partial": 0,
+    "not_started": 10,
+    "deviation_note": "plan-verify written at sprint-plan time (ultra_lean skips standalone /plan-verify phase); execute phase will populate plan_vs_execute_delta."
+  },
+  "next_phase_after_plan_verify": "/execute (dev, first phase of build+verify macro per ultra_lean)"
+}

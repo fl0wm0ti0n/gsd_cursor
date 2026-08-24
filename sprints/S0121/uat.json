@@ -1,0 +1,132 @@
+{
+  "story_id": "US-0121",
+  "sprint_id": "S0121",
+  "orchestrator_run_id": "auto-20260824-01",
+  "delivery_mode": "ultra_lean",
+  "phase_id": "verify-work",
+  "story_type": "code",
+  "verdict": "PASS",
+  "total": 10,
+  "passed": 10,
+  "failed": 0,
+  "steps": [
+    {
+      "step_id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Verify template/.opencode/ tree is a valid empty-but-valid pack: agents/.gitkeep, commands/.gitkeep, plugins/README.md, .gitignore (Q10 four groups), README.md; no repo-root opencode.json; no active kit .opencode/ mirror.",
+      "result": "pass",
+      "evidence": "Glob template/.opencode/** -> 5 files: agents/.gitkeep, commands/.gitkeep, plugins/README.md, .gitignore, README.md. No repo-root opencode.json. No active .opencode/ mirror in kit repo. Confirmed in sprints/S0121/summary.md T-001."
+    },
+    {
+      "step_id": "UAT-2",
+      "ac": "AC-2",
+      "description": "Verify --host flag accepted by installer.py / installer.ps1 / installer.sh / bin/its-magic.js with default cursor, explicit opt-in for opencode|both, and unknown value fail-closed with INSTALL_HOST_INVALID.",
+      "result": "pass",
+      "evidence": "Live pytest markers 1,5,6,7 (test_us0121_default_host_cursor_when_omitted, test_us0121_invalid_host_fails_closed_install_host_invalid, test_us0121_host_normalize_case_and_whitespace, test_us0121_duplicate_host_argv_fails_closed) all PASSED live. Static source review: installer.py L21-34 _HostAction (duplicate + unknown fail-closed INSTALL_HOST_INVALID); installer.ps1 -InstallHost; installer.sh --host argparse; bin/its-magic.js --host parser."
+    },
+    {
+      "step_id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Verify install/upgrade/clean host-scoped semantics: missing adds .opencode/ when host includes opencode; upgrade refreshes framework-owned OpenCode files; clean removes installer-owned .opencode/ paths when host includes opencode; .cursor/ untouched when --host opencode.",
+      "result": "pass",
+      "evidence": "Live pytest markers 2,3,4,8,9 (test_us0121_host_cursor_installs_cursor_and_kernel_no_opencode, test_us0121_host_opencode_skips_cursor_installs_opencode_and_kernel, test_us0121_host_both_installs_both_trees, test_us0121_clean_host_cursor_after_both_emits_orphan_diagnostic, test_us0121_upgrade_host_cursor_after_both_emits_stale_diagnostic) all PASSED live. installer.py build_effective_include_paths / build_effective_clean_paths / emit_host_shrink_diagnostics."
+    },
+    {
+      "step_id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Verify cursor coexistence: --host cursor (default) byte-identical on .cursor/ and Cursor-owned installer paths vs pre-US-0121; --host both leaves both trees present.",
+      "result": "pass",
+      "evidence": "Live pytest markers 2,3,4 PASSED live (cursor-only no opencode; opencode-only no cursor; both trees present). host_gates_cursor_row predicate gates .cursor/ rows; --host cursor excludes .opencode/ rows from effective include/clean paths (build_effective_*)."
+    },
+    {
+      "step_id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Verify installer-owned-paths.manifest lists template/.opencode/** pack rows + [opencode_install_include_paths] + [opencode_clean_paths] sections, and PowerShell/Bash/Python installers honor --host with same semantics (triple-installer parity at source level).",
+      "result": "pass",
+      "evidence": "Live pytest markers 10,11,14 (test_us0121_mixed_section_cursor_skip_when_host_opencode, test_us0121_manifest_lists_opencode_pack, test_us0121_triple_installer_host_parity) all PASSED live. Grep manifest: L100 [opencode_install_include_paths] + L107 [opencode_clean_paths]; rows .opencode/agents, .opencode/commands, .opencode/plugins, .opencode/.gitignore, .opencode/README.md. Manifest byte-identity SHA-256 = 4AC96FF8A3B9EA2B025A93D787526B0E6343B662BA78BB0C8A72B186697082B5 (active + template)."
+    },
+    {
+      "step_id": "UAT-6",
+      "ac": "AC-6",
+      "description": "Verify check_intake_template_parity.py registers --scope=opencode-adapter (OPENCODE_ADAPTER_PAIRS + SCOPES + SCOPES[all] union) and would fail on template/.opencode/ drift.",
+      "result": "pass",
+      "evidence": "Live pytest marker 13 (test_us0121_parity_scope_opencode_adapter_registered) PASSED live. Grep scripts/check_intake_template_parity.py: L21 --scope=opencode-adapter doc; L484 OPENCODE_ADAPTER_PAIRS tuple; L521 SCOPES['opencode-adapter']; L543 added to SCOPES['all'] union. Parity script byte-identity SHA-256 = E479211A556543C91972D1E9417A4F31058791A0DA03A9EDE26A67507458B647 (active + template)."
+    },
+    {
+      "step_id": "UAT-7",
+      "ac": "AC-7",
+      "description": "Verify 14 contract test markers exist in tests/us0121_host_mode_test.py with architecture-canonical names covering: default cursor-only, each --host value, upgrade/clean, coexistence, invalid host fail-closed, manifest inclusion, no-secrets, parity scope, triple-installer parity.",
+      "result": "pass",
+      "evidence": "Live pytest: python -m pytest tests/us0121_host_mode_test.py -v -> 14/14 PASSED (3.43s; python 3.12.10 on PATH; collected 14 items). All 14 markers test_us0121_* present with architecture-canonical names. Test pair byte-identity SHA-256 = F3A6075783B87851C6529B0AC8C788449E43E815AE2EEA0511157A55AD6AF83B (active + template). B-1 CLOSED: marker 12 regex tightened to assignment-like patterns (L248)."
+    },
+    {
+      "step_id": "UAT-8",
+      "ac": "AC-8",
+      "description": "Verify compose, do not amend: US-0008 installer modes / backup flags / DEC-0045 its_magic/ ownership unchanged except additive host switch; no VS Code contrib rewrite; no OpenCode fork; no command body clone.",
+      "result": "pass",
+      "evidence": "Compose guards 5/5 UNCHANGED (verified read-only this verify-work run): US-0008 (additive --host only; missing/overwrite/clean/upgrade semantics unchanged), DEC-0045 (its_magic/ ownership unchanged), US-0102 (no vendor slugs; *.local.json{,c} gitignore mirrors kit), US-0001 (placeholders only; no command body clone), US-0018 (installer delivery path unchanged except additive --host forward)."
+    },
+    {
+      "step_id": "UAT-9",
+      "ac": "AC-9",
+      "description": "Verify docs hook minimal: installer --help (JS/PS/sh/py) and runbook mention --host and the cursor-default lock.",
+      "result": "pass",
+      "evidence": "Static grep: bin/its-magic.js --help documents --host value + cursor-default + diagnostics; installer.py --help; installer.ps1 --help; installer.sh --help; docs/engineering/runbook.md ## OpenCode host mode (US-0121) h2 covers --host flag + cursor-default lock + install/clean/upgrade host-scoped semantics + orphan/stale diagnostics + PS -InstallHost landmine note. Marker 14 triple-installer parity sub-assertion covers --host <value> in JS help (live PASSED)."
+    },
+    {
+      "step_id": "UAT-10",
+      "ac": "AC-10",
+      "description": "Verify no secrets in template/.opencode/**: no assignment-like apiKey/api_key/sk-/MODEL= hits; no vendor model slugs (US-0102 volatile-ID rule).",
+      "result": "pass",
+      "evidence": "Live pytest marker 12 (test_us0121_no_secrets_in_pack) PASSED live. Independent re-verification this run: Grep tool 'apiKey|api_key|sk-|MODEL=' on template/.opencode -> 0 hits. B-1 CLOSED: regex tightened (L248) to assignment-like patterns only; README.md L45 rephrased to remove literal apiKey token."
+    }
+  ],
+  "ac_results": [
+    {"ac": "AC-1", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-1; Glob template/.opencode/** -> 5 files; no repo-root opencode.json; no active mirror."},
+    {"ac": "AC-2", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-2; live pytest markers 1,5,6,7 PASSED; installer.py L21-34 _HostAction INSTALL_HOST_INVALID."},
+    {"ac": "AC-3", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-3; live pytest markers 2,3,4,8,9 PASSED; build_effective_* / emit_host_shrink_diagnostics."},
+    {"ac": "AC-4", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-4; live pytest markers 2,3,4 PASSED; host_gates_cursor_row predicate."},
+    {"ac": "AC-5", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-5; live pytest markers 10,11,14 PASSED; manifest byte-identity SHA-256 4AC96FF8...082B5."},
+    {"ac": "AC-6", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-6; live pytest marker 13 PASSED; parity script byte-identity SHA-256 E479211A...58B647."},
+    {"ac": "AC-7", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-7; live pytest 14/14 PASSED (python 3.12.10 on PATH); test pair byte-identity SHA-256 F3A60757...6AF83B; B-1 closed."},
+    {"ac": "AC-8", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-8; compose guards 5/5 UNCHANGED."},
+    {"ac": "AC-9", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-9; --help docs in JS/PS/sh/py + runbook h2; marker 14 live PASSED."},
+    {"ac": "AC-10", "status": "PASS", "evidence": "sprints/S0121/uat.json UAT-10; live pytest marker 12 PASSED; Grep 0 hits independently re-verified; B-1 CLOSED."}
+  ],
+  "contract_test_total": 14,
+  "contract_test_passed": 14,
+  "contract_test_failed": 0,
+  "contract_test_command": "python -m pytest tests/us0121_host_mode_test.py -v",
+  "contract_test_note": "Live pytest executed this verify-work run: 14/14 PASSED in 3.43s (python 3.12.10 on PATH; pytest 9.1.1). NB-1 CLOSED for this environment.",
+  "probe_results": [
+    {
+      "probe_id": "probe-01-pytest-cli-smoke",
+      "type": "cli_smoke",
+      "command": "python -m pytest tests/us0121_host_mode_test.py -v",
+      "passed": true,
+      "reason_code": "UAT_PROBE_PASS",
+      "reason": "Python 3.12.10 now on PATH. Live pytest executed this verify-work run: 14/14 PASSED in 3.43s. NB-1 CLOSED for this environment.",
+      "ac_mapping": ["AC-7"],
+      "evidence_ref": "sprints/S0121/uat.json probe_results[0]; live pytest stdout captured this run (14 passed in 3.43s)."
+    }
+  ],
+  "canonical_harness": {
+    "command": "powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1",
+    "report_path": "tests/report.md",
+    "report_timestamp": "2026-08-24T10:45:36Z",
+    "pass_count": 845,
+    "fail_literal": "Fail: 0",
+    "fail_rows": 0,
+    "evidence_ref": "tests/report.md (literal 'Fail: 0' at L5; zero '[FAIL]' rows via Grep)."
+  },
+  "fresh_context_marker": "qa-US0121-verify-work-20260824T105200Z-fresh",
+  "timestamp": "2026-08-24T10:52:00Z",
+  "model_id": "glm-5.2-high",
+  "cross_model_review": 1,
+  "runtime_proof_id": "rp-auto-20260824-01-verify-work-qa-20260824T105200Z-US-0121",
+  "proof_hash": "5DF2AB193AA53A4163418A6808B111CED877195295326ADA326FA0759EA4127D",
+  "proof_ttl_seconds": 3600,
+  "proof_ttl": "2026-08-24T11:52:00Z",
+  "next_scheduled_phase": "/release",
+  "stop_condition": "STOP after verify-work; do not spawn /release."
+}

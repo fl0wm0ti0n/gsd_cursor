@@ -534,10 +534,9 @@ used for resume/materialization failures):
    **native chain supersedes Option B** in IDE **`full_autonomy`**).
    `stop_reason`: `completed|decision_gate|missing_input|pause_request|loop_max|error|blocked`.
 6. Isolation evidence verification at each boundary (**reference** step 11a).
-7. At each phase boundary, verify strict runtime attestation tuple exists
+11b. At each phase boundary, verify strict runtime attestation tuple exists
    and is valid for the completed phase (`orchestrator_run_id`, `runtime_proof_id`,
-   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`)
-   (**reference** step 11b).
+   `phase_id`, `role`, `proof_issued_at`, `proof_ttl_seconds`, `proof_hash`).
 8. Sync verdict recording when eligible — reference step 12.
 9. Backlog-drain / bulk per-item summaries when enabled — reference step 13.
 

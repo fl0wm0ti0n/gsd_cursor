@@ -1,0 +1,272 @@
+{
+  "story_id": "US-0125",
+  "sprint_id": "S0125",
+  "orchestrator_run_id": "auto-20260824-02",
+  "delivery_mode": "ultra_lean",
+  "macro_phase": "build+verify",
+  "phase_id": "verify-work",
+  "role": "qa",
+  "loop": 2,
+  "loop_context": "verify-work (post qa loop-2 PASS) ? UAT placeholder -> populated transition per DEC-0009",
+  "story_type": "code",
+  "verdict": "PASS",
+  "total": 11,
+  "passed": 11,
+  "failed": 0,
+  "steps": [
+    {
+      "id": "UAT-1",
+      "ac": "AC-1",
+      "description": "Dispatch-only command inventory: 15 named OpenCode command files at template/.opencode/commands/<name>.md; no extra; .gitkeep removed. Each selects role+phase id+artifact path list and stops; no embedded 200-line Cursor procedure (marker 1).",
+      "result": "pass",
+      "evidence": "test_us0125_command_inventory PASSED; md_files==sorted(expected 15); .gitkeep not exists; marker 11 frontmatter_shape PASSED"
+    },
+    {
+      "id": "UAT-2",
+      "ac": "AC-2",
+      "description": "Clone guard: per-file line cap <=20 + normalized similarity <=0.30 via difflib vs .cursor/commands/<name>.md; strip-token manifest locked as US0125_CLONE_GUARD_STRIP_TOKENS constant (closes ik_us0125_dq2_normalization_strip_list_open) (marker 2).",
+      "result": "pass",
+      "evidence": "test_us0125_clone_guard PASSED; offenders_line=[]; offenders_sim=[]; US0125_CLONE_GUARD_STRIP_TOKENS at test L61-L88; all 15 files <=20 lines (max 14)"
+    },
+    {
+      "id": "UAT-3",
+      "ac": "AC-3",
+      "description": "Validator source of truth: persistence-blocking gates remain existing Python CLIs (intake_evidence_validate.py + bug_issue_validate.py); command/plugin subprocess them; must not reimplement. Bridge contract for named CLIs: stubbed non-zero -> no persistence (marker 3).",
+      "result": "pass",
+      "evidence": "test_us0125_validator_subprocess_fail_closed PASSED; fixture validator_artifact_mapping.json contains both named CLIs bridge=named; harness release-blocked-nonzero returns allowed=false reasonCode=INTAKE_PERSISTENCE_BLOCKED"
+    },
+    {
+      "id": "UAT-4",
+      "ac": "AC-4",
+      "description": "Success test (b): /release after a failing validator is blocked even if command/agent prompt says continue. Mock-ctx+mock-subprocess: non-zero -> refuse write; raw Python reason code; throw -> OPENCODE_DRIVER_INVOKE_FAILED (marker 4).",
+      "result": "pass",
+      "evidence": "test_us0125_release_blocked_after_failing_validator PASSED; r_nonzero allowed=false reasonCode=INTAKE_PERSISTENCE_BLOCKED calls=1; r_throw allowed=false reasonCode=OPENCODE_DRIVER_INVOKE_FAILED calls=1; r_ok allowed=true"
+    },
+    {
+      "id": "UAT-5",
+      "ac": "AC-5",
+      "description": "Fail-closed reason codes: validator non-zero surfaces existing kit reason codes as-is; no OPENCODE_VALIDATOR_FAILED wrapper; OPENCODE_DRIVER_INVOKE_FAILED only for subprocess invocation failure (marker 5).",
+      "result": "pass",
+      "evidence": "test_us0125_reason_code_raw_python PASSED; OPENCODE_VALIDATOR_FAILED zero hits across commands+mock_subprocess+bridge_harness; OPENCODE_DRIVER_INVOKE_FAILED present in harness, absent from command files (DQ4)"
+    },
+    {
+      "id": "UAT-6",
+      "ac": "AC-6",
+      "description": "If a rule can be a plugin check or Python CLI, it must not live in a command file. Grep 15 command files for policy text fragments (INTAKE_REQUIRED_TOPIC_MISSING, topic_coverage, asked_topics, missing_topics, assumptions_confirmed, etc.) ? zero hits (marker 6).",
+      "result": "pass",
+      "evidence": "test_us0125_no_policy_in_commands PASSED; POLICY_TEXT_FRAGMENTS zero hits across all 15 command files"
+    },
+    {
+      "id": "UAT-7",
+      "ac": "AC-7",
+      "description": "Optional commands: missing a convenience command must not disable plugin spawn (US-0124) or Python CLIs. Delete quick.md in temp copy -> plugin still auto-discovered; @auto agent still invocable; remaining 14 commands present (marker 7).",
+      "result": "pass",
+      "evidence": "test_us0125_missing_command_does_not_disable_plugin PASSED; temp-copy plugins/orchestrator.ts exists; agents/auto.md exists; 14 commands remain after quick.md deletion"
+    },
+    {
+      "id": "UAT-8",
+      "ac": "AC-1",
+      "description": "/auto dispatch-only: auto.md <=20 lines + no ctx.session.create / Session.create / spawn-call logic literals in BODY (frontmatter description 'spawn-only' permitted) + agent: auto + subtask: false frontmatter (marker 8; also AC-7).",
+      "result": "pass",
+      "evidence": "test_us0125_auto_command_dispatch_only PASSED; auto.md <=20 lines; body free of ctx.session.create/Session.create/spawn(= patterns; agent: auto + subtask: false frontmatter"
+    },
+    {
+      "id": "UAT-9",
+      "ac": "AC-9",
+      "description": "Compose US-0001: Cursor command files unchanged. OpenCode commands additive. Grep .cursor/commands/*.md for 'US-0125' -> zero hits (marker 9).",
+      "result": "pass",
+      "evidence": "test_us0125_cursor_commands_unchanged PASSED; 'US-0125' zero hits across .cursor/commands/*.md; OpenCode commands live in template/.opencode/commands/ only"
+    },
+    {
+      "id": "UAT-10",
+      "ac": "AC-10",
+      "description": "No new npm runtime in consumer app code: validator bridge is kit scripts + plugin subprocess. Grep package.json deps for @opencode-ai/, @ai-sdk/, opencode prefixes -> zero hits; command files no 'npm install' or 'require(' (marker 10).",
+      "result": "pass",
+      "evidence": "test_us0125_no_new_npm_runtime PASSED; package.json deps zero forbidden prefixes; 15 command files zero 'npm install' / 'require(' hits"
+    },
+    {
+      "id": "UAT-11",
+      "ac": "AC-8",
+      "description": "Contract tests cover thin-command inventory (marker 1), clone guard (marker 2), validator subprocess fail-closed (marker 3), success test (b) (marker 4). Frontmatter shape: 15 files ? description present; agent present for 14 (omitted for /ask); no model:; subtask: false only on /auto (marker 11).",
+      "result": "pass",
+      "evidence": "python -m pytest tests/us0125_contract_test.py -v -> 11 passed in 0.45s (exit 0); covers all 11 markers"
+    }
+  ],
+  "ac_results": [
+    {
+      "ac": "AC-1",
+      "status": "PASS",
+      "evidence": "markers 1+8+11 PASS; 15 dispatch-only command files; auto.md dispatch-only with agent: auto + subtask: false"
+    },
+    {
+      "ac": "AC-2",
+      "status": "PASS",
+      "evidence": "marker 2 PASS; line cap <=20 + similarity <=0.30 for all 15 files; US0125_CLONE_GUARD_STRIP_TOKENS locked"
+    },
+    {
+      "ac": "AC-3",
+      "status": "PASS",
+      "evidence": "marker 3 PASS; named CLIs subprocess; non-zero -> INTAKE_PERSISTENCE_BLOCKED; no reimplementation"
+    },
+    {
+      "ac": "AC-4",
+      "status": "PASS",
+      "evidence": "marker 4 PASS; success test (b) ? non-zero -> refuse write; throw -> OPENCODE_DRIVER_INVOKE_FAILED; ok -> allowed"
+    },
+    {
+      "ac": "AC-5",
+      "status": "PASS",
+      "evidence": "marker 5 PASS; raw Python reason codes; no OPENCODE_VALIDATOR_FAILED wrapper; OPENCODE_DRIVER_INVOKE_FAILED only for subprocess throw"
+    },
+    {
+      "ac": "AC-6",
+      "status": "PASS",
+      "evidence": "marker 6 PASS; zero policy-text fragments in 15 command files"
+    },
+    {
+      "ac": "AC-7",
+      "status": "PASS",
+      "evidence": "markers 7+8 PASS; deleting quick.md keeps plugin + @auto agent + 14 commands intact"
+    },
+    {
+      "ac": "AC-8",
+      "status": "PASS",
+      "evidence": "marker 11 PASS + 11/11 contract markers PASS in 0.45s (exit 0); covers all required surfaces"
+    },
+    {
+      "ac": "AC-9",
+      "status": "PASS",
+      "evidence": "marker 9 PASS; zero US-0125 references in .cursor/commands/*.md; OpenCode commands additive only"
+    },
+    {
+      "ac": "AC-10",
+      "status": "PASS",
+      "evidence": "marker 10 PASS; package.json zero forbidden runtime deps; command files zero npm install / require("
+    }
+  ],
+  "contract_test_total": 11,
+  "contract_test_passed": 11,
+  "contract_test_failed": 0,
+  "contract_test_command": "python -m pytest tests/us0125_contract_test.py -v",
+  "contract_test_output": "11 passed in 0.45s (exit 0) ? independently re-run by /verify-work @ 2026-08-24T22:35:00Z",
+  "parity_command": "python scripts/check_intake_template_parity.py --repo . --scope=opencode-adapter",
+  "parity_result": "[INTAKE_TEMPLATE_PARITY_OK] scope=opencode-adapter (exit 0)",
+  "readme_coverage_command": "python scripts/validate_readme_feature_coverage.py --repo . --report",
+  "readme_coverage_result": "{\"coverage_missing\":[],\"coverage_present\":[\"US-0121\",\"US-0122\",\"US-0123\",\"US-0124\"],\"coverage_total\":4,\"gaps\":[],\"repo_root\":\".\",\"report_schema_version\":1,\"status\":\"PASS\"} ? US-0125 correctly absent (OPEN, not in coverage set)",
+  "fresh_context_marker": "qa-US0125-verify-work-20260824T223500Z-fresh",
+  "timestamp": "2026-08-24T22:35:00Z",
+  "model_id": "glm-5.2-high",
+  "cross_model_review": 1,
+  "runtime_proof_id": "rp-auto-20260824-02-verify-work-qa-20260824T223500Z-US-0125",
+  "proof_hash": "7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312",
+  "proof_ttl_seconds": 3600,
+  "proof_ttl": "2026-08-24T23:35:00Z",
+  "story_status": "OPEN",
+  "acceptance_row_unchecked": true,
+  "blocking_findings": 0,
+  "non_blocking_findings": 0,
+  "probe_results": [
+    {
+      "step": "UAT-1",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_command_inventory PASSED (marker 1)."
+    },
+    {
+      "step": "UAT-2",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_clone_guard PASSED (marker 2); difflib similarity <=0.30."
+    },
+    {
+      "step": "UAT-3",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest + Node harness: test_us0125_validator_subprocess_fail_closed PASSED; release-blocked-nonzero returns allowed=false reasonCode=INTAKE_PERSISTENCE_BLOCKED."
+    },
+    {
+      "step": "UAT-4",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest + Node harness: test_us0125_release_blocked_after_failing_validator PASSED; success test (b) scenarios pass."
+    },
+    {
+      "step": "UAT-5",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_reason_code_raw_python PASSED; static grep confirms no OPENCODE_VALIDATOR_FAILED wrapper."
+    },
+    {
+      "step": "UAT-6",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_no_policy_in_commands PASSED; zero policy-text fragments."
+    },
+    {
+      "step": "UAT-7",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_missing_command_does_not_disable_plugin PASSED; temp-copy delete quick.md keeps plugin+agent+14 commands."
+    },
+    {
+      "step": "UAT-8",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_auto_command_dispatch_only PASSED; auto.md body free of spawn literals."
+    },
+    {
+      "step": "UAT-9",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_cursor_commands_unchanged PASSED; .cursor/commands zero US-0125 refs."
+    },
+    {
+      "step": "UAT-10",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_no_new_npm_runtime PASSED; package.json zero forbidden runtime deps."
+    },
+    {
+      "step": "UAT-11",
+      "probe_class": "test",
+      "reason_code": "UAT_PROBE_PASS",
+      "passed": true,
+      "note": "Live pytest: test_us0125_command_frontmatter_shape PASSED + 11/11 contract markers PASS in 0.45s (exit 0)."
+    }
+  ],
+  "browser_probe_used": false,
+  "browser_probe_reason": "Non-browser plugin/command contract story; no browser_smoke step classifies. Browser MCP not invoked. No fake browser PASS. CLI/contract evidence is the right probe class per DEC-0078.",
+  "runtime_qa_autopilot": {
+    "runtime_stack_profile": "node",
+    "runtime_mode": "local",
+    "runtime_startup_command": "node --experimental-strip-types tests/us0125/bridge_harness.mjs <scenario> (driven via pytest)",
+    "runtime_health_target": "Node subprocess harness exit code + 11/11 contract markers",
+    "runtime_health_result": "PASS (exit 0; 11/11 markers in 0.45s)",
+    "runtime_log_summary": "0 errors / 0 warnings / 11 pass",
+    "runtime_retry_count": 0,
+    "runtime_retry_ledger": [],
+    "runtime_final_verdict": "pass",
+    "runtime_reason_code": "N/A",
+    "runtime_evidence_refs": "tests/us0125_contract_test.py pytest output; sprints/S0125/summary.md contract-test block"
+  },
+  "generated_test_evidence": {
+    "generated_test_command": "python -m pytest tests/us0125_contract_test.py -v",
+    "generated_test_result": "pass",
+    "generated_test_output_ref": "sprints/S0125/uat.json contract_test_output",
+    "generated_test_paths_ref": "tests/us0125_contract_test.py; template/tests/us0125_contract_test.py; tests/us0125/mock_subprocess.ts; tests/us0125/bridge_harness.mjs; tests/us0125/fixtures/validator_artifact_mapping.json; template/.opencode/commands/*.md",
+    "generated_test_reason_code": "N/A"
+  },
+  "next_scheduled_phase": "/release",
+  "next_scheduled_role": "release",
+  "stop_condition": "STOP after /verify-work. Hand off via artifacts only to /release (role=release). Do NOT spawn /release from this qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON."
+}

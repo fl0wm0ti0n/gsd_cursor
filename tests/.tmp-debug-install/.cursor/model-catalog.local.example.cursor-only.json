@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "cheap": "composer-2.5-fast",
+    "balanced": "composer-2.5-standard",
+    "strong": "composer-2.5"
+  },
+  "notes": "Cursor-integrated models only. Uses Cursor's own Composer 2.5 family via stable Cursor model IDs. No external API key is required; everything routes through Cursor-managed infrastructure. Strong maps to the strongest available Composer 2.5 variant (often the default parent model when model: is omitted)."
+}

@@ -263,6 +263,49 @@ def _map_exit(
     return EXIT_HARD_STOP
 
 
+def run_stop_matrix_json(
+    *,
+    phase: str,
+    role: str,
+    story: str | None,
+    sprint: str | None,
+    orchestrator_run_id: str | None,
+    stop_reason: str | None,
+) -> int:
+    """US-0124 / DEC-0124 §6 — additive argv JSON response path.
+
+    When the new flags (--phase/--role/--story/--sprint/--orchestrator-run-id/--stop-reason)
+    are present, emit a JSON stop-matrix decision on stdout and exit 0. When the
+    flags are absent, the legacy run_driver() path is byte-identical (no
+    regression to US-0092 / DEC-0078). The plugin (TypeScript) parses this JSON
+    and dispatches; the Python SOT owns all state-machine transitions.
+    """
+    action = "spawn_next"
+    next_phase: str | None = None
+    emitted_stop_reason = stop_reason or "(none)"
+    if stop_reason in HARD_STOP_REASONS:
+        action = "hard_stop"
+    elif stop_reason == "pause_request":
+        action = "pause_boundary"
+    elif stop_reason in RECOVERABLE_STOP_REASONS:
+        action = "ledger_write"
+    elif stop_reason in ("completed", "(none)", None):
+        action = "spawn_next"
+    payload = {
+        "action": action,
+        "phase": phase,
+        "role": role,
+        "story_id": story or "(none)",
+        "sprint_id": sprint or "(none)",
+        "orchestrator_run_id": orchestrator_run_id or "(none)",
+        "stop_reason": emitted_stop_reason,
+        "next_phase": next_phase,
+    }
+    sys.stdout.write(json.dumps(payload, sort_keys=True, separators=(",", ":")))
+    sys.stdout.write("\n")
+    return EXIT_COMPLETED
+
+
 def run_driver(
     repo: Path,
     *,
@@ -472,8 +515,42 @@ def main() -> int:
         default=None,
         help="Self-test only: inject stop_reason for exit-code path (e.g. pause_request).",
     )
+    # US-0124 / DEC-0124 §6 — additive argv for the OpenCode orchestrator
+    # plugin subprocess callout. When --phase is present, the driver emits a
+    # JSON stop-matrix decision on stdout and exits 0. When these flags are
+    # absent, the legacy run_driver() behavior is byte-identical.
+    parser.add_argument("--phase", default=None, help="US-0124: phase_id for stop-matrix JSON path.")
+    parser.add_argument("--role", default=None, help="US-0124: role for stop-matrix JSON path.")
+    parser.add_argument("--story", default=None, help="US-0124: story_id for stop-matrix JSON path.")
+    parser.add_argument("--sprint", default=None, help="US-0124: sprint_id for stop-matrix JSON path.")
+    parser.add_argument(
+        "--orchestrator-run-id",
+        default=None,
+        dest="orchestrator_run_id",
+        help="US-0124: orchestrator_run_id for stop-matrix JSON path.",
+    )
+    parser.add_argument(
+        "--stop-reason",
+        default=None,
+        dest="stop_reason",
+        help="US-0124: stop_reason for stop-matrix JSON path.",
+    )
     args = parser.parse_args()
     repo = Path(args.repo).resolve()
+
+    # US-0124 additive path — emit JSON and exit before any legacy side effect.
+    if args.phase is not None:
+        if args.role is None:
+            print("OPENCODE_DRIVER_INVOKE_FAILED: --phase requires --role", file=sys.stderr)
+            return EXIT_CONFIG
+        return run_stop_matrix_json(
+            phase=args.phase,
+            role=args.role,
+            story=args.story,
+            sprint=args.sprint,
+            orchestrator_run_id=args.orchestrator_run_id,
+            stop_reason=args.stop_reason,
+        )
 
     if args.self_test:
         try:

@@ -1,0 +1,7 @@
+.opencode/opencode.json
+.opencode/opencode.jsonc
+.env
+.env.*
+*.local.json
+*.local.jsonc
+auth.json

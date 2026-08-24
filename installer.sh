@@ -46,7 +46,14 @@ show_help() {
   printf "                                   Use after updating its-magic to a newer version.\n"
   printf "  --backup          Before overwriting, save existing files to backups/<timestamp>/.\n"
   printf "                    Ignored when mode is 'missing' (nothing gets replaced).\n"
-  printf "  --create          Create the target directory if it does not exist.\n\n"
+  printf "  --create          Create the target directory if it does not exist.\n"
+  printf "  --host <value>    Host-surface switch: cursor | opencode | both (default: cursor).\n"
+  printf "                    Normalized case-insensitive and whitespace-trimmed before validate.\n"
+  printf "                    Unknown value -> exit with INSTALL_HOST_INVALID.\n"
+  printf "                    Duplicate --host argv -> fail closed INSTALL_HOST_INVALID (no last-wins).\n"
+  printf "                    --host gates ONLY .cursor/ and .opencode/ trees; kernel paths\n"
+  printf "                    (docs/, scripts/, its_magic/, handoffs/, decisions/, sprints/,\n"
+  printf "                    .github/workflows/) always install regardless of --host.\n\n"
   printf "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from\n"
   printf "        OS+stack detection; unresolved TEST_COMMAND fails fast with\n"
   printf "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics.\n"
@@ -109,6 +116,74 @@ get_manifest_paths() {
   ' "$OWNERSHIP_MANIFEST"
 }
 
+# US-0121 / DEC-0120 §1: normalize-then-validate --host (Bash is case-sensitive;
+# normalize lowercase). Unknown or duplicate -> fail closed INSTALL_HOST_INVALID.
+host_normalize() {
+  printf '%s' "$1" | tr '[:upper:]' '[:lower:]' | sed 's/^[[:space:]]*//; s/[[:space:]]*$//'
+}
+
+host_is_valid() {
+  case "$1" in
+    cursor|opencode|both) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# DEC-0120 §4: shared predicate. Returns 0 (true) if row should be SKIPPED.
+host_gates_cursor_row() {
+  rel="$1"; host="$2"
+  if [ "$host" = "opencode" ]; then
+    case "$rel" in
+      .cursor/*) return 0 ;;
+      *) return 1 ;;
+    esac
+  fi
+  return 1
+}
+
+host_includes_opencode() {
+  [ "$1" = "opencode" ] || [ "$1" = "both" ]
+}
+
+host_includes_cursor() {
+  [ "$1" = "cursor" ] || [ "$1" = "both" ]
+}
+
+build_effective_include_paths() {
+  install_paths="$1"; opencode_install_paths="$2"; host="$3"
+  eff=""
+  for rel in $install_paths; do
+    if host_gates_cursor_row "$rel" "$host"; then continue; fi
+    eff="$eff $rel"
+  done
+  if host_includes_opencode "$host"; then
+    for rel in $opencode_install_paths; do eff="$eff $rel"; done
+  fi
+  printf '%s' "$eff" | sed 's/^ *//'
+}
+
+build_effective_clean_paths() {
+  clean_paths="$1"; opencode_clean_paths="$2"; host="$3"
+  eff=""
+  if host_includes_cursor "$host"; then
+    for rel in $clean_paths; do eff="$eff $rel"; done
+  fi
+  if host_includes_opencode "$host"; then
+    for rel in $opencode_clean_paths; do eff="$eff $rel"; done
+  fi
+  printf '%s' "$eff" | sed 's/^ *//'
+}
+
+emit_host_shrink_diagnostics() {
+  target_root="$1"; host="$2"
+  if [ "$host" = "cursor" ] && [ -e "$target_root/.opencode" ]; then
+    printf '%s\n' "[OPENCODE_ORPHANED_BY_CLEAN_CURSOR] .opencode/ exists from a prior --host both install; --host cursor does not remove it. Run 'its-magic --clean-repo --host opencode|both' to remove it."
+  fi
+  if [ "$host" = "opencode" ] && [ -d "$target_root/.cursor" ]; then
+    printf '%s\n' "[CURSOR_ORPHANED_BY_CLEAN_OPENCODE] .cursor/ exists from a prior --host both install; --host opencode does not remove it. Run 'its-magic --clean-repo --host cursor|both' to remove it."
+  fi
+}
+
 backup_files() {
   target_root="$1"
   shift
@@ -144,6 +219,10 @@ choose_mode() {
 scratchpad_postinstall() {
   target_root="$1"
   mode="$2"
+  if ! host_includes_cursor "$HOST"; then
+    printf '%s\n' "[CURSOR_HOST_HOOKS_SKIPPED] --host opencode does not materialize .cursor/ (scratchpad Model B + dev-env profile)."
+    return 0
+  fi
   installer_py="$SCRIPT_DIR/installer.py"
   if [ ! -f "$installer_py" ]; then
     printf "%s\n" "[SCRATCHPAD_POSTINSTALL_ERROR] installer.py missing next to installer.sh."
@@ -155,6 +234,31 @@ scratchpad_postinstall() {
     python "$installer_py" --scratchpad-postinstall --target "$target_root" --mode "$mode" || exit $?
   else
     printf "%s\n" "[SCRATCHPAD_POSTINSTALL_ERROR] PYTHON_NOT_FOUND: Python 3 is required for scratchpad materialization/validation (Model B)."
+    exit 1
+  fi
+}
+
+opencode_model_catalog_apply() {
+  target_root="$1"
+  if ! host_includes_opencode "$HOST"; then
+    return 0
+  fi
+  catalog_path="$target_root/.opencode/model-catalog.local.json"
+  if [ ! -f "$catalog_path" ]; then
+    printf '%s\n' "[OPENCODE_MODEL_CATALOG_SKIPPED] no .opencode/model-catalog.local.json at install target (optional catalog)."
+    return 0
+  fi
+  script_path="$SCRIPT_DIR/scripts/opencode_model_catalog_apply.py"
+  if [ ! -f "$script_path" ]; then
+    printf '%s\n' "[OPENCODE_MODEL_CATALOG_ERROR] scripts/opencode_model_catalog_apply.py not found next to installer.sh."
+    exit 1
+  fi
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$script_path" --target "$target_root" || exit $?
+  elif command -v python >/dev/null 2>&1; then
+    python "$script_path" --target "$target_root" || exit $?
+  else
+    printf '%s\n' "[OPENCODE_MODEL_CATALOG_ERROR] PYTHON_NOT_FOUND: Python is required for OpenCode model catalog materialization."
     exit 1
   fi
 }
@@ -216,11 +320,45 @@ write_installed_version() {
 
 sync_root_readme_to_its_magic() {
   target_root="$1"
-  [ -f "$target_root/README.md" ] || return 1
+  fallback_readme="$2"
+  marker="intent contract:"
+  src_readme=""
+  if [ -n "$fallback_readme" ] && [ -f "$fallback_readme" ]; then
+    if [ ! -f "$target_root/README.md" ]; then
+      src_readme="$fallback_readme"
+    elif ! grep -qF "$marker" "$target_root/README.md" 2>/dev/null; then
+      src_readme="$fallback_readme"
+    fi
+  fi
+  if [ -z "$src_readme" ] && [ -f "$target_root/README.md" ]; then
+    src_readme="$target_root/README.md"
+  elif [ -z "$src_readme" ] && [ -n "$fallback_readme" ] && [ -f "$fallback_readme" ]; then
+    src_readme="$fallback_readme"
+  fi
+  if [ -z "$src_readme" ]; then
+    return 1
+  fi
   dst="$target_root/its_magic/README.md"
   ensure_parent "$dst"
-  cp -p "$target_root/README.md" "$dst"
+  cp -p "$src_readme" "$dst"
   return 0
+}
+
+should_bootstrap_test_command() {
+  current="$1"
+  candidate="$2"
+  [ -n "$candidate" ] || return 1
+  [ -z "$current" ] && return 0
+  case "$candidate" in
+    "npm run test"*|sh\ tests/run-tests*)
+      case "$(printf "%s" "$current" | tr 'A-Z' 'a-z')" in
+        'powershell -executionpolicy bypass -file "tests/run-tests.ps1"'|\
+        'powershell -executionpolicy bypass -file tests/run-tests.ps1')
+          return 0 ;;
+      esac
+      ;;
+  esac
+  return 1
 }
 
 read_runbook_key() {
@@ -321,11 +459,15 @@ bootstrap_runbook_commands() {
   detect_runbook_defaults "$target_root"
   for key in TEST_COMMAND LINT_COMMAND TYPECHECK_COMMAND; do
     current=$(read_runbook_key "$runbook" "$key")
-    [ -n "$current" ] && continue
     candidate=""
     [ "$key" = "TEST_COMMAND" ] && candidate="$TEST_CANDIDATE"
     [ "$key" = "LINT_COMMAND" ] && candidate="$LINT_CANDIDATE"
     [ "$key" = "TYPECHECK_COMMAND" ] && candidate="$TYPECHECK_CANDIDATE"
+    if [ "$key" = "TEST_COMMAND" ]; then
+      should_bootstrap_test_command "$current" "$candidate" || continue
+    elif [ -n "$current" ]; then
+      continue
+    fi
     if [ -z "$candidate" ]; then
       if [ "$key" = "TEST_COMMAND" ]; then
         BOOTSTRAP_NOTES="${BOOTSTRAP_NOTES}[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED: could not detect a valid baseline test command. Fix: define TEST_COMMAND in docs/engineering/runbook.md or add detectable stack markers (package.json scripts.test, pyproject.toml, go.mod)."$'\n'
@@ -362,6 +504,8 @@ prompt_yes_no() {
 
 TARGET=""
 MODE=""
+HOST=""
+HOST_SEEN=0
 BACKUP="false"
 CREATE="false"
 CLEAN_REPO="false"
@@ -377,6 +521,19 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --target) TARGET="$2"; shift 2 ;;
     --mode) MODE="$2"; shift 2 ;;
+    --host)
+      HOST_SEEN=$((HOST_SEEN + 1))
+      if [ "$HOST_SEEN" -gt 1 ]; then
+        printf '%s\n' "[INSTALL_HOST_INVALID] duplicate --host argv (no last-wins). Accepted: cursor | opencode | both (default: cursor)."
+        exit 1
+      fi
+      RAW_HOST="$2"
+      HOST=$(host_normalize "$RAW_HOST")
+      if ! host_is_valid "$HOST"; then
+        printf '%s\n' "[INSTALL_HOST_INVALID] unknown host value '$HOST'. Accepted: cursor | opencode | both (default: cursor)."
+        exit 1
+      fi
+      shift 2 ;;
     --backup) BACKUP="true"; shift 1 ;;
     --create) CREATE="true"; shift 1 ;;
     --clean-repo) CLEAN_REPO="true"; shift 1 ;;
@@ -386,6 +543,8 @@ while [ $# -gt 0 ]; do
     *) shift 1 ;;
   esac
 done
+
+[ -z "$HOST" ] && HOST="cursor"
 
 if [ "$SHOW_VERSION" = "true" ]; then
   printf "its-magic v%s\n" "$APP_VERSION"
@@ -433,7 +592,9 @@ if [ "$CLEAN_REPO" = "true" ]; then
     printf "%s\n" "[INSTALL_MANIFEST_ERROR] clean_paths section is empty in $OWNERSHIP_MANIFEST"
     exit 1
   fi
-  for rel in $CLEAN_PATHS; do
+  OPENCODE_CLEAN_PATHS=$(get_manifest_paths "opencode_clean_paths")
+  EFFECTIVE_CLEAN_PATHS=$(build_effective_clean_paths "$CLEAN_PATHS" "$OPENCODE_CLEAN_PATHS" "$HOST")
+  for rel in $EFFECTIVE_CLEAN_PATHS; do
     path="$TARGET_ROOT/$rel"
     if [ -e "$path" ]; then
       rm -rf "$path"
@@ -441,6 +602,9 @@ if [ "$CLEAN_REPO" = "true" ]; then
     fi
   done
   printf "%s\n" "Clean completed."
+  if [ "$HOST" != "both" ]; then
+    emit_host_shrink_diagnostics "$TARGET_ROOT" "$HOST"
+  fi
   exit 0
 fi
 
@@ -476,8 +640,10 @@ if [ -z "$INCLUDE_PATHS" ]; then
   printf "%s\n" "[INSTALL_MANIFEST_ERROR] install_include_paths section is empty in $OWNERSHIP_MANIFEST"
   exit 1
 fi
+OPENCODE_INCLUDE_PATHS=$(get_manifest_paths "opencode_install_include_paths")
+EFFECTIVE_INCLUDE_PATHS=$(build_effective_include_paths "$INCLUDE_PATHS" "$OPENCODE_INCLUDE_PATHS" "$HOST")
 
-FILES=$(list_source_files "$SOURCE_ROOT" $INCLUDE_PATHS)
+FILES=$(list_source_files "$SOURCE_ROOT" $EFFECTIVE_INCLUDE_PATHS)
 if [ -z "$FILES" ]; then
   printf "%s\n" "No source files found to install."
   exit 1
@@ -562,10 +728,18 @@ if [ "$MODE" = "upgrade" ]; then
   done
 
   scratchpad_postinstall "$TARGET_ROOT" "upgrade"
+  opencode_model_catalog_apply "$TARGET_ROOT"
   validate_install_completeness "$TARGET_ROOT"
 
+  if [ "$HOST" = "cursor" ] && [ -e "$TARGET_ROOT/.opencode" ]; then
+    printf '%s\n' "[OPENCODE_STALE_BY_UPGRADE_CURSOR] .opencode/ exists from a prior --host both install; --host cursor upgrade does not refresh it. Run 'its-magic --target <repo> --mode upgrade --host opencode|both' to refresh it."
+  fi
+  if [ "$HOST" = "opencode" ] && [ -d "$TARGET_ROOT/.cursor" ]; then
+    printf '%s\n' "[CURSOR_STALE_BY_UPGRADE_OPENCODE] .cursor/ exists from a prior --host both install; --host opencode upgrade does not refresh it. Run 'its-magic --target <repo> --mode upgrade --host cursor|both' to refresh it."
+  fi
+
   write_installed_version "$TARGET_ROOT" "$APP_VERSION"
-  sync_root_readme_to_its_magic "$TARGET_ROOT" || true
+  sync_root_readme_to_its_magic "$TARGET_ROOT" "$SCRIPT_DIR/README.md" || true
   bootstrap_runbook_commands "$TARGET_ROOT"
   [ -n "$BOOTSTRAP_NOTES" ] && printf "%s" "$BOOTSTRAP_NOTES"
   [ "$BOOTSTRAP_OK" = "true" ] || exit 1
@@ -634,10 +808,11 @@ for rel in $FILES; do
 done
 
 scratchpad_postinstall "$TARGET_ROOT" "$MODE"
+opencode_model_catalog_apply "$TARGET_ROOT"
 validate_install_completeness "$TARGET_ROOT"
 
 write_installed_version "$TARGET_ROOT" "$APP_VERSION"
-sync_root_readme_to_its_magic "$TARGET_ROOT" || true
+sync_root_readme_to_its_magic "$TARGET_ROOT" "$SCRIPT_DIR/README.md" || true
 bootstrap_runbook_commands "$TARGET_ROOT"
 [ -n "$BOOTSTRAP_NOTES" ] && printf "%s" "$BOOTSTRAP_NOTES"
 [ "$BOOTSTRAP_OK" = "true" ] || exit 1

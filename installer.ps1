@@ -2,6 +2,7 @@ Param(
   [string]$Target,
   [ValidateSet("missing","overwrite","interactive","upgrade")]
   [string]$Mode,
+  [string]$InstallHost,
   [switch]$Backup,
   [switch]$Create,
   [switch]$CleanRepo,
@@ -11,6 +12,31 @@ Param(
 )
 
 $ErrorActionPreference = "Stop"
+
+# US-0121 / DEC-0120 §1: normalize-then-validate --host (PowerShell -Host landmine:
+# we use -InstallHost internally; JS forwards -InstallHost <value>). Unknown or
+# duplicate -> fail closed INSTALL_HOST_INVALID (ASCII, no GUI per D11).
+$validHosts = @("cursor","opencode","both")
+$hostValue = "cursor"
+if ($PSBoundParameters.ContainsKey("InstallHost")) {
+  $normalized = [string]$InstallHost
+  if ($null -ne $normalized) { $normalized = $normalized.ToLowerInvariant().Trim() }
+  if (-not ($validHosts -contains $normalized)) {
+    Write-Host "[INSTALL_HOST_INVALID] unknown host value '$normalized'. Accepted: cursor | opencode | both (default: cursor)."
+    exit 1
+  }
+  $hostValue = $normalized
+}
+# Duplicate -InstallHost detection: PowerShell Param() collapses duplicates to last-wins,
+# so we re-scan $argv for count > 1 to enforce no-last-wins parity with JS/Python.
+$hostArgCount = 0
+foreach ($a in $args) {
+  if ($a -eq "-InstallHost" -or $a -eq "--host") { $hostArgCount += 1 }
+}
+if ($hostArgCount -gt 1) {
+  Write-Host "[INSTALL_HOST_INVALID] duplicate --host argv (no last-wins). Accepted: cursor | opencode | both (default: cursor)."
+  exit 1
+}
 
 function Normalize-PathSafe($Path) {
   return [System.IO.Path]::GetFullPath($Path)
@@ -50,17 +76,71 @@ function Load-InstallerOwnershipManifest($SourceRoot, $ScriptRoot) {
     if (-not (Test-Path $candidate -PathType Leaf)) { continue }
     $installPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "install_include_paths"
     $cleanPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "clean_paths"
+    $opencodeInstallPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "opencode_install_include_paths"
+    $opencodeCleanPaths = Get-ManifestSection -ManifestPath $candidate -SectionName "opencode_clean_paths"
     if ($installPaths.Count -eq 0 -or $cleanPaths.Count -eq 0) {
       throw "[INSTALL_MANIFEST_ERROR] $candidate is missing required sections or entries."
     }
     return [PSCustomObject]@{
       install_include_paths = @($installPaths)
       clean_paths = @($cleanPaths)
+      opencode_install_include_paths = @($opencodeInstallPaths)
+      opencode_clean_paths = @($opencodeCleanPaths)
       manifest_path = $candidate
     }
   }
 
   throw "[INSTALL_SOURCE_ERROR] installer-owned-paths.manifest not found. Reinstall its-magic to restore template assets."
+}
+
+function Host-GatesCursorRow($Rel, $HostValue) {
+  # Returns True if the row should be SKIPPED for this host (DEC-0120 §4).
+  if ($HostValue -eq "opencode") {
+    return $Rel.StartsWith(".cursor/")
+  }
+  return $false
+}
+
+function Host-IncludesOpencode($HostValue) {
+  return ($HostValue -eq "opencode") -or ($HostValue -eq "both")
+}
+
+function Host-IncludesCursor($HostValue) {
+  return ($HostValue -eq "cursor") -or ($HostValue -eq "both")
+}
+
+function Build-EffectiveIncludePaths($InstallPaths, $OpencodeInstallPaths, $HostValue) {
+  $effective = New-Object System.Collections.Generic.List[string]
+  foreach ($rel in $InstallPaths) {
+    if (Host-GatesCursorRow -Rel $rel -HostValue $HostValue) { continue }
+    $effective.Add($rel) | Out-Null
+  }
+  if (Host-IncludesOpencode -HostValue $HostValue) {
+    foreach ($rel in $OpencodeInstallPaths) { $effective.Add($rel) | Out-Null }
+  }
+  return $effective
+}
+
+function Build-EffectiveCleanPaths($CleanPaths, $OpencodeCleanPaths, $HostValue) {
+  $effective = New-Object System.Collections.Generic.List[string]
+  if (Host-IncludesCursor -HostValue $HostValue) {
+    foreach ($rel in $CleanPaths) { $effective.Add($rel) | Out-Null }
+  }
+  if (Host-IncludesOpencode -HostValue $HostValue) {
+    foreach ($rel in $OpencodeCleanPaths) { $effective.Add($rel) | Out-Null }
+  }
+  return $effective
+}
+
+function Emit-HostShrinkDiagnostics($TargetRoot, $HostValue) {
+  $opencodePresent = Test-Path (Join-Path $TargetRoot ".opencode")
+  $cursorPresent = Test-Path (Join-Path $TargetRoot ".cursor") -PathType Container
+  if ($HostValue -eq "cursor" -and $opencodePresent) {
+    Write-Host "[OPENCODE_ORPHANED_BY_CLEAN_CURSOR] .opencode/ exists from a prior --host both install; --host cursor does not remove it. Run 'its-magic --clean-repo --host opencode|both' to remove it."
+  }
+  if ($HostValue -eq "opencode" -and $cursorPresent) {
+    Write-Host "[CURSOR_ORPHANED_BY_CLEAN_OPENCODE] .cursor/ exists from a prior --host both install; --host opencode does not remove it. Run 'its-magic --clean-repo --host cursor|both' to remove it."
+  }
 }
 
 function List-SourceFiles($SourceRoot, $IncludePaths) {
@@ -183,12 +263,28 @@ function Write-InstalledVersion($TargetRoot, $Ver) {
   }
 }
 
-function Sync-RootReadmeToItsMagic($TargetRoot) {
+function Sync-RootReadmeToItsMagic($TargetRoot, $FallbackReadme) {
+  $marker = "intent contract:"
   $rootReadme = Join-Path $TargetRoot "README.md"
-  if (-not (Test-Path $rootReadme -PathType Leaf)) { return $false }
+  $srcReadme = $null
+  if ($FallbackReadme -and (Test-Path $FallbackReadme -PathType Leaf)) {
+    if (-not (Test-Path $rootReadme -PathType Leaf)) {
+      $srcReadme = $FallbackReadme
+    } elseif (-not (Select-String -Path $rootReadme -Pattern $marker -Quiet)) {
+      $srcReadme = $FallbackReadme
+    }
+  }
+  if (-not $srcReadme -and (Test-Path $rootReadme -PathType Leaf)) {
+    $srcReadme = $rootReadme
+  } elseif (-not $srcReadme -and $FallbackReadme -and (Test-Path $FallbackReadme -PathType Leaf)) {
+    $srcReadme = $FallbackReadme
+  }
+  if (-not $srcReadme) {
+    return $false
+  }
   $itsMagicReadme = Join-Path $TargetRoot "its_magic\README.md"
   Ensure-Parent $itsMagicReadme
-  Copy-Item -Path $rootReadme -Destination $itsMagicReadme -Force
+  Copy-Item -Path $srcReadme -Destination $itsMagicReadme -Force
   return $true
 }
 
@@ -326,6 +422,22 @@ function Test-BootstrapCommandValid($TargetRoot, $Key, $Command) {
   return [PSCustomObject]@{ valid = $true; reason = "OK" }
 }
 
+function Test-ShouldBootstrapTestCommand($Current, $Candidate) {
+  if ([string]::IsNullOrWhiteSpace($Candidate)) { return $false }
+  if ([string]::IsNullOrWhiteSpace($Current)) { return $true }
+  if ($Candidate.StartsWith("npm run test") -or $Candidate.StartsWith("sh tests/run-tests")) {
+    $normalized = $Current.Trim().ToLowerInvariant()
+    $kitDefaults = @(
+      'powershell -executionpolicy bypass -file "tests/run-tests.ps1"',
+      'powershell -executionpolicy bypass -file tests/run-tests.ps1'
+    )
+    foreach ($kitDefault in $kitDefaults) {
+      if ($normalized -eq $kitDefault) { return $true }
+    }
+  }
+  return $false
+}
+
 function Invoke-RunbookBootstrap($TargetRoot) {
   $runbookPath = Join-Path $TargetRoot "docs\engineering\runbook.md"
   if (-not (Test-Path $runbookPath -PathType Leaf)) {
@@ -338,9 +450,13 @@ function Invoke-RunbookBootstrap($TargetRoot) {
 
   foreach ($key in @("TEST_COMMAND","LINT_COMMAND","TYPECHECK_COMMAND")) {
     $current = Read-RunbookKeyValue -RunbookPath $runbookPath -Key $key
-    if (-not [string]::IsNullOrWhiteSpace($current)) { continue }
-
     $candidate = [string]$defaults[$key]
+    if ($key -eq "TEST_COMMAND") {
+      if (-not (Test-ShouldBootstrapTestCommand $current $candidate)) { continue }
+    } elseif (-not [string]::IsNullOrWhiteSpace($current)) {
+      continue
+    }
+
     if ([string]::IsNullOrWhiteSpace($candidate)) {
       if ($key -eq "TEST_COMMAND") {
         $notes.Add("[RUNBOOK_BOOTSTRAP_ERROR] TEST_COMMAND_UNRESOLVED: could not detect a valid baseline test command. Fix: define TEST_COMMAND in docs/engineering/runbook.md or add detectable stack markers (package.json scripts.test, pyproject.toml, go.mod).")
@@ -399,6 +515,10 @@ function Invoke-ScratchpadPostinstall {
     [string]$TargetRoot,
     [string]$Mode
   )
+  if (-not (Host-IncludesCursor -HostValue $hostValue)) {
+    Write-Host "[CURSOR_HOST_HOOKS_SKIPPED] --host opencode does not materialize .cursor/ (scratchpad Model B + dev-env profile)."
+    return
+  }
   $installerPy = Join-Path $scriptDir "installer.py"
   if (-not (Test-Path $installerPy -PathType Leaf)) {
     Write-Host "[SCRATCHPAD_POSTINSTALL_ERROR] installer.py missing next to installer.ps1."
@@ -410,6 +530,32 @@ function Invoke-ScratchpadPostinstall {
     exit 1
   }
   & python $installerPy --scratchpad-postinstall --target $TargetRoot --mode $Mode
+  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+}
+
+function Invoke-OpencodeModelCatalogHook {
+  param(
+    [string]$TargetRoot
+  )
+  if (-not (Host-IncludesOpencode -HostValue $hostValue)) {
+    return
+  }
+  $catalogPath = Join-Path $TargetRoot ".opencode/model-catalog.local.json"
+  if (-not (Test-Path $catalogPath -PathType Leaf)) {
+    Write-Host "[OPENCODE_MODEL_CATALOG_SKIPPED] no .opencode/model-catalog.local.json at install target (optional catalog)."
+    return
+  }
+  $scriptPath = Join-Path $scriptDir "scripts/opencode_model_catalog_apply.py"
+  if (-not (Test-Path $scriptPath -PathType Leaf)) {
+    Write-Host "[OPENCODE_MODEL_CATALOG_ERROR] scripts/opencode_model_catalog_apply.py not found next to installer.ps1."
+    exit 1
+  }
+  $py = Get-Command python -ErrorAction SilentlyContinue
+  if (-not $py) {
+    Write-Host "[OPENCODE_MODEL_CATALOG_ERROR] PYTHON_NOT_FOUND: Python is required for OpenCode model catalog materialization."
+    exit 1
+  }
+  & python $scriptPath --target $TargetRoot
   if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 }
 
@@ -477,6 +623,14 @@ function Show-ItsMagicHelp($VersionString, $RepoUrl) {
   Write-Host "  --backup          Before overwriting, save existing files to backups/<timestamp>/."
   Write-Host "                    Ignored when mode is 'missing' (nothing gets replaced)."
   Write-Host "  --create          Create the target directory if it does not exist."
+  Write-Host "  -InstallHost <v>  Host-surface switch: cursor | opencode | both (default: cursor)."
+  Write-Host "                    Normalized case-insensitive and whitespace-trimmed before validate."
+  Write-Host "                    Unknown value -> exit with INSTALL_HOST_INVALID."
+  Write-Host "                    Duplicate -InstallHost argv -> fail closed INSTALL_HOST_INVALID (no last-wins)."
+  Write-Host "                    -InstallHost gates ONLY .cursor/ and .opencode/ trees; kernel paths"
+  Write-Host "                    (docs/, scripts/, its_magic/, handoffs/, decisions/, sprints/,"
+  Write-Host "                    .github/workflows/) always install regardless of -InstallHost."
+  Write-Host "                    Note: -InstallHost (not -Host) avoids the PowerShell `$Host landmine."
   Write-Host "  Note: installer bootstraps runbook TEST/LINT/TYPECHECK commands from"
   Write-Host "        OS+stack detection; unresolved TEST_COMMAND fails fast with"
   Write-Host "        [RUNBOOK_BOOTSTRAP_ERROR] diagnostics."
@@ -530,6 +684,10 @@ if (-not (Test-Path $sourceRoot -PathType Container)) {
 $ownershipManifest = Load-InstallerOwnershipManifest -SourceRoot $sourceRoot -ScriptRoot $scriptDir
 $includePaths = @($ownershipManifest.install_include_paths)
 $cleanPaths = @($ownershipManifest.clean_paths)
+$opencodeInstallPaths = @($ownershipManifest.opencode_install_include_paths)
+$opencodeCleanPaths = @($ownershipManifest.opencode_clean_paths)
+$effectiveIncludePaths = Build-EffectiveIncludePaths -InstallPaths $includePaths -OpencodeInstallPaths $opencodeInstallPaths -HostValue $hostValue
+$effectiveCleanPaths = Build-EffectiveCleanPaths -CleanPaths $cleanPaths -OpencodeCleanPaths $opencodeCleanPaths -HostValue $hostValue
 
 if ($CleanRepo) {
   if (-not $Target) { $Target = "." }
@@ -545,7 +703,7 @@ if ($CleanRepo) {
       exit 1
     }
   }
-  foreach ($rel in $cleanPaths) {
+  foreach ($rel in $effectiveCleanPaths) {
     $fullPath = Join-Path $targetRoot $rel
     if (Test-Path $fullPath) {
       if (Test-Path $fullPath -PathType Container) {
@@ -557,6 +715,9 @@ if ($CleanRepo) {
     }
   }
   Write-Host "Clean completed."
+  if ($hostValue -ne "both") {
+    Emit-HostShrinkDiagnostics -TargetRoot $targetRoot -HostValue $hostValue
+  }
   exit 0
 }
 
@@ -580,7 +741,7 @@ if (($mode -eq "overwrite" -or $mode -eq "interactive") -and -not $backupEnabled
   $backupEnabled = Prompt-YesNo "Backup existing files before overwrite?" $false
 }
 
-$files = List-SourceFiles $sourceRoot $includePaths
+$files = List-SourceFiles $sourceRoot $effectiveIncludePaths
 if ($files.Count -eq 0) {
   Write-Host "No source files found to install."
   exit 1
@@ -669,10 +830,18 @@ if ($mode -eq "upgrade") {
   }
 
   Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode "upgrade"
+  Invoke-OpencodeModelCatalogHook -TargetRoot $targetRoot
   Invoke-InstallCompletenessValidation -TargetRoot $targetRoot
 
+  if ($hostValue -eq "cursor" -and (Test-Path (Join-Path $targetRoot ".opencode"))) {
+    Write-Host "[OPENCODE_STALE_BY_UPGRADE_CURSOR] .opencode/ exists from a prior --host both install; --host cursor upgrade does not refresh it. Run 'its-magic --target <repo> --mode upgrade --host opencode|both' to refresh it."
+  }
+  if ($hostValue -eq "opencode" -and (Test-Path (Join-Path $targetRoot ".cursor") -PathType Container)) {
+    Write-Host "[CURSOR_STALE_BY_UPGRADE_OPENCODE] .cursor/ exists from a prior --host both install; --host opencode upgrade does not refresh it. Run 'its-magic --target <repo> --mode upgrade --host cursor|both' to refresh it."
+  }
+
   Write-InstalledVersion $targetRoot $appVersion
-  Sync-RootReadmeToItsMagic $targetRoot | Out-Null
+  Sync-RootReadmeToItsMagic $targetRoot (Join-Path $scriptDir "README.md") | Out-Null
   $runbookBootstrap = Invoke-RunbookBootstrap -TargetRoot $targetRoot
   foreach ($note in $runbookBootstrap.notes) { Write-Host $note }
   if (-not $runbookBootstrap.ok) { exit 1 }
@@ -751,10 +920,11 @@ foreach ($rel in $files) {
 }
 
 Invoke-ScratchpadPostinstall -TargetRoot $targetRoot -Mode $mode
+Invoke-OpencodeModelCatalogHook -TargetRoot $targetRoot
 Invoke-InstallCompletenessValidation -TargetRoot $targetRoot
 
 Write-InstalledVersion $targetRoot $appVersion
-Sync-RootReadmeToItsMagic $targetRoot | Out-Null
+Sync-RootReadmeToItsMagic $targetRoot (Join-Path $scriptDir "README.md") | Out-Null
 $runbookBootstrap = Invoke-RunbookBootstrap -TargetRoot $targetRoot
 foreach ($note in $runbookBootstrap.notes) { Write-Host $note }
 if (-not $runbookBootstrap.ok) { exit 1 }

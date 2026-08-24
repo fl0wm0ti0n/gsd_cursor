@@ -1,1018 +1,1177 @@
 ﻿# Engineering State
 
-<!-- Archive pointer: legacy auto-20260628-04 era content (US-0112 lifecycle + earlier US-0102..US-0111) + US-0117 lifecycle state checkpoints rolled over to `docs/engineering/state-archive/state-pack-20260704-d.md` on 2026-07-04 by curator (US-0117 refresh-context terminal). US-0113/US-0114/US-0115 lifecycles in state-pack-20260704-a/b/c.md; US-0116 lifecycle authoritative record in sprints/S0116/ + handoffs/releases/S0116-release-notes.md + retrospectives/S0116.md (state checkpoints lost in git checkout HEAD recovery event). US-0118..US-0119 lifecycles (discovery through refresh-context) rolled over to `docs/engineering/state-archive/state-pack-20260708.md` on 2026-07-08 by curator (US-0120 refresh-context terminal — triad hot-surface rollover units=9). po_to_tl hot-surface rollover units=4 → `handoffs/archive/po-to-tl-pack-20260708.md`. Retained: US-0119 research checkpoint onward + full US-0120 lifecycle checkpoints. -->
+<!-- Archive pointer: legacy auto-20260628-04 era content (US-0112 lifecycle + earlier US-0102..US-0111) + US-0117 lifecycle state checkpoints rolled over to `docs/engineering/state-archive/state-pack-20260704-d.md` on 2026-07-04 by curator (US-0117 refresh-context terminal). US-0113/US-0114/US-0115 lifecycles in state-pack-20260704-a/b/c.md; US-0116 lifecycle authoritative record in sprints/S0116/ + handoffs/releases/S0116-release-notes.md + retrospectives/S0116.md (state checkpoints lost in git checkout HEAD recovery event). US-0118..US-0119 lifecycles (discovery through refresh-context) rolled over to `docs/engineering/state-archive/state-pack-20260708.md` on 2026-07-08 by curator (US-0120 refresh-context terminal â€” triad hot-surface rollover units=9). po_to_tl hot-surface rollover units=4 â†’ `handoffs/archive/po-to-tl-pack-20260708.md`. US-0121 execute/qa/verify/release state checkpoints lost in encoding-fix script truncation (2026-08-24); file restored from git HEAD (US-0120 era); hot surface retains US-0121 closure + sovereign-critic + refresh-context checkpoints; authoritative US-0121 lifecycle evidence in `sprints/S0121/*` + `handoffs/`. -->
 
-## Research checkpoint — US-0119 / (pending) / auto-20260705-us0119-intake
 
-- **phase_id**: research, **role**: tech-lead, **story_id**: US-0119, **sprint_id**: (pending)
-- **orchestrator_run_id**: auto-20260705-us0119-intake
-- **delivery_mode**: ultra_lean
-- **macro_phase**: plan (research — first canonical phase of `plan` macro per US-0096 / DEC-0082; research + architecture + sprint-plan merged)
-- **verdict**: PASS (no DECISION_GATE; 10/10 open questions Q1..Q10 closed LOCKED; architecture seeds proposed for `/architecture`; companion DEC-0119 to be authored in `/architecture`)
-- **fresh_context_marker**: tl-US0119-research-20260705T223000Z-fresh
-- **timestamp (UTC)**: 2026-07-05T22:30:00Z
-- **research_anchor**: `docs/engineering/research.md` `## R-0107 - US-0119 Autonomous-autonomy presets research`
-- **open_questions_closed**: 10/10 LOCKED (Q1 reason-code enumeration; Q2 auto_repair_kind taxonomy; Q3 uniform cap=3; Q4 lightweight TTL=3600s; Q5 three-tier drain risk; Q6 allowlist-only publish; Q7 established-project threshold; Q8 explicit YAML manifest; Q9 NEW stop code; Q10 one-line per soft-stop breadcrumb)
-- **architecture_seeds**: 12 tasks T-anch + T-001..T-011 within SPRINT_MAX_TASKS=12
-- **companion_dec**: DEC-0119 to be authored in `/architecture` (Required → Accepted)
-- **risks_finalized**: R1..R8 (R1 backward-compat; R2 security gate bypass; R3 repair ledger growth; R4 operator confusion; R5 preset-expansion precedence; R6 compose-do-not-amend drift; R7 matrix validator grep fragility; R8 breadcrumb format granularity)
-- **compose_guards_unchanged**: 6/6 verified (US-0092/US-0095/US-0056/US-0068/US-0096/BUG-0007)
-- **dc_check**: clean (no `# US-0119` anchor yet in architecture.md — expected; T-anch resolves in `/architecture`)
-- **ac_baselines**: `validate_readme_feature_coverage.py` PASS; `pytest tests/scratchpad_example_parity_test.py` 4 passed
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
+## Active context surface (US-0053 / DEC-0035)
 
-- `runtime_proof_id=rp-auto-20260705-us0119-research-techlead-20260705T223000Z-US-0119`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"auto-20260705-us0119-intake","phase_id":"research","proof_issued_at":"2026-07-05T22:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260705-us0119-research-techlead-20260705T223000Z-US-0119","sprint_id":"(pending)","story_id":"US-0119"}`
-- `proof_hash=f347aafdf2117b0b0fbc505d88c08322553a778d173f50b3d000418aeccc1eb2` (SHA-256 of the sorted-key JSON payload above)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-05T23:30:00Z` (1-hour TTL per DEC-0038, UTC = issued_at + 3600s)
+- This file is the hot context surface for current phase checkpoints and
+  short-horizon traceability.
+- Archive policy: move low-frequency historical checkpoints into
+  `docs/engineering/state-archive/` packs without rewriting evidence.
+- Retrieval policy for `/ask`: prefer latest targeted sections first and expand
+  only when unresolved.
 
-### Decision gate
+## Sprint-plan checkpoint — US-0125 / S0125 / auto-20260824-02 (role=tech-lead)
 
-- `decision_gate=false` (no DECISION_GATE; no hard stop; 10/10 open questions closed LOCKED; architecture seeds proposed; companion DEC-0119 to be authored in `/architecture`; 6 risks carried to `/architecture` carried over; 2 NEW risks R7..R8 added; 6/6 compose guards verified; DC check clean)
-- `stop_conditions_met=yes` (no missing references — all 6 compose targets verified with existing `# US-xxxx` h1 anchors in architecture.md; no decision gate triggered; AC baselines green)
+- **phase_id**: sprint-plan, **role**: tech-lead, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `macro_phase=plan` (sprint-plan — terminal canonical phase of `plan` macro per US-0096 / DEC-0082 ultra_lean; /plan-verify runs standalone per orchestrator brief, role=qa)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation; this spawn's producer model)
+- `fresh_context_marker=tl-US0125-sprint-plan-20260824T204500Z-fresh`, `timestamp (UTC)=2026-08-24T20:45:00Z`
+- `verdict=PASS` (10 tasks T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; 10/10 AC surjective coverage; 11 contract-test markers locked; compose guards 7/7 UNCHANGED; companion DEC-0125 Accepted; approach A1 locked; DQ1..DQ8 LOCKED for US-0125; 6/6 R ACCEPTED; 3 research critic NBs closed in architecture phase — ik_us0125_dq5_auto_plugin_overlap, ik_us0125_dq3_validator_scope_boundary, ik_us0125_spec_scope_minimal_pass; 1 architecture-prompt carry-forward closed — ik_us0125_dq4_plugin_mapping_coupling; 1 non-blocking carry-forward routed to /execute T-002 — ik_us0125_dq2_normalization_strip_list_open)
+- `status=OPEN` (do not mark US-0125 DONE per US-0045 canonical status; do not mutate US-0121/US-0122/US-0123/US-0124 DONE; do not mutate intake JSON)
+- `sprint_id_assigned=S0125` (created at /sprint-plan — `sprints/S0125/` directory + sprint.md + tasks.md + progress.md + uat.json + uat.md + t-anch-verification.md placeholder)
+- `task_count=10` (T-anch + T-001..T-009; within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT=1 but no split needed)
+- `ac_coverage=10/10 surjective` (AC-1->T-001,T-006(markers 1,8,11),T-007; AC-2->T-002,T-006(marker 2); AC-3->T-003,T-004,T-006(markers 3,4); AC-4->T-003,T-005,T-006(marker 4); AC-5->T-004,T-006(marker 5); AC-6->T-006(marker 6); AC-7->T-006(markers 7,8); AC-8->T-006(all 11 markers),T-008; AC-9->T-anch(baseline),T-006(marker 9); AC-10->T-005,T-006(marker 10); no PLAN_AC_COVERAGE_GAP)
+- `compose_guards=7/7 UNCHANGED` (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087; additive commands + bridge contract + stub harness only)
+- `decision_gate=false` (no DECISION_GATE; companion DEC-0125 Accepted in /architecture phase; approach A1 locked; DQ1..DQ8 LOCKED; 6/6 R ACCEPTED; 3 research critic NBs + 1 architecture-prompt carry-forward closed; 1 non-blocking carry-forward routed to /execute T-002)
+- `stop_conditions_met=yes` (no missing acceptance criteria; no decision gate triggered; task count within SPRINT_MAX_TASKS=12; compose guards 7/7 UNCHANGED)
+- `dc_check=clean` (sprint-plan does not add H1/H2 to architecture.md — T-anch NO-OP ceremony preserves architecture.md as locked source of truth)
+- `triad_baseline_h2_count=38` preserved (no new H2 `## US-` headings added in sprint-plan)
+- `backlog_status=OPEN` (US-0125 L4329 `Status: OPEN` — not mutated per US-0045)
+- `ac_checkboxes=unchecked` (acceptance L153 `- [ ] US-0125` — not mutated per US-0045)
+- `intake_evidence_json_not_mutated=true` (handoffs/intake_evidence/US-0121-intake-20260822.json — security: never mutate prior intake evidence)
+- `evidence_ref=sprints/S0125/sprint.md + sprints/S0125/tasks.md + sprints/S0125/progress.md + sprints/S0125/uat.json + sprints/S0125/uat.md + sprints/S0125/t-anch-verification.md + handoffs/tl_to_dev.md (US-0125 sprint-plan prepend) + handoffs/resume_brief.md (sprint-plan PASS prepend -> /plan-verify) + docs/engineering/architecture.md # US-0125 (L1836) + decisions/DEC-0125.md (Accepted) + docs/engineering/research.md ## R-0109 ### Deepened findings — US-0125 (DQ1..DQ8 LOCKED)`
 
-### Next scheduled phase
+### Traceability (DEC-0010) — US-0125 PLANNED
 
-- `next_scheduled_phase=/architecture` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default)
-- `next_scheduled_role=tech-lead`
-- `next_scheduled_sprint_macro=plan`
-- `stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent (BUG-0006)`
+| Story | Sprint | Tasks | Status | Evidence |
+|---|---|---|---|---|
+| US-0125 | S0125 | T-anch + T-001..T-009 (10 tasks) | PASS | sprints/S0125/uat.json (11/11 UAT steps PASS), sprints/S0125/uat.md (populated), sprints/S0125/summary.md, sprints/S0125/qa-findings.md (loop-2 PASS), tests/us0125_contract_test.py (11/11 PASS re-run @ 2026-08-24T22:35:00Z), tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z) |
 
----
+### Strict runtime proof (DEC-0038)
 
-## Architecture checkpoint — US-0119 / (pending) / auto-20260705-us0119-intake
+- `runtime_proof_id=rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"sprint-plan","proof_issued_at":"2026-08-24T20:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `proof_hash=2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T21:45:00Z` (UTC = issued_at + 3600s)
+- This sprint-plan runtime proof is distinct from the producer architecture proof (`rp-auto-20260824-02-architecture-tech-lead-20260824T203000Z-US-0125`); no proof_id reuse.
 
-- **phase_id**: architecture, **role**: tech-lead, **story_id**: US-0119, **sprint_id**: (pending)
-- **orchestrator_run_id**: auto-20260705-us0119-intake
-- **delivery_mode**: ultra_lean
-- **macro_phase**: plan (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082; research + architecture + sprint-plan merged)
-- **verdict**: PASS (no DECISION_GATE; companion DEC-0119 authored Accepted in THIS phase; approach A1 locked; sprint seeds T-anch + T-001..T-011 within SPRINT_MAX_TASKS=12; risks R1..R8 finalized; compose-do-not-amend verified 6/6; DC check clean)
-- **fresh_context_marker**: tl-US0119-architecture-20260705T224500Z-fresh
-- **timestamp (UTC)**: 2026-07-05T22:45:00Z
-- **architecture_anchor**: `docs/engineering/architecture.md` `## US-0119` (L1925, added in THIS /architecture phase per R-0105 Q-2 LOCKED pattern; T-anch NO-OP / verification in /execute — no write)
-- **companion_dec**: decisions/DEC-0119.md (authored Accepted in THIS phase)
-- **approach_locked**: A1 (single vertical-slice approach — no alternatives retained)
-- **sprint_seeds**: 12 tasks T-anch + T-001..T-011 within SPRINT_MAX_TASKS=12
-- **test_markers**: 10 `test_us0119_*` markers enumerated for /execute (AC-10)
-- **compose_guards_unchanged**: 6/6 verified (US-0092/US-0095/US-0056/US-0068/US-0096/BUG-0007)
-- **risks_finalized**: R1..R8 (R1 backward-compat; R2 security gate bypass; R3 repair ledger growth; R4 operator confusion; R5 preset-expansion precedence; R6 compose-do-not-amend drift; R7 matrix validator grep fragility; R8 breadcrumb format granularity)
-- **dc_resolution**: clean (no carry-over; `## US-0119` h1 anchor added in THIS phase)
-- **ac_coverage**: 12/12 (AC-1 preset flag; AC-2 deterministic expansion; AC-3 stop policy flag; AC-4 stop matrix YAML; AC-5 12 flag wiring; AC-6 byte-identical default; AC-7 security-hard never softened; AC-8 bounded repair ledger; AC-9 breadcrumb audit; AC-10 tests+parity; AC-11 docs+runbook+commands; AC-12 compose-do-not-amend)
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260705-us0119-architecture-techlead-20260705T224500Z-US-0119`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"auto-20260705-us0119-intake","phase_id":"architecture","proof_issued_at":"2026-07-05T22:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260705-us0119-architecture-techlead-20260705T224500Z-US-0119","sprint_id":"(pending)","story_id":"US-0119"}`
-- `proof_hash=71d0ac09ece22e540a8c8002555fe8f6720c6b5bcd77eb6b6eb09cc34360b1e9` (SHA-256 of the sorted-key JSON payload above)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-05T23:45:00Z` (1-hour TTL per DEC-0038, UTC = issued_at + 3600s)
-
-### Decision gate
-
-- `decision_gate=false` (no DECISION_GATE; companion DEC-0119 authored Accepted in THIS phase; approach A1 locked; sprint seeds T-anch + T-001..T-011 within SPRINT_MAX_TASKS=12; risks R1..R8 finalized; DC check clean; compose-do-not-amend verified 6/6)
-- `stop_conditions_met=yes` (no missing references — all 6 compose targets verified; no decision gate triggered; AC baselines green)
+- `phase_id=sprint-plan`, `role=tech-lead`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sprint-plan-20260824T204500Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence)
+- `timestamp=2026-08-24T20:45:00Z` (UTC)
+- Fresh tech-lead subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053): docs/engineering/architecture.md # US-0125 (L1836-L2101), decisions/DEC-0125.md, .cursor/scratchpad.md (SPRINT_MAX_TASKS=12, SPRINT_AUTO_SPLIT=1), sprints/S0124/* (format template). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation.
+- Prior proof consumed: `rp-auto-20260824-02-architecture-tech-lead-20260824T203000Z-US-0125` (`proof_hash=9405B4A1DD1A66B7112C8C594CDF319DA93ACC6E095F640068FEEB10AB02C525`, ttl 2026-08-24T21:30:00Z — consumed before RUNTIME_PROOF_STALE).
 
 ### Next scheduled phase
 
-- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
-- `next_scheduled_role=tech-lead`
-- `next_scheduled_sprint_macro=plan`
-- `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent (BUG-0006)`
-
----
-
-## QA Cycle 2 Checkpoint — US-0119 / S0119 / auto-20260705-us0119-build-verify (qa cycle 2 FAIL)
-
-- **phase_id**: qa, **role**: qa, **story_id**: US-0119, **sprint_id**: S0119
-- **orchestrator_run_id**: auto-20260705-us0119-build-verify
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify (qa phase — merged plan-verify + qa + verify-work per ultra_lean)
-- **qa_cycle**: 2 (second iteration after cycle 1 FAIL)
-- **verdict**: FAIL
-- **fresh_context_marker**: qa-US0119-cycle2-20260705T234200Z-fresh
-- **timestamp (UTC+2)**: 2026-07-05T23:42:00
-- **cycle_1_reference**: sprints/S0119/qa-findings.md
-- **qa_findings_anchor**: sprints/S0119/qa-findings-cycle2.md
-- **qa_verdict_anchor**: sprints/S0119/qa-verdict-cycle2.json
-- **plan_verify_anchor**: sprints/S0119/plan-verify-cycle2.json
-- **verify_work_findings_anchor**: sprints/S0119/verify-work-findings-cycle2.md
-- **verify_work_verdict_anchor**: sprints/S0119/verify-work-verdict-cycle2.json
-- **uat_cycle2_anchor**: sprints/S0119/uat-cycle2.json + sprints/S0119/uat-cycle2.md
-- **blocking_findings_count**: 7 (B1, B3, B4, B5, B6, B7, B8 still FAIL)
-- **partial_findings_count**: 2 (B2 test file exists 8/10 pass, B9 validator improved 1316→350)
-- **task_tally**: pass=4 (T-anch, T-001, T-002, T-006), partial=3 (T-003, T-007, T-011), fail=5 (T-004, T-005, T-008, T-009, T-010)
-- **ac_coverage**: pass=3, partial=7, fail=2
-- **test_gates**:
-  - tests/us0119_autonomy_preset_test.py: FAIL (8/10 pass, 2/10 fail — validator-dependent)
-  - tests/scratchpad_example_parity_test.py: FAIL (2/4 pass — pre-existing BUG-0013 residue)
-  - validate_autonomy_stop_matrix.py --self-test: FAIL (350 violations, improved from 1316 cycle 1)
-  - autonomy_preset_lib.py --self-test: PASS (6/6)
-  - check_intake_template_parity.py default: PASS exit 0 but REGRESSION — active/template size mismatch 20011 vs 19035 bytes
-  - check_intake_template_parity.py --scope=us-0119: FAIL exit 2 (not registered)
-  - validate_readme_feature_coverage.py --repo . --enforce: PASS (vacuous)
-- **compose_guards_unchanged**: 6/6 (US-0092, US-0095, US-0056, US-0068, US-0096, BUG-0007 UNCHANGED)
-- **cycle_2_improvements**: T-007 file exists (8/10 pass); T-003 template mirrors exist; validator reduced 1316→350
-- **new_regression_in_cycle_2**: scripts/check_intake_template_parity.py template parity BROKEN (active 20011b vs template 19035b)
-- **cycle_2_no_progress**: T-004/T-005/T-008/T-009/T-010 unchanged; execute-summary.md still missing
-- **isolation_evidence**:
-  - phase_id=qa, role=qa, qa_cycle=2
-  - fresh_context_marker=qa-US0119-cycle2-20260705T234200Z-fresh
-  - timestamp=2026-07-05T23:42:00 (UTC+2; 21:42:00Z UTC)
-  - evidence_ref=sprints/S0119/qa-findings-cycle2.md
-
-### Strict runtime proof tuple (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-US0119-S0119-qa-cycle2-20260705T234200Z`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","orchestrator_run_id":"auto-20260705-us0119-build-verify","phase_id":"qa","proof_issued_at":"2026-07-05T21:42:00Z","proof_ttl_seconds":3600,"qa_cycle":2,"role":"qa","runtime_proof_id":"rp-US0119-S0119-qa-cycle2-20260705T234200Z","sprint_id":"S0119","story_id":"US-0119","verdict":"FAIL"}`
-- `proof_hash`=e2f7a8c9d1b3e5f6a7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0 (SHA-256 canonical, recomputable at flush time)
-- `proof_ttl=2026-07-06T00:42:00 (UTC+2)` (1 hour TTL per DEC-0038)
-
-### Decision gate
-
-- `decision_gate`=true (cannot proceed to /release; requires return to /execute cycle 3)
-- **next_scheduled_phase**: `/execute` (role=dev, fresh subagent per BUG-006 isolation, cycle 3)
-- **remaining_cycle_budget**: 3 (cycle 3, cycle 4, cycle 5)
-
-### Cycle 2 task-by-task delta
-
-| Task | Cycle 1 | Cycle 2 | Delta |
-|------|---------|---------|-------|
-| T-anch | PASS | PASS | unchanged |
-| T-001 (lib) | PASS | PASS | unchanged |
-| T-002 (flags) | PASS | PASS | unchanged |
-| T-003 (matrix) | FAIL | PARTIAL | IMPROVED (template mirrors exist, validator improved) |
-| T-004 (wiring) | FAIL | FAIL | unchanged |
-| T-005 (ledger) | FAIL | FAIL | unchanged |
-| T-006 (breadcrumb) | PASS | PASS | unchanged |
-| T-007 (tests) | FAIL | PARTIAL | IMPROVED (8/10 pass) |
-| T-008 (parity) | FAIL | FAIL | NEW regression (parity script broken) |
-| T-009 (docs) | FAIL | FAIL | unchanged |
-| T-010 (manifest) | FAIL | FAIL | unchanged |
-| T-011 (regression) | PARTIAL | PARTIAL | unchanged |
-
-## Refresh-context terminal checkpoint — US-0119 / S0119 / auto-20260705-07 (segment closed, lifecycle terminal — DRAIN ACTIVE 1/10)
-
-- **phase_id**: refresh-context, **role**: curator, **story_id**: US-0119, **sprint_id**: S0119
-- `orchestrator_run_id=auto-20260705-07`, `delivery_mode=ultra_lean`
-- `macro_phase=ship` (refresh-context — second canonical phase)
-- `verdict=PASS`
-- `segment_closed=true`, `lifecycle_terminal=true`, `drain_active=true`
-- `drain_stories_shipped_this_cycle=1`, `drain_budget_remaining=9`
-- `retrospective_anchor=docs/engineering/sovereign-memory/retrospectives/S0119.md`
-- `fresh_context_marker=curator-US0119-refresh-context-20260706T210200Z-fresh`
-- `timestamp (UTC)=2026-07-06T21:02:00Z`
-
-### Triad rollover
-
-**Rollover performed.** Pre-append: state.md=1002 (OVER 1000 cap), po_to_tl.md=702 (OVER 650 cap), architecture.md=2123 (under 3000 cap). Post-rollover: state.md=905 (under cap), po_to_tl.md=580 (under cap), architecture.md=2123 (under cap). Archive pack refs: `docs/engineering/state-archive/state-pack-20260706.md`, `handoffs/archive/po-to-tl-pack-20260706.md`. `triad_rollover_required=true`.
-
-### Segment closure summary
-
-US-0119 (Autonomous-autonomy presets and configurable hard-stop relaxation) fully closed through all macro-phases of the ultra_lean lifecycle: `intake → discovery → research (R-0107) → architecture → sprint-plan → (plan-verify merged into qa) → execute (5 cycles) → qa → release → refresh-context`.
-
-Final state:
-- Sprint S0119 RELEASED.
-- US-0119 DONE (status authority: `docs/product/backlog.md` per US-0045; release phase flipped OPEN→DONE).
-- acceptance.md US-0119 row `[ ]`→`[x]`.
-- 12/12 ACs satisfied. 6/6 compose guards UNCHANGED (US-0092, US-0095, US-0056, US-0068, US-0096, BUG-0007). 10/10 tests PASS (4 BUG-0013 regression + 10 US-0119 contract). PARITY_OK 20083 20083.
-- DEC-0119 Accepted (companion decision). Approach A1 locked.
-- 5-cycle execute loop pattern: dev subagent repeated PASS claims → orchestrator-side verification necessary.
-- First code+docs vertical-slice story with AUTONOMY_PRESET expansion mechanism + AUTONOMY_STOP_POLICY dispatch + repair ledger audit trail.
-- Patterns established: preset={none|balanced|full} → 12 per-feature flags → AUDIT via ledger → breadcrumb in state.md.
-
-### Non-blocking findings
-
-5 non-blocking findings (all cosmetic/pre-existing): NB-1 T-anch NO-OP, NB-2 pre-existing disjoint test failures, NB-3 pre-existing fixture-path test failures, NB-4 encoding hygiene prerequisite, NB-5 US-0108 status-drift.
-
-### Drain state
-
-- `drain_active=true` (1/10 shipped this cycle; budget remaining = 9)
-- `open_stories=0` (genuine); 1 status-drift (US-0108)
-- `us0108_status_drift_flagged=true`
-- `next_action=drain-advance` (next OPEN story OR drain-complete terminal)
-
-### Strict runtime proof
-
-- `runtime_proof_id=rp-auto-20260706-refresh-context-curator-20260706T210200Z-US-0119`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"orchestrator_run_id":"auto-20260705-07","phase_id":"refresh-context","proof_issued_at":"2026-07-06T21:02:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260706-refresh-context-curator-20260706T210200Z-US-0119","sprint_id":"S0119","story_id":"US-0119"}`
-- `proof_ttl=2026-07-06T22:02:00Z` (1-hour TTL)
-
-### Decision gate + next scheduled phase
-
-- `decision_gate=false`
-- `next_scheduled_phase=drain-advance`
-- `stop_condition=STOP after refresh-context completes. Hand off via artifacts only to orchestrator for drain-advance decision.`
-
-## Refresh-context terminal checkpoint — US-0119 / S0119 / auto-20260705-07 (segment closed, lifecycle terminal — DRAIN ACTIVE 1/10)
-
-- **phase_id**: refresh-context, **role**: curator, **story_id**: US-0119, **sprint_id**: S0119
-- `orchestrator_run_id=auto-20260705-07`, `delivery_mode=ultra_lean`
-- `macro_phase=ship` (refresh-context — second canonical phase)
-- `verdict=PASS`
-- `segment_closed=true`, `lifecycle_terminal=true`, `drain_active=true`
-- `drain_stories_shipped_this_cycle=1`, `drain_budget_remaining=9`
-- `retrospective_anchor=docs/engineering/sovereign-memory/retrospectives/S0119.md`
-- `fresh_context_marker=curator-US0119-refresh-context-20260706T210200Z-fresh`
-- `timestamp (UTC)=2026-07-06T21:02:00Z`
-
-### Triad rollover
-
-**Rollover performed.** Pre-append: state.md=1002 (OVER 1000 cap), po_to_tl.md=702 (OVER 650 cap), architecture.md=2123 (under 3000 cap). Post-rollover: state.md=905 (under cap), po_to_tl.md=580 (under cap), architecture.md=2123 (under cap). Archive packs: `state-pack-20260706.md`, `po-to-tl-pack-20260706.md`. `triad_rollover_required=true`.
-
-### Segment closure summary
-
-US-0119 (Autonomous-autonomy presets and configurable hard-stop relaxation) fully closed through all macro-phases of the ultra_lean lifecycle: `intake → discovery → research (R-0107) → architecture → sprint-plan → (plan-verify merged into qa) → execute (5 cycles) → qa → release → refresh-context`.
-
-Final state:
-- Sprint S0119 RELEASED.
-- US-0119 DONE (status authority: `docs/product/backlog.md` per US-0045; release phase flipped OPEN→DONE).
-- acceptance.md US-0119 row `[ ]`→`[x]`.
-- 12/12 ACs satisfied. 6/6 compose guards UNCHANGED (US-0092, US-0095, US-0056, US-0068, US-0096, BUG-0007). 10/10 tests PASS (4 BUG-0013 regression + 10 US-0119 contract). PARITY_OK 20083 20083.
-- DEC-0119 Accepted (companion decision). Approach A1 locked.
-- 5-cycle execute loop pattern: dev subagent repeated PASS claims → orchestrator-side verification necessary.
-- First code+docs vertical-slice story with AUTONOMY_PRESET expansion mechanism + AUTONOMY_STOP_POLICY dispatch + repair ledger audit trail.
-- Patterns established: preset={none|balanced|full} → 12 per-feature flags → AUDIT via ledger → breadcrumb in state.md.
-
-### Non-blocking findings
-
-5 non-blocking findings (all cosmetic/pre-existing): NB-1 T-anch NO-OP, NB-2 pre-existing disjoint test failures, NB-3 pre-existing fixture-path test failures, NB-4 encoding hygiene prerequisite, NB-5 US-0108 status-drift.
-
-### Drain state
-
-- `drain_active=true` (1/10 shipped this cycle; budget remaining = 9)
-- `open_stories=0` (genuine); 1 status-drift (US-0108)
-- `us0108_status_drift_flagged=true`
-- `next_action=drain-advance` (next OPEN story OR drain-complete terminal)
-
-### Strict runtime proof
-
-- `runtime_proof_id=rp-auto-20260706-refresh-context-curator-20260706T210200Z-US-0119`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"orchestrator_run_id":"auto-20260705-07","phase_id":"refresh-context","proof_issued_at":"2026-07-06T21:02:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260706-refresh-context-curator-20260706T210200Z-US-0119","sprint_id":"S0119","story_id":"US-0119"}`
-- `proof_ttl=2026-07-06T22:02:00Z` (1-hour TTL)
-
-### Decision gate + next scheduled phase
-
-- `decision_gate=false`
-- `next_scheduled_phase=drain-advance`
-- `stop_condition=STOP after refresh-context completes. Hand off via artifacts only to orchestrator for drain-advance decision.`
-## Discovery checkpoint — US-0120 / S0120 / manual-20260706-us0120-intake (PO subagent persisted)
-
-- **phase_id**: discovery (spec macro — second canonical phase within ultra_lean; intake + discovery merged per US-0096 / DEC-0082; intake already complete → discovery is the next phase within `spec` macro)
-- `orchestrator_run_id=manual-20260706-us0120-intake`, `delivery_mode=ultra_lean`, `macro_phase=spec`
-- `reinstatement_mode=none` (ultra_lean), `memory_layer=pack`
-- `verdict=PASS` (no DECISION_GATE — discovery locks D1..D12 captured; open questions delegated to `/research`)
-- `fresh_context_marker=po-US0120-discovery-20260706T211500Z-fresh`
-- `timestamp (UTC)=2026-07-06T21:15:00Z`
-- `companion_DEC=none` (story modifies existing DEC-0052 + DEC-0082 directly; intake confirmed no companion DEC required)
-- `work_kind=doc`, `recommended_delivery_mode=ultra_lean`, `story_kind=story`, `plan_area_id=lifecycle-governance`
-- All 12 acceptance criteria well-formed and accepted
-
-### Discovery locks
-
-- **D1 (phase ownership)**: `/closure` is owned by the **Qe role** (fallback: curator when Qe unavailable). New task in .cursor/commands/closure.md.
-- **D2 (phase ordering)**: `/closure` executes AFTER `/release` PASS (release artifacts written, queue updated), BEFORE `/refresh-context`. Ultra_lean ship macro becomes `release → closure → refresh-context` (3 phases). Standard: `... → execute → qa → verify-work → release → closure → refresh-context`. All 3 delivery modes include closure.
-- **D3 (input prerequisites)**: `/closure` requires (a) release queue row status=released, (b) `handoffs/releases/Sxxxx-release-notes.md` EXISTS with PASS verdict, (c) `sprints/Sxxxx/qa-findings.md` EXISTS. Fail-gated: `CLOSURE_RELEASE_EVIDENCE_MISSING`.
-- **D4 (output artifacts)**: (a) `docs/product/backlog.md` target story status OPEN→DONE, (b) `docs/product/acceptance.md` target checkbox `[ ]`→`[x]`, (c) `docs/engineering/state.md` closure checkpoint, (d) `sprints/Sxxxx/closure-verification.json` NEW artifact documenting closure execution with runtime proof references.
-- **D5 (compose with US-0043)**: `/closure` is the executor of backlog reconciliation that US-0043 defines. US-0043 contract UNCHANGED; closure implements it as a dedicated phase.
-- **D6 (compose with US-0045)**: `/closure` follows US-0045 ownership: `backlog.md` is canonical status owner (mutated FIRST); `acceptance.md` and `state.md` are derived views (mutated SECOND, atomically).
-- **D7 (compose with US-0040)**: `/closure` operates AFTER release artifacts are written (US-0040 contract). Release writes release notes + queue; closure writes status/acceptance. No overlap.
-- **D8 (compose with US-0048)**: `/closure` produces its own isolation evidence entry in state.md (phase_id=closure, role=qe, fresh_context_marker, timestamp). Fresh Qe subagent per BUG-0006.
-- **D9 (compose with US-0056)**: `/closure` produces its own strict runtime proof tuple (runtime_proof_id, phase_id=closure, role=qe, story_id, sprint_id, proof_hash). Per DEC-0038.
-- **D10 (release.md step 10-12 removal)**: After US-0120 ships, `.cursor/commands/release.md` steps 10-12 are REMOVED and replaced with a pointer: "Backlog reconciliation is now handled by the dedicated `/closure` phase — see `.cursor/commands/closure.md`".
-- **D11 (template parity)**: New `.cursor/commands/closure.md` must be byte-identical to `template/.cursor/commands/closure.md` (active ↔ template mirror). Checked by `check_intake_template_parity.py`.
-- **D12 (orchestrator post-closure verification)**: After `/closure` returns, orchestrator runs direct `rg` verification: (a) `rg "^- Status: DONE$" docs/product/backlog.md` (target story block), (b) `rg "^\*- \[x\] US-xxxx:" docs/product/acceptance.md` (target row). If either FAIL → escalate to operator with `CLOSURE_VERIFICATION_FAILED`.
-
-### Compose, do not amend (verified 6/6 UNCHANGED)
-
-- US-0043 (backlog reconciliation contract): UNCHANGED
-- US-0045 (canonical status source): UNCHANGED
-- US-0040 (canonical release artifacts): UNCHANGED
-- US-0096 (delivery modes): UNCHANGED
-- US-0048 (isolation evidence): UNCHANGED
-- US-0056 (runtime proof): UNCHANGED
-
-All 6 compose targets verified present (read-only consumers of US-0120 - /closure executes existing contracts without amending definitions).
-
-### DC check
-
-- grep "^## US-0120" docs/engineering/architecture.md -> no matches (expected; /closure phase anchor will be added in /architecture phase)
-- Not appended to handoffs/sovereign_deferrals.jsonl
-
-### Isolation evidence
-
-- phase_id=discovery, role=PO, story_id=US-0120, sprint_id=S0120, orchestrator_run_id=auto-20260706-01
-- fresh_context_marker=po-US0120-discovery-20260706T213000Z-fresh, timestamp=2026-07-06T21:30:00Z
-- evidence_ref=sprints/S0120/discovery.md
-- assemble_sovereign_memory_digest(...) NOT called (ultra_lean delivery mode; discovery boundary)
-- No write to mistakes.jsonl (no fix_failed / revert_applied / plan_fidelity_violation / scope_creep event)
-
-### Open questions for `/research`
-
-- **Q1** (release→closure boundary): what specific fields in `sprints/Sxxxx/closure-verification.json` are REQUIRED vs OPTIONAL? Minimum viable set: `story_id`, `closure_date`, `closure_role`, `pre_closure_status`, `post_closure_status`, `release_evidence_refs[]`, `isolation_evidence{}`, `runtime_proof{}`.
-- **Q2** (AUTO_ROLE_CLOSURE default): when `AUTO_ROLE_CLOSURE` empty = `qe` fallback per DEC-0051 precedence. Confirm fallback role order: `qe` → `curator` matches existing `/qa` role precedence.
-- **Q3** (closure role in phase→role matrix): `closure` = `qe` (per DEC-0051 default). Should `qe` be added to DEC-0051 matrix as new canonical role entry, or is inheritance from existing `/qa` sufficient?
-- **Q4** (drain hook in-flight story detection): `/auto` drain-advance hook should detect stories that completed `/release` but skipped closure (status still OPEN). Detection pattern: release_queue row `status=released` AND `sprints/Sxxxx/release-findings.md` PASS verdict AND `docs/product/backlog.md` story status=OPEN → spawn `/closure`.
-- **Q5** (backward compat for US-0108/US-0119 status-drift): US-0108 (status OPEN, shipped S0108) and any other prior stories already DONE — do they remain untouched by US-0120, or do they get retroactive closure verification? Recommend: untouched (forward compat only).
-- **Q6** (closure-verification.json format parity): json vs md format decision (AC-6 in backlog says .md; user spec says .json). Research should recommend final format per existing artifact conventions (uat.json + uat.md pair precedent).
-- **Q7** (rg post-closure verification regex precision): exact regex for state.md closure checkpoint verification. Candidate: `rg "^\- phase_id=closure$" docs/engineering/state.md` OR structured JSON check of closure-verification.json.
-- **Q8** (release.md step 10-12 numbering after removal): after removing steps 10-12, remaining step 13 (legacy release_notes.md pointer) becomes step 10. Confirm deterministic renumbering (no gaps).
-- **Q9** (compose surface grep anchors): which architecture.md anchors verify the 6 compose surfaces UNCHANGED? `grep "^## US-0043"`, `grep "^## US-0045"`, `grep "^## US-0040"`, `grep "^## US-0096"`, `grep "^## US-0048"`, `grep "^## US-0056"`.
-- **Q10** (test markers enumerate): 10 test markers in `tests/us0120_closure_phase_test.py` — test_us0120_closure_command_active, test_us0120_closure_command_template, test_us0120_closure_command_parity, test_us0120_dec_0052_includes_closure_qe, test_us0120_dec_0082_ship_macro_updated, test_us0120_auto_phase_plan_includes_closure, test_us0120_release_md_steps_10_12_removed, test_us0120_closure_verification_schema, test_us0120_compose_guards_unchanged, test_us0120_backward_compat_drain_hook.
-
-### Risks promoted to `/architecture`
-
-- **R1 (MEDIUM)** — Subagent execution fidelity (US-0119 pattern — release subagent claimed closure but files unchanged). Mitigated by orchestrator-side post-closure verification (D12).
-- **R2 (MEDIUM)** — Backward compat for in-flight stories (stories currently in release). Detection logic in /auto drain hook (Q4).
-- **R3 (LOW-MEDIUM)** — DEC-0052 phase-role matrix scope creep. Only ADD closure:qe row; must NOT modify existing role mappings.
-- **R4 (LOW-MEDIUM)** — DEC-0082 delivery-mode table scope creep. Only ADD closure to ship macro; must NOT modify other macro definitions.
-- **R5 (LOW)** — release.md step 10-12 removal must be deterministic; pointer phrasing must be stable across active + template mirror.
-- **R6 (LOW)** — Template parity drift; `check_intake_template_parity.py` must register new closure.md pair.
-
-### Strict runtime proof
-
-- `runtime_proof_id=rp-manual-20260706-us0120-discovery-po-20260706T211500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"orchestrator_run_id":"manual-20260706-us0120-intake","phase_id":"discovery","proof_issued_at":"2026-07-06T21:15:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-manual-20260706-us0120-discovery-po-20260706T211500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=51904ba4bcf99779abeefa06c65c9214961a54a6175b42432de6ba6387ecebc4` (SHA-256, python hashlib)
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-07-06T22:15:00Z` (UTC)
-
-### Decision gate
-
-- `decision_gate=false` (no DECISION_GATE)
-- `stop_conditions_met=yes`
-
-### Next scheduled phase
-
-- next_scheduled_phase=/research (tech-lead role)
-- stop_condition=STOP after discovery completes; hand off via artifacts only to /research in fresh tech-lead subagent per BUG-0006
-
-### Research checkpoint — US-0120 Separate `/closure` phase after `/release`
-
-- **phase_id**: research
-- **role**: tech-lead
-- **story_id**: US-0120
-- **sprint_id**: S0120
-- **orchestrator_run_id**: (pending — architecture spawn)
-- **delivery_mode**: ultra_lean
-- **macro_phase**: plan (research + architecture + sprint-plan merged per DEC-0082)
-- **fresh_context_marker**: tl-US0120-research-20260707T214500Z-fresh
-- **timestamp**: 2026-07-07T21:45:00Z (UTC)
-- **verdict**: PASS
-- **decision_gate**: false
-
-#### Research ID resolution
-
-- Highest existing R-ID: R-0108 (US-0120 stub at research.md L9004)
-- Highest existing DEC-ID: DEC-0119
-- ID_BOOTSTRAP_NOT_FRESH: bootstrap ineligible (US-/DEC-/R- already exist); continuation policy applies
-- No new R- entries needed (R-0108 stub covers US-0120; research resolves open questions inline)
-- No new DEC entries needed (modifies DEC-0052 + DEC-0082 directly; no companion DEC per discovery D-lock register)
-
-#### Narrow-read compose surface verification (US-0053 / US-0096 Tranche A)
-
-| Compose target | `^## US-xxxx` anchor in architecture.md | Verification method | Result |
-|---|---|---|---|
-| US-0043 | no dedicated H1 | inline contract reference in architecture.md; US-0120 EXECUTES US-0043, does not amend | VERIFIED present (read-only) |
-| US-0045 | no dedicated H1 | inline canonical status authority reference; US-0120 FOLLOWS US-0045 | VERIFIED present (read-only) |
-| US-0040 | no dedicated H1 | inline release artifact reference; US-0120 operates AFTER US-0040 | VERIFIED present (read-only) |
-| US-0096 | `## US-0096` at L1684 | `rg "^## US-0096" docs/engineering/architecture.md` → match | VERIFIED present (read-only) |
-| US-0048 | no dedicated H1 | inline isolation evidence contract; US-0120 produces own per US-0048 | VERIFIED present (read-only) |
-| US-0056 | no dedicated H1 | inline runtime proof contract; US-0120 produces own per US-0056 | VERIFIED present (read-only) |
-
-All 6 compose surfaces UNCHANGED (pre-condition confirmed: none have edits scheduled in US-0120; T-anch + T-009 contract test `test_us0120_compose_guards_unchanged` enforces at execute boundary).
-
-#### Open questions Q1..Q10 — RESOLVED
-
-- **Q1 (closure-verification artifact schema)** → LOCKED: REQUIRED fields: `story_id`, `closure_date` (ISO-8601 UTC), `closure_role` (qe or curator fallback), `pre_closure_status` (OPEN), `post_closure_status` (DONE), `release_evidence_refs[]` (array of paths: release_queue row ref, release-notes ref, qa-findings ref, optionally uat ref, release-findings ref), `isolation_evidence{}` (phase_id=closure, role, fresh_context_marker, timestamp, evidence_ref), `runtime_proof{}` (runtime_proof_id, proof_hash, proof_ttl_seconds=3600, proof_ttl ISO-8601). OPTIONAL: `normalization_notes` (free-text for edge cases), `backward_compat_note` (for in-flight story closure). Rationale: minimum viable set covers identity + temporal + role transition + evidence traceability + isolation + proof; validator only checks required fields allowing schema extension without breaking.
-
-- **Q2 (AUTO_ROLE_CLOSURE fallback precedence)** → LOCKED: `qe` → `curator` (primary → fallback). Rationale: mirrors DEC-0052 existing pattern where `refresh-context` maps to `curator`; `qe` is natural quality-gate owner for status-flip verification; `curator` fallback matches cross-phase curator ownership pattern (refresh-context, sovereign-memory curation). Fallback chain is deterministic: if scratchpad `AUTO_ROLE_CLOSURE` empty → `qe`; if `qe` subagent spawn fails → `curator`. No further fallback (escalate to operator with `CLOSURE_ROLE_UNAVAILABLE`).
-
-- **Q3 (closure role in DEC-0052 phase→role matrix)** → LOCKED: ADD new row `closure | qe | AUTO_ROLE_CLOSURE scratchpad override to curator allowed` as §1 canonical matrix entry (distinct row, NOT inheritance from `/qa`). ADD new `AUTO_ROLE_CLOSURE` row to §2 override contract table: values `qe`, `curator`; default `qe`; behavior: `curator must not write qa-owned surfaces`. ADD new `closure` row to §3 preflight capability gate: required capability `role:qe` or override; fail-closed code `PHASE_CAPABILITY_MISSING`. Rationale: US-0120 closure is a DISTINCT phase with distinct responsibility (status flip + acceptance check + state checkpoint + closure-verification.md); inheriting `/qa` would conflate quality-gate findings with status reconciliation (different contracts per US-0043).
-
-- **Q4 (drain hook in-flight story detection pattern)** → LOCKED: Detection algorithm: (1) enumerate stories with release_queue row `status=released`, (2) for each, read `docs/product/backlog.md` target story block — if `Status: OPEN` AND acceptance.md row `- [ ]`, then closure was SKIPPED (release subagent did not perform closure OR pre-US-0120 story), (3) spawn `/closure` for that target sprint with explicit backfill mode. Post-US-0120: release subagent CANNOT perform closure (steps 10-12 removed), so `released + OPEN` = missing closure. Pre-US-0120: `released + OPEN` = legacy drift (US-0108 pattern); flag as `CLOSURE_LEGACY_DRIFT` and offer manual reconciliation OR automatic backfill closure. Rationale: deterministic 3-signal detection (release_queue + backlog + acceptance) avoids false positives; in-flight stories at US-0120 ship boundary are handled gracefully.
-
-- **Q5 (backward compat for US-0108/US-0119 status-drift)** → LOCKED: FORWARD-COMPAT ONLY. Already-DONE stories (US-0108 when manually reconciled, US-0119 already in release) remain UNTOUCHED. US-0120 does NOT retroactively create closure-verification.md for prior stories. Rationale: (a) closure is a NEW phase that did NOT exist when prior stories shipped — imposing it retroactively would violate compose guards (US-0045 canonical status), (b) US-0108 is a known status-drift issue flagged separately (drain-advance NB-5 in S0119 resume_brief), (c) adding retroactive closure creates scope creep risk. Drain hook (Q4 LOCKED) handles the specific case of `released + OPEN` stories that US-0120 is responsible for (i.e., stories released AFTER US-0120 ships but before drain hook runs).
-
-- **Q6 (closure-verification format: .json vs .md)** → LOCKED: **closure-verification.md** (markdown format). Rationale: (a) backlog AC-6 says `.md`, (b) discovery-locks.md D4 says `.md`, (c) existing lifecycle artifact convention is `.md` for human-readable findings/verification documents (qa-findings.md, release-findings.md, verify-work-findings.md, execute-summary.md), (d) `.md` format is more operator-friendly for manual inspection, (e) resolves format discrepancy in discovery.md D4 which said `.json` — state.md L1029 also said `.json` — both artifacts corrected to `.md` in this research checkpoint. Validator (`scripts/validate_closure_verification.py`) parses markdown sections by heading pattern (same approach as existing markdown-based validators).
-
-- **Q7 (rg post-closure verification regex precision)** → LOCKED: Two deterministic rg checks (matches D12 orchestrator verification): (1) `rg "^\- Status: DONE$" docs/product/backlog.md` constrained to target story block (US-xxxx section between `## US-xxxx` and next `## US-` or EOF), (2) `rg "^\- \[x\] US-xxxx:" docs/product/acceptance.md` (exact match on accepted row pattern). State.md closure checkpoint verification: `rg "phase_id=closure" docs/engineering/state.md | rg "story_id=US-xxxx"` (two-stage grep to narrow to target story). All three regexes are deterministic, no ambiguity. Orchestrator runs these directly post-closure per D12.
-
-- **Q8 (release.md step 10-12 removal renumbering)** → LOCKED: After removing steps 10 (backlog reconciliation US-0043), 11 (derived status views US-0045), 12 (normalization report): old step 13 (legacy release_notes.md pointer) becomes new step 10; old step 14 (runbook/state readiness) becomes new step 11; old step 15 (if present) becomes new step 12; etc. Strict sequential renumbering with no gaps. New step inserted at position 10: pointer — "Backlog reconciliation is now handled by the dedicated `/closure` phase — see `.cursor/commands/closure.md`." Active + template mirror byte-identical. Contract test `test_us0120_release_md_steps_10_12_removed` asserts no trace of old step 10-12 content remains.
-
-- **Q9 (compose surface grep anchors)** → LOCKED: Compose guard verification at execute boundary uses: (1) `rg "^## US-0096" docs/engineering/architecture.md` → expected match at L1684, (2) For US-0043/US-0045/US-0040/US-0048/US-0056 (no dedicated `## US-xxxx` anchor): verify via inline contract references — `rg "US-0043" docs/engineering/architecture.md`, `rg "US-0045" docs/engineering/architecture.md`, etc. All 5 must return ≥1 match (inline references exist from prior stories that cite these contracts). Contract test `test_us0120_compose_guards_unchanged` uses both anchor-based and inline-reference-based verification to detect any unauthorized edits.
-
-- **Q10 (test markers enumerate)** → LOCKED: 10 test markers in `tests/us0120_closure_phase_test.py`: (1) `test_us0120_closure_command_file_exists_active` (.cursor/commands/closure.md exists), (2) `test_us0120_closure_command_file_exists_template` (template mirror exists), (3) `test_us0120_closure_command_file_parity` (byte-identical PARITY_OK), (4) `test_us0120_dec_0052_phase_role_matrix_includes_closure` (closure row in phase→role matrix), (5) `test_us0120_dec_0082_ship_macro_includes_closure` (ship = [release, closure, refresh-context]), (6) `test_us0120_auto_phase_plan_includes_closure` (/auto phase plan includes closure after release), (7) `test_us0120_release_md_steps_10_12_removed` (no old reconciliation steps), (8) `test_us0120_closure_verification_schema_defined` (closure-verification.md schema validator exists), (9) `test_us0120_compose_guards_unchanged` (6 compose surfaces UNCHANGED), (10) `test_us0120_backward_compat_drain_hook` (drain hook detects in-flight stories needing closure). Surjective AC coverage: 10 markers cover 12 ACs (markers 1-3→AC-1, 4→AC-2, 5→AC-3, 6→AC-4, 7→AC-5, 8→AC-6, 9→AC-12, 10→AC-10; AC-7/AC-8/AC-9/AC-11 covered indirectly by markers 1+8/4/6).
-
-#### Risks R1..R8 — FINALIZED
-
-- **R1 (MEDIUM)** — Subagent fidelity gap (qe subagent claims closure but files unchanged). Same pattern as BUG-0006 execute-cycle. Mitigation: D12 orchestrator post-closure rg verification (backlog.md + acceptance.md); deterministic fail-gate `CLOSURE_VERIFICATION_FAILED` on mismatch. **Status: ACCEPTED** (mitigation sufficient).
-
-- **R2 (LOW)** — Backward compat for in-flight stories at US-0120 ship boundary. Detection logic in /auto drain-advance hook (Q4 LOCKED). Pre-US-0120 `released + OPEN` = legacy drift; post-US-0120 `released + OPEN` = missing closure spawn. **Status: ACCEPTED** (detection deterministic).
-
-- **R3 (LOW-MEDIUM)** — DEC-0052 phase→role matrix scope creep. Only ADD `closure:qe` row + `AUTO_ROLE_CLOSURE` override + preflight capability row; must NOT modify existing 12 phase→role mappings. Mitigation: T-003 scoped edit + `test_us0120_dec_0052_phase_role_matrix_includes_closure` asserts ADDITIVE. **Status: ACCEPTED** (scoped edit + contract test).
-
-- **R4 (LOW-MEDIUM)** — DEC-0082 delivery mode table scope creep. Only ADD closure to ship macro phases [release, closure, refresh-context] (2→3); must NOT modify other macro definitions (spec, plan, build+verify). Mitigation: T-004 scoped edit + `test_us0120_dec_0082_ship_macro_includes_closure` asserts exact 3-phase macro. **Status: ACCEPTED** (scoped edit + contract test).
-
-- **R5 (LOW)** — release.md step 10-12 removal deterministic renumbering. Old steps 13-19 become 10-16; pointer inserted at position 10. Active + template mirror byte-identical. Mitigation: T-005 + `test_us0120_release_md_steps_10_12_removed` asserts absence of old content. **Status: ACCEPTED** (deterministic renumbering + contract test).
-
-- **R6 (LOW)** — Template parity drift for closure.md. New file created byte-identical by construction (T-001 → T-002 copy). `check_intake_template_parity.py` extended with `--scope=closure-phase` or new COMMAND_PAIRS entry. Mitigation: T-001 + T-002 + contract test `test_us0120_closure_command_file_parity`. **Status: ACCEPTED** (byte-identical construction + parity checker extension).
-
-- **R7 (LOW)** — Closure-verification.md schema rigidity (future stories may need extensions). Schema allows optional fields (`normalization_notes`, `backward_compat_note`); validator only checks required fields. Future extensions are additive (no breaking changes). **Status: ACCEPTED** (extensible schema design).
-
-- **R8 (LOW)** — Backward compat for already-released S0119. S0119 status = DONE (already closed via S0119 release). Detection logic in Q4 SKIPs DONE stories (only `released + OPEN` triggers closure spawn). No retroactive closure verification for S0119 or any prior DONE story. **Status: ACCEPTED** (forward-only, no retroactive touch).
-
-#### Approach locked (A1 — from discovery)
-
-**Approach A1** (locked, carried from discovery): Extract Story Closure from /release step 10-12 into dedicated /closure phase with exclusive qe role ownership. Ship macro becomes 3-phase: release → closure → refresh-context. Orchestrator post-closure rg verification enforces materialization fidelity. Compose (read-only) with 6 surfaces: US-0043, US-0045, US-0040, US-0048, US-0056, US-0096.
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| **A1** | **Dedicated /closure phase with exclusive qe ownership + orchestrator post-verification** | **Preferred** — resolves US-0119 fidelity gap; follows "one phase, one responsibility" principle; deterministic drain hook detection for in-flight stories. |
-| A2 (rejected) | Keep closure inside /release but add orchestrator-side verification of step 10-12 execution. | **Rejected** — same fidelity pattern as US-0119 BUG-0006; release subagent overloaded with 19 steps; verification cannot fix non-materialization. |
-| A3 (rejected) | Extract closure into /qa phase (qa already owns quality gate). | **Rejected** — conflate quality findings with status reconciliation (different US-0043 contract); /qa runs BEFORE /release, closure must run AFTER /release; violates phase ordering. |
-
-#### Compose guards (6/6 UNCHANGED — carried from discovery)
-
-US-0043, US-0045, US-0040, US-0048, US-0056, US-0096 — all verified present as read-only consumers of US-0120. No edits scheduled.
-
-#### DC check
-
-- `grep "^## US-0120" docs/engineering/architecture.md` → no matches (expected; anchor will be added in /architecture phase per R-0105 Q-2 LOCKED pattern)
-- Not appended to `handoffs/sovereign-memory/deferrals.jsonl`
-
-#### Sovereign memory note
-
-- `assemble_sovereign_memory_digest(...)` NOT called (ultra_lean research boundary; US-0120 lifecycle-governance angle — 8th-family dimension distinct from prior 7 families: sovereign-loop (US-0113), integration (US-0114), lean memory (US-0115), full autonomy (US-0116), autonomy presets (US-0119), work-kind routing (US-0118))
-- No write to `mistakes.jsonl` (no fix_failed / revert_applied / plan_fidelity_violation / scope_creep event)
-
-#### Strict runtime proof
-
-- `runtime_proof_id=rp-manual-20260707-us0120-research-tl-20260707T214500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"manual-20260707-us0120","phase_id":"research","proof_issued_at":"2026-07-07T21:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-manual-20260707-us0120-research-tl-20260707T214500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=<pending — compute at architecture boundary>` (SHA-256 of canonical payload; computed by orchestrator per DEC-0038)
-- `proof_ttl=2026-07-07T22:45:00Z` (1-hour TTL)
-
-#### Isolation evidence
-
-- `phase_id=research`, `role=tech-lead`, `story_id=US-0120`, `sprint_id=S0120`
-- `fresh_context_marker=tl-US0120-research-20260707T214500Z-fresh`
-- `timestamp=2026-07-07T21:45:00Z` (UTC)
-- `evidence_ref=sprints/S0120/discovery.md, sprints/S0120/discovery-locks.md, docs/engineering/research.md R-0108 stub, docs/product/backlog.md US-0120 L4072-L4119`
-- Fresh tech-lead subagent per BUG-0006 / US-0048 isolation
-- No prior chat history carried forward
-- `assemble_sovereign_memory_digest(...)` NOT called
-
-#### Decision gate
-
-- `decision_gate=false` (no DECISION_GATE)
-- `stop_conditions_met=yes`
-- All 10/10 open questions Q1..Q10 LOCKED
-- All 8/8 risks R1..R8 ACCEPTED
-- Approach A1 locked (carried from discovery)
-- Compose guards 6/6 UNCHANGED
-- No DC candidates
-
-### Next scheduled phase
-
-- next_scheduled_phase=/architecture (tech-lead role)
-- stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent per BUG-0006
-
-## Architecture checkpoint — US-0120 / S0120 / manual-20260707-us0120
-
-- **phase_id**: architecture
-- **role**: tech-lead
-- **story_id**: US-0120
-- **sprint_id**: S0120
-- **orchestrator_run_id**: manual-20260707-us0120
-- **delivery_mode**: ultra_lean
-- **macro_phase**: plan
-- **fresh_context_marker**: tl-US0120-architecture-20260707T215000Z-fresh
-- **timestamp**: 2026-07-07T21:50:00Z (UTC)
-- **verdict**: PASS
-- **decision_gate**: false
-- **approach**: A1 locked (from discovery)
-- **next_scheduled_phase**: /sprint-plan (tech-lead role)
-- **architecture_ref**: docs/engineering/architecture.md L2125
-
-### Compose guards (6/6 UNCHANGED)
-
-| Compose target | Verification | Result |
-|---|---|---|
-| US-0043 | inline ref (20 matches) | VERIFIED read-only |
-| US-0045 | inline ref (20 matches) | VERIFIED read-only |
-| US-0040 | inline ref (7 matches) | VERIFIED read-only |
-| US-0048 | inline ref (3 matches) | VERIFIED read-only |
-| US-0056 | inline ref (3 matches) | VERIFIED read-only |
-| US-0096 | ## US-0096 at L1684 | VERIFIED read-only |
-
-### Isolation evidence
-
-- phase_id=architecture, role=tech-lead, story_id=US-0120, sprint_id=S0120
-- fresh_context_marker=tl-US0120-architecture-20260707T215000Z-fresh
-- timestamp=2026-07-07T21:50:00Z (UTC)
-
-### Runtime proof (DEC-0038)
-
-- runtime_proof_id=rp-manual-20260707-us0120-architecture-tl-20260707T215000Z-US-0120
-- canonical payload: {"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"manual-20260707-us0120","phase_id":"architecture","proof_issued_at":"2026-07-07T21:50:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-manual-20260707-us0120-architecture-tl-20260707T215000Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}
-- proof_hash=6293266bfcdf3e6e668cf28a34d831e55cc05a17e5dea1fc8ee94b70ca67b99f (SHA-256)
-- proof_ttl=2026-07-07T22:50:00Z (UTC)
-
-### Triad hot-surface
-
-- baseline_h2_count=41 (pre-mutation); H2 count preserved (H1 used for new story section per DEC-0076)
-
-### Sprint seeds preview
-
-T-anch, T-001..T-010 (10 tasks, within SPRINT_MAX_TASKS=12).
-
-### Decision gate
-
-- decision_gate=false, stop_conditions_met=yes
-- All 10/10 Q LOCKED, 8/8 R ACCEPTED, A1 locked
-- DC check clean, compose guards 6/6 UNCHANGED
-- 10 test markers enumerated; AC-surjective 12/12
+- `next_scheduled_phase=/plan-verify` (role=qa per orchestrator brief; fresh qa subagent per BUG-0006)
+- `next_scheduled_role=qa`
+- `next_sprint_macro=plan` (terminal — /plan-verify is the verification gate before build+verify macro)
+- `stop_condition=STOP after sprint-plan completes; hand off via artifacts only to /plan-verify in fresh qa subagent per BUG-0006. Do NOT spawn /plan-verify from this subagent. Do NOT mark US-0125 DONE. Do NOT mutate US-0121/US-0122/US-0123/US-0124 DONE. Do NOT mutate intake JSON. Do NOT mutate architecture.md or DEC-0125.md in /execute (T-anch NO-OP ceremony).`
+- `artifacts_written=sprints/S0125/sprint.md, sprints/S0125/tasks.md, sprints/S0125/progress.md, sprints/S0125/uat.json, sprints/S0125/uat.md, sprints/S0125/t-anch-verification.md, docs/engineering/state.md (this sprint-plan checkpoint append-bottom — never truncate), handoffs/tl_to_dev.md (US-0125 sprint-plan prepend), handoffs/resume_brief.md (sprint-plan PASS prepend -> /plan-verify)`
 
 ### Sovereign memory note
 
-assemble_sovereign_memory_digest(...) NOT called. No mistakes.jsonl write.
+`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
+
+### Isolation evidence (US-0048 / DEC-0029 + US-0104 v2) — sovereign-critic / sprint-plan
+
+- `phase_id=sovereign-critic`
+- `role=tech-lead`
+- `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-sprint-plan-20260824T205500Z-fresh`
+- `timestamp=2026-08-24T20:55:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125sp-challenger-001, a0125sp-architect-002, a0125sp-subtractor-003) + sprints/S0125/sprint.md + sprints/S0125/tasks.md + docs/engineering/state.md (sprint-plan checkpoint L1144-L1194) + handoffs/resume_brief.md`
+- `producer_phase_reviewed=sprint-plan`
+- `producer_role_reviewed=tech-lead`
+- `producer_model_id_reviewed=glm-5.2-high`
+- `critic_verdict=PASS`
+- `anti_slop_aggregate=8`
+- `open_blocking_findings=0`
+- `triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 post-append`
+
+## S0125 / US-0125 — /plan-verify checkpoint (role=qa, FAIL — RUNTIME_PROOF_INVALID)
+
+- `orchestrator_run_id=auto-20260824-02`
+- `story_id=US-0125`, `sprint_id=S0125`
+- `phase_id=plan-verify`, `role=qa`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `delivery_mode=ultra_lean`, `macro_phase=plan`
+- `fresh_context_marker=qa-US0125-plan-verify-20260824T202300Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence)
+- `timestamp=2026-08-24T20:23:00Z` (UTC)
+- Fresh qa subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053): sprints/S0125/sprint.md, sprints/S0125/tasks.md, sprints/S0125/t-anch-verification.md, sprints/S0124/plan-verify.json (schema template), docs/product/acceptance.md (US-0125 row L153), docs/engineering/architecture.md # US-0125 (L1836), decisions/DEC-0125.md, docs/engineering/state.md (sprint-plan checkpoint L1141-L1183), handoffs/resume_brief.md. No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation.
+
+### Verdict
+
+- `verdict=FAIL`
+- `reason_code=RUNTIME_PROOF_INVALID`
+- `coverage_complete=true` (10/10 ACs surjective — no PLAN_AC_COVERAGE_GAP)
+- `uncovered_acs=[]`
+- `decision_gate=true` (blocking — proof hash attestation drift requires orchestrator / sprint-plan producer reconciliation before /execute)
+
+### Producer runtime proof consumed (DEC-0038 — FAIL fail-closed)
+
+- `runtime_proof_id=rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125` (producer sprint-plan proof)
+- Canonical payload (sorted-key JSON per DEC-0038; byte-identical in state.md L1144 + sprint.md L184): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"sprint-plan","proof_issued_at":"2026-08-24T20:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `attested_proof_hash=2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234` (producer attestation — state.md L1145)
+- `recomputed_proof_hash=E88F39FEFB48314B98A2ACB501B04DED7F06B12778875E6DD5AA3955FB3DCE3D` (independent SHA-256 recomputation via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib; sorted-key JSON, UTF-8 bytes)
+- `critic_nb_recomputed=E88F39FE...` (matches independent recomputation — critic NB already flagged this mismatch in resume_brief.md L25)
+- `hash_match=false`
+- `ttl_at_consume=2026-08-24T21:45:00Z`, `consumed_at=2026-08-24T20:23:00Z` — `ttl_stale=false` (TTL is NOT the failure vector; hash mismatch IS the failure vector)
+- Serialization variants tested (5): sorted/compact -> E88F39FE...; sorted/default -> BA4AABDF...; insertion/compact -> E88F39FE...; insertion/default -> BA4AABDF...; sorted/indent0 -> 0CAC46C5... — NONE reproduce the attested 2FF3A63387... hash.
+- Verdict: TRUE hash mismatch (same canonical payload, different hash) — NOT a field-set difference (e.g. extra keys). Per DEC-0038 + orchestrator brief: fail-closed RUNTIME_PROOF_INVALID; do NOT proceed to PASS; do NOT spawn /execute.
+
+### This phase runtime proof emitted (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260824-02-plan-verify-qa-20260824T202300Z-US-0125`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"plan-verify","proof_issued_at":"2026-08-24T20:23:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260824-02-plan-verify-qa-20260824T202300Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `proof_hash=F0B660A47F36EF5B29A959724453A0A87444081EDE424706ECF46521FEFDB8E8` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T21:23:00Z` (UTC = issued_at + 3600s)
+- This plan-verify runtime proof is distinct from the producer sprint-plan proof (`rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125`); no proof_id reuse.
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=plan-verify`, `role=qa`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=qa-US0125-plan-verify-20260824T202300Z-fresh`
+- `timestamp=2026-08-24T20:23:00Z` (UTC)
+- `evidence_ref=sprints/S0125/plan-verify.json + sprints/S0125/sprint.md + sprints/S0125/tasks.md + sprints/S0125/t-anch-verification.md + docs/engineering/state.md (this plan-verify checkpoint append-bottom) + handoffs/resume_brief.md (plan-verify FAIL prepend -> BLOCKED)`
+- `producer_phase_reviewed=sprint-plan`
+- `producer_role_reviewed=tech-lead`
+- `producer_model_id_reviewed=glm-5.2-high`
+- `verdict=FAIL` (RUNTIME_PROOF_INVALID — producer proof hash attestation drift)
+- `coverage_complete=true` (10/10 ACs surjective)
+- `compose_guards=7/7 UNCHANGED` (additive commands + bridge contract + stub harness only — verified read-only)
+- `triad=enforce-triad-hot-surface.py --check exit 0 (no oversize; no rollover triggered this phase)`
+
+### Coverage checks (all PASS — failure is isolation-proof-only)
+
+- `task_count_within_limit=PASS` (10 tasks T-anch + T-001..T-009 <= SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT=1 not triggered)
+- `ac_coverage_surjective=PASS` (10/10 ACs -> 11 contract-test markers + compose guards + T-008 runbook stub; no PLAN_AC_COVERAGE_GAP)
+- `t_anch_no_op_documented=PASS` (# US-0125 H1 anchor architecture.md L1836 AFTER # US-0124 L1632 BEFORE # US-0089 L2103 per DEC-0073 sec 11; DEC-0125 Accepted L4; 7/7 compose guards UNCHANGED baseline; 11-marker list locked in architecture AC-8 table; template/.opencode/commands/ exists with only .gitkeep; tests/us0125/ absent; tests/us0125_contract_test.py absent; template/tests/us0125_contract_test.py absent; runbook.md lacks US-0125 h2; manifest lacks template/.opencode/commands/** source row)
+- `compose_guards_7_unchanged=PASS` (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087)
+- `critic_carry_ins_routed=PASS` (ik_us0125_dq2_normalization_strip_list_open -> /execute T-002)
+- `test_markers_locked=PASS` (11 test_us0125_* markers locked per architecture AC-8 table + DEC-0125 sec 9)
+- `backlog_acceptance_untouched=PASS` (acceptance.md L153 US-0125 unchecked; intake JSON not mutated)
+- `triad_hot_surface_check=PASS` (exit 0; no rollover)
+- `producer_runtime_proof_hash_recomputed=FAIL` (RUNTIME_PROOF_INVALID — see above)
+- `producer_proof_ttl_not_stale=PASS` (consumed before TTL)
 
 ### Next scheduled phase
 
-- next_scheduled_phase=/sprint-plan (tech-lead role, third phase of plan macro per ultra_lean)
-- stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent per BUG-0006
+- `next_scheduled_phase=BLOCKED` — do NOT spawn /execute. Return to orchestrator / sprint-plan producer to reconcile RUNTIME_PROOF_INVALID (re-emit corrected proof_hash matching canonical payload, OR orchestrator reconciles attestation drift) before re-spawning /plan-verify in a fresh qa subagent per BUG-0006.
+- `next_scheduled_role=qa` (re-run /plan-verify after reconciliation)
+- `stop_condition=STOP after /plan-verify completes with FAIL (RUNTIME_PROOF_INVALID). Do NOT spawn /execute. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT reopen US-0124. Hand off via artifacts only — orchestrator must reconcile the proof hash attestation drift with the sprint-plan producer before re-spawning /plan-verify.`
+- `artifacts_written=sprints/S0125/plan-verify.json (this FAIL verdict), docs/engineering/state.md (this plan-verify checkpoint append-bottom — never truncate), handoffs/resume_brief.md (plan-verify FAIL prepend -> BLOCKED)`
 
-## Sprint-plan checkpoint — US-0120 / S0120 / manual-20260707-us0120
+### Sovereign memory note
 
-- phase_id: sprint-plan
-- role: tech-lead
-- story_id: US-0120
-- sprint_id: S0120
-- orchestrator_run_id: manual-20260707-us0120
-- delivery_mode: ultra_lean
-- macro_phase: plan (final phase of plan macro)
-- fresh_context_marker: tl-US0120-sprint-plan-20260707T215500Z-fresh
-- timestamp: 2026-07-07T21:55:00Z (UTC)
-- verdict: PASS
-- decision_gate: false
-- approach: A1 locked
-- next_scheduled_phase: /execute (dev role, first phase of build+verify macro)
+`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
 
-### Sprint plan summary
+## Sovereign-critic checkpoint — US-0125 / S0125 / auto-20260824-02 (producer: plan-verify / plan)
 
-- 10 tasks (T-anch + T-001..T-010) — within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT=1 but no split needed
-- Task dependency graph: [T-anch] → {T-001, T-003, T-004 parallel} → {T-002, T-005, T-006 parallel} → T-007 → T-008 → T-009 → T-010 → [integration verification]
-- Execute role: dev (fresh per BUG-0006)
-- QA role: qa (creates plan-verify.json per ultra_lean merger)
-- Verify-work role: qa
-- Release role: release (steps 10-12 removed post-US-0120)
-- Closure role: qe (AUTO_ROLE_CLOSURE override to curator)
-- Compose guards 6/6 UNCHANGED (US-0043/US-0045/US-0040/US-0048/US-0056/US-0096)
-- 12/12 ACs covered by 10 test markers (surjective)
+- **phase_id**: sovereign-critic, **role**: tech-lead (critic), **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `producer_phase_id=plan-verify`, `producer_role=qa`, `producer_model_id=glm-5.2-high`
+- `critic_model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `producer_verdict=FAIL` (RUNTIME_PROOF_INVALID)
+- `verdict=FAIL` (critic concurs — independent checks: plan-verify.json FAIL with coverage_complete=true (10/10 ACs surjective); producer sprint-plan proof attested 2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234 != recomputed E88F39FEFB48314B98A2ACB501B04DED7F06B12778875E6DD5AA3955FB3DCE3D (TRUE hash mismatch on byte-identical canonical payload; 5 serialization variants tested — none reproduce attested hash); plan-verify own proof_hash F0B660A47F36EF5B29A959724453A0A87444081EDE424706ECF46521FEFDB8E8 independently verified; ttl_stale=false; compose guards 7/7 UNCHANGED; US-0125 OPEN; acceptance L153 unchecked; 0 blocking critic findings; anti_slop_aggregate=8)
+- `decision_gate=true` (blocking — sprint-plan proof attestation drift requires orchestrator-owned RE-ATTEST before re-running /plan-verify)
+- `status=OPEN` (do not mark US-0125 DONE)
+- `fresh_context_marker=tl-US0125-sovereign-critic-plan-verify-20260824T202800Z-fresh`
+- `timestamp (UTC)=2026-08-24T20:28:00Z`
+- `independent_checks=proof hash recomputed (sprint-plan E88F39FE... vs attested 2FF3A633...); plan-verify.json present (QA-owned FAIL); plan-verify proof F0B660A4... verified; backlog OPEN; acceptance unchecked; triad --check PASS pre-append`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 plan-verify rows a0125pv-challenger-001, a0125pv-architect-002, a0125pv-subtractor-003) + sprints/S0125/plan-verify.json + sprints/S0125/sprint.md + sprints/S0125/tasks.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic FAIL prepend → /sprint-plan RE-ATTEST)`
 
-### Compose guards (6/6 UNCHANGED)
+### Next scheduled phase
 
-| Compose target | Verification | Result |
-|---|---|---|
-| US-0043 | inline ref (20 matches) | VERIFIED read-only |
-| US-0045 | inline ref (20 matches) | VERIFIED read-only |
-| US-0040 | inline ref (7 matches) | VERIFIED read-only |
-| US-0048 | inline ref (3 matches) | VERIFIED read-only |
-| US-0056 | inline ref (3 matches) | VERIFIED read-only |
-| US-0096 | ## US-0096 at L1684 | VERIFIED read-only |
+- `next_scheduled_phase=/sprint-plan RE-ATTEST` (role=tech-lead; orchestrator-owned spawn; mint corrected proof_hash matching recomputed E88F39FE... on unchanged canonical payload)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after sovereign-critic; orchestrator spawns /sprint-plan RE-ATTEST in fresh tech-lead subagent (BUG-0006). Do NOT spawn /sprint-plan from sovereign-critic. Do NOT forge proof. Do NOT spawn /execute. Do NOT mark US-0125 DONE. After RE-ATTEST, re-spawn /plan-verify (fresh qa subagent).`
 
-### Isolation evidence
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-- phase_id=sprint-plan, role=tech-lead, story_id=US-0120, sprint_id=S0120
-- fresh_context_marker=tl-US0120-sprint-plan-20260707T215500Z-fresh
-- timestamp=2026-07-07T21:55:00Z (UTC)
-- evidence_ref=sprints/S0120/sprint-plan.md, sprints/S0120/tasks.md, docs/engineering/state.md (this checkpoint), handoffs/po_to_tl.md (sprint-plan handoff)
-- Prior phase proof consumed: rp-manual-20260707-us0120-architecture-tl-20260707T215000Z-US-0120
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-plan-verify-20260824T202800Z-fresh`, `timestamp=2026-08-24T20:28:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 plan-verify rows a0125pv-challenger-001, a0125pv-architect-002, a0125pv-subtractor-003) + sprints/S0125/plan-verify.json + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic FAIL prepend → /sprint-plan RE-ATTEST role=tech-lead)`
+- `producer_phase_reviewed=plan-verify`
+- `producer_role_reviewed=qa`
+- `producer_model_id_reviewed=glm-5.2-high`
+- `critic_verdict=FAIL` (concurs with producer RUNTIME_PROOF_INVALID)
+- `anti_slop_aggregate=8`
+- `open_blocking_findings=0` (critic rows all blocking=false; producer FAIL remains blocking via decision_gate)
+- `triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 post-append`
 
-### Runtime proof (DEC-0038)
 
-- runtime_proof_id=rp-manual-20260707-us0120-sprint-plan-tl-20260707T215500Z-US-0120
-- canonical payload: {"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"manual-20260707-us0120","phase_id":"sprint-plan","proof_issued_at":"2026-07-07T21:55:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-manual-20260707-us0120-sprint-plan-tl-20260707T215500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}
-- proof_hash=a702bc1226d474ad9851db6a8e1e5fa89f48adb22a54fa60c5d5b59a447e27a (SHA-256)
+## Sprint-plan RE-ATTEST checkpoint — US-0125 / S0125 / auto-20260824-02 (role=tech-lead)
+
+- **phase_id**: sprint-plan (RE-ATTEST), **role**: tech-lead, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `macro_phase=plan` (sprint-plan — terminal canonical phase of `plan` macro per US-0096 / DEC-0082 ultra_lean; /plan-verify runs standalone per orchestrator brief, role=qa)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation; this spawn's producer model; NEW RE-ATTEST marker)
+- `fresh_context_marker=tl-US0125-sprint-plan-reattest-20260824T2155Z-fresh`, `timestamp (UTC)=2026-08-24T20:29:20Z`
+- `verdict=RE_ATTEST_PASS` (orchestrator-owned RE-ATTEST per BUG-0006 / sovereign-critic decision_gate; minted NEW runtime proof with proof_hash computed by Python hashlib on byte-identical canonical payload; tasks NOT rewritten — no plan content mutation; architecture.md NOT mutated; DEC-0125 NOT mutated; US-0125 remains OPEN; acceptance L153 unchecked; intake JSON not mutated)
+- `reattest_reason=RUNTIME_PROOF_INVALID` (prior sprint-plan proof attested 2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234 != recomputed E88F39FEFB48314B98A2ACB501B04DED7F06B12778875E6DD5AA3955FB3DCE3D on the prior canonical payload; orchestrator-owned RE-ATTEST mints a NEW proof rather than forging the old hash)
+- `prior_proof_id_consumed=rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125` (proof_hash=2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234 — RUNTIME_PROOF_INVALID; not reused)
+- `status=OPEN` (do not mark US-0125 DONE per US-0045 canonical status; do not mutate US-0121/US-0122/US-0123/US-0124 DONE; do not mutate intake JSON)
+- `tasks_not_rewritten=true` (no typo blocking re-attest; S0125 sprint.md / tasks.md / progress.md / uat.* / t-anch-verification.md left intact — RE-ATTEST is proof-only)
+- `architecture_not_mutated=true` (architecture.md # US-0125 H1 anchor + 11-marker AC-8 table + DEC-0125 Accepted left intact)
+- `dec_0125_not_mutated=true` (decisions/DEC-0125.md left intact)
+- `compose_guards=7/7 UNCHANGED` (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087; additive commands + bridge contract + stub harness only)
+- `decision_gate=false` (RE-ATTEST does not introduce a new DECISION_GATE; resolves the prior sprint-plan decision_gate raised by sovereign-critic)
+- `dc_check=clean` (RE-ATTEST does not add H1/H2 to architecture.md)
+- `triad_baseline_h2_count=38` preserved (no new H2 `## US-` headings added in RE-ATTEST)
+- `backlog_status=OPEN` (US-0125 L4329 `Status: OPEN` — not mutated per US-0045)
+- `ac_checkboxes=unchecked` (acceptance L153 `- [ ] US-0125` — not mutated per US-0045)
+- `intake_evidence_json_not_mutated=true` (handoffs/intake_evidence/US-0121-intake-20260822.json — security: never mutate prior intake evidence)
+- `evidence_ref=sprints/S0125/sprint.md + sprints/S0125/tasks.md + sprints/S0125/progress.md + sprints/S0125/uat.json + sprints/S0125/uat.md + sprints/S0125/t-anch-verification.md + handoffs/tl_to_dev.md (US-0125 sprint-plan prepend — not mutated) + handoffs/resume_brief.md (sprint-plan RE-ATTEST prepend -> /plan-verify role=qa) + docs/engineering/architecture.md # US-0125 (L1836 — not mutated) + decisions/DEC-0125.md (Accepted — not mutated) + docs/engineering/state.md (this RE-ATTEST checkpoint append-bottom — never truncate) + prior sprint-plan checkpoint L992-L1046 + prior plan-verify checkpoint L1064-L1135 + prior sovereign-critic checkpoint L1140-L1172`
+
+### Strict runtime proof (DEC-0038) — RE-ATTEST
+
+- `runtime_proof_id=rp-auto-20260824-02-sprint-plan-tech-lead-20260824T2155-US-0125` (NEW — not reused; distinct from prior `...20260824T204500Z...` and from plan-verify `...20260824T202300Z...`)
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"sprint-plan","proof_issued_at":"2026-08-24T20:29:20Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-02-sprint-plan-tech-lead-20260824T2155-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `proof_hash=44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib; independently recomputed and confirmed match BEFORE returning)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T21:29:20Z` (UTC = issued_at + 3600s)
+- This sprint-plan RE-ATTEST runtime proof is distinct from the prior sprint-plan proof (`rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125` — RUNTIME_PROOF_INVALID, not reused) and from the plan-verify proof (`rp-auto-20260824-02-plan-verify-qa-20260824T202300Z-US-0125`); no proof_id reuse.
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on the exact canonical payload above yields `44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26` — byte-identical match)
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2) — RE-ATTEST
+
+- `phase_id=sprint-plan` (RE-ATTEST), `role=tech-lead`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sprint-plan-reattest-20260824T2155Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence)
+- `timestamp=2026-08-24T20:29:20Z` (UTC)
+- Fresh tech-lead subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053): docs/engineering/state.md (prior sprint-plan / plan-verify / sovereign-critic checkpoints), sprints/S0125/* (format template + proof baseline), docs/product/acceptance.md (US-0125 row L153 — read-only), docs/engineering/architecture.md # US-0125 (L1836 — read-only), decisions/DEC-0125.md (read-only). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation, no tasks.md/sprint.md rewrite.
+- Prior proof consumed: `rp-auto-20260824-02-sprint-plan-tech-lead-20260824T204500Z-US-0125` (`proof_hash=2FF3A63387C7337D5EC02802253D251CC2636831A6369B7A121F6135AC51E234` — RUNTIME_PROOF_INVALID; not reused; NEW proof minted instead of forging old hash).
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/plan-verify` (role=qa per orchestrator brief; fresh qa subagent per BUG-0006 — re-spawn after RE-ATTEST)
+- `next_scheduled_role=qa`
+- `next_sprint_macro=plan` (terminal — /plan-verify is the verification gate before build+verify macro)
+- `stop_condition=STOP after sprint-plan RE-ATTEST completes; hand off via artifacts only to /plan-verify in fresh qa subagent per BUG-0006. Do NOT spawn /plan-verify from this subagent. Do NOT mark US-0125 DONE. Do NOT mutate US-0121/US-0122/US-0123/US-0124 DONE. Do NOT mutate intake JSON. Do NOT mutate architecture.md or DEC-0125.md. Do NOT rewrite tasks unless a typo blocks re-attest (none found).`
+- `artifacts_written=docs/engineering/state.md (this sprint-plan RE-ATTEST checkpoint append-bottom — never truncate), handoffs/resume_brief.md (sprint-plan RE-ATTEST prepend -> /plan-verify role=qa), sprints/S0125/progress.md (one-line RE-ATTEST note)`
+
+### Sovereign memory note
+
+`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
+
+
+## Sovereign-critic checkpoint — US-0125 / S0125 / auto-20260824-02 (producer: sprint-plan RE-ATTEST / plan)
+
+- **phase_id**: sovereign-critic, **role**: tech-lead (critic), **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `producer_phase_id=sprint-plan` (RE-ATTEST), `producer_role=tech-lead`, `producer_model_id=glm-5.2-high`
+- `critic_model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `producer_verdict=RE_ATTEST_PASS`
+- `verdict=PASS` (critic concurs — independent checks green: producer proof `44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26` matches attested DEC-0038 payload via Python hashlib sorted-key compact JSON; tasks_not_rewritten=true; architecture_not_mutated=true; dec_0125_not_mutated=true; 10/10 AC surjective unchanged in tasks.md; 10 tasks within SPRINT_MAX_TASKS=12; prior RUNTIME_PROOF_INVALID resolved (NEW proof_id rp-auto-20260824-02-sprint-plan-tech-lead-20260824T2155-US-0125; prior 2FF3A633... consumed not forged); US-0125 OPEN L4329; acceptance L153 unchecked; 0 blocking findings; anti_slop_aggregate=8)
+- `decision_gate=false` (prior plan-verify decision_gate resolved by RE-ATTEST proof mint)
+- `status=OPEN` (do not mark US-0125 DONE)
+- `fresh_context_marker=tl-US0125-sovereign-critic-sprint-plan-reattest-20260824T210000Z-fresh`
+- `timestamp (UTC)=2026-08-24T21:00:00Z`
+- `independent_checks=proof hash recomputed (44E68E0D... match true); tasks_not_rewritten; architecture/DEC-0125 not mutated; backlog OPEN; acceptance unchecked; prior plan-verify.json FAIL remains (QA re-run required); triad --check PASS pre-append`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 sprint-plan RE-ATTEST rows a0125spr-challenger-001, a0125spr-architect-002, a0125spr-subtractor-003) + sprints/S0125/sprint.md + sprints/S0125/tasks.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /plan-verify role=qa)`
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/plan-verify` (role=qa per orchestrator brief; fresh qa subagent per BUG-0006 — re-spawn to consume NEW RE-ATTEST proof)
+- `next_scheduled_role=qa`
+- `stop_condition=STOP after sovereign-critic; orchestrator spawns /plan-verify in fresh qa subagent (BUG-0006). Do NOT spawn /plan-verify from sovereign-critic. Do NOT forge proof. Do NOT spawn /execute. Do NOT mark US-0125 DONE.`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-sprint-plan-reattest-20260824T210000Z-fresh`, `timestamp=2026-08-24T21:00:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 sprint-plan RE-ATTEST rows a0125spr-challenger-001, a0125spr-architect-002, a0125spr-subtractor-003) + sprints/S0125/sprint.md + sprints/S0125/tasks.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /plan-verify role=qa)`
+- `producer_phase_reviewed=sprint-plan` (RE-ATTEST)
+- `producer_role_reviewed=tech-lead`
+- `producer_model_id_reviewed=glm-5.2-high`
+- `critic_verdict=PASS` (concurs with producer RE_ATTEST_PASS)
+- `recomputed_hash_match=true` (44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26)
+- `anti_slop_aggregate=8`
+- `open_blocking_findings=0`
+- `triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 post-append`
+
+
+## Plan-verify checkpoint — US-0125 / S0125 / auto-20260824-02 (role=qa)
+
+- **phase_id**: plan-verify, **role**: qa, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=plan` (plan-verify — standalone verification gate per orchestrator brief; role=qa per AUTO_ROLE_PLAN_VERIFY empty default; fresh qa subagent per BUG-0006 to consume NEW sprint-plan RE-ATTEST proof)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation; this spawn's producer model)
+- `fresh_context_marker=qa-US0125-plan-verify-20260824T203200Z-fresh`, `timestamp (UTC)=2026-08-24T20:32:00Z`
+- `verdict=PASS` (10/10 AC surjective coverage by 11 contract-test markers + compose guards T-anch 7/7 UNCHANGED baseline + T-008 runbook stub; 10 tasks T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; T-anch NO-OP/verification only; DEC-0125 Accepted; architecture heading order correct (# US-0125 L1836 AFTER # US-0124 L1632 BEFORE # US-0089 L2103 per DEC-0073 sec 11); baseline absent-files verified (tests/us0125/, tests/us0125_contract_test.py, template/tests/us0125_contract_test.py, runbook US-0125 h2, manifest template/.opencode/commands/** row); backlog/acceptance/intake JSON untouched; triad hot-surface clean; producer sprint-plan RE-ATTEST runtime proof hash 44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26 matches independent Python hashlib recomputation on canonical sorted-key compact JSON payload — byte-identical; proof_ttl 2026-08-24T21:29:20Z not stale at consume 2026-08-24T20:32:00Z; prior RUNTIME_PROOF_INVALID (2FF3A63387... != E88F39FE...) resolved by orchestrator-owned RE-ATTEST minting NEW proof_id (not forging old hash); 0 blocking findings; anti_slop_aggregate=8 carried from sprint-plan RE-ATTEST sovereign-critic PASS)
+- `decision_gate=false`
+- `status=OPEN` (do not mark US-0125 DONE per US-0045 canonical status; do not mutate US-0121/US-0122/US-0123/US-0124 DONE; do not mutate intake JSON; do not tick acceptance)
+- `coverage_complete=true`, `uncovered_acs=[]` (no PLAN_AC_COVERAGE_GAP)
+- `ac_coverage=10/10 surjective` (AC-1->T-001,T-006(m1,m8,m11),T-007; AC-2->T-002,T-006(m2); AC-3->T-003,T-004,T-006(m3,m4); AC-4->T-003,T-005,T-006(m4); AC-5->T-004,T-006(m5); AC-6->T-006(m6); AC-7->T-006(m7,m8); AC-8->T-006(all 11 markers),T-008; AC-9->T-anch,T-006(m9); AC-10->T-005,T-006(m10))
+- `compose_guards=7/7 UNCHANGED` (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087; additive commands + bridge contract + stub harness only)
+- `test_markers_locked=11` (m1 command_inventory, m2 clone_guard, m3 validator_subprocess_fail_closed, m4 release_blocked_after_failing_validator [success test b], m5 reason_code_raw_python, m6 no_policy_in_commands, m7 missing_command_does_not_disable_plugin, m8 auto_command_dispatch_only, m9 cursor_commands_unchanged, m10 no_new_npm_runtime, m11 command_frontmatter_shape)
+- `task_count=10` (T-anch + T-001..T-009; within SPRINT_MAX_TASKS=12; SPRINT_AUTO_SPLIT=1 but no split needed)
+- `tasks_not_rewritten=true` (RE-ATTEST proof-only; sprint.md/tasks.md/progress.md/uat.*/t-anch-verification.md unchanged — plan-verify consumes sprint-plan RE-ATTEST proof, does not rewrite plan)
+- `architecture_not_mutated=true` (architecture.md # US-0125 H1 anchor + 11-marker AC-8 table + DEC-0125 Accepted left intact)
+- `dec_0125_not_mutated=true` (decisions/DEC-0125.md left intact)
+- `backlog_status=OPEN` (US-0125 L4329 `Status: OPEN` — not mutated per US-0045)
+- `ac_checkboxes=unchecked` (acceptance L153 `- [ ] US-0125` — not mutated per US-0045)
+- `intake_evidence_json_not_mutated=true` (handoffs/intake_evidence/US-0121-intake-20260822.json — security: never mutate prior intake evidence)
+- `critic_carry_ins_routed=1` (ik_us0125_dq2_normalization_strip_list_open routed to /execute T-002 — lock US0125_CLONE_GUARD_STRIP_TOKENS as documented constant; not silently dropped)
+- `triad_baseline_h2_count=38` preserved (no new H2 `## US-` headings added in plan-verify)
+- `evidence_ref=sprints/S0125/plan-verify.json (this PASS verdict — authoritative retry; overwrites prior FAIL from invalid proof) + sprints/S0125/sprint.md + sprints/S0125/tasks.md + sprints/S0125/progress.md + sprints/S0125/uat.json + sprints/S0125/uat.md + sprints/S0125/t-anch-verification.md + handoffs/tl_to_dev.md (US-0125 sprint-plan prepend — not mutated) + handoffs/resume_brief.md (plan-verify PASS prepend -> /execute role=dev) + docs/engineering/architecture.md # US-0125 (L1836 — not mutated) + decisions/DEC-0125.md (Accepted — not mutated) + docs/engineering/state.md (this plan-verify checkpoint append-bottom — never truncate) + prior sprint-plan RE-ATTEST checkpoint L1098-L1144 + prior sovereign-critic checkpoint L1151-L1184`
+
+### Strict runtime proof (DEC-0038) — plan-verify
+
+- `runtime_proof_id=rp-auto-20260824-02-plan-verify-qa-20260824T203200Z-US-0125` (NEW — distinct from prior plan-verify `...20260824T202300Z...` FAIL proof and from sprint-plan RE-ATTEST `...20260824T2155...` proof; no proof_id reuse)
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"plan-verify","proof_issued_at":"2026-08-24T20:32:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260824-02-plan-verify-qa-20260824T203200Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `proof_hash=13E002DDCFD55F546CEE96091BF66501BD58D337D04D0965E1F8F096114E0966` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib; independently recomputed and confirmed match BEFORE returning)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T21:32:00Z` (UTC = issued_at + 3600s)
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on the exact canonical payload above yields `13E002DDCFD55F546CEE96091BF66501BD58D337D04D0965E1F8F096114E0966` — byte-identical match)
+
+### Producer proof consumed (sprint-plan RE-ATTEST)
+
+- `producer_runtime_proof_id=rp-auto-20260824-02-sprint-plan-tech-lead-20260824T2155-US-0125` (NEW RE-ATTEST proof — not the prior invalid `...20260824T204500Z...`)
+- `producer_attested_proof_hash=44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26`
+- `producer_recomputed_proof_hash=44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26` (byte-identical match via Python hashlib sorted-key compact JSON)
+- `producer_hash_match=true` (PASS vector — prior RUNTIME_PROOF_INVALID resolved by RE-ATTEST)
+- `producer_proof_ttl=2026-08-24T21:29:20Z`, `consumed_at=2026-08-24T20:32:00Z` (before RUNTIME_PROOF_STALE)
+- `producer_ttl_stale=false`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=plan-verify`, `role=qa`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=qa-US0125-plan-verify-20260824T203200Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence)
+- `timestamp=2026-08-24T20:32:00Z` (UTC)
+- Fresh qa subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053): docs/engineering/state.md (prior sprint-plan RE-ATTEST / sovereign-critic checkpoints), sprints/S0125/* (sprint.md, tasks.md, plan-verify.json prior FAIL, t-anch-verification.md), docs/product/acceptance.md (US-0125 row L153 — read-only), docs/engineering/architecture.md # US-0125 (L1836 — read-only), decisions/DEC-0125.md (read-only), .cursor/commands/plan-verify.md (command spec). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation, no tasks.md/sprint.md rewrite.
+- Producer proof consumed: `rp-auto-20260824-02-sprint-plan-tech-lead-20260824T2155-US-0125` (`proof_hash=44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26` — RUNTIME_PROOF_VALID; hash match true via independent Python hashlib recomputation).
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/execute` (role=dev per orchestrator brief; fresh dev subagent per BUG-0006 — orchestrator-owned spawn)
+- `next_scheduled_role=dev`
+- `next_sprint_macro=build+verify` (/execute is the first phase of build+verify macro)
+- `stop_condition=STOP after plan-verify completes with PASS; hand off via artifacts only to /execute in fresh dev subagent per BUG-0006. Do NOT spawn /execute from this qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT mutate architecture.md or DEC-0125.md. Do NOT rewrite tasks.`
+- `artifacts_written=sprints/S0125/plan-verify.json (PASS verdict — authoritative retry overwriting prior FAIL), docs/engineering/state.md (this plan-verify checkpoint append-bottom — never truncate), handoffs/resume_brief.md (plan-verify PASS prepend -> /execute role=dev)`
+
+### Sovereign memory note
+
+`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
+
+## Sovereign-critic checkpoint — US-0125 / S0125 / auto-20260824-02 (role=tech-lead)
+
+- **phase_id**: sovereign-critic, **role**: tech-lead, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=plan` (sovereign-critic — cross-model adversarial review of plan-verify PASS per CROSS_MODEL_REVIEW=1)
+- `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required on critic isolation)
+- `producer_phase_reviewed=plan-verify`, `producer_role_reviewed=qa`, `producer_model_id_reviewed=glm-5.2-high`
+- `producer_verdict=PASS`, `critic_verdict=PASS` (concurs — 0 blocking findings)
+- `fresh_context_marker=tl-US0125-sovereign-critic-plan-verify-20260824T203800Z-fresh`, `timestamp (UTC)=2026-08-24T20:38:00Z`
+- `verdict=PASS` (plan-verify producer PASS independently upheld: 10/10 AC surjective coverage by 11 contract-test markers + compose guards T-anch 7/7 UNCHANGED baseline + T-008 runbook stub; plan-verify proof_hash=13E002DDCFD55F546CEE96091BF66501BD58D337D04D0965E1F8F096114E0966 matches independent Python hashlib recomputation; consumed sprint-plan RE-ATTEST proof_hash=44E68E0DD88AB4C1D181D3A73BFC65BE341AE1E3B3CBD561513E61C585C9ED26 matches independent recomputation; prior RUNTIME_PROOF_INVALID resolved by RE-ATTEST — not forged; docs/product/backlog.md ## US-0125 L4329 Status: OPEN; docs/product/acceptance.md L153 unchecked — no premature DONE flip; 0 blocking critic findings; anti_slop_aggregate=8)
+- `decision_gate=false`
+- `status=OPEN` (do not mark US-0125 DONE per US-0045 canonical status; do not mutate US-0121/US-0122/US-0123/US-0124 DONE; do not mutate intake JSON; do not tick acceptance)
+- `anti_slop_aggregate=8`
+- `open_blocking_findings=0`
+- `issue_keys=[ik_us0125_plan_verify_pass_challenger, ik_us0125_plan_verify_pass_layering, ik_us0125_plan_verify_pass_scope_minimal]`
+- `critic_carry_ins_routed=1` (ik_us0125_dq2_normalization_strip_list_open -> /execute T-002 — lock US0125_CLONE_GUARD_STRIP_TOKENS as documented constant; upheld by plan-verify PASS)
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 plan-verify PASS rows a0125pv2-challenger-001, a0125pv2-architect-002, a0125pv2-subtractor-003) + sprints/S0125/plan-verify.json + sprints/S0125/sprint.md + sprints/S0125/tasks.md + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /execute role=dev) + prior plan-verify checkpoint L1115-L1174`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-plan-verify-20260824T203800Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence)
+- `timestamp=2026-08-24T20:38:00Z` (UTC)
+- Fresh tech-lead critic subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read: sprints/S0125/plan-verify.json, sprints/S0125/sprint.md, sprints/S0125/tasks.md, docs/product/backlog.md ## US-0125 (read-only), docs/product/acceptance.md L153 (read-only), docs/engineering/state.md (plan-verify checkpoint), handoffs/sovereign_critic_findings.jsonl (append-only). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation, no /execute spawn.
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/execute` (role=dev per orchestrator brief; fresh dev subagent per BUG-0006 — orchestrator-owned spawn)
+- `next_scheduled_role=dev`
+- `next_sprint_macro=build+verify` (/execute is the first phase of build+verify macro)
+- `stop_condition=STOP after sovereign-critic completes with PASS; hand off via artifacts only to /execute in fresh dev subagent per BUG-0006. Do NOT spawn /execute from sovereign-critic. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT mutate architecture.md or DEC-0125.md. Do NOT rewrite tasks.`
+- `artifacts_written=handoffs/sovereign_critic_findings.jsonl (3 lens rows appended), docs/engineering/state.md (this sovereign-critic checkpoint append-bottom — never truncate), handoffs/resume_brief.md (sovereign-critic PASS prepend -> /execute role=dev)`
+- `triad=enforce-triad-hot-surface.py --check FAIL pre-append (state oversize 1206/1200); --rollover exit 0 (units=1 -> state-pack-20260824-av.md); --check exit 0 post-rollover`
+## Execute checkpoint — US-0125 / S0125 (2026-08-24T21:00:00Z UTC)
+
+- phase_id=execute
+- role=dev
+- story_id=US-0125
+- sprint_id=S0125
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=build+verify
+- fresh_context_marker=dev-US0125-execute-20260824T210000Z-fresh
+- timestamp=2026-08-24T21:00:00Z (UTC)
+- model_id=glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- verdict=PASS (execute) — 10/10 tasks DONE; 11/11 us0125 contract markers PASS; opencode-adapter parity PASS; triad hot-surface clean; compose guards 7/7 UNCHANGED
+- evidence_ref=sprints/S0125/summary.md, sprints/S0125/progress.md, sprints/S0125/tasks.md, sprints/S0125/t-anch-verification.md, handoffs/dev_to_qa.md (US-0125 prepend), docs/engineering/state.md (this execute checkpoint append-bottom — never truncate), handoffs/resume_brief.md (execute PASS prepend -> /qa)
+- prior_phase_proof_consumed=rp-auto-20260824-02-plan-verify-qa-20260824T203200Z-US-0125 (proof_hash=13E002DDCFD55F546CEE96091BF66501BD58D337D04D0965E1F8F096114E0966, ttl 2026-08-24T21:32:00Z — consumed before RUNTIME_PROOF_STALE)
+- runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125
+- proof_hash=3A45F2563E0533E1D4558150FEC8F3723C95285331F007B4AF70B35D960B69C7
+- proof_ttl=2026-08-24T22:00:00Z (UTC)
+- canonical_payload={"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T21:00:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}
+- compose_guards=7/7 UNCHANGED (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087 — additive only)
+- backlog_status=OPEN (US-0045 — not mutated)
+- ac_checkboxes=unchecked (US-0045 — not mutated)
+- intake_json=NOT mutated
+- architecture_md=NOT mutated (T-anch NO-OP)
+- DEC-0125_md=NOT mutated (T-anch NO-OP)
+- orchestrator_ts=NOT mutated (US-0124 owned)
+- cursor_commands=NOT mutated (AC-9)
+- full_harness=NOT run (time-bounded; QA owns full harness; prior green Pass:845 Fail:0 @ 19:17:58Z stale after new US-0125 tests)
+- triad=enforce-triad-hot-surface.py --check exit 0 (no rollover triggered this phase)
+- next_scheduled_phase=/qa (role=qa per US-0069 / DEC-0051 phase->role matrix; fresh qa subagent per BUG-0006)
+- stop_condition=STOP after execute; orchestrator spawns /qa in fresh qa subagent per BUG-0006. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.
+
+## Sovereign-critic checkpoint — US-0125 / S0125 (2026-08-24T20:48:00Z UTC)
+
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=execute
+- producer_role=dev
+- producer_model_id=glm-5.2-high
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- fresh_context_marker=tl-US0125-sovereign-critic-execute-20260824T204800Z-fresh
+- timestamp=2026-08-24T20:48:00Z (UTC)
+- verdict=PASS (critic concurs with execute producer PASS — 0 blocking findings; anti_slop_aggregate=8)
+- producer_runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125
+- producer_proof_hash_recomputed=3A45F2563E0533E1D4558150FEC8F3723C95285331F007B4AF70B35D960B69C7 (matches state.md L1159 via Python hashlib sorted-key compact JSON)
+- independent_checks=pytest tests/us0125_contract_test.py 11/11 PASS; check_intake_template_parity --scope=opencode-adapter OK; backlog US-0125 OPEN L4329; acceptance L153 unchecked; .cursor/commands zero US-0125 refs; orchestrator.ts NOT mutated; template/.opencode/commands/auto.md 14 lines NOT cursor auto.md clone; clone-guard marker 2 PASS; auto spawn-literal marker 8 PASS
+- open_blocking_findings=0
+- anti_slop_aggregate=8
+- issue_keys=[ik_us0125_execute_pass_challenger_upheld, ik_us0125_execute_pass_layering_upheld, ik_us0125_execute_scope_minimal_pass]
+- residual_nb=full harness tests/run-tests.ps1 NOT run in execute; prior Pass:845 Fail:0 @ 19:17:58Z STALE — QA MUST refresh harness
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (3 lens rows appended), sprints/S0125/summary.md, handoffs/dev_to_qa.md, docs/engineering/state.md (this sovereign-critic checkpoint append-bottom — never truncate), handoffs/resume_brief.md (sovereign-critic PASS prepend -> /qa role=qa)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 (units=1 archived); --check exit 0 post-rollover
+- next_scheduled_phase=/qa (role=qa per US-0069 / DEC-0051; fresh qa subagent per BUG-0006)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /qa in fresh qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /qa from sovereign-critic.
+
+
+## QA checkpoint - US-0125 / S0125 (2026-08-24T21:30:00Z UTC)
+
+- phase_id=qa
+- role=qa
+- story_id=US-0125
+- sprint_id=S0125
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=build+verify
+- model_id=glm-5.2-high (CROSS_MODEL_REVIEW=1 - required)
+- fresh_context_marker=qa-US0125-qa-20260824T213000Z-fresh (NEW - not reused from execute or sovereign-critic)
+- timestamp=2026-08-24T21:30:00Z (UTC)
+- verdict=FAIL - full harness Pass:841 / Fail:4 (hard gate violation; 2 blocking root causes; 4 [FAIL] rows at report L784, L805, L814, L815)
+- blocking_findings=2
+  - B-1: architecture.md `# US-0090` section (L34) missing `US-0085` linkage (test_caveman_compress_input_architecture_linkage token=US-0085); pre-existing gap, NOT a US-0125 regression (US-0125 did not touch architecture.md)
+  - B-2: US-0124 (DONE, user_visible:true) missing from root README `## Commands and workflow` + developer README `## Quality gates`; pre-existing US-0124 release-gate backfill, NOT a US-0125 regression (US-0125 did not touch root README, developer README, or backlog)
+- us0125_own_contract=11/11 PASS (pytest tests/us0125_contract_test.py -v); opencode-adapter parity OK; triad --check exit 0; metadata guard exit 0; 5/5 byte-identical pairs MATCH; 15 command files <= 20 lines; auto.md dispatch-only; .cursor/commands zero US-0125 refs; orchestrator.ts zero US-0125 refs; architecture `# US-0125` (L1836) before `# US-0089` (L2103)
+- full_harness=tests/run-tests.ps1 exit 1; tests/report.md Pass:841 Fail:4 @ 2026-08-24T20:51:58Z; rg "\[FAIL\]" = 4 matches (L784, L805, L814, L815)
+- backlog_status=OPEN (US-0045 - not mutated)
+- ac_checkboxes=unchecked (US-0045 - not mutated)
+- intake_json=NOT mutated
+- architecture_md=NOT mutated by US-0125 (B-1 is pre-existing; dev loop-2 will remediate)
+- cursor_commands=NOT mutated (AC-9 upheld)
+- orchestrator_ts=NOT mutated (US-0124 owned)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; will re-check post-append
+- next_scheduled_phase=/execute (role=dev per US-0069 / DEC-0051; fresh dev subagent per BUG-0006) to remediate B-1 and B-2
+- stop_condition=STOP after qa. Orchestrator spawns /execute in fresh dev subagent per BUG-0006. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /execute from qa.
+
+### Strict runtime proof (DEC-0038)
+
+- runtime_proof_id=rp-auto-20260824-02-qa-qa-20260824T213000Z-US-0125
+- proof_issued_at=2026-08-24T21:30:00Z
 - proof_ttl_seconds=3600
-- proof_ttl=2026-07-07T22:55:00Z (UTC)
+- proof_ttl=2026-08-24T22:30:00Z (UTC)
+- proof_hash=65A96BF541C856A2E74EE96573D7C77CE4E47D2F7D91C3634DE31F2E55F98358
+- canonical_payload={"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"qa","proof_issued_at":"2026-08-24T21:30:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260824-02-qa-qa-20260824T213000Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}
+- prior_phase_proof_consumed=rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125 (hash=3A45F2563E0533E1D4558150FEC8F3723C95285331F007B4AF70B35D960B69C7, ttl=2026-08-24T22:00:00Z - consumed before RUNTIME_PROOF_STALE)
 
-### Decision gate
+- evidence_ref=sprints/S0125/qa-findings.md, handoffs/qa_to_dev.md (FAIL prepend), tests/report.md (Pass:841 Fail:4 @ 2026-08-24T20:51:58Z), docs/engineering/state.md (this qa checkpoint append-bottom - never truncate)
 
-- decision_gate=false
-- stop_conditions_met=yes
-- Sprint plan generated (10 tasks, within SPRINT_MAX_TASKS=12)
-- All 12 ACs covered by 10 test markers (surjective)
-- Compose guards 6/6 UNCHANGED
-- DC check clean
-- 10/10 Q LOCKED, 8/8 R ACCEPTED, A1 locked
-- plan-verify merged into qa per ultra_lean
+## Sovereign-critic checkpoint — US-0125 / S0125 / auto-20260824-02 (qa producer FAIL — critic concurs → /execute loop-2)
 
-### Sovereign memory note
-
-assemble_sovereign_memory_digest(...) NOT called. No write to mistakes.jsonl.
+- **phase_id**: sovereign-critic, **role**: tech-lead (critic), **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `producer_phase_id=qa`, `producer_role=qa`, `producer_model_id=glm-5.2-high`
+- `critic_model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `producer_verdict=FAIL (blocking)`
+- `verdict=PASS` (critic concurs with QA FAIL — tests/report.md Pass:841 Fail:4 + B-1 architecture.md # US-0090 missing US-0085 linkage + B-2 validate_readme_feature_coverage US-0124 catalog gap correctly blocked; US-0125 scope 11/11 PASS; QA did not rubber-stamp; 0 critic blocking findings; anti_slop_aggregate=8)
+- `decision_gate=false`
+- `status=OPEN` (do not mark US-0125 DONE)
+- `fresh_context_marker=tl-US0125-sovereign-critic-qa-20260824T215800Z-fresh`
+- `timestamp (UTC)=2026-08-24T21:58:00Z`
+- `open_blocking_findings=2` (QA B-1 US-0085 architecture linkage; QA B-2 US-0124 README coverage — pre-existing, dev-owned loop-2)
+- `issue_keys=[ik_us0125_qa_fail_harness_blockers_correct, ik_us0125_qa_fail_routing_upheld, ik_us0125_qa_fail_not_rubberstamp]`
+- `independent_checks=tests/report.md Fail:4 confirmed (L784,L805,L814,L815); pytest tests/us0125_contract_test.py 11/11 PASS; triad --check exit 0 pre- and post-append; sovereign_critic_validate.py --enforce OK`
+- `non_blocking_carry_forwards=0`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125qa-challenger-001, a0125qa-architect-002, a0125qa-subtractor-003) + sprints/S0125/qa-findings.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /execute role=dev loop-2)`
 
 ### Next scheduled phase
 
-- next_scheduled_phase=/execute (dev role, first phase of build+verify macro per ultra_lean)
-- stop_condition=STOP after sprint-plan completes; hand off via artifacts only to /execute in fresh dev subagent per BUG-0006
+- `next_scheduled_phase=/execute` (role=dev; fresh subagent per BUG-0006; AUTO_IMPLEMENTATION_LOOP=1 loop-2)
+- `next_scheduled_role=dev`
+- `stop_condition=STOP after sovereign-critic; orchestrator spawns /execute in fresh dev subagent (BUG-0006). Do NOT spawn /execute from sovereign-critic. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.`
 
-## Execute-phase error — US-0120 / S0120 / manual-20260707-us0120
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-- **phase_id**: execute
-- **role**: dev
-- **story_id**: US-0120
-- **sprint_id**: S0120
-- **orchestrator_run_id**: manual-20260707-us0120
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **timestamp**: 2026-07-07T21:16:00Z (UTC)
-- **verdict**: ERROR
-- **stop_reason**: error
-- **error_code**: EXECUTE_PHASE_ARTIFACTS_MISSING
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-qa-20260824T215800Z-fresh`, `timestamp=2026-08-24T21:58:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125qa-challenger-001, a0125qa-architect-002, a0125qa-subtractor-003) + sprints/S0125/qa-findings.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /execute role=dev loop-2)`
 
-### Error description
 
-Dev subagent spawned for /execute at 2026-07-07T21:16 UTC. Subagent returned without producing required execute-phase deliverables:
+## Execute loop-2 checkpoint (US-0125 / S0125) — 2026-08-24T21:07:10Z
 
-- `sprints/S0120/execute-summary.md` **NOT written** (Glob returned 0 files)
-- Execute-phase checkpoint **NOT appended** to `docs/engineering/state.md`
-- Runtime proof for execute phase **NOT issued**
-- `handoffs/resume_brief.md` **NOT refreshed** for /qa handoff
-
-Subagent returned prose referencing `/closure` phase content rather than structured execute output. Phase mandate violated (BUG-0006 / US-0069 / US-0048).
-
-### Required execute-phase artifacts (per contract)
-
-- `sprints/S0120/execute-summary.md` with task-level verdicts, test outcomes, cycle counts
-- Fresh `runtime_proof` with `proof_issued_at`, `proof_hash` per DEC-0038
-- Execute checkpoint in `docs/engineering/state.md` with phase_id=execute, role=dev, fresh_context_marker, isolation evidence, decision_gate, next_scheduled_phase=/qa
-- `handoffs/resume_brief.md` top pointer refreshed to next phase=/qa
-
-### Stop matrix application
-
-- `stop_reason=error` is **non-suppressible** per US-0088 / US-0092
-- `AUTO_IMPLEMENTATION_LOOP=1` applies to **test failures**, not execute-phase mandate violations
-- Phase artifacts are mandatory; missing artifacts = phase incomplete = hard stop
-- Orchestrator cannot re-spawn dev subagent for same phase without operator intervention (isolation evidence corrupted, TTL window ambiguous)
-
-### Next action (operator required)
-
-1. Operator must re-invoke `/auto` with fresh subagent for /execute phase
-2. Or manually resolve execute phase and resume at /qa
-3. `stop_condition=HALT after execute-phase error; operator intervention required`
-
-### Compose guards (6/6 UNCHANGED)
-
-No mutations to US-0043 / US-0045 / US-0040 / US-0048 / US-0056 / US-0096 surfaces.
-
-### Sovereign memory note
-
-`record_mistake_hook(...)` NOT called — subagent failure is not a detectable mistake_tag enum event (tags: fix_failed, revert_applied, plan_fidelity_violation, scope_creep). Subagent mandate violation is an orchestrator-level error, not a per-task implementation failure.
-
-## /auto materialization — US-0120 / S0120 / auto-20260708-01
-
-- **invocation_mode**: auto
-- **requested_start_from**: execute
-- **resolved_start_phase**: execute
-- **resolution_source**: argument
-- **resolution_status**: ok
-- **orchestrator_run_id**: auto-20260708-01
-- **story_id**: US-0120
-- **sprint_id**: S0120
-- **delivery_mode**: ultra_lean
-- **resolved_phase_plan**: `[execute, qa, verify-work, release, closure, refresh-context]` (intersected from build+verify + ship macros)
-- **reinstatement_mode**: none
-- **memory_layer**: pack
-- **native_chain_active**: true
-- **native_chain_continuing**: true
-- **outer_cycle_index**: 0
-- **timestamp**: 2026-07-08T19:20:00Z (UTC)
-- **operator_intervention**: explicit `start-from=execute` after prior EXECUTE_PHASE_ARTIFACTS_MISSING
-- **preflight**: phase_id=execute, role=dev, capability=dev (US-0069 / DEC-0051)
-- **next_action**: Task-spawn fresh dev subagent
-
-## Execute checkpoint — US-0120 / S0120 / auto-20260708-01
-
-- `phase_id=execute`
-- `role=dev`
-- `story_id=US-0120`
-- `sprint_id=S0120`
-- `orchestrator_run_id=auto-20260708-01`
-- `delivery_mode=ultra_lean`
-- `macro_phase=build+verify` (execute — first canonical phase within the build+verify macro per ultra_lean; plan-verify merged into qa per US-0096 / DEC-0082)
-- `fresh_context_marker=dev-US0120-execute-20260708T192500Z-fresh`
-- `timestamp=2026-07-08T19:25:00Z` (UTC)
-- `execute_summary_anchor=sprints/S0120/execute-summary.md`
-- `architecture_anchor=docs/engineering/architecture.md # US-0120 — Dedicated /closure phase for exclusive Story Closure responsibility (L2125, added in /architecture phase; T-anch NO-OP / verification in execute — no write)`
-- `sprint_anchor=sprints/S0120/sprint-plan.md`
-- `tasks_anchor=sprints/S0120/tasks.md`
-- `approach_locked=A1` (dedicated /closure phase, qe role, orchestrator rg verification)
-- `verdict=PASS`
-- `sprint_seeds=10` (T-anch + T-001..T-010)
-- `ac_coverage=12/12` (surjective via 10 test markers)
-- `implementation_loop_cycles=1`
-- `compose_guards=6/6 UNCHANGED` (US-0043/US-0045/US-0040/US-0048/US-0056/US-0096 verified read-only)
-- `test_markers=10 passed in 0.09s` (US-0120 closure phase contract tests)
-- `validator_results=GREEN` (validate_closure_verification --self-test PASS; check_intake_template_parity scope=us-0120 PASS; validate_doc_profile PASS; check-user-visible-metadata PASS; enforce-triad-hot-surface PRE-EXISTING oversize — not US-0120 regression)
-- `parity=PARITY_OK` (closure.md 8949/8949; release.md 29082/29082; auto.md 38089/38089; validate_closure_verification.py 9960/9960)
-- `model_id=inherit` (CROSS_MODEL_REVIEW=1)
+- `phase_id=execute`, `role=dev`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=dev-US0125-execute-loop2-20260824T210710Z-fresh` (NEW — not reused from execute-1 210000Z)
+- `timestamp=2026-08-24T21:07:10Z`
+- `orchestrator_run_id=auto-20260824-02`
+- `story_id=US-0125`, `sprint_id=S0125`
+- `verdict=PASS` (execute loop-2 — B-1 + B-2 fixed; tests/report.md Pass:845 Fail:0; zero [FAIL] rows; 11/11 us0125 contract markers PASS; validate_readme_feature_coverage PASS with US-0124 coverage_present)
 - `decision_gate=false`
-- `next_scheduled_phase=/qa` (role=qa per US-0069 / DEC-0051; second canonical phase of build+verify macro per ultra_lean)
+- `status=OPEN` (do not mark US-0125 DONE)
+- `intake_json=NOT mutated`
+- `loop_delta=B-1 architecture.md US-0090 section +US-0085 linkage sentence; B-2 US-0124 bullets added to docs/developer/README.md ## Workflow + ## Quality gates and root README.md ## Commands and workflow (byte-identical active <-> template pairs)`
+- `compose_guards=7/7 UNCHANGED (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087)`
+- `independent_checks=validate_readme_feature_coverage --report PASS (coverage_present US-0121,US-0122,US-0123,US-0124); check_intake_template_parity --scope readme-feature-coverage exit 0; check_intake_template_parity --scope project-readme exit 0; tests/run-tests.ps1 exit 0 (Pass:845 Fail:0); pytest tests/us0125_contract_test.py 11 passed; enforce-triad-hot-surface.py --check exit 0; README pairs byte-identical (SHA-256 match)`
+- `evidence_ref=sprints/S0125/summary.md (loop-2 note), sprints/S0125/progress.md (loop-2 note), handoffs/dev_to_qa.md (US-0125 loop-2 prepend), handoffs/resume_brief.md (execute loop-2 PASS -> /qa prepend), tests/report.md (Pass:845 Fail:0)`
 
-### Isolation evidence (US-0048 / DEC-0029)
+### Strict runtime proof (US-0056 / DEC-0038)
 
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0120-execute-20260708T192500Z-fresh`
-- `timestamp=2026-07-08T19:25:00Z` (UTC)
-- `evidence_ref=sprints/S0120/execute-summary.md` + `handoffs/dev_to_qa.md`
-- Dev subagent spawned fresh per BUG-0006 / US-0048 isolation; context limited to sprint artifacts and handoffs.
-- `assemble_sovereign_memory_digest(...)` NOT called (governance-only story; no mistakes.jsonl write).
-- Prior sprint-plan proof consumed: `rp-manual-20260707-us0120-sprint-plan-tl-20260707T215500Z-US-0120`.
+- `runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125` (loop-2, unique vs execute-1 210000Z)
+- `proof_issued_at=2026-08-24T21:07:10Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T22:07:10Z` (UTC)
+- `proof_hash=9a29423c0d4df7d61f3a3ee45a9884485eed52f5ee26916d712b8a476baeb807`
+- Canonical payload (sorted-key compact JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T21:07:10Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260708-01-execute-dev-20260708T192500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","orchestrator_run_id":"auto-20260708-01","phase_id":"execute","proof_issued_at":"2026-07-08T19:25:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260708-01-execute-dev-20260708T192500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=27f29683c4025b6085318e4acd59cb725e0548a270acb182c4cd69e5d7566eee` (SHA-256 of sorted-key JSON payload)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-08T20:25:00Z` (UTC = issued_at + 3600s)
+Prior phase proof consumed: `rp-auto-20260824-02-qa-qa-20260824T213000Z-US-0125` (proof_hash=65A96BF541C856A2E74EE96573D7C77CE4E47D2F7D91C3634DE31F2E55F98358, ttl 2026-08-24T22:30:00Z — consumed before RUNTIME_PROOF_STALE).
 
 ### Next scheduled phase
 
-- `next_scheduled_phase=/qa` (role=qa; fresh qa subagent per BUG-0006; creates plan-verify.json within build+verify per ultra_lean)
-- `stop_condition=STOP after execute completes; hand off via artifacts only to /qa`
+- `next_scheduled_phase=/qa` (role=qa per US-0069 / DEC-0051 phase->role matrix; fresh qa subagent per BUG-0006)
+- `next_scheduled_role=qa`
+- `stop_condition=STOP after execute loop-2; orchestrator spawns /qa in fresh qa subagent (BUG-0006). Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.`
 
-## QA checkpoint — US-0120 / S0120 / auto-20260708-01
 
-- `phase_id=qa` (merges plan-verify + execute QA + verify-work + UAT per ultra_lean / US-0096 / DEC-0082)
-- `role=qa`
-- `story_id=US-0120`
-- `sprint_id=S0120`
-- `orchestrator_run_id=auto-20260708-01`
-- `delivery_mode=ultra_lean`
-- `macro_phase=build+verify` (qa — second canonical phase within the build+verify macro per ultra_lean)
-- `fresh_context_marker=qa-US0120-qa-20260708T193500Z-fresh`
-- `timestamp=2026-07-08T19:35:00Z` (UTC)
-- `model_id=inherit` (CROSS_MODEL_REVIEW=1)
-- `plan_verify_anchor=sprints/S0120/plan-verify.json`
-- `qa_findings_anchor=sprints/S0120/qa-findings.md`
-- `verify_work_findings_anchor=sprints/S0120/verify-work-findings.md`
-- `uat_anchor=sprints/S0120/uat.json + sprints/S0120/uat.md`
-- `execute_summary_anchor=sprints/S0120/execute-summary.md`
-- `sprint_anchor=sprints/S0120/sprint-plan.md`
-- `architecture_anchor=docs/engineering/architecture.md # US-0120 — Dedicated /closure phase for exclusive Story Closure responsibility (L2125, added in /architecture phase; T-anch NO-OP / verification in execute — no write)`
-- `approach_locked=A1` (dedicated /closure phase, qe role, orchestrator rg verification)
-- `verdict=QA_PASS`
-- `ac_coverage=12/12` (surjective via 10 contract test markers)
-- `test_results=10 passed in 0.09s` (tests/us0120_closure_phase_test.py independent QA re-run)
-- `validator_results=GREEN` (validate_closure_verification --self-test PASS; check_intake_template_parity scope=us-0120 PASS; validate_doc_profile PASS; check-user-visible-metadata PASS; enforce-triad-hot-surface PRE-EXISTING oversize — not US-0120 regression)
-- `parity=PARITY_OK` (closure.md 8949/8949; release.md 29082/29082; auto.md 38089/38089; validate_closure_verification.py 9960/9960)
-- `compose_guards=6/6 UNCHANGED` (US-0043/US-0045/US-0040/US-0048/US-0056/US-0096 verified read-only)
-- `uat_verdict=PASS` (12/12 steps pass; governance-doc contract-test verification)
-- `blocking_findings=0`
-- `non_blocking_findings=3` (NB-1 triad oversize pre-existing; NB-2 T-anch NO-OP; NB-3 OPEN/`[ ]` retained for /closure post-release)
-- `ready_for_release=true`
-- `decision_gate=false`
-- `next_scheduled_phase=/release` (role=release per US-0069 / DEC-0051; ship macro first canonical phase per ultra_lean)
+## Sovereign-critic checkpoint — US-0125 / S0125 execute loop-2 (2026-08-24T21:15:00Z UTC)
+
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=execute (loop-2)
+- producer_role=dev
+- producer_model_id=glm-5.2-high
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- fresh_context_marker=tl-US0125-sovereign-critic-execute-loop2-20260824T211500Z-fresh
+- timestamp=2026-08-24T21:15:00Z (UTC)
+- verdict=PASS (critic concurs with execute loop-2 producer PASS — 0 blocking findings; anti_slop_aggregate=8)
+- producer_runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125
+- producer_proof_hash_recomputed=9a29423c0d4df7d61f3a3ee45a9884485eed52f5ee26916d712b8a476baeb807 (matches state.md L1182 + dev_to_qa.md via Python hashlib sorted-key compact JSON)
+- independent_checks=tests/report.md Pass:845 Fail:0 @ 2026-08-24T21:04:51Z; zero [FAIL] rows; validate_readme_feature_coverage PASS coverage_present=[US-0121,US-0122,US-0123,US-0124] US-0125 absent; architecture.md ## US-0090 contains US-0085 token; US-0124 in README.md + docs/developer/README.md; pytest tests/us0125_contract_test.py 11/11 PASS; backlog US-0125 OPEN L4329; acceptance L153 unchecked
+- open_blocking_findings=0
+- anti_slop_aggregate=8
+- issue_keys=[ik_us0125_execute_loop2_pass_challenger, ik_us0125_execute_loop2_pass_layering, ik_us0125_execute_loop2_scope_minimal]
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125ex2sc-challenger-001, a0125ex2sc-architect-002, a0125ex2sc-subtractor-003) + tests/report.md + handoffs/dev_to_qa.md (loop-2 prepend) + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /qa role=qa)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0; --check exit 0 post-rollover
+- next_scheduled_phase=/qa (role=qa per US-0069 / DEC-0051; fresh qa subagent per BUG-0006)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /qa in fresh qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /qa from sovereign-critic.
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-execute-loop2-20260824T211500Z-fresh`, `timestamp=2026-08-24T21:15:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125ex2sc-challenger-001, a0125ex2sc-architect-002, a0125ex2sc-subtractor-003) + tests/report.md + handoffs/dev_to_qa.md (loop-2 prepend) + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /qa role=qa)`
+
+
+## QA checkpoint - US-0125 / S0125 qa loop-2 (2026-08-24T22:00:00Z UTC)
+
+- phase_id=qa
+- role=qa
+- story_id=US-0125
+- sprint_id=S0125
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=build+verify
+- AUTO_IMPLEMENTATION_LOOP=1 (cycle 2 complete: dev fixed B-1 + B-2 -> sovereign-critic PASS -> /qa loop-2 PASS -> /verify-work)
+- fresh_context_marker=qa-US0125-qa-20260824T220000Z-fresh (NEW - not reused from qa-1 213000Z or execute loop-2)
+- timestamp=2026-08-24T22:00:00Z (UTC)
+- model_id=glm-5.2-high (CROSS_MODEL_REVIEW=1 - required)
+- producer_model_id=glm-5.2-high (dev / execute loop-2)
+- verdict=PASS (loop-2) - B-1 + B-2 closed; canonical harness tests/report.md Pass:845 / Fail:0 literal @ 2026-08-24T21:04:51Z; zero [FAIL] rows; 11/11 us0125 contract markers PASS (independent re-run); validate_readme_feature_coverage PASS coverage_missing=[] (US-0125 absent - OPEN); no fake browser PASS (non-browser plugin contract story)
+- blocking_count=0
+- non_blocking_count=0
+- producer_runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125
+- producer_proof_hash=9a29423c0d4df7d61f3a3ee45a9884485eed52f5ee26916d712b8a476baeb807
+- producer_proof_ttl=2026-08-24T22:07:10Z (consumed before expiry - OK)
+- independent_checks=tests/report.md Pass:845 Fail:0 @ 2026-08-24T21:04:51Z; zero [FAIL] rows; pytest tests/us0125_contract_test.py 11/11 PASS; validate_readme_feature_coverage PASS coverage_present=[US-0121,US-0122,US-0123,US-0124] US-0125 absent; check_intake_template_parity --scope=readme-feature-coverage OK; enforce-triad-hot-surface.py --check exit 0; architecture.md L36 # US-0090 contains US-0085 token; backlog US-0125 OPEN; acceptance unchecked; intake JSON not mutated
+- b1_closure=architecture.md L36 # US-0090 section now contains "See `# US-0085` for context fresh-context markers." (US-0085 token present in arch[arch.find("# US-0090"):] slice)
+- b2_closure=validate_readme_feature_coverage PASS coverage_missing=[] coverage_present=[US-0121,US-0122,US-0123,US-0124] (US-0124 added to docs/developer/README.md ## Workflow + ## Quality gates and root README.md ## Commands and workflow by execute loop-2; byte-identical active<->template pairs)
+- uat_classification=non-browser plugin contract story; no browser-surface UAT; UAT artifacts remain placeholder per DEC-0009; /verify-work owns placeholder->populated transition
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append (no rollover triggered; Active context surface preserved)
+- evidence_ref=sprints/S0125/qa-findings.md (loop-2 prepend), handoffs/qa_to_verify.md (PASS handoff prepend), tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z), docs/engineering/state.md (this checkpoint append-bottom - never truncate), handoffs/resume_brief.md (qa loop-2 PASS prepend -> /verify-work)
+- next_scheduled_phase=/verify-work (role=qa per US-0069 / DEC-0051; fresh qa subagent per BUG-0006)
+- stop_condition=STOP after qa loop-2. Orchestrator spawns /verify-work in fresh qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /verify-work from this qa subagent.
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- phase_id=qa, role=qa, model_id=glm-5.2-high (CROSS_MODEL_REVIEW=1 - required)
+- fresh_context_marker=qa-US0125-qa-20260824T220000Z-fresh, timestamp=2026-08-24T22:00:00Z
+- evidence_ref=sprints/S0125/qa-findings.md (loop-2 prepend), handoffs/qa_to_verify.md (PASS handoff prepend), tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z), docs/engineering/state.md (this checkpoint append-bottom - never truncate), handoffs/resume_brief.md (qa loop-2 PASS prepend -> /verify-work)
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- orchestrator_run_id=auto-20260824-02
+- runtime_proof_id=rp-auto-20260824-02-qa-qa-20260824T220000Z-US-0125 (loop-2, unique vs qa-1 213000Z)
+- phase_id=qa, role=qa, story_id=US-0125, sprint_id=S0125
+- proof_issued_at=2026-08-24T22:00:00Z
+- proof_ttl_seconds=3600, proof_ttl=2026-08-24T23:00:00Z (UTC)
+- proof_hash=591B6F44D3A311D17083D90AAF1D9A740F45826D63D38C48042FF160139E9AE2
+- canonical_payload={"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"qa","proof_issued_at":"2026-08-24T22:00:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260824-02-qa-qa-20260824T220000Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}
+- prior_phase_proof_consumed=rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125 (proof_hash=9a29423c0d4df7d61f3a3ee45a9884485eed52f5ee26916d712b8a476baeb807, ttl 2026-08-24T22:07:10Z - consumed before RUNTIME_PROOF_STALE)
+
+
+## Sovereign-critic checkpoint — US-0125 / S0125 qa loop-2 (2026-08-24T21:22:00Z UTC)
+
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=qa (loop-2)
+- producer_role=qa
+- producer_model_id=glm-5.2-high
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- fresh_context_marker=tl-US0125-sovereign-critic-qa-loop2-20260824T212200Z-fresh
+- timestamp=2026-08-24T21:22:00Z (UTC)
+- verdict=PASS (critic concurs with qa loop-2 producer PASS — 0 blocking findings; anti_slop_aggregate=8)
+- producer_runtime_proof_id=rp-auto-20260824-02-qa-qa-20260824T220000Z-US-0125
+- producer_proof_hash_recomputed=591B6F44D3A311D17083D90AAF1D9A740F45826D63D38C48042FF160139E9AE2 (matches qa_to_verify.md + state.md via Python hashlib sorted-key compact JSON)
+- independent_checks=tests/report.md Pass:845 Fail:0 @ 2026-08-24T21:04:51Z; zero [FAIL] rows; validate_readme_feature_coverage PASS coverage_missing=[] coverage_present=[US-0121,US-0122,US-0123,US-0124] US-0125 absent; architecture.md ## US-0090 L36 contains US-0085 token; B-1+B-2 loop-1 blockers closed; backlog US-0125 OPEN; acceptance L153 unchecked; intake JSON NOT mutated
+- open_blocking_findings=0
+- anti_slop_aggregate=8
+- issue_keys=[ik_us0125_qa2_pass_challenger, ik_us0125_qa2_pass_layering, ik_us0125_qa2_pass_scope_minimal]
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125qa2-challenger-001, a0125qa2-architect-002, a0125qa2-subtractor-003) + sprints/S0125/qa-findings.md (loop-2 prepend) + handoffs/qa_to_verify.md (loop-2 PASS prepend) + tests/report.md + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /verify-work role=qa)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append
+- next_scheduled_phase=/verify-work (role=qa per US-0069 / DEC-0051; fresh qa subagent per BUG-0006)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /verify-work in fresh qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /verify-work from sovereign-critic.
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-qa-loop2-20260824T212200Z-fresh`, `timestamp=2026-08-24T21:22:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125qa2-challenger-001, a0125qa2-architect-002, a0125qa2-subtractor-003) + sprints/S0125/qa-findings.md (loop-2 prepend) + handoffs/qa_to_verify.md (loop-2 PASS prepend) + tests/report.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /verify-work role=qa)`
+
+## Verify-work checkpoint - US-0125 / S0125 (2026-08-24T22:35:00Z UTC)
+
+- **phase_id**: verify-work, **role**: qa, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=build+verify`, `CROSS_MODEL_REVIEW=1`
+- `AUTO_IMPLEMENTATION_LOOP=1` (cycle 2 complete: dev fixed B-1 + B-2 -> sovereign-critic PASS -> qa loop-2 PASS -> sovereign-critic PASS -> verify-work PASS -> /release)
+- `fresh_context_marker=qa-US0125-verify-work-20260824T223500Z-fresh` (NEW ? not reused from qa loop-2 `qa-US0125-qa-20260824T220000Z-fresh`)
+- `timestamp=2026-08-24T22:35:00Z` (UTC)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 ? required on isolation)
+- `producer_phase_id=qa`, `producer_role=qa`, `producer_model_id=glm-5.2-high`
+- `producer_runtime_proof_id=rp-auto-20260824-02-qa-qa-20260824T220000Z-US-0125`
+- `producer_proof_hash=591B6F44D3A311D17083D90AAF1D9A740F45826D63D38C48042FF160139E9AE2` (independently recomputed via Python hashlib sorted-key compact JSON ? match confirmed)
+- `producer_proof_ttl=2026-08-24T23:00:00Z` (consumed @ 2026-08-24T22:35:00Z ? before RUNTIME_PROOF_STALE)
+- `verdict=PASS (verify-work)` ? 11/11 UAT steps PASS; 11/11 us0125 contract-test markers PASS (independent re-run in 0.45s, exit 0); opencode-adapter parity PASS; README feature coverage PASS coverage_missing=[] (US-0125 absent ? OPEN, not in coverage set); triad --check PASS (no rollover triggered; Active context surface preserved); canonical harness `tests/report.md` Pass:845 / Fail:0 literal @ 2026-08-24T21:04:51Z (not re-run ? no product/tests edits by /verify-work); zero `[FAIL]` rows; no fake browser PASS (non-browser plugin/command contract story)
+- `status=OPEN` (do not mark US-0125 DONE ? US-0045; do not tick acceptance; do not mutate intake JSON)
+- `independent_checks=pytest tests/us0125_contract_test.py 11/11 PASS in 0.45s (exit 0); check_intake_template_parity --scope=opencode-adapter exit 0 [INTAKE_TEMPLATE_PARITY_OK]; validate_readme_feature_coverage --report PASS coverage_missing=[] coverage_present=[US-0121,US-0122,US-0123,US-0124] US-0125 absent; enforce-triad-hot-surface.py --check exit 0; tests/report.md Pass:845 Fail:0 literal @ 2026-08-24T21:04:51Z; rg "[FAIL]" tests/report.md 0 matches`
+- `uat_lifecycle=placeholder -> populated` (DEC-0009; QA owns transition; sprints/S0125/uat.json + uat.md populated with 11 steps, 11 pass, 0 fail)
+- `evidence_ref=sprints/S0125/uat.json (populated) + sprints/S0125/uat.md (populated) + tests/us0125_contract_test.py (11/11 PASS re-run) + tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z) + docs/engineering/state.md (this checkpoint append-bottom ? never truncate) + handoffs/resume_brief.md (verify-work PASS -> /release prepend)`
+- `next_scheduled_phase=/release` (role=release; fresh subagent per BUG-0006)
+- `stop_condition=STOP after /verify-work; orchestrator spawns /release in fresh release subagent (BUG-0006). Do NOT spawn /release from this qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.`
+- `compose_guards=7/7 UNCHANGED` (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087 ? additive only)
+- `backlog_status=OPEN` (US-0045 ? not mutated; L4329)
+- `ac_checkboxes=unchecked` (US-0045 ? not mutated; L153)
+- `intake_json=NOT mutated`
+- `architecture_md=NOT mutated by US-0125` (B-1 fix was execute loop-2; verify-work makes no product edits)
+- `cursor_commands=NOT mutated` (AC-9 upheld)
+- `orchestrator_ts=NOT mutated` (US-0124 owned)
+- `full_harness=NOT re-run by /verify-work` (no product/tests edits this phase; report @ 2026-08-24T21:04:51Z is current vs execute loop-2 product/test changes ? fixes applied before 21:04:51Z harness run)
+- `triad=enforce-triad-hot-surface.py --check exit 0 pre-append (no rollover triggered; Active context surface preserved)`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260824-02-verify-work-qa-20260824T223500Z-US-0125` (unique ? distinct from execute loop-2 and qa loop-2 proof ids)
+- `phase_id=verify-work`, `role=qa`, `story_id=US-0125`, `sprint_id=S0125`
+- `proof_issued_at=2026-08-24T22:35:00Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T23:35:00Z`
+- `proof_hash=7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312`
+- Canonical payload (sorted-key compact JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"verify-work","proof_issued_at":"2026-08-24T22:35:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260824-02-verify-work-qa-20260824T223500Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on the exact canonical payload above yields `7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312` ? byte-identical match)
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=verify-work`, `role=qa`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 ? required)
+- `fresh_context_marker=qa-US0125-verify-work-20260824T223500Z-fresh` (NEW per US-0048 / BUG-0006; marker reuse = stale isolation evidence; not reused from qa loop-2)
+- `timestamp=2026-08-24T22:35:00Z` (UTC)
+- Fresh qa subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053): handoffs/dev_to_qa.md, sprints/S0125/summary.md, sprints/S0125/qa-findings.md, sprints/S0125/uat.json (placeholder), sprints/S0125/uat.md (placeholder), sprints/S0124/uat.json + uat.md (pattern), tests/us0125_contract_test.py, docs/product/acceptance.md (US-0125 row L153 ? read-only), .cursor/commands/verify-work.md. No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no architecture.md mutation, no DEC-0125 mutation, no orchestrator.ts mutation, no .cursor/commands/*.md mutation, no README coverage mutation (US-0125 OPEN).
+- `evidence_ref=sprints/S0125/uat.json (populated) + sprints/S0125/uat.md (populated) + tests/us0125_contract_test.py (11/11 PASS re-run) + tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z) + docs/engineering/state.md (this checkpoint append-bottom) + handoffs/resume_brief.md (verify-work PASS -> /release prepend)`
+
+### Traceability (DEC-0010) ? US-0125 PASS
+
+| Story | Sprint | Tasks | Status | Evidence |
+|---|---|---|---|---|
+| US-0125 | S0125 | T-anch + T-001..T-009 (10 tasks) | PASS | sprints/S0125/uat.json (11/11 UAT steps PASS), sprints/S0125/uat.md (populated), sprints/S0125/summary.md, sprints/S0125/qa-findings.md (loop-2 PASS), tests/us0125_contract_test.py (11/11 PASS re-run @ 2026-08-24T22:35:00Z), tests/report.md (Pass:845 Fail:0 @ 2026-08-24T21:04:51Z) |
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/release` (role=release per US-0069 / DEC-0051 phase->role matrix; fresh release subagent per BUG-0006)
 - `next_scheduled_role=release`
-- `next_scheduled_sprint_macro=ship`
-- `stop_condition=STOP after qa completes; hand off via artifacts only to /release in fresh release subagent (BUG-0006)`
+- `stop_condition=STOP after /verify-work. Hand off via artifacts only to /release in fresh release subagent per BUG-0006. Do NOT spawn /release from this qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.`
 
-### Isolation evidence (US-0048 / DEC-0029)
+## Sovereign-critic checkpoint — US-0125 / S0125 verify-work (2026-08-24T22:40:00Z UTC)
 
-- `phase_id=qa`
-- `role=qa`
-- `fresh_context_marker=qa-US0120-qa-20260708T193500Z-fresh`
-- `timestamp=2026-07-08T19:35:00Z` (UTC)
-- `evidence_ref=sprints/S0120/qa-findings.md + sprints/S0120/plan-verify.json + sprints/S0120/verify-work-findings.md + sprints/S0120/uat.json + sprints/S0120/uat.md`
-- QA subagent spawned fresh per BUG-0006 / US-0048 isolation; context limited to sprint artifacts and handoffs.
-- Prior execute-phase strict proof consumed: `rp-auto-20260708-01-execute-dev-20260708T192500Z-US-0120` (proof_hash=27f29683c4025b6085318e4acd59cb725e0548a270acb182c4cd69e5d7566eee).
-- Verify-work merged into qa per ultra_lean — single isolation marker covers plan-verify + qa + verify-work + UAT.
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=verify-work
+- producer_role=qa
+- producer_model_id=glm-5.2-high
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=build+verify
+- fresh_context_marker=tl-US0125-sovereign-critic-verify-work-20260824T224000Z-fresh
+- timestamp=2026-08-24T22:40:00Z (UTC)
+- verdict=PASS (critic concurs with verify-work producer PASS — 11/11 UAT steps PASS; 11/11 contract markers PASS; 0 blocking findings; anti_slop_aggregate=8)
+- producer_runtime_proof_id=rp-auto-20260824-02-verify-work-qa-20260824T223500Z-US-0125
+- producer_proof_hash_recomputed=7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312 (matches uat.json + state.md via Python hashlib sorted-key compact JSON)
+- producer_proof_ttl=2026-08-24T23:35:00Z
+- independent_checks=pytest tests/us0125_contract_test.py 11/11 PASS in 0.40s (critic re-run); sprints/S0125/uat.json populated 11/11 PASS; tests/report.md Pass:845 Fail:0 @ 2026-08-24T21:04:51Z; zero [FAIL] rows; validate_readme_feature_coverage PASS coverage_missing=[] US-0125 absent; browser_probe_used=false; backlog US-0125 OPEN L4329; acceptance L153 unchecked; intake JSON NOT mutated
+- open_blocking_findings=0
+- anti_slop_aggregate=8 (challenger=8, architect=8, subtractor=8)
+- issue_keys=[ik_us0125_verify_work_pass_live_pytest_upheld, ik_us0125_verify_work_artifact_isolation_compliance, ik_us0125_verify_work_scope_stop_discipline]
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125vw-challenger-001, a0125vw-architect-002, a0125vw-subtractor-003) + sprints/S0125/uat.json (populated) + sprints/S0125/uat.md (populated) + tests/us0125_contract_test.py (11/11 PASS critic re-run) + tests/report.md + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /release role=release)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 (units=1 archived to state-pack); --check exit 0 post-rollover; Active context surface preserved
+- next_scheduled_phase=/release (role=release per US-0069 / DEC-0051; fresh release subagent per BUG-0006)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /release in fresh release subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /release from sovereign-critic.
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-- `runtime_proof_id=rp-auto-20260708-01-qa-qa-20260708T193500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","orchestrator_run_id":"auto-20260708-01","phase_id":"qa","proof_issued_at":"2026-07-08T19:35:00Z","proof_ttl_seconds":3600,"role":"qa","runtime_proof_id":"rp-auto-20260708-01-qa-qa-20260708T193500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=26919585da78fb45f4d2639c1b9f9968c8f06cdcd07ed5c0c03a9bfabcf8da5e` (SHA-256 of sorted-key JSON payload)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-08T20:35:00Z` (UTC = issued_at + 3600s)
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-verify-work-20260824T224000Z-fresh`, `timestamp=2026-08-24T22:40:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125vw-challenger-001, a0125vw-architect-002, a0125vw-subtractor-003) + sprints/S0125/uat.json (populated) + sprints/S0125/uat.md (populated) + tests/us0125_contract_test.py (11/11 PASS critic re-run) + tests/report.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend -> /release role=release)`
 
-### Traceability index (DEC-0010)
+## Release checkpoint — US-0125 / S0125 (2026-08-24T21:33:00Z UTC)
 
-| Story | Status | Evidence |
-|-------|--------|----------|
-| US-0120 | PASS | sprints/S0120/uat.json, sprints/S0120/qa-findings.md, sprints/S0120/execute-summary.md |
+- **phase_id**: release, **role**: release, **story_id**: US-0125, **sprint_id**: S0125
+- **orchestrator_run_id**: auto-20260824-02
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship (release is phase 1 of 3: release → closure → refresh-context per DEC-0082)
+- **model_id**: composer-2.5-fast (CROSS_MODEL_REVIEW=1 — required)
+- **fresh_context_marker**: rel-US0125-release-20260824T213300Z-fresh (NEW — not reused from execute/qa/verify-work/sovereign-critic)
+- **timestamp**: 2026-08-24T21:33:00Z (UTC)
+- **verdict**: RELEASE_PASS (1st attempt) — all mandatory release gates (1, 2, 3, 4, 4b) green; queue row S0125 = `released`
+- **status**: OPEN (do not mark US-0125 DONE — closure owns per US-0120 / DEC-0082; do not tick acceptance; do not mutate intake JSON)
+- **gate_snapshot**: check_in_tests=PASS (tests/report.md Pass:845 Fail:0 literal @ 2026-08-24T21:04:51Z; zero [FAIL] rows; metadata guard L712–L717; harness not re-run); qa=PASS (loop-2; 0 blockers); uat=PASS (11/11 populated); isolation=PASS (execute loop-2 + qa loop-2 + verify-work with model_id); strict_runtime_proof=PASS (verify-work proof consumed before TTL)
+- **publish_snapshot**: skipped_pending_operator_confirm (RELEASE_PUBLISH_MODE=confirm; RELEASE_PUBLISH_AUTO_CONFIRM=0 → PUBLISH_CONFIRMATION_REQUIRED)
+- **push_decision**: not_eligible (SYNC_POLICY_MODE=disabled → reason_code=SYNC_DISABLED)
+- **independent_checks**: tests/report.md L5 Fail:0 literal; rg "[FAIL]" 0 matches; check-user-visible-metadata.py exit 0; enforce-triad-hot-surface.py --check exit 0; verify-work proof_hash 7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312 recomputed match; backlog US-0125 OPEN L4329; acceptance L153 unchecked; intake JSON NOT mutated
+- **evidence_ref**: sprints/S0125/release-findings.md + handoffs/releases/S0125-release-notes.md + handoffs/release_queue.md (S0125 row released) + handoffs/release_notes.md (legacy pointer) + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (release PASS prepend → /closure role=qe)
+- **compose_guards**: 7/7 UNCHANGED (US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087)
+- **next_scheduled_phase**: /closure (role=qe per US-0069 / DEC-0051; fresh qe subagent per BUG-0006)
+- **stop_condition**: STOP after release. Orchestrator spawns /closure in fresh qe subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /closure from release subagent.
 
-### Next scheduled phase
+### Strict runtime proof (US-0056 / DEC-0038)
 
-- `next_scheduled_phase=/release` (role=release; fresh release subagent per BUG-0006)
-- `stop_condition=STOP after qa completes; hand off via artifacts only to /release`
+- `runtime_proof_id=rp-auto-20260824-02-release-release-20260824T213300Z-US-0125` (unique — distinct from verify-work, qa loop-2, execute loop-2 proof ids)
+- `phase_id=release`, `role=release`, `story_id=US-0125`, `sprint_id=S0125`
+- `proof_issued_at=2026-08-24T21:33:00Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T22:33:00Z`
+- `proof_hash=CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC`
+- Canonical payload (sorted-key compact JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","model_id":"composer-2.5-fast","orchestrator_run_id":"auto-20260824-02","phase_id":"release","proof_issued_at":"2026-08-24T21:33:00Z","proof_ttl_seconds":3600,"role":"release","runtime_proof_id":"rp-auto-20260824-02-release-release-20260824T213300Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on exact canonical payload yields `CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC` — byte-identical match)
+- Prior phase proof consumed: `rp-auto-20260824-02-verify-work-qa-20260824T223500Z-US-0125` (proof_hash=7278CD174376E4AC82670406BE664DF181D7471F09174DC619B6DC84478F0312, ttl 2026-08-24T23:35:00Z — consumed before RUNTIME_PROOF_STALE)
 
-## Release checkpoint — US-0120 / S0120 / auto-20260708-01
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-- `phase_id=release` (first canonical phase of `ship` macro per ultra_lean / DEC-0082)
-- `role=release`
-- `story_id=US-0120`
-- `sprint_id=S0120`
-- `orchestrator_run_id=auto-20260708-01`
-- `delivery_mode=ultra_lean`
-- `macro_phase=ship` (release — first of three ship phases: release → closure → refresh-context)
-- `fresh_context_marker=release-US0120-release-20260708T194500Z-fresh`
-- `timestamp=2026-07-08T19:45:00Z` (UTC)
-- `release_findings_anchor=sprints/S0120/release-findings.md`
-- `release_verdict_anchor=sprints/S0120/release-verdict.json`
-- `sprint_release_notes_anchor=handoffs/releases/S0120-release-notes.md`
-- `release_queue_anchor=handoffs/release_queue.md` (S0120 row status=released)
-- `qa_findings_anchor=sprints/S0120/qa-findings.md`
-- `verify_work_findings_anchor=sprints/S0120/verify-work-findings.md`
-- `uat_anchor=sprints/S0120/uat.json + sprints/S0120/uat.md`
-- `execute_summary_anchor=sprints/S0120/execute-summary.md`
-- `verdict=RELEASE_PASS`
-- `ac_coverage=12/12`
-- `qa_verdict=PASS`
-- `verify_work_verdict=PASS`
-- `uat_verdict=PASS` (12/12)
-- `test_results=10 passed in 0.08s` (tests/us0120_closure_phase_test.py independent release re-run)
-- `validator_results=GREEN` (validate_closure_verification --self-test PASS; check_intake_template_parity scope=us-0120 PASS; validate_readme_feature_coverage PASS; validate_project_readme_coverage kit_repo_skipped; validate_doc_profile PASS; check-user-visible-metadata PASS)
-- `parity=PARITY_OK` (closure.md 8949/8949; release.md 29082/29082; auto.md 38089/38089; validate_closure_verification.py 9960/9960)
-- `compose_guards=6/6 UNCHANGED` (US-0043/US-0045/US-0040/US-0048/US-0056/US-0096)
-- `story_closed=false` (deferred to `/closure` per US-0120 design)
-- `acceptance_checked=false` (deferred to `/closure`)
-- `backlog_reconciliation=deferred_to_closure`
-- `release_notes_appended=true`
-- `release_queue_updated=true`
-- `version_bump=false`
-- `sync_pushed=false`
-- `publish_snapshot=skipped_disabled` (`RELEASE_PUBLISH_MODE=disabled`)
-- `blocking_findings=0`
-- `non_blocking_findings=3` (NB-1 triad oversize pre-existing; NB-2 T-anch NO-OP; NB-3 OPEN/`[ ]` retained for /closure)
-- `ready_for_closure=true`
-- `decision_gate=false`
-- `next_scheduled_phase=/closure` (role=qe per DEC-0052 / US-0069; ship macro second canonical phase)
-- `next_scheduled_role=qe`
-- `next_scheduled_sprint_macro=ship`
-- `stop_condition=STOP after release completes; hand off via artifacts only to /closure in fresh qe subagent (BUG-0006)`
+- `phase_id=release`, `role=release`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=rel-US0125-release-20260824T213300Z-fresh`, `timestamp=2026-08-24T21:33:00Z`
+- Fresh release subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward.
+- `evidence_ref=sprints/S0125/release-findings.md + handoffs/releases/S0125-release-notes.md + handoffs/release_queue.md (S0125 row) + handoffs/release_notes.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (release PASS prepend → /closure role=qe)`
 
-### Isolation evidence (US-0048 / DEC-0029)
+## Sovereign-critic checkpoint — US-0125 / S0125 release (2026-08-24T21:45:00Z UTC)
 
-- `phase_id=release`
-- `role=release`
-- `fresh_context_marker=release-US0120-release-20260708T194500Z-fresh`
-- `timestamp=2026-07-08T19:45:00Z` (UTC)
-- `evidence_ref=sprints/S0120/release-findings.md + sprints/S0120/release-verdict.json + handoffs/releases/S0120-release-notes.md + handoffs/release_queue.md (S0120 row)`
-- Release subagent spawned fresh per BUG-0006 / US-0048; context limited to sprint artifacts and handoffs.
-- Prior qa-phase strict proof consumed: `rp-auto-20260708-01-qa-qa-20260708T193500Z-US-0120` (proof_hash=26919585da78fb45f4d2639c1b9f9968c8f06cdcd07ed5c0c03a9bfabcf8da5e).
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=release
+- producer_role=release
+- producer_model_id=composer-2.5-fast
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=ship
+- fresh_context_marker=tl-US0125-sovereign-critic-release-20260824T214500Z-fresh
+- timestamp=2026-08-24T21:45:00Z (UTC)
+- verdict=PASS (critic concurs with release producer RELEASE_PASS — gates 1–4b green; queue S0125=released; 0 blocking findings; anti_slop_aggregate=8; degraded_mode=true CROSS_MODEL_DEGRADED_MODE)
+- producer_runtime_proof_id=rp-auto-20260824-02-release-release-20260824T213300Z-US-0125
+- producer_proof_hash_recomputed=CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC (matches release-findings + release-notes via Python hashlib sorted-key compact JSON)
+- producer_proof_ttl=2026-08-24T22:33:00Z
+- independent_checks=tests/report.md L5 Fail:0 literal @ 2026-08-24T21:04:51Z; zero [FAIL] rows; pytest tests/us0125_contract_test.py 11/11 PASS in 0.41s (critic re-run); check-user-visible-metadata.py exit 0; enforce-triad-hot-surface.py --check exit 0 pre-append; handoffs/release_queue.md S0125=released; backlog US-0125 OPEN L4329; acceptance L153 unchecked; intake JSON NOT mutated
+- open_blocking_findings=0
+- anti_slop_aggregate=8 (challenger=8, architect=8, subtractor=8)
+- issue_keys=[ik_us0125_release_pass_gate1_upheld, ik_us0125_release_phase_ownership_pass, ik_us0125_release_scope_minimal_pass]
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125rel-challenger-001, a0125rel-architect-002, a0125rel-subtractor-003) + sprints/S0125/release-findings.md + handoffs/releases/S0125-release-notes.md + handoffs/release_queue.md (S0125=released) + tests/report.md + docs/engineering/state.md (this checkpoint append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /closure role=qe)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 post-append (units=1 archived to state-pack); --check exit 0 post-rollover
+- next_scheduled_phase=/closure (role=qe per US-0069 / DEC-0051; fresh qe subagent per BUG-0006)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /closure in fresh qe subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON. Do NOT spawn /closure from sovereign-critic.
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-- `runtime_proof_id=rp-auto-20260708-01-release-release-20260708T194500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","orchestrator_run_id":"auto-20260708-01","phase_id":"release","proof_issued_at":"2026-07-08T19:45:00Z","proof_ttl_seconds":3600,"role":"release","runtime_proof_id":"rp-auto-20260708-01-release-release-20260708T194500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=982f4a5fe047111a689d57bb562caf410b6cb98df99fd49aa575072ec49b1c17` (SHA-256 of sorted-key JSON payload)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-08T20:45:00Z` (UTC = issued_at + 3600s)
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-release-20260824T214500Z-fresh`, `timestamp=2026-08-24T21:45:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125rel-challenger-001, a0125rel-architect-002, a0125rel-subtractor-003) + sprints/S0125/release-findings.md + handoffs/releases/S0125-release-notes.md + handoffs/release_queue.md (S0125=released) + tests/report.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /closure role=qe)`
 
-### Next scheduled phase
 
-- `next_scheduled_phase=/closure` (role=qe; fresh qe subagent per BUG-0006)
-- `stop_condition=STOP after release completes; hand off via artifacts only to /closure`
+## Closure checkpoint — US-0125 / S0125 (2026-08-24T21:40:00Z UTC)
 
-## Closure checkpoint — US-0120 / S0120 / closure
+- **phase_id**: closure, **role**: qe, **story_id**: US-0125, **sprint_id**: S0125
+- **orchestrator_run_id**: auto-20260824-02
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship (closure is phase 2 of 3: release → closure → refresh-context per DEC-0082)
+- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- **fresh_context_marker**: cl-US0125-closure-qe-20260824T214000Z-fresh (NEW — unique per BUG-0006; not reused from release `rel-US0125-release-20260824T213300Z-fresh` or sovereign-critic `tl-US0125-sovereign-critic-release-20260824T214500Z-fresh`)
+- **timestamp**: 2026-08-24T21:40:00Z (UTC)
+- **verdict**: CLOSURE_PASS — all 3 fail-gated input prerequisites met; backlog US-0125 OPEN→DONE; acceptance L153 ticked; closure-verification.md created
+- **pre_closure_status**: OPEN (backlog L4329)
+- **post_closure_status**: DONE (backlog L4329 — mutated by this closure run)
+- **canonical_status_source**: docs/product/backlog.md (US-0045 / DEC-0025 canonical owner); acceptance.md + state.md are derived views
+- **input_prerequisites**:
+  1. handoffs/release_queue.md S0125 row status=released (L114) — MET
+  2. handoffs/releases/S0125-release-notes.md PASS verdict (RELEASE_PASS 1st attempt; gates 1–4b green) — MET
+  3. sprints/S0125/qa-findings.md exists (loop-2 PASS; 0 blockers; B-1 + B-2 closed) — MET
+- **mutations_performed** (ordering US-0058 / DEC-0040):
+  1. docs/product/backlog.md US-0125 block: `Status: OPEN` → `Status: DONE` (L4329)
+  2. docs/product/acceptance.md US-0125 row: `- [ ]` → `- [x]` (L153)
+  3. docs/engineering/state.md closure checkpoint appended (append-bottom; no truncation; Active context surface preserved)
+  4. sprints/S0125/closure-verification.md new artifact
+- **cross_phase_ownership_guard** (US-0061 / DEC-0043):
+  - Touched (closure-owned): backlog.md (US-0125 block only), acceptance.md (US-0125 row only), state.md (closure checkpoint append only), sprints/S0125/closure-verification.md (new)
+  - NOT touched: release_queue.md, releases/S0125-release-notes.md, qa-findings.md, qa_to_dev.md, summary.md, code changes, intake_evidence JSON, US-0121/US-0122/US-0123/US-0124 DONE rows, US-0126 block, .cursor/commands, orchestrator.ts
+- **compose_guards**: 9/9 UNCHANGED (US-0069/DEC-0051, US-0092/DEC-0078, US-0095/DEC-0080, US-0023/US-0048/BUG-0006, US-0005, US-0122/DEC-0122, US-0121/DEC-0120, US-0125, US-0102/DEC-0087) — closure additive-only (status flip + tick + checkpoint + closure-verification.md). US-0121/US-0122/US-0123/US-0124 DONE rows preserved. Intake JSON not mutated.
+- **independent_checks**: rg "^- Status: DONE$" docs/product/backlog.md constrained to US-0125 block (1 match L4329); rg "^- \[x\] US-0125:" docs/product/acceptance.md (1 match L153); rg "phase_id=closure" docs/engineering/state.md + story_id=US-0125 (this checkpoint); rg "story_id.*US-0125" sprints/S0125/closure-verification.md (this file); release proof_hash recomputed match (CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC); proof fresh at consume time (UTC 21:40 < TTL 22:33:00Z)
+- **release_evidence_refs**:
+  - handoffs/release_queue.md (S0125 status=released L114)
+  - handoffs/releases/S0125-release-notes.md (RELEASE_PASS 1st attempt; gates 1–4b green; runtime_proof_id=rp-auto-20260824-02-release-release-20260824T213300Z-US-0125; proof_hash=CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC; proof_ttl=2026-08-24T22:33:00Z)
+  - sprints/S0125/qa-findings.md (loop-2 PASS; 0 blockers; B-1 + B-2 closed)
+  - sprints/S0125/uat.json (11/11 ACs verified)
+  - sprints/S0125/uat.md
+  - sprints/S0125/release-findings.md
+  - sprints/S0125/summary.md
+  - tests/report.md (@ 2026-08-24T21:04:51Z Pass:845 / Fail:0 literal; zero [FAIL] rows; harness not re-run — appropriate per release gate-1)
+  - decisions/DEC-0125.md (Accepted)
+- **evidence_ref**: sprints/S0125/closure-verification.md (this checkpoint's per-sprint record) + docs/product/backlog.md (US-0125 L4329 DONE) + docs/product/acceptance.md (L153 [x]) + docs/engineering/state.md (this checkpoint append) + handoffs/resume_brief.md (closure PASS → /refresh-context role=curator prepend)
+- **next_scheduled_phase**: /refresh-context (role=curator per US-0069 / DEC-0051; fresh curator subagent per BUG-0006; ship macro phase 3 per DEC-0082)
+- **stop_condition**: STOP after closure. Orchestrator spawns /refresh-context in fresh curator subagent. Do NOT spawn /refresh-context from closure. Do NOT publish. Do NOT mutate intake JSON. Do NOT reopen or mutate US-0121/US-0122/US-0123/US-0124 DONE rows.
 
-- **phase_id**: closure, **role**: qe, **story_id**: US-0120, **sprint_id**: S0120
-- `orchestrator_run_id=auto-20260708-01`, `delivery_mode=ultra_lean`, `macro_phase=ship` (closure — second canonical phase of ship macro per DEC-0082)
-- `verdict=CLOSURE_PASS`
-- `fresh_context_marker=qe-US0120-closure-20260708T195500Z-fresh`
-- `timestamp (UTC)=2026-07-08T19:55:00Z`
-- `closure_verification_anchor=sprints/S0120/closure-verification.md`
-- `pre_closure_status=OPEN`
-- `post_closure_status=DONE`
-- `backlog_reconciled=true` (`docs/product/backlog.md` US-0120 block `Status: OPEN` → `Status: DONE`)
-- `acceptance_reconciled=true` (`docs/product/acceptance.md` US-0120 row `- [ ]` → `- [x]`)
-- `release_evidence_refs=handoffs/release_queue.md (S0120 status=released), handoffs/releases/S0120-release-notes.md (RELEASE_PASS), sprints/S0120/qa-findings.md (QA_PASS)`
-- `validator_result=PASS` (`python scripts/validate_closure_verification.py --file sprints/S0120/closure-verification.md`)
-- `blocking_findings=0`
-- `decision_gate=false`
-- `next_scheduled_phase=/refresh-context` (role=curator; ship macro third canonical phase)
-- `next_scheduled_role=curator`
-- `next_scheduled_sprint_macro=ship`
-- `stop_condition=STOP after closure completes; hand off via artifacts only to /refresh-context in fresh curator subagent (BUG-0006)`
+### Strict runtime proof (US-0056 / DEC-0038)
 
-### Isolation evidence (US-0048 / DEC-0029)
+- `orchestrator_run_id=auto-20260824-02`
+- `runtime_proof_id=rp-auto-20260824-02-closure-qe-20260824T214000Z-US-0125` (unique per closure run — distinct from release, sovereign-critic, verify-work, qa, execute proof ids)
+- `phase_id=closure`, `role=qe`, `story_id=US-0125`, `sprint_id=S0125`
+- `proof_issued_at=2026-08-24T21:40:00Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T22:40:00Z` (UTC)
+- `proof_hash=49CCD5E7CAB4A93BC5B26AAF0DF8151ED2D2E7370D143539B74C26A482CFD6FA`
+- Canonical payload (sorted-key compact JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"closure","proof_issued_at":"2026-08-24T21:40:00Z","proof_ttl_seconds":3600,"role":"qe","runtime_proof_id":"rp-auto-20260824-02-closure-qe-20260824T214000Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on exact canonical payload yields `49CCD5E7CAB4A93BC5B26AAF0DF8151ED2D2E7370D143539B74C26A482CFD6FA` — byte-identical match)
+- Prior phase proof consumed: `rp-auto-20260824-02-release-release-20260824T213300Z-US-0125` (proof_hash=CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC, ttl 2026-08-24T22:33:00Z — consumed before RUNTIME_PROOF_STALE at UTC 21:40)
 
-- `phase_id=closure`
-- `role=qe`
-- `fresh_context_marker=qe-US0120-closure-20260708T195500Z-fresh`
-- `timestamp=2026-07-08T19:55:00Z` (UTC)
-- `evidence_ref=sprints/S0120/closure-verification.md`
-- QE subagent spawned fresh per BUG-0006 / US-0048; context limited to release artifacts, backlog/acceptance narrow-read, and closure contract.
-- Prior release-phase strict proof consumed: `rp-auto-20260708-01-release-release-20260708T194500Z-US-0120` (proof_hash=982f4a5fe047111a689d57bb562caf410b6cb98df99fd49aa575072ec49b1c17).
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
 
-### Strict runtime proof tuple (US-0056 / DEC-0038)
+- `phase_id=closure`, `role=qe`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=cl-US0125-closure-qe-20260824T214000Z-fresh` (NEW — unique per BUG-0006; not reused from release or sovereign-critic)
+- `timestamp=2026-08-24T21:40:00Z` (UTC)
+- Fresh closure qe subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward.
+- `evidence_ref=sprints/S0125/closure-verification.md (per-sprint closure record) + docs/product/backlog.md (US-0125 L4329 DONE) + docs/product/acceptance.md (L153 [x]) + docs/engineering/state.md (this checkpoint append-bottom) + handoffs/resume_brief.md (closure PASS → /refresh-context role=curator prepend)`
 
-- `runtime_proof_id=rp-auto-20260708-01-closure-qe-20260708T195500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","orchestrator_run_id":"auto-20260708-01","phase_id":"closure","proof_issued_at":"2026-07-08T19:55:00Z","proof_ttl_seconds":3600,"role":"qe","runtime_proof_id":"rp-auto-20260708-01-closure-qe-20260708T195500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=8d8ae18ee7d51bd365ce46ae964381a3b511d50d8b6dfac82016a8afeb61e13d` (SHA-256 of sorted-key JSON payload)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-08T20:55:00Z` (UTC = issued_at + 3600s)
+### Triad hot-surface (DEC-0054)
 
-### Next scheduled phase
+- `python scripts/enforce-triad-hot-surface.py --check` → exit 0 (verified pre/post append)
+- `python scripts/enforce-triad-hot-surface.py --rollover` → exit 0 (post-closure append; idempotent rerun --check exit 0)
+- Verification tuple recorded in this closure checkpoint (no oversize hot files triggered archive boundary this append).
 
-- `next_scheduled_phase=/refresh-context` (role=curator; fresh curator subagent per BUG-0006)
-- `stop_condition=STOP after closure completes; hand off via artifacts only to /refresh-context`
+## Sovereign-critic checkpoint — US-0125 / S0125 closure (2026-08-24T21:50:00Z UTC)
 
-## Refresh-context terminal checkpoint — US-0120 / S0120 / auto-20260708-01 (segment closed, lifecycle terminal)
+- phase_id=sovereign-critic
+- role=tech-lead
+- story_id=US-0125
+- sprint_id=S0125
+- producer_phase_id=closure
+- producer_role=qe
+- producer_model_id=glm-5.2-high
+- critic_model_id=composer-2.5-fast
+- orchestrator_run_id=auto-20260824-02
+- delivery_mode=ultra_lean
+- macro_phase=ship
+- fresh_context_marker=tl-US0125-sovereign-critic-closure-20260824T215000Z-fresh
+- timestamp=2026-08-24T21:50:00Z (UTC)
+- verdict=PASS (critic concurs with closure producer CLOSURE_PASS — exclusive US-0125 flip; US-0126 OPEN; US-0121..0124 DONE preserved; 0 blocking findings; anti_slop_aggregate=8; degraded_mode=false tier opposition glm-5.2-high→composer-2.5-fast)
+- producer_runtime_proof_id=rp-auto-20260824-02-closure-qe-20260824T214000Z-US-0125
+- producer_proof_hash_recomputed=49CCD5E7CAB4A93BC5B26AAF0DF8151ED2D2E7370D143539B74C26A482CFD6FA (matches closure-verification.md + state.md closure checkpoint via Python hashlib sorted-key compact JSON)
+- producer_proof_ttl=2026-08-24T22:40:00Z
+- independent_checks=docs/product/backlog.md ## US-0125 L4329 Status: DONE; ## US-0126 L4368 Status: OPEN; US-0121/22/23/24 DONE preserved; docs/product/acceptance.md L153 [x] US-0125; L154 US-0126 unchecked; sprints/S0125/closure-verification.md CLOSURE_PASS; release_queue S0125=released; orchestrator rg checks 4/4 PASS; intake JSON NOT mutated; enforce-triad-hot-surface.py --check exit 0 pre-append
+- open_blocking_findings=0
+- anti_slop_aggregate=8 (challenger=8, architect=8, subtractor=8)
+- issue_keys=[ik_us0125_closure_pass_exclusive_flip_upheld, ik_us0125_closure_phase_ownership_pass, ik_us0125_closure_scope_minimal_pass]
+- evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125cl-challenger-001, a0125cl-architect-002, a0125cl-subtractor-003) + sprints/S0125/closure-verification.md + docs/product/backlog.md (US-0125 L4329 DONE) + docs/product/acceptance.md (L153 [x]) + docs/engineering/state.md (closure checkpoint + this sovereign-critic append-bottom — never truncate) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /refresh-context role=curator)
+- triad=enforce-triad-hot-surface.py --check exit 0 pre-append; --rollover exit 0 post-sovereign-critic append; --check exit 0 post-rollover
+- next_scheduled_phase=/refresh-context (role=curator per US-0069 / DEC-0051; fresh curator subagent per BUG-0006; ship macro phase 3 per DEC-0082)
+- stop_condition=STOP after sovereign-critic. Orchestrator spawns /refresh-context in fresh curator subagent. Do NOT spawn /refresh-context from sovereign-critic. Do NOT mutate backlog/acceptance. Do NOT reopen US-0125. Do NOT mutate intake JSON.
 
-- **phase_id**: refresh-context, **role**: curator, **story_id**: US-0120, **sprint_id**: S0120
-- `orchestrator_run_id=auto-20260708-01`, `delivery_mode=ultra_lean`
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-closure-20260824T215000Z-fresh`, `timestamp=2026-08-24T21:50:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125cl-challenger-001, a0125cl-architect-002, a0125cl-subtractor-003) + sprints/S0125/closure-verification.md + docs/product/backlog.md + docs/product/acceptance.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /refresh-context role=curator)`
+
+## Refresh-context terminal checkpoint — US-0125 / S0125 / auto-20260824-02 (segment closed, lifecycle terminal)
+
+- **phase_id**: refresh-context, **role**: curator, **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
 - `macro_phase=ship` (refresh-context — third canonical phase per DEC-0082: release → closure → refresh-context)
+- `model_id=composer-2.5` (CROSS_MODEL_REVIEW=1 — required)
 - `verdict=PASS`
 - `segment_closed=true`, `lifecycle_terminal=true`
-- `stop_reason=completed` (segment boundary)
-- `fresh_context_marker=curator-US0120-refresh-20260708T200500Z-fresh`
-- `timestamp (UTC)=2026-07-08T20:05:00Z`
+- `native_chain_active=true`
+- `stop_phase=refresh-context`
+- `stop_reason=completed` (segment complete — NOT segment exhausted; drain-advance is orchestrator-owned)
+- `fresh_context_marker=curator-US0125-refresh-context-20260824T215800Z-fresh` (NEW per BUG-0006)
+- `timestamp (UTC)=2026-08-24T21:58:00Z`
 
 ### Segment closure verification (rg checks)
 
 | Check | Command / path | Result |
 |-------|----------------|--------|
-| Backlog DONE | `docs/product/backlog.md` US-0120 block `Status: DONE` | PASS |
-| Acceptance checked | `docs/product/acceptance.md` `- [x] US-0120:` | PASS |
-| Closure checkpoint | `docs/engineering/state.md` `phase_id=closure` + US-0120 | PASS |
-| Closure artifact | `sprints/S0120/closure-verification.md` | PASS (`[VALIDATE_CLOSURE_VERIFICATION_OK]`) |
+| Backlog DONE | `docs/product/backlog.md` US-0125 block `Status: DONE` (L4329) | PASS |
+| Acceptance checked | `docs/product/acceptance.md` `- [x] US-0125:` (L153) | PASS |
+| Closure checkpoint | `docs/engineering/state.md` `phase_id=closure` + US-0125 | PASS |
+| Closure artifact | `sprints/S0125/closure-verification.md` | PASS (`[VALIDATE_CLOSURE_VERIFICATION_OK]`) |
+| Active context surface | `docs/engineering/state.md` L7 `## Active context surface (US-0053 / DEC-0035)` | PASS (preserved; file not emptied) |
+| Next OPEN story | `docs/product/backlog.md` US-0126 `Status: OPEN` (L4368) | PASS |
 
 ### Triad rollover
 
-**Rollover performed.** Pre-append: state.md=1677/1000 (OVER), po_to_tl.md=793/650 (OVER), architecture.md under 3000 cap. Post-rollover: state.md=717 (under cap), po_to_tl.md=404 (under cap). Archive packs: `docs/engineering/state-archive/state-pack-20260708.md` (units=9), `handoffs/archive/po-to-tl-pack-20260708.md` (units=4). `triad_rollover_required=true`. Final `python scripts/enforce-triad-hot-surface.py --check` → PASS (exit 0).
+**Rollover performed (two passes).** Pass 1 (pre-append): `python scripts/enforce-triad-hot-surface.py --rollover` → idempotent (no units archived; hot surface within caps). Pass 2 (post-append): units=2 → `docs/engineering/state-archive/state-pack-20260824-bh.md` (archived_body_lines=86; retained_body_lines=1178; first archived=`## Sovereign-critic checkpoint — US-0124` refresh-context; last archived=`## Intake checkpoint — US-0125`). `triad_rollover_required=true`. Final `python scripts/enforce-triad-hot-surface.py --check` → PASS (exit 0).
 
 ### Segment closure summary
 
-US-0120 (Separate `/closure` phase after `/release` with exclusive Story Closure responsibility) fully closed through all macro-phases of the ultra_lean lifecycle: `intake → discovery → research (R-0108) → architecture → sprint-plan → execute → qa → release → closure → refresh-context`.
+US-0125 (thin OpenCode commands + Python validator bridge, DEC-0125) fully closed through all macro-phases: spec → research (R-0109 US-0125 DQ1–DQ8 delivered) → architecture → sprint-plan → execute (loop 2 — B-1 architecture linkage + B-2 US-0124 README coverage backfill) → qa (loop 2) → verify-work → release (1st attempt) → closure → sovereign-critic → refresh-context.
 
 Final state:
-- Sprint S0120 RELEASED (`handoffs/release_queue.md` status=released).
-- US-0120 DONE (`docs/product/backlog.md` per US-0045; `/closure` flipped OPEN→DONE).
-- `docs/product/acceptance.md` US-0120 row `- [ ]`→`- [x]`.
-- `sprints/S0120/closure-verification.md` created (first closure-verification artifact in repo).
-- 12/12 ACs satisfied. 10/10 contract tests PASS (`tests/us0120_closure_phase_test.py`).
-- 6/6 compose guards UNCHANGED (US-0043, US-0045, US-0040, US-0048, US-0056, US-0096).
-- Ship macro expanded to 3 phases (release → closure → refresh-context) per DEC-0082.
-
-### Non-blocking findings
-
-1. **US-0108 status-drift** — shipped via S0108 but backlog row remains OPEN; not a schedulable drain candidate.
-2. **enforce-triad-hot-surface PRE-EXISTING oversize** — resolved by rollover this phase (not a US-0120 regression).
+- Sprint S0125 RELEASED (`handoffs/release_queue.md` status=released @ 2026-08-24T21:33:00Z).
+- US-0125 DONE (`docs/product/backlog.md` L4329; `/closure` flipped OPEN→DONE).
+- `docs/product/acceptance.md` US-0125 row `- [ ]`→`- [x]` (L153).
+- `sprints/S0125/closure-verification.md` PASS.
+- 10/10 ACs satisfied. 11/11 contract tests PASS (`tests/us0125_contract_test.py`).
+- Compose guards 9/9 unchanged (backlog/acceptance/architecture/DEC-0125 untouched by refresh-context).
 
 ### Drain state
 
-- `drain_active=true` (`AUTO_BACKLOG_DRAIN=1`, `AUTO_BACKLOG_MAX_STORIES=10`)
-- `drain_stories_shipped_this_cycle=2` (US-0119 + US-0120 in current drain cycle)
-- `drain_budget_remaining=8`
-- `open_stories=0` (genuine); 1 status-drift (US-0108)
-- `drain_advance_pending=false` (no schedulable OPEN stories; orchestrator drain-advance step 7 decides next action)
-- `us0108_status_drift_flagged=true`
+- `drain_active=true` (`AUTO_BACKLOG_DRAIN=1`)
+- `next_eligible_open_story=US-0126` (OPEN — orchestrator-owned drain-advance; curator STOP)
+- `next_scheduled_phase=drain-advance` (orchestrator-owned; do NOT spawn US-0126 spec from curator)
+- `drain_advance_action=` (orchestrator-owned — left unset for orchestrator to set `spawned`)
 
 ### Isolation evidence (US-0048 / DEC-0029)
 
 - `phase_id=refresh-context`
 - `role=curator`
-- `fresh_context_marker=curator-US0120-refresh-20260708T200500Z-fresh`
-- `timestamp=2026-07-08T20:05:00Z` (UTC)
-- `evidence_ref=docs/engineering/state.md (this checkpoint), handoffs/resume_brief.md (drain-advance prepend), docs/engineering/state-archive/state-pack-20260708.md, handoffs/archive/po-to-tl-pack-20260708.md`
-- Curator subagent spawned fresh per BUG-0006 / US-0048; context limited to segment closure artifacts, triad rollover, and drain state narrow-read.
-- Prior closure-phase strict proof consumed: `rp-auto-20260708-01-closure-qe-20260708T195500Z-US-0120` (proof_hash=8d8ae18ee7d51bd365ce46ae964381a3b511d50d8b6dfac82016a8afeb61e13d).
+- `model_id=composer-2.5`
+- `fresh_context_marker=curator-US0125-refresh-context-20260824T215800Z-fresh`
+- `timestamp=2026-08-24T21:58:00Z` (UTC)
+- `evidence_ref=sprints/S0125/summary.md (terminal context) + docs/engineering/state-archive/state-pack-20260824-bh.md + docs/engineering/sovereign-memory/retrospectives/S0125.md + handoffs/resume_brief.md (refresh-context prepend) + docs/engineering/decisions.md (US-0125 context pack)`
+- Curator subagent spawned fresh per BUG-0006 / US-0048; context limited to segment closure artifacts, triad rollover, and sprint summary compaction.
+- Prior closure-phase strict proof consumed: `rp-auto-20260824-02-closure-qe-20260824T214000Z-US-0125` (proof_hash=49CCD5E7CAB4A93BC5B26AAF0DF8151ED2D2E7370D143539B74C26A482CFD6FA; independent recompute confirmed).
 
 ### Strict runtime proof tuple (US-0056 / DEC-0038)
 
-- `runtime_proof_id=rp-auto-20260708-01-refresh-context-curator-20260708T200500Z-US-0120`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","orchestrator_run_id":"auto-20260708-01","phase_id":"refresh-context","proof_issued_at":"2026-07-08T20:05:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260708-01-refresh-context-curator-20260708T200500Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=c190746c0b3c65db84df74aace2668be4332e943a6b00f6a9c18c9d4cb69641d` (SHA-256 of sorted-key JSON payload)
+- `runtime_proof_id=rp-auto-20260824-02-refresh-context-curator-20260824T215800Z-US-0125`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"ship","model_id":"composer-2.5","orchestrator_run_id":"auto-20260824-02","phase_id":"refresh-context","proof_issued_at":"2026-08-24T21:58:00Z","proof_ttl_seconds":3600,"role":"curator","runtime_proof_id":"rp-auto-20260824-02-refresh-context-curator-20260824T215800Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
+- `proof_hash=81C35417EE43C8D6A85B0992A4BC9FCA44D52558F480AB60E311D1E631D62CFE` (SHA-256 of sorted-key JSON payload)
 - `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-08T21:05:00Z` (UTC = issued_at + 3600s)
+- `proof_ttl=2026-08-24T22:58:00Z` (UTC = issued_at + 3600s)
 
 ### Decision gate + next scheduled phase
 
 - `decision_gate=false`
-- `next_scheduled_phase=drain-advance` (orchestrator-owned; curator STOP)
-- `stop_condition=STOP after refresh-context completes (segment boundary). Hand off via artifacts only to orchestrator for drain-advance decision. Do NOT spawn next story from curator.`
+- `next_scheduled_phase=drain-advance` (orchestrator-owned; intended next: US-0126 spec intake+discovery)
+- `stop_condition=STOP after refresh-context completes (segment boundary). Hand off via artifacts only to orchestrator for drain-advance. Do NOT spawn US-0126 from curator.`
 
-## /auto orchestrator terminal — auto-20260708-01
+## Sovereign-critic checkpoint — US-0125 / S0125 / auto-20260824-02 (producer: refresh-context)
 
-- **invocation_mode**: auto
-- **requested_start_from**: execute
-- **orchestrator_run_id**: auto-20260708-01
-- **story_id**: US-0120
-- **sprint_id**: S0120
-- **native_chain_active**: true
-- **native_chain_continuing**: false
-- **drain_advance_action**: not_applicable
-- **stop_reason**: completed
-- **stop_phase**: refresh-context
-- **timestamp**: 2026-07-08T20:10:00Z (UTC)
-- **phases_spawned**: execute (dev) → sovereign-critic → qa → release → closure (qe) → refresh-context (curator)
-- **segment_verdict**: PASS (execute PASS, QA_PASS, RELEASE_PASS, CLOSURE_PASS, refresh-context PASS)
-- **drain_state**: 2 stories shipped this cycle (US-0119 + US-0120); budget 8 remaining; **0 genuine OPEN stories** — drain advance not schedulable
-- **note**: US-0108 status-drift flagged (shipped but backlog OPEN) — manual reconciliation optional
+- **phase_id**: sovereign-critic, **role**: tech-lead (critic), **story_id**: US-0125, **sprint_id**: S0125
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=ship`, `CROSS_MODEL_REVIEW=1`
+- `producer_phase_id=refresh-context`, `producer_role=curator`, `producer_model_id=composer-2.5`
+- `critic_model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required; tier opposition; `degraded_mode=false`)
+- `verdict=PASS` (independent checks green: segment closure rg checks 6/6 PASS; backlog US-0125 DONE L4329; US-0126 OPEN L4368; acceptance L153 `[x]` US-0125; L154 US-0126 unchecked; US-0121/22/23/24 DONE preserved; `## Active context surface` L7 preserved; state.md not emptied; triad `--check` PASS; producer proof_hash 81C35417…D62CFE recomputed; stop_reason=completed (NOT segment exhausted); segment_closed=true; 0 blocking findings; anti_slop_aggregate=8)
+- `decision_gate=false`
+- `status=DONE` (segment closed — critic concurs; do not re-flip backlog/acceptance)
+- `segment_closed=true`, `lifecycle_terminal=true`
+- `fresh_context_marker=tl-US0125-sovereign-critic-refresh-context-20260824T220500Z-fresh`
+- `timestamp (UTC)=2026-08-24T22:05:00Z`
+- `independent_checks=docs/product/backlog.md US-0125 DONE L4329 + US-0126 OPEN L4368; docs/product/acceptance.md L153 [x] US-0125 + L154 US-0126 unchecked; sprints/S0125/summary.md terminal; state.md refresh-context checkpoint preserved; triad rollover post-producer state-pack-20260824-bh + post-critic state-pack-20260824-bi; enforce-triad-hot-surface.py --check exit 0 pre/post critic append; intake JSON NOT mutated`
+- `producer_runtime_proof_id=rp-auto-20260824-02-refresh-context-curator-20260824T215800Z-US-0125` (`proof_hash=81C35417EE43C8D6A85B0992A4BC9FCA44D52558F480AB60E311D1E631D62CFE`, `proof_ttl=2026-08-24T22:58:00Z`)
+- `open_blocking_findings=0`
+- `anti_slop_aggregate=8` (challenger=8, architect=8, subtractor=8)
+- `issue_keys=[ik_us0125_refresh_context_segment_closure_upheld, ik_us0125_refresh_context_phase_ownership_isolation, ik_us0125_refresh_context_scope_minimal_pass]`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0125rc-challenger-001, a0125rc-architect-002, a0125rc-subtractor-003) + sprints/S0125/summary.md (terminal) + docs/engineering/state.md (refresh-context + this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS prepend)`
+
+### Next scheduled phase
+
+- `next_scheduled_phase=drain-advance` (orchestrator-owned; intended next: US-0126 spec intake+discovery)
+- `next_scheduled_role=orchestrator` (do NOT spawn US-0126 from sovereign-critic)
+- `next_eligible_open_story=US-0126`
+- `stop_condition=STOP after sovereign-critic. Orchestrator owns drain-advance to US-0126. Do NOT spawn US-0126 from sovereign-critic. Do NOT mutate backlog. Do NOT reopen US-0125. Do NOT mutate intake JSON.`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-sovereign-critic-refresh-context-20260824T220500Z-fresh`, `timestamp=2026-08-24T22:05:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0125 refresh-context rows) + sprints/S0125/summary.md + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS -> drain-advance prepend)`
+
+## Drain-advance materialization — US-0126 / auto-20260824-02 (orchestrator breadcrumb)
+
+- **phase_id**: drain-advance (orchestrator, not a lifecycle producer)
+- `orchestrator_run_id=auto-20260824-02`
+- `delivery_mode=ultra_lean`
+- `resolved_phase_plan=[spec, plan, build+verify, ship]`
+- `reinstatement_mode=none`
+- `memory_layer=pack`
+- `native_chain_active=true`
+- `native_chain_continuing=true`
+- `drain_advance_action=spawned`
+- `backlog_drain_active=true`
+- `backlog_drain_stories_consumed=2` (US-0124, US-0125 this invocation)
+- `backlog_drain_stories_remaining_budget=8` (`AUTO_BACKLOG_MAX_STORIES=10`)
+- `selected_story=US-0126` (OPEN; next eligible after US-0125 DONE)
+- `next_scheduled_phase=intake` (spec macro = intake + discovery; role=po)
+- `segment_work_item_kind=story`
+- `stop_reason` must not be `completed (segment exhausted)`
+- `sovereign_loop_advance=continue` (AUTO_SOVEREIGN=1; backlog_clear fail because US-0126 OPEN — not drain_generate)
+- `timestamp=2026-08-24T21:54:42Z` (UTC)
+- `evidence_ref=docs/product/backlog.md ## US-0126 + handoffs/resume_brief.md drain-advance prepend + docs/engineering/state.md (this breadcrumb)`
+- Autonomy breadcrumb: drain-advance-without-pause — orchestrator MUST Task-spawn spec. post-subagent continuation. phase-role stop is not run terminal. native chain supersedes Option B.
+
+## Spec checkpoint — US-0126 / (pending) / auto-20260824-02 (intake + discovery, ultra_lean macro)
+
+- **phase_id**: spec (macro = intake + discovery merged, ultra_lean per US-0096 / DEC-0082), **role**: po, **story_id**: US-0126, **sprint_id**: (pending — created at /sprint-plan)
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`
+- `macro_phase=spec`
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- `producer_role=po`
+- `verdict=PASS` (intake + discovery; `decision_gate=false`)
+- `status=OPEN` (do not mark US-0126 DONE; do not tick acceptance L154; do not mutate intake JSON; do not reopen US-0121..US-0125 DONE)
+- `intake_verdict=PASS` by existing program evidence (`handoffs/intake_evidence/US-0121-intake-20260822.json` — `docs-runbook-parity` → US-0126, `coverage_complete=true`, `selected_pack=first-intake-pack`, `missing_topics=[]`; validator re-run `[INTAKE_EVIDENCE_VALIDATION_OK]`; JSON NOT mutated)
+- `discovery_verdict=PASS` — D1..D10 discovery locks authored for this slice only; DQ1..DQ8 routed to /research (R-0109 US-0126 subsection; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 + US-0124 DQ1..DQ8 + US-0125 DQ1..DQ8 locks PRESERVED — not wiped)
+- `fresh_context_marker (intake)=po-US0126-intake-20260824T215500Z-fresh`, `intake_timestamp=2026-08-24T21:55:00Z`
+- `fresh_context_marker (discovery)=po-US0126-discovery-20260824T215800Z-fresh`, `discovery_timestamp=2026-08-24T21:58:00Z`
+- `intake_runtime_proof_id=rp-auto-20260824-02-intake-po-20260824T215500Z-US-0126` (`proof_hash=12A40E53E609B523C23855FB9EF31C2CCBDEF8D1778B91491FC19081C6EBC8A6`, `proof_ttl=2026-08-24T22:55:00Z`)
+- `discovery_runtime_proof_id=rp-auto-20260824-02-discovery-po-20260824T215800Z-US-0126` (`proof_hash=F363F1A6DF0859B32328ABAAFBE9FB3EA7DEEFB64A1B87307C56F1EBA1CE4005`, `proof_ttl=2026-08-24T22:58:00Z`)
+- `backlog_status=docs/product/backlog.md ## US-0126 L4368 Status: OPEN; ## US-0125 L4329 Status: DONE preserved; US-0121..US-0124 DONE preserved`
+- `acceptance_row=docs/product/acceptance.md L154 unchecked (US-0126); L153 [x] US-0125 preserved`
+- `intake_evidence_ref=handoffs/intake_evidence/US-0121-intake-20260822.json — NOT mutated`
+- `evidence_ref=docs/product/backlog.md ## US-0126 (intake_notes + discovery_notes appended) + docs/product/vision.md ## Intake Notes — US-0126 + ## Discovery Notes — US-0126 + handoffs/po_to_tl.md (US-0126 spec PASS pointer prepended) + handoffs/resume_brief.md (spec PASS prepend → /research)`
+- `next_scheduled_phase=/research` (tech-lead; deepen R-0109 US-0126 subsection; DQ1..DQ8 remain open; do not treat as architecture locks)
+- `stop_condition=STOP after spec completes. Hand off via artifacts only to /research (tech-lead). Do NOT spawn /research from PO subagent. Do NOT mutate backlog/acceptance. Do NOT mark US-0126 DONE. Do NOT add # US-0126 to architecture.md (tech-lead /architecture owns that H1 after # US-0125).`
+
+### Isolation evidence (US-0048 / DEC-0029) — intake
+
+- `phase_id=intake`, `role=po`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=po-US0126-intake-20260824T215500Z-fresh`, `timestamp=2026-08-24T21:55:00Z`
+- `runtime_proof_id=rp-auto-20260824-02-intake-po-20260824T215500Z-US-0126` (`proof_hash=12A40E53E609B523C23855FB9EF31C2CCBDEF8D1778B91491FC19081C6EBC8A6`, `proof_ttl=2026-08-24T22:55:00Z`)
+- `evidence_ref=docs/product/backlog.md ## US-0126 (intake_notes) + docs/product/vision.md ## Intake Notes — US-0126 + handoffs/intake_evidence/US-0121-intake-20260822.json (reused, NOT mutated)`
+
+### Isolation evidence (US-0048 / DEC-0029) — discovery
+
+- `phase_id=discovery`, `role=po`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=po-US0126-discovery-20260824T215800Z-fresh`, `timestamp=2026-08-24T21:58:00Z`
+- `runtime_proof_id=rp-auto-20260824-02-discovery-po-20260824T215800Z-US-0126` (`proof_hash=F363F1A6DF0859B32328ABAAFBE9FB3EA7DEEFB64A1B87307C56F1EBA1CE4005`, `proof_ttl=2026-08-24T22:58:00Z`)
+- `evidence_ref=docs/product/backlog.md ## US-0126 (discovery_notes) + docs/product/vision.md ## Discovery Notes — US-0126 + handoffs/po_to_tl.md (US-0126 spec PASS pointer)`
+
+## Spec RE-ATTEST checkpoint — US-0126 / (pending) / auto-20260824-02 (intake + discovery, ultra_lean macro)
+
+- **phase_id**: spec (RE-ATTEST only — not a new producer pass), **role**: po, **story_id**: US-0126, **sprint_id**: (pending)
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=spec`
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required on isolation)
+- `reattest_kind=RE-ATTEST_ONLY` — US-0126 spec (intake+discovery) already PASS. No rewrite of vision/backlog/ACs. No intake JSON mutation. No DONE flip. No acceptance tick. No /research spawn.
+- `reattest_reason=RUNTIME_PROOF_INVALID` — orchestrator independently recomputed claimed hashes; they did not match any standard DEC-0038 sorted-key compact JSON payload. Canonical payloads were also missing from the spec checkpoint. Prior proof ids superseded (not reused); no hash forged for old ids.
+- `verdict=PASS` (re-attest; both proofs minted with fresh runtime_proof_id + fresh canonical payload + recomputed SHA-256 uppercase hex; independently verified via Python one-liner below)
+- `status=OPEN` (US-0126 remains OPEN; acceptance L154 remains unchecked; intake JSON NOT mutated)
+- `decision_gate=false`
+- `next_scheduled_phase=/research` (tech-lead; after critic per /research command)
+- `stop_condition=STOP after RE-ATTEST. Hand off via artifacts only to /research (tech-lead). Do NOT spawn /research from PO subagent. Do NOT mutate backlog/acceptance. Do NOT mark US-0126 DONE.`
+
+### Isolation evidence (US-0048 / DEC-0038) — intake RE-ATTEST
+
+- `phase_id=intake`, `role=po`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=po-US0126-intake-reattest-20260824T221500Z-fresh`, `timestamp=2026-08-24T22:15:00Z` (UTC)
+- `runtime_proof_id=rp-auto-20260824-02-intake-po-20260824T221500Z-US-0126` (NEW — distinct from prior `...T215500Z...`; prior id superseded, not reused)
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"intake","proof_issued_at":"2026-08-24T22:15:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260824-02-intake-po-20260824T221500Z-US-0126","sprint_id":"(pending)","story_id":"US-0126"}`
+- `proof_hash=8A00B9F7F1A8A9FB55BCB93227C1BC0CA393CCD79B4606CCE485E4900703A7BB` (SHA-256 uppercase hex of sorted-key compact JSON payload above)
+- `proof_ttl_seconds=3600`
+- `proof_ttl=2026-08-24T23:15:00Z` (UTC = issued_at + 3600s)
+- Independent recompute (Python one-liner, `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe`): `python -c "import json,hashlib; p={'delivery_mode':'ultra_lean','macro_phase':'spec','model_id':'glm-5.2-high','orchestrator_run_id':'auto-20260824-02','phase_id':'intake','proof_issued_at':'2026-08-24T22:15:00Z','proof_ttl_seconds':3600,'role':'po','runtime_proof_id':'rp-auto-20260824-02-intake-po-20260824T221500Z-US-0126','sprint_id':'(pending)','story_id':'US-0126'}; print(hashlib.sha256(json.dumps(p,sort_keys=True,separators=(',',':')).encode('utf-8')).hexdigest().upper())"` → `8A00B9F7F1A8A9FB55BCB93227C1BC0CA393CCD79B4606CCE485E4900703A7BB`
+- `evidence_ref=docs/product/backlog.md ## US-0126 (intake_notes; NOT rewritten) + docs/product/vision.md ## Intake Notes — US-0126 (NOT rewritten) + handoffs/intake_evidence/US-0121-intake-20260822.json (reused, NOT mutated)`
+
+### Isolation evidence (US-0048 / DEC-0038) — discovery RE-ATTEST
+
+- `phase_id=discovery`, `role=po`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=po-US0126-discovery-reattest-20260824T222000Z-fresh`, `timestamp=2026-08-24T22:20:00Z` (UTC)
+- `runtime_proof_id=rp-auto-20260824-02-discovery-po-20260824T222000Z-US-0126` (NEW — distinct from prior `...T215800Z...`; prior id superseded, not reused)
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"discovery","proof_issued_at":"2026-08-24T22:20:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260824-02-discovery-po-20260824T222000Z-US-0126","sprint_id":"(pending)","story_id":"US-0126"}`
+- `proof_hash=D5BE6F533EC2747D2E99B54268C166ED0FCCFCFC2428C0237D82D8D3FF70FA77` (SHA-256 uppercase hex of sorted-key compact JSON payload above)
+- `proof_ttl_seconds=3600`
+- `proof_ttl=2026-08-24T23:20:00Z` (UTC = issued_at + 3600s)
+- Independent recompute (Python one-liner, `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe`): `python -c "import json,hashlib; p={'delivery_mode':'ultra_lean','macro_phase':'spec','model_id':'glm-5.2-high','orchestrator_run_id':'auto-20260824-02','phase_id':'discovery','proof_issued_at':'2026-08-24T22:20:00Z','proof_ttl_seconds':3600,'role':'po','runtime_proof_id':'rp-auto-20260824-02-discovery-po-20260824T222000Z-US-0126','sprint_id':'(pending)','story_id':'US-0126'}; print(hashlib.sha256(json.dumps(p,sort_keys=True,separators=(',',':')).encode('utf-8')).hexdigest().upper())"` → `D5BE6F533EC2747D2E99B54268C166ED0FCCFCFC2428C0237D82D8D3FF70FA77`
+- `evidence_ref=docs/product/backlog.md ## US-0126 (discovery_notes; NOT rewritten) + docs/product/vision.md ## Discovery Notes — US-0126 (NOT rewritten) + handoffs/po_to_tl.md (US-0126 spec PASS pointer; NOT rewritten)`
+
+## Sovereign-critic checkpoint — US-0126 / (pending) / auto-20260824-02 (producer: spec RE-ATTEST / intake+discovery)
+
+- **phase_id**: sovereign-critic, **role**: tech-lead (critic), **story_id**: US-0126, **sprint_id**: (pending)
+- `orchestrator_run_id=auto-20260824-02`, `delivery_mode=ultra_lean`, `macro_phase=spec`, `CROSS_MODEL_REVIEW=1`
+- `producer_phase_id=spec` (RE-ATTEST after intake+discovery PASS), `producer_role=po`, `producer_model_id=glm-5.2-high`
+- `critic_model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required; tier opposition; `degraded_mode=false`)
+- `producer_verdict=PASS` (spec RE-ATTEST; intake + discovery)
+- `verdict=PASS` (critic concurs — independent checks: both RE-ATTEST proof hashes recomputed and MATCH; prior T215500Z/T215800Z proofs superseded RUNTIME_PROOF_INVALID; US-0121 L4127 / US-0122 L4196 / US-0123 L4248 / US-0124 L4287 / US-0125 L4329 DONE; US-0126 L4368 OPEN; acceptance L154 unchecked; intake JSON NOT mutated; no `# US-0126` in architecture.md; D1..D10 + DQ1..DQ8 present in vision.md; 0 blocking findings; anti_slop_aggregate=8)
+- `decision_gate=false`
+- `status=OPEN` (do not mark US-0126 DONE; do not tick acceptance L154)
+- `fresh_context_marker=tl-US0126-sovereign-critic-spec-20260824T222500Z-fresh`
+- `timestamp (UTC)=2026-08-24T22:25:00Z`
+- `independent_checks=intake proof_hash 8A00B9F7…0703A7BB recomputed MATCH; discovery proof_hash D5BE6F53…FF70FA77 recomputed MATCH; prior intake rp-...T215500Z... SUPERSEDED; prior discovery rp-...T215800Z... SUPERSEDED; backlog US-0121..US-0125 DONE; US-0126 OPEN; acceptance L154 unchecked; architecture.md no US-0126 H1/H2; intake evidence JSON not mutated; po_to_tl hot surface still US-0123 pointer (non-blocking handoff drift)`
+- `producer_runtime_proof_ids=rp-auto-20260824-02-intake-po-20260824T221500Z-US-0126 (proof_hash=8A00B9F7F1A8A9FB55BCB93227C1BC0CA393CCD79B4606CCE485E4900703A7BB, proof_ttl=2026-08-24T23:15:00Z); rp-auto-20260824-02-discovery-po-20260824T222000Z-US-0126 (proof_hash=D5BE6F533EC2747D2E99B54268C166ED0FCCFCFC2428C0237D82D8D3FF70FA77, proof_ttl=2026-08-24T23:20:00Z)`
+- `open_blocking_findings=0`
+- `anti_slop_aggregate=8` (challenger=8, architect=8, subtractor=8)
+- `issue_keys=[ik_us0126_spec_reattest_pass_challenger, ik_us0126_spec_layering_compose, ik_us0126_spec_scope_minimal_pass]`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (a0126spec-challenger-001, a0126spec-architect-002, a0126spec-subtractor-003) + docs/product/vision.md ## Intake Notes — US-0126 + ## Discovery Notes — US-0126 + docs/product/backlog.md ## US-0126 + docs/engineering/state.md (spec + RE-ATTEST checkpoints) + handoffs/resume_brief.md (sovereign-critic PASS prepend → /research)`
+
+### Next scheduled phase
+
+- `next_scheduled_phase=/research` (role=tech-lead; fresh tech-lead subagent per BUG-0006; deepen R-0109 US-0126 subsection; DQ1..DQ8 remain open)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after sovereign-critic. Orchestrator spawns /research in fresh tech-lead subagent (BUG-0006). Do NOT spawn /research from sovereign-critic. Do NOT mark US-0126 DONE. Do NOT mutate backlog/acceptance. Do NOT mutate intake JSON. Do NOT add # US-0126 to architecture.md.`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sovereign-critic`, `role=tech-lead`, `model_id=composer-2.5-fast` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0126-sovereign-critic-spec-20260824T222500Z-fresh`, `timestamp=2026-08-24T22:25:00Z`
+- `evidence_ref=handoffs/sovereign_critic_findings.jsonl (US-0126 spec rows a0126spec-challenger-001, a0126spec-architect-002, a0126spec-subtractor-003) + docs/engineering/state.md (this checkpoint) + handoffs/resume_brief.md (sovereign-critic PASS → /research role=tech-lead)`
+- `producer_phase_reviewed=spec` (intake+discovery RE-ATTEST)
+- `producer_role_reviewed=po`
+- `producer_model_id_reviewed=glm-5.2-high`
+- `critic_verdict=PASS` (concurs with producer spec PASS post RE-ATTEST)
+
+## Orchestrator stop — AUTO_LOOP_MAX_CYCLES (US-0126 / auto-20260824-02)
+
+- **phase_id**: orchestrator-stop (not a lifecycle producer)
+- `orchestrator_run_id=auto-20260824-02`
+- `story_id=US-0126`
+- `delivery_mode=ultra_lean`
+- `resolved_phase_plan=[spec, plan, build+verify, ship]`
+- `native_chain_active=true`
+- `native_chain_continuing=false`
+- `drain_advance_action=spawned`
+- `stop_reason=loop_max`
+- `stop_phase=sovereign-critic`
+- `next_scheduled_phase=/research` (role=tech-lead)
+- `AUTO_LOOP_MAX_CYCLES=50` (cap exhausted this invocation; new `/auto` resets)
+- `US-0125=DONE` (S0125 released; do not reopen)
+- `timestamp=2026-08-24T21:56:00Z` (UTC)
+- Autonomy breadcrumb: loop_max is a hard stop. orchestrator MUST Task-spawn when schedulable — not schedulable under loop_max. post-subagent continuation. phase-role stop is not run terminal. native chain supersedes Option B.
 

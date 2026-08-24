@@ -1,3 +1,19 @@
+# QA → Verify-Work Handoff
+
+## Remote evidence tuple (US-0086 / AC-5)
+
+When routing verify-work to remote or container targets, emit names-only evidence:
+
+- `target_id`
+- `environment_label`
+- `automation_profile`
+- `routing_source`
+- `secret_surface=names_only`
+
+See `docs/engineering/runbook.md` for operator examples.
+
+---
+
 # QA → Verify-Work Handoff — S0108 / US-0108 (QA PASS, next `/verify-work` fresh qa subagent)
 
 **Sprint**: S0108

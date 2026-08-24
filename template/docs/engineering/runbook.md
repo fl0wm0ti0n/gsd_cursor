@@ -3867,3 +3867,152 @@ For stories that completed `/release` before US-0120 ship:
 - **Manifest**: `docs/engineering/context/installer-owned-paths.manifest` (closure paths in `install_include_paths` + `clean_paths`).
 - **Parity checker**: `scripts/check_intake_template_parity.py --scope=us-0120` (closure-phase surfaces).
 
+## OpenCode host mode (US-0121)
+
+**Goal:** Ship the first vertical slice of the OpenCode adapter epic — an
+empty-but-valid `template/.opencode/` pack plus an additive `--host cursor|opencode|both`
+switch on the existing its-magic installer. Default install remains
+**cursor-only** until explicit opt-in. Full operator runbook is US-0126; this
+section is the minimal docs hook (AC-9).
+
+### `--host` flag
+
+```
+its-magic --target <repo> --mode missing [--host cursor|opencode|both]
+```
+
+- `--host` accepts `cursor | opencode | both` (case-insensitive, whitespace-trimmed).
+- Default is `cursor` when `--host` is omitted. No scratchpad key, environment
+  variable, or host auto-detect may flip the default in this story.
+- Unknown value → exit with `INSTALL_HOST_INVALID` (ASCII diagnostic, no GUI).
+- Duplicate / conflicting `--host` argv → fail closed `INSTALL_HOST_INVALID`
+  (no last-wins; closes critic finding `ik_us0121_upgrade_host_transition`).
+- `--host` gates **only** `.cursor/` and `.opencode/` trees. Kernel paths
+  (`docs/`, `scripts/`, `its_magic/`, `handoffs/`, `decisions/`, `sprints/`,
+  `.github/workflows/`) always install regardless of `--host`.
+
+### Install
+
+```bash
+# Cursor-only (default; .opencode/ is NOT installed)
+its-magic --target . --mode missing
+
+# OpenCode-only (.cursor/ rows skipped; kernel paths still install)
+its-magic --target . --mode missing --host opencode
+
+# Both host trees
+its-magic --target . --mode missing --host both
+```
+
+### Clean (host-scoped — no silent deletion)
+
+```bash
+its-magic --clean-repo --target . --yes --host cursor      # removes [clean_paths] only
+its-magic --clean-repo --target . --yes --host opencode    # removes [opencode_clean_paths] only
+its-magic --clean-repo --target . --yes --host both        # removes both
+```
+
+Shrinking `--host both` → `cursor` does **not** delete `.opencode/`; it emits
+`OPENCODE_ORPHANED_BY_CLEAN_CURSOR`. The operator must run
+`its-magic --clean-repo --host opencode|both` to remove the orphan. Symmetric
+for `--host opencode` shrinking from `both` (`CURSOR_ORPHANED_BY_CLEAN_OPENCODE`).
+
+### Upgrade (host-scoped)
+
+```bash
+its-magic --target . --mode upgrade --host cursor
+its-magic --target . --mode upgrade --host opencode
+its-magic --target . --mode upgrade --host both
+```
+
+`upgrade --host cursor` after `--host both` does **not** refresh `.opencode/`;
+it emits `OPENCODE_STALE_BY_UPGRADE_CURSOR`. Symmetric:
+`CURSOR_STALE_BY_UPGRADE_OPENCODE` when shrinking the other way.
+
+### Missing (host-scoped — YAGNI)
+
+`missing` after `--host both` then `--host cursor` no-ops on `.opencode/` via
+the `host_gates_cursor_row` predicate (copy-if-missing is host-scoped). No new
+diagnostic needed; overwrite remains US-0008 unchanged (critic carry-in
+`ik_us0121_missing_overwrite_host_gap`).
+
+### Manifest (parallel additive sections)
+
+`docs/engineering/context/installer-owned-paths.manifest` (active + template
+byte-identical) ships two new sections; existing `[install_include_paths]`,
+`[clean_paths]`, `[required_install_script_paths]` are unchanged:
+
+```
+[opencode_install_include_paths]
+.opencode/agents
+.opencode/commands
+.opencode/plugins
+.opencode/.gitignore
+.opencode/README.md
+
+[opencode_clean_paths]
+.opencode
+```
+
+The triple-installer (`installer.py` / `installer.ps1` / `installer.sh`) shares
+a single `host_gates_cursor_row(rel, host)` predicate so the three installers
+do not diverge (critic finding `ik_us0121_mixed_manifest_cursor_skip`).
+
+### PowerShell `-InstallHost` landmine
+
+`installer.ps1` uses `-InstallHost` (not `-Host`) internally because `-Host`
+shadows the automatic `$Host` variable. `bin/its-magic.js` still exposes `--host`
+to users and forwards `-InstallHost <value>` to `installer.ps1`. Document this
+in QA handoffs.
+
+### Diagnostics reference
+
+| Code | Meaning |
+|------|---------|
+| `INSTALL_HOST_INVALID` | Unknown or duplicate `--host` argv (fail closed). |
+| `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` | `clean --host cursor` left `.opencode/` in place. |
+| `OPENCODE_STALE_BY_UPGRADE_CURSOR` | `upgrade --host cursor` did not refresh `.opencode/`. |
+| `CURSOR_ORPHANED_BY_CLEAN_OPENCODE` | `clean --host opencode` left `.cursor/` in place. |
+| `CURSOR_STALE_BY_UPGRADE_OPENCODE` | `upgrade --host opencode` did not refresh `.cursor/`. |
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0121`.
+- **Decision**: `decisions/DEC-0120.md`.
+- **Pack**: `template/.opencode/{agents/.gitkeep, commands/.gitkeep, plugins/README.md, .gitignore, README.md}`.
+- **Tests**: `tests/us0121_host_mode_test.py` (14 markers).
+- **Parity**: `scripts/check_intake_template_parity.py --scope=opencode-adapter`.
+- **Full runbook**: US-0126 (deferred).
+
+## OpenCode role agents and permissions (US-0122)
+
+With the pack installed via `--host opencode|both`, an operator can `@po` (or `@<role>` for any of the seven role agents) in the OpenCode chat to invoke that role manually, before the US-0124 plugin exists.
+
+## OpenCode model slug routing (US-0123)
+
+QA/dev should default to a tool-reliable slug (a model with documented tool-calling support); Chinese API quality is operator model choice. The kit does not endorse a single vendor.
+
+## OpenCode orchestrator plugin reason codes (US-0124)
+
+Stub reason-code table — US-0126 owns the full cross-host consolidated table; this section ships the one-liner stub only.
+
+- `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` — v2 `ctx.session.create` unavailable at runtime; fail closed; do not degrade to same-session roleplay.
+- `OPENCODE_SUBTASK_IGNORED` — `ctx.session.create` returned null/threw/identical-id (DQ5 matrix); fail closed; stop `/auto`.
+- `OPENCODE_HEADLESS_UNSUPPORTED` — `opencode run` CLI missing on PATH (DQ7); fail closed; stop `/auto`.
+- `OPENCODE_DRIVER_INVOKE_FAILED` — `scripts/auto_outer_driver.py` subprocess failed (non-zero exit, malformed JSON, timeout) (DQ6); fail closed; stop `/auto`.
+- `AUTO_ORCHESTRATOR_PHASE_EXECUTION` — orchestrator (or any role) performing another role's artifact writes; fail closed; stop `/auto`.
+- `PHASE_ROLE_MISMATCH` — wrong-role spawn per US-0069 / DEC-0051 matrix; fail closed; stop `/auto`.
+- `NATIVE_CHAIN_UNAVAILABLE` — headless fallback when native in-session chain unavailable (compose with `OPENCODE_HEADLESS_UNSUPPORTED`).
+
+Cross-link: US-0126 owns the full reason-code table text and remediation guidance.
+
+## OpenCode thin commands + validator bridge (US-0125)
+
+Stub reason-code reference — US-0126 owns the full cross-host consolidated table; this section ships the one-liner stub only.
+
+- `intake_evidence_validate.py --repo . --enforce` — gates `handoffs/intake_evidence/*.json` writes; raw Python reason codes: `INTAKE_PERSISTENCE_BLOCKED`, `INTAKE_REQUIRED_TOPIC_MISSING`, ...
+- `bug_issue_validate.py --repo . --check-acceptance` — gates `docs/product/backlog.md` bug rows + `docs/product/acceptance.md` bug rows; raw Python reason code: `BUG_ISSUE_VALIDATION_FAILED`, ...
+- `OPENCODE_DRIVER_INVOKE_FAILED` — subprocess invocation failure (missing Python, missing script, timeout) per DEC-0124 DQ6; distinct from validator non-zero exit.
+
+Cross-link: US-0126 owns the full reason-code table text and remediation guidance.
+

@@ -5,6 +5,33 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
+function Ensure-NodeOnPath {
+  if (Get-Command node -ErrorAction SilentlyContinue) { return }
+  $candidates = [System.Collections.Generic.List[string]]::new()
+  foreach ($dir in @(
+      "$env:LOCALAPPDATA\Programs\nodejs",
+      "${env:ProgramFiles}\nodejs",
+      "${env:ProgramFiles(x86)}\nodejs"
+    )) {
+    if ($dir) { [void]$candidates.Add($dir) }
+  }
+  $wingetRoot = Join-Path $env:LOCALAPPDATA "Microsoft\WinGet\Packages"
+  if (Test-Path $wingetRoot -PathType Container) {
+    Get-ChildItem -Path $wingetRoot -Filter "node.exe" -Recurse -ErrorAction SilentlyContinue |
+      ForEach-Object { $_.Directory.FullName } |
+      Select-Object -Unique |
+      ForEach-Object { [void]$candidates.Add($_) }
+  }
+  foreach ($dir in $candidates) {
+    if ((Test-Path $dir -PathType Container) -and (Test-Path (Join-Path $dir "node.exe") -PathType Leaf)) {
+      $env:PATH = "$dir;$env:PATH"
+      break
+    }
+  }
+}
+
+Ensure-NodeOnPath
+
 function Resolve-RepoRoot {
   if ($RepoRoot) { return (Resolve-Path $RepoRoot).Path }
   return (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
@@ -73,7 +100,7 @@ Assert-True "Decisions folder exists" (Test-Path (Join-Path $tpl "decisions"))
 Assert-True "Workflows folder exists" (Test-Path (Join-Path $tpl ".github\workflows"))
 
 # 2) Command/rule counts
-Assert-True "23 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 23)
+Assert-True "25 commands exist" ((Count-Files (Join-Path $tpl ".cursor\commands") "*.md") -eq 25)
 Assert-True "6 rules exist" ((Count-Files (Join-Path $tpl ".cursor\rules") "*.mdc") -eq 6)
 Assert-True "7 agents exist" ((Count-Files (Join-Path $tpl ".cursor\agents") "*.mdc") -eq 7)
 
@@ -1634,8 +1661,8 @@ if (Test-Path (Join-Path $root "tests\.tmp-install")) {
 # Report
 $reportPath = Join-Path $root "tests\report.md"
 $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
-$passCount = ($Results | Where-Object { $_.Status -eq "PASS" }).Count
-$failCount = ($Results | Where-Object { $_.Status -eq "FAIL" }).Count
+$passCount = @(($Results | Where-Object { $_.Status -eq "PASS" })).Count
+$failCount = @(($Results | Where-Object { $_.Status -eq "FAIL" })).Count
 
 $resultLines = foreach ($r in $Results) {
   $line = "- [$($r.Status)] $($r.Name)"

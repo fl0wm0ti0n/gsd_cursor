@@ -83,7 +83,7 @@ assert_true "Workflows folder exists" "[ -d \"$TPL/.github/workflows\" ]"
 cmd_count=$(ls "$TPL/.cursor/commands"/*.md 2>/dev/null | wc -l | tr -d ' ')
 rule_count=$(ls "$TPL/.cursor/rules"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
 agent_count=$(ls "$TPL/.cursor/agents"/*.mdc 2>/dev/null | wc -l | tr -d ' ')
-assert_true "23 commands exist" "[ $cmd_count -eq 23 ]"
+assert_true "25 commands exist" "[ $cmd_count -eq 25 ]"
 assert_true "6 rules exist" "[ $rule_count -eq 6 ]"
 assert_true "7 agents exist" "[ $agent_count -eq 7 ]"
 

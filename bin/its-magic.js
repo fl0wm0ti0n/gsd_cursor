@@ -32,6 +32,9 @@ function parseArgs(argv) {
     yes: false,
     help: false,
     version: false,
+    host: "cursor",
+    hostSeen: 0,
+    hostError: null,
   };
 
   if (argv.length === 0) {
@@ -56,6 +59,23 @@ function parseArgs(argv) {
     }
     if (a === "--mode" && argv[i + 1]) {
       args.mode = argv[i + 1];
+      i += 1;
+      continue;
+    }
+    if (a === "--host" && argv[i + 1]) {
+      args.hostSeen += 1;
+      if (args.hostSeen > 1) {
+        args.hostError = "duplicate";
+        continue;
+      }
+      const raw = argv[i + 1];
+      const normalized = String(raw).toLowerCase().trim();
+      if (normalized !== "cursor" && normalized !== "opencode" && normalized !== "both") {
+        args.hostError = "invalid";
+        args.host = normalized;
+      } else {
+        args.host = normalized;
+      }
       i += 1;
       continue;
     }
@@ -112,6 +132,16 @@ Install options:
                                    hooks, skills, CI, scripts) while preserving user
                                    data (docs, sprints, handoffs, decisions, runbook).
                                    Use after updating its-magic to a newer version.
+  --host <value>    Host-surface switch: cursor | opencode | both (default: cursor).
+                    Normalized case-insensitive and whitespace-trimmed before validate.
+                    Unknown value -> exit with INSTALL_HOST_INVALID.
+                    Duplicate --host argv -> fail closed INSTALL_HOST_INVALID (no last-wins).
+                    --host gates ONLY .cursor/ and .opencode/ trees; kernel paths
+                    (docs/, scripts/, its_magic/, handoffs/, decisions/, sprints/,
+                    .github/workflows/) always install regardless of --host.
+                    clean --host cursor after --host both leaves .opencode/ in place
+                    and emits OPENCODE_ORPHANED_BY_CLEAN_CURSOR; upgrade --host cursor
+                    after --host both emits OPENCODE_STALE_BY_UPGRADE_CURSOR.
   --backup          Before overwriting, save existing files to backups/<timestamp>/.
                     Ignored when mode is "missing" (nothing gets replaced).
   --create          Create the target directory if it does not exist.
@@ -156,6 +186,13 @@ if (args.version) {
   console.log(`its-magic v${packageJson.version}`);
   process.exit(0);
 }
+if (args.hostError) {
+  const reason = args.hostError === "duplicate"
+    ? "duplicate --host argv (no last-wins)"
+    : `unknown host value '${args.host}'`;
+  console.log(`[INSTALL_HOST_INVALID] ${reason}. Accepted: cursor | opencode | both (default: cursor).`);
+  process.exit(1);
+}
 
 const root = path.resolve(__dirname, "..");
 const isWin = process.platform === "win32";
@@ -171,6 +208,8 @@ if (isWin) {
     args.target,
     "-Mode",
     args.mode,
+    "-InstallHost",
+    args.host,
   ];
   if (args.backup) psArgs.push("-Backup");
   if (args.create) psArgs.push("-Create");
@@ -186,6 +225,8 @@ if (isWin) {
     args.target,
     "--mode",
     args.mode,
+    "--host",
+    args.host,
   ];
   if (args.backup) shArgs.push("--backup");
   if (args.create) shArgs.push("--create");

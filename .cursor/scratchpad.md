@@ -9,7 +9,11 @@
 # - LOOP_UNTIL_GREEN: 0|1 (optional test loop)
 # - RUN_TESTS_ON_EDIT: 0|1 (run tests after edits)
 # - AUTO_IMPLEMENTATION_LOOP: 0|1 (auto cycle execute->qa->execute)
-# - AUTO_LOOP_MAX_CYCLES: integer >= 1 (safety guard)
+# - AUTO_LOOP_MAX_CYCLES: integer >= 1 (safety guard). Under /auto this counts
+#   every Task spawn: phase subagents + CROSS_MODEL_REVIEW critics + drain-advance.
+#   5 is too small for ultra_lean+critic (one story is ~18-24 spawns). Use >= 32
+#   for a full story with critics and a few execute-qa retries; raise further
+#   if AUTO_BACKLOG_DRAIN should finish multiple stories in one invocation.
 # - AUTO_PAUSE_REQUEST: 0|1 (request graceful stop at next safe boundary)
 # - AUTO_PAUSE_POLICY: after_task|after_phase (safe stop boundary)
 # - DONE: 0|1 (stop hook loops)
@@ -17,7 +21,7 @@ MAGIC_CONTEXT_STRICT=1
 LOOP_UNTIL_GREEN=1
 RUN_TESTS_ON_EDIT=1
 AUTO_IMPLEMENTATION_LOOP=1
-AUTO_LOOP_MAX_CYCLES=5
+AUTO_LOOP_MAX_CYCLES=50
 AUTO_PAUSE_REQUEST=0
 AUTO_PAUSE_POLICY=after_phase
 DONE=0
@@ -174,6 +178,7 @@ AUTO_PUSH_BRANCH_ALLOWLIST=main
 #
 # Delivery mode (US-0096 / DEC-0082)
 # - DELIVERY_MODE: standard|ultra_lean|mega_quick (default standard; unset = standard)
+#   Example: DELIVERY_MODE=standard
 # - LEAN_MEMORY_READ: 0|1 (default 1 when pack/active-context paths exist)
 # - LEAN_MEMORY_WRITE: 0|1 (default 1 when pack/active-context paths exist)
 # - LEAN_COLD_READ_MAX_SECTIONS: int >= 1 (default 4)
@@ -205,8 +210,8 @@ INTAKE_GUIDED_MODE=1
 INTAKE_SUBAGENT_FALLBACK=deny
 INTAKE_WORK_ITEM_KIND=story
 ID_NAMESPACE_BOOTSTRAP=0
-TOKEN_PROFILE=lean
-STATE_HOT_MAX_LINES=1000
+TOKEN_PROFILE=balanced
+STATE_HOT_MAX_LINES=1200
 STATE_HOT_MAX_CHECKPOINTS=80
 PO_TO_TL_HOT_MAX_LINES=650
 PO_TO_TL_HOT_MAX_SECTIONS=60
@@ -220,7 +225,7 @@ ARCH_HOT_MAX_STORY_SECTIONS=120
 #   - auto: allow publish without confirmation (explicit opt-in)
 # - RELEASE_TARGETS_FILE: canonical target config path
 # - RELEASE_TARGETS_DEFAULT: comma-separated default target IDs (optional)
-RELEASE_PUBLISH_MODE=disabled
+RELEASE_PUBLISH_MODE=confirm
 RELEASE_TARGETS_FILE=docs/engineering/release-targets.json
 RELEASE_TARGETS_DEFAULT=
 
@@ -334,8 +339,8 @@ DEV_ENVIRONMENT_CONFIG=.cursor/dev-environment.json
 #     * hybrid: profile:docs-prose-only;globs:handoffs/archive/*.md
 #   Mutation requires COMPRESS_INPUT=1 + non-empty scope + CLI --write; use --dry-run first.
 #   Originals land in docs/.caveman-originals/<path>; deny-list always wins over allow.
-CAVEMAN_MODE=1
-CAVEMAN_LEVEL=full
+CAVEMAN_MODE=0
+CAVEMAN_LEVEL=
 CAVEMAN_COMPRESS_INPUT=0
 CAVEMAN_FILE_SCOPE=
 
@@ -622,7 +627,7 @@ RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0
 # AUTONOMY_REPAIR_CAP_OVERRIDE: int >= 1 or empty (default=empty)
 # Operator override for per-run repair cap (empty = use matrix default cap=3 per DEC-0119 Â§5).
 AUTONOMY_PRESET=full
-AUTONOMY_STOP_POLICY=block
+AUTONOMY_STOP_POLICY=auto_repair_then_block
 INTAKE_AUTONOMY_MODE=0
 INTAKE_MINIMAL_PACK=0
 INTAKE_ASSUME_STACK_CONTEXT=0

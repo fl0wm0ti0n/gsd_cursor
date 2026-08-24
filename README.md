@@ -364,6 +364,7 @@ Generated test scaffolding + auto-run behavior (US-0066):
 - `/memory-audit`: read-only memory drift check with advisory report.
 - `/pause`, `/resume`, `/refresh-context`.
 - `/auto`: orchestration mode that spawns a fresh subagent per phase.
+- **US-0124**: OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session).
 
 ### Guided intake behavior (US-0033)
 

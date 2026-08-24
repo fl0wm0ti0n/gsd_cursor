@@ -1,46 +1,56 @@
-# Release-to-Dev Handoff — S0111 / US-0111
+# Release-to-Dev Handoff — S0122 / US-0122
 
-**date**: 2026-06-30
-**from**: release
-**to**: dev / verify-work
-**orchestrator_run_id**: auto-20260628-04
-**release_attempt_marker**: release-S0111-US0111-auto-20260628-04-20260630T190000Z-fresh
+**date**: 2026-08-24
+**from**: release (1st attempt, fresh subagent)
+**to**: dev / operator (runbook mirror + triad rollover + harness green)
+**orchestrator_run_id**: auto-20260824-01
+**release_attempt_marker**: rel-US0122-release-20260824T124500Z-fresh
+**model_id**: composer-2.5-fast (CROSS_MODEL_REVIEW=1 — required)
 
 ## Blocker
 
-`/release` for `S0111` (US-0111 Release Trigger-Driven Version Changelog Derivation) fails closed at gate 3 (UAT completion gate) with reason code **`RELEASE_UAT_INCOMPLETE`**.
+`/release` for `S0122` (US-0122 OpenCode role agents and Layer-1 permission table) fails closed at **gate 1 (check-in test)** with reason code **`RELEASE_TEST_FAILED`**. Queue row S0122 set to `blocked` (NOT `released`). No backlog mutation (closure owns that per US-0120). No publish (disabled).
+
+QA, UAT, isolation, and verify-work strict proof were green at spawn. Gate 4b verify-work proof `rp-auto-20260824-01-verify-work-qa-20260824T123500Z-US-0122` (ttl `2026-08-24T13:35:00Z`) was still fresh — **not** `RUNTIME_PROOF_STALE`.
 
 ## Deterministic cause
 
-`sprints/S0111/uat.json` and `sprints/S0111/uat.md` are currently S0110/US-0110 artifacts (story header, `story_id=US-0110`, UAT-1..UAT-10 referencing `test_us0110_*` markers and `scripts/sovereign_convergence_*.py`). They do not contain US-0111 UAT steps, contract tests, or adapter-scope evidence, so they cannot satisfy the UAT gate for S0111 / US-0111.
+**`RELEASE_TEST_FAILED`** — Prior `tests/report.md` @ `2026-08-24T10:45:36Z` (`Pass: 845 / Fail: 0`) predates US-0122 execute (`12:15:00Z`) and lacks US-0122 harness rows → stale for this story. Release subagent reran consolidated harness:
 
-## QA / verify-work state (informative, not gating here)
+```powershell
+powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1
+```
 
-- QA verdict for S0111 / US-0111: `PASS` (`sprints/S0111/qa-findings.md`, `sprints/S0111/qa-verdict.json`).
-- Verify-work verdict for S0111 / US-0111: `PASS` (`sprints/S0111/verify-work-verdict.json`, `sprints/S0111/verify-work-findings.md`), 12/12 contract tests, 7/7 compose guards.
-- These verdicts confirm functional/correctness quality but do **not** substitute for a populated US-0111 UAT artifact set under `sprints/S0111/uat.{json,md}` per DEC-0009 / US-0039 / US-0027.
+- Exit code: **1**
+- Fresh `tests/report.md` @ `2026-08-24T12:44:49Z`: **`Pass: 830 / Fail: 15`**
+- Grep `\[FAIL\]` on report: **15 rows**
+
+Key in-scope failures (US-0122 execute regression surface):
+
+| Failure row | Root cause |
+|-------------|------------|
+| `slim auto command contract markers pass` | 3 pytest failures in `tests/auto_command_contract_test.py`: architecture `# US-0089` bottom-append violated by later `# US-0122` heading; active/template runbook byte mismatch |
+| `check_intake_template_parity --scope=*` (multiple scopes) | `docs/engineering/runbook.md` active (196549b) ≠ template (196286b) — US-0122 h2 added active-only |
+| `triad check passes on repo` / `triad check idempotent rerun passes` | `STATE_ARCHIVE_REQUIRED` — state 1845/1200 lines; architecture 3219/3000 lines |
+
+US-0122 contract tests (`tests/us0122_contract_test.py` 8/8) pass in isolation; failure is **parity / triad / consolidated harness** integration.
+
+## QA / verify-work state (informative)
+
+- QA: **PASS** (`sprints/S0122/qa-findings.md`) — 0 blockers; 8/8 contract tests independent re-run.
+- Verify-work: **PASS** (`handoffs/verify_to_release.md`, `sprints/S0122/verify-work-findings.md`) — 10/10 UAT; 8/8 live pytest.
+- UAT: **PASS** (`sprints/S0122/uat.json` 10/10).
+- Isolation: **PASS** — execute, qa, verify-work in `docs/engineering/state.md`.
 
 ## Required remediation
 
-1. Run `/verify-work` for `S0111` / `US-0111` in a fresh `qa` subagent context.
-2. Populate US-0111 UAT artifacts:
-   - `sprints/S0111/uat.json` — US-0111 steps for AC-1..AC-12 with `result`/`evidence_ref` per step.
-   - `sprints/S0111/uat.md` — narrative matching the JSON, covering adapter registry, four adapter types, TriggerContext contract, US-0100 compose guard, US-0103 ledger integration, atomic promotion, per-version notes, reason code inventory, and template parity for `scope=release-trigger-adapter`.
-3. Rerun `/release` for `S0111`.
+1. **Mirror runbook h2** — Copy `## OpenCode role agents and permissions (US-0122)` block from active `docs/engineering/runbook.md` to `template/docs/engineering/runbook.md` so active/template runbook pair is byte-identical (fixes parity scopes + `test_template_runbook_literal_parity_active` + `test_us0095_template_parity_auto_surfaces`).
+2. **Architecture bottom-append** — Resolve `test_caveman_architecture_section_bottom_appended_and_linked` failure (`# US-0122` appended after `# US-0089` per DEC-0073 §11). Coordinate with tech-lead if contract update is required; prefer minimal compliant placement.
+3. **Triad rollover** — `python scripts/enforce-triad-hot-surface.py --rollover` then `--check` (state + architecture hot-surface oversize).
+4. **Refresh harness** — `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` → exit 0; `Fail: 0`; zero `[FAIL]` rows.
+5. **Rerun `/verify-work`** if gate-4b proof TTL expires before `/release` retry (current ttl `2026-08-24T13:35:00Z`).
+6. **Rerun `/release`** in fresh release subagent. On PASS → `/closure` (qe).
 
-## Non-target safety (honored)
+## Stop condition
 
-- No non-S0111 rows in `handoffs/release_queue.md` were mutated.
-- No historical sprint notes files were mutated.
-- `docs/product/backlog.md` `US-0111` remains `OPEN` (canonical status authority, US-0045).
-- `docs/product/acceptance.md` US-0111 row remains unchecked.
-- `docs/engineering/state.md` unchanged beyond the existing verify-work checkpoint for S0111.
-
-## Evidence refs
-
-- `sprints/S0111/release-findings.md`
-- `sprints/S0111/uat.json` (S0110 contents; not US-0111 evidence)
-- `sprints/S0111/uat.md` (S0110 contents; not US-0111 evidence)
-- `sprints/S0111/qa-findings.md`, `sprints/S0111/qa-verdict.json`
-- `sprints/S0111/verify-work-findings.md`, `sprints/S0111/verify-work-verdict.json`
-- `handoffs/release_queue.md` (no S0111 row exists)
+STOP after release handoff. Orchestrator spawns `/execute` (dev) for remediation — release must NOT self-remediate implementation.

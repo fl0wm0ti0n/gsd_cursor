@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "providers": {
+    "deepseek": { "npm": "@ai-sdk/deepseek" },
+    "moonshot": { "npm": "@ai-sdk/moonshot" },
+    "zai": { "npm": "@ai-sdk/zai" },
+    "anthropic": { "npm": "@ai-sdk/anthropic" },
+    "openai": { "npm": "@ai-sdk/openai" },
+    "dashscope": {
+      "npm": "@ai-sdk/openai-compatible",
+      "options": { "baseURL": "https://dashscope.aliyuncs.com/compatible-mode/v1" }
+    }
+  },
+  "roles": {
+    "po": "anthropic/<your-claude-slug>",
+    "tech-lead": "zai/<your-glm-slug>",
+    "dev": "deepseek/<your-deepseek-slug>",
+    "qa": "moonshot/<your-kimi-slug>",
+    "release": "openai/<your-gpt-slug>",
+    "curator": "anthropic/<your-claude-slug>",
+    "security": "anthropic/<your-claude-slug>",
+    "auto": "zai/<your-glm-slug>"
+  }
+}

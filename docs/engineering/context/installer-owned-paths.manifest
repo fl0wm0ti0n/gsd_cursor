@@ -97,6 +97,21 @@ scripts/validate_closure_verification.py
 its_magic
 .its-magic-version
 
+[opencode_install_include_paths]
+.opencode/agents
+.opencode/commands
+.opencode/plugins
+.opencode/.gitignore
+.opencode/README.md
+template/.opencode/agents/**
+template/.opencode/commands/**
+template/.opencode/model-catalog.local.example.json
+template/.opencode/plugins/orchestrator.ts
+scripts/opencode_model_catalog_apply.py
+
+[opencode_clean_paths]
+.opencode
+
 [required_install_script_paths]
 scripts/validate-and-push.ps1
 scripts/validate-and-push.sh

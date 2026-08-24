@@ -18,6 +18,7 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=release-trigger-adapter DEC-0111 release trigger adapter surfaces (US-0111).
   --scope=us-0119               DEC-0119 autonomous-autonomy preset surfaces (US-0119).
   --scope=us-0120               US-0120 dedicated /closure phase surfaces.
+  --scope=opencode-adapter       US-0121 OpenCode host pack + --host cursor/opencode/both surfaces.
   --scope=all              union of all tables.
 """
 
@@ -474,6 +475,47 @@ CLOSURE_PHASE_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+# US-0121 — OpenCode adapter host pack + --host cursor/opencode/both surfaces
+# (DEC-0120). Pairs the manifest, the parity checker itself (edited in
+# lockstep), and the contract test file. Pack files under template/.opencode/
+# are template-only (Q9 YAGNI: no kit-repo active .opencode/ mirror), so they
+# are not parity-paired here; the contract test (marker 11) asserts manifest
+# membership for the pack rows.
+OPENCODE_ADAPTER_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+    (
+        "scripts/check_intake_template_parity.py",
+        "template/scripts/check_intake_template_parity.py",
+    ),
+    (
+        "tests/us0121_host_mode_test.py",
+        "template/tests/us0121_host_mode_test.py",
+    ),
+    (
+        "tests/us0122_contract_test.py",
+        "template/tests/us0122_contract_test.py",
+    ),
+    (
+        "tests/us0123_contract_test.py",
+        "template/tests/us0123_contract_test.py",
+    ),
+    (
+        "tests/us0124_contract_test.py",
+        "template/tests/us0124_contract_test.py",
+    ),
+    (
+        "tests/us0125_contract_test.py",
+        "template/tests/us0125_contract_test.py",
+    ),
+    (
+        "scripts/model_tier_validate.py",
+        "template/scripts/model_tier_validate.py",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
@@ -496,6 +538,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "work-kind-routing": WORK_KIND_ROUTING_PAIRS,
     "us-0119": AUTONOMY_PRESET_PAIRS,
     "us-0120": CLOSURE_PHASE_PAIRS,
+    "opencode-adapter": OPENCODE_ADAPTER_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -517,6 +560,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + WORK_KIND_ROUTING_PAIRS
         + AUTONOMY_PRESET_PAIRS
         + CLOSURE_PHASE_PAIRS
+        + OPENCODE_ADAPTER_PAIRS
     ),
 }
 

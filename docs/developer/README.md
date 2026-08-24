@@ -15,6 +15,8 @@ setup stays in the root `README.md` (user channel).
   `sprint-plan`, `execute`, `qa`, `release`, etc.).
 - Keep handoffs and `docs/engineering/state.md` updated at phase boundaries.
 - Use `.cursor/scratchpad.local.md` for personal overrides; never commit secrets.
+- **US-0124** — OpenCode orchestrator plugin spawn-only `/auto`; traceability:
+  runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
 
 ## Quality gates
 
@@ -22,9 +24,17 @@ setup stays in the root `README.md` (user channel).
 - Run `python scripts/validate_doc_profile.py` when changing documentation profile flags or
   README surfaces.
 - Observe `US-0071` hygiene for user-visible script output (see runbook).
+- **US-0121** — OpenCode template pack + installer `--host` flag; traceability:
+  runbook `## OpenCode host mode (US-0121)`, architecture `# US-0121`.
+- **US-0123** — OpenCode per-role/per-phase model slug routing (multi-provider, no vendor IDs in template); traceability:
+  runbook `## OpenCode model slug routing (US-0123)`, architecture `# US-0123`, `decisions/DEC-0123.md`.
+- **US-0124** — OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session); traceability:
+  runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
 
 ## Architecture notes
 
+- **US-0122** — OpenCode role agents and Layer-1 permission table; traceability:
+  architecture `# US-0122`, `decisions/DEC-0122.md`.
 - High-level contracts live in `docs/engineering/architecture.md` (search for story ids).
 - Installer ownership is driven by `docs/engineering/context/installer-owned-paths.manifest`.
 - Template parity: changes in repo root often require the same edit under `template/`.

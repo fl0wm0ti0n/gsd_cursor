@@ -1,5 +1,8 @@
 # /closure — dedicated story closure phase
 
+## Subagents
+- qe
+
 ## Phase role
 
 - **phase_id**: `closure`

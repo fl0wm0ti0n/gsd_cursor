@@ -1,0 +1,296 @@
+{
+  "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+  "turn_index": 0,
+  "writer_id": "po-cursor-20260822",
+  "selected_pack": "first-intake-pack",
+  "requested_mode": "story",
+  "intake_boundary_utc": "2026-08-22T21:15:00Z",
+  "INTAKE_GUIDED_MODE": 1,
+  "INTAKE_WORK_ITEM_KIND": "story",
+  "ID_NAMESPACE_BOOTSTRAP": 0,
+  "decomposition_verdict": "multi_story",
+  "decomposition_rationale": "Operator submitted docs/product/opencode-adapter-masterplan.md and accepted six independently valuable workflow-step slices (US-0051): pack+installer, role agents+permissions, model slug routing, orchestrator plugin spawn, thin commands+validator bridge, docs+contract tests. Split axis is vertical workflow steps, not technical layers. Do not clone US-0001–US-0119. Standalone runtime is a separate program.",
+  "duplicate_check_pass": true,
+  "duplicate_check_notes": "Compose, do not clone: US-0001 phase names, US-0003 roles, US-0008 installer (additive --host only), US-0069 matrix, US-0092 outer driver, US-0101/US-0102 semantics without Cursor aliases as runtime, US-0023 isolation, BUG-0006 spawn-only. Do not port US-0095 native Cursor chain. Distinct from docs/product/standalone-runtime-masterplan.md.",
+  "assumptions_confirmed": "Default install host remains cursor-only until explicit --host opencode|both opt-in; OpenCode plugin v1 vs v2 deferred to /research.",
+  "assumption_confirmation_ref": "ie:cursor-20260822-opencode-adapter-intake:8:b35124171a7ab0a0",
+  "assumption_confirmation_intake_run_id": "cursor-20260822-opencode-adapter-intake",
+  "assumption_confirmation_turn_index": 8,
+  "assumption_confirmation_quoted": "Default install host remains cursor-only until explicit --host opencode|both opt-in; OpenCode plugin v1 vs v2 deferred to /research.",
+  "topic_coverage": [
+    {
+      "topic_key": "users_problem",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:0:b2b84005e4038934",
+      "quoted_user_text": "Operators who want its-magic's artifact workflow without Cursor's soft rules, BYOK-subagent ceiling, and alias-only models. They need real subagents, own provider keys including Chinese APIs, and host-enforced behavior.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 0,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#users_problem"
+    },
+    {
+      "topic_key": "runtime_target_environment",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:1:270da9723966d71c",
+      "quoted_user_text": "Authoring in this git repo. Operator runtime is stock OpenCode TUI/desktop/IDE, not a vendored OpenCode binary. Consumer repos get .opencode/ via the its-magic installer. Headless uses US-0092 --invoke-cmd.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 1,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#runtime_target_environment"
+    },
+    {
+      "topic_key": "language_framework_runtime",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:2:50a57e1edc38adc1",
+      "quoted_user_text": "Kernel stays Python 3 validators and existing scripts. Adapter plugin is OpenCode plugin TypeScript/JavaScript. Agents and thin commands are markdown plus JSON under .opencode/.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 2,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#language_framework_runtime"
+    },
+    {
+      "topic_key": "architecture_preference",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:3:dc851046ff25c950",
+      "quoted_user_text": "Host-adapter on unmodified OpenCode: kernel artifacts plus validators plus auto_outer_driver plus US-0069 matrix; host pack is .opencode/agents, thin commands, and one orchestrator plugin. Cursor pack remains. Rejected: OpenCode fork, greenfield runtime in this repo, VS Code plus shell rewrite.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 3,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#architecture_preference"
+    },
+    {
+      "topic_key": "ui_design_expectations",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:4:d21e205690b89687",
+      "quoted_user_text": "No new its-magic GUI in v1. Operators use OpenCode TUI/desktop/IDE. Kit UX stays slash-command names and ASCII CLI diagnostics with reason codes.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 4,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#ui_design_expectations"
+    },
+    {
+      "topic_key": "security_compliance",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:5:6706660c48966284",
+      "quoted_user_text": "Never read .env in plugin logs. Provider keys stay in OpenCode /connect auth store, not git, not template vendor slugs. Plugin must not print API keys. Role permission deny-lists are the security control. Kit does not proxy traffic.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 5,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#security_compliance"
+    },
+    {
+      "topic_key": "non_functional_priorities",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:6:df8593ab44842ceb",
+      "quoted_user_text": "Priority 1 enforceability of spawn permissions and validators. Priority 2 Cursor coexistence. Priority 3 fail-closed reason codes. Priority 4 template parity. Priority 5 TUI polish is out of kit v1.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 6,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#non_functional_priorities"
+    },
+    {
+      "topic_key": "scope_timeline",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260822-opencode-adapter-intake:7:6438b839594dafde",
+      "quoted_user_text": "v1 is OpenCode adapter in this repo: install pack, seven roles with permissions, thin commands, orchestrator plugin, per-role models, docs and tests. Out of scope: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman, Cursor browser UAT, full sovereign-loop parity.",
+      "intake_run_id": "cursor-20260822-opencode-adapter-intake",
+      "turn_index": 7,
+      "evidence_source": "equivalent_evidence_ref",
+      "equivalent_evidence_ref": "docs/product/opencode-adapter-masterplan.md#scope_timeline"
+    }
+  ],
+  "asked_topics": [
+    "users_problem",
+    "runtime_target_environment",
+    "language_framework_runtime",
+    "architecture_preference",
+    "ui_design_expectations",
+    "security_compliance",
+    "non_functional_priorities",
+    "scope_timeline"
+  ],
+  "missing_topics": [],
+  "candidate_story_ids": [
+    "US-0121",
+    "US-0122",
+    "US-0123",
+    "US-0124",
+    "US-0125",
+    "US-0126"
+  ],
+  "story_ids": [
+    "US-0121",
+    "US-0122",
+    "US-0123",
+    "US-0124",
+    "US-0125",
+    "US-0126"
+  ],
+  "plan_area_inventory": [
+    {
+      "plan_area_id": "opencode-template-pack",
+      "plan_area_description": "template/.opencode/** layout, examples, gitignore for local models/keys"
+    },
+    {
+      "plan_area_id": "installer-host-mode",
+      "plan_area_description": "Install/upgrade/clean for .opencode/ without breaking .cursor/ (US-0008 compose)"
+    },
+    {
+      "plan_area_id": "role-agents-permissions",
+      "plan_area_description": "Seven roles + orchestrator as OpenCode agents; permission table"
+    },
+    {
+      "plan_area_id": "model-slug-routing",
+      "plan_area_description": "Per-role/per-phase slugs; multi-provider; no vendor IDs in template/ (US-0102 rule)"
+    },
+    {
+      "plan_area_id": "orchestrator-plugin-spawn",
+      "plan_area_description": "Plugin spawn-only /auto; US-0069; isolation evidence; stop matrix"
+    },
+    {
+      "plan_area_id": "validator-bridge",
+      "plan_area_description": "Plugin/CLI invokes existing Python validators; fail-closed; no reimplementation"
+    },
+    {
+      "plan_area_id": "thin-commands",
+      "plan_area_description": "Named commands as dispatch-only (no Cursor command clones)"
+    },
+    {
+      "plan_area_id": "docs-runbook-parity",
+      "plan_area_description": "Runbook + README + contract tests + parity scopes for OpenCode host"
+    },
+    {
+      "plan_area_id": "cursor-coexistence",
+      "plan_area_description": "Cursor path remains default; no forced migration"
+    },
+    {
+      "plan_area_id": "headless-invoke-cmd",
+      "plan_area_description": "Wire US-0092 --invoke-cmd to OpenCode"
+    },
+    {
+      "plan_area_id": "sovereign-loop-on-opencode",
+      "plan_area_description": "US-0103–US-0110 on OpenCode (deferred)"
+    },
+    {
+      "plan_area_id": "standalone-runtime",
+      "plan_area_description": "Owned agent runtime in a new repo (deferred)"
+    },
+    {
+      "plan_area_id": "opencode-fork",
+      "plan_area_description": "Private OpenCode distro (deferred unless spawn isolation impossible)"
+    },
+    {
+      "plan_area_id": "vscode-shell-port",
+      "plan_area_description": "VS Code plugin wrapping PowerShell (rejected)"
+    },
+    {
+      "plan_area_id": "caveman-voice-port",
+      "plan_area_description": "Caveman on OpenCode (Cursor-tax / optional later)"
+    },
+    {
+      "plan_area_id": "cursor-browser-uat",
+      "plan_area_description": "Cursor MCP browser probes (host-specific)"
+    }
+  ],
+  "plan_area_coverage": [
+    {
+      "plan_area_id": "opencode-template-pack",
+      "story_ids": [
+        "US-0121"
+      ]
+    },
+    {
+      "plan_area_id": "installer-host-mode",
+      "story_ids": [
+        "US-0121"
+      ]
+    },
+    {
+      "plan_area_id": "role-agents-permissions",
+      "story_ids": [
+        "US-0122"
+      ]
+    },
+    {
+      "plan_area_id": "model-slug-routing",
+      "story_ids": [
+        "US-0123"
+      ]
+    },
+    {
+      "plan_area_id": "orchestrator-plugin-spawn",
+      "story_ids": [
+        "US-0124"
+      ]
+    },
+    {
+      "plan_area_id": "validator-bridge",
+      "story_ids": [
+        "US-0125"
+      ]
+    },
+    {
+      "plan_area_id": "thin-commands",
+      "story_ids": [
+        "US-0125"
+      ]
+    },
+    {
+      "plan_area_id": "docs-runbook-parity",
+      "story_ids": [
+        "US-0126"
+      ]
+    },
+    {
+      "plan_area_id": "cursor-coexistence",
+      "story_ids": [
+        "US-0121"
+      ]
+    },
+    {
+      "plan_area_id": "headless-invoke-cmd",
+      "story_ids": [
+        "US-0124"
+      ]
+    },
+    {
+      "plan_area_id": "sovereign-loop-on-opencode",
+      "deferred_ref": "docs/product/opencode-adapter-masterplan.md#plan-area-inventory",
+      "deferred_reason": "After v1 spawn and validators work; US-0103–US-0110 not in adapter v1."
+    },
+    {
+      "plan_area_id": "standalone-runtime",
+      "deferred_ref": "docs/product/standalone-runtime-masterplan.md",
+      "deferred_reason": "Owned agent runtime is a separate program in a new repo."
+    },
+    {
+      "plan_area_id": "opencode-fork",
+      "deferred_ref": "docs/product/opencode-adapter-masterplan.md",
+      "deferred_reason": "Fork only if stock OpenCode cannot isolate child sessions."
+    },
+    {
+      "plan_area_id": "vscode-shell-port",
+      "deferred_ref": "docs/product/opencode-adapter-masterplan.md",
+      "deferred_reason": "Rejected for this program."
+    },
+    {
+      "plan_area_id": "caveman-voice-port",
+      "deferred_ref": "docs/product/opencode-adapter-masterplan.md",
+      "deferred_reason": "Cursor-tax; optional later."
+    },
+    {
+      "plan_area_id": "cursor-browser-uat",
+      "deferred_ref": "docs/product/opencode-adapter-masterplan.md",
+      "deferred_reason": "Host-specific Cursor MCP; HTTP probes may stay in kernel."
+    }
+  ],
+  "coverage_complete": true,
+  "story_persisted": true,
+  "backlog_ref": "docs/product/backlog.md ## US-0121 .. ## US-0126",
+  "acceptance_ref": "docs/product/acceptance.md US-0121..US-0126 rows",
+  "dec_ref": "none (companion DEC deferred to /architecture after /research)",
+  "research_ref": "docs/engineering/research.md ## R-0109",
+  "handoff_ref": "handoffs/po_to_tl.md ## US-0121 OpenCode adapter intake",
+  "source_brief": "docs/product/opencode-adapter-masterplan.md",
+  "fresh_context_marker": "po-US0121-intake-20260822T211500Z-fresh"
+}

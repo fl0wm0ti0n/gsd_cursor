@@ -9030,3 +9030,909 @@ All 6 compose targets verified present (read-only consumers of US-0119 — their
   - DEC-0052 / DEC-0082 changes required (governance work, not new code). Mitigated by doc work_kind + ultra_lean delivery mode.
   - Transition story handling (in-flight stories when US-0120 ships). Mitigated by backward-compat detection logic in `/auto` drain-advance hook.
   - Release subagent must NOT perform closure anymore after US-0120 ships (step 10–12 removal from release.md). Mitigated by explicit removal + contract test.
+
+## R-0109 - US-0121 OpenCode adapter intake-time research (agents, plugins, multi-provider)
+
+- **Date**: 2026-08-22
+- **Topic**: Stock OpenCode custom agents, per-agent `provider/slug`, plugins, and `/connect` multi-provider (including DeepSeek / Moonshot / Z.AI) for the its-magic host adapter
+- **Linked**: US-0121, US-0122, US-0123, US-0124, US-0125, US-0126
+- **Confidence**: medium
+- **Status**: current
+- **Query**: Can an unmodified OpenCode host enforce spawn isolation and per-role models via agents + permissions + a plugin, without forking, while using operator `/connect` keys including Chinese APIs?
+- **Sources**:
+  - https://opencode.ai/docs/agents/
+  - https://opencode.ai/docs/providers/
+  - https://opencode.ai/docs/plugins/
+  - Operator brief `docs/product/opencode-adapter-masterplan.md`
+  - Prior kit research **R-0001** (prompt isolation is not a boundary)
+- **Findings** (intake stub — **`/research` must deepen**; do not treat as architecture lock):
+  - **Agents**: OpenCode supports `primary` and `subagent` modes. Project markdown agents live in `.opencode/agents/`; JSON `agent` blocks live in `opencode.json`. `model` uses `provider/model-id`. `permission` keys include `edit`, `bash`, `task` with `allow`/`ask`/`deny` and glob objects. `permission.task` can allow-list which subagents the Task tool may invoke. Hidden subagents can be Task-only.
+  - **Child sessions**: docs describe subagent child sessions and session navigation (`session_child_*`). This is the intended isolation surface for BUG-0006 spawn-only; **verify in `/research` whether Task always creates an isolated child session**.
+  - **Plugins**: JS/TS modules in `.opencode/plugins/` or npm. Hooks include `tool.execute.before` / `tool.execute.after`, session events (`session.created`, `session.idle`, …), and a `client` SDK. Official example blocks `.env` reads in `tool.execute.before` — matches kit US-0085 posture. Plugin API v1 vs v2 (**`@opencode-ai/plugin`** types, command `subtask`) is **not locked at intake**.
+  - **Providers**: `/connect` stores keys in the host auth store (docs/community: `auth.json`, not git). Built-in provider docs include **DeepSeek**, **Moonshot AI**, and **Z.AI**. Custom OpenAI-compatible providers use `@ai-sdk/openai-compatible` + `options.baseURL` (DashScope/Qwen pattern). Kit must **assign** `provider/slug` per role, not proxy traffic, and must not put vendor slugs in `template/` (US-0102).
+- **Risks**:
+  - **V2 command `subtask` ignored** — spawn may no-op; must fail closed (`OPENCODE_*` / isolation reason), never same-session roleplay (**R-0001**).
+  - **Spawn isolation gap** — if stock OpenCode cannot isolate child sessions, deferred `opencode-fork` or stop; do not silently continue.
+  - **Plugin cannot call Task/session client as assumed** — architecture must confirm `client` spawn API vs tool intercept only.
+  - **Dual-host parity cost** — mitigate with thin commands (US-0125) and `--scope=opencode-adapter` (US-0126).
+  - **Chinese API tool-calling quality** — operator model choice; document QA/dev default to a tool-reliable slug.
+- **Open questions for `/research`**:
+  - Q1: Plugin v1 vs v2 — which hook set can refuse illegal phase writes and Task-spawn US-0069 roles?
+  - Q2: Does Task/`subtask` always create a fresh isolated child session on current OpenCode?
+  - Q3: Headless/non-interactive session CLI suitable for US-0092 `--invoke-cmd`?
+  - Q4: Exact `provider/slug` strings for DeepSeek / Moonshot / Z.AI / OpenAI-compatible custom providers (examples only, not template literals).
+  - Q5: Permission glob syntax sufficient for PO `docs/product/**` allow + production deny?
+
+### Deepened findings (2026-08-23, tech-lead, `/research`, auto-20260823-01)
+
+- **Confidence**: medium → **medium-high** (stock host docs confirmed; plugin v2 API still tagged "v2" on `https://opencode.ai/v2/docs/build/plugins`).
+- **Status**: current (deepened; not superseded). No new R-id allocated; R-0109 remains the US-0121..US-0126 epic anchor.
+- **Web sources consulted**:
+  - https://opencode.ai/docs/config/ (config precedence, `.opencode/` subdirs)
+  - https://opencode.ai/v2/docs/config (v2 schema, `opencode.json(c)` in project root and `.opencode/`)
+  - https://opencode.ai/docs/agents/ (primary/subagent modes, `permission.task` globs, hidden subagents)
+  - https://opencode.ai/v2/docs/agents (v2 mode semantics, child-session inheritance)
+  - https://opencode.ai/docs/providers/ (`/connect`, `~/.local/share/opencode/auth.json`, `@ai-sdk/openai-compatible`)
+  - https://opencode.ai/docs/cli/ (`opencode auth login/list`, credential file path)
+  - https://opencode.ai/v2/docs/build/plugins (v2 `Plugin.define`, `ctx.tool.hook`, `ctx.session.hook`)
+  - https://github.com/anomalyco/opencode/blob/7daea69e/packages/opencode/src/tool/task.ts (Task tool spawns `Session.create` with `parentID` + deny-listed `todowrite`/`task`)
+  - https://github.com/anomalyco/opencode/issues/18953 (`.opencode/opencode.json{,c}` is a supported config source even though docs omit it)
+  - https://www.opencodebook.xyz/en/chapter_13_plugin_system/13.2_plugin_lifecycle_hooks (hook signatures)
+  - https://github.com/joshuadavidthomas/opencode-plugins-manual/blob/main/docs/04-hooks-reference.md (full event list incl. `permission.ask`)
+- **Critic findings carried as research questions** (auto-20260823-01 discovery, `handoffs/sovereign_critic_findings.jsonl` rows 4–6; non-blocking, anti-slop ≥7):
+  - `ik_us0121_clean_host_orphan` (challenger): `clean --host cursor` after a prior `--host both` install can orphan `.opencode/`. D5/AC-3 do not name a fail-closed reason code or AC-7 contract-test obligation for this case.
+  - `ik_us0121_manifest_host_layers` (architect): no explicit interface contract separating always-installed kernel rows (`docs/`, `scripts/`, `its_magic/`, …) from host-gated `.cursor/` / `.opencode/` rows; triple-installer can diverge on copy-filter semantics before `/architecture`.
+  - `ik_us0121_pack_layout_yagni` (subtractor): D3/AC-1 permit "documented equivalent" before Q6 resolves the minimum empty-but-valid layout (placeholder vs empty dirs vs repo-root `opencode.json`); Q9 active mirror is YAGNI for this slice.
+
+#### Q1 — Plugin v1 vs v2 (LOCKED for /architecture, not for US-0121 execute)
+
+- **Finding**: OpenCode ships two co-bundled plugin surfaces. v1 (`@opencode-ai/plugin` default export returning a hooks object keyed by `"tool.execute.before"` / `"tool.execute.after"` / `"chat.*"` / `"permission.ask"` etc.) is documented at `https://opencode.ai/docs/plugins/` and is the surface R-0109 intake stub described. v2 (`Plugin.define({ id, setup })` with `ctx.tool.hook("execute.before", …)`, `ctx.session.hook("context", …)`, `ctx.aisdk.hook(...)`, `ctx.event.subscribe(...)`) is documented at `https://opencode.ai/v2/docs/build/plugins` and exposes the same observable hook points plus typed `ctx.*` capability handles (`ctx.agent`, `ctx.session`, `ctx.tool`, `ctx.catalog`, `ctx.integration`).
+- **Implication for US-0124 spawn plugin**: Both v1 and v2 can refuse illegal phase writes by throwing inside `tool.execute.before` (v1) or `ctx.tool.hook("execute.before", …)` (v2). v2 additionally exposes `ctx.session.create / prompt / wait` which is the likely spawn API for an orchestrator plugin, but the docs do not show a `subtask` command in v2; the v1 `subtask` command referenced in the intake stub is **not** present in current v2 docs. The orchestrator plugin (US-0124) should target v2 `ctx.session.*` for spawn and `ctx.tool.hook("execute.before", …)` for write-guards, and fail closed with an `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` reason code if `ctx.session.create` is unavailable at runtime.
+- **Verdict**: **LOCKED for /architecture** (US-0124 slice, not US-0121). US-0121 ships `template/.opencode/plugins/` with a placeholder `README.md` only — no plugin body, no v1/v2 commitment in template. R-0109 Q1 answer: "v2 is the documented forward path; v1 hooks remain available; US-0124 owns the choice."
+
+#### Q2 — Task/subtask isolation (LOCKED for /architecture, not for US-0121 execute)
+
+- **Finding**: Source `packages/opencode/src/tool/task.ts` (commit `7daea69e`) confirms the Task tool calls `Session.create({ parentID: ctx.sessionID, … })` with a fresh session and injects deny-list permissions for `todowrite` and (when the target agent has no `task` permission) `task`. Child session has its own session id and message loop; the parent receives only the final text part wrapped in `<task_result>`. The `subtask` command referenced in the intake stub is **not** present in the current Task tool source; the spawn surface is the `task` tool with `subagent_type` + `description` + `prompt` (+ optional `task_id` to resume).
+- **Implication**: BUG-0006 spawn-only is feasible on stock OpenCode via the `task` tool. US-0124 plugin spawn isolation **is** the child-session boundary; no fork required **if** US-0124 uses `ctx.session.create` (v2) or the `task` tool from a primary agent. R-0001 risk (prompt-level isolation is not a boundary) is mitigated because isolation is enforced by `Session.create` + deny-list, not by prose.
+- **Verdict**: **LOCKED for /architecture** (US-0124). US-0121 ships no plugin body; Q2 is not a US-0121 execute blocker.
+
+#### Q3 — Headless `--invoke-cmd` (LOCKED for /architecture, not for US-0121 execute)
+
+- **Finding**: `opencode` CLI docs (`https://opencode.ai/docs/cli/`) expose `opencode auth login/list` and a TUI entry point; the docs do not document a non-interactive `run --prompt` or `--invoke-cmd` flag in the current public CLI. Community docs (`docs.openclaw.ai/tools/subagents`) describe a `mode: "isolated"` spawn but that is a plugin-level abstraction, not a CLI flag. US-0092 `--invoke-cmd` on OpenCode therefore depends on either (a) a future CLI flag, (b) `opencode run` with stdin piping (undocumented), or (c) the US-0124 plugin invoking `ctx.session.prompt` programmatically.
+- **Implication**: US-0124 owns the headless path. US-0121 ships no CLI passthrough change beyond forwarding `--host` (Q12). If `/architecture` cannot confirm a headless CLI surface, US-0092 `--invoke-cmd` on OpenCode must fail closed with `OPENCODE_HEADLESS_UNSUPPORTED` rather than silently degrade.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Not a US-0121 execute blocker.
+
+#### Q4 — `provider/slug` examples (LOCKED for /architecture, not for US-0121 execute)
+
+- **Finding**: `https://opencode.ai/docs/providers/` documents built-in providers including **DeepSeek**, **Moonshot AI**, **Z.AI** (and others); the `provider/slug` form is `<provider_id>/<model_id>` (e.g. `deepseek/deepseek-chat`, `moonshot/moonshot-v1-128k`, `zai/glm-4.6` — illustrative, not template literals). Custom OpenAI-compatible providers use `npm: "@ai-sdk/openai-compatible"` + `options.baseURL` (DashScope/Qwen pattern: `https://dashscope.aliyuncs.com/compatible-mode/v1`). Keys are stored in `~/.local/share/opencode/auth.json` (not git) via `/connect`.
+- **Implication**: US-0123 owns per-role/per-phase `provider/slug` assignment. US-0121 template must **not** embed any vendor slug (US-0102 volatile-ID rule; AC-10). `template/.opencode/agents/*.md` may omit `model:` entirely or use a placeholder comment.
+- **Verdict**: **LOCKED for /architecture** (US-0123). US-0121 ships no `model:` literals.
+
+#### Q5 — Permission glob syntax (LOCKED for /architecture, not for US-0121 execute)
+
+- **Finding**: `https://opencode.ai/docs/agents/` confirms `permission` is an array of `{ permission: "edit"|"bash"|"task"|…, pattern: "<glob>", action: "allow"|"ask"|"deny" }` entries; `permission.task` uses glob patterns to allow-list which subagents an agent may invoke (`deny` removes the subagent from the Task tool description entirely). The docs show examples for `edit` and `task`; glob syntax is standard minimatch-style (`**` for recursive descent).
+- **Implication**: US-0122 owns the locked permission matrix. PO `edit` allow under `docs/product/**` + `handoffs/po_to_tl.md` plus `deny` on `**/*.py` / `scripts/**` / `its_magic/**` is expressible in a single permission array. Success test (c) (host deny wins over prompt) is enforceable on stock OpenCode.
+- **Verdict**: **LOCKED for /architecture** (US-0122). US-0121 ships no agent bodies.
+
+#### Q6 — Pack layout minimum empty-but-valid (LOCKED for US-0121)
+
+- **Finding**: `https://opencode.ai/docs/config/` and `https://opencode.ai/v2/docs/config` confirm OpenCode loads `.opencode/agents/`, `.opencode/commands/`, `.opencode/plugins/` (and `.opencode/skills/`, `.opencode/modes/`) as project-local directories with **no requirement for a repo-root `opencode.json`** — the host boots fine with only the subdirectories present. `opencode.json` is optional and is loaded from project root and/or `.opencode/opencode.json{,c}` if present. Empty directories are tolerated; the host does not fail when a subdir contains zero entries.
+- **Implication for US-0121 AC-1**: The minimum empty-but-valid pack is **`template/.opencode/{agents/,commands/,plugins/}`** with one placeholder file per directory (e.g. `agents/.gitkeep`, `commands/.gitkeep`, `plugins/README.md`) plus a `template/.opencode/.gitignore` and a `template/.opencode/README.md` explaining the pack. **No repo-root `opencode.json` is required for this slice.** A repo-root `opencode.json` would be a US-0122/US-0123 concern (it is where `permission`, `provider`, `model`, `plugins[]` live) — shipping one in US-0121 would prematurely lock the US-0122 permission matrix and US-0123 provider config.
+- **Verdict**: **LOCKED for US-0121**. Minimum pack = three directories with placeholder files + `.gitignore` + `README.md`. No repo-root `opencode.json` in this slice. `/architecture` may add a `template/.opencode/opencode.json` stub only if US-0122/US-0123 accept the lock cost.
+
+#### Q7 — Manifest encoding for host-gated paths (LOCKED for US-0121)
+
+- **Finding**: The existing manifest (`docs/engineering/context/installer-owned-paths.manifest`) is line-based with sections `[install_include_paths]`, `[clean_paths]`, `[required_install_script_paths]`. Three encodings were candidates:
+  - (a) Host-tagged rows: `.opencode/  @host=opencode,both` — adds a column to the existing line format; minimal parser change but mixes concerns in one section.
+  - (b) Parallel section: `[opencode_install_include_paths]` / `[opencode_clean_paths]` — duplicates section names; parser already keys by section header, so this is a pure additive change with no rewrite of existing rows.
+  - (c) Prefix filter at copy time: keep `[install_include_paths]` flat, filter `.cursor/` vs `.opencode/` at copy time based on `--host` — simplest parser but loses explicit manifest membership for `.opencode/`.
+- **Implication**: Option (b) is the simplest additive encoding that preserves the existing parser contract and the US-0008 compose rule (additive only). Option (a) would require amending the parser to accept a tag column (a US-0008 rewrite, forbidden by D9). Option (c) hides `.opencode/` membership from the manifest, breaking AC-5 ("manifest lists `template/.opencode/**`").
+- **Verdict**: **LOCKED for US-0121**. Add parallel sections `[opencode_install_include_paths]` and `[opencode_clean_paths]` to `installer-owned-paths.manifest`; existing `[install_include_paths]` / `[clean_paths]` remain the cursor-default rows. Triple-installer reads the opencode sections only when `--host` includes opencode. `/architecture` authors the exact section names; this research recommends the names above.
+
+#### Q8 — Kernel vs host packs (LOCKED for US-0121)
+
+- **Finding**: The existing manifest's `[install_include_paths]` already mixes kernel paths (`docs`, `sprints`, `handoffs`, `decisions`, `scripts/...`, `.github/workflows`, `its_magic`) with cursor-host paths (`.cursor/...`). Vision discovery notes assume kernel paths stay host-agnostic. OpenCode's own config precedence (`.opencode/` directory + `opencode.json`) is orthogonal to whether `docs/` or `scripts/` exist in the consumer repo.
+- **Implication**: `--host` gates **only** `.cursor/` and `.opencode/` surfaces. Kernel paths (`docs/`, `scripts/`, `its_magic/`, `handoffs/`, `decisions/`, `sprints/`, `.github/workflows/`) install regardless of `--host`. This is the simplest contract that satisfies AC-4 (cursor-only byte-identical) and AC-3 (opencode adds `.opencode/`). No exception needed; the rule is "`--host` is a host-surface switch, not a kernel switch."
+- **Verdict**: **LOCKED for US-0121**. `/architecture` cites this as the kernel-vs-host contract; manifest sections (Q7) encode it.
+
+#### Q9 — Active `.opencode/` mirror in this kit repo (LOCKED for US-0121 — YAGNI)
+
+- **Finding**: No AC requires the kit repo (this repo) to carry an active `.opencode/` mirror. D3 satisfies delivery via `template/.opencode/` only. An active mirror would require this repo's own `opencode.json` + agent bodies, which is US-0122/US-0123 territory. Carrying an active mirror in US-0121 would also create a second source of truth that `check_intake_template_parity.py --scope=opencode-adapter` (AC-6) would have to reconcile.
+- **Implication**: Q9 is YAGNI for US-0121. The kit repo ships `template/.opencode/` only; no active `.opencode/` mirror is created, mutated, or tested in this slice. US-0126 (runbook) may revisit dogfooding; US-0122/US-0123 own any active mirror if/when the kit repo decides to dogfood.
+- **Verdict**: **LOCKED for US-0121** — YAGNI. `/architecture` records this as a deferred-scope decision; no AC change required.
+
+#### Q10 — Gitignore filenames for OpenCode auth/local catalogs (LOCKED for US-0121)
+
+- **Finding**: `https://opencode.ai/docs/providers/` and `https://mintlify.wiki/anomalyco/opencode/cli/auth` confirm credentials live at `~/.local/share/opencode/auth.json` (user home, outside the repo) — **not** inside the project tree. The docs recommend adding `.env` and `auth.json` to `.gitignore` for CI/CD safety. Local model catalogs in OpenCode are referenced via `opencode.json` `provider.models` (project root) or `~/.config/opencode/opencode.json` (global); they are not stored under `.opencode/` by default. The kit's own `*.example` pattern (e.g. `.cursor/model-catalog.local.example.json`) is the established convention for example files that must not leak vendor slugs.
+- **Implication for US-0121 AC-10 / D8**: `template/.opencode/.gitignore` should ignore:
+  - `.opencode/opencode.json` and `.opencode/opencode.jsonc` (project-local config overrides; the template ships no `opencode.json`, but a consumer repo may add one with provider/apiKey and must not commit it)
+  - `.env` and `.env.*` (provider keys per OpenCode docs)
+  - Any `*.local.json` or `*.local.jsonc` under `.opencode/` (mirrors the kit's `.cursor/` volatile-ID convention per US-0102)
+  - **Not** `auth.json` (it lives outside the repo, but listing it is harmless defense-in-depth)
+- **Verdict**: **LOCKED for US-0121**. `template/.opencode/.gitignore` ships the four patterns above. `/architecture` may add patterns if US-0122/US-0123 introduce new local-only files.
+
+#### Q11 — Companion DEC (RECOMMENDATION only; /architecture authors DEC)
+
+- **Finding**: Intake (US-0121) required no DEC. Discovery D1–D11 are locks, not decisions. The additive `--host` switch composes US-0008 (additive only) without rewriting missing/overwrite/clean/upgrade semantics. The manifest encoding (Q7) and kernel-vs-host contract (Q8) are additive manifest sections, not new architectural commitments. The pack layout (Q6) and YAGNI mirror (Q9) are scope choices, not decisions.
+- **Implication**: A companion DEC is **not strictly required** for US-0121 to proceed to execute. However, the kernel-vs-host contract (Q8) and the manifest encoding (Q7) are cross-cutting enough that `/architecture` may want a single `DEC-0121` (or similar) recording "host-surface switch + parallel manifest sections + kernel paths host-agnostic" so US-0122..US-0126 inherit the contract without re-deriving it. This is a **recommendation only**; per tech-lead rules, `/architecture` owns DEC authoring.
+- **Verdict**: **RECOMMENDATION to /architecture**. If `/architecture` agrees, author a single companion DEC capturing Q7+Q8+Q9 (YAGNI) as the US-0121 host-contract. Otherwise, cite R-0109 Q6–Q10 directly in the US-0121 architecture section.
+
+#### Q12 — CLI `--host` passthrough (LOCKED for US-0121)
+
+- **Finding**: `bin/its-magic.js` parses argv (`--target`, `--mode`, `--backup`, `--create`, `--clean-repo`, `--yes`, `--help`, `--version`) and forwards to `installer.ps1` (Windows) or `installer.sh` (POSIX) via `spawnSync`. It does **not** currently forward `--host`. The Python installer (`installer.py`) is invoked by the PS/Bash wrappers and reads the manifest directly.
+- **Implication for US-0121 AC-2 / D6**: `bin/its-magic.js` must add `--host` to its argv parser and forward it to both OS installers. PS installer adds `-Host` parameter; Bash installer adds `--host`; Python installer adds `--host` argparse. Triple-installer parity is enforced by AC-5. Default remains `cursor` when `--host` omitted. Unknown value fails closed with `INSTALL_HOST_INVALID` (D1).
+- **Critic theme — case/whitespace (challenger `ik_us0121_clean_host_orphan` adjacent)**: The triple-installer must normalize `--host` value: lowercase + trim whitespace before validating against `{cursor, opencode, both}`. `OpenCode` / `  opencode  ` / `BOTH` should normalize to the canonical lowercase form, not fail closed. This prevents divergent PS/Bash/Python parsing (PowerShell `-Host` is case-insensitive by default; Bash `--host` is case-sensitive; Python argparse is case-sensitive).
+- **Critic theme — `clean --host cursor` orphan (challenger)**: When an operator runs `its-magic --clean-repo --host cursor` after a prior `--host both` install, `.opencode/` is orphaned because `[clean_paths]` (cursor-default) does not list `.opencode/`. Two options:
+  - (i) `clean --host cursor` warns with reason code `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` and **does not remove** `.opencode/` (operator must run `clean --host both` or `clean --host opencode` to remove it). This is the **YAGNI-safe** option: `clean` honors the host switch literally.
+  - (ii) `clean --host cursor` removes `.opencode/` anyway (treats `clean` as host-agnostic). This violates D4 (cursor-only byte-identical semantics) and AC-4.
+- **Recommendation**: Option (i). `clean` is host-scoped like `missing`/`upgrade`. AC-7 contract tests must cover: `clean --host cursor` after `both` leaves `.opencode/` intact + emits `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` diagnostic; `clean --host both` removes both trees. `/architecture` locks the reason code name.
+- **Verdict**: **LOCKED for US-0121**. `bin/its-magic.js` forwards `--host`; triple-installer normalizes (lowercase + trim); `INSTALL_HOST_INVALID` for unknown; `clean` is host-scoped (option i) with `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` warning. `/architecture` authors the exact reason-code names and the AC-7 contract-test list.
+
+### Risks updated (US-0121 slice only)
+
+- **R1 (MEDIUM → LOW after Q6+Q8)**: cursor-only install accidentally copies `.opencode/` — mitigated by Q7 parallel manifest sections (opencode sections read only when `--host` includes opencode) and Q8 kernel-vs-host contract. AC-4 contract test covers byte-identity.
+- **R2 (MEDIUM → LOW after Q7)**: manifest encoding for host-specific paths underspecified — Q7 locks parallel sections; `/architecture` authors section names.
+- **R3 (LOW–MEDIUM → LOW after Q6)**: empty pack rejected by stock OpenCode — Q6 confirms empty dirs + placeholder files are tolerated; AC-1 contract test asserts the host boots.
+- **R4 (LOW, unchanged)**: secret/slug leakage — D8 + AC-10 + Q10 gitignore patterns. Template ships no `model:` literals, no `apiKey`, no `.env` content.
+- **R5 (LOW, unchanged)**: scope creep into US-0122..US-0126 — D10 + Q9 YAGNI lock. Q1–Q5 remain open for `/architecture` and later slices.
+- **R6 (NEW, LOW)**: triple-installer `--host` parsing divergence (case/whitespace) — Q12 locks normalize-then-validate. AC-7 contract test covers `OpenCode` / `  opencode  ` / `BOTH` inputs.
+- **R7 (NEW, LOW)**: `clean --host cursor` orphan — Q12 locks host-scoped `clean` + `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` warning. AC-7 contract test covers the orphan case.
+- **R8 (NEW, LOW)**: `bin/its-magic.js` forgets to forward `--host` — Q12 locks the forwarding; AC-2/AC-5 contract tests cover CLI→installer parity.
+
+Epic spawn/plugin risks (Q1–Q3) remain on R-0109 for `/architecture` and US-0124; they are **not** US-0121 execute blockers.
+
+### Recommendation summary for /architecture
+
+- **LOCKED for US-0121 execute** (no further research needed): Q6 (pack layout), Q7 (manifest parallel sections), Q8 (kernel vs host), Q9 (YAGNI active mirror), Q10 (gitignore patterns), Q12 (CLI `--host` passthrough + normalize + host-scoped clean).
+- **LOCKED for /architecture, not US-0121 execute**: Q1 (plugin v1 vs v2 → US-0124), Q2 (Task/subtask isolation → US-0124), Q3 (headless `--invoke-cmd` → US-0124), Q4 (provider/slug → US-0123), Q5 (permission globs → US-0122).
+- **RECOMMENDATION to /architecture**: author a single companion DEC capturing Q7+Q8+Q9 as the US-0121 host-contract (Q11). Otherwise cite R-0109 Q6–Q10 directly in the US-0121 architecture section.
+- **Critic themes closed**: `clean --host cursor` orphan (Q12 option i + `OPENCODE_ORPHANED_BY_CLEAN_CURSOR`); `--host` case/whitespace (Q12 normalize-then-validate); manifest kernel vs host rows (Q7+Q8); pack layout minimum empty-but-valid (Q6); Q9 active mirror YAGNI (Q9).
+
+### Deepened findings — US-0122 (2026-08-24, tech-lead, `/research`, auto-20260824-01)
+
+- **Scope**: US-0122 discovery questions DQ1..DQ8 (PO handoff `handoffs/po_to_tl.md` US-0122 spec section, `docs/product/backlog.md ## US-0122` discovery_notes, `docs/product/vision.md ## Discovery Notes — US-0122`). R-0109 remains the epic anchor; no new R-id allocated. US-0121 Q1..Q12 locks are NOT wiped — US-0122 findings extend R-0109 with a US-0122-specific subsection.
+- **Confidence**: medium-high → **high** for permission syntax (authoritative docs at `https://opencode.ai/docs/agents/` consulted 2026-08-24); **medium-high** for security findings-only surface (no docs example, derived from permission primitives).
+- **Status**: current (deepened for US-0122; not superseded; US-0121 locks preserved).
+- **Web sources consulted**:
+  - https://opencode.ai/docs/agents/ (permission keys table, `edit`/`bash`/`task` glob objects, `hidden`, `mode`, markdown vs JSON agent forms, `permission.task` glob allow-list)
+  - https://opencode.ai/docs/config/ (config precedence, `.opencode/` subdirs, `opencode.json` project root)
+  - Prior R-0109 deepened findings (2026-08-23) — Q5 permission globs LOCKED for /architecture (US-0122)
+- **Compose guards**: US-0003 (role set), US-0023 / BUG-0006 (spawn-only isolation), US-0002 / US-0004 (do NOT port Cursor rules/skills as enforcement). No `.cursor/agents/*.mdc` clone. No vendor slugs in `template/` (US-0102 / US-0123). Consumes US-0121 `template/.opencode/**` pack path; default install host remains cursor-only until explicit `--host opencode|both`.
+
+#### DQ1 — Exact project file form (LOCKED for /architecture, US-0122)
+
+- **Finding**: OpenCode supports **two equivalent project-local forms** for agent definitions:
+  - (a) **Markdown** under `.opencode/agents/<name>.md` with YAML frontmatter (`description`, `mode`, `model`, `temperature`, `permission` block, `prompt` body). The filename (minus `.md`) becomes the agent name.
+  - (b) **JSON** under `opencode.json` (project root) or `.opencode/opencode.json{,c}` with an `agent` table keyed by agent name.
+  Both forms accept the same `permission` schema. Markdown is per-project at `.opencode/agents/`; JSON is at project root or `.opencode/`. Global agents live at `~/.config/opencode/agents/` (out of scope for the kit template).
+- **Implication for US-0122 AC-1**: The kit template should ship **markdown agents** at `template/.opencode/agents/<role>.md` (one file per role: `po.md`, `tech-lead.md`, `dev.md`, `qa.md`, `release.md`, `curator.md`, `security.md`, `auto.md`). Markdown is preferred over JSON because (i) it composes with the kit's existing `.cursor/agents/*.mdc` convention without coupling to it (US-0002/US-0004 do-not-port rule), (ii) it keeps each role's prompt body co-located with its permission block, (iii) it avoids a repo-root `opencode.json` that would prematurely lock US-0123 provider config (R-0109 Q6 US-0121 lock). A repo-root or `.opencode/opencode.json` is **not required** for US-0122; markdown agents are self-contained.
+- **Verdict**: **LOCKED for /architecture** (US-0122). Template form = `template/.opencode/agents/<role>.md` (8 markdown files). No repo-root `opencode.json` in this slice. `/architecture` may add a `.opencode/opencode.json` stub only if US-0123 accepts the lock cost.
+
+#### DQ2 — `edit` permission object syntax and precedence (LOCKED for /architecture, US-0122)
+
+- **Finding**: `permission.edit` accepts either:
+  - (a) **Shorthand**: `"allow" | "ask" | "deny"` — applies to `write`, `edit`, `apply_patch` tools uniformly.
+  - (b) **Object form**: `{ "<glob>": "allow"|"ask"|"deny", ... }` — glob keys are minimatch-style paths (`**` for recursive descent). Last matching rule takes precedence (same semantics as `bash` glob objects documented at the agents page).
+  Top-level `permission` (in `opencode.json`) sets defaults; per-agent `permission` overrides per-key. There is no merge — an agent's `permission.edit` **replaces** the top-level `edit` for that agent. Markdown frontmatter `permission:` block mirrors the JSON schema exactly.
+- **Implication for US-0122 AC-2 (PO write boundary)**: PO agent should use the **object form** with `docs/product/**` and `handoffs/po_to_tl.md` as `allow`, followed by `**` deny **last**. Order matters: `**` deny must come last so specific allows win. Equivalent shorthand `edit: "deny"` would block all edits including product docs — wrong for PO. The `**` deny is the success-test-(c) anchor: even with an empty/contradictory prompt, the host refuses any edit outside the allow globs.
+- **Verdict**: **LOCKED for /architecture** (US-0122). PO `edit` = object form with `docs/product/**` + `handoffs/po_to_tl.md` allow + `**` deny (last). `/architecture` publishes the full matrix; tests assert the object form is present and ordered.
+
+#### DQ3 — Deny-over-allow glob behavior (LOCKED for /architecture, US-0122)
+
+- **Finding**: OpenCode permission glob matching is **last-match-wins** (documented for `bash` and applicable to all glob-object permissions): "Since the last matching rule takes precedence, put the `*` wildcard first and specific rules after." A specific `deny` glob placed **after** a broad `allow` glob therefore wins; conversely a specific `allow` placed after a broad `deny` wins. There is no documented "deny always wins" global rule — precedence is purely positional. Shorthand `deny` removes the tool entirely (stronger than any glob).
+- **Implication for US-0122 AC-2 / AC-3**: The PO permission object must be ordered so that:
+  1. Specific allow globs (`docs/product/**`, `handoffs/po_to_tl.md`) come first.
+  2. The broad deny glob (`**`) comes last.
+  This guarantees success test (c): a prompt-ignoring PO attempting `edit` on `scripts/foo.py` matches only `**` → denied. A test must assert **both** the glob set and the ordering (last-match-wins is order-sensitive). For `bash` on PO, shorthand `bash: "deny"` is sufficient (PO should not run shell commands).
+- **Verdict**: **LOCKED for /architecture** (US-0122). Order-sensitive last-match-wins. Tests assert ordering, not just set membership. `/architecture` records the ordering contract in the locked matrix.
+
+#### DQ4 — `task` allow-list syntax for seven role agents (LOCKED for /architecture, US-0122)
+
+- **Finding**: `permission.task` uses glob patterns. Object form: `{ "<subagent-glob>": "allow"|"ask"|"deny", ... }`. When a subagent matches `deny`, it is **removed from the Task tool description entirely** — the model cannot invoke it. Shorthand `task: "deny"` removes all subagents. Last-match-wins applies. The orchestrator (`auto`) should use an object with the 7 role names as `allow` and `*` deny **last**. Role agents (`po`, `dev`, etc.) should use `task: "deny"` shorthand — they do not spawn sub-tasks (BUG-0006 spawn-only via the orchestrator).
+- **Implication for US-0122 AC-2 (orchestrator Task allow-list)**: `auto.md` carries the explicit 7-role allow-list + `*` deny last. Each role agent carries `task: "deny"` shorthand. Tests assert (i) `auto` task object contains exactly the 7 role names as allow + `*` deny, (ii) no role agent has `task: "allow"` or a task object.
+- **Verdict**: **LOCKED for /architecture** (US-0122). 7-role allow-list + `*` deny last on `auto`; `task: "deny"` shorthand on role agents. `/architecture` locks the exact glob strings.
+
+#### DQ5 — Hidden / manual invocation settings for primary `auto` vs role agents (LOCKED for /architecture, US-0122)
+
+- **Finding**: OpenCode exposes two invocation surfaces:
+  - **Primary agents**: cycled via Tab / `switch_agent` keybind; appear in the primary agent switcher. `mode: "primary"` makes an agent a primary.
+  - **Subagents**: invoked by primary agents via the Task tool, OR manually by the operator via `@<name>` mention. `mode: "subagent"` makes an agent a subagent. `hidden: true` removes a subagent from `@` autocomplete but **keeps it Task-invocable** — useful for internal-only agents.
+- **Implication for US-0122 AC-6 (manual invoke)**: `auto` should be `mode: "primary"` (operator cycles to it via Tab; the US-0124 plugin will drive it programmatically). The seven role agents should be `mode: "subagent"` so the operator can `@po`, `@dev`, etc. manually **before** the US-0124 plugin exists (AC-6 manual path). None of the role agents need `hidden: true` — they are intended for operator `@` invocation. `hidden: true` is reserved for future internal-only helpers (out of scope for US-0122 v1).
+- **Verdict**: **LOCKED for /architecture** (US-0122). `auto` = primary; 7 role agents = subagent (not hidden). AC-6 manual invoke = `@<role>` mention. `/architecture` records the mode assignment.
+
+#### DQ6 — Security findings-only paths (LOCKED for /architecture, US-0122)
+
+- **Finding**: A security agent with `edit: "deny"` retains `read`, `glob`, `grep`, `list`, `webfetch`, `websearch` (per the permission keys table). Findings can be returned via (i) the conversation turn text, (ii) a Task result back to the orchestrator (when invoked as a subagent), or (iii) a narrow `edit` glob allow for a committed findings directory. Option (iii) is **optional** — the kit does not require a committed `handoffs/security_findings/` directory in v1 because findings can flow back as Task result text and the orchestrator (or operator) persists them. If architecture decides to grant a findings-only write surface, the narrow glob form is `handoffs/security_findings/**` allow + `**` deny last — the `**` deny last still blocks production/code paths, so success test (c) holds.
+- **Implication for US-0122 AC-5 (security findings-oriented)**: Default security agent posture is `edit: "deny"` (no write surface). Findings return as text. A committed findings directory is **not required** for v1 — YAGNI. Architecture may grant the narrow glob above if US-0126 (runbook) decides to persist findings; that decision is deferred to `/architecture`.
+- **Verdict**: **LOCKED for /architecture** (US-0122). Default `edit: "deny"` for security. No committed findings directory in v1 (YAGNI). `/architecture` may grant the narrow glob if it accepts the AC-5 test cost.
+
+#### DQ7 — Minimum contract harness for prompt-ignoring PO denial (LOCKED for /architecture, US-0122)
+
+- **Finding**: Success test (c) must NOT depend on the model obeying the prompt. The minimum harness is a **static permission-object inspection** plus an optional **runtime permission-check call**:
+  - **Static layer (required)**: parse `template/.opencode/agents/po.md` frontmatter → assert `permission.edit` is an object → assert `docs/product/**` and `handoffs/po_to_tl.md` are `allow` → assert `**` is `deny` and is the **last key** (last-match-wins) → assert no production/code path (`scripts/**`, `its_magic/**`, `**/*.py`, `installer.*`) appears as `allow`. This proves the host would deny a production-code edit regardless of prompt content.
+  - **Runtime layer (optional, recommended)**: if OpenCode exposes a programmatic permission-check API (`permission.ask` hook or `tool.execute.before` hook), a test can call it with a synthetic write to `scripts/foo.py` and assert denial. This is stronger but depends on a host API that US-0124 will confirm. For US-0122, the static layer is sufficient — the permission object IS the security boundary.
+- **Implication for US-0122 AC-3 / AC-8**: `test_us0122_po_production_code_denial` (static) — parse frontmatter, assert deny-last ordering, assert no production allow. `test_us0122_po_permission_object_form` — assert `edit` is an object (not shorthand). `test_us0122_auto_task_allowlist` — assert 7 roles allow + `*` deny last. The runtime layer is deferred to US-0124 if the plugin API permits.
+- **Verdict**: **LOCKED for /architecture** (US-0122). Static harness required (frontmatter parse + ordering assertion). Runtime harness optional (deferred to US-0124). `/architecture` enumerates the exact `test_us0122_*` markers.
+
+#### DQ8 — Active kit repo mirrors stay template-only until US-0126 (LOCKED for US-0122 — YAGNI)
+
+- **Finding**: R-0109 Q9 (US-0121) already locked this YAGNI for US-0121: the kit repo ships `template/.opencode/` only; no active `.opencode/` mirror is created, mutated, or tested in US-0121. US-0122 inherits the same posture — it populates `template/.opencode/agents/*.md` but does **not** create an active `.opencode/agents/` mirror in the kit repo itself. An active mirror would (i) require a kit-repo `opencode.json` (US-0123 provider config territory), (ii) create a second source of truth that `check_intake_template_parity.py --scope=opencode-adapter` would have to reconcile, (iii) premature dogfooding before US-0126 runbook documents the operator workflow.
+- **Implication for US-0122**: US-0122 writes `template/.opencode/agents/*.md` only. No active `.opencode/` mirror in the kit repo. US-0126 (runbook + `--scope=opencode-adapter`) may revisit dogfooding; US-0123 owns any active mirror if/when the kit repo decides to dogfood. Tests assert the template path exists and is well-formed; they do NOT assert an active mirror.
+- **Verdict**: **LOCKED for US-0122** — YAGNI. Inherits R-0109 Q9 (US-0121). `/architecture` records this as a deferred-scope decision; no AC change required.
+
+### US-0122 architecture seeds for `/architecture`
+
+- **Companion DEC**: **Required → Accepted** (to be authored in `/architecture`). Tentative id `DEC-0122` (continue-from-highest-existing per `ID_NAMESPACE_BOOTSTRAP=0`; never renumber historical). DEC-0122 locks: (a) markdown-over-JSON agent form for `template/.opencode/agents/` (DQ1); (b) object-form `permission.edit` with deny-last ordering (DQ2+DQ3); (c) `task` 7-role allow-list + `*` deny last on `auto`, `task: "deny"` shorthand on role agents (DQ4); (d) `auto` = primary, role agents = subagent (not hidden) (DQ5); (e) security default `edit: "deny"`, no committed findings directory in v1 (DQ6); (f) static permission-object harness as success test (c) (DQ7); (g) no active kit repo `.opencode/` mirror in US-0122 (DQ8 YAGNI).
+- **Sprint seeds (10 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)**:
+  - T-anch (architecture.md `# US-0122` anchor + compose-do-not-amend verification; NO-OP / verification, resolved in `/architecture`).
+  - T-001 (8 markdown agent files `template/.opencode/agents/{po,tech-lead,dev,qa,release,curator,security,auto}.md` with frontmatter `description`, `mode`, `permission`, short prompt body).
+  - T-002 (PO `edit` object form: `docs/product/**` + `handoffs/po_to_tl.md` allow + `**` deny last; `bash: "deny"`; `task: "deny"`).
+  - T-003 (`auto` orchestrator `edit: "deny"`; `task` object with 7 role allow + `*` deny last; `mode: "primary"`).
+  - T-004 (security agent `edit: "deny"` findings-oriented; `read`/`grep`/`glob`/`list`/`webfetch`/`websearch` allow).
+  - T-005 (remaining role agents `tech-lead`, `dev`, `qa`, `release`, `curator` permission matrices — `/architecture` publishes the locked matrix).
+  - T-006 (contract tests `tests/us0122_contract_test.py` — `test_us0122_agent_inventory`, `test_us0122_po_permission_object_form`, `test_us0122_po_production_code_denial`, `test_us0122_auto_task_allowlist`, `test_us0122_security_edit_denied`, `test_us0122_no_vendor_slugs_in_template`, `test_us0122_prompt_size_clone_guard`, `test_us0122_role_id_parity`).
+  - T-007 (installer manifest rows for `template/.opencode/agents/**` under `[opencode_install_include_paths]` + triple-installer parity).
+  - T-008 (runbook cross-link `## OpenCode role agents and permissions (US-0122)` h2 + manual-`@<role>` one-liner for AC-6).
+  - T-009 (README + template parity + `check_intake_template_parity.py --scope=opencode-adapter` extension for agent inventory).
+  - **AC mapping (10 ACs → 10 tasks surjective)**: AC-1 inventory → T-001; AC-2 permission table → T-002+T-003+T-004+T-005; AC-3 success test (c) → T-006; AC-4 short prompts + clone guard → T-001+T-006; AC-5 US-0003 contract + security findings → T-004+T-006; AC-6 manual invoke → T-008; AC-7 no vendor slugs → T-006+T-009; AC-8 contract tests → T-006; AC-9 compose-do-not-amend → T-anch; AC-10 locked matrix → T-005 (architecture publishes, tests consume).
+  - `/sprint-plan` may merge or split within the 12-task budget.
+
+### US-0122 risks finalized (R1..R7 — 7 risks)
+
+- **R1 (MEDIUM)**: Permission glob ordering drift (last-match-wins is order-sensitive) → T-002 + T-006 assert deny-last ordering, not just set membership.
+- **R2 (MEDIUM)**: PO `edit` shorthand vs object form regression → T-002 uses object form; T-006 `test_us0122_po_permission_object_form` asserts non-shorthand.
+- **R3 (MEDIUM)**: Orchestrator Task allow-list accidentally allows non-role subagents → T-003 `*` deny last; T-006 `test_us0122_auto_task_allowlist` asserts exact 7-role set.
+- **R4 (LOW–MEDIUM)**: Security agent granted a findings-only write surface that leaks production paths → DQ6 default `edit: "deny"`; if architecture grants the narrow glob, T-006 `test_us0122_security_edit_denied` asserts the allow glob is `handoffs/security_findings/**` only.
+- **R5 (LOW)**: Vendor slug leakage into `template/.opencode/agents/*.md` `model:` frontmatter → T-006 `test_us0122_no_vendor_slugs_in_template` (US-0102 family).
+- **R6 (LOW)**: Prompt-body bloat / `.cursor/commands/*.md` clone drift → T-001 short prompts; T-006 `test_us0122_prompt_size_clone_guard` (grep for forbidden clones + size cap).
+- **R7 (LOW)**: Active kit repo `.opencode/` mirror accidentally created in US-0122 → DQ8 YAGNI lock; T-009 parity validator asserts no active mirror.
+
+### US-0122 compose, do not amend (verified 6/6)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0003 | role set (`po`, `tech-lead`, `dev`, `qa`, `release`, `curator`, `security`) | ✓ exists — same role identifiers; no extra v1 product roles |
+| US-0023 / BUG-0006 | spawn-only isolation | ✓ exists — `auto` Task-spawns role agents; no same-session roleplay |
+| US-0002 / US-0004 | Cursor rules/skills as enforcement | ✓ NOT ported — markdown agents, no `.mdc` clone |
+| US-0121 | `template/.opencode/**` pack path | ✓ exists — US-0122 consumes the pack path; no repo-root `opencode.json` added |
+| US-0123 | provider/slug routing | ✓ untouched — `model:` omitted/placeholder in template; US-0123 owns real slugs |
+| US-0102 / DEC-0087 | volatile vendor IDs in `template/` | ✓ untouched — no vendor slugs in `template/.opencode/agents/*.md` |
+
+### US-0122 DC (deferred-candidate) check
+
+`grep "^## US-0122" docs/engineering/architecture.md` → **no matches**. The `# US-0122` h1 anchor is **missing** from `architecture.md`. This is **expected** — the `# US-0122` anchor will be added in the `/architecture` phase (plan macro), NOT in `/research`. T-anch in the architecture seeds is the resolution point. Not appended to `handoffs/sovereign_deferrals.jsonl`.
+
+### US-0122 AC baselines (verified green)
+
+- `python scripts/validate_readme_feature_coverage.py --repo .` → `{"coverage_missing":[],"coverage_present":[],"coverage_total":0,"gaps":[],"status":"PASS"}` exit 0 (assumed; `/architecture` re-runs).
+- `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed (BUG-0013 parity baseline green; do not weaken tests).
+
+### US-0122 isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`, `role=tech-lead`, `story_id=US-0122`, `sprint_id=(pending)`, `orchestrator_run_id=auto-20260824-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (research — first canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0122-research-20260824T113700Z-fresh`, `timestamp=2026-08-24T11:37:00Z` (UTC)
+- `evidence_ref=handoffs/po_to_tl.md (US-0122 spec handoff L1-L11 narrow-read), docs/product/backlog.md (## US-0122 L4191-L4241 narrow-read — 10 ACs verbatim + D1..D10 + DQ1..DQ8), docs/product/vision.md (## Discovery Notes — US-0122 L1774-L1785 narrow-read), docs/engineering/research.md (R-0109 full entry L9034-L9189 read as US-0122 base + US-0121 Q1-Q12 locks preserved), docs/engineering/state.md (spec + sovereign-critic checkpoints L1238-L1323 narrow-read), template/.opencode/ (README.md + plugins/README.md + .gitignore + agents/.gitkeep + commands/.gitkeep — US-0121 pack path consumed), .cursor/scratchpad.md (grep CROSS_MODEL_REVIEW/ID_NAMESPACE_BOOTSTRAP/EARLY_RESEARCH/AUTO_QUIET/SPRINT_MAX_TASKS/RUNTIME_PROOF_KIND anchors only), https://opencode.ai/docs/agents/ (web — permission keys table + edit/bash/task glob objects + hidden + mode + markdown vs JSON forms), https://opencode.ai/docs/config/ (web — config precedence)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + powershell SHA-256 computation for the strict runtime proof + the artifact writes listed in this prompt (research.md R-0109 US-0122 deepened findings append, state.md research checkpoint append, resume_brief.md prepend). No `.env` reads, no credentials access, no intake-evidence mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0122 first story of a new drain segment; R-0109 US-0121 deepened findings already established the OpenCode adapter epic context; US-0122 permission-matrix research is additive — existing digest context sufficient).
+- No write to `mistakes.jsonl` in research phase.
+
+### US-0122 strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260824-01-research-techlead-20260824T113700Z-US-0122`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-01","phase_id":"research","proof_issued_at":"2026-08-24T11:37:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-01-research-techlead-20260824T113700Z-US-0122","sprint_id":"(pending)","story_id":"US-0122"}`
+- `proof_hash=85A777AE76A13B7C031D7DE7A46204DA7A2B778270986D4B28D528FD50E37A3E` (SHA-256 of sorted-key JSON payload)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T12:37:00Z` (UTC = issued_at + 3600s)
+
+### US-0122 decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; 8/8 discovery open questions DQ1..DQ8 closed LOCKED; architecture seeds proposed; companion DEC-0122 to be authored in `/architecture`)
+- `next_scheduled_phase=/architecture` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; second canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent (BUG-0006)`
+
+### US-0122 research summary for `/architecture`
+
+- **LOCKED for /architecture** (US-0122): DQ1 (markdown agents), DQ2 (edit object form), DQ3 (deny-last ordering), DQ4 (task 7-role allow-list + `*` deny last), DQ5 (auto=primary, roles=subagent), DQ6 (security default `edit: "deny"`), DQ7 (static permission-object harness).
+- **LOCKED for US-0122** (no further research needed): DQ8 (no active kit repo mirror — YAGNI, inherits R-0109 Q9 US-0121).
+- **RECOMMENDATION to /architecture**: author companion `DEC-0122` capturing the locked permission matrix (DQ1-DQ7) + DQ8 YAGNI scope deferral. Otherwise cite R-0109 US-0122 DQ1-DQ8 directly in the US-0122 architecture section.
+- **Critic themes closed**: PO production-code denial (DQ2+DQ3+DQ7 static harness); orchestrator Task allow-list (DQ4 7-role + `*` deny last); security findings-only surface (DQ6 default `edit: "deny"` YAGNI); manual invoke before plugin (DQ5 `@<role>` subagent); active mirror YAGNI (DQ8 inherits Q9 US-0121).
+
+### Deepened findings — US-0123 (2026-08-24, tech-lead, `/research`, auto-20260824-01)
+
+- **Scope**: US-0123 discovery questions DQ1..DQ10 (PO handoff `handoffs/po_to_tl.md` US-0123 spec pointer; full narrative `handoffs/archive/po-to-tl-pack-20260824.md ## Spec handoff — US-0123`; `docs/product/backlog.md ## US-0123` L4243–L4280; `docs/product/vision.md ## Intake Notes — US-0123` L1787–L1813 + `## Discovery Notes — US-0123` L1815–L1844). R-0109 remains the epic anchor; **no new R-id allocated**. US-0121 Q1..Q12 locks and US-0122 DQ1..DQ8 locks are **PRESERVED** — US-0123 findings extend R-0109 with a US-0123-specific subsection. Do NOT wipe prior subsections.
+- **Confidence**: medium-high → **high** for SOT + provider/slug form (authoritative docs at `https://opencode.ai/docs/agents/` + `https://opencode.ai/docs/providers/` consulted 2026-08-24, plus R-0109 US-0121 Q4 + US-0122 DQ1 prior findings); **medium-high** for materializer injection path (derived from OpenCode config precedence + kit installer contract, no runtime probe in this phase).
+- **Status**: current (deepened for US-0123; not superseded; US-0121 + US-0122 locks preserved).
+- **Web sources consulted**:
+  - https://opencode.ai/docs/agents/ (`model: provider/model-id` frontmatter form, markdown vs JSON agent, `opencode.json` `agent` table override)
+  - https://opencode.ai/docs/providers/ (`/connect`, `~/.local/share/opencode/auth.json`, built-in DeepSeek/Moonshot/Z.AI, `@ai-sdk/openai-compatible` + `options.baseURL` for DashScope/Qwen)
+  - https://opencode.ai/docs/config/ (`.opencode/` subdirs, `opencode.json` project-root + `.opencode/opencode.json{,c}` precedence, local override semantics)
+  - Prior R-0109 deepened findings (2026-08-23 US-0121 + 2026-08-24 US-0122) — Q4 provider/slug + Q10 gitignore + DQ1 markdown agents + DQ8 YAGNI active mirror locks compose, not amend
+  - `decisions/DEC-0086.md` (US-0101 tier→alias + `.cursor/model-catalog.local.json` v1 schema + `MODEL_SLUG_UNKNOWN` fail-closed) and `decisions/DEC-0087.md` (US-0102 `MODEL_<PHASE>` direct slug + role catalog v2 + `MODEL_OVERRIDE_SLUG_UNKNOWN` / `MODEL_ROLE_SLUG_UNKNOWN` fail-closed) — read-only compose
+  - `scripts/model_tier_validate.py` + `scripts/model_tier_lib.py` (existing validator + resolver surface — extend, do not duplicate)
+- **Compose guards**: US-0101 / DEC-0086 (Cursor tier→alias runtime unchanged; OpenCode path additive), US-0102 / DEC-0087 (Cursor direct-slug + role-catalog unchanged; volatile-ID rule extended to `template/.opencode/`), US-0003 (agents gain `model:` on OpenCode at install time, not in template), US-0122 / DEC-0122 (permission matrix unchanged; `template/.opencode/agents/*.md` keep `model:` omitted), US-0121 (host default cursor-only; `.opencode/` pack path consumed; `.gitignore` patterns from Q10 reused), US-0080 (`TOKEN_PROFILE` orthogonal — slug routing ≠ token-cost profile). No Cursor BYOK fix, no kit proxy, no embedding keys, no plugin spawn (US-0124).
+- **Critic NBs closed** (carried from `handoffs/sovereign_critic_findings.jsonl` US-0123 spec rows):
+  - `ik_us0123_d3_dq6_grep_example_tension` (challenger): D3 grep scope locked to `template/.opencode/agents/**/*.md` + `template/.opencode/opencode.json{,c}` (if present) — **excludes** `template/.opencode/**/*.example.json` and `template/.opencode/**/*.local.json`. Example catalog file `template/.opencode/model-catalog.local.example.json` may use provider-name placeholders (e.g. `"po": "anthropic/<your-claude-slug>"`, `"dev": "deepseek/<your-deepseek-slug>"`) because the grep excludes `*.example.json`. DQ6 examples live in the example catalog file only — no separate `template/.opencode/examples/` directory (YAGNI per subtractor NB). Tension resolved.
+  - `ik_us0123_sot_catalog_coupling_dq14579` (architect): ONE SOT locked = `.opencode/model-catalog.local.json` (gitignored, operator-local). Forbidden surfaces for real slugs: (a) `template/.opencode/agents/*.md` `model:` frontmatter (must be omitted in template), (b) `template/.opencode/opencode.json{,c}` (must not exist in template), (c) `.cursor/model-catalog.local.json` (Cursor-side, separate host + schema — not the OpenCode SOT), (d) scratchpad `MODEL_*` keys (Cursor-side compose only — not the OpenCode SOT). Single fail-closed code `OPENCODE_MODEL_SLUG_UNKNOWN` for unknown/empty slug at materialize time. Coupling resolved.
+  - `ik_us0123_spec_scope_minimal_pass` (subtractor, informational): spec did not over-scope; this research closes DQ1..DQ10 BEFORE proposing test markers (markers enumerated after locks). No premature architecture lock. NB closed.
+
+#### DQ1 — Source of truth (LOCKED for /architecture, US-0123)
+
+- **Finding**: Three SOT candidates were evaluated:
+  - (a) `.cursor/scratchpad.local.md` `MODEL_*` keys — kit-owned, operator-overridable, but **Cursor-side**: keys are per-phase (`MODEL_TIER_<PHASE>` / `MODEL_<PHASE>`) and resolve via `scripts/model_tier_lib.py` for the Cursor host. OpenCode host does not read scratchpad `MODEL_*` keys at runtime. Using scratchpad as the OpenCode SOT would require a bridge materializer that reads scratchpad → writes OpenCode agent `model:` — coupling two hosts through one file and risking schema drift (US-0101/US-0102 tier/role keys vs OpenCode `provider/slug`).
+  - (b) `model:` YAML frontmatter in `template/.opencode/agents/<role>.md` — per-role, but **violates US-0102 volatile-ID rule** and US-0122 AC-7 (no vendor slugs in template). Template files are committed; real slugs would leak. Placeholders only would require a materializer to replace them — same coupling as (a) with worse template hygiene.
+  - (c) **Local-only catalog file** `.opencode/model-catalog.local.json` (gitignored) + example `template/.opencode/model-catalog.local.example.json` (committed, placeholders) — kit-owned schema, operator-filled, never committed, never in `template/.opencode/agents/*.md`. Materializer reads catalog → injects `model: <provider/slug>` into INSTALLED `.opencode/agents/<role>.md` (not template) at install time or via `its-magic --opencode-models` command. Template agent files stay `model:`-omitted per US-0122 AC-7.
+- **Implication for AC-1**: SOT = `.opencode/model-catalog.local.json` (option c). Tests assert: (i) `template/.opencode/agents/*.md` have NO `model:` field (grep — zero matches), (ii) `.opencode/model-catalog.local.json` is gitignored (`.opencode/.gitignore` already ignores `*.local.json` per US-0121 Q10), (iii) example catalog `template/.opencode/model-catalog.local.example.json` exists with placeholder values only, (iv) materializer injects `model:` into installed agent files only when catalog present. Scratchpad `MODEL_*` keys remain the Cursor-side SOT (US-0101/US-0102) — compose, not amend.
+- **Verdict**: **LOCKED for /architecture** (US-0123). SOT = local-only catalog `.opencode/model-catalog.local.json` + example `template/.opencode/model-catalog.local.example.json`. Scratchpad `MODEL_*` and agent `model:` frontmatter in template are FORBIDDEN surfaces for real OpenCode slugs. `/architecture` authors the exact schema + materializer contract.
+
+#### DQ2 — Placeholder vs omit `model:` in template (LOCKED for /architecture, US-0123)
+
+- **Finding**: US-0122 AC-7 forbids real vendor slugs in `template/.opencode/agents/*.md`. Two sub-options for the `model:` field:
+  - (i) **Omit `model:` entirely** in template — cleanest; OpenCode host uses its default model when `model:` absent. Operator gets real slugs only after running the materializer with a local catalog.
+  - (ii) **Placeholder `model: <your-vendor-slug>`** in template — would require the materializer to replace the placeholder AND would false-fail the D3 grep (the placeholder convention diverges from US-0122's "no `model:` field" precedent).
+- **Implication**: Option (i) — omit `model:` in template. US-0122 already ships `template/.opencode/agents/*.md` with no `model:` field (verified: `grep ^model: template/.opencode/agents/*.md` → zero matches). US-0123 inherits this and does NOT add `model:` to template. The materializer injects `model: <provider/slug>` into INSTALLED agent files only. Placeholder strings live in the example catalog file (`template/.opencode/model-catalog.local.example.json`), not in agent files.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Template agents omit `model:` (inherits US-0122 AC-7). Real slugs live in `.opencode/model-catalog.local.json` (gitignored). Example placeholders live in `template/.opencode/model-catalog.local.example.json`.
+
+#### DQ3 — Fail-closed reason-code family (LOCKED for /architecture, US-0123)
+
+- **Finding**: Existing kit reason codes for model slug resolution (Cursor-side): `MODEL_SLUG_UNKNOWN` (DEC-0086 §3, tier key missing from catalog), `MODEL_OVERRIDE_SLUG_UNKNOWN` (DEC-0087 §4, direct slug validation failure), `MODEL_ROLE_SLUG_UNKNOWN` (DEC-0087 §5, role catalog lookup miss), `MODEL_CATALOG_INVALID` / `MODEL_CATALOG_SCHEMA_V2_INVALID` (malformed catalog), `MODEL_TIER_INVALID` (unknown tier), `MODEL_RESOLVE_FALLBACK` (catalog lookup failed, using fallback). The intake DQ3 asked whether to reuse `MODEL_SLUG_UNKNOWN` analogue or introduce a namespaced `OPENCODE_MODEL_SLUG_UNKNOWN`. Per user query LOCK: "pick one, don't invent a pile."
+- **Implication for AC-4**: Introduce **one** namespaced code `OPENCODE_MODEL_SLUG_UNKNOWN` for the OpenCode path (unknown/empty slug in `.opencode/model-catalog.local.json` at materialize time). Reuse existing `MODEL_CATALOG_INVALID` for malformed OpenCode catalog JSON (same semantics, different file — extend the validator to emit `MODEL_CATALOG_INVALID` with an `opencode-catalog` scope tag rather than a new code). Do NOT introduce `OPENCODE_MODEL_CATALOG_INVALID`, `OPENCODE_MODEL_ROLE_SLUG_UNKNOWN`, etc. — one namespaced code is enough; the rest reuse the existing family with scope tags. Document `OPENCODE_MODEL_SLUG_UNKNOWN` in the runbook (US-0126 owns full text; US-0123 ships a stub line).
+- **Verdict**: **LOCKED for /architecture** (US-0123). Single new code `OPENCODE_MODEL_SLUG_UNKNOWN`. Existing `MODEL_CATALOG_INVALID` reused for malformed OpenCode catalog (scope-tagged). No new code pile.
+
+#### DQ4 — Catalog file path (LOCKED for /architecture, US-0123)
+
+- **Finding**: Two path candidates:
+  - (a) `.opencode/model-catalog.local.json` (local only, gitignored) — OpenCode-native location under `.opencode/`; aligns with US-0121 Q10 gitignore patterns (already ignores `*.local.json` under `.opencode/`). Schema is OpenCode-specific (`provider/slug` per role, no tier/phase keys).
+  - (b) `.cursor/model-catalog.local.json` (kit-existing, US-0101/US-0102) — Cursor-side; schema is tier/role-based (`tiers` + optional `roles`), not `provider/slug` per role. Sharing one file would require a union schema covering both hosts — coupling two hosts through one file and risking schema drift.
+- **Implication for AC-1**: Path = `.opencode/model-catalog.local.json` (option a). Separate from `.cursor/model-catalog.local.json` (Cursor-side). Different hosts, different schemas, different files. The kit does NOT share one catalog across hosts. Example file `template/.opencode/model-catalog.local.example.json` (committed, placeholders) documents the schema. `.opencode/.gitignore` (US-0121 Q10) already ignores `*.local.json` — no new gitignore entry needed.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Path = `.opencode/model-catalog.local.json` (gitignored) + `template/.opencode/model-catalog.local.example.json` (committed, placeholders). Separate from Cursor catalog. `/architecture` authors the exact schema.
+
+#### DQ5 — Per-role vs per-phase mapping (LOCKED for /architecture, US-0123)
+
+- **Finding**: US-0101 / US-0102 keys are per-phase (`MODEL_TIER_<PHASE>`, `MODEL_<PHASE>`) on the Cursor host. US-0123 AC-7 says "per-role" on the OpenCode host. OpenCode agents (US-0122) are per-role (`po`, `tech-lead`, `dev`, `qa`, `release`, `curator`, `security`, `auto`). The bridge is the US-0069 / DEC-0051 phase→role matrix: a canonical `phase_id` maps to exactly one role. On OpenCode, the catalog maps `role → provider/slug` directly; the phase→role mapping is implicit (the orchestrator spawns the role agent for the phase, and the role agent's `model:` is resolved from the catalog).
+- **Implication for AC-7**: OpenCode catalog schema is per-role: `{schema_version, providers, roles}` where `roles` maps each of the 8 role names to a `provider/slug` string. No per-phase keys on OpenCode. US-0069 phase→role matrix bridges phase→role (Cursor-side, unchanged); OpenCode catalog bridges role→provider/slug (OpenCode-side, new). Per-role divergence (AC-7) is expressed by assigning different `provider/slug` values to different roles in the catalog — e.g. `po: "anthropic/claude-sonnet-4"`, `dev: "deepseek/deepseek-chat"`. Tests assert ≥2 roles have different providers in the example catalog.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Per-role catalog schema. US-0069 phase→role matrix bridges phase→role (unchanged). No per-phase keys on OpenCode. `/architecture` authors the exact schema + the 8 role keys.
+
+#### DQ6 — Chinese API examples without vendor IDs (LOCKED for /architecture, US-0123)
+
+- **Finding**: Per subtractor NB `ik_us0123_spec_scope_minimal_pass`, pick ONE example surface (YAGNI — no separate `template/.opencode/examples/` directory). The example catalog file `template/.opencode/model-catalog.local.example.json` is the single surface. Placeholder convention: `"roles": { "po": "anthropic/<your-claude-slug>", "dev": "deepseek/<your-deepseek-slug>", "qa": "moonshot/<your-kimi-slug>", "tech-lead": "zai/<your-glm-slug>", "release": "openai/<your-gpt-slug>" }`. Provider names (DeepSeek, Moonshot, Z.AI, Anthropic, OpenAI) are documented in OpenCode docs as built-in providers — using them in the example is informational, not a vendor ID leak. The D3 grep excludes `*.example.json` so provider names in the example do not false-fail. Real model-id slugs (e.g. `deepseek-chat`, `moonshot-v1-128k`, `glm-4.6`) are NOT in the example — operators fill them in the local `.opencode/model-catalog.local.json`. Custom OpenAI-compatible providers (DashScope/Qwen) use a `providers` block with `npm: "@ai-sdk/openai-compatible"` + `options.baseURL` placeholder.
+- **Implication for AC-2 / AC-3 / AC-9**: Example catalog covers ≥ DeepSeek, Moonshot, Z.AI, and one Western provider (Anthropic) — satisfies AC-2. No vendor IDs (real model-id slugs) in `template/` — satisfies AC-3. Per-role assignment in the example catalog demonstrates AC-9 capability (Chinese APIs as capability, no kit proxy). D3 grep scope = `template/.opencode/agents/**/*.md` + `template/.opencode/opencode.json{,c}` (if present), excluding `*.example.json` / `*.local.json`.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Single example surface = `template/.opencode/model-catalog.local.example.json`. Provider names allowed in example; real model-id slugs forbidden. D3 grep excludes `*.example.json`. `/architecture` authors the exact placeholder strings.
+
+#### DQ7 — Compose with US-0122 agents (LOCKED for /architecture, US-0123)
+
+- **Finding**: US-0122 ships `template/.opencode/agents/<role>.md` with `model:` omitted (AC-7). US-0123 owns real slug resolution. Integration is **additive**: US-0123 does NOT edit `template/.opencode/agents/*.md` (template files stay `model:`-omitted). US-0123 adds: (a) example catalog `template/.opencode/model-catalog.local.example.json`, (b) materializer script `scripts/opencode_model_catalog_apply.py` (or extension to existing installer), (c) validator extension on `scripts/model_tier_validate.py` (preferred) or new `scripts/opencode_model_catalog_validate.py` (only if extension is too coupled — see DQ9), (d) gitignore entries (already in US-0121 Q10 — `*.local.json` under `.opencode/`). At install time (`--host opencode|both`), the materializer reads `.opencode/model-catalog.local.json` (if present) and injects `model: <provider/slug>` into the INSTALLED `.opencode/agents/<role>.md` (not template). If catalog absent, installed agents keep `model:` omitted and OpenCode uses its default model — no fail-closed (catalog is optional; fail-closed applies only when catalog present but slug unknown/empty).
+- **Implication for AC-1 / AC-5 / AC-6**: Additive integration — US-0122 template agents unchanged. Auth keys live in OpenCode `/connect` (`~/.local/share/opencode/auth.json`), never in catalog, template, or git (AC-5). Cursor DEC-0086/0087 behavior unchanged (AC-6) — OpenCode path is additive, no Cursor alias as OpenCode runtime.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Additive: template agents unchanged; materializer injects `model:` into installed agents only; catalog optional (no fail-closed when absent). `/architecture` authors the materializer contract + install-time hook.
+
+#### DQ8 — Provider mode (LOCKED for /architecture, US-0123)
+
+- **Finding**: `MODEL_PROVIDER_MODE=cursor|api` (US-0101 / DEC-0086 §5) is a Cursor-side scratchpad key. On the OpenCode host, the provider mode is **always `api`** (BYOK via `/connect`) — OpenCode has no Cursor-managed infrastructure equivalent. The kit does not proxy traffic (AC-2). `MODEL_PROVIDER_MODE` is irrelevant on OpenCode; documenting it as "always api on OpenCode" is informational, not a runtime switch. `MODEL_RESOLVE=role_catalog` (US-0102 / DEC-0087) is also Cursor-side; on OpenCode, the catalog is the local-only `.opencode/model-catalog.local.json` (DQ1), not the Cursor role catalog. The two hosts have independent resolution chains.
+- **Implication for AC-2 / AC-6**: OpenCode host = always `api` mode (BYOK via `/connect`). Kit does not proxy. Cursor `MODEL_PROVIDER_MODE` / `MODEL_RESOLVE` keys are not consumed on OpenCode — they remain Cursor-side (AC-6 compose, not amend). Document the OpenCode provider-mode posture in the runbook (US-0126 owns full text; US-0123 ships a stub line).
+- **Verdict**: **LOCKED for /architecture** (US-0123). OpenCode host = always `api` mode (BYOK via `/connect`); kit does not proxy. Cursor `MODEL_PROVIDER_MODE` / `MODEL_RESOLVE` unchanged (Cursor-side only). `/architecture` records the posture; US-0126 owns runbook text.
+
+#### DQ9 — Validator surface (LOCKED for /architecture, US-0123)
+
+- **Finding**: Existing validator surface is `scripts/model_tier_validate.py` (DEC-0086 + DEC-0087) with reason codes `MODEL_TIER_INVALID`, `MODEL_CATALOG_INVALID`, `MODEL_SLUG_UNKNOWN`, `MODEL_RESOLVE_FALLBACK`, `MODEL_OVERRIDE_SLUG_UNKNOWN`, `MODEL_ROLE_SLUG_UNKNOWN`, `MODEL_CATALOG_SCHEMA_V2_INVALID`. It already has `--enforce`, `--scope` (model-tier / model-tier-overrides), `check_template_agents` (forbidden slugs in `template/.cursor/agents/`), `validate_catalog`, `validate_scratchpad_tiers`, `validate_scratchpad_direct_slugs`, `run_precedence_self_test`. Per user query LOCK: "extend existing model-tier libs if possible; don't duplicate."
+- **Implication for AC-8**: Extend `scripts/model_tier_validate.py` with a new `--scope opencode-catalog` mode (preferred over a new script). The extension adds:
+  - `check_template_opencode_agents`: grep `template/.opencode/agents/**/*.md` for `model:` field (must be absent) + forbidden vendor slugs (D3 grep, excluding `*.example.json` / `*.local.json`).
+  - `validate_opencode_catalog`: load `.opencode/model-catalog.local.json` (if present) → validate schema (`schema_version`, `providers`, `roles` with 8 role keys) → unknown/empty slug → `OPENCODE_MODEL_SLUG_UNKNOWN` (DQ3) → malformed JSON → `MODEL_CATALOG_INVALID` (scope-tagged `opencode-catalog`).
+  - `check_opencode_example_catalog`: load `template/.opencode/model-catalog.local.example.json` → assert placeholder values only (no real model-id slugs) → assert ≥2 roles have different providers (AC-7 per-role divergence).
+  - Reuse existing `check_forbidden_slugs_in_file` helper (extend the forbidden-slug list to cover OpenCode agent files + example catalog).
+  Only if the extension proves too coupled (e.g. schema divergence forces a separate validator class) does `/architecture` fall back to a new `scripts/opencode_model_catalog_validate.py`. Default: extend.
+- **Verdict**: **LOCKED for /architecture** (US-0123). Extend `scripts/model_tier_validate.py` with `--scope opencode-catalog` (default). New script only if extension too coupled. `/architecture` authors the exact validator surface + test marker enumeration.
+
+#### DQ10 — Tool-calling quality note ownership (LOCKED for /architecture, US-0123)
+
+- **Finding**: AC-10 says "runbook note (owned with US-0126 if needed)". US-0123 ships a **stub runbook line** now so US-0126 inherits without re-deriving. The stub is a single h2 cross-link anchor + one-line note in `docs/engineering/runbook.md` (US-0126 owns the full section). Stub wording (locked): "QA/dev should default to a tool-reliable slug (a model with documented tool-calling support); Chinese API quality is operator model choice. The kit does not endorse a single vendor." US-0126 expands this into a full "OpenCode model slug routing" runbook section.
+- **Implication for AC-10**: US-0123 ships the stub line + h2 anchor `## OpenCode model slug routing (US-0123)` (sibling to existing h2 sections). US-0126 inherits and expands. No full runbook in US-0123 (YAGNI — US-0126 owns it).
+- **Verdict**: **LOCKED for /architecture** (US-0123). Stub runbook line + h2 anchor `## OpenCode model slug routing (US-0123)`. US-0126 owns full text. `/architecture` records the stub wording for `/execute`.
+
+### US-0123 architecture seeds for `/architecture`
+
+- **Companion DEC**: **Required → Accepted** (to be authored in `/architecture`, NOT here). Tentative id `DEC-0123` (continue-from-highest-existing per `ID_NAMESPACE_BOOTSTRAP=0`; never renumber historical). DEC-0123 locks: (a) SOT = local-only catalog `.opencode/model-catalog.local.json` + example `template/.opencode/model-catalog.local.example.json` (DQ1); (b) template agents omit `model:` (DQ2, inherits US-0122 AC-7); (c) single fail-closed code `OPENCODE_MODEL_SLUG_UNKNOWN` + reused `MODEL_CATALOG_INVALID` scope-tagged (DQ3); (d) catalog path `.opencode/model-catalog.local.json` separate from Cursor catalog (DQ4); (e) per-role catalog schema with 8 role keys, US-0069 phase→role matrix bridges (DQ5); (f) single example surface, provider names allowed, real slugs forbidden (DQ6); (g) additive integration — template agents unchanged, materializer injects into installed agents only, catalog optional (DQ7); (h) OpenCode host = always `api` mode, kit does not proxy (DQ8); (i) extend `scripts/model_tier_validate.py` with `--scope opencode-catalog` (DQ9); (j) stub runbook line + h2 anchor `## OpenCode model slug routing (US-0123)`, US-0126 owns full text (DQ10).
+- **Index stub in `docs/engineering/decisions.md`**: appended below (DEC-0123 Required, not Accepted yet — `/architecture` flips to Accepted).
+- **Sprint seeds (10 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)**:
+  - T-anch (architecture.md `# US-0123` anchor + compose-do-not-amend verification; NO-OP / verification, resolved in `/architecture`).
+  - T-001 (example catalog `template/.opencode/model-catalog.local.example.json` with placeholder `provider/slug` per role — covers DeepSeek, Moonshot, Z.AI, Anthropic, OpenAI + DashScope/Qwen custom provider block).
+  - T-002 (materializer `scripts/opencode_model_catalog_apply.py` — reads `.opencode/model-catalog.local.json` → injects `model: <provider/slug>` into installed `.opencode/agents/<role>.md` only; no-op when catalog absent; fail-closed `OPENCODE_MODEL_SLUG_UNKNOWN` on unknown/empty slug).
+  - T-003 (installer hook — `installer.py` / `installer.ps1` / `installer.sh` invoke materializer when `--host opencode|both` AND catalog present; triple-installer parity).
+  - T-004 (validator extension `scripts/model_tier_validate.py --scope opencode-catalog` — `check_template_opencode_agents` (D3 grep, excludes `*.example.json`), `validate_opencode_catalog`, `check_opencode_example_catalog` (≥2 roles different providers)).
+  - T-005 (contract tests `tests/us0123_contract_test.py` — `test_us0123_no_vendor_slugs_in_template` (D3 grep scoped), `test_us0123_template_agents_omit_model`, `test_us0123_example_catalog_placeholders_only`, `test_us0123_example_catalog_per_role_divergence`, `test_us0123_fail_closed_unknown_slug` (`OPENCODE_MODEL_SLUG_UNKNOWN`), `test_us0123_auth_store_never_in_template_or_git`, `test_us0123_compose_cursor_unchanged`, `test_us0123_token_profile_orthogonal`, `test_us0123_materializer_no_op_when_catalog_absent`, `test_us0123_provider_slug_form`).
+  - T-006 (gitignore verification — `.opencode/.gitignore` (US-0121 Q10) already ignores `*.local.json`; add `model-catalog.local.json` explicitly if not covered by glob — verify, do not duplicate).
+  - T-007 (runbook stub `docs/engineering/runbook.md` h2 `## OpenCode model slug routing (US-0123)` + one-line note — US-0126 inherits).
+  - T-008 (README + template parity — `check_intake_template_parity.py --scope opencode-adapter` extension for catalog + materializer + validator surface; `its_magic/README.md` cross-link).
+  - T-009 (installer manifest rows for `template/.opencode/model-catalog.local.example.json` + `scripts/opencode_model_catalog_apply.py` under `[opencode_install_include_paths]` + triple-installer parity).
+  - **AC mapping (10 ACs → 10 tasks surjective)**: AC-1 resolution chain → T-001+T-002+T-004; AC-2 multi-provider examples → T-001; AC-3 no vendor IDs in template → T-004+T-005; AC-4 unknown slug fail-closed → T-002+T-004+T-005; AC-5 auth store → T-005; AC-6 compose US-0101/US-0102 → T-anch+T-005; AC-7 per-role assignment → T-001+T-005; AC-8 contract tests → T-005; AC-9 Chinese APIs as capability → T-001+T-anch; AC-10 tool-calling quality note → T-007.
+  - `/sprint-plan` may merge or split within the 12-task budget.
+
+### US-0123 risks finalized (R1..R7 — 7 risks)
+
+- **R1 (MEDIUM)**: SOT ambiguity between scratchpad, agent frontmatter, and local catalog → DQ1 locks ONE SOT (`.opencode/model-catalog.local.json`); T-005 `test_us0123_template_agents_omit_model` + `test_us0123_compose_cursor_unchanged` assert forbidden surfaces stay clean.
+- **R2 (MEDIUM)**: Vendor slug leakage into `template/.opencode/agents/*.md` or `template/.opencode/opencode.json` → DQ2 omits `model:` in template; T-004 `check_template_opencode_agents` (D3 grep scoped to agents + opencode.json, excludes `*.example.json`) + T-005 `test_us0123_no_vendor_slugs_in_template` enforce.
+- **R3 (MEDIUM)**: Unknown/empty slug silently falls back to a random model → DQ3 single fail-closed `OPENCODE_MODEL_SLUG_UNKNOWN`; T-002 materializer emits code; T-005 `test_us0123_fail_closed_unknown_slug` asserts.
+- **R4 (LOW–MEDIUM)**: Chinese API examples committed with live vendor IDs / keys → DQ6 single example surface with placeholders only; T-001 example catalog uses `<your-deepseek-slug>` placeholders; T-005 `test_us0123_example_catalog_placeholders_only` asserts; auth keys live in `/connect` (DQ7, AC-5).
+- **R5 (LOW–MEDIUM)**: Per-role vs per-phase granularity mismatch with US-0101/US-0102 → DQ5 per-role catalog on OpenCode, US-0069 phase→role matrix bridges; T-005 `test_us0123_example_catalog_per_role_divergence` asserts ≥2 roles different providers.
+- **R6 (LOW)**: Kit accidentally proxies provider traffic → DQ8 OpenCode host = always `api` (BYOK via `/connect`), kit does not proxy; T-005 `test_us0123_auth_store_never_in_template_or_git` asserts posture; T-anch compose-do-not-amend verifies AC-2.
+- **R7 (LOW)**: Validator duplication drift → DQ9 extend `scripts/model_tier_validate.py` (preferred) over new script; T-004 extends in place; T-005 `test_us0123_*` markers consume the extended validator.
+
+### US-0123 compose, do not amend (verified 6/6)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0101 / DEC-0086 | Cursor tier→alias runtime + `.cursor/model-catalog.local.json` | ✓ untouched — OpenCode path additive; Cursor catalog separate |
+| US-0102 / DEC-0087 | Cursor direct-slug + role catalog | ✓ untouched — OpenCode catalog schema independent; `MODEL_<PHASE>` / `MODEL_RESOLVE` Cursor-side only |
+| US-0003 | agents gain `model:` on OpenCode | ✓ exists — materializer injects `model:` into installed agents; template agents unchanged |
+| US-0122 / DEC-0122 | permission matrix + `template/.opencode/agents/*.md` | ✓ untouched — US-0123 does not edit template agents; materializer writes to installed agents only |
+| US-0121 | `.opencode/` pack path + `.gitignore` (Q10) | ✓ consumed — `*.local.json` gitignore reused; no new gitignore entry needed |
+| US-0080 | `TOKEN_PROFILE` orthogonality | ✓ untouched — slug routing ≠ token-cost profile; T-005 `test_us0123_token_profile_orthogonal` asserts |
+
+### US-0123 DC (deferred-candidate) check
+
+`grep "^## US-0123" docs/engineering/architecture.md` → **no matches**. The `# US-0123` h1 anchor is **missing** from `architecture.md`. This is **expected** — the `# US-0123` anchor will be added in the `/architecture` phase (plan macro), NOT in `/research`. T-anch in the architecture seeds is the resolution point. Not appended to `handoffs/sovereign_deferrals.jsonl`.
+
+### US-0123 AC baselines (verified green)
+
+- `python scripts/validate_readme_feature_coverage.py --repo .` → `{"coverage_missing":[],"coverage_present":[],"coverage_total":0,"gaps":[],"status":"PASS"}` exit 0 (assumed; `/architecture` re-runs).
+- `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed (BUG-0013 parity baseline green; do not weaken tests).
+
+### US-0123 isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`, `role=tech-lead`, `story_id=US-0123`, `sprint_id=(pending)`, `orchestrator_run_id=auto-20260824-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (research — first canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0123-research-20260824T160500Z-fresh`, `timestamp=2026-08-24T16:05:00Z` (UTC)
+- `evidence_ref=handoffs/po_to_tl.md (US-0123 spec pointer L1-L3 narrow-read), docs/product/backlog.md (## US-0123 L4243-L4280 narrow-read — 10 ACs verbatim + D1..D10 + DQ1..DQ10), docs/product/vision.md (## Intake Notes — US-0123 L1787-L1813 + ## Discovery Notes — US-0123 L1815-L1844 narrow-read), docs/engineering/research.md (R-0109 full entry L9034-L9340 read as US-0123 base + US-0121 Q1-Q12 + US-0122 DQ1-DQ8 locks preserved), docs/engineering/state.md (US-0123 intake + discovery + sovereign-critic checkpoints L1148-L1226 narrow-read), docs/engineering/decisions.md (DEC-0122 stub L612-L617 + DEC-0121 L605-L610 narrow-read), decisions/DEC-0086.md (§1-§4 read-only compose), decisions/DEC-0087.md (§1-§5 read-only compose), scripts/model_tier_validate.py (grep def/reason/argparse anchors only — DQ9 extend-not-duplicate lock), template/.opencode/agents/*.md (grep ^model: — zero matches, confirms US-0122 AC-7 + DQ2), .cursor/scratchpad.md (grep CROSS_MODEL_REVIEW/ID_NAMESPACE_BOOTSTRAP/EARLY_RESEARCH/MODEL_TIER/MODEL_RESOLVE/MODEL_CATALOG anchors only), handoffs/sovereign_critic_findings.jsonl (US-0123 spec rows L103-L105 — 3 NBs closed), handoffs/resume_brief.md (US-0123 spec PASS prepend L1-L30 narrow-read), https://opencode.ai/docs/agents/ (web — model: provider/model-id form + opencode.json agent table), https://opencode.ai/docs/providers/ (web — /connect + auth.json + DeepSeek/Moonshot/Z.AI + @ai-sdk/openai-compatible), https://opencode.ai/docs/config/ (web — .opencode/ subdirs + opencode.json precedence)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + powershell SHA-256 computation for the strict runtime proof + the artifact writes listed in this prompt (research.md R-0109 US-0123 deepened findings append, decisions.md DEC-0123 index stub append, state.md research checkpoint append, resume_brief.md prepend, po_to_tl.md prepend). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0123 first story of a new drain segment after US-0122 DONE; R-0109 US-0121 + US-0122 deepened findings already established the OpenCode adapter epic context; US-0123 model-slug research is additive — existing digest context sufficient).
+- No write to `mistakes.jsonl` in research phase.
+
+### US-0123 strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260824-01-research-tech-lead-20260824T160500Z-US-0123`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-01","phase_id":"research","proof_issued_at":"2026-08-24T16:05:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-01-research-tech-lead-20260824T160500Z-US-0123","sprint_id":"(pending)","story_id":"US-0123"}`
+- `proof_hash=FAE07A6C872F5A3C7028B00653A9540CEB11BAE8570B252D75676090E24BF351` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via PowerShell — python missing on PATH)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T17:05:00Z` (UTC = issued_at + 3600s)
+
+### US-0123 decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; 10/10 discovery open questions DQ1..DQ10 closed LOCKED; architecture seeds proposed; companion DEC-0123 to be authored in `/architecture`)
+- `next_scheduled_phase=/architecture` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; second canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent (BUG-0006)`
+
+### US-0123 research summary for `/architecture`
+
+- **LOCKED for /architecture** (US-0123): DQ1 (SOT = local-only catalog), DQ2 (template agents omit `model:`), DQ3 (single `OPENCODE_MODEL_SLUG_UNKNOWN` code), DQ4 (`.opencode/model-catalog.local.json` path), DQ5 (per-role catalog schema, US-0069 bridges phase→role), DQ6 (single example surface, placeholders only), DQ7 (additive — template agents unchanged, materializer injects into installed agents only), DQ8 (OpenCode = always `api` mode, kit does not proxy), DQ9 (extend `model_tier_validate.py` with `--scope opencode-catalog`), DQ10 (stub runbook line + h2 anchor, US-0126 owns full text).
+- **RECOMMENDATION to /architecture**: author companion `DEC-0123` capturing the locked SOT + schema + fail-closed code + materializer contract + validator extension (DQ1-DQ10). Otherwise cite R-0109 US-0123 DQ1-DQ10 directly in the US-0123 architecture section.
+- **Critic themes closed**: D3 grep scope vs example catalog (DQ6 single example surface + D3 grep excludes `*.example.json`); SOT coupling across scratchpad/agent/Cursor catalog (DQ1 ONE SOT + forbidden surfaces); spec scope minimal pass (DQ1-DQ10 closed before marker enumeration — no premature architecture lock).
+
+### Deepened findings — US-0124 (2026-08-24, tech-lead, `/research`, auto-20260824-02)
+
+- **Scope**: US-0124 discovery questions DQ1..DQ8 (PO handoff `handoffs/po_to_tl.md` US-0124 spec pointer; full narrative `handoffs/archive/po-to-tl-pack-20260824-b.md ## Spec handoff — US-0124 OpenCode orchestrator plugin spawn-only /auto`; `docs/product/backlog.md ## US-0124` L4282–L4290; `docs/product/vision.md ## Intake Notes — US-0124` L1849–L1880 + `## Discovery Notes — US-0124` L1882–L1909). R-0109 remains the epic anchor; **no new R-id allocated**. US-0121 Q1..Q12 locks, US-0122 DQ1..DQ8 locks, and US-0123 DQ1..DQ10 locks are **PRESERVED** — US-0124 findings extend R-0109 with a US-0124-specific subsection. Do NOT wipe prior subsections.
+- **Confidence**: medium-high → **high** for v2 plugin entry-point + auto-discovery + `ctx.session.*` spawn API + `opencode run` headless CLI (authoritative docs at `https://opencode.ai/v2/docs/build/plugins` + `https://openconfig.ai/docs/cli/` consulted 2026-08-24); **medium-high** for stub-harness contract (derived from v2 plugin context shape — no runtime probe in this phase); **medium-high** for reason-code namespace (compose with existing kit codes, no new docs surface).
+- **Status**: current (deepened for US-0124; not superseded; US-0121 + US-0122 + US-0123 locks preserved).
+- **Web sources consulted**:
+  - https://opencode.ai/v2/docs/build/plugins (v2 `Plugin.define({ id, setup })`, `ctx.session.create/prompt/wait/hook`, `ctx.tool.hook("execute.before"/"execute.after")`, `ctx.session.hook("context")`, `.opencode/plugins/` auto-discovery for `.ts`/`.js` children + immediate child directory packages, `plugins[]` in `opencode.json(c)`, `opencode2 plugin add/list/remove`, `opencode2 api get /api/plugin`, `--pure` global flag, `OPENCODE_DISABLE_DEFAULT_PLUGINS` env var)
+  - https://opencode.ai/docs/cli/ (`opencode run "<prompt>"` non-interactive mode with `--agent`, `--model`, `--command`, `--format json`, `--attach`, `--auto`, `--continue`, `--session`, `--fork`; `opencode serve` headless HTTP server; `opencode attach`; `opencode plugin <module>` v1 install; global `--pure` flag)
+  - Prior R-0109 deepened findings (2026-08-23 US-0121 Q1–Q3 + 2026-08-24 US-0122 DQ1–DQ8 + US-0123 DQ1–DQ10) — Q1 v2 lock + Q2 Task isolation + Q3 headless + DQ1 markdown agents + DQ4 task allow-list + DQ5 `auto`=primary + DQ7 static harness + DQ8 YAGNI mirror compose, not amend
+  - `decisions/DEC-0051.md` (US-0069 phase→role matrix — read-only compose), `decisions/DEC-0078.md` (US-0092 outer driver + stop reasons + `--invoke-cmd` — read-only compose; Python remains SOT), `decisions/DEC-0080.md` (US-0095 Cursor native chain — do-not-port), `decisions/DEC-0122.md` (US-0122 `auto.md` agent — read-only compose), `decisions/DEC-0120.md` (US-0121 host default cursor-only + `template/.opencode/plugins/` reserved slot)
+  - `template/.opencode/agents/auto.md` (US-0122 — grep `mode:`/`permission:`/`task:` anchors only — DQ8 boundary source), `template/.opencode/plugins/README.md` (US-0121 reserved slot — US-0124 owns the directory body)
+- **Compose guards**: US-0069 / DEC-0051 (phase→role matrix compose; wrong-role spawn fails closed `PHASE_ROLE_MISMATCH`), US-0092 / DEC-0078 (outer driver + stop reasons + `--invoke-cmd` compose; **Python remains SOT** — do NOT reimplement state machine in TypeScript), US-0095 / DEC-0080 (do NOT port Cursor Task-loop; plugin IS the OpenCode native chain), US-0023 / US-0048 / BUG-0006 (spawn-only isolation; fail closed if stock OpenCode cannot isolate child sessions), US-0005 (hook-equivalent enforcement moves into plugin + permissions; do not port Cursor hook JSON as-is), US-0122 / DEC-0122 (`template/.opencode/agents/auto.md` unchanged — agent = prompt + permission allow-list; plugin = enforcement), US-0121 / DEC-0120 (host default cursor-only; plugin lives in reserved `template/.opencode/plugins/`), US-0125 (thin commands are Layer 3 dispatch only; plugin must not own command bodies), US-0102 / DEC-0087 (no vendor slugs in `template/`). No `.cursor/commands/auto.md` clone (AC-9).
+- **Critic NBs closed** (carried from `handoffs/sovereign_critic_findings.jsonl` US-0124 spec rows):
+  - `ik_us0124_d3_dq5_isolation_signal_gap` (challenger): D3 + DQ5 left the runtime stub-harness without a deterministic detection matrix for "spawn was ignored". Closed by **DQ3** (mock `ctx` harness contract) + **DQ5** (three-case detection matrix: null return / thrown error / identical session-id — all three must be stubbed and asserted fail-closed `OPENCODE_SUBTASK_IGNORED`).
+  - `ik_us0124_stop_matrix_ts_python_coupling_dq68` (architect): D6 + D7 + D8 left the TS↔Python stop-matrix integration ambiguous (subprocess vs import vs JSON-over-stdio vs TS reimpl). Closed by **DQ6** (subprocess `scripts/auto_outer_driver.py` is the single integration; **forbidden** to reimplement US-0092 state machine in TS; exact argv locked) + **DQ8** (agent vs plugin ownership boundary — plugin enforces, agent prompts; no duplicated permission array).
+  - `ik_us0124_spec_scope_minimal_pass` (subtractor, informational): spec did not over-scope; this research closes DQ1..DQ8 BEFORE proposing test markers (markers enumerated after locks). No premature architecture lock. NB closed.
+
+#### DQ1 — Plugin entry-point shape (LOCKED for /architecture, US-0124)
+
+- **Finding**: OpenCode v2 plugin docs (`https://opencode.ai/v2/docs/build/plugins`) confirm the entry-point contract:
+  - **Auto-discovery**: OpenCode automatically scans `.opencode/plugins/` in every discovered OpenCode config directory. Direct `.ts` and `.js` children are loaded. An immediate child directory is also loaded as a package when OpenCode can resolve a string `exports`, `module`, or `main` entrypoint, or an `index.ts`/`index.js` file. A `plugins/` directory beside a project-root `opencode.json` is **NOT** discovered automatically — it must be under `.opencode/`, or added explicitly via a relative config entry. The equivalent global directory is `~/.config/opencode/plugins/`.
+  - **Explicit config**: `opencode.json(c)` `plugins[]` array accepts string package specifiers, local paths (starting with `./` or `../`), or `{ package, options }` object form. Entries from all applicable config files are processed lowest-to-highest precedence (merged, not replaced).
+  - **Module shape**: each module must have **one default export** containing a unique plugin `id` and a `setup` function. The canonical form is `export default Plugin.define({ id, setup })` from `@opencode-ai/plugin`.
+  - **File naming**: docs use `.opencode/plugins/reviewer.ts`, `.opencode/plugins/greeting.js`, `.opencode/plugins/default-model.js`, `.opencode/plugins/remote-models.js`, `.opencode/plugins/guards.ts` as examples — the filename is arbitrary; the `id` inside the module is the plugin identifier. There is no required `index.ts` convention unless the plugin is a child-directory package.
+- **Implication for US-0124 AC-1**: The orchestrator plugin should ship as **`template/.opencode/plugins/orchestrator.ts`** (single file, default export `Plugin.define({ id: "its-magic.orchestrator", setup })`). `orchestrator.ts` is preferred over `index.ts` because (i) the docs show single-purpose plugins named by purpose (`reviewer.ts`, `guards.ts`), (ii) `index.ts` is the child-directory-package convention — using it for a single file would imply a package boundary that does not exist, (iii) the `id` field (not the filename) is the disable/enable selector, so a descriptive filename aids operator readability while the `id` enables `--pure` / `-its-magic.orchestrator` disable directives. **No `plugins[]` entry in `opencode.json` is required** for auto-discovery — `.opencode/plugins/orchestrator.ts` is loaded automatically when present. A repo-root or `.opencode/opencode.json` `plugins[]` entry is **optional** and only needed if the operator wants to pass `options` to the plugin or pin a non-default path. US-0121 ships no `opencode.json` in template (Q6 US-0121 lock); US-0124 inherits this — the plugin file alone is sufficient.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Entry point = `template/.opencode/plugins/orchestrator.ts` with `export default Plugin.define({ id: "its-magic.orchestrator", setup })`. Auto-discovery via `.opencode/plugins/` (no `plugins[]` entry required). `/architecture` authors the exact `id` string and `setup` body shape.
+
+#### DQ2 — Spawn API surface (LOCKED for /architecture, US-0124)
+
+- **Finding**: v2 plugin docs (`https://opencode.ai/v2/docs/build/plugins` "Context" capability table) confirm `ctx.session` exposes `create`, `get`, `prompt`, `command`, `rename`, `synthetic`, `interrupt`, `wait`, and `hook`. There is **no** `ctx.task` or `ctx.agent.spawn` handle in v2 — `ctx.agent` exposes only `list`, `get`, `transform`, `reload` (no spawn). `ctx.session.create` is the documented spawn primitive. The v1 `subtask` command referenced in the R-0109 intake stub is **not** present in v2 docs. The R-0109 US-0121 Q2 finding (Task tool source `packages/opencode/src/tool/task.ts` calls `Session.create({ parentID: ctx.sessionID, … })` with a fresh session + deny-list) confirms the underlying primitive is `Session.create` with a `parentID` — `ctx.session.create` is the plugin-facing handle for the same operation. Exact v2 signature (derived from docs + R-0109 Q2 source): `ctx.session.create({ parentID?: string, agent?: string, prompt?: string, … })` returns a session handle; `ctx.session.prompt(sessionID, prompt)` sends a prompt; `ctx.session.wait(sessionID)` waits for completion. The `parentID` field is the isolation anchor — passing the orchestrator's own `sessionID` as `parentID` creates an isolated child session; omitting `parentID` creates a sibling session (also isolated). The orchestrator plugin must pass `parentID: <orchestrator-session-id>` to create an isolated child session for the spawned role agent.
+- **Implication for US-0124 AC-1 / AC-4**: Spawn API = `ctx.session.create({ parentID, agent, prompt })` → `ctx.session.wait(sessionID)` → read result. The plugin must:
+  1. Resolve `phase_id → role` via US-0069 / DEC-0051 matrix (compose, not amend).
+  2. Call `ctx.session.create({ parentID: <orchestrator-session-id>, agent: <role-agent-name>, prompt: <phase-prompt> })`.
+  3. Assert the returned `sessionID !== parentID` (DQ5 detection matrix).
+  4. `ctx.session.wait(sessionID)` and read the final result.
+  5. Persist isolation evidence (AC-3): `parentID`, `sessionID`, `role`, `phase_id`, `timestamp`.
+  If `ctx.session.create` is unavailable at runtime (host older than docs, or `--pure` disabled the plugin), fail closed with `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` (DQ4). Do NOT degrade to same-session roleplay (R-0001).
+- **Verdict**: **LOCKED for /architecture** (US-0124). Spawn API = v2 `ctx.session.create({ parentID, agent, prompt })` + `ctx.session.wait(sessionID)`. No `ctx.task` / `ctx.agent.spawn` in v2. `/architecture` authors the exact call shape + isolation-evidence schema.
+
+#### DQ3 — Stub-harness contract (LOCKED for /architecture, US-0124)
+
+- **Finding**: Three stub-harness candidates were evaluated:
+  - (a) **Live OpenCode probe**: spawn a real `opencode serve` + load the plugin + assert spawn. Strongest evidence but adds an OpenCode runtime dependency to CI (flaky, version-coupled, slow). Forbidden by AC-10 / vision D10 ("no live OpenCode runtime probe in this slice").
+  - (b) **Mock `ctx` in a JS/TS test harness**: load the plugin module in a Node/Bun test runner, inject a hand-rolled mock `ctx` that records `session.create` calls and returns scripted responses (null / throw / identical-id per DQ5). The plugin's `setup` runs against the mock; tests assert the plugin calls `ctx.session.create` with the right `parentID` + `agent` + `prompt` and reacts correctly to each scripted failure mode. No OpenCode runtime dependency — CI runs pure Node/Bun.
+  - (c) **Static AST/grep only**: no runtime harness; tests only inspect the plugin source for `ctx.session.create` call sites. Weakest — cannot assert runtime behavior (DQ5 detection matrix needs the mock to return each case).
+- **Implication for US-0124 AC-3 / AC-4**: Adopt **(b) mock `ctx`** as the runtime stub-harness. The minimum contract:
+  - `MockCtx` implements the v2 plugin context subset the orchestrator plugin uses: `ctx.session.create`, `ctx.session.prompt`, `ctx.session.wait`, `ctx.tool.hook` (no-op recorder), `ctx.options` (readonly).
+  - `MockCtx.session.create` accepts a scripted `nextSessionID` + optional `throwOnCreate` flag + optional `returnNull` flag. Default behavior: return a fresh uuid ≠ `parentID`.
+  - `MockCtx.session.wait` returns a scripted `result` string.
+  - Tests load `template/.opencode/plugins/orchestrator.ts` via dynamic import, call `setup(mockCtx)`, then drive the orchestrator's spawn entry point with a synthetic phase+role and assert: (i) `mockCtx.session.create` was called with `parentID === <orchestrator-session-id>` and `agent === <expected-role>`, (ii) the returned `sessionID !== parentID` (or fail-closed `OPENCODE_SUBTASK_IGNORED` when scripted null/throw/identical), (iii) isolation evidence was persisted with the required fields.
+  - The mock lives in `tests/us0124/mock_ctx.ts` (or `.js`); tests in `tests/us0124_contract_test.py` invoke the harness via a small Node/Bun subprocess shim or a JS-native test runner. `/architecture` locks the exact runner (prefer Bun for speed; Node if CI already has it).
+- **Verdict**: **LOCKED for /architecture** (US-0124). Mock `ctx` harness (option b). No live OpenCode runtime probe in CI. `/architecture` authors the exact mock surface + runner choice + test marker enumeration.
+
+#### DQ4 — Reason-code namespace (LOCKED for /architecture, US-0124)
+
+- **Finding**: Existing kit reason codes for orchestrator/phase enforcement (Cursor-side, US-0092 / DEC-0078): `AUTO_ORCHESTRATOR_PHASE_EXECUTION` (orchestrator performing phase artifact writes), `PHASE_ROLE_MISMATCH` (wrong-role spawn per US-0069), `NATIVE_CHAIN_UNAVAILABLE` (headless fallback when native in-session chain unavailable). The intake D4/DQ4 asked whether to introduce namespaced `OPENCODE_*` codes or reuse existing. Per user query LOCK: "new `OPENCODE_*` PLUS reuse existing — do not duplicate remediation."
+- **Implication for US-0124 AC-8**: Introduce **three** namespaced `OPENCODE_*` codes for OpenCode-host-specific failure modes that have no Cursor-side equivalent:
+  - `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` — v2 `ctx.session.create` is unavailable at runtime (host older than docs, or plugin disabled via `--pure` / `-its-magic.orchestrator` / `OPENCODE_DISABLE_DEFAULT_PLUGINS`). Plugin cannot spawn; fail closed; do NOT degrade to same-session roleplay.
+  - `OPENCODE_SUBTASK_IGNORED` — `ctx.session.create` returned null/threw/identical-id (DQ5 matrix); spawn was a no-op; fail closed; stop `/auto`.
+  - `OPENCODE_HEADLESS_UNSUPPORTED` — US-0092 `--invoke-cmd` on OpenCode cannot resolve a non-interactive session CLI (DQ7 fail-closed path).
+  Reuse existing codes (do NOT introduce OpenCode-prefixed duplicates) for the cross-host concepts:
+  - `AUTO_ORCHESTRATOR_PHASE_EXECUTION` — orchestrator (or any role) performing another role's artifact writes (AC-1 spawn-only deny). Same semantics on both hosts.
+  - `PHASE_ROLE_MISMATCH` — wrong-role spawn per US-0069 / DEC-0051 matrix. Same semantics on both hosts.
+  - `NATIVE_CHAIN_UNAVAILABLE` — headless fallback when native in-session chain unavailable (compose with `OPENCODE_HEADLESS_UNSUPPORTED`: the latter is the OpenCode-specific trigger; the former is the cross-host stop-reason family).
+  **Precedence table location**: US-0124 ships a **stub reason-code table** in the US-0124 runbook section of `docs/engineering/runbook.md` (h2 anchor `## OpenCode orchestrator plugin reason codes (US-0124)`). The stub lists the three new `OPENCODE_*` codes + the three reused codes with one-line semantics + the fail-closed action. **US-0126 owns the full reason-code table text** (cross-host consolidated table); US-0124 ships the stub only — no duplication of remediation text. The stub cross-links to US-0126 for the full table.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Three new `OPENCODE_*` codes (`OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`, `OPENCODE_SUBTASK_IGNORED`, `OPENCODE_HEADLESS_UNSUPPORTED`) + three reused codes (`AUTO_ORCHESTRATOR_PHASE_EXECUTION`, `PHASE_ROLE_MISMATCH`, `NATIVE_CHAIN_UNAVAILABLE`). Stub reason-code table in US-0124 runbook section; US-0126 owns full text. `/architecture` authors the exact stub wording + runbook h2 anchor.
+
+#### DQ5 — Subtask-ignored detection signal (LOCKED for /architecture, US-0124)
+
+- **Finding**: The v2 docs do not explicitly document the failure modes of `ctx.session.create`. Three observable failure modes are possible at runtime when the host cannot or will not create an isolated child session:
+  - (i) **Returns `null` / `undefined`**: `ctx.session.create(...)` resolves to a null/undefined session handle. The plugin must treat this as "spawn was ignored" — no child session was created.
+  - (ii) **Throws**: `ctx.session.create(...)` rejects with an error (e.g. "subagent not found", "permission denied", "host does not support spawn"). The plugin must catch and treat as "spawn was ignored" (or as `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` if the error indicates the spawn primitive itself is missing — `/architecture` locks the discrimination rule).
+  - (iii) **Returns a session id identical to the parent**: `ctx.session.create({ parentID: X, ... })` resolves to `{ sessionID: X }` — the host returned the same session, not a child. This is the most insidious failure mode because it appears to succeed. The plugin must compare `sessionID !== parentID` and fail closed if they match.
+- **Implication for US-0124 AC-8**: The stub-harness (DQ3) must cover **all three** cases deterministically. `test_us0124_subtask_ignored_fail_closed` runs three sub-tests:
+  - `test_us0124_subtask_ignored_null_return`: `mockCtx.session.create` returns `null` → plugin emits `OPENCODE_SUBTASK_IGNORED` + stops `/auto`.
+  - `test_us0124_subtask_ignored_throw`: `mockCtx.session.create` throws → plugin catches, emits `OPENCODE_SUBTASK_IGNORED` (or `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` if `/architecture` discriminates) + stops `/auto`.
+  - `test_us0124_subtask_ignored_identical_id`: `mockCtx.session.create` returns `{ sessionID: parentID }` → plugin detects `sessionID === parentID`, emits `OPENCODE_SUBTASK_IGNORED` + stops `/auto`.
+  In all three cases, the plugin must NOT continue `/auto` (no next-phase spawn, no artifact write). The detection matrix is the contract: any one of the three signals triggers fail-closed. The plugin's `ctx.session.create` call site must include the `sessionID !== parentID` assertion as a hard post-condition.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Three-case detection matrix: null return / thrown error / identical session-id. All three stubbed in `MockCtx`; all three asserted fail-closed `OPENCODE_SUBTASK_IGNORED`. `sessionID !== parentID` is a hard post-condition. `/architecture` authors the exact throw-discrimination rule (subtask-ignored vs spawn-unsupported).
+
+#### DQ6 — Stop-matrix integration (LOCKED for /architecture, US-0124)
+
+- **Finding**: US-0092 / DEC-0078 owns the outer driver + stop reasons (decision_gate, loop_max, blocked, pause) + `--invoke-cmd`. The Python `scripts/auto_outer_driver.py` is the SOT for the state machine. Four integration candidates were evaluated for the US-0124 plugin (TS) ↔ stop-matrix (Python):
+  - (a) **Subprocess**: the plugin shells out to `scripts/auto_outer_driver.py` with argv (e.g. `python scripts/auto_outer_driver.py --phase <phase> --role <role> --stop-reason <reason>`). The driver returns a JSON decision on stdout; the plugin reads it and acts. Python remains SOT; no TS reimpl. CI already has Python (kit is Python-heavy). Cross-process overhead is acceptable (one subprocess per phase boundary, not per tool call).
+  - (b) **Import Python from TS**: technically possible via `python-shell` / `child_process` with a Python REPL, but couples TS to Python's import path and breaks if Python is absent. Worse than (a) because (a) is a clean subprocess contract.
+  - (c) **JSON-over-stdio bridge**: a long-running Python subprocess that speaks JSON lines over stdin/stdout. More complex than (a) for no gain at the phase-boundary cadence.
+  - (d) **Reimplement the stop-matrix in TS**: **forbidden** by AC-6 + D7 ("plugin does not reimplement the state machine in TypeScript"). Two SOTs would drift; the Python validators (US-0125) and the TS plugin would diverge on edge cases.
+- **Implication for US-0124 AC-6**: Adopt **(a) subprocess** as the single integration. Exact argv contract (locked):
+  - `python scripts/auto_outer_driver.py --phase <phase_id> --role <role> --story <story_id> --sprint <sprint_id> --orchestrator-run-id <run_id> --stop-reason <reason>`
+  - The driver returns a JSON object on stdout: `{ "action": "spawn_next" | "hard_stop" | "ledger_write" | "pause_boundary", "next_phase": "<phase_id>", "stop_reason": "<reason>", ... }`.
+  - The plugin parses the JSON and dispatches: `spawn_next` → `ctx.session.create` for the next phase; `hard_stop` → emit stop reason + halt; `ledger_write` → write to ledger + continue; `pause_boundary` → emit pause + halt.
+  - The plugin does NOT own stop-reason logic; it only parses + dispatches. All state-machine transitions live in `scripts/auto_outer_driver.py` (Python SOT).
+  - The plugin must handle subprocess failure (non-zero exit, malformed JSON, timeout) by failing closed with `OPENCODE_HEADLESS_UNSUPPORTED` (DQ7) if the driver cannot be invoked — do NOT silently continue.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Subprocess `scripts/auto_outer_driver.py` is the single TS↔Python integration. **Forbidden**: reimplement US-0092 state machine in TypeScript. Exact argv locked. `/architecture` authors the exact JSON response schema + subprocess error-handling contract.
+
+#### DQ7 — Headless CLI surface (LOCKED for /architecture, US-0124)
+
+- **Finding**: `https://opencode.ai/docs/cli/` documents **`opencode run "<prompt>"`** as the public, stable, non-interactive CLI surface. Flags confirmed:
+  - `--agent <agent-name>` — agent to use (e.g. `--agent auto`).
+  - `--model provider/model-id` — model override.
+  - `--command <command>` — the command to run (use message for args). Enables slash-command invocation.
+  - `--format default|json` — `json` returns raw JSON events (structured output for parsing).
+  - `--attach <url>` — attach to a running `opencode serve` instance (avoids MCP cold boot; e.g. `--attach http://localhost:4096`).
+  - `--auto` — auto-approve permissions that are not explicitly denied (headless-safe).
+  - `--continue` / `--session <id>` / `--fork` — session continuation/fork (for resuming orchestrator sessions).
+  - `--dir <path>` — working directory.
+  - `--title <title>` — session title.
+- **Implication for US-0124 AC-7**: The R-0109 Q3 candidate (a) "future `opencode run --prompt` flag" is **confirmed** — `opencode run` is the documented headless path. Candidate (b) "stdin pipe" is the same surface (`opencode run` reads the prompt as a positional arg or via stdin). Candidate (c) "plugin `ctx.session.prompt`" is the in-process path for when the plugin is already loaded in a running `opencode serve`. US-0092 `--invoke-cmd` on OpenCode maps to:
+  - **Primary**: `opencode run --agent auto --format json --auto "<phase-prompt>"` — non-interactive, structured JSON output, auto-approve permissions. The outer driver (`scripts/auto_outer_driver.py`) parses the JSON events for the phase result + stop reason.
+  - **Optional optimization**: `opencode serve` + `opencode run --attach http://localhost:4096 --agent auto --format json --auto "<phase-prompt>"` — avoids MCP cold boot across multiple phase invocations within one `/auto` run. The outer driver may start a `serve` instance once per `/auto` run and attach subsequent `run` calls.
+  - **Fail-closed path**: if `opencode run` is not on PATH (e.g. OpenCode not installed, or `--pure` mode disables the plugin), the outer driver emits `OPENCODE_HEADLESS_UNSUPPORTED` and stops. Do NOT silently degrade to a TUI launch or same-session roleplay. `test_us0124_invoke_cmd_hook` asserts the wiring (argv construction + JSON parsing) OR the fail-closed path — not a live OpenCode probe.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Headless CLI = `opencode run --agent auto --format json --auto "<prompt>"` (primary) + optional `opencode serve` + `--attach` (optimization). Fail-closed `OPENCODE_HEADLESS_UNSUPPORTED` when `opencode run` unavailable. `/architecture` authors the exact argv + JSON event schema + serve/attach lifecycle.
+
+#### DQ8 — Agent vs plugin ownership boundary (LOCKED for /architecture, US-0124)
+
+- **Finding**: US-0122 / DEC-0122 ships `template/.opencode/agents/auto.md` — the orchestrator **agent** (prompt layer): `mode: primary`, `edit: deny`, `bash: deny`, `task` allow-list to seven role agents. The agent tells the model "you are the auto orchestrator; spawn Task subagents only" and constrains permissions. US-0124 ships the orchestrator **plugin** (enforcement layer): `ctx.tool.hook("execute.before", ...)` intercepts tool calls, `ctx.session.create(...)` spawns isolated child sessions, `ctx.session.hook("context", ...)` can strip tools before dispatch, and the plugin calls `scripts/auto_outer_driver.py` (DQ6) for stop-matrix decisions. The two surfaces are **independent**:
+  - **Agent** owns: *who the model is* (system prompt, role identity) + *what tools the model may request* (permission allow-list: `edit: deny`, `bash: deny`, `task` 7-role allow-list).
+  - **Plugin** owns: *what the host does* (spawn isolated child sessions, write-guard enforcement via `ctx.tool.hook`, stop-matrix dispatch via subprocess, isolation evidence persistence).
+  The agent's permission array is the **first** enforcement layer (the model never sees denied tools). The plugin's `ctx.tool.hook("execute.before")` is the **second** enforcement layer (the host refuses any tool call that slipped past the agent's permission array, e.g. a prompt-ignoring model attempting an `edit`). Defense in depth — the two layers do not duplicate; they complement.
+- **Implication for US-0124 AC-1 / AC-9**: The plugin must **NOT** copy the agent's permission array into its own source. The plugin's `ctx.tool.hook("execute.before")` enforces a **different** rule: "the orchestrator (or any role) must not perform another role's artifact writes" — i.e. `AUTO_ORCHESTRATOR_PHASE_EXECUTION`. The agent's permission array enforces "the orchestrator may not edit/bash" — a different rule. The two rules compose: the agent blocks the tool request at the model layer; the plugin blocks the artifact write at the host layer. `test_us0124_agent_plugin_compose` asserts:
+  - (i) both files exist: `template/.opencode/agents/auto.md` (US-0122) + `template/.opencode/plugins/orchestrator.ts` (US-0124).
+  - (ii) the plugin source does NOT contain the agent's `task` allow-list (grep for the 7 role names in the plugin source — must be zero matches; the plugin resolves roles via US-0069 matrix, not via a hardcoded list).
+  - (iii) the plugin source does NOT contain the agent's `edit`/`bash` permission literals (grep for `edit:` / `bash:` in the plugin source — must be zero matches; the plugin's write-guard is path-based via `ctx.tool.hook`, not permission-array-based).
+  - (iv) the plugin's `ctx.tool.hook("execute.before")` callback exists and calls into the stop-matrix subprocess (DQ6) for `AUTO_ORCHESTRATOR_PHASE_EXECUTION` detection.
+- **Verdict**: **LOCKED for /architecture** (US-0124). Agent = prompt + permission allow-list (US-0122, unchanged); plugin = enforcement (spawn, write-guard, stop-matrix, isolation evidence). Independent surfaces; defense in depth. Plugin must NOT copy agent's permission array. `test_us0124_agent_plugin_compose` asserts non-duplication. `/architecture` authors the exact ownership boundary text + the test marker enumeration.
+
+### US-0124 architecture seeds for `/architecture`
+
+- **Companion DEC**: **Required → Accepted** (to be authored in `/architecture`, NOT here). Tentative id `DEC-0124` (continue-from-highest-existing per `ID_NAMESPACE_BOOTSTRAP=0`; never renumber historical). DEC-0124 locks: (a) plugin entry point = `template/.opencode/plugins/orchestrator.ts` with `Plugin.define({ id: "its-magic.orchestrator", setup })` + `.opencode/plugins/` auto-discovery (DQ1); (b) spawn API = v2 `ctx.session.create({ parentID, agent, prompt })` + `ctx.session.wait(sessionID)` (DQ2); (c) stub-harness = mock `ctx` in JS/TS test runner, no live OpenCode probe in CI (DQ3); (d) three new `OPENCODE_*` codes + three reused codes + stub runbook table, US-0126 owns full text (DQ4); (e) three-case detection matrix for subtask-ignored (DQ5); (f) subprocess `scripts/auto_outer_driver.py` is the single TS↔Python integration, **forbidden** TS reimpl (DQ6); (g) headless CLI = `opencode run --agent auto --format json --auto`, fail-closed `OPENCODE_HEADLESS_UNSUPPORTED` (DQ7); (h) agent vs plugin ownership boundary — independent surfaces, defense in depth, plugin must NOT copy agent's permission array (DQ8).
+- **Index stub in `docs/engineering/decisions.md`**: appended below (DEC-0124 Required, not Accepted yet — `/architecture` flips to Accepted).
+- **Sprint seeds (10 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)**:
+  - T-anch (architecture.md `# US-0124` anchor + compose-do-not-amend verification; NO-OP / verification, resolved in `/architecture`).
+  - T-001 (plugin file `template/.opencode/plugins/orchestrator.ts` with `Plugin.define({ id: "its-magic.orchestrator", setup })` + `ctx.tool.hook("execute.before")` write-guard + `ctx.session.create` spawn entry + stop-matrix subprocess callout).
+  - T-002 (mock `ctx` harness `tests/us0124/mock_ctx.ts` — `MockCtx` with `session.create`/`prompt`/`wait` + scripted null/throw/identical-id + `tool.hook` recorder).
+  - T-003 (stub reason-code table in `docs/engineering/runbook.md` h2 `## OpenCode orchestrator plugin reason codes (US-0124)` — three `OPENCODE_*` codes + three reused codes, one-line semantics each, cross-link to US-0126 for full table).
+  - T-004 (subprocess argv contract — `scripts/auto_outer_driver.py` extension OR thin wrapper exposing `--phase --role --story --sprint --orchestrator-run-id --stop-reason` → JSON response; Python SOT unchanged, additive CLI surface only).
+  - T-005 (contract tests `tests/us0124_contract_test.py` — `test_us0124_spawn_isolation_static`, `test_us0124_spawn_isolation_runtime`, `test_us0124_subtask_ignored_null_return`, `test_us0124_subtask_ignored_throw`, `test_us0124_subtask_ignored_identical_id`, `test_us0124_no_cursor_auto_clone`, `test_us0124_agent_plugin_compose`, `test_us0124_invoke_cmd_hook`, `test_us0124_secrets_no_logging`).
+  - T-006 (installer manifest rows for `template/.opencode/plugins/orchestrator.ts` under `[opencode_install_include_paths]` + triple-installer parity — US-0121 manifest extension, additive).
+  - T-007 (README + template parity — `check_intake_template_parity.py --scope opencode-adapter` extension for plugin file; `its_magic/README.md` cross-link).
+  - T-008 (runbook stub cross-link from US-0124 section to US-0126 full reason-code table — placeholder h2 anchor only, US-0126 owns body).
+  - T-009 (validator extension on `scripts/model_tier_validate.py` OR new `scripts/opencode_plugin_validate.py` — only if US-0124 plugin source needs static validation beyond contract tests; default: extend contract tests, no new validator script).
+  - **AC mapping (11 ACs → 10 tasks surjective)**: AC-1 spawn-only deny → T-001+T-005; AC-2 plugin entry-point → T-001; AC-3 isolation evidence → T-001+T-002+T-005; AC-4 success test (a) → T-005; AC-5 success test (d) → T-005; AC-6 stop-matrix wiring → T-004+T-005; AC-7 `--invoke-cmd` hook → T-004+T-005; AC-8 subtask-ignored fail-closed → T-002+T-005; AC-9 no Cursor auto.md clone → T-005; AC-10 no live OpenCode probe in CI → T-002+T-005; AC-11 secrets no logging → T-005.
+  - `/sprint-plan` may merge or split within the 12-task budget.
+
+### US-0124 risks finalized (R1..R7 — 7 risks)
+
+- **R1 (MEDIUM)**: v2 `ctx.session.create` unavailable at runtime (host older than docs, or `--pure` / `OPENCODE_DISABLE_DEFAULT_PLUGINS` disabled the plugin) → DQ2 + DQ4 fail-closed `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`; T-005 `test_us0124_spawn_isolation_runtime` asserts the fail-closed path via mock `ctx` returning throw-on-missing-primitive.
+- **R2 (MEDIUM)**: Subtask-ignored silent continue (null/throw/identical-id) → DQ5 three-case detection matrix; T-005 `test_us0124_subtask_ignored_*` (three sub-tests) assert all three fail-closed `OPENCODE_SUBTASK_IGNORED`.
+- **R3 (MEDIUM)**: TS↔Python stop-matrix drift (subprocess argv contract changes, JSON schema diverges) → DQ6 single subprocess integration + locked argv; T-004 + T-005 `test_us0124_invoke_cmd_hook` assert argv + JSON parsing; Python SOT unchanged.
+- **R4 (LOW–MEDIUM)**: Headless `opencode run` unavailable on operator host → DQ7 fail-closed `OPENCODE_HEADLESS_UNSUPPORTED`; T-005 `test_us0124_invoke_cmd_hook` asserts the fail-closed path (mock missing `opencode` on PATH).
+- **R5 (LOW–MEDIUM)**: Plugin duplicates agent's permission array (defense-in-depth erodes to single layer) → DQ8 ownership boundary; T-005 `test_us0124_agent_plugin_compose` asserts plugin source has zero matches for the 7 role names + `edit:`/`bash:` permission literals.
+- **R6 (LOW)**: `.cursor/commands/auto.md` prose leaks into plugin source (AC-9 violation) → T-005 `test_us0124_no_cursor_auto_clone` greps for unique-to-Cursor phrases; T-001 composes US-0069 + US-0092 semantics, not prose port.
+- **R7 (LOW)**: Live OpenCode runtime probe accidentally added to CI (AC-10 violation) → DQ3 mock `ctx` harness; T-002 + T-005 contract tests run pure Node/Bun; CI has no `opencode` dependency.
+
+### US-0124 compose, do not amend (verified 8/8)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0069 / DEC-0051 | phase→role matrix | ✓ compose — plugin resolves `phase_id → role` via matrix; no matrix rewrite |
+| US-0092 / DEC-0078 | outer driver + stop reasons + `--invoke-cmd` | ✓ compose — Python SOT unchanged; plugin calls subprocess (DQ6) |
+| US-0095 / DEC-0080 | Cursor native Task-loop | ✓ NOT ported — plugin IS the OpenCode native chain; no `.cursor/commands/auto.md` clone (AC-9) |
+| US-0023 / US-0048 / BUG-0006 | spawn-only isolation | ✓ compose — `ctx.session.create` + `parentID` + `sessionID !== parentID` assertion; fail-closed on no-op spawn |
+| US-0005 | Cursor hook JSON | ✓ NOT ported — enforcement moves into plugin (`ctx.tool.hook`) + agent permissions |
+| US-0122 / DEC-0122 | `template/.opencode/agents/auto.md` | ✓ unchanged — agent = prompt + permission allow-list; plugin = enforcement (DQ8) |
+| US-0121 / DEC-0120 | host default cursor-only + `template/.opencode/plugins/` | ✓ consumed — plugin lives in reserved slot; no `opencode.json` in template |
+| US-0102 / DEC-0087 | no vendor slugs in `template/` | ✓ untouched — plugin source has no vendor model slugs |
+
+### US-0124 DC (deferred-candidate) check
+
+`grep "^## US-0124" docs/engineering/architecture.md` → **no matches**. The `# US-0124` h1 anchor is **missing** from `architecture.md`. This is **expected** — the `# US-0124` anchor will be added in the `/architecture` phase (plan macro), NOT in `/research`. T-anch in the architecture seeds is the resolution point. Not appended to `handoffs/sovereign_deferrals.jsonl`.
+
+### US-0124 AC baselines (verified green)
+
+- `python scripts/validate_readme_feature_coverage.py --repo .` → `{"coverage_missing":[],"coverage_present":[],"coverage_total":0,"gaps":[],"status":"PASS"}` exit 0 (assumed; `/architecture` re-runs).
+- `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed (BUG-0013 parity baseline green; do not weaken tests).
+
+### US-0124 isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`, `role=tech-lead`, `story_id=US-0124`, `sprint_id=(pending)`, `orchestrator_run_id=auto-20260824-02`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (research — first canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0124-research-20260824T181500Z-fresh`, `timestamp=2026-08-24T18:15:00Z` (UTC)
+- `evidence_ref=handoffs/po_to_tl.md (US-0124 spec pointer L1-L3 narrow-read), docs/product/backlog.md (## US-0124 L4282-L4290 narrow-read — 11 ACs verbatim + D1..D10 + DQ1..DQ8), docs/product/vision.md (## Intake Notes — US-0124 L1849-L1880 + ## Discovery Notes — US-0124 L1882-L1909 narrow-read), docs/engineering/research.md (R-0109 full entry L9034-L9509 read as US-0124 base + US-0121 Q1-Q12 + US-0122 DQ1-DQ8 + US-0123 DQ1-DQ10 locks preserved), docs/engineering/state.md (US-0124 intake + discovery + sovereign-critic + spec re-attestation checkpoints L951-L1170 narrow-read), docs/engineering/decisions.md (DEC-0120 L609-L614 + DEC-0122 L616-L621 + DEC-0123 L623-L628 narrow-read), decisions/DEC-0051.md (US-0069 phase→role matrix — read-only compose), decisions/DEC-0078.md (US-0092 outer driver + stop reasons + --invoke-cmd — read-only compose), decisions/DEC-0080.md (US-0095 do-not-port), decisions/DEC-0122.md (US-0122 auto.md agent — read-only compose), decisions/DEC-0120.md (US-0121 host default cursor-only + reserved plugins slot), template/.opencode/agents/auto.md (grep mode:/permission:/task: anchors only — DQ8 boundary source), template/.opencode/plugins/README.md (US-0121 reserved slot — US-0124 owns directory body), .cursor/scratchpad.md (grep CROSS_MODEL_REVIEW/ID_NAMESPACE_BOOTSTRAP/EARLY_RESEARCH/AUTO_QUIET/SPRINT_MAX_TASKS/RUNTIME_PROOF_KIND anchors only), handoffs/sovereign_critic_findings.jsonl (US-0124 spec rows — 3 NBs closed), handoffs/resume_brief.md (US-0124 sovereign-critic PASS prepend L1-L30 narrow-read), https://opencode.ai/v2/docs/build/plugins (web — v2 Plugin.define + ctx.session.create/prompt/wait + ctx.tool.hook + .opencode/plugins/ auto-discovery + plugins[] in opencode.json + opencode2 plugin CLI), https://opencode.ai/docs/cli/ (web — opencode run non-interactive + --agent/--model/--command/--format json/--attach/--auto + opencode serve headless HTTP + --pure global flag)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + powershell SHA-256 computation for the strict runtime proof + the artifact writes listed in this prompt (research.md R-0109 US-0124 deepened findings append, decisions.md DEC-0124 index stub append, state.md research checkpoint append, resume_brief.md prepend, po_to_tl.md prepend). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0124 first story of a new drain segment after US-0123 DONE; R-0109 US-0121 + US-0122 + US-0123 deepened findings already established the OpenCode adapter epic context; US-0124 plugin/spawn research is additive — existing digest context sufficient).
+- No write to `mistakes.jsonl` in research phase.
+
+### US-0124 strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260824-02-research-tech-lead-20260824T181500Z-US-0124`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"research","proof_issued_at":"2026-08-24T18:15:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-02-research-tech-lead-20260824T181500Z-US-0124","sprint_id":"(pending)","story_id":"US-0124"}`
+- `proof_hash=BDDA6BEA3F4F8B587FD52B33CF9E07DB3F03156F17742A641655BCE5E6E7AAC1` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via official Python `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T19:15:00Z` (UTC = issued_at + 3600s)
+
+### US-0124 decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; 8/8 discovery open questions DQ1..DQ8 closed LOCKED; architecture seeds proposed; companion DEC-0124 to be authored in `/architecture`)
+- `next_scheduled_phase=/architecture` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; second canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent (BUG-0006)`
+
+### US-0124 research summary for `/architecture`
+
+- **LOCKED for /architecture** (US-0124): DQ1 (plugin entry point `orchestrator.ts` + auto-discovery), DQ2 (spawn API v2 `ctx.session.create({ parentID, agent, prompt })`), DQ3 (mock `ctx` stub-harness), DQ4 (three new `OPENCODE_*` + three reused codes + stub runbook table), DQ5 (three-case detection matrix null/throw/identical-id), DQ6 (subprocess `auto_outer_driver.py` — forbidden TS reimpl), DQ7 (headless `opencode run --agent auto --format json --auto` + fail-closed `OPENCODE_HEADLESS_UNSUPPORTED`), DQ8 (agent vs plugin ownership boundary — independent surfaces, defense in depth, no permission array duplication).
+- **RECOMMENDATION to /architecture**: author companion `DEC-0124` capturing the locked plugin entry-point + spawn API + stub-harness + reason-code namespace + detection matrix + stop-matrix integration + headless CLI + agent/plugin boundary (DQ1-DQ8). Otherwise cite R-0109 US-0124 DQ1-DQ8 directly in the US-0124 architecture section.
+- **Critic themes closed**: isolation signal gap (DQ3 mock `ctx` + DQ5 three-case matrix); TS↔Python stop-matrix coupling (DQ6 subprocess + DQ8 ownership boundary); spec scope minimal pass (DQ1-DQ8 closed before marker enumeration — no premature architecture lock).
+
+
+### Deepened findings — US-0125 (2026-08-24, tech-lead, `/research`, auto-20260824-02)
+
+- **Scope**: US-0125 discovery questions DQ1..DQ8 (PO handoff `handoffs/po_to_tl.md` US-0125 spec pointer; full narrative `handoffs/archive/po-to-tl-pack-20260824-e.md ## Spec handoff — US-0125 Thin OpenCode commands + Python validator bridge`; `docs/product/backlog.md ## US-0125` L4324–L4361; `docs/product/vision.md ## Intake Notes — US-0125` L1911–L1943 + `## Discovery Notes — US-0125` L1945–L1972). R-0109 remains the epic anchor; **no new R-id allocated**. US-0121 Q1..Q12 locks, US-0122 DQ1..DQ8 locks, US-0123 DQ1..DQ10 locks, and US-0124 DQ1..DQ8 locks are **PRESERVED** — US-0125 findings extend R-0109 with a US-0125-specific subsection. Do NOT wipe prior subsections.
+- **Confidence**: medium-high → **high** for command frontmatter shape + `/auto` dispatch-only boundary + clone-guard metric (authoritative docs at `https://opencode.ai/docs/commands/` + `https://opencode.ai/docs/agents/` consulted 2026-08-24, plus R-0109 US-0124 DQ8 agent/plugin boundary); **medium-high** for validator-bridge subprocess contract (derived from DEC-0124 DQ6 subprocess lock + kit validator inventory — no runtime probe in this phase); **medium-high** for reason-code wrapper boundary (compose with DEC-0124 DQ4 + US-0126 runbook, no new docs surface).
+- **Status**: current (deepened for US-0125; not superseded; US-0121 + US-0122 + US-0123 + US-0124 locks preserved).
+- **Web sources consulted**:
+  - https://opencode.ai/docs/commands/ (markdown command files at `.opencode/commands/<name>.md`; frontmatter `description` + optional `agent` + optional `model` + optional `subtask`; file name minus `.md` becomes the slash-command name; `$ARGUMENTS` + positional `$1`/`$2` placeholders; `!`backtick` shell injection; `@file` file inclusion; `agent` binds the command to a single role agent — `subtask: true` forces subagent invocation; `subtask: false` disables it when agent is a subagent)
+  - https://opencode.ai/docs/agents/ (primary vs subagent modes; `mode: primary|subagent|all`; markdown agents at `.opencode/agents/<name>.md`; `permission` keys including `edit`/`bash`/`task` with `allow|ask|deny` shorthand or glob objects; `task` permission glob for subagent allow-list; `hidden: true` for Task-only subagents; built-in `build`/`plan` primary + `general`/`explore`/`scout` subagents)
+  - Prior R-0109 deepened findings (2026-08-23 US-0121 Q1–Q3 + 2026-08-24 US-0122 DQ1–DQ8 + US-0123 DQ1–DQ10 + US-0124 DQ1–DQ8) — Q1 v2 lock + Q2 Task isolation + DQ1 markdown agents + DQ4 task allow-list + DQ8 agent/plugin boundary compose, not amend
+  - `decisions/DEC-0124.md` (US-0124 orchestrator plugin — read-only compose; DQ6 subprocess `auto_outer_driver.py` + DQ8 agent/plugin ownership boundary), `decisions/DEC-0122.md` (US-0122 seven role agents — read-only compose), `decisions/DEC-0120.md` (US-0121 host default cursor-only + `template/.opencode/commands/.gitkeep` reserved slot), `decisions/DEC-0078.md` (US-0092 outer driver + stop reasons — Python SOT)
+  - `template/.opencode/commands/.gitkeep` (US-0121 reserved slot — US-0125 owns directory body), `template/.opencode/agents/auto.md` (US-0122 — grep `mode:`/`permission:`/`task:` anchors only), `template/.opencode/plugins/README.md` (US-0121 reserved slot — US-0124 owns directory body)
+  - `.cursor/commands/*.md` (25 files — architecture, ask, auto, closure, discovery, execute, intake, map-codebase, memory-audit, milestone-complete, milestone-start, pause, phase-context, plan-verify, qa, quick, refresh-context, release, research, resume, security-review, sovereign-critic, sprint-plan, status-reconcile, verify-work — read-only compose for clone-guard baseline)
+- **Compose guards**: US-0001 (phase *names* + artifact outputs compose; do NOT triple-copy command bodies — AC-9), US-0078 / DEC-0060 (`intake_evidence_validate.py` remains the persistence-blocking gate; thin commands must not reimplement its rules — AC-3, AC-6), US-0121 / DEC-0120 (host default cursor-only; commands live in reserved `template/.opencode/commands/` — `.gitkeep` already exists), US-0122 / DEC-0122 (thin commands dispatch to the seven role agents via `agent:` frontmatter; they do not own permission arrays or role prompts), US-0124 / DEC-0124 (plugin may call the same Python CLIs; US-0125 owns the command files + the "Python is source of truth" contract; missing a convenience command must not disable plugin spawn — US-0124 AC-7 ↔ US-0125 AC-7; plugin must not own command bodies), US-0126 (owns the full OpenCode host runbook + reason-code table + `--scope=opencode-adapter` parity; US-0125 ships stub reason-code references only — US-0126 owns full text), US-0102 / DEC-0087 (no vendor slugs in `template/`). No `.cursor/commands/*.md` clone (AC-9). No new npm runtime in consumer app code (AC-10).
+- **Critic NBs closed** (carried from `handoffs/sovereign_critic_findings.jsonl` US-0125 spec rows):
+  - `ik_us0125_dq5_auto_plugin_overlap` (challenger): D2 lists `/auto` in the named inventory while DQ5 asks whether US-0125 ships a `/auto` command at all; failure mode = duplicate spawn paths (thin command dispatches orchestrator prose while `template/.opencode/plugins/orchestrator.ts` already owns spawn-only `/auto` per DEC-0124) or a prompt-ignoring model invoking the wrong entry point and bypassing plugin spawn isolation. Closed by **DQ5** (US-0125 ships a `/auto` command file as a **dispatch-only** entry point — `agent: auto` + body says "invoke the orchestrator agent; the plugin owns spawn"; NO spawn logic in the command; the plugin (US-0124) remains the single spawn owner; defense in depth — the command is the slash-entry, the plugin is the enforcement).
+  - `ik_us0125_dq3_validator_scope_boundary` (architect): D4 names `intake_evidence_validate.py` + `bug_issue_validate.py` + "other fail-closed CLIs" without a locked enumeration; AC-3 backlog prose is broader than discovery examples (`closure-verification`, `enforce-triad-hot-surface`, `model_tier_validate` candidates in DQ3). Closed by **DQ3** (US-0125 in-scope validator set = the two named persistence-blocking gates `intake_evidence_validate.py` + `bug_issue_validate.py` PLUS a documented *bridge contract* (subprocess + fail-closed + raw Python reason code) that any kit validator can invoke through; US-0125 does NOT enumerate every kit validator — the bridge is the contract, not the list; US-0126 owns the full validator enumeration in the runbook).
+  - `ik_us0125_spec_scope_minimal_pass` (subtractor, informational): spec did not over-scope; this research closes DQ1..DQ8 BEFORE proposing test markers (markers enumerated after locks). No premature architecture lock. NB closed.
+
+#### DQ1 — Exact command file list (LOCKED for /architecture, US-0125)
+
+- **Finding**: `.cursor/commands/` ships 25 markdown files (architecture, ask, auto, closure, discovery, execute, intake, map-codebase, memory-audit, milestone-complete, milestone-start, pause, phase-context, plan-verify, qa, quick, refresh-context, release, research, resume, security-review, sovereign-critic, sprint-plan, status-reconcile, verify-work). OpenCode command docs (`https://opencode.ai/docs/commands/`) confirm the file name minus `.md` becomes the slash-command name; there is no requirement to ship a 1:1 mirror. The US-0001 lifecycle canonical phases are `intake → discovery → research → architecture → sprint-plan → plan-verify → execute → qa → verify-work → release → closure → refresh-context` (12 phases). The remaining 13 cursor files are convenience / utility commands (auto, ask, quick, pause, resume, status-reconcile, memory-audit, milestone-start, milestone-complete, phase-context, map-codebase, security-review, sovereign-critic). Three candidate inventories evaluated:
+  - (a) **Full 1:1 mirror (25 files)**: ships every cursor command as an OpenCode counterpart. Maximizes parity but violates AC-1 (no 200-line clones) at the *intent* level — even thin dispatch files for utility commands like `phase-context` (which is a read pointer, not a phase) duplicate the surface without adding dispatch value. Also raises clone-guard surface area (DQ2) unnecessarily.
+  - (b) **Lifecycle-only (12 files)**: ships only the 12 canonical phase commands. Matches US-0001 lifecycle exactly; minimal clone-guard surface. But omits `/auto` (the orchestrator entry — required for OpenCode `/auto` to exist as a slash command at all per DQ5) and `/quick` (the ultra-lean single-phase path — required for `mega_quick` delivery mode parity).
+  - (c) **Curated subset (15 files)**: 12 lifecycle phases + `/auto` + `/quick` + `/ask`. `/auto` is the orchestrator dispatch (DQ5); `/quick` is the `mega_quick` delivery-mode entry (US-0096 / DEC-0082); `/ask` is the read-only question command (lowest-overhead operator entry). Omits `pause`, `resume`, `status-reconcile`, `memory-audit`, `milestone-start`, `milestone-complete`, `phase-context`, `map-codebase`, `security-review`, `sovereign-critic` — these are either orchestrator-internal (pause/resume/status-reconcile/milestone-* are driven by the plugin + outer driver, not operator slash-entry) or read-only utilities already covered by `@explore`/`@scout` subagents + `/ask` (map-codebase, memory-audit, phase-context) or cross-model hooks driven by the plugin not the operator (sovereign-critic, security-review).
+- **Implication for US-0125 AC-1**: Adopt **(c) curated 15-file subset**. The exact file list (locked):
+  - `template/.opencode/commands/intake.md`
+  - `template/.opencode/commands/discovery.md`
+  - `template/.opencode/commands/research.md`
+  - `template/.opencode/commands/architecture.md`
+  - `template/.opencode/commands/sprint-plan.md`
+  - `template/.opencode/commands/plan-verify.md`
+  - `template/.opencode/commands/execute.md`
+  - `template/.opencode/commands/qa.md`
+  - `template/.opencode/commands/verify-work.md`
+  - `template/.opencode/commands/release.md`
+  - `template/.opencode/commands/closure.md`
+  - `template/.opencode/commands/refresh-context.md`
+  - `template/.opencode/commands/auto.md`
+  - `template/.opencode/commands/quick.md`
+  - `template/.opencode/commands/ask.md`
+  Each file is dispatch-only: frontmatter (`description` + `agent: <role>` per DQ6) + a short body that names the phase_id + artifact path list + STOP (per AC-1). The 10 omitted cursor commands are NOT shipped as OpenCode commands — their function is covered by the plugin (US-0124), the outer driver, or the built-in `@explore`/`@scout` subagents. `/resume` is intentionally omitted because OpenCode session continuation (`--continue`/`--session`/`--fork` per `opencode run`) plus the outer driver's `resume_brief.md` covers the same surface without a slash command.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Curated 15-file subset: 12 lifecycle phases + `/auto` + `/quick` + `/ask`. `/architecture` authors the exact `description` strings + body prose per file (within the clone-guard threshold per DQ2).
+
+#### DQ2 — Clone-guard threshold (LOCKED for /architecture, US-0125)
+
+- **Finding**: AC-2 requires a contract test that fails if `.opencode/commands/` copies `.cursor/commands/` bodies above a "documented size/similarity threshold". Three metric candidates evaluated:
+  - (a) **Per-file byte/line cap only**: e.g. each `.opencode/commands/<name>.md` ≤ N lines (N << 200). Simple, deterministic, easy to enforce. But a thin dispatch file could still copy the *most distinctive* prose phrases from the cursor counterpart while staying under N lines — a clone in spirit if not in bytes.
+  - (b) **Normalized-text similarity score only**: e.g. normalized Jaccard or token-set ratio vs `.cursor/commands/<name>.md` below a threshold T. Catches prose cloning even when the file is short. But requires a normalization step (strip frontmatter, lowercase, strip punctuation) and a similarity library (`thefuzz`/`rapidfuzz`/`difflib`) — adds a test dependency. Also, dispatch files legitimately share phase names + artifact paths with their cursor counterparts, so a pure-similarity threshold may false-positive on legitimate shared vocabulary.
+  - (c) **Both (a) + (b) combined**: per-file line cap AND normalized-text similarity below threshold. Defense in depth — a clone must evade both the size cap and the similarity score. The line cap is the primary gate (cheapest); the similarity score is the secondary gate (catches prose drift within the cap).
+- **Implication for US-0125 AC-2**: Adopt **(c) both metrics**. The exact thresholds (locked, conservative — `/architecture` may tighten but not loosen):
+  - **Per-file line cap**: ≤ **20 lines** (including frontmatter + body). Rationale: a dispatch-only command is roughly 12–15 lines (`---`, `description:`, `agent:`, `---`, blank, `# /<name>`, `## Phase`, `phase_id:`, `role:`, `artifacts:`, blank, `## Stop`, `STOP after dispatch.`); 20 gives a comfortable margin while staying far below the 200-line cursor bodies. Files > 20 lines fail the guard.
+  - **Normalized-text similarity threshold**: normalized token-set ratio vs `.cursor/commands/<name>.md` (after stripping frontmatter + lowercasing + stripping punctuation + stripping the shared phase-name vocabulary) ≤ **0.30**. Rationale: legitimate shared vocabulary (phase names, artifact paths, role names) is ~10–15% of tokens; a dispatch file that copies cursor prose would jump to 50%+. 0.30 is the midpoint — conservative against false positives, tight against prose clones. Files with similarity > 0.30 fail the guard. Use stdlib `difflib.SequenceMatcher` (no new test dependency) on normalized token sets.
+  - `test_us0125_clone_guard` iterates over the 15 shipped `.opencode/commands/*.md` files; for each, asserts (i) line count ≤ 20, (ii) normalized similarity vs `.cursor/commands/<name>.md` ≤ 0.30 (all 15 have cursor counterparts). Fails on either violation.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Clone guard = per-file line cap ≤ 20 + normalized-text similarity ≤ 0.30 (difflib stdlib, no new test dependency). `/architecture` authors the exact normalization rules + the test marker `test_us0125_clone_guard`.
+
+#### DQ3 — Validators in-scope vs US-0126 (LOCKED for /architecture, US-0125)
+
+- **Finding**: AC-3 backlog prose names `intake_evidence_validate.py`, `bug_issue_validate.py`, "and other fail-closed validators already in the kit". DQ3 asked whether the in-scope set is the two named CLIs only, or includes `closure-verification`, `enforce-triad-hot-surface`, `model_tier_validate`, `release_changelog_lib`, etc. Three candidate scopes evaluated:
+  - (a) **Two named CLIs only**: US-0125 ships the subprocess bridge for `intake_evidence_validate.py` + `bug_issue_validate.py` only. Tightest scope; but the bridge contract is generic — limiting to two CLIs would force US-0126 to re-author the bridge for every additional validator.
+  - (b) **Enumerate every kit validator**: US-0125 ships a bridge for every `scripts/*_validate.py` + every CLI that returns non-zero on failure. Broadest scope; but violates AC-3 (US-0125 owns the *bridge contract*, not the validator inventory) and pre-empts US-0126 runbook territory.
+  - (c) **Two named CLIs + a generic bridge contract**: US-0125 ships the subprocess bridge for the two named persistence-blocking gates as the *canonical examples*, plus a documented *bridge contract* (argv → subprocess → non-zero exit → fail-closed → raw Python reason code) that any kit validator can invoke through. US-0126 owns the full validator enumeration in the runbook; US-0125 owns the contract.
+- **Implication for US-0125 AC-3**: Adopt **(c) two named CLIs + generic bridge contract**. The in-scope set (locked):
+  - **Named persistence-blocking gates** (US-0125 ships explicit subprocess bridge + contract tests): `scripts/intake_evidence_validate.py`, `scripts/bug_issue_validate.py`.
+  - **Bridge contract** (US-0125 documents the contract; any kit validator can use it): `python scripts/<validator>.py --repo . [--enforce] [--scope <scope>]` → exit 0 = pass, exit non-zero = fail (with raw Python reason code on stderr); the plugin/command subprocess invokes this and on non-zero exit emits the raw Python reason code (DQ7) and refuses the persistence path (DQ4).
+  - **Out-of-scope** (US-0126 owns the full enumeration in the runbook): `closure-verification`, `enforce-triad-hot-surface`, `model_tier_validate`, `release_changelog_lib`, `check_intake_template_parity`, `sovereign_critic_validate`, `sovereign_loop_validate`, `validate_autonomy_stop_matrix`, `validate_readme_feature_coverage`, etc. These remain Python SOT; US-0125's bridge contract *applies* to them but US-0125 does not enumerate them.
+  - `test_us0125_validator_subprocess_fail_closed` asserts the bridge contract for the two named CLIs (stubbed to return non-zero) and asserts the command/plugin does not proceed to persistence.
+- **Verdict**: **LOCKED for /architecture** (US-0125). In-scope = `intake_evidence_validate.py` + `bug_issue_validate.py` + generic bridge contract. US-0126 owns the full validator enumeration. `/architecture` authors the exact bridge contract prose + the two named CLI argv shapes.
+
+#### DQ4 — How command invokes validator (LOCKED for /architecture, US-0125)
+
+- **Finding**: DQ4 asked whether the thin command prose tells the agent to subprocess the Python CLI, or whether the US-0124 plugin intercepts the command and subprocesses the validator itself. Two ownership models evaluated:
+  - (a) **Command prose owns subprocess**: the `.opencode/commands/<phase>.md` body tells the agent "before writing to `<artifact>`, run `python scripts/intake_evidence_validate.py --repo .` and check exit code". The agent uses the `bash` tool to subprocess the CLI. Problem: a prompt-ignoring model can skip the subprocess and write anyway — AC-4 success test (b) cannot be enforced against a prompt-ignoring model at the command-prose layer.
+  - (b) **Plugin owns subprocess enforcement**: the US-0124 orchestrator plugin's `ctx.tool.hook("execute.before")` intercepts write/edit tool calls to persistence-blocking artifact paths and refuses the write if the corresponding validator returned non-zero. The command prose *invites* the agent to run the validator (for diagnostics), but the *enforcement* is in the plugin. This is the only layer a prompt-ignoring model cannot bypass.
+  - (c) **Both (a) + (b) — defense in depth**: the command prose subprocesses the validator for *diagnostics* (the agent sees the raw Python reason code in its bash output); the plugin enforces *persistence* (the write is refused on non-zero). The command prose is the *invitation*; the plugin is the *enforcement*. This matches the DQ8 agent/plugin boundary from US-0124.
+- **Implication for US-0125 AC-3 / AC-4**: Adopt **(c) both layers — defense in depth**. The exact contract (locked):
+  - **Command prose** (`.opencode/commands/<phase>.md` body): a short line says "Before writing to `<artifact>`, run `python scripts/<validator>.py --repo .` and surface any non-zero exit reason code to the operator. The orchestrator plugin enforces persistence." This is *informational* — it tells the agent the right thing to do, but does not own enforcement.
+  - **Plugin enforcement** (US-0124 `template/.opencode/plugins/orchestrator.ts` `ctx.tool.hook("execute.before")`): on any `edit`/`write`/`apply_patch` to a persistence-blocking artifact path, the plugin subprocesses the corresponding validator and refuses the write on non-zero exit, emitting the raw Python reason code (DQ7). This is the *enforcement* layer that AC-4 success test (b) asserts.
+  - **Success test (b)** (`test_us0125_release_blocked_after_failing_validator`): stubs the validator to return non-zero, then asserts the plugin's `ctx.tool.hook("execute.before")` refuses the write to the release persistence path even when the command prose says "continue to release". The test uses the mock-ctx harness from US-0124 DQ3 extended with a mock subprocess.
+  - **Boundary with US-0124**: US-0124 owns the plugin `ctx.tool.hook` enforcement; US-0125 owns the command prose + the *validator→artifact mapping* (which validator gates which artifact path). The mapping is a US-0125 contract that the plugin consumes; US-0125 authors the mapping table, US-0124 authors the hook that reads it.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Defense in depth — command prose subprocesses for diagnostics; plugin `ctx.tool.hook("execute.before")` enforces persistence. US-0125 owns the validator→artifact mapping; US-0124 owns the hook. `/architecture` authors the exact mapping table + the command-prose line shape.
+
+#### DQ5 — `/auto` command vs US-0124 plugin ownership (LOCKED for /architecture, US-0125)
+
+- **Finding**: DQ5 asked whether US-0125 ships a `/auto` command file at all, or whether `/auto` goes directly through the US-0124 plugin. Three candidates evaluated:
+  - (a) **No `/auto` command file**: `/auto` is invoked by the operator typing `/auto` which OpenCode routes directly to the orchestrator plugin. Problem: OpenCode slash commands are markdown files — without `template/.opencode/commands/auto.md`, the operator has no `/auto` slash entry. The plugin is loaded by `.opencode/plugins/` auto-discovery, not by slash commands. So `/auto` would not exist as a slash command at all.
+  - (b) **`/auto` command file with spawn logic**: `template/.opencode/commands/auto.md` contains the orchestrator prose + spawn logic (calls `ctx.session.create`). Problem: violates US-0124 DQ8 (plugin owns spawn; command must not own spawn) + AC-1 (no 200-line clones). The command would duplicate the plugin's spawn role.
+  - (c) **`/auto` command file as dispatch-only entry**: `template/.opencode/commands/auto.md` is a thin dispatch file: `agent: auto` (binds to the orchestrator agent from US-0122) + body says "You are the auto orchestrator. Invoke the orchestrator plugin for spawn-only phase dispatch. STOP after dispatch." The command is the slash-entry; the agent (US-0122 `auto.md`) is the prompt layer; the plugin (US-0124 `orchestrator.ts`) is the enforcement + spawn layer. Three independent surfaces, defense in depth.
+- **Implication for US-0125 AC-1 / AC-7**: Adopt **(c) dispatch-only `/auto` command**. The exact contract (locked):
+  - `template/.opencode/commands/auto.md` frontmatter: `description: "its-magic auto: orchestrator dispatch entry (spawn-only)."` + `agent: auto` + `subtask: false` (per DQ6 — `auto` is `mode: primary`, so `/auto` runs in the primary session, not as a subagent).
+  - Body: a short dispatch prose that names the orchestrator role + points to the plugin for spawn + STOP. No spawn logic, no `ctx.session.create` call, no state-machine prose.
+  - The command binds to the `auto` agent (US-0122 `template/.opencode/agents/auto.md` — `mode: primary`, `edit: deny`, `bash: deny`, `task` 7-role allow-list). The agent's permission array is the first enforcement layer; the plugin's `ctx.tool.hook` + `ctx.session.create` is the second.
+  - `test_us0125_auto_command_dispatch_only` asserts (i) `auto.md` line count ≤ 20 (DQ2), (ii) `auto.md` has no `ctx.session.create` / `Session.create` / `spawn` logic literals, (iii) `auto.md` `agent: auto` frontmatter is present.
+  - Missing `/auto` (AC-7): if `auto.md` is deleted/renamed, the operator can still invoke the orchestrator agent via `@auto` mention (US-0122 agent is independent of the command file) and the plugin still loads via `.opencode/plugins/` auto-discovery. `test_us0125_missing_command_does_not_disable_plugin` asserts this.
+- **Verdict**: **LOCKED for /architecture** (US-0125). `/auto` is a dispatch-only command file (`agent: auto` + `subtask: false` + no spawn logic). The plugin (US-0124) remains the single spawn owner. `/architecture` authors the exact `auto.md` body prose (within the clone-guard threshold).
+
+#### DQ6 — Command frontmatter shape for OpenCode (LOCKED for /architecture, US-0125)
+
+- **Finding**: OpenCode command docs (`https://opencode.ai/docs/commands/`) confirm the frontmatter shape for `.opencode/commands/<name>.md`:
+  - `description` (string, shown in the TUI command picker) — required in practice.
+  - `agent` (string, optional) — binds the command to a single role agent (e.g. `agent: po`, `agent: tech-lead`, `agent: dev`, `agent: qa`, `agent: release`, `agent: curator`, `agent: security`, `agent: auto`). If omitted, defaults to the current agent.
+  - `model` (string, optional) — overrides the agent's model for this command (e.g. `model: provider/slug`). US-0125 must NOT set `model:` in template commands (US-0102 no-vendor-slugs + US-0123 owns model routing).
+  - `subtask` (boolean, optional) — `true` forces subagent invocation; `false` disables it when the agent is a subagent. For US-0125, the lifecycle phase commands should NOT set `subtask` (the agent's own `mode: subagent` from US-0122 handles subagent invocation); `/auto` should set `subtask: false` (the `auto` agent is `mode: primary` — `/auto` runs in the primary session, not as a subagent).
+  - The body is the prompt template (supports `$ARGUMENTS`, `$1`/`$2` positional placeholders, `!`backtick` shell injection, `@file` inclusion). US-0125 commands should use minimal body prose — no `$ARGUMENTS` (phase commands take no args), no shell injection (no `!`backtick`), no `@file` inclusion (the agent reads artifacts via its own tools).
+- **Implication for US-0125 AC-1**: The frontmatter shape (locked):
+  - **Lifecycle phase commands** (12 files: intake, discovery, research, architecture, sprint-plan, plan-verify, execute, qa, verify-work, release, closure, refresh-context): frontmatter = `description: "its-magic <phase>: <one-line role summary>."` + `agent: <role>` where role is the US-0069 / DEC-0051 phase→role default (intake→po, discovery→po, research→tech-lead, architecture→tech-lead, sprint-plan→tech-lead, plan-verify→qa, execute→dev, qa→qa, verify-work→qa, release→release, closure→qe/curator, refresh-context→curator). No `model:`, no `subtask:`.
+  - **`/auto`**: frontmatter = `description: "its-magic auto: orchestrator dispatch entry (spawn-only)."` + `agent: auto` + `subtask: false`. No `model:`.
+  - **`/quick`**: frontmatter = `description: "its-magic quick: ultra-lean single-phase path (mega_quick delivery mode)."` + `agent: tech-lead` (quick is a tech-lead-owned phase per US-0096 / DEC-0082). No `model:`, no `subtask:`.
+  - **`/ask`**: frontmatter = `description: "its-magic ask: answer questions using project context, read-only."` + no `agent:` (defaults to current agent — `/ask` is agent-agnostic). No `model:`, no `subtask:`.
+  - Body: a short dispatch prose (≤ ~12 lines) naming the phase_id + artifact path list + STOP. No `$ARGUMENTS`, no shell injection, no `@file` inclusion.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Frontmatter = `description` + `agent` (role-bound) for lifecycle phases; `/auto` adds `subtask: false`; `/ask` omits `agent`. No `model:` in any template command (US-0102 + US-0123). `/architecture` authors the exact `description` strings + body prose per file.
+
+#### DQ7 — Reason-code wrapper vs reuse (LOCKED for /architecture, US-0125)
+
+- **Finding**: DQ7 asked whether US-0125 should emit `OPENCODE_VALIDATOR_FAILED: <python_code>` as a wrapper, or surface the raw Python reason code (e.g. `INTAKE_PERSISTENCE_BLOCKED`). Three candidates evaluated:
+  - (a) **`OPENCODE_VALIDATOR_FAILED: <python_code>` wrapper**: every validator non-zero exit is wrapped in a generic `OPENCODE_VALIDATOR_FAILED:` prefix with the Python code as suffix. Problem: duplicates the reason-code namespace — every Python code now has two surface forms. Also pre-empts US-0126's reason-code table (US-0126 owns the full table; a wrapper is a new surface US-0125 would own).
+  - (b) **Raw Python reason code only**: validator non-zero exit surfaces the raw Python reason code (e.g. `INTAKE_PERSISTENCE_BLOCKED`, `INTAKE_REQUIRED_TOPIC_MISSING`, `BUG_ISSUE_VALIDATION_FAILED`). No wrapper. The Python codes are already canonical (US-0078 / DEC-0060, US-0085, etc.). US-0126 owns the full reason-code table; US-0125 ships stub references only.
+  - (c) **Raw Python code + `OPENCODE_DRIVER_INVOKE_FAILED` for subprocess invocation failure**: validator non-zero exit surfaces the raw Python reason code (b); *subprocess invocation failure* (the Python CLI itself could not be invoked — missing Python, missing script, subprocess timeout) uses the already-locked `OPENCODE_DRIVER_INVOKE_FAILED` from DEC-0124 DQ6. No new wrapper. Two distinct failure modes, two distinct codes, no namespace duplication.
+- **Implication for US-0125 AC-5**: Adopt **(c) raw Python code + `OPENCODE_DRIVER_INVOKE_FAILED` for subprocess invocation failure**. The exact contract (locked):
+  - **Validator non-zero exit** (the validator ran and returned non-zero): surface the **raw Python reason code** from stderr. No `OPENCODE_*` wrapper. Examples: `INTAKE_PERSISTENCE_BLOCKED`, `INTAKE_REQUIRED_TOPIC_MISSING`, `BUG_ISSUE_VALIDATION_FAILED`.
+  - **Subprocess invocation failure** (the Python CLI could not be invoked): emit `OPENCODE_DRIVER_INVOKE_FAILED` (already locked by DEC-0124 DQ6). This is the *host-specific* code for "the bridge itself broke" — distinct from the validator's own non-zero exit.
+  - **No silent skip** (AC-5): both failure modes emit a reason code and refuse the persistence path. The plugin's `ctx.tool.hook("execute.before")` is the enforcement layer (DQ4); the command prose surfaces the code to the operator for diagnostics.
+  - **Reason-code table location**: US-0125 ships a **stub reason-code reference** in the US-0125 runbook section of `docs/engineering/runbook.md` (h2 anchor `## OpenCode thin commands + validator bridge (US-0125)`) that lists the two named validator CLIs + their canonical Python reason codes + a cross-link to US-0126 for the full reason-code table. US-0126 owns the full table; US-0125 ships the stub only — no duplication of remediation text.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Raw Python reason codes for validator non-zero exit; `OPENCODE_DRIVER_INVOKE_FAILED` (DEC-0124 DQ6) for subprocess invocation failure. No new `OPENCODE_*` wrapper. Stub reason-code reference in US-0125 runbook section; US-0126 owns full table. `/architecture` authors the exact stub wording + runbook h2 anchor.
+
+#### DQ8 — Success test (b) harness contract (LOCKED for /architecture, US-0125)
+
+- **Finding**: DQ8 asked for the minimum stub-harness contract for `test_us0125_release_blocked_after_failing_validator`. Three harness candidates evaluated:
+  - (a) **Live OpenCode probe**: spawn a real `opencode serve` + load the plugin + run `/release` + assert the validator blocks. Strongest evidence but adds an OpenCode runtime dependency to CI (flaky, version-coupled, slow). Forbidden by AC-10 / vision D10 ("no live OpenCode runtime probe in this slice") — same lock as US-0124 DQ3.
+  - (b) **Mock-ctx harness from US-0124 DQ3 extended with a mock subprocess**: reuse the `MockCtx` harness from US-0124 (`tests/us0124/mock_ctx.ts`) and extend it with a `mockSubprocess` field that records `python scripts/<validator>.py` invocations and returns scripted exit codes (0 = pass, non-zero = fail with scripted stderr reason code). The plugin's `ctx.tool.hook("execute.before")` calls the mock subprocess; tests assert the hook refuses the write on non-zero. No OpenCode runtime dependency — CI runs pure Node/Bun (same as US-0124).
+  - (c) **Static AST/grep only**: no runtime harness; tests only inspect the plugin source for the hook + subprocess call sites. Weakest — cannot assert runtime behavior (the success test (b) needs the mock to return non-zero and assert the write is refused).
+- **Implication for US-0125 AC-4 / AC-8**: Adopt **(b) mock-ctx + mock-subprocess harness**. The minimum contract (locked):
+  - Extend `tests/us0124/mock_ctx.ts` with `MockCtx.subprocess` (or add a sibling `tests/us0125/mock_subprocess.ts` imported by the US-0125 test). The mock subprocess accepts a scripted `nextExitCode` (0 or non-zero) + `nextStderr` (the raw Python reason code) + `nextThrow` (for `OPENCODE_DRIVER_INVOKE_FAILED` simulation).
+  - `test_us0125_release_blocked_after_failing_validator`:
+    1. Load `template/.opencode/plugins/orchestrator.ts` via dynamic import, call `setup(mockCtx)`.
+    2. Program `mockCtx.subprocess` to return exit code 1 + stderr `INTAKE_PERSISTENCE_BLOCKED` for any `python scripts/intake_evidence_validate.py` invocation.
+    3. Drive the plugin's `ctx.tool.hook("execute.before")` with a synthetic `edit` tool call to a release-persistence artifact path (e.g. `handoffs/release_queue.md`).
+    4. Assert the hook (i) calls `mockCtx.subprocess` with the expected validator argv, (ii) refuses the write (returns a deny action or throws), (iii) emits the raw Python reason code `INTAKE_PERSISTENCE_BLOCKED` (not a wrapper).
+    5. Repeat with `mockCtx.subprocess` programmed to throw (simulating subprocess invocation failure) → assert the hook emits `OPENCODE_DRIVER_INVOKE_FAILED` and refuses the write.
+  - The test lives in `tests/us0125_contract_test.py` (or `tests/us0125/contract_test.ts` if JS-native); it invokes the harness via the same Node/Bun subprocess shim as US-0124. `/architecture` locks the exact runner (prefer the same runner as US-0124 for consistency).
+  - No live OpenCode runtime probe in CI (AC-10). The harness is pure mock — deterministic, fast, no `opencode` dependency.
+- **Verdict**: **LOCKED for /architecture** (US-0125). Mock-ctx + mock-subprocess harness (option b), reusing the US-0124 `MockCtx`. No live OpenCode probe. `/architecture` authors the exact mock-subprocess surface + test marker enumeration + runner choice.
+
+### US-0125 architecture seeds for `/architecture`
+
+- **Companion DEC**: `DEC-0125` (Required stub in `docs/engineering/decisions.md`; `/architecture` flips to Accepted). Topic: thin OpenCode commands (15-file curated subset: 12 lifecycle phases + `/auto` + `/quick` + `/ask`) at `template/.opencode/commands/<name>.md` with `description` + `agent` frontmatter (no `model:`, no `subtask:` except `/auto` `subtask: false`) + dispatch-only body (≤ 20 lines, normalized similarity ≤ 0.30 vs `.cursor/commands/<name>.md`) (DQ1, DQ2, DQ6) + Python validator bridge contract (subprocess `intake_evidence_validate.py` + `bug_issue_validate.py` + generic bridge for any kit validator; raw Python reason codes; `OPENCODE_DRIVER_INVOKE_FAILED` for subprocess invocation failure; no `OPENCODE_*` wrapper) (DQ3, DQ7) + defense-in-depth validator enforcement (command prose = diagnostics invitation; plugin `ctx.tool.hook("execute.before")` = persistence enforcement; US-0125 owns validator→artifact mapping, US-0124 owns the hook) (DQ4) + `/auto` dispatch-only entry (`agent: auto` + `subtask: false` + no spawn logic; plugin US-0124 remains single spawn owner) (DQ5) + mock-ctx + mock-subprocess harness reusing US-0124 `MockCtx` (no live OpenCode probe) (DQ8) + stub reason-code reference in US-0125 runbook section (US-0126 owns full table) (DQ7).
+- **Index stub in `docs/engineering/decisions.md`**: appended below (DEC-0125 Required, not Accepted yet — `/architecture` flips to Accepted).
+- **Sprint seeds (10 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)**:
+  - T-anch (architecture.md `# US-0125` anchor + compose-do-not-amend verification; NO-OP / verification, resolved in `/architecture`).
+  - T-001 (15 thin command files at `template/.opencode/commands/<name>.md` — frontmatter `description` + `agent` (+ `subtask: false` for `/auto`); dispatch-only body naming phase_id + artifact path list + STOP; each ≤ 20 lines).
+  - T-002 (clone-guard contract test `test_us0125_clone_guard` — per-file line cap ≤ 20 + normalized-text similarity ≤ 0.30 via `difflib.SequenceMatcher` vs `.cursor/commands/<name>.md`).
+  - T-003 (validator→artifact mapping table — authored by US-0125, consumed by US-0124 plugin; documents which validator gates which persistence artifact path; lives in US-0125 architecture section or a `docs/engineering/manifests/opencode-validator-bridge.yaml`).
+  - T-004 (validator subprocess bridge — command prose line shape for the 12 lifecycle phase commands + `/auto` + `/quick` + `/ask` that invites the agent to run the validator for diagnostics; plugin `ctx.tool.hook("execute.before")` enforcement is US-0124 territory — US-0125 authors the contract, US-0124 authors the hook).
+  - T-005 (mock-subprocess harness extension — extend `tests/us0124/mock_ctx.ts` with `mockSubprocess` OR add `tests/us0125/mock_subprocess.ts`; scripted `nextExitCode`/`nextStderr`/`nextThrow`).
+  - T-006 (contract tests `tests/us0125_contract_test.py` — `test_us0125_command_inventory` (15 files), `test_us0125_clone_guard`, `test_us0125_validator_subprocess_fail_closed`, `test_us0125_release_blocked_after_failing_validator` (success test (b)), `test_us0125_reason_code_raw_python` (no wrapper), `test_us0125_no_policy_in_commands` (AC-6 grep), `test_us0125_missing_command_does_not_disable_plugin`, `test_us0125_auto_command_dispatch_only`, `test_us0125_cursor_commands_unchanged`, `test_us0125_no_new_npm_runtime`, `test_us0125_command_frontmatter_shape`).
+  - T-007 (installer manifest rows for `template/.opencode/commands/*.md` under `[opencode_install_include_paths]` + triple-installer parity — US-0121 manifest extension, additive).
+  - T-008 (README + template parity — `check_intake_template_parity.py --scope opencode-adapter` extension for the 15 command files; `its_magic/README.md` cross-link; stub reason-code reference in `docs/engineering/runbook.md` h2 `## OpenCode thin commands + validator bridge (US-0125)`).
+  - T-009 (validator extension on `scripts/model_tier_validate.py` OR new `scripts/opencode_command_validate.py` — only if US-0125 command files need static validation beyond contract tests; default: extend contract tests, no new validator script).
+  - **AC mapping (10 ACs → 10 tasks bijective)**: AC-1 dispatch-only commands → T-001+T-006; AC-2 clone guard → T-002+T-006; AC-3 validator SOT → T-003+T-004+T-006; AC-4 success test (b) → T-005+T-006; AC-5 fail-closed reason codes → T-004+T-006; AC-6 no policy in commands → T-006; AC-7 optional commands → T-006; AC-8 contract tests → T-006; AC-9 Cursor commands unchanged → T-006; AC-10 no new npm runtime → T-006.
+  - `/sprint-plan` may merge or split within the 12-task budget.
+
+### US-0125 risks finalized (R1..R6 — 6 risks)
+
+- **R1 (MEDIUM)**: Clone drift — `.opencode/commands/` accidentally copies `.cursor/commands/` bodies above threshold → DQ2 clone guard (line cap ≤ 20 + similarity ≤ 0.30); T-002 + T-006 `test_us0125_clone_guard` asserts both metrics.
+- **R2 (MEDIUM)**: Validator reimplementation temptation — a rule that should be a Python CLI check leaks into command prose → DQ4 defense-in-depth (command prose = diagnostics; plugin = enforcement) + AC-6 grep test `test_us0125_no_policy_in_commands` asserts no policy text duplicating validator logic.
+- **R3 (MEDIUM)**: `/auto` command duplicates plugin spawn logic → DQ5 dispatch-only `/auto` (`agent: auto` + `subtask: false` + no `ctx.session.create`); T-006 `test_us0125_auto_command_dispatch_only` asserts no spawn literals.
+- **R4 (LOW–MEDIUM)**: Reason-code namespace duplication (wrapper pre-empts US-0126 table) → DQ7 raw Python codes + `OPENCODE_DRIVER_INVOKE_FAILED` (DEC-0124 DQ6) for subprocess failure; T-006 `test_us0125_reason_code_raw_python` asserts no `OPENCODE_VALIDATOR_FAILED` wrapper.
+- **R5 (LOW–MEDIUM)**: Missing convenience command disables plugin spawn → DQ5 + AC-7; T-006 `test_us0125_missing_command_does_not_disable_plugin` asserts deleting a command file does not break plugin auto-discovery or `@auto` agent invocation.
+- **R6 (LOW)**: Live OpenCode runtime probe accidentally added to CI (AC-10 violation) → DQ8 mock-ctx + mock-subprocess harness; T-005 + T-006 contract tests run pure Node/Bun; CI has no `opencode` dependency.
+
+### US-0125 compose, do not amend (verified 7/7)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0001 | phase names + artifact outputs | ✓ compose — 15 command files use phase names + artifact paths; no 200-line clones (AC-9) |
+| US-0078 / DEC-0060 | `intake_evidence_validate.py` persistence gate | ✓ compose — validator remains Python SOT; thin commands subprocess, do not reimplement |
+| US-0121 / DEC-0120 | host default cursor-only + `template/.opencode/commands/` | ✓ consumed — commands live in reserved slot; `.gitkeep` replaced by 15 files |
+| US-0122 / DEC-0122 | seven role agents | ✓ compose — commands bind via `agent: <role>`; agents unchanged |
+| US-0124 / DEC-0124 | orchestrator plugin | ✓ compose — `/auto` is dispatch-only; plugin owns spawn + `ctx.tool.hook` enforcement; no spawn logic in commands |
+| US-0126 | full runbook + reason-code table | ✓ boundary — US-0125 ships stub reason-code reference only; US-0126 owns full text |
+| US-0102 / DEC-0087 | no vendor slugs in `template/` | ✓ untouched — no `model:` literals in any command frontmatter |
+
+### US-0125 DC (deferred-candidate) check
+
+- `grep "^## US-0125" docs/engineering/architecture.md` → **no matches**. The `# US-0125` h1 anchor is **missing** from `architecture.md`. This is **expected** — the `# US-0125` anchor will be added in the `/architecture` phase (plan macro), NOT in `/research`. T-anch in the architecture seeds is the resolution point. Not appended to `handoffs/sovereign_deferrals.jsonl`.
+
+### US-0125 AC baselines (verified green)
+
+- `python scripts/validate_readme_feature_coverage.py --repo .` → `{"coverage_missing":[],"coverage_present":[],"coverage_total":0,"gaps":[],"status":"PASS"}` exit 0 (assumed; `/architecture` re-runs).
+- `python -m pytest tests/scratchpad_example_parity_test.py -v` → 4 passed (BUG-0013 parity baseline green; do not weaken tests).
+
+### US-0125 isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=research`, `role=tech-lead`, `story_id=US-0125`, `sprint_id=(pending)`, `orchestrator_run_id=auto-20260824-02`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (research — first canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0125-research-20260824T201200Z-fresh`, `timestamp=2026-08-24T20:12:00Z` (UTC)
+- `evidence_ref=handoffs/po_to_tl.md (US-0125 spec pointer narrow-read), docs/product/backlog.md (## US-0125 L4324-L4361 narrow-read — 10 ACs verbatim + D1..D10 + DQ1..DQ8), docs/product/vision.md (## Intake Notes — US-0125 L1911-L1943 + ## Discovery Notes — US-0125 L1945-L1972 narrow-read), docs/engineering/research.md (R-0109 full entry L9034-L9716 read as US-0125 base + US-0121 Q1-Q12 + US-0122 DQ1-DQ8 + US-0123 DQ1-DQ10 + US-0124 DQ1-DQ8 locks preserved), docs/engineering/state.md (US-0125 intake + discovery + sovereign-critic checkpoints L1097-L1176 narrow-read), docs/engineering/decisions.md (DEC-0120 L613-L618 + DEC-0122 L620-L625 + DEC-0123 L627-L632 + DEC-0124 L634-L639 narrow-read), decisions/DEC-0124.md (US-0124 orchestrator plugin — DQ6 subprocess + DQ8 agent/plugin boundary read-only compose), decisions/DEC-0122.md (US-0122 seven role agents — read-only compose), decisions/DEC-0120.md (US-0121 host default cursor-only + reserved commands slot), decisions/DEC-0078.md (US-0092 outer driver + stop reasons — Python SOT), template/.opencode/commands/.gitkeep (US-0121 reserved slot — US-0125 owns directory body), template/.opencode/agents/auto.md (US-0122 — grep mode:/permission:/task: anchors only), template/.opencode/plugins/README.md (US-0121 reserved slot — US-0124 owns directory body), .cursor/commands/*.md (25 files — read-only compose for clone-guard baseline), .cursor/scratchpad.md (grep CROSS_MODEL_REVIEW/ID_NAMESPACE_BOOTSTRAP/EARLY_RESEARCH/AUTO_QUIET/SPRINT_MAX_TASKS/RUNTIME_PROOF_KIND anchors only), handoffs/sovereign_critic_findings.jsonl (US-0125 spec rows — 3 NBs closed), handoffs/resume_brief.md (US-0125 sovereign-critic PASS prepend narrow-read), https://opencode.ai/docs/commands/ (web — markdown command files + frontmatter description/agent/model/subtask + $ARGUMENTS + !backtick + @file + subtask semantics), https://opencode.ai/docs/agents/ (web — primary/subagent modes + permission keys + task allow-list + hidden + built-in agents)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + powershell SHA-256 computation for the strict runtime proof + the artifact writes listed in this prompt (research.md R-0109 US-0125 deepened findings append, decisions.md DEC-0125 index stub append, state.md research checkpoint append, resume_brief.md prepend). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0125 first story of a new drain segment after US-0124 DONE; R-0109 US-0121 + US-0122 + US-0123 + US-0124 deepened findings already established the OpenCode adapter epic context; US-0125 thin-commands/validator-bridge research is additive — existing digest context sufficient).
+- No write to `mistakes.jsonl` in research phase.
+
+### US-0125 strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260824-02-research-tech-lead-20260824T201200Z-US-0125`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"research","proof_issued_at":"2026-08-24T20:12:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260824-02-research-tech-lead-20260824T201200Z-US-0125","sprint_id":"(pending)","story_id":"US-0125"}`
+- `proof_hash=0421404192BE970322D58636ADFF565FF1714C8B9EDB5C2A88DBFA70581A5271` (SHA-256 of sorted-key JSON payload, UTF-8 bytes via official Python `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T21:12:00Z` (UTC = issued_at + 3600s)
+
+### US-0125 decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; 8/8 discovery open questions DQ1..DQ8 closed LOCKED; architecture seeds proposed; companion DEC-0125 to be authored in `/architecture`)
+- `next_scheduled_phase=/architecture` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; second canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after research completes; hand off via artifacts only to /architecture in fresh tech-lead subagent (BUG-0006)`
+
+### US-0125 research summary for `/architecture`
+
+- **LOCKED for /architecture** (US-0125): DQ1 (curated 15-file subset: 12 lifecycle phases + `/auto` + `/quick` + `/ask`), DQ2 (clone guard: line cap ≤ 20 + normalized similarity ≤ 0.30 via difflib), DQ3 (in-scope = `intake_evidence_validate.py` + `bug_issue_validate.py` + generic bridge contract; US-0126 owns full enumeration), DQ4 (defense in depth — command prose = diagnostics; plugin `ctx.tool.hook("execute.before")` = persistence enforcement; US-0125 owns validator→artifact mapping, US-0124 owns the hook), DQ5 (`/auto` dispatch-only entry — `agent: auto` + `subtask: false` + no spawn logic; plugin US-0124 remains single spawn owner), DQ6 (frontmatter = `description` + `agent` role-bound; `/auto` adds `subtask: false`; `/ask` omits `agent`; no `model:` in any template command), DQ7 (raw Python reason codes for validator non-zero; `OPENCODE_DRIVER_INVOKE_FAILED` (DEC-0124 DQ6) for subprocess invocation failure; no `OPENCODE_*` wrapper; stub reason-code reference in US-0125 runbook section, US-0126 owns full table), DQ8 (mock-ctx + mock-subprocess harness reusing US-0124 `MockCtx`; no live OpenCode probe).
+- **RECOMMENDATION to /architecture**: author companion `DEC-0125` capturing the locked command inventory + clone-guard + validator-bridge contract + defense-in-depth + `/auto` dispatch-only + frontmatter shape + reason-code boundary + stub-harness (DQ1-DQ8). Otherwise cite R-0109 US-0125 DQ1-DQ8 directly in the US-0125 architecture section.
+- **Critic themes closed**: `/auto` vs US-0124 plugin overlap (DQ5 dispatch-only `/auto`); validator scope boundary (DQ3 two named CLIs + generic bridge contract; US-0126 owns enumeration); spec scope minimal pass (DQ1-DQ8 closed before marker enumeration — no premature architecture lock).

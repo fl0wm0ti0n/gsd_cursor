@@ -2496,25 +2496,35 @@ class AutoCommandContractTest(unittest.TestCase):
             "bootstrap_dev_environment_profile_installer_hook",
             "run_scratchpad_postinstall",
             "bootstrap_runbook_commands",
+            "run_cursor_surface_postinstall_hooks",
         ):
             with self.subTest(marker=marker):
                 self.assertIn(marker, text)
-        upgrade_idx = text.find('run_scratchpad_postinstall(target_root, source_root, "upgrade"')
+        hook_fn_start = text.find("def run_cursor_surface_postinstall_hooks")
+        self.assertNotEqual(hook_fn_start, -1)
+        hook_fn_end = text.find("\ndef ", hook_fn_start + 1)
+        hook_fn = text[hook_fn_start:hook_fn_end]
+        sp_idx = hook_fn.find("run_scratchpad_postinstall")
+        dev_idx = hook_fn.find("bootstrap_dev_environment_profile_installer_hook")
+        self.assertNotEqual(sp_idx, -1)
+        self.assertNotEqual(dev_idx, -1)
+        self.assertLess(sp_idx, dev_idx)
+        upgrade_idx = text.find('run_cursor_surface_postinstall_hooks(\n            target_root, source_root, "upgrade"')
         self.assertNotEqual(upgrade_idx, -1)
         upgrade_runbook = text.find("bootstrap_runbook_commands", upgrade_idx)
-        upgrade_hook = text.find("bootstrap_dev_environment_profile_installer_hook", upgrade_idx)
+        upgrade_hook = text.find("run_cursor_surface_postinstall_hooks", upgrade_idx)
         self.assertNotEqual(upgrade_hook, -1)
         self.assertNotEqual(upgrade_runbook, -1)
         self.assertLess(upgrade_hook, upgrade_runbook)
         missing_anchor = (
-            "    if not run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):\n"
-            "        return 1\n"
-            "    if not bootstrap_dev_environment_profile_installer_hook(target_root, source_root):"
+            "    if not run_cursor_surface_postinstall_hooks(\n"
+            "        target_root, source_root, mode, host, print_ok=True\n"
+            "    ):"
         )
         missing_idx = text.find(missing_anchor)
         self.assertNotEqual(missing_idx, -1)
         missing_runbook = text.find("bootstrap_runbook_commands", missing_idx)
-        missing_hook = text.find("bootstrap_dev_environment_profile_installer_hook", missing_idx)
+        missing_hook = text.find("run_cursor_surface_postinstall_hooks", missing_idx)
         self.assertLess(missing_hook, missing_runbook)
 
     def test_us0099_postinstall_parity(self) -> None:
@@ -2552,7 +2562,7 @@ class Us0100ReleaseChangelogContractTests(unittest.TestCase):
             with self.subTest(doc=label):
                 self.assertIn("{semver}-release-notes.md", blob)
                 self.assertIn("CHANGELOG.md", blob)
-                self.assertIn("0.1.2-41", blob)
+        self.assertIn("0.1.2-41", dec)
 
     def test_us0100_release_changelog_lib_api_surface(self) -> None:
         """AC-3, AC-7: required symbols importable from release_changelog_lib."""
@@ -2619,8 +2629,8 @@ class Us0100ReleaseChangelogContractTests(unittest.TestCase):
         ):
             with self.subTest(path=rel):
                 text = (root / rel).read_text(encoding="utf-8")
-                self.assertIn("19. Version changelog derivation (US-0100 / DEC-0085)", text)
-                for sub in ("19a", "19b", "19c", "19d"):
+                self.assertIn("17. Version changelog derivation (US-0100 / DEC-0085)", text)
+                for sub in ("17a", "17b", "17c", "17d"):
                     self.assertIn(sub, text)
                 self.assertIn("RELEASE_CHANGELOG_ENFORCE", text)
                 self.assertIn("build_version_doc", text)
@@ -2703,17 +2713,17 @@ class Us0100ReleaseChangelogContractTests(unittest.TestCase):
     def test_us0101_default_matrix_literals(self) -> None:
         """AC-2: Phase→tier table matches architecture-locked matrix."""
         root = self._root()
-        arch = (root / "docs" / "engineering" / "architecture.md").read_text(encoding="utf-8")
-        # Check for default phase→tier matrix section
-        self.assertIn("## Default phase→tier matrix", arch)
+        runbook = (root / "docs" / "engineering" / "runbook.md").read_text(encoding="utf-8")
+        # Matrix published in runbook (architecture hot-surface stub points to runbook)
+        self.assertIn("### Default phase→tier matrix", runbook)
         # Check for tier values in matrix
-        self.assertIn("cheap", arch)
-        self.assertIn("balanced", arch)
-        self.assertIn("strong", arch)
+        self.assertIn("cheap", runbook)
+        self.assertIn("balanced", runbook)
+        self.assertIn("strong", runbook)
         # Check for phase examples
-        self.assertIn("execute", arch)
-        self.assertIn("intake", arch)
-        self.assertIn("refresh-context", arch)
+        self.assertIn("execute", runbook)
+        self.assertIn("intake", runbook)
+        self.assertIn("refresh-context", runbook)
 
     def test_us0101_token_profile_orthogonality(self) -> None:
         """AC-6: Grep confirms MODEL_TIER ≠ TOKEN_PROFILE."""

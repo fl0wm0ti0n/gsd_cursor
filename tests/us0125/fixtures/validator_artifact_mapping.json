@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "story_id": "US-0125",
+  "source_of_truth": "docs/engineering/architecture.md # US-0125 (mapping table L1939-L1945)",
+  "consumer": "template/.opencode/plugins/orchestrator.ts (ctx.tool.hook('execute.before')) — read-only",
+  "rows": [
+    {
+      "artifact_path": "handoffs/intake_evidence/*.json",
+      "validator_cli": "scripts/intake_evidence_validate.py --repo . --enforce",
+      "reason_codes": [
+        "INTAKE_PERSISTENCE_BLOCKED",
+        "INTAKE_REQUIRED_TOPIC_MISSING"
+      ],
+      "bridge": "named"
+    },
+    {
+      "artifact_path": "docs/product/backlog.md bug rows + docs/product/acceptance.md bug rows",
+      "validator_cli": "scripts/bug_issue_validate.py --repo . --check-acceptance",
+      "reason_codes": [
+        "BUG_ISSUE_VALIDATION_FAILED"
+      ],
+      "bridge": "named"
+    },
+    {
+      "artifact_path": "(other persistence-blocking artifacts)",
+      "validator_cli": "python scripts/<validator>.py --repo . [--enforce] [--scope <scope>]",
+      "reason_codes": [
+        "(raw Python reason code per validator)"
+      ],
+      "bridge": "generic"
+    }
+  ],
+  "reason_code_boundary": {
+    "validator_non_zero_exit": "surface raw Python reason code from stderr (no OPENCODE_* wrapper)",
+    "subprocess_invocation_failure": "OPENCODE_DRIVER_INVOKE_FAILED (DEC-0124 DQ6)",
+    "no_silent_skip": true
+  }
+}

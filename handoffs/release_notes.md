@@ -11,6 +11,115 @@ Canonical queue state now lives under:
 
 ---
 
+## Release finalized note (S0125)
+
+- Sprint: `S0125`
+- Story: `US-0125` (OpenCode thin dispatch-only commands + validator bridge — 15 command files ≤20 lines, Python CLI SOT, 11 contract-test markers)
+- Release: **finalized** (`2026-08-24T21:33:00Z`, `orchestrator_run_id=auto-20260824-02`, `fresh_context_marker=rel-US0125-release-20260824T213300Z-fresh`, `runtime_proof_id=rp-auto-20260824-02-release-release-20260824T213300Z-US-0125`, `model_id=composer-2.5-fast`)
+- Queue: **`handoffs/release_queue.md`** row **`S0125`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (1st attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green.
+- **Run / verify:** `python -m pytest tests/us0125_contract_test.py -v` → 11 passed in 0.45s; `python scripts/check_intake_template_parity.py --scope=opencode-adapter` → `[INTAKE_TEMPLATE_PARITY_OK]`; `tests/report.md` Pass:845 / Fail:0 literal @ 2026-08-24T21:04:51Z (harness **not** re-run this release spawn). See **`handoffs/releases/S0125-release-notes.md`** **## Run** / **## Verify**.
+- **Gate snapshot**: check_in_tests=PASS (Fail:0 @ 21:04:51Z accepted; metadata guard L712–L717); qa=PASS (loop-2; 0 blockers; B-1+B-2 closed); verify_work=PASS (11/11; 11/11 live); uat=PASS (11/11); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed before TTL 23:35:00Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **10/10** (11/11 contract markers live; 0 blocking findings)
+- Compose guards: **7/7 UNCHANGED** (backlog OPEN; acceptance unchecked; arch anchor; DEC-0125 Accepted; cursor commands unchanged; mirrors byte-identical)
+- **Backlog status**: US-0125 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: US-0125 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** + **`RELEASE_PUBLISH_AUTO_CONFIRM=0`** — `publish_snapshot=skipped_pending_operator_confirm`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=CB1BB92BB263BEA244C382A4A7B3662BB45A00EBD4B41ECC4E8ADB5F26A5E2CC`, `proof_ttl=2026-08-24T22:33:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
+## Release finalized note (S0124)
+
+- Sprint: `S0124`
+- Story: `US-0124` (OpenCode orchestrator plugin spawn-only `/auto` — US-0069 phase→role spawn, isolation evidence, US-0092 stop matrix + headless invoke, 12 contract-test markers)
+- Release: **finalized** (`2026-08-24T19:35:00Z`, `orchestrator_run_id=auto-20260824-02`, `fresh_context_marker=rel-US0124-release-20260824T193500Z-fresh`, `runtime_proof_id=rp-auto-20260824-02-release-release-20260824T193500Z-US-0124`, `model_id=composer-2.5-fast`)
+- Queue: **`handoffs/release_queue.md`** row **`S0124`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (1st attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green.
+- **Run / verify:** `python -m pytest tests/us0124_contract_test.py -v` → 12 passed in 1.14s; `python scripts/check_intake_template_parity.py --scope=opencode-adapter` → `[INTAKE_TEMPLATE_PARITY_OK]`; `tests/report.md` Pass:845 / Fail:0 literal @ 2026-08-24T19:17:58Z (harness **not** re-run this release spawn). See **`handoffs/releases/S0124-release-notes.md`** **## Run** / **## Verify**.
+- **Gate snapshot**: check_in_tests=PASS (Fail:0 @ 19:17:58Z accepted; metadata guard L712–L717); qa=PASS (loop-2; 0 blockers; B-1 closed); verify_work=PASS (loop-2; 11/11; 12/12 live); uat=PASS (11/11); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed before TTL 20:30:00Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **11/11** (12/12 contract markers live; 0 blocking findings)
+- Compose guards: **9/9 UNCHANGED** (backlog OPEN; acceptance unchecked; arch anchor; DEC-0124 Accepted; no auto.md clone; mirrors byte-identical)
+- **Backlog status**: US-0124 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: US-0124 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** + **`RELEASE_PUBLISH_AUTO_CONFIRM=0`** — `publish_snapshot=skipped_pending_operator_confirm`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=21738212CD0C94494ECB8951B233CFD0FFE663852BDF643E0598AE83E8043777`, `proof_ttl=2026-08-24T20:35:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
+## Release finalized note (S0123)
+
+- Sprint: `S0123`
+- Story: `US-0123` (Per-role OpenCode model slug routing — example catalog + materializer + fail-closed validator + 8 contract-test markers)
+- Release: **finalized** (`2026-08-24T15:32:00Z`, `orchestrator_run_id=auto-20260824-01`, `fresh_context_marker=rel-US0123-release-20260824T153200Z-fresh`, `runtime_proof_id=rp-auto-20260824-01-release-release-20260824T153200Z-US-0123`, `model_id=composer-2.5-fast`)
+- Queue: **`handoffs/release_queue.md`** row **`S0123`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (1st attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green.
+- **Run / verify:** `python -m pytest tests/us0123_contract_test.py -v` → 8 passed in 0.20s; `python scripts/check_intake_template_parity.py --scope=opencode-adapter` → `[INTAKE_TEMPLATE_PARITY_OK]`; `python scripts/model_tier_validate.py --scope opencode-catalog --repo .` → `[MODEL_TIER_VALIDATION_OK]`; `tests/report.md` Pass:845 / Fail:0 literal @ 2026-08-24T15:12:17Z (harness **not** re-run this release spawn). See **`handoffs/releases/S0123-release-notes.md`** **## Run** / **## Verify**.
+- **Gate snapshot**: check_in_tests=PASS (Fail:0 @ 15:12:17Z accepted; metadata guard L712–L717); qa=PASS (loop-2; 0 blockers); verify_work=PASS (loop-2; 10/10; 8/8 live); uat=PASS (10/10); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed before TTL 16:24:00Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **10/10** (8/8 contract markers live; 0 blocking findings; 1 non-blocking carry-forward)
+- Compose guards: **6/6 UNCHANGED** (backlog OPEN; acceptance unchecked; arch anchor; DEC-0123 Accepted; no `model:`; mirrors byte-identical)
+- **Backlog status**: US-0123 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: US-0123 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — `publish_snapshot=skipped_disabled`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=EED2303A06C30EB5DAC490D738B95F1B1D7E281A0CF20F1DCC6C8B8E7ECD81F6`, `proof_ttl=2026-08-24T16:32:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
+## Release finalized note (S0122)
+
+- Sprint: `S0122`
+- Story: `US-0122` (OpenCode role agents and Layer-1 permission table — eight markdown agents in `template/.opencode/agents/` + locked DEC-0122 §2 matrix + 8 contract-test markers)
+- Release: **finalized** (`2026-08-24T13:22:00Z`, `orchestrator_run_id=auto-20260824-01`, `fresh_context_marker=rel-US0122-release-20260824T132200Z-fresh`, `runtime_proof_id=rp-auto-20260824-01-release-release-20260824T132200Z-US-0122`, `model_id=composer-2.5-fast`)
+- Queue: **`handoffs/release_queue.md`** row **`S0122`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (2nd attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green. Prior BLOCKED attempt (2026-08-24T12:45:00Z `RELEASE_TEST_FAILED`) CLOSED by execute loop-2 remediations + qa/verify-work loop-2.
+- **Run / verify:** `python -m pytest tests/us0122_contract_test.py -v` → 8 passed in 0.03s; `python scripts/check_intake_template_parity.py --scope=opencode-adapter` → `[INTAKE_TEMPLATE_PARITY_OK]`; `tests/report.md` Pass:845 / Fail:0 literal @ 2026-08-24T13:02:49Z (harness **not** re-run this release spawn). See **`handoffs/releases/S0122-release-notes.md`** **## Run** / **## Verify**.
+- **Gate snapshot**: check_in_tests=PASS (Fail:0 @ 13:02:49Z accepted; metadata guard L712–L717); qa=PASS (loop-2; 0 blockers); verify_work=PASS (loop-2; 10/10; 8/8 live); uat=PASS (10/10); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed before TTL 14:16:00Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **10/10** (8/8 contract markers live; 0 blocking findings; 3 non-blocking carry-forwards)
+- Compose guards: **5/5 UNCHANGED** (US-0003, US-0023/BUG-0006, US-0121, US-0102/DEC-0087, US-0002/US-0004)
+- **Backlog status**: US-0122 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: US-0122 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — `publish_snapshot=skipped_disabled`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=82FDC8D25981588F7AF370ECE715A8D84187DEAC7057FE2E9FD2717EE834741A`, `proof_ttl=2026-08-24T14:22:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
+## Release blocked note (S0122 — historical, 1st attempt; superseded by PASS above)
+
+- Sprint: `S0122`
+- Story: `US-0122`
+- Release: **BLOCKED (1st attempt)** (`2026-08-24T12:45:00Z`, `fresh_context_marker=rel-US0122-release-20260824T124500Z-fresh`, `runtime_proof_id=rp-auto-20260824-01-release-release-20260824T124500Z-US-0122`) — **superseded by `released` on 2026-08-24T13:22:00Z (2nd attempt) above**
+- **Reason code**: `RELEASE_TEST_FAILED` (harness Fail:15 @ 12:44:49Z pre-remediation)
+- **Remediation (completed)**: execute loop-2 mirrored runbook, fixed architecture ordering, triad rollover → `tests/report.md` Fail:0 @ 13:02:49Z; qa loop-2 + verify-work loop-2 PASS
+
+## Release finalized note (S0121)
+
+- Sprint: `S0121`
+- Story: `US-0121` (OpenCode host-mode adapter — additive `--host cursor|opencode|both` + empty-but-valid `template/.opencode/` pack + parity scope + 14 contract-test markers)
+- Release: **finalized** (`2026-08-24T10:58:00Z`, `orchestrator_run_id=auto-20260824-01`, `fresh_context_marker=rel-US0121-release-20260824T105800Z-fresh`, `runtime_proof_id=rp-auto-20260824-01-release-release-20260824T105800Z-US-0121`, `model_id=glm-5.2-high`)
+- Queue: **`handoffs/release_queue.md`** row **`S0121`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (3rd attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green. Prior BLOCKED attempts (2026-08-23T12:48:00Z + 2026-08-23T16:35:00Z) CLOSED by execute loop-3+4 harness remediation + fresh verify-work (2026-08-24T10:52:00Z).
+- **Run / verify:** `python -m pytest tests/us0121_host_mode_test.py -v` → 14 passed in 3.43s (Python 3.12.10 on PATH; pytest 9.1.1); `python scripts/check_intake_template_parity.py --scope=opencode-adapter` → `[INTAKE_TEMPLATE_PARITY_OK]`; `powershell -ExecutionPolicy Bypass -File "tests/run-tests.ps1"` → exit 0; `tests/report.md` Pass:845 / Fail:0 literal; zero `[FAIL]` rows. See **`handoffs/releases/S0121-release-notes.md`** **## Run** / **## Verify**.
+- **Gate snapshot**: check_in_tests=PASS (Pass:845/Fail:0 literal @ 2026-08-24T10:45:36Z; US-0071 metadata guard coverage present); qa=PASS (loop-3; 0 blockers; B-1 CLOSED; NB-1 CLOSED for env); verify_work=PASS (10/10 ACs live; 14/14 contract-test markers PASSED live); uat=PASS (10/10 ACs; probe `UAT_PROBE_PASS`); isolation=PASS (execute loop-3+loop-4, qa loop-3, verify-work, sovereign-critic; all `model_id` set); strict_runtime_proof=PASS (verify-work + qa loop-3 + execute loop-4 proofs all fresh within 1-hour TTL; no reuse); finalization=PASS (queue row S0121 → `released`).
+- ACs satisfied: **10/10** (live pytest 14/14; B-1 CLOSED; 0 blocking findings; 4 non-blocking NB-1..NB-4 carried, NB-1 CLOSED for env)
+- Compose guards: **5/5 UNCHANGED** (US-0008, DEC-0045, US-0102, US-0001, US-0018 — additive only; release does not mutate installer surfaces)
+- **Backlog status**: US-0121 remains **OPEN** — closure deferred to `/closure` per US-0120 design (release does not flip backlog Status or tick ACs)
+- **Acceptance**: US-0121 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=disabled`** — `publish_snapshot=skipped_disabled` (`RELEASE_PUBLISH_AUTO_CONFIRM=0`)
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Isolation**: PASS (execute loop-3+loop-4, qa loop-3, verify-work, sovereign-critic in `docs/engineering/state.md`; release checkpoint appended with `model_id=glm-5.2-high`)
+- **Strict runtime proof (release)**: `proof_hash=284BA5148FC227A2DA47A0D10DA126F78E8330423C814D66571BA3264335ABBB`, `proof_ttl=2026-08-24T11:58:00Z` (attests fresh release subagent context AND release PASS — all gates 1–4b green)
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro — second canonical phase per DEC-0082) for backlog OPEN→DONE + acceptance tick + `sprints/S0121/closure-verification.md` + closure checkpoint in `docs/engineering/state.md`. After closure PASS → `/refresh-context` (fresh curator subagent).
+
+## Release blocked note (S0121 — historical, 2nd attempt; superseded by PASS above)
+
+- Sprint: `S0121`
+- Story: `US-0121` (OpenCode host-mode adapter — additive `--host cursor|opencode|both` + empty-but-valid `template/.opencode/` pack + parity scope + 14 contract-test markers)
+- Release: **BLOCKED (2nd attempt)** (`2026-08-23T16:35:00Z`, `orchestrator_run_id=auto-20260823-01`, `fresh_context_marker=rel-US0121-release-20260823T163500Z-fresh`, `runtime_proof_id=rp-auto-20260823-01-release-release-20260823T163500Z-US-0121`, `model_id=glm-5.2-high`)
+- Queue: **`handoffs/release_queue.md`** row **`S0121`** was **`blocked`** (NOT `released` — fail-closed) — **superseded by `released` on 2026-08-24T10:58:00Z (3rd attempt) above**
+- **Reason codes**: `RELEASE_TEST_FAILED` (fresh `tests/report.md` @ 2026-08-23T16:27:27Z records `Pass:779 / Fail:50`; Fail ≠ 0) + `RUNTIME_PROOF_STALE` (prior verify-work proof TTL `2026-08-23T13:00:00Z` is in the past relative to now `2026-08-23T16:35:00Z`; prior release proof attested BLOCKED and is also stale → not reused)
+- **Prior attempt closure**: The 12:48:00Z `RELEASE_TEST_STALE` + `RELEASE_TEST_EVIDENCE_MISSING` are now CLOSED by operator remediation (python 3.12.10 user-scope on PATH; `python -m pytest tests/us0121_host_mode_test.py -v` → 14 passed per orchestrator resume note 2026-08-23T16:32:00Z; `tests/report.md` refreshed 2026-08-23T16:27:27Z). However the canonical harness still recorded `Fail:50`, so gate 1 failed with a new reason code `RELEASE_TEST_FAILED`.
+- **Remediation (completed)**: reran `/verify-work` (qa) in a fresh subagent to mint a fresh gate-4b proof (2026-08-24T10:52:00Z); resolved the 50 failing canonical harness rows via execute loop-3+4 so `tests/report.md` reaches `Fail:0` (Pass:845 @ 2026-08-24T10:45:36Z); reran `/release` in a fresh subagent (3rd attempt → PASS above).
+
 ## Release finalized note (S0120)
 
 - Sprint: `S0120`
@@ -582,7 +691,7 @@ Canonical queue state now lives under:
 Check `handoffs/release_queue.md` for all pending entries where `status=unreleased`
 or `status=blocked` before finalization.
 
-- **`S0070` / `BUG-0008`**: **`blocked`** (`2026-04-04T23:30:00Z`) — **`RELEASE_TEST_FAILED`**, **`RELEASE_UAT_INCOMPLETE`**, deferred **publish**/**E2E**; canonical notes `handoffs/releases/S0070-release-notes.md`; do **not** treat **`S0069`** pointer as superseding this track until **`S0070`** **`released`** or row cleared.
+- **No `unreleased` or `blocked` entries** for S0121 as of `2026-08-24T10:58:00Z` — S0121 transitioned to `released` (3rd release attempt PASS). See `## Release finalized note (S0121)` above.
 
 ## Release readiness note (S0057)
 
@@ -608,16 +717,11 @@ or `status=blocked` before finalization.
 
 ## Latest operator summary (Run/Connect/Verify)
 
-- **Start command:** Last finalized sprint **`S-BUG0014`**: `python scripts/validate_readme_feature_coverage.py --repo . --enforce` — refer to `## Run` in
-  `handoffs/releases/S-BUG0014-release-notes.md`.
-- **Endpoint + port:** N/A (release documentation layer) — refer to `## Connect` in
-  `handoffs/releases/S-BUG0014-release-notes.md`.
-- **Verification steps + health signal:** Refer to `## Verify` in
-  `handoffs/releases/S-BUG0014-release-notes.md`.
-- **Credentials source refs (sanitized):** Refer to `## Credentials` in
-  `handoffs/releases/S-BUG0014-release-notes.md` (env-ref only).
-- **Known issues:** Refer to `## Known Issues` in
-  `handoffs/releases/S-BUG0014-release-notes.md`.
+- **Start command:** Latest sprint **`S0121`** (RELEASED — finalized 3rd attempt, `2026-08-24T10:58:00Z`): kit/installer story — `its-magic --target <repo> --mode missing [--host cursor|opencode|both]` (default `cursor`); see `## Run` in `handoffs/releases/S0121-release-notes.md`.
+- **Endpoint + port:** N/A (kit/installer story — no service endpoint) — see `## Connect` in `handoffs/releases/S0121-release-notes.md`.
+- **Verification steps + health signal:** See `## Verify` in `handoffs/releases/S0121-release-notes.md` (health = contract tests, not HTTP; 14/14 markers + parity CLI OK + 0 secret-pattern hits + manifest byte-identity).
+- **Credentials source refs (sanitized):** See `## Credentials` in `handoffs/releases/S0121-release-notes.md` (n/a — kit/installer story; no external secrets).
+- **Known issues:** See `## Known Issues` in `handoffs/releases/S0121-release-notes.md` (no blocking issues; NB-1 CLOSED for env; NB-2..NB-4 non-blocking carry-forwards).
 
 ## Historical references
 
