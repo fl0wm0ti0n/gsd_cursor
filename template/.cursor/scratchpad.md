@@ -404,6 +404,9 @@ MODEL_PROVIDER_MODE=cursor
 #     MODEL_EXECUTE=<your-vendor-slug>
 #     MODEL_QA=<your-vendor-slug>
 #     MODEL_REFRESH-CONTEXT=<your-vendor-slug>
+#     MODEL_SOVEREIGN-CRITIC=<your-critic-model-slug>
+#   MODEL_SOVEREIGN-CRITIC is a synthetic-phase pin (not a canonical phase). Hyphen exact —
+#   no underscore alias MODEL_SOVEREIGN_CRITIC. Vendor slugs live in .cursor/scratchpad.local.md only.
 #   MODEL_ASK participates in step 1 like any other phase (no special-case bypass).
 #
 # AI Decision Ledger + Plan Fidelity (US-0103 / DEC-0103)
@@ -438,6 +441,8 @@ SOVEREIGN_GOAL_TIMEOUT_MAX=0
 # - CROSS_MODEL_REVIEW: 0|1 (default 0)
 # - CROSS_MODEL_ANTISLOP_THRESHOLD: int 0-10 aggregate floor (default 6)
 # - CROSS_MODEL_REWORK_MAX: int >= 0 producer re-spawns per (run, phase) (default 2)
+# US-0130 critic precedence: MODEL_SOVEREIGN-CRITIC > roles.critic (when MODEL_RESOLVE=role_catalog) > opposition/dev.
+# Same-slug keeps CROSS_MODEL_DEGRADED_MODE (not a hard stop). One global critic for all producer phases.
 CROSS_MODEL_REVIEW=1
 CROSS_MODEL_ANTISLOP_THRESHOLD=6
 CROSS_MODEL_REWORK_MAX=2
@@ -577,6 +582,11 @@ RELEASE_TRIGGER_FALLBACK_TO_LOCAL=0
 #   block:                  all fail-closed codes block (pre-US-0119 behavior)
 #   auto_repair_then_block: autonomy_resolvable codes get bounded repair; cap exhaustion -> BLOCK
 #   auto_repair_then_skip:  autonomy_resolvable codes get bounded repair; cap exhaustion -> SKIP
+#
+# ARCH_LINKAGE_AUTO_REPAIR: 0|1 (default=0)
+# Opt-in bounded H1-stub restore after architecture rollover (US-0129 / DEC-0129).
+# Explicit key only; not in AUTONOMY_PRESET. Default 0 even under AUTONOMY_PRESET=full.
+# Committed scratchpad must not contain a live on-assignment for this flag.
 #
 # Per-feature autonomy flags (12 total â€” DEC-0119 Â§7):
 #

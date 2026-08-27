@@ -1,0 +1,80 @@
+{
+  "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+  "turn_index": 0,
+  "writer_id": "po-drain-gen-auto-20260825-01-1",
+  "selected_pack": "small-intake-pack",
+  "requested_mode": "story",
+  "intake_boundary_utc": "2026-08-25T18:20:00Z",
+  "INTAKE_GUIDED_MODE": 1,
+  "INTAKE_WORK_ITEM_KIND": "story",
+  "ID_NAMESPACE_BOOTSTRAP": 0,
+  "decomposition_verdict": "multi_story",
+  "decomposition_rationale": "Operator accepted three drain-generate candidates (auto-20260825-01 gate PASSED): convergence critic blocking-only (US-0127), convergence smoke surrogate (US-0128), architecture linkage guard (US-0129). Split axis: sovereign-loop convergence vs architecture hot-surface. Independently valuable vertical slices.",
+  "duplicate_check_pass": true,
+  "duplicate_check_notes": "Bounded refinements of US-0104/US-0110/US-0107/DEC-0054; no duplicate US rows; addresses CONVERGENCE_CROSS_REVIEWER_OPEN and CONVERGENCE_SMOKE_PROBE_FAIL from drain-terminate checkpoint.",
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:intake-drain-gen-auto-20260825-01-1:0:b53bc0234f611937",
+      "quoted_user_text": "Block or bounded auto-repair architecture triad rollover when active-only US/BUG heading refs required by contract tests would break; prevent US-0126 B-1 style Fail:7 after rollover archives active tokens.",
+      "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:intake-drain-gen-auto-20260825-01-1:1:3c71b1d7feb50453",
+      "quoted_user_text": "New scripts/arch_linkage_guard.py pre/post enforce-triad-hot-surface.py --rollover; /refresh-context rollover path; harness marker; template script + runbook h2 parity.",
+      "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:intake-drain-gen-auto-20260825-01-1:2:9c0fb775b4bd75b2",
+      "quoted_user_text": "Compose read-only DEC-0054/DEC-0073/US-0049; optional bounded auto-repair restores minimal heading stubs from latest archive pack; do not reopen US-0126 product scope.",
+      "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+      "turn_index": 2
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:intake-drain-gen-auto-20260825-01-1:3:04988e8ec3c57344",
+      "quoted_user_text": "Regression tests using US-0126 B-1 fixture: rollover without guard FAIL; with guard PASS or explicit ARCH_LINKAGE_ROLLOVER_BLOCKED block with remediation metadata.",
+      "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+      "turn_index": 3
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:intake-drain-gen-auto-20260825-01-1:4:d0a8c75aa97430d6",
+      "quoted_user_text": "Single story US-0129 OPEN P2: arch_linkage_guard wired into refresh-context rollover with audit row in state.md on auto-repair; release flips DONE per US-0045.",
+      "intake_run_id": "intake-drain-gen-auto-20260825-01-1",
+      "turn_index": 4
+    }
+  ],
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "candidate_story_ids": [
+    "US-0129"
+  ],
+  "story_ids": [
+    "US-0129"
+  ],
+  "candidate_id": "9ba054f2-0082-4291-801e-c2dc2ada9180",
+  "plan_area_id": "architecture-hot-surface",
+  "priority": "P2",
+  "provenance": "vision",
+  "operator_accepted_quote": "Architecture hot-surface rollover linkage guard (active contract preservation)",
+  "delivery_mode": "ultra_lean",
+  "orchestrator_run_id": "auto-20260825-01",
+  "ephemeral_work_item_id": "drain-gen-auto-20260825-01-1"
+}

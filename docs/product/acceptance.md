@@ -151,7 +151,11 @@
 - [x] US-0123: Per-role OpenCode `provider/slug` routing — multi-provider including Chinese APIs, no vendor IDs in template (US-0102), fail-closed unknown slug, `/connect` keys, `test_us0123_*`, compose US-0101/US-0102 without Cursor aliases as runtime (10 ACs)
 - [x] US-0124: Orchestrator plugin spawn-only `/auto` — US-0069, isolation evidence, US-0092 stop matrix + `--invoke-cmd`, plugin must not write phase artifacts, success tests (a)(d), no US-0095 port, subtask-ignored fail-closed, `test_us0124_*` (11 ACs)
 - [x] US-0125: Thin OpenCode commands + Python validator bridge — dispatch-only named commands, no Cursor command clones, Python CLIs remain fail-closed source of truth, success test (b) `/release` blocked after failing validator, `test_us0125_*` (10 ACs)
-- [ ] US-0126: OpenCode host runbook, reason codes, and `--scope=opencode-adapter` parity — operator docs without leaked DEC, `OPENCODE_*` / `NATIVE_CHAIN_UNAVAILABLE` analogue, `test_us0126_*` and/or per-story markers, program DoD without Cursor (10 ACs)
+- [x] US-0126: OpenCode host runbook, reason codes, and `--scope=opencode-adapter` parity — operator docs without leaked DEC, `OPENCODE_*` / `NATIVE_CHAIN_UNAVAILABLE` analogue, `test_us0126_*` and/or per-story markers, program DoD without Cursor (10 ACs)
+- [x] US-0127: Convergence critic conjunct — blocking-only open findings plus non-blocking auto-resolve at sovereign-critic PASS — `_critic_jsonl_has_open` aligned with `read_open_blocking`, hygiene CLI, contract tests, runbook, SOVEREIGN_CRITIC_PAIRS parity (6 ACs)
+- [x] US-0128: Convergence smoke surrogate for contract-test and waived-probe UAT slices — `_eval_smoke_green` surrogate, canonical `convergence_smoke` uat step, `CONVERGENCE_SMOKE_SURROGATE_MISSING`, `/qa`+`/verify-work` contracts, contract tests, runbook parity (6 ACs)
+- [x] US-0129: Architecture hot-surface rollover linkage guard — `arch_linkage_guard.py`, `ARCH_LINKAGE_ROLLOVER_BLOCKED`, optional auto-repair, `/refresh-context` wiring, US-0126 B-1 regression, template parity (6 ACs)
+- [x] US-0130: Operator-pinned sovereign-critic model — `MODEL_SOVEREIGN-CRITIC` + optional catalog `roles.critic`, `select_critic_model` precedence, keep degraded same-slug fallback, one global critic, example/installer compose, `test_us0130_*`, US-0104 schema unchanged (9 ACs)
 
 ## Bug acceptance (canonical)
 

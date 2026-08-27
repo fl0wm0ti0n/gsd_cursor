@@ -19,6 +19,8 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=us-0119               DEC-0119 autonomous-autonomy preset surfaces (US-0119).
   --scope=us-0120               US-0120 dedicated /closure phase surfaces.
   --scope=opencode-adapter       US-0121 OpenCode host pack + --host cursor/opencode/both surfaces.
+  --scope=sovereign-critic       US-0127 sovereign critic hygiene script pair.
+  --scope=sovereign-convergence  US-0110 convergence lib + validator pair table.
   --scope=all              union of all tables.
 """
 
@@ -290,6 +292,10 @@ MODEL_TIER_OVERRIDES_PAIRS: tuple[tuple[str, str], ...] = (
         "docs/engineering/runbook.md",
         "template/docs/engineering/runbook.md",
     ),
+    (
+        ".cursor/model-catalog.local.example.role-based-balanced_cursor_only.json",
+        "template/.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json",
+    ),
 )
 
 DOWNSTREAM_CI_GUARD_PAIRS: tuple[tuple[str, str], ...] = (
@@ -511,8 +517,76 @@ OPENCODE_ADAPTER_PAIRS: tuple[tuple[str, str], ...] = (
         "template/tests/us0125_contract_test.py",
     ),
     (
+        "tests/us0126_contract_test.py",
+        "template/tests/us0126_contract_test.py",
+    ),
+    (
         "scripts/model_tier_validate.py",
         "template/scripts/model_tier_validate.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+)
+
+# US-0127 additive: hygiene CLI pair. Existing scopes unchanged.
+SOVEREIGN_CRITIC_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/sovereign_critic_hygiene.py",
+        "template/scripts/sovereign_critic_hygiene.py",
+    ),
+    (
+        "scripts/sovereign_critic_lib.py",
+        "template/scripts/sovereign_critic_lib.py",
+    ),
+)
+
+# Confirmed / added if missing (architecture DQ5 + T-006): convergence lib mirror.
+SOVEREIGN_CONVERGENCE_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/sovereign_convergence_lib.py",
+        "template/scripts/sovereign_convergence_lib.py",
+    ),
+    (
+        "scripts/sovereign_convergence_validate.py",
+        "template/scripts/sovereign_convergence_validate.py",
+    ),
+    (
+        ".cursor/commands/qa.md",
+        "template/.cursor/commands/qa.md",
+    ),
+    (
+        ".cursor/commands/verify-work.md",
+        "template/.cursor/commands/verify-work.md",
+    ),
+)
+
+# US-0129 additive: linkage guard + refresh-context wiring + contract test.
+ARCH_LINKAGE_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/arch_linkage_guard.py",
+        "template/scripts/arch_linkage_guard.py",
+    ),
+    (
+        ".cursor/commands/refresh-context.md",
+        "template/.cursor/commands/refresh-context.md",
+    ),
+    (
+        "tests/us0129_contract_test.py",
+        "template/tests/us0129_contract_test.py",
+    ),
+    (
+        "docs/engineering/reason_codes.md",
+        "template/docs/engineering/reason_codes.md",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        ".cursor/scratchpad.md",
+        "template/.cursor/scratchpad.md",
     ),
 )
 
@@ -539,6 +613,9 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "us-0119": AUTONOMY_PRESET_PAIRS,
     "us-0120": CLOSURE_PHASE_PAIRS,
     "opencode-adapter": OPENCODE_ADAPTER_PAIRS,
+    "sovereign-critic": SOVEREIGN_CRITIC_PAIRS,
+    "sovereign-convergence": SOVEREIGN_CONVERGENCE_PAIRS,
+    "arch-linkage": ARCH_LINKAGE_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -561,6 +638,9 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + AUTONOMY_PRESET_PAIRS
         + CLOSURE_PHASE_PAIRS
         + OPENCODE_ADAPTER_PAIRS
+        + SOVEREIGN_CRITIC_PAIRS
+        + SOVEREIGN_CONVERGENCE_PAIRS
+        + ARCH_LINKAGE_PAIRS
     ),
 }
 

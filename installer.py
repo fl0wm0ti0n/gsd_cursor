@@ -250,6 +250,7 @@ FRAMEWORK_EXACT = {
     ".cursor/model-catalog.local.example.level-4-super.json",
     ".cursor/model-catalog.local.example.role-based-balanced.json",
     ".cursor/model-catalog.local.example.role-based-highend.json",
+    ".cursor/model-catalog.local.example.role-based-balanced_cursor_only.json",
     ".its-magic-version", "its_magic/.its-magic-version", "its_magic/README.md",
 }
 USER_DATA_PREFIXES = (

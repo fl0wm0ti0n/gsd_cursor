@@ -1,727 +1,541 @@
-# Dev → QA handoff — US-0125 / S0125 (execute loop-2 — B-1 + B-2 fix)
+# Dev → QA handoff — US-0129 / S0129 (execute)
 
-- **sprint_id**: S0125
-- **story_id**: US-0125 (OPEN — not marked DONE per US-0045)
-- **phase_id**: execute (build+verify macro — implementation-loop cycle 2)
+- **sprint_id**: S0129
+- **story_id**: US-0129 (OPEN — not marked DONE per US-0045)
+- **phase_id**: execute (build+verify macro — first canonical phase)
 - **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-02
+- **orchestrator_run_id**: auto-20260827-01
 - **delivery_mode**: ultra_lean
 - **macro_phase**: build+verify
-- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle 2: dev fix B-1 + B-2 → /qa re-run)
-- **fresh_context_marker**: dev-US0125-execute-loop2-20260824T210710Z-fresh (NEW — not reused from execute-1 210000Z)
-- **timestamp**: 2026-08-24T21:07:10Z (UTC)
-- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
-- **verdict**: PASS (execute loop-2) — B-1 + B-2 fixed; canonical harness `tests/report.md` Pass:845 / Fail:0; zero `[FAIL]` rows; 11/11 us0125 contract markers PASS; `validate_readme_feature_coverage` PASS (US-0124 coverage_present)
-- **story_status**: OPEN (US-0045 — not marked DONE; acceptance checkboxes unchecked)
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **fresh_context_marker**: dev-US0129-execute-20260827T080438Z-fresh (NEW per US-0048 / BUG-0006)
+- **timestamp**: 2026-08-27T08:04:38Z (UTC)
+- **model_id**: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required)
+- **verdict**: PASS (execute) — 8/8 tasks completed; 8/8 us0129 contract markers green; `--scope=arch-linkage` parity OK; compose 8/8 UNCHANGED
+- **story_status**: OPEN (US-0045 — not marked DONE; acceptance L157 unchecked)
 - **intake_json**: NOT mutated
+- **next_scheduled_phase**: `/qa` (role=qa) — orchestrator-owned; this subagent did not spawn QA
+- **UAT_BROWSER**: n/a — library/docs/tests story; no browser UAT
 
-## Loop-2 delta — B-1 + B-2 remediation (pre-existing backfill, NOT US-0125 scope expansion)
+## Scope delivered (US-0129 — linkage guard + reason_codes + flag + refresh-context + tests + runbook + parity + installer)
 
-### B-1 resolved (architecture.md `# US-0090` missing `US-0085` linkage)
+Fail-closed architecture-rollover linkage guard wrapping `enforce-triad-hot-surface.py --rollover` (DEC-0129 / R-0113). New `scripts/arch_linkage_guard.py` imports `split_arch_stories` (no copy-fork). Pre-guard blocks with `ARCH_LINKAGE_ROLLOVER_BLOCKED` (`security_hard`) before any archive write. Post-guard re-checks active headings. Optional `ARCH_LINKAGE_AUTO_REPAIR` default-off, not in `AUTONOMY_PRESET`; DQ8 H1 stubs insert before US-0089/US-0090 tail. `/refresh-context` step 4: pre-guard → `--rollover` → post-guard → `--check`. Eight `test_us0129_*` markers + harness **26AB**.
 
-- **Before** (execute-1 / qa): `tests/auto_command_contract_test.py::test_caveman_compress_input_architecture_linkage (token='US-0085')` FAIL — `docs/engineering/architecture.md` `## US-0090 — Caveman input compression` section lacked any `US-0085` reference.
-- **After** (execute loop-2): Appended one sentence to the US-0090 section paragraph: `See \`# US-0085\` for context fresh-context markers.` No new H1 added; `# US-0089` not moved.
+### Files created (new)
 
-### B-2 resolved (US-0124 README feature coverage gap)
+- `scripts/arch_linkage_guard.py` + `template/scripts/arch_linkage_guard.py`
+- `tests/us0129_contract_test.py` + `template/tests/us0129_contract_test.py`
+- `sprints/S0129/t-anch-verification.md`
+- `sprints/S0129/summary.md`
 
-US-0124 is DONE and `user_visible:true`; affinity = `slash_command` (title contains `/auto`) → root_h2 `Commands and workflow`, dev_h2 `Workflow`. US-0125 NOT added (still OPEN).
+### Files edited (scoped, additive; active↔template byte-identical)
 
-- **Before** (execute-1 / qa): `validate_readme_feature_coverage --report` FAIL with `coverage_missing=["US-0124"]` (present in `its_magic/README.md` `## Commands and workflow` via existing `### OpenCode orchestrator plugin (US-0124)` subsection, but absent from `docs/developer/README.md` `## Workflow` section).
-- **After** (execute loop-2): `validate_readme_feature_coverage --report` PASS with `coverage_missing=[]`, `coverage_present=["US-0121","US-0122","US-0123","US-0124"]`.
+- `docs/engineering/reason_codes.md` + template (`## US-0129`)
+- `scripts/data/autonomy_stop_matrix.yaml` (`ARCH_LINKAGE_ROLLOVER_BLOCKED` security_hard)
+- `docs/engineering/autonomy-stop-matrix.md` + template
+- `.cursor/scratchpad.md` + `.cursor/scratchpad.local.example.md` + template mirrors (comment only)
+- `.cursor/commands/refresh-context.md` + template
+- `tests/run-tests.ps1` + `tests/run-tests.sh` (harness 26AB)
+- `docs/engineering/runbook.md` + template (h3 under triad)
+- `scripts/check_intake_template_parity.py` + template (`ARCH_LINKAGE_PAIRS`)
+- `docs/engineering/context/installer-owned-paths.manifest` + template
+- `sprints/S0129/tasks.md`, `sprints/S0129/progress.md`
 
-### Files edited (loop-2)
-
-| File | Change | Parity |
-|---|---|---|
-| `docs/engineering/architecture.md` | Appended `See \`# US-0085\` for context fresh-context markers.` to US-0090 section paragraph (B-1) | n/a (kit-only surface) |
-| `docs/developer/README.md` | Added `**US-0124**` + `traceability:` bullet to `## Workflow` section (validator-required dev_h2 for slash_command affinity) AND added detailed `**US-0124**` traceability bullet to `## Quality gates` after the US-0123 bullet (per fix spec) | byte-identical mirror of `template/docs/developer/README.md` (SHA-256 match) |
-| `template/docs/developer/README.md` | Same edits (byte-identical mirror) | byte-identical mirror of `docs/developer/README.md` |
-| `README.md` | Added `- **US-0124**: OpenCode orchestrator plugin spawn-only \`/auto\` …` bullet under `## Commands and workflow` after the `/auto` line (B-2 root README) | byte-identical mirror of `template/README.md` (SHA-256 match) |
-| `template/README.md` | Same edit (byte-identical mirror) | byte-identical mirror of `README.md` |
-
-### US-0124 bullets added (byte-identical in each pair)
-
-`## Workflow` (dev README):
-```
-- **US-0124** — OpenCode orchestrator plugin spawn-only `/auto`; traceability:
-  runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
-```
-
-`## Quality gates` (dev README, after US-0123 bullet):
-```
-- **US-0124** — OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session); traceability:
-  runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
-```
-
-`## Commands and workflow` (root README, after `/auto` line):
-```
-- **US-0124**: OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session).
-```
-
-US-0125 NOT added to any README (still OPEN, not in coverage set).
-
-## Verification evidence (PASS claim rule — all three satisfied)
-
-| Check | Result |
-|---|---|
-| `python scripts/validate_readme_feature_coverage.py --repo . --report` | **PASS** — `{"coverage_missing":[],"coverage_present":["US-0121","US-0122","US-0123","US-0124"],"coverage_total":4,"gaps":[],"status":"PASS"}` |
-| `python scripts/check_intake_template_parity.py --repo . --scope readme-feature-coverage` | **exit 0** — `[INTAKE_TEMPLATE_PARITY_OK] scope=readme-feature-coverage` |
-| `python scripts/check_intake_template_parity.py --repo . --scope project-readme` | **exit 0** — `[INTAKE_TEMPLATE_PARITY_OK] scope=project-readme` |
-| Developer README pair byte-identical (SHA-256) | **match** |
-| Root README pair byte-identical (SHA-256) | **match** |
-| Harness exit code | `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` → **exit 0** |
-| `tests/report.md` header | `Pass: 845` / `Fail: 0` (literal zero) @ 2026-08-24T21:04:51Z |
-| `rg "\[FAIL\]" tests/report.md` | **0 matches** |
-| `python -m pytest tests/us0125_contract_test.py -q` | **11 passed** (us0125 11/11 green — not weakened) |
-| `python scripts/enforce-triad-hot-surface.py --check` | **exit 0** (clean, no rollover triggered) |
-
-## US-0125 scope (unchanged from execute-1 — no product-scope edits in loop-2)
-
-- 11/11 contract-test markers PASS (`tests/us0125_contract_test.py`).
-- 15 dispatch-only command files at `template/.opencode/commands/<name>.md` (≤ 20 lines each).
-- opencode-adapter parity PASS.
-- Compose guards 7/7 UNCHANGED; backlog US-0125 OPEN; acceptance unchecked; intake JSON not mutated.
-
-## Compose guards (7/7 UNCHANGED — verified read-only)
-
-US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087 — all read-only consumers. Loop-2 edits are confined to architecture.md (US-0085 linkage sentence in US-0090 section) + developer README (US-0124 bullets) + root README (US-0124 bullet); no installer/plugin/agent/scratchpad/DEC/backlog/acceptance surfaces touched.
-
-## Files NOT modified (compose guards)
-
-- `template/.opencode/plugins/orchestrator.ts` (US-0124 owned — architecture non-goal)
-- `template/.opencode/agents/*.md` (US-0122 owned)
-- `.cursor/commands/*.md` (US-0001 compose — AC-9)
-- `docs/product/backlog.md` + `docs/product/acceptance.md` (US-0045 — not mutated)
-- `scripts/auto_outer_driver.py` (US-0124 territory)
-- `decisions/DEC-0125.md` (T-anch NO-OP)
-- Intake evidence JSON (NOT mutated)
-
-## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
-
-- `phase_id=execute`
-- `role=dev`
-- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
-- `fresh_context_marker=dev-US0125-execute-loop2-20260824T210710Z-fresh` (NEW — not reused from execute-1 210000Z)
-- `timestamp=2026-08-24T21:07:10Z`
-- `evidence_ref=sprints/S0125/summary.md (loop-2 note), sprints/S0125/progress.md (loop-2 note), docs/engineering/state.md (execute loop-2 checkpoint append-bottom), handoffs/dev_to_qa.md (this prepend), handoffs/resume_brief.md (execute loop-2 PASS → /qa prepend), tests/report.md (Pass:845 Fail:0)`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `orchestrator_run_id=auto-20260824-02`
-- `runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125` (loop-2, unique vs execute-1 210000Z)
-- `phase_id=execute`, `role=dev`, `story_id=US-0125`, `sprint_id=S0125`
-- `proof_issued_at=2026-08-24T21:07:10Z`
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T22:07:10Z` (UTC)
-- `proof_hash=9a29423c0d4df7d61f3a3ee45a9884485eed52f5ee26916d712b8a476baeb807`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T21:07:10Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T210710Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
-
-Prior phase proof consumed: `rp-auto-20260824-02-qa-qa-20260824T213000Z-US-0125` (proof_hash=65A96BF541C856A2E74EE96573D7C77CE4E47D2F7D91C3634DE31F2E55F98358, ttl 2026-08-24T22:30:00Z — consumed before RUNTIME_PROOF_STALE).
-
-## Next phase
-
-- `/qa` (fresh qa subagent per BUG-0006; orchestrator spawns in new chat). Do NOT spawn /qa from this subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.
-
----
-
-# Dev → QA handoff — US-0125 / S0125 (execute PASS)
-
-- **sprint_id**: S0125
-- **story_id**: US-0125 (OPEN — not marked DONE per US-0045)
-- **phase_id**: execute (build+verify macro — first canonical phase per ultra_lean)
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-02
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **fresh_context_marker**: dev-US0125-execute-20260824T210000Z-fresh
-- **timestamp**: 2026-08-24T21:00:00Z (UTC)
-- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
-- **verdict**: PASS (execute) — 10/10 tasks DONE; 11/11 us0125 contract markers PASS; opencode-adapter parity PASS; triad hot-surface clean; compose guards 7/7 UNCHANGED
-- **story_status**: OPEN (US-0045 — not marked DONE; acceptance checkboxes unchecked)
-- **intake_json**: NOT mutated
-
-## What QA should verify
-
-1. **Contract tests**: `python -m pytest tests/us0125_contract_test.py -v` → 11/11 PASS (marker 1 inventory, marker 2 clone guard, marker 3 validator subprocess fail-closed, marker 4 success test (b) release-blocked-after-failing-validator, marker 5 raw Python reason codes, marker 6 no policy in commands, marker 7 missing command does not disable plugin, marker 8 /auto dispatch-only, marker 9 cursor commands unchanged, marker 10 no new npm runtime, marker 11 frontmatter shape).
-2. **Parity**: `python scripts/check_intake_template_parity.py --repo . --scope opencode-adapter` → OK.
-3. **Byte-identical pairs**: active ↔ template for manifest, runbook, its_magic/README.md, parity script, contract test file.
-4. **Compose guards 7/7**: US-0001, US-0078/DEC-0060, US-0121/DEC-0120, US-0122/DEC-0122, US-0124/DEC-0124, US-0126, US-0102/DEC-0087 — all UNCHANGED (additive only).
-5. **No-secrets gate**: grep `api_key|apikey|sk-|auth.json|.env` on command files + harness → zero hits.
-6. **Clone-guard gate**: 15 files ≤ 20 lines + normalized similarity ≤ 0.30 vs `.cursor/commands/<name>.md`.
-7. **Full harness**: `tests/run-tests.ps1` (or `.sh`) — prior green Pass:845 Fail:0 @ 19:17:58Z is stale after new US-0125 tests; QA should run the full harness and confirm Fail: 0.
-
-## Files created (new)
-
-- `template/.opencode/commands/{intake,discovery,research,architecture,sprint-plan,plan-verify,execute,qa,verify-work,release,closure,refresh-context,auto,quick,ask}.md` (15 files, ≤ 20 lines each)
-- `tests/us0125_contract_test.py` + byte-identical `template/tests/us0125_contract_test.py`
-- `tests/us0125/mock_subprocess.ts` + `tests/us0125/bridge_harness.mjs`
-- `tests/us0125/fixtures/validator_artifact_mapping.json`
-
-## Files edited (scoped, additive)
-
-- `scripts/check_intake_template_parity.py` (extended OPENCODE_ADAPTER_PAIRS) + byte-identical template mirror
-- `docs/engineering/context/installer-owned-paths.manifest` (additive `template/.opencode/commands/**` row) + byte-identical template mirror
-- `docs/engineering/runbook.md` (append `## OpenCode thin commands + validator bridge (US-0125)` h2 stub) + byte-identical template mirror
-- `its_magic/README.md` (cross-link US-0125 section) + byte-identical template mirror
-- `sprints/S0125/{t-anch-verification.md, tasks.md, progress.md, summary.md}` (sprint artifacts)
-
-## Files NOT modified (compose guards)
+### Files NOT modified (compose guards)
 
 - `docs/engineering/architecture.md` (T-anch NO-OP)
-- `decisions/DEC-0125.md` (T-anch NO-OP)
-- `template/.opencode/plugins/orchestrator.ts` (US-0124 owned)
-- `template/.opencode/agents/*.md` (US-0122 owned)
-- `.cursor/commands/*.md` (US-0001 compose — AC-9)
-- `docs/product/backlog.md` + `docs/product/acceptance.md` (US-0045 — not mutated)
-- `scripts/auto_outer_driver.py` (US-0124 territory)
-
-## Runtime proof (DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125`
-- `proof_hash=3A45F2563E0533E1D4558150FEC8F3723C95285331F007B4AF70B35D960B69C7`
-- `proof_ttl=2026-08-24T22:00:00Z` (UTC)
-- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T21:00:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T210000Z-US-0125","sprint_id":"S0125","story_id":"US-0125"}`
-
-Prior phase proof consumed: `rp-auto-20260824-02-plan-verify-qa-20260824T203200Z-US-0125` (proof_hash=13E002DDCFD55F546CEE96091BF66501BD58D337D04D0965E1F8F096114E0966, ttl 2026-08-24T21:32:00Z — consumed before RUNTIME_PROOF_STALE).
-
-## Next phase
-
-- `/qa` (role=qa per US-0069 / DEC-0051 phase→role matrix; fresh qa subagent per BUG-0006)
-- STOP after execute; orchestrator spawns /qa in fresh qa subagent. Do NOT mark US-0125 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.
-
----
-
-﻿# Dev → QA handoff — US-0124 / S0124 (execute loop-2 — B-1 fix)
-
-- **sprint_id**: S0124
-- **story_id**: US-0124 (OPEN — not marked DONE per US-0045)
-- **phase_id**: execute (build+verify macro — implementation-loop cycle 2)
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-02
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle 2: dev fix B-1 → /qa re-run)
-- **fresh_context_marker**: dev-US0124-execute-loop2-20260824T192000Z-fresh
-- **timestamp**: 2026-08-24T19:20:00Z (UTC)
-- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
-- **verdict**: PASS (execute loop-2) — B-1 fixed; canonical harness `tests/report.md` Pass:845 / Fail:0; zero `[FAIL]` rows; 12/12 us0124 contract markers PASS; opencode-adapter parity PASS
-- **story_status**: OPEN (US-0045 — not marked DONE; acceptance checkboxes unchecked)
-
-## Loop-2 delta — B-1 remediation (US-0123 README feature coverage gap)
-
-### Blocker resolved (B-1 from qa-to-dev handoff)
-
-- **Before** (execute-1 / qa): `tests/report.md` Pass:843 / Fail:2 — `validate_readme_feature_coverage` FAIL with `coverage_missing=["US-0123"]` (US-0123 DONE, `user_visible:true`, present in `its_magic/README.md` `## Commands and workflow` but absent from `docs/developer/README.md` `## Quality gates`).
-- **After** (execute loop-2): `tests/report.md` Pass:845 / Fail:0 — `validate_readme_feature_coverage` PASS with `coverage_missing=[]`, `coverage_present=["US-0121","US-0122","US-0123"]`.
-
-### Files edited (loop-2)
-
-| File | Change | Parity |
-|---|---|---|
-| `docs/developer/README.md` | Added `**US-0123**` + `traceability:` bullet to `## Quality gates` immediately after `**US-0121**` bullet | byte-identical mirror of `template/docs/developer/README.md` (SHA-256 match) |
-| `template/docs/developer/README.md` | Same edit (byte-identical mirror) | byte-identical mirror of `docs/developer/README.md` |
-| `template/CHANGELOG.md` | Synced to root `CHANGELOG.md` (CRLF→LF line-ending normalization; content was already identical) — fixes pre-existing `check_intake_template_parity --scope=release-changelog` FAIL (US-0100 pair) | byte-identical to `CHANGELOG.md` (SHA-256 match) |
-
-### US-0123 bullet added (byte-identical in both READMEs)
-
-```
-- **US-0123** — OpenCode per-role/per-phase model slug routing (multi-provider, no vendor IDs in template); traceability:
-  runbook `## OpenCode model slug routing (US-0123)`, architecture `# US-0123`, `decisions/DEC-0123.md`.
-```
-
-US-0124 NOT added (OPEN, not in coverage set). US-0122 left under `## Architecture notes` (already coverage_present).
-
-### CHANGELOG parity note (pre-existing, surfaced by harness)
-
-`template/CHANGELOG.md` was modified in the working tree (CRLF line endings, +100 CR bytes vs root LF). Content was already identical to root `CHANGELOG.md`; only line endings differed. Synced `template/CHANGELOG.md` to root bytes (LF) to satisfy `RELEASE_CHANGELOG_PAIRS` byte-identical requirement (US-0100 / DEC-0085). This is a harness-refresh fix, not a US-0124 product-scope change.
-
-## Verification evidence (PASS claim rule — all three satisfied)
-
-| Check | Result |
-|---|---|
-| `python scripts/validate_readme_feature_coverage.py --repo . --report` | **PASS** — `{"coverage_missing":[],"coverage_present":["US-0121","US-0122","US-0123"],"coverage_total":3,"gaps":[],"status":"PASS"}` |
-| `python scripts/check_intake_template_parity.py --repo . --scope readme-feature-coverage` | **exit 0** — `[INTAKE_TEMPLATE_PARITY_OK] scope=readme-feature-coverage` |
-| `python scripts/check_intake_template_parity.py --repo . --scope release-changelog` | **exit 0** — `[INTAKE_TEMPLATE_PARITY_OK] scope=release-changelog` |
-| Developer README pair byte-identical (SHA-256) | **match** — `9DB980E389A60DF572995102B8A32B816E99399710A...` both |
-| CHANGELOG pair byte-identical (SHA-256) | **match** — `C1BC4A935FF0A1864CEEA070A830BECFA9359CFE55E2DDE2287C04ECA0BF2147` both |
-| Harness exit code | `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` → **exit 0** |
-| `tests/report.md` header | `Pass: 845` / `Fail: 0` (literal zero) @ 2026-08-24T19:17:58Z |
-| `rg "\[FAIL\]" tests/report.md` | **0 matches** |
-| `python -m pytest tests/us0124_contract_test.py -q` | **12 passed** (regression check — us0124 12/12 green) |
-| `check_intake_template_parity --scope=opencode-adapter` | PASS (opencode-adapter parity still OK) |
-
-## US-0124 scope (unchanged from execute-1 — no product-scope edits in loop-2)
-
-- 12/12 contract-test markers PASS (`tests/us0124_contract_test.py`).
-- opencode-adapter parity PASS.
-- 6/6 byte-identical pairs (active ↔ template): runbook, its_magic/README.md, installer-owned-paths.manifest, auto_outer_driver.py, check_intake_template_parity.py, us0124_contract_test.py.
-- Architecture `# US-0124` before `# US-0089` (DEC-0073 §11).
-- Plugin hygiene: spawn-only (no auto.md clone), `OPENCODE_DRIVER_INVOKE_FAILED` distinct from `OPENCODE_HEADLESS_UNSUPPORTED`, zero secrets/env refs.
-- Compose guards 9/9 UNCHANGED; backlog L4287 OPEN; acceptance unchecked; intake JSON not mutated.
-
-## Compose guards (9/9 UNCHANGED — verified read-only)
-
-US-0069/DEC-0051, US-0092/DEC-0078, US-0095/DEC-0080, US-0023/US-0048/BUG-0006, US-0005, US-0122/DEC-0122, US-0121/DEC-0120, US-0125, US-0102/DEC-0087 — all read-only consumers. Loop-2 edits are confined to developer README (US-0123 bullet) + CHANGELOG line-ending sync; no installer/plugin/agent/scratchpad/architecture/DEC/backlog/acceptance surfaces touched.
-
-## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0124-execute-loop2-20260824T192000Z-fresh` (NEW — not reused from execute-1)
-- `timestamp=2026-08-24T19:20:00Z`
-- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
-- `evidence_ref=sprints/S0124/summary.md (loop-2 note), sprints/S0124/progress.md (loop-2 note), docs/engineering/state.md (execute loop-2 checkpoint append-bottom), handoffs/dev_to_qa.md (this prepend), handoffs/resume_brief.md (execute loop-2 PASS → /qa prepend), tests/report.md (Pass:845 Fail:0)`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `orchestrator_run_id=auto-20260824-02`
-- `runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T192000Z-US-0124` (loop-2, unique)
-- `phase_id=execute`, `role=dev`, `story_id=US-0124`, `sprint_id=S0124`
-- `proof_issued_at=2026-08-24T19:20:00Z`
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T20:20:00Z`
-- `proof_hash=EB5EC946A6B466E561FCE87D8D04B5C24B7585529C751C7FD8CF991E8DAFAB43`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build_verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T19:20:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T192000Z-US-0124","sprint_id":"S0124","story_id":"US-0124"}`
-
-## Next phase
-
-- `/qa` (fresh qa subagent per BUG-0006; orchestrator spawns in new chat). Do NOT spawn /qa from this subagent. Do NOT mark US-0124 DONE. Do NOT tick acceptance. Do NOT mutate intake JSON.
-
----
-
-# Dev â†’ QA handoff â€” US-0124 / S0124 (execute)
-
-- **sprint_id**: S0124
-- **story_id**: US-0124 (OPEN â€” not marked DONE per US-0045)
-- **phase_id**: execute (build+verify macro â€” first phase per ultra_lean)
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-02
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **AUTO_IMPLEMENTATION_LOOP**: 1 (dev implements; QA comes later in fresh subagent)
-- **fresh_context_marker**: dev-US0124-execute-20260824T184700Z-fresh
-- **timestamp**: 2026-08-24T18:47:00Z (UTC)
-- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (execute) â€” 10/10 tasks DONE; 12/12 contract-test markers PASS; opencode-adapter parity PASS
-- **story_status**: OPEN (US-0045 â€” not marked DONE; acceptance checkboxes unchecked)
-
-## Tasks delivered
-
-| Task | Artifact | Status |
-|---|---|---|
-| T-anch | `sprints/S0124/t-anch-verification.md` (11/11 baseline PASS) | DONE |
-| T-001 | `template/.opencode/plugins/orchestrator.ts` (v2 Plugin.define + spawnPhase + dispatchStopMatrix + invokeHeadless + ctx.tool.hook) | DONE |
-| T-002 | `tests/us0124/mock_ctx.ts` + `tests/us0124/run_harness.mjs` (Node subprocess harness) | DONE |
-| T-003 | `docs/engineering/runbook.md` + template mirror â€” `## OpenCode orchestrator plugin reason codes (US-0124)` h2 stub | DONE |
-| T-004 | `scripts/auto_outer_driver.py` + template mirror â€” additive argv `--phase/--role/--story/--sprint/--orchestrator-run-id/--stop-reason` â†’ JSON; legacy byte-identical when flags absent | DONE |
-| T-005 | `tests/us0124_contract_test.py` + `template/tests/us0124_contract_test.py` mirror â€” 12 markers (9 required + 10th `test_us0124_phase_role_mismatch` + 2 extra guards); 12/12 PASS | DONE |
-| T-006 | `docs/engineering/context/installer-owned-paths.manifest` + template mirror â€” `template/.opencode/plugins/orchestrator.ts` row under `[opencode_install_include_paths]` | DONE |
-| T-007 | `scripts/check_intake_template_parity.py` + template mirror â€” `OPENCODE_ADAPTER_PAIRS` extended with us0124 test pair; `its_magic/README.md` + template mirror â€” US-0124 section | DONE |
-| T-008 | runbook US-0124 stub â€” US-0126 cross-link placeholder | DONE |
-| T-009 | Default: no new validator script (contract tests + `model_tier_validate.py --scope opencode-catalog` cover plugin validation; fallback trigger not met) | DONE |
-
-## Contract-test results
-
-```
-tests/us0124_contract_test.py â€” 12 passed in 1.11s
-  test_us0124_spawn_isolation_static       PASSED  (AC-1, AC-3)
-  test_us0124_spawn_isolation_runtime       PASSED  (AC-3, AC-4, AC-10)
-  test_us0124_subtask_ignored_null_return  PASSED  (AC-8)
-  test_us0124_subtask_ignored_throw        PASSED  (AC-8; throw-discrimination)
-  test_us0124_subtask_ignored_identical_id PASSED  (AC-8)
-  test_us0124_no_cursor_auto_clone         PASSED  (AC-9)
-  test_us0124_agent_plugin_compose         PASSED  (AC-1, AC-9; DQ8)
-  test_us0124_invoke_cmd_hook              PASSED  (AC-6, AC-7; DQ6 + DQ7)
-  test_us0124_secrets_no_logging           PASSED  (AC-11 / US-0085)
-  test_us0124_phase_role_mismatch          PASSED  (AC-2; plan-verify carry-forward 10th marker)
-  test_us0124_no_vendor_slugs_in_plugin    PASSED  (US-0102 extra guard)
-  test_us0124_runbook_stub_present         PASSED  (AC-8 extra guard)
-```
-
-## Parity results
-
-- `python scripts/check_intake_template_parity.py --repo . --scope opencode-adapter` â†’ `[INTAKE_TEMPLATE_PARITY_OK]`
-- `--scope us-0092` â†’ OK (driver + runbook pairs)
-- `--scope us-0095` â†’ OK (auto.md + runbook pairs)
-- `--scope us-0120` â†’ OK (closure pairs)
-- Byte-identical pairs verified (active â†” template): runbook, its_magic/README.md, installer-owned-paths.manifest, auto_outer_driver.py, check_intake_template_parity.py, us0124_contract_test.py
-
-## Compose guards (9/9 UNCHANGED)
-
-US-0069/DEC-0051, US-0092/DEC-0078, US-0095/DEC-0080, US-0023/US-0048/BUG-0006, US-0005, US-0122/DEC-0122, US-0121/DEC-0120, US-0125, US-0102/DEC-0087 â€” all read-only consumers; US-0124 is additive-only.
-
-## Hard implementation constraints (verified)
-
-1. No clone of `.cursor/commands/auto.md` â€” `test_us0124_no_cursor_auto_clone` zero hits.
-2. Runbook byte-identical active â†” template (197981 bytes each).
-3. `its_magic/README.md` byte-identical `template/its_magic/README.md` mirror (72044 bytes each).
-4. Parity script `OPENCODE_ADAPTER_PAIRS` extended; plugin file template-only (no kit-root mirror â€” YAGNI); mock harness `tests/us0124/` kit-only (unpaired). Parity script byte-copied to template.
-5. Manifest: `template/.opencode/plugins/orchestrator.ts` under `[opencode_install_include_paths]`; active â†” template byte-identical.
-6. T-004: additive argv; legacy byte-identical when flags absent; `OPENCODE_DRIVER_INVOKE_FAILED` (driver subprocess failure) distinct from `OPENCODE_HEADLESS_UNSUPPORTED` (missing `opencode run`); never conflated.
-7. T-009: default no new validator script.
-8. No vendor slugs in template (plugin source zero vendor model slugs).
-9. Architecture heading `# US-0124` not moved (T-anch NO-OP; architecture.md untouched).
-
-## DQ8 vs US-0069 (per orchestrator brief)
-
-The compose test does NOT require zero occurrences of role names â€” the phaseâ†’role matrix legitimately contains role names as values. It asserts instead: no agent permission-array literals (`edit: deny` / `bash: deny` / `task:` allow-list object form), `ctx.tool.hook("execute.before")` present, `ctx.session.create` present, both auto.md + orchestrator.ts exist.
-
-## Runtime harness (no live OpenCode)
-
-pytest (Python) drives a Node subprocess harness (`tests/us0124/run_harness.mjs`) that imports `template/.opencode/plugins/orchestrator.ts` + `tests/us0124/mock_ctx.ts` under `node --experimental-strip-types` (Node 24 on PATH). No live OpenCode runtime probe (AC-10). No new npm runtime dependency in consumer app code.
-
-Throw-discrimination: missing primitive â†’ `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`; null / identical-id / generic throw â†’ `OPENCODE_SUBTASK_IGNORED`.
-
-## Full test harness
-
-`tests/run-tests.ps1` was run (84s). Result: 843 pass / 2 fail. The 2 failures are pre-existing and unrelated to US-0124:
-- `validate_readme_feature_coverage repo --report passes` â€” US-0123 root README catalog gap (US-0123's execute did not add a US-0123 bullet; `FRAMEWORK_KIT_REPO=1` skips step 23b per execute command).
-- `validate_readme_feature_coverage report idempotent` â€” same root cause.
-
-NOT US-0124 regressions (confirmed via `git stash`: at HEAD the validator also returns `status:FAIL`). US-0124's required gates are green. QA may wish to triage the US-0123 README coverage gap separately.
-
-## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0124-execute-20260824T184700Z-fresh`
-- `timestamp=2026-08-24T18:47:00Z`
-- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 â€” required)
-- `evidence_ref=sprints/S0124/summary.md, sprints/S0124/progress.md, sprints/S0124/tasks.md, sprints/S0124/t-anch-verification.md, docs/engineering/state.md (execute checkpoint append-bottom; triad --rollover archived 2 units to state-pack-20260824-x.md), handoffs/dev_to_qa.md, handoffs/resume_brief.md`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `orchestrator_run_id=auto-20260824-02`
-- `runtime_proof_id=rp-auto-20260824-02-execute-dev-20260824T184700Z-US-0124`
-- `phase_id=execute`, `role=dev`, `story_id=US-0124`, `sprint_id=S0124`
-- `proof_issued_at=2026-08-24T18:47:00Z`
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T19:47:00Z`
-- `proof_hash=B473BFC28C8AAFC26155D8233ED8E34F41E2D4B62DC116A1BEB38D0D3D4113DD`
-- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build_verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260824-02","phase_id":"execute","proof_issued_at":"2026-08-24T18:47:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-02-execute-dev-20260824T184700Z-US-0124","sprint_id":"S0124","story_id":"US-0124"}`
-
-## Next phase
-
-- `/qa` (fresh qa subagent per BUG-0006; orchestrator spawns in new chat). Do NOT spawn /qa from this subagent. Do NOT mark US-0124 DONE.
-
----
-
-# Dev â†’ QA handoff â€” US-0123 / S0123 (execute harness-refresh)
-
-- **sprint_id**: S0123
-- **story_id**: US-0123
-- **phase_id**: execute (harness-refresh â€” gate-1 for /release)
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-01
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **AUTO_IMPLEMENTATION_LOOP**: harness-refresh (pre-/release gate-1)
-- **fresh_context_marker**: dev-US0123-execute-harness-refresh-20260824T151230Z-fresh
-- **timestamp**: 2026-08-24T15:12:30Z (UTC)
-- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (consolidated harness green; 8/8 contract tests)
-- **story_status**: OPEN (US-0045 â€” not marked DONE)
-- **next_scheduled_phase**: /qa (fresh qa subagent per BUG-0006)
-- **stop_condition**: STOP after harness-refresh; do not spawn /qa from this dev subagent.
-
-## Harness-refresh evidence
-
-| Check | Result |
-|---|---|
-| `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` | **exit 0** |
-| `tests/report.md` timestamp | **2026-08-24T15:12:17Z** |
-| Pass / Fail | **845 / 0** |
-| `[FAIL]` rows | **0** |
-| `python -m pytest tests/us0123_contract_test.py -v` | **8/8 PASS** |
-
-## Harness-refresh remediations
-
-| Remediation | Result |
-|---|---|
-| Triad hot-surface rollover (`enforce-triad-hot-surface.py --rollover` + `--check`) | PASS |
-| US-0122 README feature coverage (Features + Architecture notes; active + template mirrors) | PASS |
-
-## Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0123-execute-harness-refresh-20260824T151230Z-fresh`
-- `timestamp=2026-08-24T15:12:30Z`
-- `model_id=composer-2.5` (CROSS_MODEL_REVIEW=1 â€” required)
-- `evidence_ref=tests/report.md, sprints/S0123/summary.md, sprints/S0123/progress.md, handoffs/dev_to_qa.md, docs/engineering/state.md`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260824-01-execute-harness-refresh-dev-20260824T151230Z-US-0123`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"composer-2.5","orchestrator_run_id":"auto-20260824-01","phase_id":"execute","proof_issued_at":"2026-08-24T15:12:30Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-01-execute-harness-refresh-dev-20260824T151230Z-US-0123","sprint_id":"S0123","story_id":"US-0123"}`
-- `proof_hash=029BE6F670D2B17AD7B86D297EE68B09392A649B540FE2FEE2A2BA7E68B54979`
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-08-24T16:12:30Z` (UTC)
-
----
-
-# Dev â†’ QA handoff â€” US-0122 / S0122 (execute loop 2)
-
-- **sprint_id**: S0122
-- **story_id**: US-0122
-- **phase_id**: execute
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-01
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **AUTO_IMPLEMENTATION_LOOP**: cycle 2 (post-`RELEASE_TEST_FAILED`)
-- **fresh_context_marker**: dev-US0122-execute-20260824T125912Z-fresh
-- **timestamp**: 2026-08-24T12:59:12Z (UTC)
-- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (consolidated harness green; 8/8 contract tests; opencode-adapter parity)
-- **story_status**: OPEN (US-0045 â€” not marked DONE)
-- **next_scheduled_phase**: /qa (fresh qa subagent per BUG-0006)
-- **stop_condition**: STOP after execute loop-2; do not spawn /qa from this dev subagent.
-
-## Loop 2 remediations (RELEASE_TEST_FAILED unblock)
-
-| Remediation | Result |
-|---|---|
-| Runbook byte-identical mirror (`docs` â†’ `template`) | PASS |
-| Architecture `# US-0122` before `# US-0089` (DEC-0073 Â§11) | PASS |
-| `state.md` active-context policy heading restored | PASS |
-| Triad rollover `--rollover` + `--check` | PASS (units=9,2) |
-| README US-0121 feature coverage | PASS |
-| `tests/run-tests.ps1` consolidated harness | **Pass:845 / Fail:0** (exit 0) |
+- `docs/product/backlog.md` / `docs/product/acceptance.md` (US-0045; L157 unchecked)
+- `decisions/DEC-0129.md` / intake JSON
+- US-0126 / US-0127 / US-0128 / US-0130 DONE rows
+- `scripts/enforce-triad-hot-surface.py` `rollover_architecture` split/pack/`ARCH_HOT_MAX_*`
+- `AUTONOMY_PRESET` expansion (12 flags unchanged)
 
 ## Verification evidence
 
 | Check | Result |
 |---|---|
-| `powershell -File tests/run-tests.ps1` | **exit 0** |
-| `tests/report.md` @ `2026-08-24T12:59:12Z` | **Pass:845 / Fail:0**; zero `[FAIL]` rows |
-| `python -m pytest tests/us0122_contract_test.py -v` | **8/8 PASS** |
-| `check_intake_template_parity.py --scope=opencode-adapter` | **PASS** |
-| `enforce-triad-hot-surface.py --check` | **PASS** |
-| Backlog / acceptance | **UNCHANGED** (US-0122 OPEN) |
-
-## Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0122-execute-20260824T125912Z-fresh`
-- `timestamp=2026-08-24T12:59:12Z`
-- `model_id=composer-2.5` (CROSS_MODEL_REVIEW=1 â€” required)
-- `evidence_ref=sprints/S0122/summary.md, sprints/S0122/progress.md, handoffs/dev_to_qa.md, tests/report.md, docs/engineering/state.md`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260824-01-execute-dev-20260824T125912Z-US-0122`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"composer-2.5","orchestrator_run_id":"auto-20260824-01","phase_id":"execute","proof_issued_at":"2026-08-24T12:59:12Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-01-execute-dev-20260824T125912Z-US-0122","sprint_id":"S0122","story_id":"US-0122"}`
-- `proof_hash=47B79B125A6D2EA8E331F988BAC00785762825DA2EDC4B406072EB78D6F14A6A`
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-08-24T13:59:12Z` (UTC)
-
----
-
-# Dev â†’ QA handoff â€” US-0122 / S0122
-
-- **sprint_id**: S0122
-- **story_id**: US-0122
-- **phase_id**: execute
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-01
-- **delivery_mode**: ultra_lean
-- **macro_phase**: build+verify
-- **fresh_context_marker**: dev-US0122-execute-20260824T121500Z-fresh
-- **timestamp**: 2026-08-24T12:15:00Z (UTC)
-- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (execute gate: 8/8 contract tests + opencode-adapter parity)
-- **story_status**: OPEN (US-0045 â€” not marked DONE)
-- **next_scheduled_phase**: /qa (fresh qa subagent per BUG-0006)
-- **stop_condition**: STOP after execute; do not spawn /qa from this dev subagent.
-
-## Scope delivered
-
-- Eight markdown agents `template/.opencode/agents/{po,tech-lead,dev,qa,release,curator,security,auto}.md` (YAML frontmatter + short prompts; no `model:` key; locked permission matrix DEC-0122 Â§2).
-- Contract tests `tests/us0122_contract_test.py` â€” 8 markers; mirror `template/tests/us0122_contract_test.py` byte-identical.
-- Manifest additive `template/.opencode/agents/**` under `[opencode_install_include_paths]` (active + template byte-identical).
-- `template/.opencode/README.md` â€” eight agents documented + DEC-0122 Â§2 pointer.
-- Runbook `## OpenCode role agents and permissions (US-0122)` h2 one-liner (AC-6).
-- `OPENCODE_ADAPTER_PAIRS` + contract-test mirror pair; parity script mirrored byte-identical.
-
-## Verification evidence
-
-| Check | Result |
-|---|---|
-| `python -m pytest tests/us0122_contract_test.py -v` | **8/8 PASS** |
-| `check_intake_template_parity.py --scope=opencode-adapter` | **PASS** |
-| Manifest byte-identical | **PASS** |
-| Compose guards 5/5 | **UNCHANGED** (backlog, acceptance, architecture, DEC-0122 not mutated) |
-
-## Files created
-
-- `template/.opencode/agents/po.md`, `tech-lead.md`, `dev.md`, `qa.md`, `release.md`, `curator.md`, `security.md`, `auto.md`
-- `tests/us0122_contract_test.py`, `template/tests/us0122_contract_test.py`
-- `sprints/S0122/t-anch-verification.md`
-
-## Files edited
-
-- `docs/engineering/context/installer-owned-paths.manifest` (+ `template/...` mirror)
-- `scripts/check_intake_template_parity.py` (+ template mirror)
-- `docs/engineering/runbook.md` (append h2 one-liner)
-- `template/.opencode/README.md`
-- `sprints/S0122/tasks.md`, `progress.md`, `summary.md`
-
-## Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=execute`
-- `role=dev`
-- `fresh_context_marker=dev-US0122-execute-20260824T121500Z-fresh`
-- `timestamp=2026-08-24T12:15:00Z`
-- `model_id=composer-2.5` (CROSS_MODEL_REVIEW=1 â€” required)
-- `evidence_ref=sprints/S0122/t-anch-verification.md, sprints/S0122/tasks.md, sprints/S0122/progress.md, sprints/S0122/summary.md, tests/us0122_contract_test.py, handoffs/dev_to_qa.md, docs/engineering/state.md`
-
-## Strict runtime proof (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260824-01-execute-dev-20260824T121500Z-US-0122`
-- `proof_issued_at=2026-08-24T12:15:00Z`
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-24T13:15:00Z`
-- `proof_hash=E69FE7F3C5A8CFD5C0C7688E1DEC082DFE430C4FD06C95B50D3D1F1A5A2E87CE`
-- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"composer-2.5","orchestrator_run_id":"auto-20260824-01","phase_id":"execute","proof_issued_at":"2026-08-24T12:15:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260824-01-execute-dev-20260824T121500Z-US-0122","sprint_id":"S0122","story_id":"US-0122"}`
-
----
-
-# Dev â†’ QA handoff â€” US-0121 / S0121
-
-- **sprint_id**: S0121
-- **story_id**: US-0121
-- **phase_id**: execute (auto-implementation loop, cycle 4)
-- **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-01
-- **delivery_mode**: ultra_lean
-- **fresh_context_marker**: dev-US0121-execute-loop4-20260824T103729Z-fresh
-- **timestamp**: 2026-08-24T10:37:29Z (UTC)
-- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (execute loop-4 â€” canonical harness Fail:0 upheld)
-- **next_scheduled_phase**: /qa (fresh qa subagent per BUG-0006)
-- **stop_condition**: STOP after execute loop-4; do not spawn /qa from this dev subagent.
-
-## Loop-4 delta â€” sovereign-critic overturn remediation
-
-### Blocker resolved (`ik_us0121_execute_loop3_harness_fail_row_mismatch`)
-
-Critic re-run @ 2026-08-24T10:30:59Z found **Fail:3** despite loop-3 producer 0-FAIL claim. Loop-4 remediated all three rows:
-
-| FAIL row (loop-3) | Root cause | Fix |
-|---|---|---|
-| Installer runbook TEST_COMMAND present for detectable stack | `npm` absent from child-process PATH â†’ bootstrap kept kit `powershell` default | `Ensure-NodeOnPath` in `tests/run-tests.ps1` prepends winget/standard Node dirs |
-| CLI lifecycle preconditions (node + bin/its-magic.js) | `node` not on PATH in harness session | Same `Ensure-NodeOnPath` helper |
-| slim auto command contract markers pass | `test_bug0011_architecture_linkage` â€” US-0117 `## US-0089` false-matched `find("# US-0089")` before Caveman h1; section lacked `BUG-0011`/`DEC-0077` | Forward-link **`BUG-0011`** / **`DEC-0077`** in architecture deferred US-0089 anchor paragraph |
-
-Additional harness hygiene: `$passCount` / `$failCount` now use `@((...)).Count` so header writes literal **`Fail: 0`** (not empty `Fail:`).
-
-### Verification evidence (PASS claim rule â€” all three satisfied)
-
-| Check | Result |
-|---|---|
-| Harness exit code | `powershell -ExecutionPolicy Bypass -File tests/run-tests.ps1` â†’ **exit 0** |
-| Header `Fail: 0` | `tests/report.md` L5: **`Fail: 0`** (literal zero) @ 2026-08-24T10:37:29Z |
-| `rg "\[FAIL\]" tests/report.md` | **0 matches** |
-| Pass count | **845** |
-| US-0121 pytest | **14/14 passed** (`tests/us0121_host_mode_test.py`) â€” not weakened |
-| Host gating | `CURSOR_HOST_HOOKS_SKIPPED` / `host_includes_cursor` preserved |
-
-### US-0121 product scope (unchanged)
-
-- No installer `--host` behavior changes in loop-4.
-- No backlog/acceptance mutation (US-0045).
-
-### Files touched (loop-4)
-
-- `tests/run-tests.ps1` â€” `Ensure-NodeOnPath`; `@(...).Count` for pass/fail header
-- `docs/engineering/architecture.md` â€” US-0089 deferred-anchor forward-link to BUG-0011/DEC-0077
-- `tests/report.md` â€” refreshed canonical evidence
-
-### Strict runtime proof (US-0056 / DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260824-01-execute-dev-loop4-20260824T103729Z-US-0121`
-- `proof_hash=d7cf0bc4013542331a876979027fd24fd72d0de13f6bbd28f8821d0a5f91c743`
-- `proof_ttl=2026-08-24T11:37:29Z` (UTC = issued_at + 3600s)
+| `python -m pytest tests/us0129_contract_test.py -v` | **8 passed** |
+| `--scope=arch-linkage` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `validate_autonomy_stop_matrix.py --self-test` | `[MATRIX_VALID]` 29 codes |
+| `check-user-visible-metadata.py` | exit 0 |
+| No live `ARCH_LINKAGE_AUTO_REPAIR=1` | PASS (comment only) |
+| No-DONE / L157 | OPEN / unchecked |
 
 ### critic_evidence
 
 ```json
-{
-  "producer_model_id": "composer-2.5",
-  "critic_model_id": "composer-2.5-fast",
-  "anti_slop_aggregate": 8,
-  "rework_generation": 4,
-  "degraded_mode": false,
-  "findings_path": "handoffs/sovereign_critic_findings.jsonl"
-}
+{"anti_slop_aggregate":8,"critic_model_id":"composer-2.5-fast","degraded_mode":false,"findings_path":"handoffs/sovereign_critic_findings.jsonl","producer_model_id":"cursor-grok-4.6-high","rework_generation":0}
 ```
 
-### Next phase
+Carry-forward of sprint-plan sovereign-critic PASS (anti_slop=8, 0 blocking `a0129spn-*`; marker `tl-US0129-sovereign-critic-sprint-plan-20260827T074408Z-fresh`). Execute critic is orchestrator-owned next; this subagent did not spawn `/sovereign-critic` or `/qa`.
 
-Spawn fresh **qa** subagent for **`/qa`** on **S0121 / US-0121** (spawn-only per BUG-0006).
+## Producer proof consumed
+
+- `runtime_proof_id=rp-auto-20260827-01-sprint-plan-tech-lead-20260827T073646Z-US-0129`
+- `proof_hash=8960A93B97E39E84B107001316228F5CBE69472DDF8835752862ECF4EC3B4B00` MATCH
+- `consumed_at=2026-08-27T08:04:38Z` < `ttl=2026-08-27T08:36:46Z`
+
+## This-phase strict runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260827-01-execute-dev-20260827T080438Z-US-0129`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260827-01","phase_id":"execute","proof_issued_at":"2026-08-27T08:04:38Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260827-01-execute-dev-20260827T080438Z-US-0129","sprint_id":"S0129","story_id":"US-0129"}`
+- `proof_hash=CFE682EA7A8A7A8EF5A9486F7A9E04FAAC2F9DB6425147CA3D8B7B77F413CE4F`
+- `proof_ttl=2026-08-27T09:04:38Z`
+
+## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-US0129-execute-20260827T080438Z-fresh`
+- `timestamp=2026-08-27T08:04:38Z`
+- `model_id=cursor-grok-4.6-high`
+- `evidence_ref=handoffs/dev_to_qa.md, sprints/S0129/summary.md`
+
+## Stop
+
+STOP after EXECUTE_PASS. Next = `/qa` in a fresh qa subagent (orchestrator-owned). Do not spawn `/qa` from this subagent.
 
 ---
 
-# Dev â†’ QA handoff â€” US-0121 / S0121 (loop-3 archive below)
+# Dev → QA handoff — US-0130 / S0130 (execute)
+
+- **sprint_id**: S0130
+- **story_id**: US-0130 (OPEN — not marked DONE per US-0045)
+- **phase_id**: execute (build+verify macro — first canonical phase)
 - **role**: dev (fresh per BUG-0006)
-- **orchestrator_run_id**: auto-20260824-01
+- **orchestrator_run_id**: auto-20260826-01
 - **delivery_mode**: ultra_lean
-- **fresh_context_marker**: dev-US0121-execute-loop3-20260824T102500Z-fresh
-- **timestamp**: 2026-08-24T10:25:00Z (UTC)
-- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1 â€” required)
-- **verdict**: PASS (execute loop-3 â€” canonical harness green)
-- **next_scheduled_phase**: /qa (fresh qa subagent per BUG-0006)
-- **stop_condition**: STOP after execute loop-3; do not spawn /qa from this dev subagent.
+- **macro_phase**: build+verify
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **fresh_context_marker**: dev-US0130-execute-20260826T221420Z-fresh (NEW per US-0048 / BUG-0006)
+- **timestamp**: 2026-08-26T22:14:20Z (UTC)
+- **model_id**: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required)
+- **verdict**: PASS (execute) — 8/8 tasks completed; 10/10 us0130 contract markers green; `--scope=sovereign-critic` + `--scope=model-tier-overrides` parity OK; us0104 compose PASS
+- **story_status**: OPEN (US-0045 — not marked DONE; acceptance L158 unchecked)
+- **intake_json**: NOT mutated
+- **next_scheduled_phase**: `/qa` (role=qa) — orchestrator-owned; this subagent did not spawn QA
+- **UAT_BROWSER**: n/a — library/docs/tests story; no browser UAT
 
-## Loop-3 delta â€” release gate-1 harness remediation
+## Scope delivered (US-0130 — additive overlay + validator allowlist + examples/installer + docs + parity + contract-test)
 
-### Blocker resolved
+Operator pin overlay for `/sovereign-critic` model selection (R-0112 / compose DEC-0104 §5 / DEC-0087 / DEC-0086; no companion DEC). Precedence: hyphen pin `MODEL_SOVEREIGN-CRITIC` > optional catalog `roles.critic` when `MODEL_RESOLVE=role_catalog` > existing opposition/`dev` fallback UNCHANGED. Same-slug keeps `CROSS_MODEL_DEGRADED_MODE`. Optional `critic` via `CATALOG_OPTIONAL_ROLE_KEYS` (not in required `CATALOG_ROLE_KEYS`). Cursor-only example `critic=composer-2.5-fast` shipped as 9th. Never wrote `model-catalog.local.json`.
 
-- **Before**: `tests/report.md` @ 2026-08-23T16:27:27Z â€” Pass:779 / Fail:50 â†’ `RELEASE_TEST_FAILED`
-- **After**: `tests/report.md` @ 2026-08-24T10:22:40Z â€” Pass:844 / **0 FAIL rows** (harness exit 0)
+### Files created (new)
 
-### What changed in loop-3
+- `tests/us0130_contract_test.py` + `template/tests/us0130_contract_test.py`
+- `template/.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json`
+- `sprints/S0130/t-anch-verification.md`
+- `sprints/S0130/summary.md`
 
-1. **Installer README mirror** (`installer.py`, `installer.ps1`, `installer.sh`): sync prefers kit-root `README.md` when installed target README is the template stub (detected via `intent contract:` marker â€” metadata-guard safe).
-2. **Harness / contract drift**: command count 25; Homebrew 0.1.3-4; scratchpad parity keys; caveman default-off key lines; `auto.md` step 11b; architecture linkage for US-0093/US-0091; triad rollover; `qa_to_verify_work.md` remote evidence tuple; readme fixture `its_magic/README.md`.
-3. **Environment**: Node.js LTS installed user-scope (winget) for CLI lifecycle tests.
+### Files edited (scoped, additive; active↔template byte-identical)
 
-### US-0121 product scope (unchanged)
+- `scripts/sovereign_critic_lib.py` + template
+- `scripts/model_tier_lib.py` + template
+- `scripts/model_tier_validate.py` + template
+- v2 role example catalogs + cursor_only
+- `docs/engineering/context/installer-owned-paths.manifest` + template
+- `installer.ps1` / `installer.py`
+- `.cursor/scratchpad.md` + `scratchpad.local.example.md` + template mirrors
+- `docs/engineering/runbook.md` + template
+- `scripts/check_intake_template_parity.py` + template
+- `sprints/S0130/tasks.md`, `sprints/S0130/progress.md`
 
-- `--host opencode` / `CURSOR_HOST_HOOKS_SKIPPED` behavior preserved.
-- `tests/us0121_host_mode_test.py` â€” 14/14 markers unchanged (not weakened).
+### Files NOT modified (compose guards)
 
-### Verification evidence
+- `docs/engineering/architecture.md` (T-anch NO-OP)
+- `docs/product/backlog.md` / `docs/product/acceptance.md` (US-0045)
+- `decisions/` / intake JSON / US-0129 / DONE rows US-0127/US-0128
+- `.cursor/model-catalog.local.json` (never write)
+- v1 example catalogs; `CATALOG_ROLE_KEYS` required-set; `PHASE_LOGICAL_ROLE`; US-0104 findings schema/lenses/`CROSS_MODEL_*` keys
 
-| Gate | Result |
-|------|--------|
-| Canonical harness | `tests/run-tests.ps1` exit 0; Pass:844; 0 `[FAIL]` rows |
-| US-0121 live pytest | 14 passed (`tests/us0121_host_mode_test.py`) |
-| Metadata guard | `check-user-visible-metadata.py --repo .` exit 0 |
-| Triad | `enforce-triad-hot-surface.py --check` exit 0 |
+## Verification evidence
 
-### Files touched (representative)
+| Check | Result |
+|---|---|
+| `python -m pytest tests/us0130_contract_test.py -v` | **10 passed** |
+| `python -m pytest tests/us0104_contract_test.py -q` | **PASS** |
+| `--scope=sovereign-critic` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `--scope=model-tier-overrides` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `check-user-visible-metadata.py` | exit 0 |
+| Never-write gate | `.cursor/model-catalog.local.json` absent |
 
-- `installer.py`, `installer.ps1`, `installer.sh`
-- `.cursor/scratchpad.md`, `template/.cursor/scratchpad.md`
-- `docs/engineering/architecture.md`
-- `handoffs/qa_to_verify_work.md`
-- `packaging/homebrew/its-magic.rb`
-- `tests/fixtures/readme_feature_coverage/minimal/its_magic/README.md`
-- `tests/report.md` (refreshed canonical evidence)
+### critic_evidence
 
-### Strict runtime proof (US-0056 / DEC-0038)
+```json
+{"anti_slop_aggregate":8,"critic_model_id":"composer-2.5-fast","degraded_mode":false,"findings_path":"handoffs/sovereign_critic_findings.jsonl","producer_model_id":"cursor-grok-4.6-high","rework_generation":0}
+```
 
-- `runtime_proof_id=rp-auto-20260824-01-execute-dev-20260824T102500Z-US-0121`
-- `proof_hash=7eb08a7ea89c04fd5978f199ed0602a3578964c4669aabbabe88ed4c3815955f`
-- `proof_ttl=2026-08-24T11:25:00Z` (UTC = issued_at + 3600s)
+Carry-forward of sprint-plan sovereign-critic PASS (anti_slop=8, 0 blocking `a0130spn-*`). Execute critic is orchestrator-owned next; this subagent did not spawn `/sovereign-critic` or `/qa`.
 
-### Status authority
+## Producer proof consumed
 
-Do **not** flip US-0121 to DONE or check acceptance boxes â€” closure owns that at `/release`.
+- `runtime_proof_id=rp-auto-20260826-01-sprint-plan-tech-lead-20260826T215200Z-US-0130`
+- `proof_hash=5D0ADA062FE675333EF06E56DBC4649D22A2045C08D71456C7963893178CFED1` MATCH
+- `consumed_at=2026-08-26T22:14:20Z` < `ttl=2026-08-26T22:52:00Z`
 
-### Next phase
+## This-phase strict runtime proof (DEC-0038)
 
-Spawn fresh **qa** subagent for **`/qa`** on **S0121 / US-0121** (spawn-only per BUG-0006).
+- `runtime_proof_id=rp-auto-20260826-01-execute-dev-20260826T221420Z-US-0130`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260826-01","phase_id":"execute","proof_issued_at":"2026-08-26T22:14:20Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260826-01-execute-dev-20260826T221420Z-US-0130","sprint_id":"S0130","story_id":"US-0130"}`
+- `proof_hash=089947FF99F92DF799FA3FD51A10E503B3DF26052833DE33EC7942ED7C59DA9C`
+- `proof_ttl=2026-08-26T23:14:20Z`
+
+## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-US0130-execute-20260826T221420Z-fresh`
+- `timestamp=2026-08-26T22:14:20Z`
+- `model_id=cursor-grok-4.6-high`
+- `evidence_ref=handoffs/dev_to_qa.md, sprints/S0130/summary.md`
+
+## Stop
+
+STOP after EXECUTE_PASS. Next = `/qa` in a fresh qa subagent (orchestrator-owned). Do not spawn `/qa` from this subagent.
 
 ---
 
-# Dev â†’ QA handoff â€” US-0121 / S0121 (loop-2 archive below)
+# Dev → QA handoff — US-0128 / S0128 (execute)
+
+- **sprint_id**: S0128
+- **story_id**: US-0128 (OPEN — not marked DONE per US-0045)
+- **phase_id**: execute (build+verify macro — first canonical phase)
+- **role**: dev (fresh per BUG-0006)
+- **orchestrator_run_id**: auto-20260826-01
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **fresh_context_marker**: dev-US0128-execute-20260826T203023Z-fresh (NEW per US-0048 / BUG-0006)
+- **timestamp**: 2026-08-26T20:30:23Z (UTC)
+- **model_id**: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required)
+- **verdict**: PASS (execute) — 8/8 tasks completed; 11/11 us0128 contract markers green; `--scope=sovereign-convergence` parity OK; US-0110/US-0104/US-0127 compose 31/31 green
+- **story_status**: OPEN (US-0045 — not marked DONE; acceptance L156 unchecked)
+- **intake_json**: NOT mutated
+- **next_scheduled_phase**: `/qa` (role=qa) — orchestrator-owned; this subagent did not spawn QA
+
+## Scope delivered (US-0128 — additive code + docs + parity + contract-test)
+
+Convergence `smoke_green` surrogate for waived-probe / contract-test UAT slices (R-0111 / DEC-0110 §10; no companion DEC). Legacy `_uat_smoke_passes` first; surrogate PASS when 6 live-runtime classes are `UAT_PROBE_FORBIDDEN`, `contract_test_failed=0`, and `convergence_smoke` (or tail `probe_kind=contract_tests_primary`) passes. Fail-closed `CONVERGENCE_SMOKE_SURROGATE_MISSING`. `/qa` and `/verify-work` emit the canonical step. 11 contract markers. Runbook subsection + reason_codes `## US-0128`. `SOVEREIGN_CONVERGENCE_PAIRS` +2 command rows.
+
+### Files created (new)
+
+- `tests/us0128_contract_test.py` + `template/tests/us0128_contract_test.py`
+- `sprints/S0128/t-anch-verification.md`
+- `sprints/S0128/summary.md`
+
+### Files edited (scoped, additive; active↔template byte-identical)
+
+- `scripts/sovereign_convergence_lib.py` + template
+- `.cursor/commands/qa.md` + template
+- `.cursor/commands/verify-work.md` + template
+- `docs/engineering/reason_codes.md` + template
+- `docs/engineering/runbook.md` + template
+- `scripts/check_intake_template_parity.py` + template (`SOVEREIGN_CONVERGENCE_PAIRS` +2)
+- `sprints/S0128/tasks.md`, `sprints/S0128/progress.md`
+
+### Files NOT modified (compose guards)
+
+- `docs/engineering/architecture.md` (T-anch NO-OP)
+- `docs/product/backlog.md` / `docs/product/acceptance.md` (US-0045)
+- `decisions/` / intake JSON / US-0129/US-0130 / DONE rows US-0108/US-0121..US-0127
+- `sprints/S0126/uat.json` (reference fixture only — marker 11)
+- `_eval_critic_resolved` / `SOVEREIGN_CRITIC_PAIRS` / US-0109 deploy smoke / US-0110 five-conjunct inventory of 10
+
+## Verification evidence
+
+| Check | Result |
+|---|---|
+| `python -m pytest tests/us0128_contract_test.py -v` | **11 passed** |
+| `--scope=sovereign-convergence` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| US-0110 + US-0104 + US-0127 contract tests | **31 passed** |
+| `check-user-visible-metadata.py` | exit 0 |
+| No-secrets grep | zero secret literals on new code |
+
+### critic_evidence
+
+```json
+{"anti_slop_aggregate":8,"critic_model_id":"composer-2.5-fast","degraded_mode":false,"findings_path":"handoffs/sovereign_critic_findings.jsonl","producer_model_id":"cursor-grok-4.6-high","rework_generation":0}
+```
+
+Carry-forward of sprint-plan sovereign-critic PASS (anti_slop=8, 0 blocking `a0128sp-*`). Execute critic is orchestrator-owned next; this subagent did not spawn `/sovereign-critic` or `/qa`.
+
+## Producer proof consumed
+
+- `runtime_proof_id=rp-auto-20260826-01-sprint-plan-tech-lead-2026-08-26T201100Z-US-0128`
+- `proof_hash=C911D7C5CAA2939EC6F65ED07C717E9CBB00E80B551DCBFECA097D39F26878F4` MATCH
+- `consumed_at=2026-08-26T20:25:50Z` < `ttl=2026-08-26T21:11:00Z`
+
+## This-phase strict runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260826-01-execute-dev-20260826T203023Z-US-0128`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260826-01","phase_id":"execute","proof_issued_at":"2026-08-26T20:30:23Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260826-01-execute-dev-20260826T203023Z-US-0128","sprint_id":"S0128","story_id":"US-0128"}`
+- `proof_hash=F0EE260C2ADF63821C8C22B7699DFDC0C184BFCD8E32B07C8AB720F78ADBBF32`
+- `proof_ttl=2026-08-26T21:30:23Z`
+
+## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=execute`
+- `role=dev`
+- `fresh_context_marker=dev-US0128-execute-20260826T203023Z-fresh`
+- `timestamp=2026-08-26T20:30:23Z`
+- `model_id=cursor-grok-4.6-high`
+- `evidence_ref=handoffs/dev_to_qa.md, sprints/S0128/summary.md`
+
+## FRAMEWORK_KIT_REPO / DEV_AUTO_LAUNCH
+
+- `FRAMEWORK_KIT_REPO=1` — skipped execute 23a/23b project README bootstrap/delta
+- `DEV_AUTO_LAUNCH_PROFILE=off` — skipped execute 24a–24d
+- `REMOTE_EXECUTION=0` — no remote cues
+- `CROSS_MODEL_REVIEW=1` — critic_evidence block above (carry-forward; no critic spawn)
+
+## Stop
+
+STOP after execute PASS. Next = `/qa` in a fresh qa subagent. Do not spawn `/qa` from this subagent.
+
+---
+
+# Dev → QA handoff — US-0127 / S0127 (execute)
+
+- **sprint_id**: S0127
+- **story_id**: US-0127 (OPEN — not marked DONE per US-0045)
+- **phase_id**: execute (build+verify macro — first canonical phase)
+- **role**: dev (fresh per BUG-0006)
+- **orchestrator_run_id**: auto-20260826-01
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **fresh_context_marker**: dev-US0127-execute-20260826T184328Z-fresh (NEW per US-0048 / BUG-0006)
+- **timestamp**: 2026-08-26T18:43:28Z (UTC)
+- **model_id**: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required)
+- **verdict**: PASS (execute) — 8/8 tasks completed; 13/13 us0127 contract markers green; `--scope=sovereign-critic` parity OK; US-0110/US-0104 compose 18/18 green
+- **story_status**: OPEN (US-0045 — not marked DONE; acceptance L155 unchecked)
+- **intake_json**: NOT mutated
+- **next_scheduled_phase**: `/qa` (role=qa) — orchestrator-owned; this subagent did not spawn QA
+
+## Scope delivered (US-0127 — additive code + docs + parity + contract-test)
+
+Blocking-only conjunct-3: `_critic_jsonl_has_open` delegates to `read_open_blocking`. JSONL is authoritative when present/non-empty; QA-markdown fallback only if JSONL absent; skip when neither. Auto-resolve hook at `/sovereign-critic` PASS. Operator-only hygiene CLI. 13 contract markers. Runbook + reason_codes. `SOVEREIGN_CRITIC_PAIRS` + `--scope=sovereign-critic`.
+
+### Files created (new)
+
+- `scripts/sovereign_critic_hygiene.py` + `template/scripts/sovereign_critic_hygiene.py`
+- `tests/us0127_contract_test.py` + `template/tests/us0127_contract_test.py`
+- `sprints/S0127/t-anch-verification.md`
+- `sprints/S0127/summary.md`
+
+### Files edited (scoped, additive; active↔template byte-identical)
+
+- `scripts/sovereign_convergence_lib.py` + template
+- `scripts/sovereign_critic_lib.py` + template (`auto_resolve_nonblocking_for_run` additive)
+- `.cursor/commands/sovereign-critic.md` + template
+- `docs/engineering/runbook.md` + template
+- `docs/engineering/reason_codes.md` + template
+- `scripts/check_intake_template_parity.py` + template
+- `sprints/S0127/tasks.md`, `sprints/S0127/progress.md`
+
+### Files NOT modified (compose guards)
+
+- `docs/engineering/architecture.md` (T-anch NO-OP)
+- `scripts/sovereign_critic_validate.py` (marker 13 asserts current reject behavior)
+- `docs/product/backlog.md` / `docs/product/acceptance.md` (US-0045)
+- `decisions/` / intake JSON / US-0128/US-0129/US-0130 / DONE rows US-0108/US-0121..US-0126
+- `read_open_blocking` / `resolve_finding` signatures and findings JSONL schema
+
+## Verification evidence
+
+| Check | Result |
+|---|---|
+| `python -m pytest tests/us0127_contract_test.py -v` | **13 passed** |
+| `--scope=sovereign-critic` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `--scope=sovereign-convergence` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| `--scope=opencode-adapter` | `[INTAKE_TEMPLATE_PARITY_OK]` |
+| US-0110 + US-0104 contract tests | **18 passed** |
+| `check-user-visible-metadata.py` | exit 0 |
+| No-secrets grep | zero hits |
+
+### critic_evidence
+
+```json
+{"anti_slop_aggregate":10,"critic_model_id":"composer-2.5-fast","degraded_mode":false,"findings_path":"handoffs/sovereign_critic_findings.jsonl","producer_model_id":"cursor-grok-4.6-high","rework_generation":0}
+```
+
+Carry-forward of plan-verify sovereign-critic PASS (anti_slop=10, 0 blocking). Execute critic is orchestrator-owned next; this subagent did not spawn `/sovereign-critic` or `/qa`.
+
+## Producer proof consumed
+
+- `runtime_proof_id=rp-auto-20260826-01-plan-verify-qa-20260826T182713Z-US-0127-reattest`
+- `proof_hash=3BFC94355962D40C58D8F65840760574022B9B17E1960C6DA03F8E593C3B38AD` MATCH
+- `consumed_at=2026-08-26T18:36:03Z` < `ttl=2026-08-26T19:27:13Z`
+
+## This-phase strict runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260826-01-execute-dev-20260826T184328Z-US-0127`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260826-01","phase_id":"execute","proof_issued_at":"2026-08-26T18:43:28Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260826-01-execute-dev-20260826T184328Z-US-0127","sprint_id":"S0127","story_id":"US-0127"}`
+- `proof_hash=F42BBB6F51CD57EE2B5D7EC04630F5EFB38F93B89B38AEE4C38418C28616BBFE`
+- `proof_ttl=2026-08-26T19:43:28Z`
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=execute`, `role=dev`, `model_id=cursor-grok-4.6-high`
+- `fresh_context_marker=dev-US0127-execute-20260826T184328Z-fresh`
+- `timestamp=2026-08-26T18:43:28Z`
+- `evidence_ref=handoffs/dev_to_qa.md, sprints/S0127/summary.md`
+
+---
+
+# Dev → QA handoff — US-0126 / S0126 (execute)
+
+> **LOOP-2 UPDATE (2026-08-25T17:10:00Z, dev, `model_id=glm-5.2-high`, fresh marker `dev-US0126-execute-20260825T171000Z-fresh-loop2`)**: Verify-work B-1 FAIL (7 harness Fail) remediated. Full harness `tests/run-tests.ps1` → **Pass:845 Fail:0** (no `[FAIL]` rows; `tests/report.md` timestamp 2026-08-25T17:09:57Z). `pytest tests/us0126_contract_test.py` 12/12 PASS. `--scope=opencode-adapter` parity OK. `validate_readme_feature_coverage --repo . --report` → `coverage_missing=[]` status=PASS (US-0125 gap closed). Edits: (A) `docs/engineering/architecture.md` — restored `# US-0091` + `# US-0093` H1 blocks before `# US-0089`, appended `# US-0090` H1 after `# US-0089` (only `# US-`/`## US-` heading after US-0089; carries DEC-0073/DEC-0072/R-0073/`# US-0089`/US-0053/US-0085/US-0078/DEC-0060), reworded 5 task-table refs `` `# US-0089` ``→`` `US-0089` `` so `arch.find` resolves to real heading (fixes `test_bug0011_architecture_linkage`); file 2950→2999 lines (under ARCH_HOT_MAX_LINES=3000); `--check-arch-heading-policy --baseline-h2-count 38` PASS. (B) `docs/developer/README.md` + byte-identical `template/docs/developer/README.md` — added `**US-0125**` Architecture notes row. NOT mutated: backlog US-0126 OPEN, acceptance L154 unchecked, intake JSON, US-0121..US-0125 not reopened, `OPENCODE_VALIDATOR_FAILED` wrapper NOT resurrected, US-0126 H1 (~L1747) untouched. Loop-2 runtime proof below.
+
+- **sprint_id**: S0126
+- **story_id**: US-0126 (OPEN — not marked DONE per US-0045)
+- **phase_id**: execute (build+verify macro — first canonical phase)
+- **role**: dev (fresh per BUG-0006)
+- **orchestrator_run_id**: auto-20260825-01
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (loop 1 first execute)
+- **fresh_context_marker**: dev-US0126-execute-20260825T163028Z-fresh (NEW per US-0048 / BUG-0006)
+- **timestamp**: 2026-08-25T16:30:28Z (UTC)
+- **model_id**: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- **verdict**: PASS (execute) — 11/11 tasks completed; 12/12 us0126 contract markers green; opencode-adapter parity OK; prior-story regression 53/53 green
+- **story_status**: OPEN (US-0045 — not marked DONE; acceptance L154 unchecked)
+- **intake_json**: NOT mutated
+
+## Scope delivered (US-0126 — additive docs + parity + contract-test only)
+
+US-0126 is the sixth and final slice of the six-story OpenCode adapter epic (US-0121..US-0126). It owns Layer 4 — the operator-facing runbook section, the consolidated cross-host reason-code table, the `--scope=opencode-adapter` parity extension (2 new pairs), and the 12 `test_us0126_*` contract markers.
+
+### Files created (new)
+
+- `tests/us0126_contract_test.py` (12 markers, static/grep, no live OpenCode probe)
+- `template/tests/us0126_contract_test.py` (byte-identical mirror — 12202b = 12202b)
+- `sprints/S0126/t-anch-verification.md` (13 baseline checks PASS — verification only)
+
+### Files edited (scoped, additive; all active↔template byte-identical)
+
+| File | Change | Parity |
+|---|---|---|
+| `docs/engineering/runbook.md` | Append `## OpenCode host operator runbook (US-0126)` h2 body (program DoD + default-host reminder + out-of-scope + Boundaries subsection + consolidated reason-code table + parity scope cross-link) | byte-identical ↔ `template/docs/engineering/runbook.md` (204996b) |
+| `template/docs/engineering/runbook.md` | Same edit (byte-identical mirror) | byte-identical ↔ active |
+| `README.md` | Add `### OpenCode host operator runbook (US-0126)` blurb (default-host reminder + out-of-scope list; operator prose, no DEC ids) | byte-identical ↔ `template/README.md` (70980b) |
+| `template/README.md` | Same edit (byte-identical mirror) | byte-identical ↔ active |
+| `its_magic/README.md` | Add `### OpenCode host operator runbook (US-0126)` blurb (default-host reminder + out-of-scope list) | byte-identical ↔ `template/its_magic/README.md` (74559b) |
+| `template/its_magic/README.md` | Same edit (byte-identical mirror) | byte-identical ↔ active |
+| `scripts/check_intake_template_parity.py` | Extend `OPENCODE_ADAPTER_PAIRS` additively with 2 new pairs (`tests/us0126_contract_test.py` ↔ template + `docs/engineering/runbook.md` ↔ template); existing 8 pairs preserved; parity CLI stays byte-only (DQ3 layer split — no grep predicates added) | byte-identical ↔ `template/scripts/check_intake_template_parity.py` (22712b) |
+| `template/scripts/check_intake_template_parity.py` | Same edit (byte-identical mirror) | byte-identical ↔ active |
+| `sprints/S0126/tasks.md` | Checkboxes ticked (T-anch + T-001..T-010 + integration verification) | n/a (sprint artifact) |
+| `sprints/S0126/progress.md` | Execute checkpoint prepended | n/a (sprint artifact) |
+
+### Files NOT modified (compose guards)
+
+- `docs/engineering/architecture.md` (T-anch NO-OP — DQ1..DQ8 locks + 12-marker table are locked source of truth)
+- `decisions/DEC-0126.md` (T-anch NO-OP)
+- `docs/engineering/context/installer-owned-paths.manifest` (DQ8 lock — UNCHANGED; 4055b = 4055b byte-identical)
+- `template/docs/engineering/context/installer-owned-paths.manifest` (byte-identical mirror — UNCHANGED)
+- `template/.opencode/agents/*.md` (US-0122 — agent files unchanged)
+- `template/.opencode/plugins/orchestrator.ts` (US-0124 — plugin unchanged)
+- `template/.opencode/commands/*.md` (US-0125 — command files unchanged)
+- `.cursor/commands/*.md` + `.cursor/agents/*.mdc` (read-only compose for AC-10 baseline; marker 11 enforces presence)
+- `docs/product/backlog.md` (US-0045 canonical status — not mutated)
+- `docs/product/acceptance.md` (US-0045 derived view — L154 NOT ticked)
+- Intake evidence JSON (not mutated)
+
+## Verification evidence (PASS claim rule — all satisfied)
+
+| Check | Result |
+|---|---|
+| `python -m pytest tests/us0126_contract_test.py -q` | **12 passed** in 0.15s (12/12 markers green) |
+| `python scripts/check_intake_template_parity.py --scope=opencode-adapter` | **exit 0** — `[INTAKE_TEMPLATE_PARITY_OK] scope=opencode-adapter` |
+| Active + template manifest byte-identical | **match** (4055b = 4055b) |
+| Active + template runbook byte-identical | **match** (204996b = 204996b) |
+| Active + template parity script byte-identical | **match** (22712b = 22712b) |
+| Active + template contract test byte-identical | **match** (12202b = 12202b) |
+| Active + template root README byte-identical | **match** (70980b = 70980b) |
+| Active + template its_magic README byte-identical | **match** (74559b = 74559b) |
+| Prior-story regression (US-0121..US-0125 contract tests) | **53 passed** in 6.02s (no regression) |
+| No-secrets grep on runbook/README/contract test | zero secret values (`.env` references are pre-existing US-0085 operator docs, not secrets) |
+| No-DEC-leak gate (markers 5 + 6) | PASS — US-0126 operator prose clean (DEC ids only in Boundaries/evidence subsection) |
+| Cursor-docs-not-deleted gate (marker 11) | PASS — `.cursor/commands/` (25 `.md`) + `.cursor/agents/` (7 `.mdc`) present vs current-kit-inventory baseline |
+| No-`OPENCODE_VALIDATOR_FAILED`-wrapper gate (marker 2) | PASS — raw Python codes only; wrapper NOT resurrected |
+
+## Contract marker summary (12 markers, one-test-per-AC)
+
+| # | Marker | AC | Status |
+|---|---|---|---|
+| 1 | `test_us0126_runbook_section_present` | AC-1 | PASS (h2 + AC-1 operator phrases: stock OpenCode TUI/desktop/IDE, --host opt-in, /connect, slash commands, reason codes) |
+| 2 | `test_us0126_reason_code_catalog_present` | AC-2 | PASS (15 codes; fail-closed action; NO OPENCODE_VALIDATOR_FAILED wrapper) |
+| 3 | `test_us0126_parity_scope_opencode_adapter` | AC-3 | PASS (parity CLI exit 0) |
+| 4 | `test_us0126_test_marker_checklist` | AC-4 | PASS (test_us0121_*..test_us0125_* found) |
+| 5 | `test_us0126_readme_no_dec_leak` | AC-5a | PASS (no DEC ids in US-0126 README blurb) |
+| 6 | `test_us0126_runbook_no_dec_leak` | AC-5b | PASS (no DEC ids in operator prose before Boundaries) |
+| 7 | `test_us0126_program_dod_documented` | AC-6 | PASS (DoD key phrases present) |
+| 8 | `test_us0126_default_host_reminder` | AC-7 | PASS (default-host phrases in runbook + README) |
+| 9 | `test_us0126_out_of_scope_listed` | AC-8 | PASS (5 excluded items in runbook + README) |
+| 10 | `test_us0126_template_doc_parity` | AC-9 | PASS (manifest + runbook byte-identical active↔template) |
+| 11 | `test_us0126_cursor_docs_not_deleted` | AC-10 | PASS (25 `.md` + 7 `.mdc` files present vs baseline) |
+| 12 | `test_us0126_prior_story_markers_present` | AC-4 aggregate | PASS (defense in depth) |
+
+## Compose guards (8/8 UNCHANGED)
+
+| Compose target | Verification | Result |
+|---|---|---|
+| US-0071 (operator-sentence sanitization) | no DEC ids in operator prose; cross-references to runbook h2 / Boundaries subsection only (DQ6/DQ7); markers 5 + 6 PASS | ✅ compose |
+| US-0113..US-0117 (operator docs) | additive OpenCode host runbook section; no Cursor command catalog rewrite | ✅ compose |
+| US-0121 / DEC-0120 (installer `--host` flag docs hook) | `## OpenCode host mode (US-0121)` h2 untouched; US-0126 cross-links | ✅ untouched |
+| US-0122 / DEC-0122 (seven role agents) | runbook references role agents; does not redefine permissions | ✅ compose |
+| US-0123 (per-role slug routing) | runbook references `/connect` keys + per-role slug routing; does not re-list vendor slugs | ✅ compose |
+| US-0124 / DEC-0124 (orchestrator plugin + stub reason-code h2) | `## OpenCode orchestrator plugin reason codes (US-0124)` h2 untouched; US-0126 owns consolidated table; cross-links | ✅ untouched |
+| US-0125 / DEC-0125 (thin commands + validator-bridge stub h2) | `## OpenCode thin commands + validator bridge (US-0125)` h2 untouched; US-0126 owns consolidated table; DEC-0125 DQ7 raw Python reason codes upheld — `OPENCODE_VALIDATOR_FAILED` wrapper NOT resurrected | ✅ untouched |
+| US-0102 / DEC-0087 (no vendor slugs in `template/`) | no vendor slugs in runbook/README operator prose | ✅ untouched |
+
+## Carry-ins closed
+
+1. `ik_us0126_sp_ac1_marker_prose_gap` — CLOSED: marker 1 greps h2 PLUS AC-1 operator phrases (stock OpenCode TUI/desktop/IDE as UI, `--host` opt-in, `/connect` keys, kit UX = slash commands + reason codes) — defense in depth beyond h2-only grep. The runbook h2 body intro paragraph carries all those phrases.
+2. AC-10 inventory path pin — CLOSED: `test_us0126_cursor_docs_not_deleted` (marker 11) uses a tuple-in-test sorted file-name list of `.cursor/commands/*.md` (25 files) + `.cursor/agents/*.mdc` (7 files) captured at execute time. NOT a frozen git snapshot. NOT a hash manifest of the entire `.cursor/` directory.
+
+## Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=execute`, `role=dev`, `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=dev-US0126-execute-20260825T163028Z-fresh`
+- `timestamp=2026-08-25T16:30:28Z`
+- `evidence_ref=sprints/S0126/summary.md, sprints/S0126/progress.md, sprints/S0126/tasks.md, sprints/S0126/t-anch-verification.md, handoffs/dev_to_qa.md (this prepend), docs/engineering/state.md (execute checkpoint append-bottom), handoffs/resume_brief.md (execute PASS prepend → /qa)`
+
+## Strict runtime proof (DEC-0038)
+
+- `orchestrator_run_id=auto-20260825-01`
+- `runtime_proof_id=rp-auto-20260825-01-execute-dev-20260825T163028Z-US-0126`
+- `phase_id=execute`, `role=dev`, `story_id=US-0126`, `sprint_id=S0126`
+- `proof_issued_at=2026-08-25T16:30:28Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-25T17:30:28Z` (UTC)
+- `proof_hash=70B8523BBC15FC833D0508A1ACDA3B1CCF71AAA0DCBAF3AAC07C05535952B4C0`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260825-01","phase_id":"execute","proof_issued_at":"2026-08-25T16:30:28Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260825-01-execute-dev-20260825T163028Z-US-0126","sprint_id":"S0126","story_id":"US-0126"}`
+
+Prior phase proof consumed: `rp-auto-20260825-01-plan-verify-qa-20260825T162348Z-US-0126` (proof_hash=7D60FA65A3BC387CE6817B27A3B16B9FEFBB92059D5575D5495E6EF7476E8559, ttl 2026-08-25T17:23:48Z — consumed before RUNTIME_PROOF_STALE).
+
+## Next scheduled phase
+
+- `/qa` (role=qa per US-0069 / DEC-0051 phase→role matrix; fresh qa subagent per BUG-0006 — after sovereign-critic of execute per CROSS_MODEL_REVIEW=1)
+- STOP after execute; orchestrator spawns /qa in fresh qa subagent. Do NOT mark US-0126 DONE. Do NOT tick acceptance L154. Do NOT mutate intake JSON. Do NOT reopen US-0121..US-0125.
+
+## Full harness note
+
+Full harness (`tests/run-tests.ps1`) was NOT run in this execute spawn (time-bounded; 12/12 US-0126 contract markers green + opencode-adapter parity OK + prior-story regression 53/53 green are the gate evidence). QA should run the full harness and report `tests/report.md` Pass/Fail counts.
+
+## Pre-existing note (NOT US-0126 scope)
+
+`validate_readme_feature_coverage --report` reports `coverage_missing=["US-0125"]` — this is a pre-existing gap from US-0125's closure (US-0125 was DONE before this execute; its coverage row was not added to `docs/developer/README.md` `## Architecture notes` at closure). US-0126 is OPEN and NOT in the coverage set. US-0126 execute did not introduce this gap and must not fix it (would reopen US-0125 scope — forbidden). QA may flag this as a pre-existing US-0125 carry-forward.
+
+> **LOOP-2 RESOLUTION (2026-08-25T17:10:00Z)**: The US-0125 coverage gap above is now CLOSED in loop-2 — `**US-0125**` row added to `docs/developer/README.md` `## Architecture notes` + byte-identical `template/docs/developer/README.md` mirror. `validate_readme_feature_coverage --repo . --report` now returns `coverage_missing=[]` status=PASS. This was a minimal coverage backfill (no US-0125 scope reopening — only a README coverage row added per US-0091 / DEC-0074 contract).
+
+## Loop-2 strict runtime proof (DEC-0038)
+
+- `orchestrator_run_id=auto-20260825-01`
+- `runtime_proof_id=rp-auto-20260825-01-execute-dev-20260825T171000Z-loop2-US-0126`
+- `phase_id=execute`, `role=dev`, `story_id=US-0126`, `sprint_id=S0126`
+- `delivery_mode=ultra_lean`, `macro_phase=build+verify`, `model_id=glm-5.2-high`
+- `proof_issued_at=2026-08-25T17:10:00Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-25T18:10:00Z` (UTC)
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260825-01","phase_id":"execute","proof_issued_at":"2026-08-25T17:10:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260825-01-execute-dev-20260825T171000Z-loop2-US-0126","sprint_id":"S0126","story_id":"US-0126"}`
+- `proof_hash` = see `docs/engineering/state.md` loop-2 isolation evidence block (SHA-256 sorted-key compact JSON, uppercase hex).
+

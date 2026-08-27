@@ -22,6 +22,7 @@
 .cursor/model-catalog.local.example.level-4-super.json
 .cursor/model-catalog.local.example.role-based-balanced.json
 .cursor/model-catalog.local.example.role-based-highend.json
+.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json
 docs
 sprints
 handoffs
@@ -39,6 +40,7 @@ scripts/materialize_codebase_map.py
 scripts/remote_config_summary.py
 scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
+scripts/arch_linkage_guard.py
 scripts/caveman_compress_input.py
 scripts/readme_feature_coverage_lib.py
 scripts/validate_readme_feature_coverage.py
@@ -80,6 +82,7 @@ scripts/materialize_codebase_map.py
 scripts/remote_config_summary.py
 scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
+scripts/arch_linkage_guard.py
 scripts/caveman_compress_input.py
 scripts/readme_feature_coverage_lib.py
 scripts/validate_readme_feature_coverage.py
@@ -126,6 +129,7 @@ scripts/materialize_codebase_map.py
 scripts/remote_config_summary.py
 scripts/guard_installer_publish.py
 scripts/enforce-triad-hot-surface.py
+scripts/arch_linkage_guard.py
 scripts/caveman_compress_input.py
 scripts/work_kind_classify_lib.py
 scripts/work_kind_routing_lib.py

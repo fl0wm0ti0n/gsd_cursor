@@ -12,7 +12,8 @@
     "dev_difficult": "<your-dev-difficult-model-slug>",
     "qa": "<your-qa-model-slug>",
     "security": "<your-security-model-slug>",
-    "release": "<your-release-model-slug>"
+    "release": "<your-release-model-slug>",
+    "critic": "<your-critic-model-slug>"
   },
   "notes": "Role-based balanced preset (US-0102 / DEC-0087). Copy to .cursor/model-catalog.local.json and set MODEL_RESOLVE=role_catalog in .cursor/scratchpad.local.md. All tier and role keys required when roles section present."
 }

@@ -217,6 +217,7 @@ function Classify-File($RelPath) {
     '.cursor/model-catalog.local.example.level-4-super.json',
     '.cursor/model-catalog.local.example.role-based-balanced.json',
     '.cursor/model-catalog.local.example.role-based-highend.json',
+    '.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json',
     'its_magic/.its-magic-version',
     'its_magic/README.md'
   )

@@ -9,6 +9,9 @@ Reason codes (DEC-0110 §10):
   SOVEREIGN_GOAL_MODE_INVALID, SOVEREIGN_GOAL_MISSING,
   SOVEREIGN_GOAL_DERIVE_FAILED, CONVERGENCE_EVAL_FAILED
 
+US-0128 additive (not in the DEC-0110 §10 inventory of 10):
+  CONVERGENCE_SMOKE_SURROGATE_MISSING
+
 Default-off: SOVEREIGN_GOAL_MODE=phase_driven → zero overhead.
 """
 
@@ -33,6 +36,7 @@ from decision_ledger_lib import (  # noqa: E402
     read_entries,
     resolve_ledger_path,
 )
+from sovereign_critic_lib import read_open_blocking  # noqa: E402
 
 
 # --- Scratchpad key contracts (DEC-0110 §1) -----------------------------------
@@ -96,6 +100,22 @@ class ReasonCode(str, Enum):
 
 
 REASON_CODES = frozenset(code.value for code in ReasonCode)
+
+# US-0128 additive fail-closed code — not part of DEC-0110 §10 REASON_CODES (must remain 10).
+CONVERGENCE_SMOKE_SURROGATE_MISSING = "CONVERGENCE_SMOKE_SURROGATE_MISSING"
+
+_CANONICAL_LIVE_RUNTIME_PROBE_CLASSES = frozenset(
+    {
+        "browser_smoke",
+        "api_health",
+        "process_health",
+        "cli_smoke",
+        "build",
+        "manual_operator",
+    }
+)
+_SMOKE_PASS_RESULTS = frozenset({"pass", "passed", "ok"})
+_SURROGATE_WAIVER_REASON = "UAT_PROBE_FORBIDDEN"
 
 _UNAPPROVED_LEDGER_TYPES = frozenset({
     "PLAN_FIDELITY_EXTENSION",
@@ -315,20 +335,23 @@ def _eval_zero_deferrals(
     return ConjunctResult(name="zero_deferrals", status="pass", reason_code=None, skipped=False), None
 
 
-def _critic_jsonl_has_open(path: Path) -> bool:
+def _jsonl_file_nonempty(path: Path) -> bool:
+    """True when findings JSONL exists and has at least one non-blank line (US-0127 DQ6)."""
+    if not path.is_file():
+        return False
     for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        if not raw.strip():
-            continue
-        try:
-            obj = json.loads(raw)
-        except json.JSONDecodeError:
-            continue
-        status = str(obj.get("status", "")).lower()
-        blocking = obj.get("blocking", True)
-        if status in ("open", "blocking", "fail") or (blocking and status not in ("resolved", "closed", "pass")):
-            if status not in ("resolved", "closed", "pass", "done"):
-                return True
+        if raw.strip():
+            return True
     return False
+
+
+def _critic_jsonl_has_open(repo: Path) -> bool:
+    """Blocking-only open check — delegates to US-0104 read_open_blocking (US-0127 AC-1).
+
+    Do not redefine read_open_blocking. Informational status=open, blocking=false rows
+    must not fail CONVERGENCE_CROSS_REVIEWER_OPEN.
+    """
+    return bool(read_open_blocking(repo))
 
 
 def _qa_findings_has_open_critic(repo: Path) -> bool:
@@ -370,40 +393,52 @@ def _qa_has_cross_reviewer_section(repo: Path) -> bool:
 
 
 def _eval_critic_resolved(repo: Path) -> Tuple[ConjunctResult, Optional[str]]:
+    """US-0110 L3 conjunct-3 with US-0127 DQ6 dispatch.
+
+    When handoffs/sovereign_critic_findings.jsonl exists and is non-empty, the JSONL
+    blocking-only predicate is authoritative and _qa_findings_has_open_critic is NOT
+    consulted. When JSONL is absent, fall back to the unchanged QA-markdown grep.
+    When neither is deployed, informational skip (US-0110 L3 degrade matrix).
+    """
     critic_path = repo / CRITIC_PATH
-    has_critic = critic_path.is_file()
+    jsonl_authoritative = _jsonl_file_nonempty(critic_path)
     has_qa_section = _qa_has_cross_reviewer_section(repo)
-    if not has_critic and not has_qa_section:
-        return (
-            ConjunctResult(
-                name="critic_resolved",
-                status="skip",
-                reason_code=None,
-                skipped=True,
-            ),
-            "critic_register_not_yet_deployed",
-        )
-    if has_critic and _critic_jsonl_has_open(critic_path):
-        return (
-            ConjunctResult(
-                name="critic_resolved",
-                status="fail",
-                reason_code=ReasonCode.CONVERGENCE_CROSS_REVIEWER_OPEN.value,
-                skipped=False,
-            ),
-            None,
-        )
-    if _qa_findings_has_open_critic(repo):
-        return (
-            ConjunctResult(
-                name="critic_resolved",
-                status="fail",
-                reason_code=ReasonCode.CONVERGENCE_CROSS_REVIEWER_OPEN.value,
-                skipped=False,
-            ),
-            None,
-        )
-    return ConjunctResult(name="critic_resolved", status="pass", reason_code=None, skipped=False), None
+
+    if jsonl_authoritative:
+        if _critic_jsonl_has_open(repo):
+            return (
+                ConjunctResult(
+                    name="critic_resolved",
+                    status="fail",
+                    reason_code=ReasonCode.CONVERGENCE_CROSS_REVIEWER_OPEN.value,
+                    skipped=False,
+                ),
+                None,
+            )
+        return ConjunctResult(name="critic_resolved", status="pass", reason_code=None, skipped=False), None
+
+    if has_qa_section:
+        if _qa_findings_has_open_critic(repo):
+            return (
+                ConjunctResult(
+                    name="critic_resolved",
+                    status="fail",
+                    reason_code=ReasonCode.CONVERGENCE_CROSS_REVIEWER_OPEN.value,
+                    skipped=False,
+                ),
+                None,
+            )
+        return ConjunctResult(name="critic_resolved", status="pass", reason_code=None, skipped=False), None
+
+    return (
+        ConjunctResult(
+            name="critic_resolved",
+            status="skip",
+            reason_code=None,
+            skipped=True,
+        ),
+        "critic_register_not_yet_deployed",
+    )
 
 
 def _report_passes(report_path: Path) -> bool:
@@ -440,16 +475,97 @@ def _uat_smoke_passes(uat_path: Path) -> bool:
     return result in ("pass", "passed", "ok")
 
 
+def _load_uat_data(uat_path: Optional[Path]) -> Optional[dict]:
+    if uat_path is None or not uat_path.is_file():
+        return None
+    try:
+        data = json.loads(uat_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return None
+    return data if isinstance(data, dict) else None
+
+
+def _uat_has_smoke_step(data: dict) -> bool:
+    steps = data.get("steps") or []
+    return any(isinstance(s, dict) and _step_is_smoke(s) for s in steps)
+
+
+def _all_six_live_runtime_probes_waived(data: dict) -> bool:
+    waived = data.get("waived_probes") or []
+    present = set()
+    for row in waived:
+        if not isinstance(row, dict):
+            continue
+        if str(row.get("reason_code", "")) != _SURROGATE_WAIVER_REASON:
+            continue
+        cls = str(row.get("probe_class", "")).strip()
+        if cls:
+            present.add(cls)
+    return _CANONICAL_LIVE_RUNTIME_PROBE_CLASSES.issubset(present)
+
+
+def _contract_test_failed_count(data: dict) -> Optional[int]:
+    if "contract_test_failed" in data:
+        try:
+            return int(data.get("contract_test_failed"))
+        except (TypeError, ValueError):
+            return None
+    passed = data.get("contract_test_passed")
+    total = data.get("contract_test_total")
+    if passed is None or total is None:
+        return None
+    try:
+        p = int(passed)
+        t = int(total)
+    except (TypeError, ValueError):
+        return None
+    return 0 if p == t else max(0, t - p)
+
+
+def _surrogate_step_passes(data: dict) -> bool:
+    steps = [s for s in (data.get("steps") or []) if isinstance(s, dict)]
+    for step in steps:
+        if str(step.get("id", "")) == "convergence_smoke":
+            return str(step.get("result", "")).lower() in _SMOKE_PASS_RESULTS
+    if not steps:
+        return False
+    tail = steps[-1]
+    if str(tail.get("probe_kind", "")) == "contract_tests_primary":
+        return str(tail.get("result", "")).lower() in _SMOKE_PASS_RESULTS
+    return False
+
+
 def _eval_smoke_green(repo: Path) -> ConjunctResult:
     report_ok = _report_passes(repo / REPORT_PATH)
     uat = _resolve_active_uat_path(repo)
+    # Legacy path first (US-0128 critic NB / R6): real smoke-named step wins.
     uat_ok = _uat_smoke_passes(uat) if uat else False
     if report_ok and uat_ok:
+        return ConjunctResult(name="smoke_green", status="pass", reason_code=None, skipped=False)
+
+    data = _load_uat_data(uat)
+    if data is not None and _uat_has_smoke_step(data):
+        return ConjunctResult(
+            name="smoke_green",
+            status="fail",
+            reason_code=ReasonCode.CONVERGENCE_SMOKE_PROBE_FAIL.value,
+            skipped=False,
+        )
+
+    failed_count = _contract_test_failed_count(data) if data is not None else None
+    surrogate_ok = (
+        report_ok
+        and data is not None
+        and _all_six_live_runtime_probes_waived(data)
+        and failed_count == 0
+        and _surrogate_step_passes(data)
+    )
+    if surrogate_ok:
         return ConjunctResult(name="smoke_green", status="pass", reason_code=None, skipped=False)
     return ConjunctResult(
         name="smoke_green",
         status="fail",
-        reason_code=ReasonCode.CONVERGENCE_SMOKE_PROBE_FAIL.value,
+        reason_code=CONVERGENCE_SMOKE_SURROGATE_MISSING,
         skipped=False,
     )
 

@@ -31,7 +31,13 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from model_tier_lib import Tier, resolve_model_for_phase  # noqa: E402
+from model_tier_lib import (  # noqa: E402
+    Tier,
+    load_catalog,
+    phase_to_model_key,
+    resolve_model_for_phase,
+    validate_direct_slug,
+)
 
 
 # --- Scratchpad key contracts (DEC-0104 §1) ------------------------------------
@@ -124,6 +130,9 @@ class ReasonCode(str, Enum):
 
 
 REASON_CODES = frozenset(code.value for code in ReasonCode)
+
+# US-0127 informational (not in US-0104 ReasonCode enum — compose-do-not-amend).
+SOVEREIGN_CRITIC_AUTORESOLVE_FAILED = "SOVEREIGN_CRITIC_AUTORESOLVE_FAILED"
 
 
 @dataclass
@@ -230,6 +239,48 @@ def _resolve_slug_for_tier(phase_id: str, tier: Tier, scratchpad: Dict[str, str]
     return "inherit"
 
 
+_DEFAULT_MODEL_CATALOG = ".cursor/model-catalog.local.json"
+
+
+def _overlay_load_catalog(pad: Dict[str, str]) -> Optional[dict]:
+    """Load MODEL_CATALOG for the US-0130 overlay only. Miss is not an error."""
+    raw = (pad.get("MODEL_CATALOG") or "").strip() or _DEFAULT_MODEL_CATALOG
+    path = Path(raw)
+    if not path.exists():
+        return None
+    catalog, _err = load_catalog(path)
+    return catalog
+
+
+def _overlay_critic_slug(pad: Dict[str, str]) -> Optional[str]:
+    """US-0130 overlay: pin > optional roles.critic when role_catalog. None = opposition."""
+    pin_key = phase_to_model_key("sovereign-critic")  # MODEL_SOVEREIGN-CRITIC (hyphen exact)
+    pin = (pad.get(pin_key) or "").strip()
+    model_resolve = (pad.get("MODEL_RESOLVE") or "alias_only").strip() or "alias_only"
+
+    catalog = None
+    if model_resolve in ("local_catalog", "role_catalog"):
+        catalog = _overlay_load_catalog(pad)
+
+    if pin:
+        if model_resolve in ("local_catalog", "role_catalog") and catalog is not None:
+            # DEC-0087 §4 / R5: validate membership when a catalog is loaded.
+            # Pin remains highest precedence (SelectCriticResult shape UNCHANGED).
+            validate_direct_slug(pin, model_resolve, catalog)
+        return pin
+
+    if model_resolve == "role_catalog":
+        if catalog is None:
+            catalog = _overlay_load_catalog(pad)
+        if catalog:
+            roles = catalog.get("roles")
+            if isinstance(roles, dict):
+                critic_role = roles.get("critic")
+                if isinstance(critic_role, str) and critic_role.strip():
+                    return critic_role.strip()
+    return None
+
+
 def select_critic_model(
     producer_model_id: str,
     scratchpad: Optional[Dict[str, str]],
@@ -244,9 +295,13 @@ def select_critic_model(
         else:
             producer = "inherit"
 
-    producer_tier = _infer_producer_tier(producer)
-    critic_tier = CRITIC_TIER_OPPOSITION.get(producer_tier, Tier.CHEAP)
-    critic = _resolve_slug_for_tier("sovereign-critic", critic_tier, pad)
+    overlay = _overlay_critic_slug(pad)
+    if overlay is not None:
+        critic = overlay
+    else:
+        producer_tier = _infer_producer_tier(producer)
+        critic_tier = CRITIC_TIER_OPPOSITION.get(producer_tier, Tier.CHEAP)
+        critic = _resolve_slug_for_tier("sovereign-critic", critic_tier, pad)
 
     if _normalize_model_token(critic) == _normalize_model_token(producer):
         return SelectCriticResult(
@@ -426,6 +481,53 @@ def resolve_finding(path: Path, finding_id: str, status: str) -> bool:
     if changed:
         path.write_text("".join(out), encoding="utf-8")
     return changed
+
+
+def auto_resolve_nonblocking_for_run(
+    repo: Path,
+    orchestrator_run_id: str,
+    phase_id: str,
+) -> Tuple[int, Optional[str]]:
+    """Resolve same-run same-phase status=open, blocking=false rows (US-0127 AC-2).
+
+    Additive helper. Does not amend read_open_blocking / resolve_finding signatures
+    or the findings JSONL schema. Scope key is (orchestrator_run_id, phase_id).
+    Idempotent: already-resolved rows are a no-op via resolve_finding. Returns
+    (resolved_count, error_code). SOVEREIGN_CRITIC_AUTORESOLVE_FAILED is
+    informational — caller keeps PASS.
+    """
+    path = repo / FINDINGS_PATH
+    if not path.is_file():
+        return 0, None
+    candidate_ids: List[str] = []
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        if not raw.strip():
+            continue
+        try:
+            obj = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        if (
+            str(obj.get("orchestrator_run_id")) == str(orchestrator_run_id)
+            and str(obj.get("phase_id")) == str(phase_id)
+            and obj.get("status") == "open"
+            and obj.get("blocking") is False
+        ):
+            fid = str(obj.get("finding_id") or "").strip()
+            if fid:
+                candidate_ids.append(fid)
+    if not candidate_ids:
+        return 0, None
+    resolved = 0
+    failed = 0
+    for fid in candidate_ids:
+        if resolve_finding(path, fid, "resolved"):
+            resolved += 1
+        else:
+            failed += 1
+    if failed:
+        return resolved, SOVEREIGN_CRITIC_AUTORESOLVE_FAILED
+    return resolved, None
 
 
 def build_qa_cross_reviewer_block(repo: Path) -> dict:

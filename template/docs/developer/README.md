@@ -30,11 +30,17 @@ setup stays in the root `README.md` (user channel).
   runbook `## OpenCode model slug routing (US-0123)`, architecture `# US-0123`, `decisions/DEC-0123.md`.
 - **US-0124** — OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session); traceability:
   runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
+- **US-0126** — OpenCode host operator runbook, cross-host reason-code catalog, and `--scope=opencode-adapter` parity; traceability:
+  runbook `## OpenCode host operator runbook (US-0126)`, architecture `# US-0126`.
+- **US-0130** — Operator-pinned sovereign-critic model (`MODEL_SOVEREIGN-CRITIC` + catalog `roles.critic`); traceability:
+  runbook **Degraded fallback troubleshooting**, architecture `# US-0130`, `decisions/DEC-0130.md`.
 
 ## Architecture notes
 
 - **US-0122** — OpenCode role agents and Layer-1 permission table; traceability:
   architecture `# US-0122`, `decisions/DEC-0122.md`.
+- **US-0125** — Thin OpenCode commands and Python validator bridge (dispatch-only `.opencode/commands/`; Python validators remain fail-closed SOT); traceability:
+  architecture `# US-0125`, `decisions/DEC-0125.md`.
 - High-level contracts live in `docs/engineering/architecture.md` (search for story ids).
 - Installer ownership is driven by `docs/engineering/context/installer-owned-paths.manifest`.
 - Template parity: changes in repo root often require the same edit under `template/`.

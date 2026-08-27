@@ -1,0 +1,79 @@
+{
+  "intake_run_id": "cursor-20260826-US0130-intake",
+  "turn_index": 0,
+  "writer_id": "po-cursor-20260826-US0130",
+  "selected_pack": "small-intake-pack",
+  "requested_mode": "story",
+  "intake_boundary_utc": "2026-08-26T18:00:00Z",
+  "INTAKE_GUIDED_MODE": 1,
+  "INTAKE_WORK_ITEM_KIND": "story",
+  "ID_NAMESPACE_BOOTSTRAP": 0,
+  "decomposition_verdict": "single_story",
+  "decomposition_rationale": "One operator-facing capability: pin the sovereign-critic model via catalog roles.critic plus MODEL_SOVEREIGN-CRITIC override. Split rejected: per-lens models would be a later story; installer compose is in-story because operator chose plus_installer.",
+  "duplicate_check_pass": true,
+  "duplicate_check_notes": "Not a duplicate of US-0104 (critic exists but no operator pin), US-0102 (role catalog has no critic slot), US-0112 (ships examples, no critic role), US-0123 (OpenCode provider/slug), US-0127 (blocking-finding semantics). Overlay story.",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260826-US0130-intake:0:9c65132972db64c8",
+      "quoted_user_text": "erstell eine neue userstory der critic mode soll bestimmte AI modelkle nutzen die ich festlegen können will zb ähnlich wie die @.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json",
+      "intake_run_id": "cursor-20260826-US0130-intake",
+      "turn_index": 0
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260826-US0130-intake:1:0f9bad853de7664f",
+      "quoted_user_text": "Both (recommended): MODEL_SOVEREIGN-CRITIC wins, then catalog roles.critic, then today’s opposition/dev fallback",
+      "intake_run_id": "cursor-20260826-US0130-intake",
+      "turn_index": 1
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260826-US0130-intake:2:d6210878cfd457db",
+      "quoted_user_text": "Keep today’s degraded same-model multi-lens fallback (CROSS_MODEL_DEGRADED_MODE) — informational, not a hard stop",
+      "intake_run_id": "cursor-20260826-US0130-intake",
+      "turn_index": 2
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260826-US0130-intake:3:1d9145a915ba8e3b",
+      "quoted_user_text": "Same as above, plus installer/template examples ship the new critic role key (US-0112 compose)",
+      "intake_run_id": "cursor-20260826-US0130-intake",
+      "turn_index": 3
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "ref": "ie:cursor-20260826-US0130-intake:4:0df2444ab6fbfdfa",
+      "quoted_user_text": "One global critic model for all producer phases (recommended)",
+      "intake_run_id": "cursor-20260826-US0130-intake",
+      "turn_index": 4
+    }
+  ],
+  "assumptions_used": [],
+  "candidate_story_ids": [
+    "US-0130"
+  ],
+  "story_ids": [
+    "US-0130"
+  ],
+  "priority": "P1",
+  "operator_accepted_quote": "Both (recommended): MODEL_SOVEREIGN-CRITIC wins, then catalog roles.critic, then today’s opposition/dev fallback",
+  "config_surface": "both_precedence",
+  "collision_policy": "degraded_keep",
+  "granularity": "one_global",
+  "done_tests": "plus_installer"
+}

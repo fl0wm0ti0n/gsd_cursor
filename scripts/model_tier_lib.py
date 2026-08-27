@@ -86,6 +86,9 @@ CATALOG_ROLE_KEYS = frozenset({
     "po", "sa", "dev", "dev_difficult", "qa", "security", "release",
 })
 
+# US-0130 optional overlay — not in the required set (DQ1).
+CATALOG_OPTIONAL_ROLE_KEYS = frozenset({"critic"})
+
 # Phase→logical role (DEC-0051 + DEC-0087 §6)
 PHASE_LOGICAL_ROLE: Dict[str, Optional[str]] = {
     "intake": "po",
@@ -217,7 +220,7 @@ def _validate_roles_object(roles: object) -> Optional[str]:
         return "Field 'roles' must be an object"
     actual_keys = set(roles.keys())
     missing = CATALOG_ROLE_KEYS - actual_keys
-    extra = actual_keys - CATALOG_ROLE_KEYS
+    extra = actual_keys - CATALOG_ROLE_KEYS - CATALOG_OPTIONAL_ROLE_KEYS
     if missing:
         return f"Missing required role keys: {', '.join(sorted(missing))}"
     if extra:

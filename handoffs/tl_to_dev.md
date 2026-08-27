@@ -1,4 +1,245 @@
-﻿## Sprint-plan handoff — **US-0125** / **S0125** — `/plan-verify` next (fresh qa)
+## Sprint-plan handoff — US-0129 / S0129 — `/execute` next (fresh dev; ultra_lean skips standalone /plan-verify)
+
+- sprint_id: S0129
+- story_id: US-0129
+- dec_id: DEC-0129 (Accepted — `decisions/DEC-0129.md`; story-aligned companion; compose DEC-0054 / DEC-0073 / DEC-0076 / US-0049 / US-0126 B-1 / DEC-0119)
+- research_anchor: R-0113 (DQ1–DQ8 LOCKED; R-0112 not extended)
+- orchestrator_run_id: auto-20260827-01
+- fresh_context_marker: tl-US0129-sprint-plan-20260827T073646Z-fresh
+- timestamp: 2026-08-27T07:36:46Z (UTC)
+- model_id: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required on isolation)
+- sprint_plan_verdict: PASS
+- sprint_status: PLANNED (backlog OPEN per US-0045 — not mutated; acceptance L157 unchecked)
+- task_count: 8 (T-anch + T-001..T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-005(m1,m2,m6); AC-2->T-001,T-002,T-005(m2,m3); AC-3->T-003,T-005(m4,m5); AC-4->T-004,T-006,T-005(m6,m7); AC-5->T-005(all 8 markers); AC-6->T-anch
+- task_order: T-anch -> T-001 (arch_linkage_guard.py helper + pre-guard no-partial-write) -> T-002 (reason_codes ## US-0129 + security_hard matrix row) -> T-003 (ARCH_LINKAGE_AUTO_REPAIR=0 comment + DQ8 stub restore) -> T-004 (refresh-context pre → rollover → post → check) -> T-005 (8 contract markers + harness 26AB) -> T-006 (runbook h3 + ARCH_LINKAGE_PAIRS) -> T-007 (installer-owned-paths.manifest) -> integration verification
+- compose_guards (non-negotiable): DO NOT amend DEC-0054 (rollover_architecture split / pack format / ARCH_HOT_MAX_* — marker 2), DEC-0073 (H1 vs H2 anchor policy — stub is H1 with title separator), DEC-0076/US-0089 (only # US-0090 after # US-0089 — stub insertion before that tail; marker 5), US-0049 (state archive contract — audit row append-bottom), US-0126 (B-1 fixture only — do not reopen; L154 stays checked), US-0127/US-0128/US-0130 (DONE — do not reopen; L155–L156 / L158 stay checked), DEC-0119 (9 auto_repair_kind + 12 preset flags — no 10th kind; flag not in AUTONOMY_PRESET), R-0112 (US-0130 overlay not extended), US-0045 (no backlog Status/ACs mutation), US-0048/BUG-0006 (fresh-context isolation), US-0056 (runtime proof lowercase keys only). Do not rewrite docs/engineering/architecture.md. Do not rewrite decisions/DEC-0129.md. Do not tick L157. Do not mutate intake JSON.
+- critic_carry_ins: 0 new blocking. 3 architecture critic NBs `a0129ar-*` status=resolved non-blocking — routed as awareness into /execute:
+  - a0129ar-challenger-001 (`ik_us0129_arch_proof_and_linkage_gaps`): T-001 discovery must exclude .tmp* and non-architecture.md reads (R1). T-003 v1 heading-only (R3). Do not pre-seed unrelated stubs (R6) — remediate via AC-2 repair flag or manual H1.
+  - a0129ar-architect-002 (`ik_us0129_arch_layer_coupling`): T-001 helper+pre-guard; T-002 reason_codes+matrix; T-003 flag+stub; T-004 refresh-context wiring; T-005 8 markers+26AB; T-006 runbook+ARCH_LINKAGE_PAIRS; T-007 installer manifest. Import split_arch_stories + while-pop — do not copy-fork archiver. Do not add ARCH_LINKAGE_AUTO_REPAIR to AUTONOMY_PRESET.
+  - a0129ar-subtractor-003 (`ik_us0129_arch_scope_discipline`): do not mark US-0129 DONE; do not tick L157; 8 markers required (not YAGNI); T-anch read-only — no architecture.md mutation; do not reopen US-0126/US-0127/US-0128/US-0130.
+- architecture_pointers: docs/engineering/architecture.md # US-0129 (L1527 — approach A1, 8-marker table, helper DQ2, fail-closed DQ4/DQ5, stub DQ8, refresh-context DQ3, contract tests DQ6/DQ7, runbook/parity D8, compose-do-not-amend 8/8, risks R1–R6; sprint seeds T-anch + T-001..T-007). Do not rewrite.
+- first_execute_task: T-anch (NO-OP / verification) — verify # US-0129 H1 anchor + DEC-0129 Accepted + approach A1 + R-0113 DQ1–DQ8 + compose guards 8/8 + 8-marker list locked + absent surfaces (arch_linkage_guard.py + template, us0129 contract test + template, reason_codes ## US-0129, matrix row, scratchpad live=1, refresh-context pre/post, harness 26AB, ARCH_LINKAGE_PAIRS, installer manifest row)
+- key_locked_artifacts:
+  - linkage guard (DQ2+DQ3): `scripts/arch_linkage_guard.py` discover_required_arch_headings stdlib scan; pre-guard no-partial-write; import split_arch_stories + while-pop; post-guard verifies active linkage
+  - fail-closed (DQ4+DQ5): `ARCH_LINKAGE_ROLLOVER_BLOCKED` security_hard never skip; new ## US-0129 family in reason_codes.md; matrix auto_repair_kind=n/a cap=0
+  - optional repair (DQ1+DQ8): ARCH_LINKAGE_AUTO_REPAIR=0 default-off not in AUTONOMY_PRESET; H1 stub + pack_ref before US-0089/US-0090 tail; idempotent; state.md audit row
+  - wiring (DQ3): `.cursor/commands/refresh-context.md` pre-guard → --rollover → post-guard → --check
+  - contract tests (Q1): `tests/us0129_contract_test.py` — 8 markers; harness 26AB after 26AA; synthetic fixtures not pack-20260825 replay
+  - docs + parity (D8): runbook h3 under triad; ARCH_LINKAGE_PAIRS + --scope=arch-linkage; installer-owned-paths.manifest for arch_linkage_guard.py
+- files_to_touch: scripts/arch_linkage_guard.py NEW + template mirror, docs/engineering/reason_codes.md + template, scripts/data/autonomy_stop_matrix.yaml, docs/engineering/autonomy-stop-matrix.md + template, .cursor/scratchpad.md + template (comment only), .cursor/commands/refresh-context.md + template, tests/us0129_contract_test.py NEW + template, tests/run-tests.ps1 + run-tests.sh (26AB), docs/engineering/runbook.md + template, scripts/check_intake_template_parity.py (ARCH_LINKAGE_PAIRS) + template, docs/engineering/context/installer-owned-paths.manifest + template
+- files_NOT_to_touch: docs/engineering/architecture.md (do not rewrite), decisions/DEC-0129.md (already Accepted), backlog US-0129 Status/ACs, handoffs/intake_evidence/US-0129-intake-20260825.json, scripts/enforce-triad-hot-surface.py rollover_architecture split/pack/ARCH_HOT_MAX_*, AUTONOMY_PRESET expansion, US-0126/US-0127/US-0128/US-0130 DONE rows, docs/engineering/research.md ## R-0112
+- next_phase: `/execute` (fresh dev per US-0069 / DEC-0051; first canonical phase of `build+verify` macro per ultra_lean; /plan-verify merged into qa per ultra_lean — qa creates plan-verify.json within build+verify). Orchestrator runs sovereign-critic of sprint-plan first (CROSS_MODEL_REVIEW=1). Do not mandate outer driver.
+- sprint_artifacts: sprints/S0129/ (sprint.md, tasks.md, progress.md, uat.json, uat.md)
+- runtime_proof_id: rp-auto-20260827-01-sprint-plan-tech-lead-20260827T073646Z-US-0129
+- proof_hash: 8960A93B97E39E84B107001316228F5CBE69472DDF8835752862ECF4EC3B4B00
+- proof_ttl: 2026-08-27T08:36:46Z (UTC)
+- prior_phase_proof_consumed: rp-auto-20260827-01-architecture-tech-lead-20260827T073000Z-US-0129 (proof_hash=DDDA46794ED39186D77F268EE47364E3070997916777582095FF9198FEEF6196, ttl=2026-08-27T08:30:00Z — independent SHA-256 MATCH; consumed at 2026-08-27T07:36:46Z before RUNTIME_PROOF_STALE; sovereign-critic architecture PASS at 2026-08-27T07:35:00Z anti_slop_aggregate=8 0 blocking findings)
+- stop_condition: STOP after sprint-plan completes; hand off via artifacts only. Orchestrator owns critic of sprint-plan then /execute in fresh dev subagent per BUG-0006. Do not spawn /execute or /plan-verify from this subagent. Do not mark US-0129 DONE. Do not tick acceptance L157. Do not mutate intake JSON. Do not amend DEC-0054/DEC-0073/DEC-0119 surfaces. Do not reopen US-0126/US-0127/US-0128/US-0130. Do not change archiver heading semantics. Do not add ARCH_LINKAGE_AUTO_REPAIR to AUTONOMY_PRESET.
+
+---
+
+## Sprint-plan handoff — US-0130 / S0130 — `/execute` next (fresh dev; ultra_lean skips standalone /plan-verify)
+
+- sprint_id: S0130
+- story_id: US-0130
+- dec_id: none (companion DEC not required per R-0112; compose DEC-0104 §5 / DEC-0087 / DEC-0086; A6 rejected DEC-0130)
+- research_anchor: R-0112 (DQ1–DQ8 LOCKED)
+- orchestrator_run_id: auto-20260826-01
+- fresh_context_marker: tl-US0130-sprint-plan-20260826T215200Z-fresh
+- timestamp: 2026-08-26T21:52:00Z (UTC)
+- model_id: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required on isolation)
+- sprint_plan_verdict: PASS
+- sprint_status: PLANNED (backlog OPEN per US-0045 — not mutated; acceptance L158 unchecked)
+- task_count: 8 (T-anch + T-001..T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-004,T-005(m1,m6); AC-2->T-002,T-005(m2,m7,m8); AC-3->T-001,T-005(m1,m2,m3,m6); AC-4->T-001,T-005(m4); AC-5->T-001,T-004,T-006; AC-6->T-005(all 10 markers); AC-7->T-anch,T-005(m5); AC-8->T-003,T-005(m9,m10); AC-9->T-004,T-006,T-007
+- task_order: T-anch -> T-001 (select_critic_model overlay) -> T-002 (CATALOG_OPTIONAL_ROLE_KEYS + validator) -> T-003 (v2 examples + ship cursor_only as 9th) -> T-004 (scratchpad DQ8 comments, no live pin) -> T-005 (10 contract markers) -> T-006 (runbook pin-precedence) -> T-007 (SOVEREIGN_CRITIC_PAIRS + MODEL_TIER_OVERRIDES_PAIRS) -> integration verification
+- compose_guards (non-negotiable): DO NOT amend US-0104 (findings JSONL / three lenses / CROSS_MODEL_* enable keys / anti-slop / opposition table / degraded_keep — marker 5), US-0102 (5-step chain / CATALOG_ROLE_KEYS required-set / PHASE_LOGICAL_ROLE — critic not in required-set; synthetic phase not registered), US-0101 (DEFAULT_PHASE_TIER_MATRIX / v1 catalogs unchanged), US-0112 (compose examples+installer; never write model-catalog.local.json), US-0127/US-0128 (DONE — do not reopen), US-0129 (OPEN — do not mutate), US-0123 (OpenCode out of scope), R-0088 (document-only), US-0045 (no backlog Status/ACs mutation), US-0048/BUG-0006 (fresh-context isolation), US-0056 (runtime proof lowercase keys only). Do not rewrite docs/engineering/architecture.md. Do not author DEC-0130. Do not write model-catalog.local.json.
+- critic_carry_ins: 0 new blocking. 3 architecture critic NBs `a0130ar-*` status=resolved non-blocking — routed as awareness into /execute:
+  - a0130ar-challenger-001 (`ik_us0130_arch_proof_and_overlay_gaps`): T-001 overlay must consume MODEL_SOVEREIGN-CRITIC via phase_to_model_key (hyphen exact). Do not consume underscore alias. Pin then optional roles.critic when role_catalog then opposition UNCHANGED. Do not pass a newly loaded catalog into _resolve_slug_for_tier. Same-slug keeps degraded=True.
+  - a0130ar-architect-002 (`ik_us0130_arch_layer_coupling`): T-001 overlay; T-002 optional role keys; T-003 examples/installer; T-004 scratchpad comments; T-005 10 markers; T-006 runbook; T-007 parity. Do not add critic to CATALOG_ROLE_KEYS. Do not register synthetic phase.
+  - a0130ar-subtractor-003 (`ik_us0130_arch_scope_discipline`): do not mark US-0130 DONE; do not tick L158; 10 markers required (not YAGNI); T-anch read-only — no architecture.md mutation; do not author DEC-0130; do not write model-catalog.local.json.
+- architecture_pointers: docs/engineering/architecture.md # US-0130 (L1815 — approach A1, 10-marker table, overlay DQ2/DQ3/DQ7, optional role DQ1/DQ6, examples/installer DQ4/DQ5, scratchpad DQ8, contract tests, runbook, parity, compose-do-not-amend 9/9, risks R1–R5; sprint seeds T-anch + T-001..T-007). Do not rewrite.
+- first_execute_task: T-anch (NO-OP / verification) — verify # US-0130 H1 anchor + approach A1 + R-0112 DQ1–DQ8 + compose guards 9/9 + 10-marker list locked + absent surfaces (us0130 contract test + template mirror, overlay, CATALOG_OPTIONAL_ROLE_KEYS, cursor_only 9th ship, scratchpad comments, runbook note, SOVEREIGN_CRITIC_PAIRS sovereign_critic_lib.py pair, MODEL_TIER_OVERRIDES_PAIRS cursor_only pair)
+- key_locked_artifacts:
+  - overlay (DQ2+DQ3+DQ7): `scripts/sovereign_critic_lib.py` `select_critic_model` prepend pin > roles.critic when role_catalog > opposition UNCHANGED; hyphen exact MODEL_SOVEREIGN-CRITIC via phase_to_model_key; SelectCriticResult shape UNCHANGED; same-slug degraded_keep UNCHANGED
+  - optional catalog role (DQ1+DQ6): `CATALOG_OPTIONAL_ROLE_KEYS={"critic"}`; extra-key subtract; empty-present-critic reuses MODEL_CATALOG_SCHEMA_V2_INVALID (message names critic); missing critic not an error
+  - examples + installer (DQ4+DQ5): v2 role examples get critic placeholder; cursor_only critic=composer-2.5-fast shipped as 9th; manifest + installer.ps1/py FRAMEWORK_EXACT; never write model-catalog.local.json
+  - contract tests (Q1): `tests/us0130_contract_test.py` — 10 markers; mirror to template byte-identical; all static/fixture-based, no live critic spawn
+  - docs (DQ8): scratchpad MODEL_* + CROSS_MODEL_* comment sites (no live pin); runbook #### Degraded fallback troubleshooting pin-precedence
+  - template parity: SOVEREIGN_CRITIC_PAIRS add sovereign_critic_lib.py; MODEL_TIER_OVERRIDES_PAIRS add cursor_only json pair
+- files_to_touch: scripts/sovereign_critic_lib.py + template mirror, scripts/model_tier_lib.py + template mirror, scripts/model_tier_validate.py + template mirror, v2 role example catalogs + cursor_only + template copy, installer-owned-paths.manifest, installer.ps1, installer.py, scratchpad.md + scratchpad.local.example.md + template mirrors, docs/engineering/runbook.md + template mirror, tests/us0130_contract_test.py NEW + template mirror, scripts/check_intake_template_parity.py (SOVEREIGN_CRITIC_PAIRS + MODEL_TIER_OVERRIDES_PAIRS) + template mirror
+- files_NOT_to_touch: docs/engineering/architecture.md (do not rewrite), decisions/ (no DEC-0130), backlog US-0130 Status/ACs, handoffs/intake_evidence/US-0130-intake-20260826.json, .cursor/model-catalog.local.json, US-0104/US-0102/US-0101 surfaces (compose read-only), US-0127/US-0128 DONE rows, US-0129 OPEN row, v1 example catalogs
+- next_phase: `/execute` (fresh dev per US-0069 / DEC-0051; first canonical phase of `build+verify` macro per ultra_lean; /plan-verify merged into qa per ultra_lean — qa creates plan-verify.json within build+verify). Orchestrator runs sovereign-critic of sprint-plan first (CROSS_MODEL_REVIEW=1). Do not mandate outer driver.
+- sprint_artifacts: sprints/S0130/ (sprint.md, tasks.md, progress.md, uat.json, uat.md)
+- runtime_proof_id: rp-auto-20260826-01-sprint-plan-tech-lead-20260826T215200Z-US-0130
+- proof_hash: 5D0ADA062FE675333EF06E56DBC4649D22A2045C08D71456C7963893178CFED1
+- proof_ttl: 2026-08-26T22:52:00Z (UTC)
+- prior_phase_proof_consumed: rp-auto-20260826-01-architecture-tech-lead-20260826T214500Z-US-0130 (proof_hash=B071AE0659D99E2513304490BD3D191550631E7564398EEEC4485BD556FD8B4D, ttl=2026-08-26T22:45:00Z — independent SHA-256 MATCH; consumed at 2026-08-26T21:52:00Z before RUNTIME_PROOF_STALE; sovereign-critic architecture PASS at 2026-08-26T21:50:00Z anti_slop_aggregate=8 0 blocking findings)
+- stop_condition: STOP after sprint-plan completes; hand off via artifacts only. Orchestrator owns critic of sprint-plan then /execute in fresh dev subagent per BUG-0006. Do not spawn /execute or /plan-verify from this subagent. Do not mark US-0130 DONE. Do not tick acceptance L158. Do not mutate intake JSON. Do not amend US-0104/US-0102/US-0101 surfaces. Do not reopen US-0127/US-0128. Do not mutate US-0129. Do not author DEC-0130. Do not write model-catalog.local.json.
+
+---
+
+## Sprint-plan handoff — US-0128 / S0128 — `/execute` next (fresh dev; ultra_lean skips standalone /plan-verify)
+
+- sprint_id: S0128
+- story_id: US-0128
+- dec_id: none (companion DEC not required per R-0111 recommendation; align with DEC-0110 §10 smoke-green + DEC-0078 UAT probe contract)
+- research_anchor: R-0111 (DQ1–DQ8 LOCKED)
+- orchestrator_run_id: auto-20260826-01
+- fresh_context_marker: tl-US0128-sprint-plan-2026-08-26T201100Z-fresh
+- timestamp: 2026-08-26T20:11:00Z (UTC)
+- model_id: cursor-grok-4.6-high (CROSS_MODEL_REVIEW=1 — required on isolation; glm-5.2-high unavailable this spawn)
+- sprint_plan_verdict: PASS
+- sprint_status: PLANNED (backlog OPEN per US-0045 — not mutated; acceptance L156 unchecked)
+- task_count: 8 (T-anch + T-001..T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-004(markers 1,2,3,4,5,6,8,9),T-007(markers 4,5); AC-2->T-002,T-004(markers 5,7,8); AC-3->T-003,T-004(markers 2,3,4,6); AC-4->T-002,T-004(markers 5,7,8); AC-5->T-004(all 11 markers),T-007(markers 4,5,7); AC-6->T-005(runbook subsection),T-006(SOVEREIGN_CONVERGENCE_PAIRS + 2 command rows)
+- task_order: T-anch -> T-001 (surrogate eval branch in _eval_smoke_green, legacy-first) -> T-002 (qa.md + verify-work.md additive subsections) -> T-003 (reason_codes.md ## US-0128 section) -> T-004 (contract test file shell + 11 markers, with T-007 markers 4,5,7 authored within) -> T-005 (runbook subsection) -> T-006 (SOVEREIGN_CONVERGENCE_PAIRS + 2 command rows) -> integration verification
+- compose_guards (non-negotiable): DO NOT amend US-0109 (deploy smoke post-publish path / DEPLOY_SMOKE_* reason codes — marker 7 regression guard), US-0126 (sprints/S0126/uat.json waived-probe fixture / S0126 release artifacts — marker 11 regression guard; reference fixture for waived_probes[] shape only; US-0126 DONE product scope NOT reopened), US-0127 (_eval_critic_resolved / read_open_blocking / hygiene CLI / SOVEREIGN_CRITIC_PAIRS — marker 10 regression guard; US-0128 touches smoke_green only, not critic_resolved; SOVEREIGN_CRITIC_PAIRS unchanged), US-0110 (five-conjunct structure / degrade matrix / CONVERGENCE_SMOKE_PROBE_FAIL reason code — marker 9 regression guard; surrogate branch is an additional PASS path inside smoke_green; conjunct name/order/shape unchanged; CONVERGENCE_SMOKE_SURROGATE_MISSING is additive), US-0104 (critic findings JSONL / read_open_blocking / resolve_finding — US-0128 does not touch critic surfaces), US-0045 (no backlog Status/ACs mutation), US-0048/BUG-0006 (fresh-context isolation), US-0056 (runtime proof lowercase keys only). Do not rewrite docs/engineering/architecture.md.
+- critic_carry_ins: 0 new blocking. 3 architecture critic NBs `a0128arch-*` status=resolved non-blocking — routed as awareness into /execute:
+  - a0128arch-challenger-001 (`ik_us0128_arch_proof_and_boundary_gaps`): T-001 preserve legacy-first (`_uat_smoke_passes` before surrogate). R6 `id=convergence_smoke` also matches `_step_is_smoke` — do not invert. T-002 emit explicit `convergence_smoke` (S0126 steps lack probe_kind — R7; marker 11 reference only). Fail-closed SURROGATE_MISSING when neither top-level contract_test_failed nor derived passed==total. T-007 marker 4: partial waivers must not false-pass.
+  - a0128arch-architect-002 (`ik_us0128_arch_layer_compose_boundaries`): T-001 lib only; T-002 commands; T-003 reason_codes; T-004 tests; T-005/T-006 runbook+parity. No lib-side uat.json synthesis (A4 rejected). Do not touch `_eval_critic_resolved` / SOVEREIGN_CRITIC_PAIRS.
+  - a0128arch-subtractor-003 (`ik_us0128_arch_scope_discipline`): do not mark US-0128 DONE; do not tick L156; 11 markers required (not YAGNI); T-anch read-only — no architecture.md mutation.
+- architecture_pointers: docs/engineering/architecture.md # US-0128 (L1671 — approach A1, 11-marker AC-5 table, surrogate eval branch DQ1+DQ3+DQ4, canonical uat step DQ2+DQ5, fail-closed reason code DQ3+DQ4, contract tests DQ6, operator docs DQ7, template parity DQ8, compose-do-not-amend 8/8, risks R1–R7; sprint seeds T-anch + T-001..T-007). Do not rewrite.
+- first_execute_task: T-anch (NO-OP / verification) — verify # US-0128 H1 anchor + approach A1 + R-0111 DQ1–DQ8 + compose guards 8/8 + 11-marker list locked + absent surfaces (us0128 contract test + template mirror, qa.md/verify-work.md subsections, runbook subsection, reason_codes.md section, SOVEREIGN_CONVERGENCE_PAIRS qa/verify-work rows)
+- key_locked_artifacts:
+  - surrogate eval branch (DQ1+DQ3+DQ4): `scripts/sovereign_convergence_lib.py` `_eval_smoke_green` legacy path first via `_uat_smoke_passes`; if legacy FAIL, surrogate prerequisites: 6 canonical waived_probes UAT_PROBE_FORBIDDEN + `contract_test_failed=0` (top-level authoritative, derived fallback) + surrogate step (`id=convergence_smoke` preferred OR tail `probe_kind=contract_tests_primary` `result=pass`); `ConjunctResult(name="smoke_green", …)` shape unchanged; `CONVERGENCE_SMOKE_PROBE_FAIL` retained for real smoke step / US-0109 deploy smoke; new `CONVERGENCE_SMOKE_SURROGATE_MISSING` for surrogate prerequisites unmet (DQ4 cases 4–8); partial waivers fail closed (case 6); US-0109 deploy smoke precedence orthogonal (case 9)
+  - canonical uat step (DQ2+DQ5): `.cursor/commands/qa.md` + `.cursor/commands/verify-work.md` (+ template mirrors) additive `### Convergence smoke surrogate (US-0128)` subsection under `## Self-verify UAT probes (US-0092 / DEC-0078)` after `### Browser UAT self-test (US-0093)` before `## Steps`; emission rule for `convergence_smoke` step with `probe_kind=contract_tests_primary`, `result=pass` (when `contract_test_failed=0`)
+  - fail-closed reason code (DQ3+DQ4): `docs/engineering/reason_codes.md` (+ template mirror) new `## US-0128: Convergence smoke surrogate (DEC-0110 §10 smoke-green)` section with `CONVERGENCE_SMOKE_SURROGATE_MISSING` + clarifying note on US-0110 `CONVERGENCE_SMOKE_PROBE_FAIL` row (description only, not schema change)
+  - contract tests (DQ6+R-0111 Q1): `tests/us0128_contract_test.py` — 11 markers (8 from DQ6 + 3 compose regression guards: marker 9 US-0110, marker 10 US-0127, marker 11 US-0126); mirror to `template/tests/us0128_contract_test.py` byte-identical; all static/fixture-based, no live critic spawn
+  - operator docs (DQ7): runbook `### Smoke surrogate for waived-probe UAT slices (US-0128)` after `### Blocking-only conjunct-3 semantics (US-0127)` (L2811) before `### Interpret \`goal_progress\` block` (L2829); active + template byte-identical
+  - template parity (DQ8): `SOVEREIGN_CONVERGENCE_PAIRS` additive rows for `qa.md` <-> `template/.cursor/commands/qa.md` and `verify-work.md` <-> `template/.cursor/commands/verify-work.md`; `--scope=sovereign-convergence` extended automatically via tuple union; `SOVEREIGN_CRITIC_PAIRS` unchanged
+- files_to_touch: scripts/sovereign_convergence_lib.py + template mirror, .cursor/commands/qa.md + template mirror, .cursor/commands/verify-work.md + template mirror, docs/engineering/reason_codes.md + template mirror, tests/us0128_contract_test.py NEW + template mirror, docs/engineering/runbook.md + template mirror, scripts/check_intake_template_parity.py (2 new rows in SOVEREIGN_CONVERGENCE_PAIRS) + template mirror
+- files_NOT_to_touch: docs/engineering/architecture.md (do not rewrite), decisions/ (no new DEC), backlog US-0128 Status/ACs, handoffs/intake_evidence/US-0128-intake-20260825.json, sprints/S0126/uat.json (read-only reference fixture — marker 11 guards non-mutation), US-0109/US-0126/US-0127/US-0110/US-0104 surfaces (compose read-only), US-0121..US-0127 DONE rows, US-0129/US-0130 OPEN rows
+- next_phase: `/execute` (fresh dev per US-0069 / DEC-0051; first canonical phase of `build+verify` macro per ultra_lean; /plan-verify merged into qa per ultra_lean — qa creates plan-verify.json within build+verify)
+- sprint_artifacts: sprints/S0128/ (sprint.md, tasks.md, progress.md, uat.json, uat.md)
+- runtime_proof_id: rp-auto-20260826-01-sprint-plan-tech-lead-2026-08-26T201100Z-US-0128
+- proof_hash: C911D7C5CAA2939EC6F65ED07C717E9CBB00E80B551DCBFECA097D39F26878F4
+- proof_ttl: 2026-08-26T21:11:00Z (UTC)
+- prior_phase_proof_consumed: rp-auto-20260826-01-architecture-tech-lead-2026-08-26T195500Z-US-0128 (proof_hash=FF499010B78C4FB7855E9D6F4482227AD7B258230671D67E4E2B42571A68A969, ttl=2026-08-26T20:55:00Z — independent SHA-256 MATCH; consumed at 2026-08-26T20:11:00Z before RUNTIME_PROOF_STALE; sovereign-critic architecture PASS at 2026-08-26T19:59:00Z anti_slop_aggregate=8 0 blocking findings)
+- stop_condition: STOP after sprint-plan completes; hand off via artifacts only to /execute in fresh dev subagent per BUG-0006. Do not spawn /execute from this subagent. Do not mark US-0128 DONE. Do not tick acceptance L156. Do not mutate intake JSON. Do not amend US-0104/US-0110/US-0109/US-0126/US-0127 surfaces. Do not mutate US-0129/US-0130.
+
+---
+
+## Sprint-plan handoff — US-0127 / S0127 — `/plan-verify` next (fresh qa)
+
+- sprint_id: S0127
+- story_id: US-0127
+- dec_id: none (companion DEC not required per R-0110 recommendation; align with DEC-0110 §10 / DEC-0104 §11)
+- research_anchor: R-0110 (DQ1–DQ8 LOCKED)
+- orchestrator_run_id: auto-20260825-01
+- fresh_context_marker: tl-US0127-sprint-plan-20260825T185100Z-fresh
+- timestamp: 2026-08-25T18:51:00Z (UTC)
+- model_id: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- sprint_plan_verdict: PASS
+- sprint_status: PLANNED (backlog OPEN per US-0045 — not mutated)
+- task_count: 8 (T-anch + T-001..T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-004(markers 1,2,11,12,13),T-007(marker 13); AC-2->T-002,T-004(markers 3,4,5); AC-3->T-003,T-004(markers 6,7,8,9,10); AC-4->T-004(all 13 markers),T-007(marker 13); AC-5->T-005(runbook subsections + reason_codes.md section); AC-6->T-006(SOVEREIGN_CRITIC_PAIRS + --scope=sovereign-critic)
+- task_order: T-anch -> T-001 (convergence lib fix + DQ6 dispatch) -> T-002 (auto-resolve hook + helper) -> T-003 (hygiene CLI + 6 reason codes) -> T-004 (contract test file shell + 13 markers, with T-007 marker 13 authored within) -> T-005 (runbook subsections + reason_codes.md section) -> T-006 (SOVEREIGN_CRITIC_PAIRS + parity CLI extension) -> integration verification
+- compose_guards (non-negotiable): DO NOT amend US-0104 (sovereign_critic_lib.read_open_blocking / resolve_finding / findings JSONL schema / build_qa_cross_reviewer_block / sovereign_critic_validate.py — DQ7), US-0110 (five-conjunct structure / degrade matrix / CONVERGENCE_CROSS_REVIEWER_OPEN reason code — DQ8), US-0107 (deferral register / drain-generate / sovereign loop stop matrix — DQ8), US-0045 (no backlog Status/ACs mutation), US-0048/BUG-0006 (fresh-context isolation), US-0053/DEC-0035 (narrow-read phase context), US-0103/DEC-0103 (no ledger entries from sprint-plan), US-0056 (runtime proof lowercase keys only)
+- critic_carry_ins: 0 new (3 architecture critic NBs noted in sovereign-critic of architecture — all non-blocking: ik_us0127_arch_proof_and_boundary_gaps, ik_us0127_arch_layer_compose_boundaries, ik_us0127_arch_scope_discipline — routed as awareness into /execute via this sprint plan)
+- architecture_pointers: docs/engineering/architecture.md # US-0127 (L1852 — approach A1, 13-marker AC-4 table, convergence lib fix DQ1+DQ6, auto-resolve hook DQ1, hygiene CLI DQ2+DQ5, contract tests DQ3, operator docs DQ4, template parity DQ5, compose-do-not-amend 8/8, risks R1–R6; sprint seeds T-anch + T-001..T-007)
+- first_execute_task: T-anch (NO-OP / verification) — verify # US-0127 H1 anchor + approach A1 + R-0110 DQ1–DQ8 + compose guards 8/8 + 13-marker list locked + absent surfaces (hygiene CLI, contract test, SOVEREIGN_CRITIC_PAIRS, runbook subsections, reason_codes.md section)
+- key_locked_artifacts:
+  - convergence lib fix (DQ1+DQ6): `scripts/sovereign_convergence_lib.py` `_critic_jsonl_has_open` -> delegate to `read_open_blocking`; `_eval_critic_resolved` JSONL-authoritative when present, QA-markdown fallback when JSONL absent, skip when neither deployed
+  - auto-resolve hook (DQ1): `.cursor/commands/sovereign-critic.md` conditional call at end of command after reconcile+JSONL+isolation, before `## Stop conditions`; `auto_resolve_nonblocking_for_run` helper in `sovereign_critic_lib.py` (additive; scope key `(orchestrator_run_id, phase_id)`; idempotent via `resolve_finding`; `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` non-blocking info)
+  - hygiene CLI (DQ2+DQ5): NEW `scripts/sovereign_critic_hygiene.py` + template mirror; inventory `--report`/`--resolve-nonblocking-for-run`/`--dry-run`/`--confirm`/`--self-test`/`--all-phases`/`--phase-id`; 6 reason codes (`HYGIENE_RESOLVE_CONFIRM_REQUIRED`, `HYGIENE_RESOLVE_NO_CANDIDATES`, `HYGIENE_RESOLVE_PARTIAL`, `HYGIENE_RESOLVE_FAILED`, `HYGIENE_REPORT_EMPTY`, `HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED`); operator-only-when-quiet contract (no advisory lock — Q3 accepted)
+  - contract tests (DQ3+R2): `tests/us0127_contract_test.py` — 13 markers (10 from DQ3 + 2 compose regression guards + marker 13 R2 validator guard); mirror to `template/tests/us0127_contract_test.py` byte-identical; all static/fixture-based, no live critic spawn
+  - operator docs (DQ4): runbook `### Blocking-only conjunct-3 semantics (US-0127)` after `### Evaluate convergence` (L2792) before `### Interpret goal_progress block` (L2811); runbook `### Hygiene CLI (US-0127)` after `#### Parity enforcement` (L2915) before `#### Related artifacts` (L2923); `reason_codes.md` `## US-0127` section after US-0110 section (L77–L107); active + template byte-identical
+  - template parity (DQ5): `SOVEREIGN_CRITIC_PAIRS` additive row (hygiene script pair); `--scope=sovereign-critic` parity CLI extension; `SOVEREIGN_CONVERGENCE_PAIRS` existing rows confirmed (no new row — convergence lib mirror already present)
+- files_to_touch: scripts/sovereign_convergence_lib.py + template mirror, scripts/sovereign_critic_lib.py + template mirror (additive auto_resolve_nonblocking_for_run helper), .cursor/commands/sovereign-critic.md + template mirror, scripts/sovereign_critic_hygiene.py NEW + template mirror, tests/us0127_contract_test.py NEW + template mirror, docs/engineering/runbook.md + template mirror, docs/engineering/reason_codes.md + template mirror, scripts/check_intake_template_parity.py (--scope=sovereign-critic extension) + template mirror
+- files_NOT_to_touch: decisions/ (no new DEC), backlog US-0127 Status/ACs, handoffs/intake_evidence/US-0127-intake-20260825.json, US-0104/US-0110/US-0107 surfaces (compose read-only), US-0121..US-0126 DONE rows, scripts/sovereign_critic_validate.py (read-only — marker 13 asserts its behavior; do not amend)
+- next_phase: `/plan-verify` (fresh qa per orchestrator brief) for S0127 / US-0127
+- sprint_artifacts: sprints/S0127/ (sprint.md, tasks.md, progress.md, uat.json, uat.md)
+- runtime_proof_id: rp-auto-20260825-01-sprint-plan-tech-lead-20260825T185100Z-US-0127
+- proof_hash: DE343C909809932C3EA4B83A0D8B5F23FF8535954F05512C5D33A3EB3DE65723
+- proof_ttl: 2026-08-25T19:51:00Z (UTC)
+- stop_condition: STOP after sprint-plan completes; hand off via artifacts only to /plan-verify in fresh qa subagent per BUG-0006. Do not spawn /plan-verify from this subagent. Do not mark US-0127 DONE. Do not tick acceptance L155. Do not mutate intake JSON. Do not amend US-0104/US-0110/US-0107 surfaces.
+
+## Architecture handoff — US-0127 — /sprint-plan next (fresh tech-lead)
+
+- story_id: US-0127
+- sprint_id: (pending — created at sprint-plan)
+- dec_id: none (companion DEC not required per R-0110 recommendation; align with DEC-0110 §10 / DEC-0104 §11)
+- research_anchor: R-0110 (DQ1-DQ8 LOCKED)
+- orchestrator_run_id: auto-20260825-01
+- delivery_mode: ultra_lean
+- macro_phase: plan
+- fresh_context_marker: tl-US0127-architecture-20260825T184100Z-fresh
+- timestamp: 2026-08-25T18:41:00Z (UTC)
+- model_id: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- architecture_verdict: PASS (no DECISION_GATE; approach A1 locked; sprint seeds T-anch + T-001..T-007 within SPRINT_MAX_TASKS=12; risks R1-R6 finalized; compose-do-not-amend verified 8/8)
+- architecture_anchor: docs/engineering/architecture.md # US-0127 (L1852; inserted after # US-0126 section and before # US-0091 per DEC-0073 §11 heading policy)
+- root_cause: scripts/sovereign_convergence_lib.py _critic_jsonl_has_open (L318-331) treats every status=open row as unmet and defaults blocking=True when key absent — ~280 informational status=open,blocking=false rows block CONVERGENCE_CROSS_REVIEWER_OPEN despite US-0110 L3 requiring "no open blocking cross-reviewer findings"
+- approach_A1: narrow _critic_jsonl_has_open to delegate to sovereign_critic_lib.read_open_blocking(repo); change _eval_critic_resolved dispatch (DQ6 — JSONL authoritative when present, QA-markdown fallback when JSONL absent, informational skip when neither deployed); auto-resolve hook at /sovereign-critic PASS (DQ1 — scope key (orchestrator_run_id, phase_id), idempotent via resolve_finding, SOVEREIGN_CRITIC_AUTORESOLVE_FAILED non-blocking info); new scripts/sovereign_critic_hygiene.py + template mirror (DQ2 — --report/--resolve-nonblocking-for-run/--dry-run/--confirm/--self-test/--all-phases/--phase-id + 6 reason codes); 13 test_us0127_* markers (DQ3 + R2 marker 13); runbook subsections + reason_codes.md section (DQ4); SOVEREIGN_CRITIC_PAIRS additive row + --scope=sovereign-critic parity CLI extension (DQ5)
+- open_questions_accepted: Q1=13 markers (R2 validator guard); Q2=yes --all-phases + HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED; Q3=no advisory lock (document operator-only-when-quiet contract)
+- sprint_seeds: T-anch (anchor verification NO-OP) + T-001 (AC-1 convergence lib fix + DQ6 dispatch) + T-002 (AC-2 auto-resolve hook + helper) + T-003 (AC-3 hygiene CLI + template mirror + 6 reason codes) + T-004 (AC-4 13 contract markers + template mirror) + T-005 (AC-5 runbook subsections + reason_codes.md section + template mirror) + T-006 (AC-6 SOVEREIGN_CRITIC_PAIRS + parity CLI extension) + T-007 (R2 validator regression guard marker 13)
+- compose_guards (non-negotiable): DO NOT amend US-0104 (sovereign_critic_lib.read_open_blocking / resolve_finding / findings JSONL schema / build_qa_cross_reviewer_block / sovereign_critic_validate.py — DQ7), US-0110 (five-conjunct structure / degrade matrix / CONVERGENCE_CROSS_REVIEWER_OPEN reason code — DQ8), US-0107 (deferral register / drain-generate / sovereign loop stop matrix — DQ8), US-0045 (no backlog Status/ACs mutation), US-0048/BUG-0006 (fresh-context isolation), US-0053/DEC-0035 (narrow-read phase context), US-0103/DEC-0103 (no ledger entries from architecture), US-0056 (runtime proof lowercase keys only)
+- files_to_touch: scripts/sovereign_convergence_lib.py + template mirror, .cursor/commands/sovereign-critic.md + template mirror, scripts/sovereign_critic_lib.py + template mirror (additive auto_resolve_nonblocking_for_run helper), scripts/sovereign_critic_hygiene.py NEW + template mirror, tests/us0127_contract_test.py NEW + template mirror, docs/engineering/runbook.md + template mirror, docs/engineering/reason_codes.md + template mirror, scripts/check_intake_template_parity.py (--scope=sovereign-critic extension)
+- files_NOT_to_touch: decisions/ (no new DEC), backlog US-0127 Status/ACs, handoffs/intake_evidence/US-0127-intake-20260825.json, US-0104/US-0110/US-0107 surfaces (compose read-only), US-0121..US-0126 DONE rows
+- triad_rollover: architecture moved=1 pack=docs/engineering/architecture-archive/architecture-pack-20260825-a.md (legacy ## US-0119 H2 section archived, 200 lines); state moved=1 pack=docs/engineering/state-archive/state-pack-20260825-ab.md; enforce-triad-hot-surface.py --check exit 0; --check-arch-heading-policy --baseline-h2-count 1 exit 0
+- codebase_map: [CODEBASE_MAP_OK] preserved_existing trigger=architecture
+- runtime_proof_id: rp-auto-20260825-01-architecture-tech-lead-20260825T184100Z-US-0127
+- proof_hash: DF773DDFBA1021C5DBD44F0470469BD76A909C1373FC528BAEA65070CB9A179C
+- proof_ttl: 2026-08-25T19:41:00Z (UTC)
+- next_scheduled_phase: /sprint-plan (role=tech-lead per US-0069 / DEC-0051; third canonical phase of plan macro per ultra_lean; after sovereign-critic of architecture)
+- stop_condition: STOP after architecture completes; hand off via artifacts only to sovereign-critic of architecture, then /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent. Do not mark US-0127 DONE. Do not tick acceptance. Do not mutate intake JSON. Do not amend US-0104/US-0110/US-0107 surfaces.
+
+﻿## Sprint-plan handoff — **US-0126** / **S0126** — `/plan-verify` next (fresh qa)
+
+- sprint_id: S0126
+- story_id: US-0126
+- dec_id: DEC-0126 (Accepted, decisions/DEC-0126.md)
+- research_anchor: R-0109 (DQ1..DQ8 LOCKED for US-0126; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 + US-0124 DQ1..DQ8 + US-0125 DQ1..DQ8 locks preserved)
+- orchestrator_run_id: auto-20260825-01
+- fresh_context_marker: tl-US0126-sprint-plan-20260825T161520Z-fresh
+- sprint_plan_verdict: PASS
+- sprint_status: PLANNED (backlog OPEN per US-0045 — not mutated)
+- task_count: 11 (T-anch + T-001..T-010; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-004(marker 1); AC-2->T-001,T-005,T-004(marker 2); AC-3->T-003,T-004(marker 3),T-009(marker 3); AC-4->T-004(all 12 markers),T-010(markers 4,12); AC-5->T-002,T-006(markers 5,6); AC-6->T-001,T-007(marker 7); AC-7->T-001,T-002,T-008(marker 8); AC-8->T-001,T-002,T-008(marker 9); AC-9->T-003,T-009(marker 10); AC-10->T-009(marker 11)
+- task_order: T-anch -> T-001 (runbook h2 body with T-005 consolidated table inline) -> {T-002, T-003 parallel (README blurb, OPENCODE_ADAPTER_PAIRS extension)} -> T-004 (contract test file shell + 12 markers) -> {T-006, T-007, T-008, T-009, T-010 parallel (markers 5,6 / 7 / 8,9 / 3,10,11 / 4,12)} -> integration verification
+- compose_guards (non-negotiable): DO NOT amend US-0071 (operator-sentence sanitization — no DEC ids in operator prose; cross-references to runbook h2 / Boundaries subsection only), US-0113..US-0117 (operator docs — add OpenCode host section; do not rewrite Cursor command catalogs), US-0121/DEC-0120 (installer `--host` flag docs hook — `## OpenCode host mode (US-0121)` h2 untouched; US-0126 cross-links), US-0122/DEC-0122 (seven role agents — referenced, not redefined), US-0123 (per-role slug routing — referenced, not re-listed), US-0124/DEC-0124 (orchestrator plugin + stub reason-code h2 untouched — US-0126 owns consolidated table; cross-links to US-0124 stub h2; does not reimplement plugin logic), US-0125/DEC-0125 (thin commands + validator-bridge stub h2 untouched — US-0126 owns consolidated table; **DEC-0125 DQ7 raw Python reason codes upheld — `OPENCODE_VALIDATOR_FAILED` wrapper NOT resurrected**), US-0102/DEC-0087 (no vendor slugs in `template/` — no vendor slugs in runbook/README operator prose)
+- critic_carry_ins: 0 new (3 research critic NBs closed in architecture phase: ik_us0126_dq3_parity_grep_false_pass [DQ3 explicit layer split — parity CLI byte-only vs contract-test grep], ik_us0126_layering_runbook_dec_tests [DQ1+DQ8 runbook whole-file byte-identical pair coupling documented], ik_us0126_research_scope_yagni_markers [DQ4 12 markers locked + AC-10 deterministic static check vs current-kit-inventory, not frozen git snapshot])
+- architecture_pointers: docs/engineering/architecture.md # US-0126 (L1747 — approach A1, 12-marker table, runbook section DQ1, reason-code table DQ2, parity scope DQ3, contract tests DQ4, program DoD DQ5, default-host reminder DQ6, out-of-scope DQ7, template parity manifest DQ8, non-goals; sprint seeds T-anch + T-001..T-010 at L1981)
+- dec_pointers: decisions/DEC-0126.md (§1 runbook section, §2 locked operator sentences, §3 consolidated reason-code table, §4 parity scope + layer split, §5 12-marker contract-test list, §6 template parity manifest unchanged, §7 compose-do-not-amend, §8 isolation + runtime proof)
+- first_execute_task: T-anch (NO-OP / verification) — verify # US-0126 H1 anchor + DEC-0126 Accepted + compose guards 8/8 + 12-marker list locked + runbook/reason-code/parity/DoD/reminder/out-of-scope/manifest contracts + absent surfaces
+- key_locked_artifacts:
+  - runbook section (DQ1): new sibling h2 `## OpenCode host operator runbook (US-0126)` in `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` byte-identical; placed immediately after `## OpenCode thin commands + validator bridge (US-0125)` section; US-0121/US-0124/US-0125 h2 sections untouched (compose, do not amend)
+  - locked operator sentences (DQ5, DQ6, DQ7): program DoD sentence (verbatim), default-host reminder sentence (verbatim, no DEC ids per US-0071), out-of-scope list (verbatim operator prose, no DEC ids); Boundaries subsection (runbook only; cross-references to DEC ids allowed here — `docs/product/standalone-runtime-masterplan.md`, `DEC-0055`, `US-0093`)
+  - consolidated reason-code table (DQ2): 4 `OPENCODE_*` US-0124 + 5 installer `OPENCODE_*`/`CURSOR_*` US-0121 + 3 reused cross-host + raw Python validator codes (no `OPENCODE_VALIDATOR_FAILED` wrapper per DEC-0125 DQ7); each with one-line semantics + fail-closed action + cross-link to owning slice
+  - parity scope (DQ3): additive `OPENCODE_ADAPTER_PAIRS` extension (2 new pairs: `tests/us0126_contract_test.py` ↔ template + `docs/engineering/runbook.md` ↔ template); parity CLI stays byte-only (DQ3 layer split — critic NB `ik_us0126_dq3_parity_grep_false_pass` closed); reason-code table presence + `test_us0126_*` markers = contract-test grep, NOT parity-CLI predicates
+  - contract tests (DQ4): `tests/us0126_contract_test.py` — 12 markers (see architecture AC-4 table); mirror to `template/tests/us0126_contract_test.py` byte-identical; all static/grep, no live OpenCode probe (vision D10)
+  - AC-10 baseline (DQ4): deterministic static check vs current-kit-inventory (sorted file-name list of `.cursor/commands/*.md` + `.cursor/agents/*.md` checked into the repo at execute time); NOT a frozen pre-US-0126 git snapshot (fragile); NOT a hash manifest of the entire `.cursor/` directory (over-broad)
+  - manifest (DQ8): `installer-owned-paths.manifest` UNCHANGED (runbook already covered by `docs` in `[install_include_paths]`; `tests/us0126_contract_test.py` NOT installer-shipped per US-0121..US-0125 pattern)
+- next_phase: `/plan-verify` (fresh qa per orchestrator brief) for S0126 / US-0126
+- sprint_artifacts: sprints/S0126/ (sprint.md, tasks.md, progress.md, uat.json, uat.md)
+- timestamp: 2026-08-25T16:15:20Z
+- role: tech-lead
+- model_id: glm-5.2-high (CROSS_MODEL_REVIEW=1 — required)
+- runtime_proof_id: rp-auto-20260825-01-sprint-plan-tech-lead-20260825T161520Z-US-0126
+- proof_hash: 10E2CAC09DA36BF61FAAC0A3A258C49E2095875703018CAD4102E921704FC2A9
+
+### Isolation evidence (US-0048 / DEC-0029 / US-0104 v2)
+
+- `phase_id=sprint-plan`
+- `role=tech-lead`
+- `fresh_context_marker=tl-US0126-sprint-plan-20260825T161520Z-fresh`
+- `timestamp=2026-08-25T16:15:20Z`
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required)
+- `evidence_ref=sprints/S0126/sprint.md, sprints/S0126/tasks.md, sprints/S0126/progress.md, sprints/S0126/uat.json, sprints/S0126/uat.md, docs/engineering/state.md (sprint-plan checkpoint append-bottom + traceability row), docs/engineering/architecture.md # US-0126, decisions/DEC-0126.md, handoffs/resume_brief.md`
+
+### Strict runtime proof (US-0056 / DEC-0038)
+
+- `orchestrator_run_id=auto-20260825-01`
+- `runtime_proof_id=rp-auto-20260825-01-sprint-plan-tech-lead-20260825T161520Z-US-0126`
+- `phase_id=sprint-plan`, `role=tech-lead`, `story_id=US-0126`, `sprint_id=S0126`
+- `proof_issued_at=2026-08-25T16:15:20Z`
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-25T17:15:20Z`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260825-01","phase_id":"sprint-plan","proof_issued_at":"2026-08-25T16:15:20Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260825-01-sprint-plan-tech-lead-20260825T161520Z-US-0126","sprint_id":"S0126","story_id":"US-0126"}`
+
+---
+
+## Sprint-plan handoff — **US-0125** / **S0125** — `/plan-verify` next (fresh qa)
 
 - sprint_id: S0125
 - story_id: US-0125

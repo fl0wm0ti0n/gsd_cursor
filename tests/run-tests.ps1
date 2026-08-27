@@ -1653,6 +1653,12 @@ Assert-True "check_intake_template_parity --scope=model-tier-overrides passes (U
 $us0102Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\auto_command_contract_test.py", "-q", "-k", "us0102") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0102 contract subtests pass" ($us0102Contract.ExitCode -eq 0)
 
+# 26AB) US-0129 / DEC-0129 — architecture rollover linkage guard
+$us0129Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=arch-linkage") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=arch-linkage passes (US-0129)" ($us0129Parity.ExitCode -eq 0)
+$us0129Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\us0129_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0129 contract tests pass" ($us0129Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

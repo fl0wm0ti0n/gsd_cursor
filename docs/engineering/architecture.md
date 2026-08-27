@@ -1,1147 +1,4 @@
 
-## US-0080 — Auto quiet mode
-
-Story US-0080 — Auto quiet mode. `AUTO_QUIET=1` suppresses non-essential stdout; angle-distinct from `TOKEN_PROFILE` (US-0072 / US-0080 shared runbook anchor). See `# US-0117`. Binding: DEC-0035; runbook `## Context compaction and token profile mode (US-0053 / DEC-0035)` L550 h2 + `### Auto quiet mode` L570 h3.
-
-## US-0081 — Caveman mode
-
-Story US-0081 — Caveman mode. `CAVEMAN_MODE=1` / `CAVEMAN_LEVEL=<n>` engages compressed-output operator mode; `CAVEMAN_LEVEL_UNKNOWN` reason code on invalid level. See `# US-0117`. Binding: DEC-0073; runbook `## Caveman mode (US-0089)` L2032 h3 (note: runbook h2 uses US-0089 id colliding with US-0081 family — US-0081 owns the caveman-mode feature; US-0089 owns auto orchestration; `/architecture` locks the resolution).
-
-## US-0082 — Codebase map (bootstrap mechanism)
-
-Story US-0082 — Codebase map bootstrap mechanism. **Label correction**: authoritative label = "Codebase map" (per runbook L63 + DEC-0065; spec handoff's "Input compression" is a mislabel). `CODEBASE_MAP_REFRESH_ON_ROLLOVER=1` (default off) triggers `scripts/materialize_codebase_map.py` on rollover. See `# US-0117` and `## US-0076`. Binding: DEC-0065; runbook `## Codebase map bootstrap (US-0082 / DEC-0065)` L63 h2.
-
-## US-0083 — Scratchpad delivery keys
-
-Story US-0083 — Scratchpad delivery keys. `AUTO_DELIVERY_ROUTING` net-new key + cross-link to US-0114 for `DELIVERY_MODE` + `DELIVERY_MODE_SWITCH_MID_STORY` reason code. See `# US-0117` and `## US-0078`. Binding: DEC-0067 / DEC-0060; runbook `## Interactive intake evidence validation (US-0078 / DEC-0060 / US-0083 / DEC-0067)` L479 h2 + `### Scratchpad delivery keys` L591 h3.
-
-## US-0085 — Context fresh-context markers
-
-Story US-0085 — Context fresh-context markers. `fresh_context_marker` is an isolation-evidence field (not a runtime toggle); `PHASE_CONTEXT_ISOLATION_MISSING` reason code on missing marker. See `# US-0117`. Binding: DEC-0029; runbook `## Phase-context isolation (US-0048 / DEC-0029)` L1628 h2.
-
-## US-0087 — Full-autonomy mode
-
-Story US-0087 — Full-autonomy mode. 18 net-new key rows (largest in family): `AUTO_FLOW_MODE` / `AUTO_IMPLEMENTATION_LOOP` / `AUTO_LOOP_MAX_CYCLES` / `AUTO_BLOCK_RETRY_MAX` / `RELEASE_PUBLISH_MODE` / `CROSS_MODEL_REVIEW` / `CROSS_MODEL_ANTISLOP_THRESHOLD` / `CROSS_MODEL_REWORK_MAX` / `SOVEREIGN_MEMORY` + family (5) / `AUTO_SOVEREIGN` + family (4) / `SOVEREIGN_GOAL_MODE` + `BLOCK_RETRY_CAP_EXHAUSTED` / `NATIVE_CHAIN_UNAVAILABLE` reason codes. See `# US-0117`. Binding: DEC-0078; runbook `## Full-autonomy mode (US-0087 / DEC-0078)` L1809 h2 + `### Full-autonomy interaction` L1958 h3.
-
-## US-0088 — Automation modes
-
-Story US-0088 — Automation modes. 9 net-new keys: `AUTO_BACKLOG_DRAIN` / `AUTO_BACKLOG_MAX_STORIES` / `AUTO_BACKLOG_ON_BLOCK` / `AUTO_STORY_SELECTION` / `AUTO_EXECUTE_BULK` / `AUTO_EXECUTE_MAX_ITEMS` / `AUTO_EXECUTE_ON_BLOCK` / `AUTO_EXECUTE_SELECTION` / `AUTO_TEAM_SCOPE_ENFORCE` + `BLOCK_RETRY_CAP_EXHAUSTED` reason code. See `# US-0117`. Binding: DEC-0078; runbook `## Automation modes (US-0088)` L1838 h2.
-
-## US-0089 — Auto orchestration
-
-Story US-0089 — Auto orchestration. **US-id collision resolution**: authoritative label = "Auto orchestration" (per scratchpad L21/L135 + 18-feature family; runbook h2 `## Caveman mode (US-0089)` L2032 is a US-id collision — US-0089 in the 18-feature family is Auto orchestration, NOT Caveman mode). 2 net-new keys: `AUTO_PAUSE_REQUEST` / `AUTO_REMOTE_AUTOMATION_PROFILE`. See `# US-0117`. Forward-link **`BUG-0011`** / **`DEC-0077`** (Caveman voice-compression delivery; see `# US-0089` §6 below). Binding: DEC-0078; runbook `### Auto orchestration` L1398 h3 + `## Automation modes (US-0088)` L1838 h2.
-
-## US-0090 — Caveman input compression
-
-Story US-0090 — Caveman input compression. **Label correction**: authoritative label = "Caveman input compression" (per runbook L2099 + DEC-0073; spec handoff's "Phase governance integration" is a mislabel — "phase governance integration" is the umbrella's introductory framing AC-1, not a separate `#### US-0090` subsection). 2 net-new keys: `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` + `CAVEMAN_COMPRESS_SCOPE_EMPTY` reason code. See `# US-0117`. Binding: DEC-0073; runbook `### Caveman input compression` L2099 h3. See `# US-0085` for context fresh-context markers.
-
-## US-0103 — Sovereign loop ledger (DC-1, from US-0113)
-
-Story US-0103 — Sovereign loop ledger. Append-only sovereign-loop event log (`sovereign_loop_lib.py` advance/drain-generate/notification); default-off `AUTO_SOVEREIGN` (US-0107) composes on this. See `# US-0113`. Binding: DEC-0103; research R-0089.
-
-## US-0104 — Cross-model critic (DC-1, from US-0113)
-
-Story US-0104 — Cross-model critic. `CROSS_MODEL_REVIEW` / `CROSS_MODEL_ANTISLOP_THRESHOLD` / `CROSS_MODEL_REWORK_MAX` keys; cross-model review dispatch with antislop threshold + bounded rework. See `# US-0113`. Binding: DEC-0104; research R-0092.
-
-## US-0105 — Convergence gate (DC-1, from US-0113)
-
-Story US-0105 — Convergence gate. `evaluate_convergence` five-conjunct gate + `goal_progress` emission; composes on US-0103 ledger. See `# US-0113`. Binding: DEC-0105; research R-0093.
-
-## US-0107 — Sovereign loop mode (DC-1, from US-0113)
-
-Story US-0107 — Sovereign loop mode. Default-off `AUTO_SOVEREIGN` orchestrates sovereign-loop advance/drain-generate/notification; fail-closed goal-mode coupling; deferral JSONL v1 + validator. See `# US-0113`. Binding: DEC-0107; research R-0094.
-
-## US-0110 — Goal-based convergence loops (DC-1, from US-0113)
-
-Story US-0110 — Goal-based convergence loops. Five-conjunct `evaluate_convergence`, `goal_progress` emission, partial-delivery report; composes on US-0103 / US-0105. See `# US-0113`. Binding: DEC-0110; research R-0091.
-
-## US-0041 — Release notes derivation (DC-2, from US-0114)
-
-Story US-0041 — Release notes derivation. Atomic `[Unreleased] -> [semver]` promotion via `release_changelog_lib.promote_unreleased()`; release-trigger-driven changelog derivation. See `# US-0114`. Binding: DEC-0041.
-
-## US-0062 — Sync policy + auto-push allowlist (DC-2, from US-0114)
-
-Story US-0062 — Sync policy + auto-push allowlist. `SYNC_POLICY_MODE=disabled` (DEC-0018 default); `AUTO_PUSH_BRANCH_ALLOWLIST` gated sync; release-publish-mode contract. See `# US-0114`. Binding: DEC-0062 / DEC-0018.
-
-## US-0034 — Cross-repo compatibility observability (DC-3, from US-0115)
-
-Story US-0034 — Cross-repo compatibility observability. Monitored sources, manifest contract boundaries, compatibility signal taxonomy, critical-gate policy (`COMPATIBILITY_GATE_ON_CRITICAL`). Default-off (`CROSS_REPO_OBSERVABILITY=0`). See `# US-0115`. Binding: DEC-0034.
-
-## US-0084 — Codebase map freshness gate (DC-3, from US-0115)
-
-Story US-0084 — Codebase map freshness gate. Freshness gate on `docs/engineering/codebase-map.md`; `CODEBASE_MAP_REFRESH_ON_ROLLOVER` default off. See `# US-0115` and `## US-0082`. Binding: DEC-0065.
-
-## US-0086 — Handoff hygiene validator (DC-3, from US-0115)
-
-Story US-0086 — Handoff hygiene validator. `scripts/check_handoff_hygiene.py` validates handoff files against schema; fail-closed on missing/malformed. See `# US-0115`. Binding: DEC-0086.
-
-# US-0091: README ↔ backlog feature coverage backfill + blocking drift gate
-
-## Overview
-
-**Composes on `# US-0077`** (dual-README audience — **`DEC-0059`**) and **extends the
-release doc-gate family** alongside **US-0030** (delta-driven command/flag documentation
-gate). Binding decision: **`DEC-0074`**. Composes on **`US-0017`** template drift guard and
-**`US-0071`** installer parity surfaces. Release changelog artifacts include
-`{semver}-release-notes.md` and **`CHANGELOG.md`** per **`DEC-0085`**.
-
-## Decision linkage
-
-- Decision: **`DEC-0074`**
-- Composed: **`US-0030`**, **`DEC-0059`**, **`US-0017`**, **`US-0071`**
-
-# US-0093: Cursor browser-integrated UAT self-test
-
-## Overview
-
-**`US-0093`** closes the execution gap left by **`US-0092`** / **`DEC-0078`**: stdlib
-**`scripts/uat_probe_lib.py`** classifies browser steps but Tier 2 agent execution owns
-Cursor built-in browser MCP. Binding decision: **`DEC-0079`**. Research anchor:
-**`R-0041`**. Composes on **`# US-0092`** / **`DEC-0078`**, **`US-0065`**, **`US-0066`**
-— spawn-only (**`BUG-0006`**) unchanged; stdlib never invokes browser MCP directly.
-
-## Agent-browser evidence contract
-
-Normative verify-work / qa / execute subsections require agents to write
-**`browser_evidence_refs`** after MCP probes. Scratchpad key **`UAT_BROWSER_PROBE_MODE`**
-selects primary path (`cursor` | `http_fallback` | `playwright_fallback`); fail closed on
-**`UAT_BROWSER_UNAVAILABLE`** when MCP is missing.
-
-## Decision linkage
-
-- Decision: **`DEC-0079`**
-- Composed: **`DEC-0078`**, **`US-0092`**, **`US-0065`**
-- Research: **`R-0041`**
-
-## US-0096 — Active context handoff / lean memory (DC-3, from US-0115)
-
-Story US-0096 — Active context handoff. `LEAN_MEMORY_*` family (DEC-0082) for memory-layer mechanics; delivery-mode-aware handoff shape. See `# US-0115`. Binding: DEC-0082.
-
-## US-0101 — Model tier resolution (DC-3, from US-0115)
-
-Story US-0101 — Model tier resolution. Resolves model tier per role + delivery mode; composes on US-0102 catalog. See `# US-0115`. Binding: DEC-0101.
-
-## US-0102 — Role-based model catalog (DC-3, from US-0115)
-
-Story US-0102 — Role-based model catalog. Role-based model catalog presets shipped on install/upgrade (US-0112); `model-catalog.local.example.*.json` framework files. See `# US-0115`. Binding: DEC-0102.
-
-## US-0092 — Delivery confirmation gate / full-autonomy outer driver (DC-4, from US-0116)
-
-Story US-0092 — Delivery confirmation gate. Full-autonomy outer driver + security posture; delivery confirmation gate at end of drain. See `# US-0116`. Binding: DEC-0078.
-
-## US-0095 — Native in-chat auto-chain (DC-4, from US-0116)
-
-Story US-0095 — Native in-chat auto-chain. Native in-chat auto-chain continuation; orchestrator continuation contract. See `# US-0116`. Binding: DEC-0080 / DEC-0081.
-
-## US-0098 — Dev environment auto-launch (DC-4, from US-0116)
-
-Story US-0098 — Dev environment auto-launch. `DEV_AUTO_LAUNCH_PROFILE` / `DEV_ENVIRONMENT_CONFIG` keys; execute-phase runtime gate (default-off). See `# US-0116`. Binding: DEC-0084.
-
-## US-0099 — Dev-environment copy-when-missing bootstrap (DC-4, from US-0116)
-
-Story US-0099 — Dev-environment copy-when-missing bootstrap. Install-time bootstrap (copy-when-missing, runs only on `missing` / `upgrade` / `postinstall`); `DEV_ENV_BOOTSTRAP_*` family + `DEV_ENV_PROFILE_MISSING` reason codes. See `# US-0116`. Binding: DEC-0084.
-
-
-## US-0118 — Work-kind classification + tiered delivery routing per story
-
-### Overview
-
-**US-0118** is the first **code-bearing** story in the new drain (US-0113..US-0117 were documentation-only). It introduces a deterministic **per-story work-kind classifier** `scripts/work_kind_classify_lib.py:classify_work_kind(story_prose, acceptance_criteria, touched_file_hints, component_scope) -> WorkKindClassification` returning `work_kind ∈ {doc, mini, code}` + `recommended_delivery_mode ∈ {standard, ultra_lean, mega_quick}` + `recommended_phase_plan` (list of canonical phase ids) + `rationale` + `evidence_refs` (+ optional `rule_trace` via `--explain`). Gated by a new default-off scratchpad flag `WORK_KIND_ROUTING=0|1` (zero overhead when off — early-return in `/auto` `resolve_delivery_mode` step 0 + `/intake` step 5 skip when `WORK_KIND_ROUTING != "1"`). Backlog rows gain optional `work_kind` + `recommended_delivery_mode` fields set at intake (operator accept/override; recorded in intake evidence bundle per US-0078 / DEC-0060). `/auto` `resolve_delivery_mode` step 0 consumes them when `DELIVERY_MODE`/`AUTO_PHASE_*` are unset (L8 precedence: explicit `DELIVERY_MODE` > explicit `AUTO_PHASE_*` > `WORK_KIND_ROUTING`-derived > current default; `start-from` always wins). `doc` → `[intake, execute, release]`; `mini` → `ultra_lean` or `mega_quick` (US-0096 eligibility); `code` → `standard`. Reuses `scripts/dev_environment_lib.py:classify_touched_files()` (tier A/B/C + `TIER_C_SKIP_PREFIXES`) — import, do not reinvent (Q9 LOCKED). Deterministic pure-stdlib, no LLM, no network, no `.env` reads (Q3 LOCKED). Four `WORK_KIND_*` reason codes (Q2 LOCKED). 12 `test_us0118_*` contract test markers (Q4 LOCKED). New `### Work-kind routing keys (US-0118)` README sub-block (Q5 LOCKED — 6th sibling; README edits happen in `/execute`, NOT here) + new `## Work-kind routing (US-0118)` runbook h2 (Q7 LOCKED). Triple-installer parity (Q10/installer manifest).
-
-**Binding decision**: **companion_dec=DEC-0118** (Required → Accepted; authored in THIS phase). US-0118 introduces a new routing primitive — DEC-0118 locks: (a) the work-kind enumeration decision (`doc`/`mini`/`code` 3-tier; alternatives: 2-tier doc/non-doc collapsed — rejected as too coarse; 4-tier doc/mini/standard/extended — rejected as over-engineered), (b) the L8 precedence chain (explicit operator flags always win; classifier fills only the unset case), (c) the `dev_environment_lib.classify_touched_files` reuse boundary (import, not rewrite — Q9 LOCKED), (d) the zero-overhead-when-off contract (default `WORK_KIND_ROUTING=0`). Mirrors DEC-0082 (US-0096 delivery modes) / DEC-0052 (US-0070 phase selection) precedent. **Research anchor**: **R-0106** (delivered 2026-07-04T20:00:00Z, 10/10 open questions Q1..Q10 closed LOCKED; architecture seeds T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; AC baselines green; risks R1..R8 finalized). **Compose guards (non-negotiable, 23 — UNCHANGED, cumulative across all prior stories — same 23 as US-0117)**: US-0091, US-0097, US-0017, US-0040, US-0100, US-0101, US-0102, US-0103, US-0104, US-0105, US-0107, US-0108, US-0109, US-0110, US-0111, US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062. **Status authority**: **OPEN** per **US-0045** (closure at `/release`).
-
-**Fresh context marker**: `tl-US0118-architecture-20260704T203000Z-fresh`
-**Orchestrator run id**: `auto-20260704-01`
-**Timestamp**: 2026-07-04T20:30:00Z (UTC)
-**Verdict**: PASS
-**Next**: `/sprint-plan`
-
-
-### Companion DEC
-
-**companion_dec = DEC-0118** (Required → Accepted; authored in THIS phase at `decisions/DEC-0118.md`). US-0118 introduces a new routing primitive (per-story work-kind classifier) with a precedence-chain tradeoff (L8: explicit `DELIVERY_MODE` > explicit `AUTO_PHASE_*` > `WORK_KIND_ROUTING`-derived > current default) and a work-kind enumeration tradeoff (`doc`/`mini`/`code` 3-tier vs alternative 2-tier or 4-tier schemes). Mirrors DEC-0082 (US-0096 delivery modes) / DEC-0052 (US-0070 phase selection) precedent: a new routing primitive gets a companion DEC locking the precedence chain + enumeration choice + reuse boundary + zero-overhead-when-off contract. The DC-1+DC-2+DC-3+DC-4 resolution (36 h1 anchors) was already performed in US-0117's `/architecture` phase (final deferred-candidate resolution point) — US-0118 inherits a clean deferral register. See `decisions/DEC-0118.md` for the decision body.
-
-### Approach locked (A1)
-
-**Approach A1** (locked): Single `### Work-kind routing (US-0118)` umbrella section + per-feature subsections + 6th scratchpad ref sub-block `### Work-kind routing keys (US-0118)` as a sibling to the US-0113..US-0117 sub-blocks (US-0113 L2421, US-0114 L2545, US-0115 L2617, US-0116 L2765, US-0117 L2856). US-0118 is the **6th-story cumulative byte-stability surface** — first 6-cumulative-surface story. Prior 5 released blocks (US-0113..US-0117) must remain byte-identical between `its_magic/README.md` and `template/its_magic/README.md`; US-0118 adds net-new-keys-only + cross-link-pointers + reason-code-only entries to its own 6th sub-block, never edits prior released blocks. README edits happen in `/execute` (build+verify macro), NOT here — this phase only PROPOSES the sub-block name + cross-link targets in prose.
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| **A1** | **Single `### Work-kind routing (US-0118)` umbrella + per-feature subsections + 6th scratchpad ref sub-block** (net-new keys + cross-link pointers + reason-code-only) | **Preferred** — matches US-0113 / US-0114 / US-0115 / US-0116 / US-0117 sibling precedent (6th sibling); preserves byte-stability of prior 5 released blocks. |
-| A2 (rejected) | Extend `### Delivery & lifecycle keys` (US-0116) sub-block with `WORK_KIND_ROUTING` key. | **Rejected** — breaks US-0116's byte-stability (released block in S0116); Q5 LOCKED rejected this alternative explicitly. |
-| A3 (rejected) | 2-tier work-kind enumeration (`doc`/`non-doc`) collapsed; or 4-tier (`doc`/`mini`/`standard`/`extended`). | **Rejected** — 2-tier too coarse (conflates `mini` and `code`); 4-tier over-engineered (no operator demand for `extended`); 3-tier mirrors `dev_environment_lib.classify_touched_files` tier A/B/C precedent. |
-
-
-### Files to touch
-
-- `scripts/work_kind_classify_lib.py` — **NEW**. Pure-stdlib classifier exposing `classify_work_kind(story_prose, acceptance_criteria, touched_file_hints, component_scope) -> WorkKindClassification` dataclass (Q10 LOCKED signature). Implements doc/mini/code rules per L5/L6/L7 + Q1 tie-break (highest tier wins). `--explain` flag emits `rule_trace` (Q3). `--self-test` exits 0 (AC-12). Imports `TIER_C_SKIP_PREFIXES` + `classify_touched_files` from `dev_environment_lib` (Q9 LOCKED import contract — no duplication).
-- `scripts/installer.py` (or `/auto` orchestrator) — `resolve_delivery_mode` step 0 minimal hook (early-return when `WORK_KIND_ROUTING != "1"`; precedence clause per L8). T-004.
-- `its_magic/README.md` — **NEW** `### Work-kind routing (US-0118)` umbrella section + per-feature subsections + `### Work-kind routing keys (US-0118)` 6th scratchpad ref sub-block (Q5 LOCKED — 6th sibling; net-new keys + cross-link pointers + reason-code-only; never edits prior US-0113..US-0117 blocks). T-007. (Edits happen in `/execute`, NOT here.)
-- `template/its_magic/README.md` — one-way byte-sync of `its_magic/README.md`. T-007/T-004.
-- `tests/us0118_contract_test.py` (or `tests/work_kind_classify_test.py` per R-0106) — **NEW**. 12 `test_us0118_*` markers (Q4 LOCKED). T-006.
-- `docs/engineering/runbook.md` — **NEW** `## Work-kind routing (US-0118)` h2 cross-link section (Q7 LOCKED). Content: `WORK_KIND_ROUTING` flag, L8 precedence, operator recipe (force full lifecycle on `doc` story via `DELIVERY_MODE=standard`), `--explain` usage, four `WORK_KIND_*` reason codes. T-008.
-- `template/docs/engineering/runbook.md` — parity one-way copy of runbook h2.
-- `.cursor/scratchpad.md` — **NEW** `WORK_KIND_ROUTING=0` key (default off) + `WORK_KIND_*` reason-code family (example scratchpad only — canonical scratchpad edits deferred to `/execute`). T-002.
-- `template/.cursor/scratchpad.local.example.md` — mirror of `WORK_KIND_ROUTING` row.
-- `.cursor/commands/auto.md` — `resolve_delivery_mode` step-0 precedence clause (L8 chain). T-002/T-004.
-- `.cursor/commands/intake.md` — step-5 classifier hook (after ACs drafted, after US-0051 decomposition evaluator, before persistence). T-003.
-- `template/.cursor/commands/auto.md` + `template/.cursor/commands/intake.md` — parity one-way copy (when template mirrors commands).
-- `handoffs/intake_evidence/*.json` — schema extension: 3 new optional fields `work_kind`, `recommended_delivery_mode`, `work_kind_operator_decision ∈ {accept, override}` (Q9 LOCKED). T-003.
-- `installer-owned-paths.manifest` — `[install_include_paths]` rows for `scripts/work_kind_classify_lib.py` + `template/scripts/work_kind_classify_lib.py`. T-009.
-- `scripts/check_intake_template_parity.py` — `WORK_KIND_ROUTING_PAIRS` manifest constant + `--scope=work-kind-routing` flag (Q6 LOCKED). T-009.
-- `decisions/DEC-0118.md` — **NEW** companion DEC (authored in THIS phase).
-- `docs/engineering/architecture.md` — **this `## US-0118` section** (T-anch; authored in THIS phase).
-
-### Files NOT to touch
-
-- `docs/product/backlog.md` — US-0045 status authority; release-only. (US-0118 remains OPEN until `/release`. Backlog row fields `work_kind` / `recommended_delivery_mode` are added per-story at intake time only when `WORK_KIND_ROUTING=1` and operator accepts — this is a schema extension, NOT a bulk edit of existing rows. No forced reclassification of existing rows.)
-- `docs/product/acceptance.md` — release-only.
-- Prior-released US-0113..US-0117 README blocks (`### Sovereign-loop era` L940 + `### Sovereign-loop era keys` L2421 / `### Release & distribution` L1225 + `### Release & distribution keys` L2545 / `### Integration & observability` L1410 + `### Integration & observability keys` L2617 / `### Delivery & lifecycle` L1665 + `### Delivery & lifecycle keys` L2765 / `### Phase & role governance` + `### Phase & role governance keys` L2856) in `its_magic/README.md` — **byte-stability contract** (all 5 already released in S0113..S0117). US-0118 adds cross-link pointers to these blocks from its own 6th sub-block; it never edits them. Execute-phase must verify `git diff HEAD -- its_magic/README.md` shows pure addition in the post-L2856 range (no removals/modifications to US-0113's L2421, US-0114's L2545, US-0115's L2617, US-0116's L2765, or US-0117's L2856 blocks).
-- `scripts/sovereign_loop_lib.py` — compose-do-not-amend (US-0103 read-only consumer).
-- `scripts/sovereign_convergence_lib.py` — compose-do-not-amend (US-0105 read-only consumer).
-- `scripts/dev_environment_lib.py` — **REUSE only — do not modify**. Import `classify_touched_files` + `TIER_C_SKIP_PREFIXES` from `dev_environment_lib` (Q9 LOCKED import contract). Contract test `test_us0118_classify_touched_files_reuse` enforces the import boundary.
-- `tests/scratchpad_example_parity_test.py` — AC-8 regression baseline; forbid edits.
-- Compose-guard stories (23 — US-0091, US-0097, US-0017, US-0040, US-0100..US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062) — read-only consumers; additive-only.
-
-
-### Sprint seeds (T-anch + T-001..T-009 — 10 tasks within SPRINT_MAX_TASKS=12)
-
-| Task | AC | Description | Role |
-|------|----|-------------|------|
-| **T-anch** | AC-10 | Add `## US-0118` h1 anchor to `docs/engineering/architecture.md` (per US-0118 h1-anchor policy; mirrors `## US-0113`..`## US-0117` format). Verify compose-do-not-amend: US-0096, US-0070, US-0078, US-0051, US-0069, US-0103 surfaces remain read-only (no edits to their architecture sections). Lock the import contract for `dev_environment_lib.classify_touched_files` reuse (Q9 boundary). | B |
-| **T-001** | AC-1 / AC-2 | Create `scripts/work_kind_classify_lib.py` exposing `classify_work_kind(story_prose, acceptance_criteria, touched_file_hints, component_scope) -> WorkKindClassification` per Q10 signature. Pure stdlib; import `TIER_C_SKIP_PREFIXES` + `classify_touched_files` from `dev_environment_lib` (no duplication — Q9). Implement the three rules (doc/mini/code) per L5/L6/L7 + Q1 tie-break (highest tier wins). Implement `--explain` flag emitting `rule_trace` (Q3). Implement `--self-test` (AC-12) exiting 0. | B |
-| **T-002** | AC-3 / AC-6 | Add `WORK_KIND_ROUTING=0` (default off) to `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md` with merge-precedence note (US-0078 model B: local > materialized baseline > example). Document the L8 precedence chain in `.cursor/commands/auto.md` `resolve_delivery_mode` step 0. (README scratchpad reference sub-block `### Work-kind routing keys (US-0118)` is added in T-007, not here.) | B |
-| **T-003** | AC-4 / AC-5 | Extend `/intake` step 5 to run the classifier when `WORK_KIND_ROUTING=1` (after ACs drafted, after US-0051 decomposition evaluator, before persistence). Present `work_kind` + `recommended_delivery_mode` to operator for accept/override (Q9). Persist choice in backlog row (`- work_kind`, `- recommended_delivery_mode`) + intake evidence bundle (`work_kind`, `recommended_delivery_mode`, `work_kind_operator_decision`). US-0078 evidence gate still runs before any backlog/acceptance write. | B |
-| **T-004** | AC-6 | `/auto` `resolve_delivery_mode` step-0 integration: add precedence clause to `.cursor/commands/auto.md`: when `WORK_KIND_ROUTING=1` AND backlog row carries `work_kind` AND `DELIVERY_MODE` unset AND `AUTO_PHASE_*` unset → derive `resolved_phase_plan` from `recommended_delivery_mode`. Explicit `DELIVERY_MODE` / `AUTO_PHASE_*` / `start-from` always win (L8). Early-return when `WORK_KIND_ROUTING != "1"` (zero overhead — Q8). | B |
-| **T-005** | AC-7 | Emit the four `WORK_KIND_*` reason codes (Q2) with remediation prose in `sprints/Sxxxx/qa-findings.md` / `release-findings.md`. `WORK_KIND_ROUTING_DISABLED` is info-only (not fail-closed); the other three are fail-closed. | B |
-| **T-006** | AC-9 | Create `tests/work_kind_classify_test.py` (or `tests/us0118_contract_test.py`) with the 12 `test_us0118_*` markers enumerated in Q4. Active + `template/` parity for the new script + scratchpad lines. | B |
-| **T-007** | AC-3 | Add `### Work-kind routing keys (US-0118)` sub-block to `its_magic/README.md` `### Full scratchpad reference (detailed)` (after the US-0117 `### Phase & role governance keys` block L2856) — documents `WORK_KIND_ROUTING` key + four reason codes + cross-link pointer to `### Release & distribution keys` for `DELIVERY_MODE` precedence. One-way copy to `template/its_magic/README.md`. Verify `PARITY_OK <size> <size>`. (README edits happen in `/execute`, not `/architecture`.) | B |
-| **T-008** | AC-11 | Append `## Work-kind routing (US-0118)` h2 to `docs/engineering/runbook.md` (Q7) + `template/docs/engineering/runbook.md` parity. Content: `WORK_KIND_ROUTING` flag, L8 precedence, operator recipe (force full lifecycle on `doc` story via `DELIVERY_MODE=standard`), `--explain` usage, four reason codes. | B |
-| **T-009** | AC-9 / AC-12 | Add `tests/work_kind_classify_test.py` to the active test suite; verify 4-prior pytest still green. Add `scripts/work_kind_classify_lib.py` + `template/scripts/work_kind_classify_lib.py` to `installer-owned-paths.manifest` `[install_include_paths]` (Q10/installer parity — triple-installer PS1/Bash/Python ships the new script). Add `WORK_KIND_ROUTING_PAIRS` to `scripts/check_intake_template_parity.py` + `--scope=work-kind-routing` flag (Q6). | B |
-
-**Execution order**: T-anch → T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009. Acyclic. (T-anch first because it is on `architecture.md`, not `its_magic/README.md` — keeps the README byte-stability surface clean for T-001..T-007.)
-
-**Total task seeds: 10 (T-anch + T-001..T-009) — within `SPRINT_MAX_TASKS=12`.** `/sprint-plan` may merge or split within the 12-task budget.
-
-
-### Test markers (12 — from R-0106 Q4 LOCKED)
-
-`test_us0118_doc_kind_routes_to_lean_plan`, `test_us0118_mini_kind_routes_to_ultra_lean`, `test_us0118_mini_kind_routes_to_mega_quick_when_eligible`, `test_us0118_code_kind_routes_to_standard`, `test_us0118_explicit_delivery_mode_wins_over_work_kind`, `test_us0118_auto_phase_wins_over_work_kind`, `test_us0118_routing_off_is_noop`, `test_us0118_classify_touched_files_reuse`, `test_us0118_intake_evidence_records_work_kind`, `test_us0118_reason_codes_preserved`, `test_us0118_default_off_zero_overhead`, `test_us0118_explain_emits_rule_trace` (in `tests/work_kind_classify_test.py` per R-0106 Q4; or `tests/us0118_contract_test.py` — name finalized in `/sprint-plan`).
-
-Plus the regression baseline marker: `tests/scratchpad_example_parity_test.py` (4 tests — BUG-0013 parity baseline; do not weaken).
-
-### Compose guards UNCHANGED (23 cumulative — same 23 as US-0117)
-
-US-0118 is a code-bearing story but lives entirely **additive** to the compose surface — it adds a new flag (`WORK_KIND_ROUTING`), a new lib (`work_kind_classify_lib.py`), new backlog row fields, a new precedence clause, a new README sub-block, and a new runbook h2. It does **not** amend any existing compose-surface feature. The 23 compose guards (cumulative across all prior stories — US-0118 adds no new family-internal guards because US-0118 is itself a single-feature story, not a family umbrella) remain UNCHANGED:
-
-US-0091, US-0097, US-0017, US-0040, US-0100, US-0101, US-0102, US-0103, US-0104, US-0105, US-0107, US-0108, US-0109, US-0110, US-0111, US-0112, US-0034, US-0084, US-0086, US-0093, US-0096, US-0041, US-0062.
-
-**Does US-0118 itself become a NEW compose guard?** **NO.** US-0118 is a **routing primitive**, not a compose-surface guard. The 6 read-only compose consumers (US-0096 / US-0070 / US-0078 / US-0051 / US-0069 / US-0103) consume US-0118's output; they are not amended by it. Adding US-0118 to the compose-guard list would conflate a routing primitive with a guard — rejected. US-0118's contract is enforced by its own 12 `test_us0118_*` markers + the `WORK_KIND_ROUTING=0` zero-overhead-when-off contract (test `test_us0118_default_off_zero_overhead`).
-
-### DC (deferred-candidate) resolution
-
-`dc_check=clean`. `grep "^## US-0118" docs/engineering/architecture.md` prior to this phase → **no matches**. The `## US-0118` h1 anchor is **added in THIS `/architecture` phase** (per R-0105 Q-2 LOCKED pattern — architecture artifacts live in `architecture.md`, not in `/execute`; T-anch in the sprint seeds is the resolution point). 
-
-Cross-check against the full US-xxxx list in `docs/product/backlog.md`: no OTHER deferred `## US-xxxx` anchors remain unresolved. US-0117 was the **final deferred-candidate resolution point** (36 `## US-xxxx` h1 anchors added in US-0117's `/architecture` phase — 18 own + 18 deferred DC-1..DC-4); the deferral register is clean. US-0118 inherits no DC candidates from prior stories. No new DC candidates are created by US-0118 (its own `## US-0118` anchor is resolved HERE, not deferred). Deferral register remains clean — no carry-over to a successor story.
-
-### Compose, do not amend (verification — read-only consumers of US-0118)
-
-| Story | README anchor | architecture.md anchor | Verification |
-|-------|---------------|------------------------|--------------|
-| US-0096 / DEC-0082 (delivery modes) | L2617 `### Integration & observability keys` (DELIVERY_MODE cross-link) + L2670 inline ref | `## US-0096` L1684 | ✓ exists — explicit `DELIVERY_MODE` still wins (L8); US-0118 only fills the unset case |
-| US-0070 / DEC-0052 (phase selection) | L2856 `### Phase & role governance keys` (AUTO_PHASE_* canonical) | `## US-0070` L1572 | ✓ exists — `AUTO_PHASE_*` remains explicit override; classifier only fills the unset case |
-| US-0078 / DEC-0060 (intake evidence) | L479 runbook `## Interactive intake evidence validation` | `## US-0078` L1596 | ✓ exists — evidence gate still runs before any write (L10); classifier proposal + operator decision recorded in evidence bundle |
-| US-0051 (decomposition) | L371 runbook `## Intake decomposition and risk-aware questioning` | (no h1 anchor) | ✓ exists — classifier runs after the decomposition evaluator (L10) |
-| US-0069 / DEC-0051 (phase→role matrix) | L2856 `### Phase & role governance keys` | `## US-0069` L1568 | ✓ exists — classifier only selects which phases run, not who runs them |
-| US-0103 (AI decision ledger) | L2421 `### Sovereign-loop era keys` | `## US-0103` L1640 | ✓ exists — read-only consumer for audit trail |
-
-All 6 compose targets verified present (read-only consumers of US-0118 — their architectural surfaces are NOT edited by US-0118; additive-only: new flag, new lib, new row fields, new precedence clause, new sub-block, new runbook h2).
-
-
-### Risks finalized (R1..R8 — promoted from R-0106)
-
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| **R1** Classification ambiguity (mixed `docs/` + `src/` tiers) | **MEDIUM** | Q1 LOCKED: highest tier wins (`code` > `mini` > `doc`) per `classify_touched_files` tier_rank A>B>C. Single-pass deterministic. Contract test `test_us0118_code_kind_routes_to_standard` covers the mixed-tier case. |
-| **R2** Precedence conflicts (`WORK_KIND_ROUTING=1` + `DELIVERY_MODE` set) | **MEDIUM** | L8 precedence chain LOCKED + `WORK_KIND_DELIVERY_MODE_CONFLICT` reason code (Q2). Explicit operator flags always win; classifier fills only the unset case. Contract test `test_us0118_explicit_delivery_mode_wins_over_work_kind` + `test_us0118_auto_phase_wins_over_work_kind`. |
-| **R3** `mega_quick` eligibility overlap with `mini` | **LOW–MEDIUM** | L6 LOCKED: classifier recommends `mega_quick` only when US-0096 eligibility passes (AC≤3, no DEC, single component), else falls back to `ultra_lean`. Contract test `test_us0118_mini_kind_routes_to_mega_quick_when_eligible` + `test_us0118_mini_kind_routes_to_ultra_lean`. |
-| **R4** Backward compatibility (existing backlog rows without `work_kind`) | **MEDIUM** | Q8 LOCKED: `WORK_KIND_ROUTING=0` default-off + early-return in `/auto` step 0 + `/intake` step 5 skip. No forced reclassification, no schema-migration. Contract test `test_us0118_default_off_zero_overhead`. |
-| **R5** Operator trust (deterministic + inspectable) | **LOW–MEDIUM** | Q3 LOCKED: deterministic pure-stdlib + `--explain` flag emitting `rule_trace` (Q10). Contract test `test_us0118_explain_emits_rule_trace`. Operators can override with confidence. |
-| **R6** Reuse boundary drift (`dev_environment_lib.classify_touched_files` rewritten vs imported) | **LOW** | Q9 LOCKED (in T-001): `work_kind_classify_lib.py` imports `TIER_C_SKIP_PREFIXES` + `classify_touched_files` from `dev_environment_lib` — no duplication. Contract test `test_us0118_classify_touched_files_reuse`. |
-| **R7** Installer parity drift (triple-installer must ship new script) | **LOW** | T-009 adds both `scripts/work_kind_classify_lib.py` + `template/scripts/work_kind_classify_lib.py` to `installer-owned-paths.manifest` `[install_include_paths]`. Manifest-driven single source of truth. |
-| **R8** Cross-story byte-stability surface (6th sub-block) — US-0118 is the first NEW story after the US-0113..US-0117 quint; it adds a 6th sub-block to `### Full scratchpad reference (detailed)`. Risk of accidentally editing a prior released block (US-0113 L2421 / US-0114 L2545 / US-0115 L2617 / US-0116 L2765 / US-0117 L2856). | **MEDIUM** | T-007 mandates net-new-keys-only + cross-link-pointer + reason-code-only shape; never edits prior released blocks. Execute-phase verifies `git diff HEAD -- its_magic/README.md` shows pure addition in the post-L2856 range (no removals/modifications to US-0113..US-0117 blocks). QA re-verifies. `PARITY_OK <size> <size>` authoritative end-to-end proof. Pattern now scales from quint to 6th story. |
-
-### Stop conditions met
-
-- **No DEC required beyond DEC-0118** — DEC-0118 authored in THIS phase (Required → Accepted; mirrors DEC-0082 / DEC-0052 precedent).
-- **No feasibility unknown** — R-0106 closed all 10 discovery open questions Q1..Q10; approach A1 locked; sprint seeds T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; risks R1..R8 finalized; DC check clean.
-- **No data migration risk** — `WORK_KIND_ROUTING=0` default-off + no forced reclassification of existing backlog rows (Q8 LOCKED). New `work_kind` / `recommended_delivery_mode` fields are optional; absence is valid.
-- **Compose-do-not-amend verified** — all 6 compose targets (US-0096 / US-0070 / US-0078 / US-0051 / US-0069 / US-0103) verified present with existing `## US-xxxx` h1 anchors in `architecture.md`; US-0118 is additive-only.
-
-**No DECISION_GATE raised.** Architecture phase revealed no question requiring operator input. DC check clean (no new DC candidates). Verdict: **PASS**.
-
-### Sovereign memory note
-
-`assemble_sovereign_memory_digest(...)` NOT called (US-0118 documentation-only so far — architecture phase writes prose + DEC only; existing digest context sufficient per R-0106 — S0113..S0117 retrospectives established the reusable patterns applied here: cross-link pointer pattern scales to 6th story; angle-distinct narrative pattern extends to the routing-primitive angle (distinct from prior 5 documentation-family angles); cross-story byte-stability contract now scales from quint to 6th story; DC anchor resolution pattern proven (US-0117 was the final deferred-candidate resolution point — US-0118 inherits a clean deferral register). No write to `mistakes.jsonl` in architecture phase.
-
-### Consequences
-
-- Sprint: S0118 (pending `/sprint-plan`).
-- Status authority: **OPEN** per **US-0045**; closure at `/release`.
-- New code surface: `scripts/work_kind_classify_lib.py` (NEW) + `tests/work_kind_classify_test.py` (NEW) + installer manifest rows.
-- New doc surface: `## US-0118` h1 anchor in `architecture.md` (this section) + `### Work-kind routing keys (US-0118)` README sub-block (in `/execute`) + `## Work-kind routing (US-0118)` runbook h2 (in `/execute`).
-- New scratchpad surface: `WORK_KIND_ROUTING=0` key + `WORK_KIND_*` reason-code family (in `/execute`).
-- New command surface: `.cursor/commands/auto.md` precedence clause + `.cursor/commands/intake.md` step-5 hook (in `/execute`).
-- New evidence schema: `work_kind` / `recommended_delivery_mode` / `work_kind_operator_decision` fields in `handoffs/intake_evidence/*.json` (in `/execute`).
-- **`WORK_KIND_ROUTING=0` (default)**: zero overhead — `/auto` `resolve_delivery_mode` + `/intake` step 5 skip classifier entirely; existing backlog rows without `work_kind` route via current `DELIVERY_MODE`/`AUTO_PHASE_*` precedence (no forced reclassification).
-- **`WORK_KIND_ROUTING=1`**: classifier runs at intake (after ACs) and at `/auto` step 0; `recommended_delivery_mode` derived from `work_kind` fills the unset case (L8 precedence); explicit operator flags always win.
-- **23/23 compose guards UNCHANGED** (additive-only). 6 read-only compose consumers (US-0096 / US-0070 / US-0078 / US-0051 / US-0069 / US-0103) consume US-0118 output; not amended.
-- DC resolution: `## US-0118` h1 anchor added in THIS phase (per R-0105 Q-2 LOCKED pattern); deferral register clean — no carry-over.
-
-### Evidence references
-
-- `docs/product/backlog.md` — `## US-0118` block (L3983–L4025, 12 ACs)
-- `docs/product/acceptance.md` — US-0118 row L145 (12 ACs, OPEN)
-- `docs/engineering/research.md` — `## R-0106` (delivered 2026-07-04T20:00:00Z, 10/10 open questions Q1..Q10 closed LOCKED; architecture seeds T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; companion DEC-0118 required; AC baselines green; risks R1..R8 finalized)
-- `handoffs/po_to_tl.md` — research handoff (topmost block) + discovery handoff + intake handoff
-- `docs/engineering/state.md` — research checkpoint (latest) + architecture checkpoint (this phase, appended)
-- `handoffs/resume_brief.md` — top block updated to reflect architecture complete
-- `scripts/dev_environment_lib.py` — `TIER_C_SKIP_PREFIXES` (L117–L125: `docs/`, `handoffs/`, `sprints/`, `decisions/`, `tests/`, `.cursor/commands/`, `template/docs/`) + `classify_touched_files` (L321–L339: tier A/B/C with `tier_rank={"A":3,"B":2,"C":1}`, highest matching tier wins) — reuse anchor (Q9 LOCKED import contract)
-- `its_magic/README.md` — L2421 (US-0113 keys block — byte-stability preserved); L2545 (US-0114 keys block — byte-stability preserved); L2617 (US-0115 keys block — byte-stability preserved); L2765 (US-0116 keys block — byte-stability preserved); L2856 (US-0117 keys block — byte-stability preserved + insertion point for `### Work-kind routing keys (US-0118)` 6th sub-block in `/execute`)
-- `docs/engineering/architecture.md` — h1 inventory confirmed: `## US-0069` L1568, `## US-0070` L1572, `## US-0078` L1596, `## US-0103` L1640, `## US-0096` L1684 exist (read-only consumers of US-0118); `## US-0118` added in THIS phase (appended below the existing `## US-0099` section)
-- `decisions/DEC-0118.md` — companion DEC (authored in THIS phase)
-- `.cursor/scratchpad.md` — `WORK_KIND_ROUTING` (new key, added in `/execute`); `DELIVERY_MODE` / `AUTO_PHASE_*` / `SPRINT_MAX_TASKS` (existing — grep anchors only)
-- `.cursor/commands/auto.md` — `resolve_delivery_mode` step 0 (precedence clause added in `/execute`)
-- `.cursor/commands/intake.md` — step 5 (classifier hook added in `/execute`)
-
-
-### Isolation evidence (per US-0048 / DEC-0029)
-
-- `phase_id=architecture`
-- `role=tech-lead`
-- `story_id=US-0118`
-- `sprint_id=(pending — created at sprint-plan)`
-- `orchestrator_run_id=auto-20260704-01`
-- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082; research + architecture + sprint-plan merged)
-- `fresh_context_marker=tl-US0118-architecture-20260704T203000Z-fresh`
-- `timestamp=2026-07-04T20:30:00Z` (UTC)
-- `evidence_ref=docs/product/backlog.md (## US-0118 block L3983–L4025 narrow-read), docs/product/acceptance.md (US-0118 row L145 narrow-read), handoffs/intake_evidence/US-0118-intake.json (cross-reference only — not read this phase), handoffs/po_to_tl.md (US-0118 research handoff L5–L93 + discovery handoff L95–L193 + intake handoff L196–L231 narrow-read), docs/engineering/state.md (research checkpoint L197–L297 + discovery checkpoint L102–L196 + drain-advance breadcrumb L84–L101 narrow-read), docs/engineering/research.md (R-0106 entry L8754–L8904 full read), docs/engineering/architecture.md (grep ^## US- anchors + US-0117 section L1420–L1566 read as template + DC anchor verification L1568–L1710 + US-0099 last line L1710), scripts/dev_environment_lib.py (TIER_C_SKIP_PREFIXES L117–L125 + classify_touched_files L321–L339 narrow-read for Q9 import-contract lock), its_magic/README.md (grep ### .*keys anchors only — no full-read), decisions/DEC-0082.md (full read as DEC-0118 template), decisions/DEC-0052.md (full read as DEC-0118 template), docs/product/backlog.md (grep ^## US- anchors for DC cross-check), handoffs/resume_brief.md (top ~30 lines narrow-read for drain-advance prose shape)`
-- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + python SHA-256 computation for the strict runtime proof + powershell line-count computations + the artifact writes listed in this phase (architecture.md `## US-0118` section append, decisions/DEC-0118.md NEW, po_to_tl.md architecture handoff prepend, state.md architecture checkpoint append, resume_brief.md drain-advance append). No `.env` reads, no credentials access, no intake-evidence mutation (read-only for this phase).
-- `assemble_sovereign_memory_digest(...)` NOT called (US-0118 documentation-only so far — architecture phase writes prose + DEC only; existing digest context sufficient per R-0106 — S0113..S0117 retrospectives established reusable patterns; classifier code is built in `/execute`, not here).
-- No write to `mistakes.jsonl` in architecture phase (no fix_failed / revert_applied / plan_fidelity_violation / scope_creep event occurred).
-- Prior phase strict proof consumed: `rp-auto-20260704-01-research-techlead-20260704T200000Z-US-0118` (from `docs/engineering/state.md` research checkpoint L281–L285, unchanged).
-- Current architecture-phase strict proof recorded below.
-
-### Strict runtime proof (DEC-0038)
-
-- **runtime_proof_id**: `rp-auto-20260704-01-architecture-techlead-20260704T203000Z-US-0118`
-- **canonical_payload** (sorted-key JSON per DEC-0038): `{"orchestrator_run_id":"auto-20260704-01","phase_id":"architecture","proof_issued_at":"2026-07-04T20:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260704-01-architecture-techlead-20260704T203000Z-US-0118","sprint_id":"(pending)","story_id":"US-0118"}`
-- **proof_hash**: `fd72d56bd8e8450cf830e3a4fa6164d5e3b98595c00fafa166ffd00669b1d3db` (SHA-256 of the sorted-key JSON payload above, computed via python `hashlib.sha256`)
-- **proof_ttl_seconds**: 3600
-- **proof_ttl**: 2026-07-04T21:30:00Z (1-hour TTL per DEC-0038, UTC = issued_at + 3600s)
-
-### Decision gate
-
-- `decision_gate=false` (no DECISION_GATE; no hard stop; companion DEC-0118 authored Accepted in THIS phase; approach A1 locked; sprint seeds T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12; risks R1..R8 finalized; DC check clean; compose-do-not-amend verified 6/6)
-- `stop_conditions_met=yes` (no missing references — all 6 compose targets verified; no decision gate triggered; AC baselines green: `validate_readme_feature_coverage.py` PASS + `pytest tests/scratchpad_example_parity_test.py` 4 passed)
-
-### Next scheduled phase
-
-- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
-- `next_scheduled_role=tech-lead`
-- `next_scheduled_sprint_macro=plan`
-- `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent (BUG-0006)`
-
----
-
-## US-0119 — Autonomous-autonomy presets and configurable hard-stop relaxation
-
-### Overview
-
-US-0119 adds two orthogonal primitives on top of the existing sovereignty stack (US-0092 / US-0095 / US-0103 / US-0104 / US-0105 / US-0107):
-
-1. **`AUTONOMY_PRESET={none|balanced|full}`** (default `none`) — an ergonomic scratchpad flag that deterministically expands into twelve per-feature autonomy flags (all of which already exist individually or are added here as net-new keys). Each preset bundles the combination an operator would otherwise configure manually. `AUTONOMY_PRESET=none` is byte-identical to pre-US-0119 behaviour.
-2. **`AUTONOMY_STOP_POLICY={block|auto_repair_then_block|auto_repair_then_skip}`** (default `block`) — classifies every fail-closed reason code in `docs/engineering/autonomy-stop-matrix.md` as either `security_hard` (never auto-resolved under any preset / policy) or `autonomy_resolvable` (bounded auto-repair with an append-only ledger before escalation).
-
-The two mechanisms compose: the preset controls *which* per-feature flags are flipped on; the stop policy controls *how* softened reason codes are handled at phase boundaries. Neither mechanism modifies the semantics of the underlying consumers — the preset is an expansion into existing keys, and the stop policy is a dispatch layer on top of existing reason-code emissions.
-
-### Companion DEC
-
-**`decisions/DEC-0119.md`** — authored in THIS architecture phase (status=Accepted). Locks:
-- (a) `AUTONOMY_PRESET` 3-tier enumeration `none|balanced|full` (default `none`)
-- (b) `AUTONOMY_STOP_POLICY` 3-value enumeration `block|auto_repair_then_block|auto_repair_then_skip` (default `block`)
-- (c) Two-tier stop classification `security_hard|autonomy_resolvable`
-- (d) `security_hard` rows never auto-repaired (bounded cap = 0 from matrix)
-- (e) Nine `auto_repair_kind` taxonomy values from R-0107 Q2
-- (f) Nine `autonomy_resolvable` reason codes per Q2 mapping
-- (g) `autonomy_repair_kind` taxonomy + uniform cap = 3 per `(run, reason_code)` per Q3
-- (h) `AUTONOMY_PRESET=none` is byte-identical to pre-US-0119
-- (i) Twelve per-feature flags are additive consumers only (no existing consumer semantics change)
-- (j) Precedence: explicit per-flag > preset expansion > scratchpad defaults
-
-Mirrors DEC-0082 (delivery modes) / DEC-0078 (full-autonomy stop matrix) precedent.
-
-### Approach A1 (LOCKED)
-
-Single vertical-slice approach. No alternatives retained — 2-tier (`none|full` preset) rejected as too coarse; 4-tier (`none|low|medium|high`) rejected as over-engineered (no operator demand); 3-tier stop-class (`security_hard|autonomy_resolvable|soft_warn`) rejected as over-engineered (operators want binary never/yes).
-
-**A1 components**:
-
-| Component | Artifact | Responsibility |
-|-----------|----------|----------------|
-| `AUTONOMY_PRESET` flag | `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md` | Scratchpad key; net-new (13th key in autonomy block) |
-| `AUTONOMY_STOP_POLICY` flag | `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md` | Scratchpad key; net-new (14th key in autonomy block) |
-| Preset expansion lib | `scripts/autonomy_preset_lib.py` | `expand_autonomy_preset(preset, overrides) -> dict`; pure stdlib; `--self-test` + `--explain` |
-| Stop-matrix manifest | `docs/engineering/autonomy-stop-matrix.md` + `template/docs/engineering/autonomy-stop-matrix.md` | Operator-facing authority file; `security_hard` and `autonomy_resolvable` rows |
-| Stop-matrix YAML | `scripts/data/autonomy_stop_matrix.yaml` | Machine-readable companion for validators |
-| Matrix validator | `scripts/validate_autonomy_stop_matrix.py` | `--self-test`; checks orphan codes, `security_hard` → `auto_repair_kind=n/a`, `autonomy_resolvable` → finite `cap` |
-| Twelve per-feature flags | `.cursor/scratchpad.md` | Net-new keys; expansion targets (existing consumers where applicable) |
-| Bounded repair ledger | `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl` | Append-only; per-run cap from matrix; gitignored |
-| Breadcrumb | `docs/engineering/state.md` phase boundary | `autonomy_relaxed: <reason_code> -> <auto_repair_kind>` one-line per soft-stop (Q10 LOCKED) |
-| Consumer wiring | `/auto`, `/intake`, `/execute`, `/qa`, `/release` | Wire 12 flags into existing consumers (additive only) |
-| Tests + parity | `tests/us0119_autonomy_preset_test.py` + `check_intake_template_parity.py --scope=us-0119` | 10 contract test markers + template parity enforcement |
-| Documentation | `docs/engineering/architecture.md` (this section) + `docs/engineering/runbook.md` (h2) + `.cursor/commands/auto.md` (anchor) | Operator-facing docs + template parity |
-
-**Execution order**: T-anch → T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 → T-008 → T-009 → T-010 → T-011 (acyclic; T-001..T-003 first since they're the code/manifest/flags foundation).
-
-### Files to touch
-
-| File | Change |
-|------|--------|
-| `docs/engineering/architecture.md` | Add `## US-0119` section (THIS phase — T-anch NO-OP / verification; no write in execute) |
-| `.cursor/scratchpad.md` | Add `AUTONOMY_PRESET`, `AUTONOMY_STOP_POLICY`, 12 per-feature flags |
-| `template/.cursor/scratchpad.local.example.md` | Mirror scratchpad additions |
-| `scripts/autonomy_preset_lib.py` | NEW — `expand_autonomy_preset(preset, overrides) -> dict` |
-| `template/scripts/autonomy_preset_lib.py` | NEW — byte-identical copy |
-| `scripts/data/autonomy_stop_matrix.yaml` | NEW — machine-readable stop classification |
-| `scripts/validate_autonomy_stop_matrix.py` | NEW — matrix validator |
-| `template/scripts/validate_autonomy_stop_matrix.py` | NEW — byte-identical copy |
-| `docs/engineering/autonomy-stop-matrix.md` | NEW — operator-facing authority file |
-| `template/docs/engineering/autonomy-stop-matrix.md` | NEW — byte-identical copy |
-| `tests/us0119_autonomy_preset_test.py` | NEW — 10 contract test markers |
-| `.cursor/commands/auto.md` | Add `## Autonomy presets (US-0119)` anchor |
-| `template/.cursor/commands/auto.md` | Mirror |
-| `docs/engineering/runbook.md` | Add `## Autonomy presets (US-0119)` h2 |
-| `template/docs/engineering/runbook.md` | Mirror |
-| `its_magic/README.md` | Add `### Autonomy preset keys (US-0119)` sub-block (7th sub-block; preserves cross-story byte-stability surface) |
-| `template/its_magic/README.md` | Mirror (byte-stability preserved) |
-| `docs/engineering/state.md` | `autonomy_relaxed` breadcrumb at phase boundaries; architecture checkpoint (THIS phase) |
-| `decisions/DEC-0119.md` | NEW — companion DEC (THIS phase) |
-| `handoffs/po_to_tl.md` | Prepend architecture handoff (THIS phase) |
-| `installer-owned-paths.manifest` | Add rows for new scripts |
-
-### Files NOT to touch (compose, do not amend)
-
-| File | Reason |
-|------|--------|
-| `.cursor/commands/execute.md` | US-0092 outer-driver semantics UNCHANGED |
-| `.cursor/commands/qa.md` | US-0095 native auto-chain UNCHANGED |
-| `.cursor/commands/release.md` | US-0056 strict runtime proof semantics UNCHANGED (`RUNTIME_PROOF_KIND=lightweight` is only an opt-in lighter attestation — proof kind select, not semantics rewrite) |
-| `.cursor/commands/intake.md` (evidence gate logic) | US-0068 intake evidence gate NEVER bypassed; `INTAKE_AUTONOMY_MODE=1` only auto-derives answers on known-stack repeat projects |
-| `scripts/scratchpad_example_parity_test.py` | BUG-0013 regression tests UNCHANGED |
-| `handoffs/intake_evidence/US-*.json` (prior entries) | BUG-0007 truthfulness UNCHANGED — schema extension optional, never retroactive |
-
-### Sprint seeds (12 tasks within SPRINT_MAX_TASKS=12)
-
-| Seed | Description | AC coverage |
-|------|-------------|-------------|
-| **T-anch** | Verify `## US-0119` h1 anchor present in `architecture.md` (added in THIS phase); verify compose-do-not-amend 6/6 compose targets; lock compose-guard UNCHANGED set (23+ guards) | AC-12, AC-11 |
-| **T-001** | `scripts/autonomy_preset_lib.py` — `expand_autonomy_preset(preset, overrides) -> dict` + `--self-test` + `--explain`; pure stdlib; deterministic | AC-1, AC-2 |
-| **T-002** | Add `AUTONOMY_PRESET` + `AUTONOMY_STOP_POLICY` + 12 per-feature flags in `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md`; merge-precedence note (explicit > preset > defaults) | AC-1, AC-3, AC-5 |
-| **T-003** | `docs/engineering/autonomy-stop-matrix.md` + `template/docs/engineering/autonomy-stop-matrix.md` parity + `scripts/data/autonomy_stop_matrix.yaml` + `scripts/validate_autonomy_stop_matrix.py --self-test` | AC-4, AC-10 |
-| **T-004** | Wire 12 per-feature flags into existing consumers — `/auto` auto-expansion + `/intake` INTAKE_AUTONOMY_MODE / INTAKE_MINIMAL_PACK / INTAKE_ASSUME_STACK_CONTEXT + `/execute` RUNTIME_PROOF_KIND + `/qa` GOAL_CONVERGENCE_INTERVAL + `/release` RELEASE_PUBLISH_AUTO_CONFIRM | AC-5 |
-| **T-005** | Bounded auto-repair ledger `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl` + cap logic + `AUTONOMY_REPAIR_CAP_EXHAUSTED` terminal stop reason | AC-8 |
-| **T-006** | `autonomy_relaxed` breadcrumb in `docs/engineering/state.md` at phase boundary (one-line per soft-stop per Q10) | AC-9 |
-| **T-007** | Contract tests `tests/us0119_autonomy_preset_test.py` — 10 markers: preset-none-noop, balanced-expansion, full-expansion, explicit-flag-overrides-preset, expansion-uses-known-keys-only, matrix-validator-passes, security-hard-gates-never-auto-repaired, stop-policy-repair-dispatch, repair-ledger-cap-escalates, matrix-no-orphan-codes | AC-6, AC-7, AC-10 |
-| **T-008** | README `### Autonomy preset keys (US-0119)` 7th sub-block + `check_intake_template_parity.py --scope=us-0119` + `AUTONOMY_PRESET_PAIRS` manifest | AC-10, AC-11 |
-| **T-009** | Runbook cross-link `## Autonomy presets (US-0119)` h2 + `.cursor/commands/auto.md` `## Autonomy presets (US-0119)` anchor + template parity | AC-11 |
-| **T-010** | `installer-owned-paths.manifest` rows for `scripts/autonomy_preset_lib.py` + `template/scripts/autonomy_preset_lib.py` + `scripts/validate_autonomy_stop_matrix.py` + `template/scripts/validate_autonomy_stop_matrix.py` | AC-10 |
-| **T-011** | Regression tests `pytest tests/scratchpad_example_parity_test.py -v` 4 passed + forbid edits to scratchpad + test; `PARITY_OK <size> <size>` byte-stability proof | AC-6, AC-10 |
-
-### Test markers (AC-10 → 10 markers)
-
-| Marker | AC | Description |
-|--------|----| -----|
-| `test_us0119_preset_none_is_noop` | AC-6 | `AUTONOMY_PRESET=none` produces byte-identical pre-US-0119 behaviour |
-| `test_us0119_preset_balanced_expansion` | AC-2 | balanced expands into documented 12 flags |
-| `test_us0119_preset_full_expansion` | AC-2 | full expands into documented 12 flags (superset of balanced) |
-| `test_us0119_explicit_flag_overrides_preset` | AC-2 | explicit per-flag > preset expansion |
-| `test_us0119_preset_expansion_uses_known_keys_only` | AC-12 | expansion output contains only keys in pre-US-0119 scratchpad schema |
-| `test_us0119_matrix_validator_passes` | AC-4 | `scripts/validate_autonomy_stop_matrix.py --self-test` exits 0 |
-| `test_us0119_security_hard_gates_never_auto_repaired` | AC-7 | matrix `security_hard` rows all carry `auto_repair_kind=n/a` |
-| `test_us0119_stop_policy_affects_repair_dispatch` | AC-3 | `auto_repair_then_block` vs `auto_repair_then_skip` dispatch correctly |
-| `test_us0119_repair_ledger_cap_escalates` | AC-8 | cap exhaustion → `AUTONOMY_REPAIR_CAP_EXHAUSTED` terminal stop |
-| `test_us0119_matrix_no_orphan_codes` | AC-4 | no orphan reason codes outside YAML manifest |
-
-### Compose guards UNCHANGED (6/6 verified)
-
-| Story | architecture.md anchor | Status |
-|-------|------------------------|--------|
-| US-0092 / DEC-0078 | `## US-0092` L1696 | ✓ exists — delivery confirmation gate UNCHANGED; AUTONOMY_PRESET only adds relaxation layer above |
-| US-0095 | `## US-0095` L1700 | ✓ exists — native auto-chain UNCHANGED |
-| US-0056 / DEC-0038 | (inline reference — no h1 anchor; strict runtime proof semantics referenced in architecture text; `RUNTIME_PROOF_KIND=lightweight` is opt-in lighter attestation only — proof kind select, not semantics rewrite) | ✓ UNCHANGED |
-| US-0068 / DEC-0060 | (inline reference — no h1 anchor; intake evidence gate referenced in intake commands; `INTAKE_AUTONOMY_MODE=1` only auto-derives answers on known-stack repeat projects — evidence gate NEVER bypassed) | ✓ UNCHANGED |
-| US-0096 / DEC-0082 | `## US-0096` L1684 | ✓ exists — delivery modes UNCHANGED; AUTONOMY_PRESET only softens governance gates within them |
-| BUG-0007 | (no h1 anchor — truthfulness rule; `INTAKE_ASSUME_STACK_CONTEXT=1` auto-fills stack/runtime from backlog history with `assumption_confirmation_ref` contract preserved) | ✓ UNCHANGED |
-
-### DC (deferred-candidate) check
-
-`grep "^## US-0119" docs/engineering/architecture.md` → **no matches prior to THIS write**. The `## US-0119` h1 anchor is added in THIS `/architecture` phase per R-0105 Q-2 LOCKED pattern (architecture artifacts live in `architecture.md`; T-anch resolves anchor presence in `/execute`). No deferred-candidate carry-over.
-
-### Compose-do-not-amend verification
-
-All 6 compose targets (US-0092 / US-0095 / US-0056 / US-0068 / US-0096 / BUG-0007) verified present in `architecture.md` with existing anchors or inline references; US-0119 is additive-only. US-0119 inherits no DC candidates from prior stories. No new DC candidates are created by US-0119 (its own `## US-0119` anchor is resolved HERE). Deferral register remains clean — no carry-over to a successor story.
-
-### Risks finalized (R1..R8)
-
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| **R1** Backward-compat regression (`AUTONOMY_PRESET=none` byte-identical to pre-US-0119) | MEDIUM | `test_us0119_preset_none_is_noop` asserts byte-identical surface; explicit-flag > preset > default precedence chain |
-| **R2** Security gate bypass via matrix drift | MEDIUM | `test_us0119_security_hard_gates_never_auto_repaired` asserts matrix divergence; validator `--self-test` enforces `auto_repair_kind=n/a` on all `security_hard` rows |
-| **R3** Repair ledger growth | LOW | Per-run cap = 3 (Q3 LOCKED) + gitignore at `handoffs/autonomy_repair_ledger/*.jsonl`; operator override via `AUTONOMY_REPAIR_CAP_OVERRIDE` |
-| **R4** Operator confusion (softened gates) | MEDIUM | Breadcrumb `autonomy_relaxed:` in state.md + ledger audit surface + `AUTONOMY_REPAIR_CAP_EXHAUSTED` terminal stop reason; `AUTONOMY_PRESET=none` default preserves current behaviour |
-| **R5** Preset-expansion vs explicit-key precedence | LOW–MEDIUM | LOCKED: explicit per-flag > preset > defaults (documented in scratchpad merge-precedence note per US-0078 model B) |
-| **R6** Compose-do-not-amend drift (expansion uses unknown keys) | LOW | `test_us0119_preset_expansion_uses_known_keys_only` enforces only pre-US-0119 scratchpad schema keys |
-| **R7** Matrix validator grep fragility | LOW | LOCKED: explicit YAML manifest (Q8 LOCKED from R-0107), not grep-only; `scripts/data/autonomy_stop_matrix.yaml` is single source of truth |
-| **R8** Breadcrumb format granularity (one-line per soft-stop vs aggregated) | LOW–MEDIUM | LOCKED: one-line per soft-stop (Q10 LOCKED from R-0107); operator can count per-code softening events |
-
-### Stop conditions
-
-- `decision_gate=false` — no decision gate triggered; companion DEC-0119 authored Accepted in THIS phase
-- `missing_acceptance_criteria=none` — all 12 ACs covered by sprint seeds
-- `task_count=12` (T-anch + T-001..T-011) — within `SPRINT_MAX_TASKS=12`
-- `compose_guards=6/6 UNCHANGED` — verified
-- `dc_check=clean` — no deferred-candidate carry-over
-
-### Consequences
-
-- **Positive**: Operators gain a single `AUTONOMY_PRESET=balanced|full` switch that deterministically configures twelve autonomy flags; `AUTONOMY_STOP_POLICY` provides explicit control over how softened non-security stops are handled; audit trail via ledger + breadcrumb; backward-compatible default.
-- **Negative**: More scratchpad surface area (14 new keys: `AUTONOMY_PRESET` + `AUTONOMY_STOP_POLICY` + 12 per-feature flags); new code surface (`autonomy_preset_lib.py` + `validate_autonomy_stop_matrix.py` + tests); new stop-matrix authority file; 7th cumulative byte-stability sub-block in README.
-- **Neutral**: Implementation lives in `/execute`; this decision fixes the architecture contract only. `/sprint-plan` may merge or split the 12 task seeds within the 12-task budget.
-
-### Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0119`, `sprint_id=(pending)`, `orchestrator_run_id=auto-20260705-us0119-intake`
-- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082; research + architecture + sprint-plan merged)
-- `fresh_context_marker=tl-US0119-architecture-20260705T224500Z-fresh`
-- `timestamp=2026-07-05T22:45:00Z` (UTC)
-- `evidence_ref=docs/product/backlog.md (## US-0119 block L4028-L4070 narrow-read — 12 ACs), docs/product/acceptance.md (US-0119 row L146 narrow-read — 12 ACs OPEN), handoffs/po_to_tl.md (US-0119 research handoff L1-L205 narrow-read), docs/engineering/state.md (research checkpoint L854-L890 narrow-read), docs/engineering/research.md (R-0107 entry L8907-L9001 full read), docs/engineering/architecture.md (## US-0118 section L1713-L1923 as template + compose-anchor verification), decisions/DEC-0118.md (full read as DEC-0119 template), .cursor/scratchpad.md (AUTONOMY_PRESET/AUTONOMY_STOP_POLICY/12 per-feature flag grep — zero matches confirming net-new), handoffs/resume_brief.md (top ~15 lines narrow-read)`
-- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + python SHA-256 computation for the strict runtime proof + the artifact writes listed in this phase (architecture.md `## US-0119` section append, decisions/DEC-0119.md NEW, po_to_tl.md architecture handoff prepend, state.md architecture checkpoint append). No `.env` reads, no credentials access, no intake-evidence mutation.
-- `assemble_sovereign_memory_digest(...)` NOT called (US-0119 code+docs; existing digest context sufficient per R-0107 — US-0113..US-0118 introspectives established reusable patterns; autonomy-preset angle adds distinct 7th-family dimension).
-- No write to `mistakes.jsonl` in architecture phase (no fix_failed / revert_applied / plan_fidelity_violation / scope_creep event occurred).
-- Prior phase strict proof consumed: `rp-auto-20260705-us0119-research-techlead-20260705T223000Z-US-0119` (from R-0107 entry, unchanged).
-- Current architecture-phase strict proof recorded below.
-
-### Strict runtime proof (DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260705-us0119-architecture-techlead-20260705T224500Z-US-0119`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"auto-20260705-us0119-intake","phase_id":"architecture","proof_issued_at":"2026-07-05T22:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260705-us0119-architecture-techlead-20260705T224500Z-US-0119","sprint_id":"(pending)","story_id":"US-0119"}`
-- `proof_hash=71d0ac09ece22e540a8c8002555fe8f6720c6b5bcd77eb6b6eb09cc34360b1e9` (SHA-256 of the sorted-key JSON payload above)
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-05T23:45:00Z` (1-hour TTL per DEC-0038, UTC = issued_at + 3600s)
-
-### Decision gate
-
-- `decision_gate=false` (no DECISION_GATE; companion DEC-0119 authored Accepted in THIS phase; approach A1 locked; sprint seeds T-anch + T-001..T-011 within SPRINT_MAX_TASKS=12; risks R1..R8 finalized; DC check clean; compose-do-not-amend verified 6/6)
-- `stop_conditions_met=yes` (no missing references — all 6 compose targets verified; no decision gate triggered; AC baselines green)
-
-### Next scheduled phase
-
-- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
-- `next_scheduled_role=tech-lead`
-- `next_scheduled_sprint_macro=plan`
-- `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent (BUG-0006)`
-
----
-
-# US-0120 — Dedicated `/closure` phase for exclusive Story Closure responsibility
-
-## Overview
-
-**US-0120** extracts Story Closure (Status `OPEN`→`DONE` in `docs/product/backlog.md` + acceptance checkbox `[ ]`→`[x]` in `docs/product/acceptance.md` + `docs/engineering/state.md` closure checkpoint + `sprints/Sxxxx/closure-verification.md` artifact) from `/release` step 10–12 into a **dedicated `/closure` phase** with exclusive `qe` role ownership. The ultra-lean ship macro becomes `release → closure → refresh-context` (3 phases instead of 2). Orchestrator post-closure `rg` verification enforces materialization fidelity (fixes the US-0119 closure fidelity gap where the release subagent claimed closure but files remained `OPEN`/unchecked — same pattern as BUG-0006 execute cycle).
-
-This is a **governance-only** change: no new code surfaces beyond a schema validator (`scripts/validate_closure_verification.py`) and contract tests (`tests/us0120_closure_phase_test.py`). The compose surface (US-0043, US-0045, US-0040, US-0048, US-0056, US-0096) remains UNCHANGED — `/closure` is the dedicated executor of the contracts those stories already define. Forward-compat only (R8 ACCEPTED): already-DONE stories are untouched; no retroactive `closure-verification.md` generation.
-
-**Research anchor**: **R-0108** (research `docs/engineering/state.md` L1102–L1231 — resolved all 10 open questions Q1..Q10 LOCKED; 8 risks R1..R8 ACCEPTED; approach A1 locked; compose guards 6/6 UNCHANGED). **No companion DEC** (modifies DEC-0052 phase→role matrix + DEC-0082 ship macro directly — both are additive scoped edits, no new DEC needed per R-0108 ID resolution).
-
-**Fresh context marker**: `tl-US0120-architecture-20260707T215000Z-fresh`
-**Orchestrator run id**: `manual-20260707-us0120`
-**Timestamp**: 2026-07-07T21:50:00Z (UTC)
-**Verdict**: PASS
-**Next**: `/sprint-plan`
-
-## Approach locked (A1 — from discovery)
-
-**Approach A1** (locked, carried from discovery): Extract Story Closure from `/release` step 10–12 into dedicated `/closure` phase with exclusive `qe` role ownership. Ship macro becomes 3-phase: `release → closure → refresh-context`. Orchestrator post-closure `rg` verification enforces materialization fidelity. Forward-compat only (no retroactive closure for already-DONE stories).
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| **A1** | **Dedicated `/closure` phase with exclusive `qe` ownership + orchestrator post-verification** | **Preferred** — resolves US-0119 fidelity gap; follows "one phase, one responsibility" principle; deterministic drain hook detection for in-flight stories. |
-| A2 (rejected) | Keep closure inside `/release` but add orchestrator-side verification of step 10–12 execution. | **Rejected** — same fidelity pattern as US-0119 BUG-0006; release subagent overloaded with 19 steps; verification cannot fix non-materialization. |
-| A3 (rejected) | Extract closure into `/qa` phase (`qa` already owns quality gate). | **Rejected** — conflates quality findings with status reconciliation (different US-0043 contract); `/qa` runs BEFORE `/release`, closure must run AFTER `/release`; violates phase ordering. |
-
-## Phase definition
-
-### /closure phase contract
-
-| Attribute | Value |
-|-----------|-------|
-| **phase_id** | `closure` |
-| **macro_phase** | `ship` (ultra_lean), canonical for all 3 delivery modes (standard, ultra_lean, mega_quick) |
-| **role** | `qe` (default; `curator` fallback via `AUTO_ROLE_CLOSURE` scratchpad override — Q2 LOCKED) |
-| **phase ordering** | AFTER `/release` PASS; BEFORE `/refresh-context` |
-| **input prerequisites** | (a) `handoffs/release_queue.md` row `status=released` exists for target sprint, (b) `handoffs/releases/Sxxxx-release-notes.md` EXISTS with PASS verdict, (c) `sprints/Sxxxx/qa-findings.md` EXISTS. Fail-gated: `CLOSURE_RELEASE_EVIDENCE_MISSING`. |
-| **outputs (all mandatory)** | (1) `docs/product/backlog.md` target story block: `- Status: OPEN` → `- Status: DONE` (canonical ownership per US-0045), (2) `docs/product/acceptance.md` target row: `- [ ] US-xxxx:` → `- [x] US-xxxx:`, (3) `docs/engineering/state.md` closure checkpoint append (phase_id=closure, role, story_id, sprint_id, fresh_context_marker, timestamp, verdict), (4) `sprints/Sxxxx/closure-verification.md` NEW artifact (schema below) |
-| **orchestrator post-verification (D12)** | After `/closure` returns, orchestrator runs direct `rg` verification: (i) `rg "^- Status: DONE$" docs/product/backlog.md` constrained to target story block, (ii) `rg "^\- \[x\] US-xxxx:" docs/product/acceptance.md`. State.md: two-stage grep `rg "phase_id=closure" docs/engineering/state.md \| rg "story_id=US-xxxx"`. If any check FAIL → escalate `CLOSURE_VERIFICATION_FAILED`. |
-
-### closure-verification.md schema (Q6/Q7 LOCKED)
-
-Markdown format (not JSON — Q6 LOCKED; follows existing lifecycle artifact convention: qa-findings.md, release-findings.md, uat.md — all `.md`).
-
-**REQUIRED fields** (validator `scripts/validate_closure_verification.py` checks these):
-
-| Field | Format | Description |
-|-------|--------|-------------|
-| `story_id` | `US-xxxx` | Target story ID |
-| `closure_date` | ISO-8601 UTC (e.g. `2026-07-07T22:00:00Z`) | When closure executed |
-| `closure_role` | `qe \| curator` | Actual role that performed closure |
-| `pre_closure_status` | `OPEN` | Pre-condition status (must be `OPEN`) |
-| `post_closure_status` | `DONE` | Post-condition status (must be `DONE`) |
-| `release_evidence_refs[]` | array of paths | Paths to release artifacts closure consumed (release_queue row ref, release-notes ref, qa-findings ref; optionally uat ref, release-findings ref) |
-| `isolation_evidence{}` | object | `{phase_id: closure, role, fresh_context_marker, timestamp, evidence_ref: closure-verification.md path}` per US-0048 |
-| `runtime_proof{}` | object | `{runtime_proof_id, proof_hash, proof_ttl_seconds: 3600}` per US-0056 / DEC-0038 |
-
-**OPTIONAL fields** (extensible — Q7 LOCKED):
-
-| Field | Format | Description |
-|-------|--------|-------------|
-| `normalization_notes` | free-text | Edge cases (legacy stories, in-flight reconciliation) |
-| `backward_compat_note` | free-text | For in-flight story closure at US-0120 ship boundary |
-
-Schema is **additive-extensible**: validator only checks required fields; future extensions do not break prior closure-verification.md files (R7 ACCEPTED).
-
-## Artifacts
-
-### New artifacts
-
-| Artifact | Path | Responsibility |
-|----------|------|----------------|
-| `/closure` command (active) | `.cursor/commands/closure.md` | NEW — closure phase command for operator/subagent |
-| `/closure` command (template) | `template/.cursor/commands/closure.md` | NEW — byte-identical mirror (T-002; `check_intake_template_parity.py --scope=closure-phase` enforces) |
-| Closure verification artifact | `sprints/Sxxxx/closure-verification.md` | NEW — per-sprint closure execution record |
-| Closure validator | `scripts/validate_closure_verification.py` | NEW — enforces required-field schema; pure stdlib |
-| Contract tests | `tests/us0120_closure_phase_test.py` | NEW — 10 test markers (Q10 LOCKED) |
-| This section | `docs/engineering/architecture.md` `# US-0120` | NEW (this phase) |
-| Runbook section | `docs/engineering/runbook.md` `## Story closure (US-0120)` | NEW in `/execute` |
-
-### Mutated artifacts (scoped edits only)
-
-| Artifact | Mutation | Scope |
-|----------|----------|-------|
-| `.cursor/commands/release.md` (active + template) | Remove steps 10–12 (backlog reconciliation + derived views + normalization report); insert pointer at new step 10: "Backlog reconciliation is now handled by the dedicated `/closure` phase — see `.cursor/commands/closure.md`." Renumber old step 13 → new step 10, old step 14 → new step 11, etc. Sequential renumbering, no gaps. Active + template byte-identical. | T-005 |
-| `decisions/DEC-0052.md` | ADD canonical phase→role matrix row: `closure \| qe \| AUTO_ROLE_CLOSURE scratchpad override to curator allowed`. ADD `AUTO_ROLE_CLOSURE` row to §2 override contract table. ADD `closure` row to §3 preflight capability gate. Existing 12 phase→role mappings UNTOUCHED. | T-003 |
-| `decisions/DEC-0082.md` | Modify ship macro from `[release, refresh-context]` → `[release, closure, refresh-context]` (2→3 phases). Other macro definitions UNTOUCHED. | T-004 |
-| `.cursor/commands/auto.md` + `template/.cursor/commands/auto.md` | Add closure to phase plan arrays in all delivery modes; after `/release` completes, orchestrator spawns closure subagent (fresh per BUG-0006). Add `AUTO_ROLE_CLOSURE` scratchpad key. | T-004 |
-| `.cursor/scratchpad.md` + `template/.cursor/scratchpad.local.example.md` | Add `AUTO_ROLE_CLOSURE` key + closure phase pointer. | T-003/T-004 |
-| `docs/engineering/state.md` | Append architecture checkpoint (this phase); runtime closure checkpoints appended per-sprint by `/closure`. | This phase |
-| `handoffs/po_to_tl.md` | Prepend architecture handoff block (this phase). | This phase |
-| `installer-owned-paths.manifest` | Add rows for new scripts + closure.md active + template. | T-009 |
-
-### Files NOT to touch (compose guard UNCHANGED)
-
-| File | Reason |
-|------|--------|
-| `docs/product/backlog.md` | US-0045 canonical status — `/closure` mutates ONLY at execution time. |
-| `docs/product/acceptance.md` | US-0045 derived view — same. |
-| Compose-guard story surfaces (US-0043, US-0045, US-0040, US-0048, US-0056, US-0096) | All 6 UNCHANGED — `/closure` EXECUTES their existing contracts. |
-
-## Contracts
-
-### DEC-0052 phase→role matrix extension (scoped — R3 ACCEPTED)
-
-**ADD only** — existing 12 phase→role mappings UNTOUCHED.
-
-| §1 Canonical phase→role matrix | New row |
-|-------------------------------|---------|
-| `closure` \| `qe` \| `AUTO_ROLE_CLOSURE` override to `curator` | |
-
-| §2 Override contract table | New row |
-|---------------------------|---------|
-| `AUTO_ROLE_CLOSURE` \| values: `qe`, `curator` \| default: `qe` \| `curator must not write qa-owned surfaces` | |
-
-| §3 Preflight capability gate | New row |
-|------------------------------|---------|
-| `closure` \| capability: `role:qe` or override \| fail-closed: `PHASE_CAPABILITY_MISSING` | |
-
-### DEC-0082 ship macro extension (scoped — R4 ACCEPTED)
-
-| Macro phase | Old ship | New ship |
-|-------------|----------|----------|
-| `ship` | `[release, refresh-context]` (2) | `[release, closure, refresh-context]` (3) |
-
-### /auto orchestration wiring (AC-4)
-
-1. All 3 delivery modes include `closure` after `release`.
-2. After `/release` PASS → spawn closure subagent (fresh `qe` / `curator` fallback per BUG-0006).
-3. After `/closure` PASS → spawn `/refresh-context` (unchanged).
-4. `AUTO_ROLE_CLOSURE` scratchpad key (empty = `qe` fallback per Q2).
-
-### Orchestrator post-closure verification protocol (D12 — R1 mitigation)
-
-After `/closure` completes, orchestrator runs deterministic `rg` checks:
-
-```
-rg "^- Status: DONE$" docs/product/backlog.md  # constrained to target story block
-rg "^\- \[x\] US-xxxx:" docs/product/acceptance.md  # exact match
-rg "phase_id=closure" docs/engineering/state.md | rg "story_id=US-xxxx"  # two-stage
-```
-
-MISMATCH → fail-gate `CLOSURE_VERIFICATION_FAILED` (non-suppressible, R1 ACCEPTED).
-
-### Drain hook for in-flight stories (Q4 — R2 mitigation)
-
-1. Enumerate stories with `release_queue.md` row `status=released`.
-2. For each, check `backlog.md` status + `acceptance.md` checkbox.
-   - If `Status: OPEN` AND `- [ ] US-xxxx:` → closure SKIPPED.
-   - **Post-US-0120**: spawn `/closure` with backfill mode.
-   - **Pre-US-0120**: `CLOSURE_LEGACY_DRIFT` (manual reconciliation or automatic backfill; no retroactive closure-verification.md).
-3. SKIP `Status: DONE` stories (R8 — no retroactive touch for US-0108/US-0119).
-
-## Orchestrator wiring
-
-### /auto phase plan update
-
-Phase plan arrays in all 3 delivery modes:
-- **standard**: `[..., release, closure, refresh-context]`
-- **ultra_lean**: `[release, closure, refresh-context]`
-- **mega_quick**: `[..., release, closure, refresh-context]`
-
-### /closure subagent spawn contract
-
-```
-phase_id=closure
-role=qe (or curator via AUTO_ROLE_CLOSURE override)
-story_id=US-xxxx
-sprint_id=Sxxxx
-orchestrator_run_id=<current>
-fresh_context_marker=tl-US0120-closure-<timestamp>-fresh (per BUG-0006)
-```
-
-Fresh subagent per BUG-0006 / US-0048 isolation. Produces own isolation evidence + runtime proof per US-0048 / US-0056.
-
-### Release subagent post-US-0120
-
-`.cursor/commands/release.md` steps 10–12 REMOVED. New step 10 = pointer to `/closure`. Release subagent focuses on release artifacts only. Active + template byte-identical (R5/R6 ACCEPTED).
-
-## Compose guards (6/6 UNCHANGED)
-
-| Compose target | Verification | Result |
-|---|---|---|
-| US-0043 | inline ref (20 matches) — US-0120 EXECUTES US-0043 | ✅ read-only |
-| US-0045 | inline ref (20 matches) — US-0120 FOLLOWS US-0045 | ✅ read-only |
-| US-0040 | inline ref (7 matches) — US-0120 operates AFTER US-0040 | ✅ read-only |
-| US-0048 | inline ref (3 matches) — US-0120 produces own isolation evidence | ✅ read-only |
-| US-0056 | inline ref (3 matches) — US-0120 produces own runtime proof | ✅ read-only |
-| US-0096 | `## US-0096` at L1684 | ✅ read-only (ship macro extended, semantics unchanged) |
-
-Contract test `test_us0120_compose_guards_unchanged` enforces at execute boundary.
-
-## Risks mitigated
-
-All 8 risks from R-0108 ACCEPTED:
-
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| R1: Subagent fidelity gap | MEDIUM | D12 orchestrator post-closure `rg` → `CLOSURE_VERIFICATION_FAILED` |
-| R2: In-flight story backward compat | LOW | Q4 drain hook 3-signal detection |
-| R3: DEC-0052 scope creep | LOW–MEDIUM | T-003 scoped ADDITIVE edit |
-| R4: DEC-0082 scope creep | LOW–MEDIUM | T-004 scoped ship-only edit |
-| R5: release.md renumbering | LOW | T-005 deterministic renumber |
-| R6: closure.md template parity drift | LOW | T-001+T-002 byte-identical + parity checker extension |
-| R7: closure-verification.md schema rigidity | LOW | Extensible schema, required-field-only validator |
-| R8: Already-released S0119 backward compat | LOW | Q4 SKIPs DONE stories |
-
-## Sprint seeds preview (10 tasks within SPRINT_MAX_TASKS=12)
-
-| Seed | Description | AC |
-|------|-------------|-----|
-| **T-anch** | Verify `# US-0120` H1 anchor present; compose guards 6/6; DEC-0052/DEC-0082 scoped-edit contract. | AC-12, AC-11 |
-| **T-001** | NEW `.cursor/commands/closure.md` (active). | AC-1 |
-| **T-002** | NEW `template/.cursor/commands/closure.md` (byte-identical). | AC-1 |
-| **T-003** | DEC-0052 scoped edit + `AUTO_ROLE_CLOSURE` scratchpad key. | AC-2 |
-| **T-004** | DEC-0082 ship + auto.md phase plan arrays + closure spawn. | AC-3, AC-4 |
-| **T-005** | release.md step 10–12 removal + renumbering (active + template). | AC-5 |
-| **T-006** | NEW `scripts/validate_closure_verification.py`. | AC-6 |
-| **T-007** | Closure isolation evidence + runtime proof contract in closure.md. | AC-7, AC-8 |
-| **T-008** | NEW `tests/us0120_closure_phase_test.py` (10 markers). | AC-9 |
-| **T-009** | Drain hook + installer manifest rows. | AC-10 |
-| **T-010** | Runbook `## Story closure (US-0120)` h2 + architecture.md (this). | AC-11 |
-
-**Total: 10 tasks (T-anch + T-001..T-010) — within `SPRINT_MAX_TASKS=12`.**
-
-## Test markers (10 — Q10 LOCKED)
-
-| Marker | AC |
-|--------|----|
-| `test_us0120_closure_command_file_exists_active` | AC-1 |
-| `test_us0120_closure_command_file_exists_template` | AC-1 |
-| `test_us0120_closure_command_file_parity` | AC-1 |
-| `test_us0120_dec_0052_phase_role_matrix_includes_closure` | AC-2 |
-| `test_us0120_dec_0082_ship_macro_includes_closure` | AC-3 |
-| `test_us0120_auto_phase_plan_includes_closure` | AC-4 |
-| `test_us0120_release_md_steps_10_12_removed` | AC-5 |
-| `test_us0120_closure_verification_schema_defined` | AC-6 |
-| `test_us0120_compose_guards_unchanged` | AC-12 |
-| `test_us0120_backward_compat_drain_hook` | AC-10 |
-
-Surjective AC coverage: markers 1-3→AC-1, 4→AC-2, 5→AC-3, 6→AC-4, 7→AC-5, 8→AC-6, 9→AC-12, 10→AC-10; AC-7/AC-8/AC-9/AC-11 covered indirectly by markers 1+8/4/6.
-
-## DC check
-
-`dc_check=clean`. No `# US-0120` or `## US-0120` existed prior to THIS write. H1 anchor added per DEC-0076 / BUG-0010 heading policy. Deferral register clean.
-
-## Stop conditions
-
-- `decision_gate=false`
-- `missing_acceptance_criteria=none` (12/12 ACs covered)
-- `compose_guards=6/6 UNCHANGED`
-- `dc_check=clean`
-- 10/10 Q LOCKED, 8/8 R ACCEPTED, A1 locked
-- Triad baseline `baseline_h2_count=41` preserved (H1 used)
-- Codebase map gate: delegated to `/sprint-plan` handoff
-
-## Sovereign memory note
-
-`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
-
-## Consequences
-
-- **Positive**: Closure gets exclusive phase ownership (resolves US-0119 fidelity gap); lifecycle follows "one phase, one responsibility".
-- **Negative**: New command file (active + template); new validator; new tests; one extra spawn cycle in ship macro.
-- **Neutral**: DEC-0052 + DEC-0082 additive scoped edits; compose UNCHANGED; forward-compat only.
-
-## Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0120`, `sprint_id=S0120`
-- `orchestrator_run_id=manual-20260707-us0120`
-- `delivery_mode=ultra_lean`, `macro_phase=plan`
-- `fresh_context_marker=tl-US0120-architecture-20260707T215000Z-fresh`
-- `timestamp=2026-07-07T21:50:00Z` (UTC)
-- `evidence_ref=docs/product/backlog.md (## US-0120 L4072-L4119), docs/product/acceptance.md (US-0120 L147), handoffs/po_to_tl.md (top research + discovery handoffs), docs/engineering/state.md (research checkpoint L1102-L1231 full read), docs/engineering/architecture.md (## US-0096 L1684 + inline refs for US-0043/US-0045/US-0040/US-0048/US-0056 + DC clean + H2 baseline=41)`
-- Fresh tech-lead subagent per BUG-0006 / US-0048; no prior chat history.
-- Prior proof consumed: `rp-manual-20260707-us0120-research-tl-20260707T214500Z-US-0120`
-- Triad baseline `baseline_h2_count=41` preserved via H1 anchor.
-
-## Strict runtime proof (DEC-0038)
-
-- `runtime_proof_id=rp-manual-20260707-us0120-architecture-tl-20260707T215000Z-US-0120`
-- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"manual-20260707-us0120","phase_id":"architecture","proof_issued_at":"2026-07-07T21:50:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-manual-20260707-us0120-architecture-tl-20260707T215000Z-US-0120","sprint_id":"S0120","story_id":"US-0120"}`
-- `proof_hash=6293266bfcdf3e6e668cf28a34d831e55cc05a17e5dea1fc8ee94b70ca67b99f`
-- `proof_ttl_seconds=3600`
-- `proof_ttl=2026-07-07T22:50:00Z`
-
-## Decision gate
-
-- `decision_gate=false` (no companion DEC per R-0108 — scoped edits to DEC-0052 + DEC-0082 directly)
-- `stop_conditions_met=yes`
-
-## Next scheduled phase
-
-- `next_scheduled_phase=/sprint-plan` (tech-lead, third phase of `plan` macro)
-- `next_scheduled_role=tech-lead`
-- `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent per BUG-0006`
-
----
-
-
-# US-0121 — OpenCode template pack and installer host mode
-
-## Overview
-
-**US-0121** is the first slice of the six-story OpenCode adapter epic (US-0121..US-0126). It ships an empty-but-valid `template/.opencode/` tree (`agents/`, `commands/`, `plugins/` + `.gitignore` + `README.md`) and an additive `--host cursor|opencode|both` switch on the existing its-magic installer (US-0008 compose, additive only). Default install remains **cursor-only** until explicit opt-in; cursor-only install must not regress `.cursor/` delivery (AC-4 byte-identity gate). No plugin body, no role agents, no model slugs, no command bodies beyond placeholders — those belong to US-0122..US-0126.
-
-This is a **pack-and-installer** change: new template tree, additive manifest sections, additive `--host` argv in `bin/its-magic.js` + PowerShell `-Host` + Bash `--host` + Python `--host`, host-scoped `missing`/`upgrade`/`clean`, and a contract-test list. The compose surface (US-0008 missing/overwrite/clean/upgrade semantics, DEC-0045 `its_magic/` ownership, US-0102 volatile-ID rule) remains UNCHANGED — US-0121 adds the host-surface switch only.
-
-**Research anchor**: **R-0109** (deepened 2026-08-23, tech-lead, `/research`, auto-20260823-01 — Q6–Q12 LOCKED for US-0121 execute; Q1–Q5 LOCKED for `/architecture` only, deferred to US-0122..US-0126; 8 risks R1–R8 ACCEPTED; approach A1 locked; compose guards verified). **Companion DEC**: **DEC-0120** (authored Accepted in THIS phase — captures Q7 manifest parallel sections + Q8 kernel-vs-host contract + Q9 YAGNI active mirror so US-0122..US-0126 inherit the host contract without re-deriving).
-
-**Fresh context marker**: `tl-US0121-architecture-20260823T111500Z-fresh`
-**Orchestrator run id**: `auto-20260823-01`
-**Timestamp**: 2026-08-23T11:15:00Z (UTC)
-**Verdict**: PASS
-**Next**: `/sprint-plan`
-
-## Approach locked (A1 — from R-0109 Q6–Q12)
-
-**Approach A1** (locked): Ship `template/.opencode/{agents,commands,plugins}/` with one placeholder file per directory + `template/.opencode/.gitignore` + `template/.opencode/README.md` (no repo-root `opencode.json` this slice). Add parallel manifest sections `[opencode_install_include_paths]` and `[opencode_clean_paths]` to `installer-owned-paths.manifest`; existing `[install_include_paths]` / `[clean_paths]` remain the cursor-default rows. Add `--host cursor|opencode|both` to `bin/its-magic.js` argv parser (normalize lowercase + trim, then validate; unknown → `INSTALL_HOST_INVALID`; duplicate/conflicting `--host` argv → fail closed `INSTALL_HOST_INVALID`, no last-wins). Forward `--host` to PowerShell `-Host`, Bash `--host`, Python `--host`. `--host` gates **only** `.cursor/` and `.opencode/` surfaces; kernel paths install regardless of `--host`. `missing`/`upgrade`/`clean` are host-scoped: `clean --host cursor` after `--host both` does **not** delete `.opencode/` and emits `OPENCODE_ORPHANED_BY_CLEAN_CURSOR`; `upgrade --host cursor` after `--host both` does not refresh `.opencode/` and emits `OPENCODE_STALE_BY_UPGRADE_CURSOR`. The mixed-section `[install_include_paths]` parser predicate skips `.cursor/` rows when `--host opencode` while still installing kernel rows from the same section.
-
-| Option | Summary | Verdict |
-|--------|---------|---------|
-| **A1** | **Parallel manifest sections + placeholder pack + normalize-then-validate `--host` + host-scoped missing/upgrade/clean + kernel-vs-host copy filter** | **Preferred** — additive only (US-0008 compose); preserves existing parser contract; AC-5 manifest membership explicit; AC-4 byte-identity enforceable; critic findings 1–3 closed. |
-| A2 (rejected) | Host-tagged rows: `.opencode/  @host=opencode,both` — adds a tag column to the existing line format. | **Rejected** — requires amending the parser to accept a tag column (a US-0008 rewrite, forbidden by D9); mixes concerns in one section; breaks the existing `[install_include_paths]` parser contract. |
-| A3 (rejected) | Prefix filter at copy time only: keep `[install_include_paths]` flat, filter `.cursor/` vs `.opencode/` at copy time based on `--host`, no new manifest sections. | **Rejected** — hides `.opencode/` membership from the manifest, breaking AC-5 ("manifest lists `template/.opencode/**`"); loses explicit manifest membership for the OpenCode pack; parity checker cannot grep the manifest for opencode rows. |
-| A4 (rejected) | Repo-root `opencode.json` stub in the template pack. | **Rejected** — would prematurely lock the US-0122 permission matrix and US-0123 provider config (R-0109 Q6 LOCKED: no repo-root `opencode.json` this slice). |
-
-
-## Components
-
-### Template pack layout (Q6 LOCKED)
-
-```
-template/.opencode/
-  agents/.gitkeep
-  commands/.gitkeep
-  plugins/README.md
-  .gitignore
-  README.md
-```
-
-- One placeholder file per directory (`.gitkeep` for `agents/`/`commands/`, `README.md` for `plugins/` explaining the plugin slot is reserved for US-0124).
-- `template/.opencode/README.md` explains the pack: empty-but-valid, three subdirs, gitignore posture, pointer to US-0122..US-0126 for fill.
-- **No repo-root `opencode.json`** this slice (R-0109 Q6).
-- **No active `.opencode/` mirror in this kit repo** (R-0109 Q9 — YAGNI).
-
-### `template/.opencode/.gitignore` (Q10 LOCKED — four pattern groups, no speculative globs)
-
-```
-.opencode/opencode.json
-.opencode/opencode.jsonc
-.env
-.env.*
-*.local.json
-*.local.jsonc
-auth.json
-```
-
-Q10 LOCKED lists four pattern groups: (1) `.opencode/opencode.json{,c}`, (2) `.env` / `.env.*`, (3) `*.local.json{,c}` under `.opencode/`, (4) `auth.json` defense-in-depth. Critic `ik_us0121_gitignore_premature_patterns` asked to drop the extras; per the orchestrator brief we **decline dropping Q10** and **do not add** further speculative globs this slice. The `*.local.json{,c}` patterns are scoped to `.opencode/` (the `.gitignore` lives at `template/.opencode/.gitignore`, so unanchored patterns apply within that directory tree only). `auth.json` lives outside the repo per OpenCode docs but is listed as harmless defense-in-depth.
-
-### Manifest sections (Q7 LOCKED — parallel additive sections)
-
-Add to `docs/engineering/context/installer-owned-paths.manifest` (and `template/docs/engineering/context/installer-owned-paths.manifest` byte-identical):
-
-```
-[opencode_install_include_paths]
-.opencode/agents
-.opencode/commands
-.opencode/plugins
-.opencode/.gitignore
-.opencode/README.md
-
-[opencode_clean_paths]
-.opencode
-```
-
-- Existing `[install_include_paths]` / `[clean_paths]` / `[required_install_script_paths]` **unchanged** (US-0008 additive only).
-- Triple-installer reads `[opencode_install_include_paths]` only when `--host` includes opencode (`opencode` or `both`); reads `[opencode_clean_paths]` only when `--host` includes opencode.
-- `[install_include_paths]` remains the cursor-default + kernel section. The mixed-section skip predicate (below) gates `.cursor/` rows by `--host`.
-
-### Mixed-section `.cursor/` skip predicate (critic finding 2 — `ik_us0121_mixed_manifest_cursor_skip`)
-
-The existing `[install_include_paths]` mixes kernel rows (`docs`, `sprints`, `handoffs`, `decisions`, `scripts/...`, `.github/workflows`, `its_magic`) with `.cursor/**` rows. The triple-installer must apply a **shared predicate** so the three installers do not diverge:
-
-```python
-def host_gates_cursor_row(rel, host):
-    # Returns True if the row should be SKIPPED for this host.
-    # host in {cursor, opencode, both} (normalized lowercase+trim)
-    if host == "opencode":
-        return rel.startswith(".cursor/")
-    # cursor / both: never skip .cursor/ rows
-    return False
-```
-
-- When `--host opencode`: `.cursor/` rows in `[install_include_paths]` are **skipped**; kernel rows in the same section are **still installed**; `[opencode_install_include_paths]` rows are installed.
-- When `--host cursor` (default): `.cursor/` rows are installed; `[opencode_install_include_paths]` rows are skipped.
-- When `--host both`: both sets installed; no skip.
-- This predicate is the **interface contract** shared by `installer.ps1`, `installer.sh`, and `installer.py`. AC-7 contract test `test_us0121_mixed_section_cursor_skip_when_host_opencode` enforces parity.
-
-
-### `--host` parse / normalize / validate (Q12 LOCKED — in `bin/its-magic.js` + PS `-Host` + sh/py `--host`)
-
-**`bin/its-magic.js`** (additive argv parser extension):
-- Add `--host <value>` to the argv loop. Accept `cursor`, `opencode`, `both` (case-insensitive, whitespace-trimmed). Default `cursor` when omitted.
-- **Normalize**: `value.toLowerCase().trim()` before validate.
-- **Validate**: unknown value → exit with reason code `INSTALL_HOST_INVALID` (ASCII diagnostic, no GUI per D11).
-- **Duplicate / conflicting `--host`**: if `--host` appears more than once in argv → fail closed `INSTALL_HOST_INVALID` (no last-wins; closes critic finding 1).
-- Forward normalized `--host` to PowerShell as `-Host <value>`, to Bash as `--host <value>`.
-- `--help` documents `--host cursor|opencode|both` and the cursor-default lock (AC-9 minimal docs hook; full runbook is US-0126).
-
-**`installer.ps1`**: add `-Host` parameter (PowerShell is case-insensitive by default, but normalize anyway for parity with Bash/Python). Apply the `host_gates_cursor_row` predicate + read `[opencode_install_include_paths]` / `[opencode_clean_paths]` when host includes opencode.
-
-**`installer.sh`**: add `--host` argparse (Bash is case-sensitive; normalize lowercase). Same predicate + section reads.
-
-**`installer.py`**: add `--host` argparse (Python argparse is case-sensitive; normalize lowercase). Same predicate + section reads. The Python installer is the manifest authority; PS/Bash delegate manifest reads to it where possible (existing pattern).
-
-### Host-scoped missing / upgrade / clean (Q12 + Q8 LOCKED)
-
-| Mode | `--host cursor` (default) | `--host opencode` | `--host both` |
-|------|---------------------------|-------------------|---------------|
-| `missing` | Copy `.cursor/` + kernel rows from `[install_include_paths]`; skip `.opencode/` rows. | Skip `.cursor/` rows; copy kernel rows + `[opencode_install_include_paths]`. | Copy all rows (`.cursor/` + kernel + `.opencode/`). |
-| `upgrade` | Refresh `.cursor/` + kernel rows; leave `.opencode/` untouched. If `.opencode/` exists from a prior `--host both`, emit `OPENCODE_STALE_BY_UPGRADE_CURSOR` (diagnostic, not an error). | Refresh kernel + `.opencode/` rows; leave `.cursor/` untouched. If `.cursor/` exists from a prior `--host both`, emit `CURSOR_STALE_BY_UPGRADE_OPENCODE` (symmetric diagnostic). | Refresh all rows. |
-| `clean` | Remove `[clean_paths]` (cursor-default + kernel); do **not** remove `.opencode/`. If `.opencode/` exists from a prior `--host both`, emit `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` (diagnostic). | Remove `[opencode_clean_paths]` (`.opencode/`); do **not** remove `.cursor/` or kernel paths. If `.cursor/` exists from a prior `--host both`, emit `CURSOR_ORPHANED_BY_CLEAN_OPENCODE` (symmetric diagnostic). | Remove both `[clean_paths]` and `[opencode_clean_paths]`. |
-
-- **Host-shrink `upgrade`/`missing`** (critic finding 1 — `ik_us0121_upgrade_host_transition`): shrinking `--host both` → `cursor` does **not silently delete** `.opencode/`; it leaves the other-host tree in place and emits a named diagnostic (`OPENCODE_STALE_BY_UPGRADE_CURSOR` for upgrade, `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` for clean). The operator must run `clean --host opencode` or `clean --host both` to remove the orphan. Symmetric for `--host opencode` shrinking from `both`.
-- **No silent deletion**: the only way to delete `.opencode/` is `clean --host opencode` or `clean --host both`. The only way to delete `.cursor/` (cursor-owned installer paths) is `clean --host cursor` or `clean --host both`.
-
-### Kernel-vs-host copy filter (Q8 LOCKED)
-
-`--host` gates **only** `.cursor/` and `.opencode/` surfaces. Kernel paths install regardless of `--host`:
-- `docs/`, `scripts/` (manifest-listed), `its_magic/`, `handoffs/`, `decisions/`, `sprints/`, `.github/workflows/`.
-
-This is the simplest contract satisfying AC-3 (opencode adds `.opencode/`) and AC-4 (cursor-only byte-identical). No exception needed; the rule is "`--host` is a host-surface switch, not a kernel switch."
-
-### Coexistence byte-identity for `--host cursor` (AC-4)
-
-`--host cursor` (default) must be byte-identical on `.cursor/` and Cursor-owned installer paths versus pre-US-0121 cursor-only install. Contract tests enforce:
-- `test_us0121_cursor_only_byte_identical_pre_us0121`: install with `--host cursor` into a clean target; compare `.cursor/` tree + manifest-listed kernel paths against a pre-US-0121 baseline snapshot.
-- `test_us0121_cursor_only_no_opencode_files`: `--host cursor` install produces zero `.opencode/` files in the target.
-- `test_us0121_both_leaves_both_trees`: `--host both` leaves both `.cursor/` and `.opencode/` present.
-
-
-### AC-7 contract-test list (locked)
-
-`tests/us0121_host_mode_test.py` — markers:
-
-| # | Marker | AC |
-|---|--------|-----|
-| 1 | `test_us0121_default_host_cursor_when_omitted` | AC-2 |
-| 2 | `test_us0121_host_cursor_installs_cursor_and_kernel_no_opencode` | AC-2, AC-3, AC-4 |
-| 3 | `test_us0121_host_opencode_skips_cursor_installs_opencode_and_kernel` | AC-2, AC-3, AC-4 |
-| 4 | `test_us0121_host_both_installs_both_trees` | AC-2, AC-3, AC-4 |
-| 5 | `test_us0121_invalid_host_fails_closed_install_host_invalid` | AC-2 |
-| 6 | `test_us0121_host_normalize_case_and_whitespace` (e.g. `OpenCode`, `  opencode  `, `BOTH`) | AC-2 |
-| 7 | `test_us0121_duplicate_host_argv_fails_closed` (no last-wins) | AC-2 |
-| 8 | `test_us0121_clean_host_cursor_after_both_emits_orphan_diagnostic` (`OPENCODE_ORPHANED_BY_CLEAN_CURSOR`; `.opencode/` left intact) | AC-3, AC-7 |
-| 9 | `test_us0121_upgrade_host_cursor_after_both_emits_stale_diagnostic` (`OPENCODE_STALE_BY_UPGRADE_CURSOR`; `.opencode/` left untouched) | AC-3, AC-7 |
-| 10 | `test_us0121_mixed_section_cursor_skip_when_host_opencode` (kernel rows from `[install_include_paths]` installed; `.cursor/` rows skipped; `[opencode_install_include_paths]` installed) | AC-5, AC-7 |
-| 11 | `test_us0121_manifest_lists_opencode_pack` (grep `[opencode_install_include_paths]` + `.opencode/` rows) | AC-5 |
-| 12 | `test_us0121_no_secrets_in_pack` (grep `template/.opencode/**` for `apiKey|api_key|sk-|MODEL=` → zero hits; no vendor slugs) | AC-10 |
-| 13 | `test_us0121_parity_scope_opencode_adapter_registered` (`check_intake_template_parity.py --scope=opencode-adapter` runs and fails on drift) | AC-6 |
-| 14 | `test_us0121_triple_installer_host_parity` (PS/Bash/Python all normalize, validate, and apply the same skip predicate) | AC-5 |
-
-Surjective AC coverage: AC-1 (pack layout via markers 11+12), AC-2 (markers 1–7), AC-3 (markers 2–4, 8, 9), AC-4 (markers 2–4), AC-5 (markers 10, 11, 14), AC-6 (marker 13), AC-7 (markers 8, 9, 10 + the full set), AC-8 (compose guards verified separately), AC-9 (`--help` grep test), AC-10 (marker 12). Every AC has ≥1 marker.
-
-## Risks mitigated
-
-All 8 risks from R-0109 ACCEPTED, plus critic findings 1–3 closed:
-
-| Risk | Severity | Mitigation |
-|------|----------|------------|
-| R1: cursor-only install accidentally copies `.opencode/` | MEDIUM → LOW | Q7 parallel manifest sections (opencode sections read only when host includes opencode) + Q8 kernel-vs-host contract; marker 2 enforces. |
-| R2: manifest encoding for host-specific paths underspecified | MEDIUM → LOW | Q7 locks parallel sections; section names locked here (`[opencode_install_include_paths]`, `[opencode_clean_paths]`); marker 11 enforces. |
-| R3: empty pack rejected by stock OpenCode | LOW–MEDIUM → LOW | Q6 confirms empty dirs + placeholder files are tolerated; marker 11 asserts manifest membership. |
-| R4: secret/slug leakage | LOW | D8 + AC-10 + Q10 gitignore patterns; marker 12 enforces. |
-| R5: scope creep into US-0122..US-0126 | LOW | D10 + Q9 YAGNI lock; non-goals section below. |
-| R6: triple-installer `--host` parsing divergence (case/whitespace) | LOW | Q12 normalize-then-validate; marker 6 enforces. |
-| R7: `clean --host cursor` orphan | LOW | Q12 host-scoped `clean` + `OPENCODE_ORPHANED_BY_CLEAN_CURSOR`; marker 8 enforces. |
-| R8: `bin/its-magic.js` forgets to forward `--host` | LOW | Q12 forwarding contract; marker 14 enforces triple-installer parity. |
-| C1 (critic): host-shrink `upgrade`/`missing` silent stale | MEDIUM → LOW | `OPENCODE_STALE_BY_UPGRADE_CURSOR` + `CURSOR_STALE_BY_UPGRADE_OPENCODE` diagnostics; marker 9 enforces; no silent deletion. |
-| C2 (critic): mixed-section `.cursor/` skip divergence | MEDIUM → LOW | Shared `host_gates_cursor_row` predicate locked as interface contract; marker 10 enforces. |
-| C3 (critic): gitignore premature patterns | LOW | Q10 four pattern groups kept; no further speculative globs added; documented here as locked. |
-
-## Non-goals (this slice)
-
-- **US-0122** (role agents + Layer-1 permission table) — not filled; `template/.opencode/agents/` ships `.gitkeep` only.
-- **US-0123** (per-role `provider/slug` routing) — no `model:` literals in template; no vendor slugs.
-- **US-0124** (orchestrator plugin spawn) — `template/.opencode/plugins/` ships `README.md` only; no plugin body; v1 vs v2 deferred (R-0109 Q1).
-- **US-0125** (thin command bodies) — `template/.opencode/commands/` ships `.gitkeep` only; no command bodies.
-- **US-0126** (full runbook) — `--help` minimal docs hook only; full OpenCode operator runbook deferred.
-- **Repo-root `opencode.json`** — not shipped this slice (R-0109 Q6).
-- **Active kit `.opencode/` mirror** — YAGNI this slice (R-0109 Q9).
-- **VS Code contrib rewrite** — out of scope (D9).
-- **OpenCode fork** — out of scope (D9); stock host only.
-- **Standalone runtime** — separate plan area; out of scope.
-
-## Compose guards (UNCHANGED — additive only)
-
-| Compose target | Verification | Result |
-|---|---|---|
-| US-0008 (CLI installer) | inline ref — US-0121 adds additive `--host` only; missing/overwrite/clean/upgrade semantics UNCHANGED | ✅ read-only (additive) |
-| DEC-0045 (`its_magic/` ownership) | inline ref — `its_magic/` ownership unchanged | ✅ read-only |
-| US-0102 (volatile-ID rule) | inline ref — template ships no vendor slugs; `*.local.json{,c}` gitignore mirrors kit convention | ✅ read-only |
-| US-0001 (phase names) | inline ref — phase names may appear as placeholders only; no command body clone | ✅ read-only |
-| US-0018 (packaging delivery) | inline ref — installer delivery path unchanged except additive `--host` forward | ✅ read-only |
-
-Contract test `test_us0121_compose_guards_unchanged` enforces at execute boundary.
-
-
-## Sprint seeds preview (within SPRINT_MAX_TASKS=12)
-
-| Seed | Description | AC |
-|------|-------------|-----|
-| **T-anch** | Verify `# US-0121` H1 anchor present; compose guards 5/5; DEC-0120 authored; mixed-section predicate contract locked. | AC-8, AC-11 (implicit) |
-| **T-001** | NEW `template/.opencode/` tree: `agents/.gitkeep`, `commands/.gitkeep`, `plugins/README.md`, `.gitignore` (Q10 four patterns), `README.md`. | AC-1, AC-10 |
-| **T-002** | NEW manifest sections `[opencode_install_include_paths]` + `[opencode_clean_paths]` in active + template manifest (byte-identical). | AC-5 |
-| **T-003** | `bin/its-magic.js` additive `--host` argv parser (normalize, validate, duplicate fail-closed) + forward to PS/Bash + `--help` docs hook. | AC-2, AC-9 |
-| **T-004** | `installer.ps1` `-Host` parameter + normalize + `host_gates_cursor_row` predicate + opencode section reads. | AC-2, AC-3, AC-5 |
-| **T-005** | `installer.sh` `--host` argparse + normalize + same predicate + opencode section reads. | AC-2, AC-3, AC-5 |
-| **T-006** | `installer.py` `--host` argparse + normalize + same predicate + opencode section reads + host-scoped missing/upgrade/clean + orphan/stale diagnostics. | AC-3, AC-7 |
-| **T-007** | NEW `tests/us0121_host_mode_test.py` (14 markers). | AC-7 |
-| **T-008** | `check_intake_template_parity.py --scope=opencode-adapter` registration + `US0121_PARITY_PAIRS` manifest. | AC-6 |
-| **T-009** | Runbook `## OpenCode host mode (US-0121)` h2 minimal + installer `--help` line. | AC-9 |
-
-**Total: 9 tasks (T-anch + T-001..T-009) — within `SPRINT_MAX_TASKS=12`.** `/sprint-plan` may merge or split within the 12-task budget.
-
-## DC check
-
-`dc_check=clean`. No `# US-0121` or `## US-0121` existed prior to THIS write. H1 anchor added per DEC-0076 / BUG-0010 heading policy. Deferral register clean.
-
-## Stop conditions
-
-- `decision_gate=false`
-- `missing_acceptance_criteria=none` (10/10 ACs covered by 14 contract-test markers + compose guards)
-- `compose_guards=5/5 UNCHANGED (additive only)`
-- `dc_check=clean`
-- Q6–Q12 LOCKED for US-0121 execute; Q1–Q5 LOCKED for `/architecture` only (deferred to US-0122..US-0126); 8/8 R ACCEPTED; A1 locked
-- Triad baseline `baseline_h2_count=41` preserved (H1 used, not H2)
-- `validator_skipped=python_not_on_path` (Windows Store stub; `py -3` and `python` both missing — exit 9009); H2 count verified via PowerShell `Select-String -Pattern '^## US-'` (41, unchanged from US-0120 baseline)
-- `enforce-triad-hot-surface.py --rollover/--check` skipped (python missing); `materialize_codebase_map.py --trigger architecture` skipped (python missing); not blocking per orchestrator brief
-
-## Sovereign memory note
-
-`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
-
-## Consequences
-
-- **Positive**: Operators can install `.opencode/` into any consumer repo via the existing installer with `--host opencode|both`; cursor-only install remains byte-identical; epic US-0122..US-0126 inherits the host contract via DEC-0120 without re-deriving.
-- **Negative**: New template tree; additive manifest sections; additive `--host` argv in 4 installer surfaces; new contract test file (14 markers); new parity scope.
-- **Neutral**: US-0008 compose (additive only); DEC-0045 `its_magic/` ownership unchanged; US-0102 volatile-ID rule respected.
-
-## Isolation evidence (US-0048 / DEC-0029)
-
-- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0121`, `sprint_id=(pending — created at sprint-plan)`
-- `orchestrator_run_id=auto-20260823-01`
-- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
-- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required; this spawn's producer model)
-- `fresh_context_marker=tl-US0121-architecture-20260823T111500Z-fresh`, `timestamp=2026-08-23T11:15:00Z` (UTC)
-- `evidence_ref=docs/engineering/architecture.md # US-0121 (this section), decisions/DEC-0120.md (companion DEC), docs/engineering/research.md ## R-0109 (Q6–Q12 LOCKED), docs/product/backlog.md ## US-0121 (D1–D11 + 10 ACs, status OPEN untouched, AC checkboxes untouched), docs/product/acceptance.md US-0121 row (unchecked), docs/product/vision.md ## Discovery Notes — US-0121, handoffs/po_to_tl.md US-0121 top section, handoffs/sovereign_critic_findings.jsonl last 3 rows (ik_us0121_upgrade_host_transition, ik_us0121_mixed_manifest_cursor_skip, ik_us0121_gitignore_premature_patterns), docs/engineering/architecture.md # US-0120 (format template), docs/engineering/decisions.md ## DEC-0119 (last DEC id), docs/engineering/context/installer-owned-paths.manifest (existing sections), bin/its-magic.js (argv parser surface), installer.ps1/installer.sh/installer.py (manifest read surfaces)`
-- Fresh tech-lead subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation.
-- Prior proof consumed: `rp-auto-20260823-01-research-tech-lead-20260823T123800Z-US-0121` (from `docs/engineering/state.md` research checkpoint, unchanged).
-- Triad baseline `baseline_h2_count=41` preserved via H1 anchor (no new H2 `## US-` headings added).
-
-## Strict runtime proof (DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260823-01-architecture-tech-lead-20260823T111500Z-US-0121`
-- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","orchestrator_run_id":"auto-20260823-01","phase_id":"architecture","proof_issued_at":"2026-08-23T11:15:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260823-01-architecture-tech-lead-20260823T111500Z-US-0121","sprint_id":"(pending)","story_id":"US-0121"}`
-- `proof_hash=753a25c11f5ca67aee2e3d4915544d744f3635a1a4433289c03e93c8732ed99e` (SHA-256, UTF-8 bytes via PowerShell — python missing on PATH)
-- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-23T12:15:00Z` (UTC)
-
-## Decision gate
-
-- `decision_gate=false` (companion DEC-0120 authored Accepted in THIS phase; approach A1 locked; Q6–Q12 LOCKED for execute; Q1–Q5 LOCKED for architecture only; 8/8 R ACCEPTED; critic findings 1–3 closed; DC check clean; compose guards 5/5 UNCHANGED)
-- `stop_conditions_met=yes`
-
-## Next scheduled phase
-
-- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro)
-- `next_scheduled_role=tech-lead`
-- `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent.`
-
----
-
-
----
-
----
-
 # US-0122 — OpenCode role agents and Layer-1 permission table
 
 ## Overview
@@ -1560,7 +417,7 @@ Contract test `test_us0123_compose_cursor_unchanged` (marker 8) enforces at exec
 
 | Seed | Description | AC |
 |------|-------------|-----|
-| **T-anch** | Verify `# US-0123` H1 anchor placed AFTER `# US-0122` and BEFORE `# US-0089`; DEC-0123 Accepted; compose guards 6/6; 8-marker list locked; materializer + installer hook contract locked in DEC-0123. | AC-6, AC-9 |
+| **T-anch** | Verify `# US-0123` H1 anchor placed AFTER `# US-0122` and BEFORE `US-0089`; DEC-0123 Accepted; compose guards 6/6; 8-marker list locked; materializer + installer hook contract locked in DEC-0123. | AC-6, AC-9 |
 | **T-001** | NEW example catalog `template/.opencode/model-catalog.local.example.json` with placeholder `provider/slug` per role — covers DeepSeek, Moonshot, Z.AI, Anthropic, OpenAI + DashScope/Qwen custom provider block. | AC-2, AC-7, AC-9 |
 | **T-002** | NEW materializer `scripts/opencode_model_catalog_apply.py` — reads `.opencode/model-catalog.local.json` → injects `model: <provider/slug>` into installed `.opencode/agents/<role>.md` only; no-op when catalog absent; fail-closed `OPENCODE_MODEL_SLUG_UNKNOWN` on unknown/empty slug; `MODEL_CATALOG_INVALID` (scope-tagged) on malformed JSON. | AC-1, AC-4, AC-5 |
 | **T-003** | Installer hook — `installer.py` / `installer.ps1` / `installer.sh` invoke materializer when `--host opencode|both` AND catalog present; triple-installer parity; absent = skip; fail = surface reason code + exit non-zero. | AC-1, AC-5 |
@@ -1764,7 +621,7 @@ Contract test `test_us0124_agent_plugin_compose` (marker 7) + `test_us0124_no_cu
 
 | Seed | Description | AC |
 |------|-------------|-----|
-| **T-anch** | Verify `# US-0124` H1 anchor placed AFTER `# US-0123` and BEFORE `# US-0089`; DEC-0124 Accepted; compose guards 9/9; 9-marker list locked; plugin entry-point + spawn API + stop-matrix argv + agent/plugin boundary locked in DEC-0124. | AC-9, AC-10 |
+| **T-anch** | Verify `# US-0124` H1 anchor placed AFTER `# US-0123` and BEFORE `US-0089`; DEC-0124 Accepted; compose guards 9/9; 9-marker list locked; plugin entry-point + spawn API + stop-matrix argv + agent/plugin boundary locked in DEC-0124. | AC-9, AC-10 |
 | **T-001** | NEW plugin file `template/.opencode/plugins/orchestrator.ts` with `Plugin.define({ id: "its-magic.orchestrator", setup })` + `ctx.tool.hook("execute.before")` write-guard + `ctx.session.create` spawn entry + stop-matrix subprocess callout. | AC-1, AC-2, AC-3 |
 | **T-002** | NEW mock `ctx` harness `tests/us0124/mock_ctx.ts` — `MockCtx` with `session.create`/`prompt`/`wait` + scripted null/throw/identical-id + `tool.hook` recorder. | AC-3, AC-4, AC-10 |
 | **T-003** | Stub reason-code table in `docs/engineering/runbook.md` h2 `## OpenCode orchestrator plugin reason codes (US-0124)` — four `OPENCODE_*` codes + three reused codes, one-line semantics each, cross-link to US-0126 for full table. | AC-8 |
@@ -2030,7 +887,7 @@ Contract test `test_us0125_cursor_commands_unchanged` (marker 9) + `test_us0125_
 
 | Seed | Description | AC |
 |------|-------------|-----|
-| **T-anch** | Verify `# US-0125` H1 anchor placed AFTER `# US-0124` and BEFORE `# US-0089`; DEC-0125 Accepted; compose guards 7/7; 11-marker list locked; command inventory + clone-guard + validator-bridge + defense-in-depth + `/auto` dispatch-only + frontmatter shape + reason-code boundary + stub-harness locked in DEC-0125. | AC-9, AC-10 |
+| **T-anch** | Verify `# US-0125` H1 anchor placed AFTER `# US-0124` and BEFORE `US-0089`; DEC-0125 Accepted; compose guards 7/7; 11-marker list locked; command inventory + clone-guard + validator-bridge + defense-in-depth + `/auto` dispatch-only + frontmatter shape + reason-code boundary + stub-harness locked in DEC-0125. | AC-9, AC-10 |
 | **T-001** | 15 thin command files at `template/.opencode/commands/<name>.md` — frontmatter `description` + `agent` (+ `subtask: false` for `/auto`; `/ask` omits `agent`); dispatch-only body naming phase_id + artifact path list + STOP; each ≤ 20 lines. | AC-1 |
 | **T-002** | Clone-guard contract test `test_us0125_clone_guard` — per-file line cap ≤ 20 + normalized-text similarity ≤ 0.30 via `difflib.SequenceMatcher` vs `.cursor/commands/<name>.md`. | AC-2 |
 | **T-003** | Validator→artifact mapping table — authored by US-0125, consumed by US-0124 plugin; documents which validator gates which persistence artifact path; lives in US-0125 architecture section (here). | AC-3, AC-4 |
@@ -2099,7 +956,919 @@ Contract test `test_us0125_cursor_commands_unchanged` (marker 9) + `test_us0125_
 - `next_scheduled_role=tech-lead`
 - `stop_condition=STOP after architecture completes; hand off via artifacts only to /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent.`
 
+# US-0126 — OpenCode host runbook, reason codes, and parity tests
+
+## Overview
+
+**US-0126** is the sixth and final slice of the six-story OpenCode adapter epic (US-0121..US-0126). US-0121 shipped the empty-but-valid `template/.opencode/` pack + the `--host` installer switch. US-0122 populated the pack with eight markdown role agents and locked the Layer-1 permission matrix. US-0123 locked the per-role `provider/slug` resolution chain. US-0124 shipped the orchestrator plugin that makes `/auto` spawn-only on the OpenCode host. US-0125 shipped the 15 dispatch-only thin commands + the Python validator bridge contract. US-0126 owns **Layer 4** — the operator-facing runbook section (`## OpenCode host operator runbook (US-0126)` in `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` byte-identical), the consolidated cross-host reason-code table, the `--scope=opencode-adapter` parity extension (2 new pairs in `OPENCODE_ADAPTER_PAIRS`), and the 12 `test_us0126_*` contract markers (one-test-per-AC, AC-5 splits into readme + runbook no-dec-leak; static/grep, no live OpenCode probe).
+
+This is an **additive docs + parity + contract-test** change: one new runbook h2 section (mirrored active↔template), one README user-visible OpenCode host blurb (mirrored to `template/its_magic/README.md`), one `OPENCODE_ADAPTER_PAIRS` additive extension (2 new pairs), one new contract test file (`tests/us0126_contract_test.py` — 12 markers, mirrored to `template/tests/us0126_contract_test.py` byte-identical), and the companion DEC-0126. The US-0121 installer-flag h2, the US-0124 stub reason-code h2, and the US-0125 stub reason-code h2 are NOT edited by US-0126 — US-0126 owns the consolidated cross-host table and cross-links to them (compose, do not amend). No Cursor kit docs are deleted (AC-10). No new GUI. No standalone runtime. No OpenCode fork. No VS Code contrib rewrite. No Caveman. No Cursor-browser-as-primary-UAT.
+
+**Research anchor**: **R-0109** US-0126 deepened findings (DQ1..DQ8 LOCKED for `/architecture`; US-0121 Q1..Q12 + US-0122 DQ1..DQ8 + US-0123 DQ1..DQ10 + US-0124 DQ1..DQ8 + US-0125 DQ1..DQ8 locks PRESERVED, not wiped; 6 risks R1..R6 ACCEPTED; 3 research critic NBs closed: `ik_us0126_dq3_parity_grep_false_pass`, `ik_us0126_layering_runbook_dec_tests`, `ik_us0126_research_scope_yagni_markers`). **Companion DEC**: **DEC-0126** (authored Accepted in THIS phase).
+
+**Fresh context marker**: `tl-US0126-architecture-20260825T160542Z-fresh`
+**Orchestrator run id**: `auto-20260825-01`
+**Timestamp**: 2026-08-25T16:05:42Z (UTC)
+**Verdict**: PASS
+**Next**: `/sprint-plan` (after critic)
+
+## Approach locked (A1 — from R-0109 US-0126 DQ1..DQ8)
+
+**Approach A1** (locked): Ship a new sibling h2 `## OpenCode host operator runbook (US-0126)` in `docs/engineering/runbook.md` (DQ1) placed immediately after the `## OpenCode thin commands + validator bridge (US-0125)` section, mirrored byte-identical to `template/docs/engineering/runbook.md` (DQ8). The section body contains: the locked program DoD sentence (DQ5), the locked default-host reminder sentence (DQ6), the locked out-of-scope list + Boundaries subsection (DQ7), the consolidated cross-host reason-code table (DQ2 — 4 `OPENCODE_*` US-0124 + 5 installer `OPENCODE_*`/`CURSOR_*` US-0121 + 3 reused cross-host + raw Python validator codes; each code has a one-line semantics + fail-closed action + cross-link to its owning slice; NO `OPENCODE_VALIDATOR_FAILED` wrapper per DEC-0125 DQ7), and a parity scope cross-link to `--scope=opencode-adapter` (DQ3). The README user-visible OpenCode host blurb carries the default-host reminder + out-of-scope list (operator prose, no DEC ids per US-0071). The `OPENCODE_ADAPTER_PAIRS` tuple in `scripts/check_intake_template_parity.py` is extended additively with 2 new pairs: `tests/us0126_contract_test.py` ↔ template + `docs/engineering/runbook.md` ↔ template (DQ3). The `installer-owned-paths.manifest` is unchanged (DQ8 — runbook already installer-owned via `docs` in `[install_include_paths]`; `tests/us0126_contract_test.py` not installer-shipped per US-0121..US-0125 pattern). The 12 `test_us0126_*` markers live in `tests/us0126_contract_test.py` (mirrored to `template/tests/us0126_contract_test.py` byte-identical), all static/grep-based, no live OpenCode runtime probe (vision D10 lock — DQ4).
+
+|| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A1** | **New sibling h2 + consolidated reason-code table + additive `OPENCODE_ADAPTER_PAIRS` (2 pairs) + 12 static/grep markers + locked operator sentences + no manifest change** | **Preferred** — additive only; composes with US-0071/US-0113..US-0117/US-0121/US-0122/US-0123/US-0124/US-0125/US-0102; AC-1..AC-10 provable via static/grep contract tests; 3 research critic NBs closed. |
+| A2 (rejected) | Merge US-0126 runbook into the US-0121 installer-flag h2 | **Rejected** — violates compose-do-not-amend (US-0121 h2 locked by US-0121 AC-9); conflates installer-flag docs with operator-runbook prose. |
+| A3 (rejected) | Generic `## OpenCode host` h2 (no US-xxxx suffix) | **Rejected** — breaks the `(US-xxxx)` suffix convention for the five sibling OpenCode-epic h2 sections. |
+| A4 (rejected) | New sibling script `scripts/check_opencode_adapter_parity.py` | **Rejected** — violates the established `--scope=<name>` pattern (15 scopes on the single CLI); diverges from US-0121's `--scope=opencode-adapter` lock. |
+| A5 (rejected) | New `--scope=opencode-adapter-us0126` sibling scope | **Rejected** — fragments the epic parity surface; `--scope=opencode-adapter` was always intended to cover the whole epic (US-0121..US-0126). |
+| A6 (rejected) | Add `tests/us0126_contract_test.py` to `[install_include_paths]` | **Rejected** — breaks the US-0121..US-0125 pattern (test files are NOT installer-shipped; parity-validated via `OPENCODE_ADAPTER_PAIRS` only). |
+| A7 (rejected) | Resurrect `OPENCODE_VALIDATOR_FAILED` wrapper in the consolidated table | **Rejected** — DEC-0125 DQ7 REJECTED the wrapper; US-0126 documents raw Python codes + `OPENCODE_DRIVER_INVOKE_FAILED` only. |
+| A8 (rejected) | Live OpenCode probe in CI for program DoD | **Rejected** — adds OpenCode runtime dependency to CI; forbidden by vision D10 — DoD is a static documentation test (grep for locked key phrases). |
+| A9 (rejected) | AC-10 cursor-docs baseline via frozen pre-US-0126 git snapshot | **Rejected** — fragile; prefer deterministic static check asserting `.cursor/commands/` and `.cursor/agents/` still exist with expected file names vs current kit inventory. |
+| A10 (rejected) | Collapse 12 markers to 11 by merging marker 4 + marker 12 | **Rejected** — AC-5 split is real (readme vs runbook no-dec-leak are distinct surfaces); keeping 12 preserves one-test-per-AC clarity; marker 4 (prior-story checklist) and marker 12 (aggregate) kept separate for explicit defense in depth. |
+
+<!-- US-0126 ARCHITECTURE BODY CONTINUES BELOW -->
+
+## Components
+
+### Runbook section (DQ1 LOCKED — AC-1)
+
+`docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` (byte-identical active↔template) — new sibling h2 placed immediately after `## OpenCode thin commands + validator bridge (US-0125)`:
+
+- **Heading**: `## OpenCode host operator runbook (US-0126)`
+- **GitHub anchor**: `opencode-host-operator-runbook-us-0126`
+- **Placement**: immediately after the `## OpenCode thin commands + validator bridge (US-0125)` section (after L4017), before the next non-OpenCode h2.
+- **Mirror**: `template/docs/engineering/runbook.md` (active↔template byte-identical parity — DQ8; validated by the new `docs/engineering/runbook.md` ↔ template pair in `OPENCODE_ADAPTER_PAIRS` — DQ3).
+- **US-0121/US-0124/US-0125 h2 sections untouched** (compose, do not amend): US-0126 cross-links to `## OpenCode host mode (US-0121)` as "installer `--host` flag reference (US-0121)"; cross-links to `## OpenCode orchestrator plugin reason codes (US-0124)` and `## OpenCode thin commands + validator bridge (US-0125)` as "stub reason-code references (US-0124, US-0125)".
+- **Coupling risk (critic NB `ik_us0126_layering_runbook_dec_tests`)**: the runbook pair is a **whole-file** byte-identical pair (installer-owned `docs` covers the runbook). Execute must keep active↔template runbook byte-identical after adding the new h2 — any drift fails `--scope=opencode-adapter`. This is intentional (the runbook is installer-owned); documented here so execute does not accidentally edit only one side.
+
+### Locked operator sentences (DQ5, DQ6, DQ7 LOCKED — AC-6, AC-7, AC-8)
+
+`/architecture` locks the wording; **execute ships the actual h2 body into `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md`** (architecture locks; execute implements — do NOT ship the runbook body in this phase).
+
+**Program DoD sentence (DQ5 LOCKED — AC-6)** — verbatim into the runbook h2 body:
+
+> "Program done: with a fresh `its-magic --host opencode` install and `/connect`ed keys, an operator can run `intake → … → release` on stock OpenCode with PO/Dev/QA as distinct sessions (optionally distinct providers per US-0123 role-slug routing), and the Python persistence-blocking validators (`intake_evidence_validate.py`, `bug_issue_validate.py`, and the US-0125 bridge contract set) refuse writes on non-zero exit exactly as on the Cursor host."
+
+- **"without Cursor" disambiguated**: = no `.cursor/` directory loaded for this project (installer `--host opencode` skips `.cursor/` rows per US-0121; kernel paths still install). It does NOT mean "no Cursor IDE process on the operator machine" — the operator may have Cursor installed for other projects; the DoD is about the kit running without the Cursor host adapter loaded for this project.
+- **"different sessions/providers" disambiguated**: = distinct OpenCode sessions (PO/Dev/QA as separate `opencode run --session` invocations or separate TUI sessions per US-0069 / DEC-0051 phase→role matrix); optionally distinct `/connect` profiles or distinct provider slugs per role (US-0123 per-role slug routing).
+- **"validators still block" disambiguated**: = the regression baseline is the existing Python validator set (`intake_evidence_validate.py`, `bug_issue_validate.py`, plus the US-0125 bridge contract for any kit validator) — these remain Python SOT and the US-0124 plugin `ctx.tool.hook("execute.before")` enforces persistence on non-zero exit exactly as the Cursor host hook layer does.
+- `test_us0126_program_dod_documented` (DQ4 marker 7) asserts the DoD sentence is present in runbook (static grep for key phrases: "fresh `its-magic --host opencode` install", "distinct sessions", "refuse writes on non-zero exit"). NOT a live end-to-end probe.
+
+**Default-host reminder sentence (DQ6 LOCKED — AC-7)** — verbatim into the runbook h2 body + README user-visible OpenCode host blurb:
+
+> "Default install is cursor-only. Pass `--host opencode` or `--host both` to install the OpenCode host adapter; without it, `.opencode/` is not installed. See `## OpenCode host mode (US-0121)` for the installer flag reference."
+
+- **No DEC ids** in the operator-facing sentence (US-0071). Cross-reference is to the US-0121 runbook h2 heading, not to `DEC-0120`.
+- `test_us0126_default_host_reminder` (DQ4 marker 8) greps runbook + README for the locked phrases: "Default install is cursor-only", "`--host opencode`", "`--host both`".
+
+**Out-of-scope list (DQ7 LOCKED — AC-8)** — verbatim into the runbook h2 body + README user-visible OpenCode host blurb (operator prose only):
+
+> "Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT."
+
+- **Boundaries subsection** (separate, not operator prose; runbook only; cross-references allowed here):
+  - "standalone runtime — see `docs/product/standalone-runtime-masterplan.md`."
+  - "OpenCode fork — out of scope; the adapter uses stock OpenCode plugins/agents/commands only."
+  - "VS Code contrib rewrite — out of scope; the adapter does not modify VS Code or its contrib extensions."
+  - "Caveman mode — see `DEC-0055`."
+  - "Cursor browser as primary UAT — out of scope; browser UAT remains a secondary surface (US-0093)."
+- `test_us0126_out_of_scope_listed` (DQ4 marker 9) greps runbook + README for each excluded item name: "standalone runtime", "OpenCode fork", "VS Code contrib rewrite", "Caveman", "Cursor browser as primary UAT".
+
+<!-- US-0126 ARCHITECTURE BODY CONTINUES BELOW -->
+
+### Consolidated cross-host reason-code table (DQ2 LOCKED — AC-2; critic NB `ik_us0126_dq3_parity_grep_false_pass` closed)
+
+The consolidated table documents **four `OPENCODE_*` codes from US-0124** + **five installer `OPENCODE_*`/`CURSOR_*` codes from US-0121** + **three reused cross-host codes** + **raw Python validator codes (no wrapper)**. Each code has a one-line semantics + fail-closed action + cross-link to its owning slice (US-0121/US-0124/US-0125/Python SOT). **NO `OPENCODE_VALIDATOR_FAILED` wrapper** (rejected by DEC-0125 DQ7 — US-0126 must not resurrect it). The table cross-links to the US-0124 stub h2 (`## OpenCode orchestrator plugin reason codes (US-0124)`) and US-0125 stub h2 (`## OpenCode thin commands + validator bridge (US-0125)`) for the per-slice stub references; US-0126 owns the consolidated cross-host view.
+
+**`OPENCODE_*` family (OpenCode-host-specific — from US-0124 / DEC-0124 DQ4):**
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` | v2 `ctx.session.create` unavailable at runtime; fail closed; do not degrade to same-session roleplay. | US-0124 |
+| `OPENCODE_SUBTASK_IGNORED` | `ctx.session.create` returned null/threw/identical-id (DQ5 matrix); fail closed; stop `/auto`. | US-0124 |
+| `OPENCODE_HEADLESS_UNSUPPORTED` | `opencode run` CLI missing on PATH (DQ7); fail closed; stop `/auto`. | US-0124 |
+| `OPENCODE_DRIVER_INVOKE_FAILED` | `scripts/auto_outer_driver.py` subprocess failed (non-zero exit, malformed JSON, timeout) (DQ6); fail closed; stop `/auto`. | US-0124 |
+
+**Installer `OPENCODE_*` / `CURSOR_*` family (from US-0121 / DEC-0120 — runbook L3970–L3976 already documents these):**
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `INSTALL_HOST_INVALID` | Unknown or duplicate `--host` argv; fail closed. | US-0121 |
+| `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` | `clean --host cursor` left `.opencode/` in place. | US-0121 |
+| `OPENCODE_STALE_BY_UPGRADE_CURSOR` | `upgrade --host cursor` did not refresh `.opencode/`. | US-0121 |
+| `CURSOR_ORPHANED_BY_CLEAN_OPENCODE` | `clean --host opencode` left `.cursor/` in place. | US-0121 |
+| `CURSOR_STALE_BY_UPGRADE_OPENCODE` | `upgrade --host opencode` did not refresh `.cursor/`. | US-0121 |
+
+**Reused cross-host codes (no `OPENCODE_` prefix — same semantics on Cursor + OpenCode):**
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `AUTO_ORCHESTRATOR_PHASE_EXECUTION` | Orchestrator (or any role) performing another role's artifact writes; fail closed; stop `/auto`. | US-0092 / DEC-0078 |
+| `PHASE_ROLE_MISMATCH` | Wrong-role spawn per US-0069 / DEC-0051 matrix; fail closed; stop `/auto`. | US-0069 / DEC-0051 |
+| `NATIVE_CHAIN_UNAVAILABLE` | Headless fallback when native in-session chain unavailable (compose with `OPENCODE_HEADLESS_UNSUPPORTED`). | US-0092 / DEC-0078 |
+
+**Raw Python validator reason codes (Python SOT — no `OPENCODE_*` wrapper per DEC-0125 DQ7):**
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `INTAKE_PERSISTENCE_BLOCKED` | `intake_evidence_validate.py` refused a persistence write; fail closed; surface to operator. | US-0078 / DEC-0060 (Python SOT) |
+| `INTAKE_REQUIRED_TOPIC_MISSING` | `intake_evidence_validate.py` found a missing required topic; fail closed; surface to operator. | US-0078 / DEC-0060 (Python SOT) |
+| `BUG_ISSUE_VALIDATION_FAILED` | `bug_issue_validate.py` refused a bug-row write; fail closed; surface to operator. | US-0079 / DEC-0061 (Python SOT) |
+
+US-0126 documents these as the persistence-blocking gate surface; US-0125 owns the bridge contract; US-0126 does NOT enumerate every kit validator — the bridge contract is generic. `test_us0126_reason_code_catalog_present` (DQ4 marker 2) greps the runbook for each code in the consolidated table (4 `OPENCODE_*` US-0124 + 5 installer `OPENCODE_*`/`CURSOR_*` US-0121 + 3 reused cross-host + raw Python validator codes) and asserts each code has a one-line semantics + fail-closed action.
+
+### Parity scope surface (DQ3 LOCKED — AC-3; critic NB `ik_us0126_dq3_parity_grep_false_pass` closed — explicit layer split)
+
+`scripts/check_intake_template_parity.py` already registers `--scope=opencode-adapter` (L541) backed by `OPENCODE_ADAPTER_PAIRS` (L484–L517). US-0126 extends `OPENCODE_ADAPTER_PAIRS` **additively** with 2 new pairs (no sibling script, no sibling scope):
+
+- **Existing pairs preserved (8)**: `installer-owned-paths.manifest` ↔ template, `check_intake_template_parity.py` ↔ template, `tests/us0121_host_mode_test.py` ↔ template, `tests/us0122_contract_test.py` ↔ template, `tests/us0123_contract_test.py` ↔ template, `tests/us0124_contract_test.py` ↔ template, `tests/us0125_contract_test.py` ↔ template, `model_tier_validate.py` ↔ template.
+- **New pairs added by US-0126 (2)**:
+  - `tests/us0126_contract_test.py` ↔ `template/tests/us0126_contract_test.py` (NEW contract test file — DQ4 inventory).
+  - `docs/engineering/runbook.md` ↔ `template/docs/engineering/runbook.md` (NEW active↔template parity for the "OpenCode host operator runbook (US-0126)" h2 section — DQ1 lock; ensures the runbook section is byte-identical active↔template).
+
+**Layer split (critic NB `ik_us0126_dq3_parity_grep_false_pass` closed)** — document this explicitly so execute does not overload `check_intake_template_parity.py`:
+
+- **`--scope=opencode-adapter` parity CLI predicate** = **byte-identical pair check only**. Each pair must be byte-identical (file content hash match); each enumerated surface file must exist (non-empty). Exit 0 = `[INTAKE_TEMPLATE_PARITY_OK] scope=opencode-adapter`; non-zero = `INTAKE_TEMPLATE_PARITY_FAILED` with the failing pair name. The parity CLI does NOT grep for reason-code table presence and does NOT grep for `test_us0126_*` markers.
+- **Reason-code table presence + `test_us0126_*` markers** = **contract-test grep**, NOT parity-CLI predicates. `test_us0126_reason_code_catalog_present` (marker 2) and `test_us0126_test_marker_checklist` (marker 4) / `test_us0126_prior_story_markers_present` (marker 12) are the grep layers — they live in `tests/us0126_contract_test.py`, not in `check_intake_template_parity.py`. Execute must NOT add reason-code-table or test-marker grep predicates to the parity CLI; the parity CLI stays byte-only.
+
+**Surface coverage** (the `--scope=opencode-adapter` flag validates the whole epic surface in one invocation):
+
+1. `template/.opencode/agents/**` (US-0122 — installed via manifest `[opencode_install_include_paths]`).
+2. `template/.opencode/commands/**` (US-0125 — 15 files; installed via manifest).
+3. `template/.opencode/plugins/orchestrator.ts` (US-0124 — installed via manifest).
+4. `template/.opencode/model-catalog.local.example.json` (US-0123 — installed via manifest).
+5. `scripts/opencode_model_catalog_apply.py` (US-0123 — installed via manifest).
+6. Installer host help/manifest: `docs/engineering/context/installer-owned-paths.manifest` ↔ template (US-0121 — existing pair).
+7. `scripts/check_intake_template_parity.py` ↔ template (US-0121 — existing pair; self-parity).
+8. `tests/us0121_host_mode_test.py`..`tests/us0126_contract_test.py` ↔ template (US-0121..US-0126 — 6 pairs; US-0126 adds the 6th).
+9. `scripts/model_tier_validate.py` ↔ template (US-0123 — existing pair).
+10. `docs/engineering/runbook.md` ↔ `template/docs/engineering/runbook.md` (US-0126 — NEW pair; validates the runbook section byte-identical active↔template).
+
+`test_us0126_parity_scope_opencode_adapter` (DQ4 marker 3) runs `python scripts/check_intake_template_parity.py --scope=opencode-adapter` and asserts exit 0.
+
+<!-- US-0126 ARCHITECTURE BODY CONTINUES BELOW -->
+
+### `test_us0126_*` contract-test list (DQ4 LOCKED — AC-4; 12 markers, static/grep, no live OpenCode probe)
+
+`tests/us0126_contract_test.py` + `template/tests/us0126_contract_test.py` (byte-identical pair — DQ3). All markers are static/grep-based; no live OpenCode runtime probe (vision D10 lock). 12 markers (one-test-per-AC, AC-5 splits into readme + runbook no-dec-leak; +1 aggregate prior-story marker — kept separate from marker 4 for explicit defense in depth):
+
+| # | Marker | AC | Assertion |
+|---|--------|-----|-----------|
+| 1 | `test_us0126_runbook_section_present` | AC-1 | grep `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` for `## OpenCode host operator runbook (US-0126)` h2 (DQ1 lock). |
+| 2 | `test_us0126_reason_code_catalog_present` | AC-2 | grep runbook for each code in the consolidated table (DQ2 lock): 4 `OPENCODE_*` (US-0124) + 5 installer `OPENCODE_*`/`CURSOR_*` (US-0121) + 3 reused cross-host + raw Python validator codes; assert each code has a one-line semantics + fail-closed action. |
+| 3 | `test_us0126_parity_scope_opencode_adapter` | AC-3 | run `python scripts/check_intake_template_parity.py --scope=opencode-adapter` and assert exit 0 (DQ3 lock). |
+| 4 | `test_us0126_test_marker_checklist` | AC-4 | grep `tests/` for `test_us0121_*`..`test_us0125_*` markers (aggregate per-story checklist; one marker per prior epic slice); assert each prior slice has its documented markers. |
+| 5 | `test_us0126_readme_no_dec_leak` | AC-5a | US-0071 sanitization grep on `README.md` (and `template/its_magic/README.md`): assert no `DEC-xxxx` ids in operator-facing sentences (code references in evidence/footnotes allowed; operator prose must not leak DEC ids). |
+| 6 | `test_us0126_runbook_no_dec_leak` | AC-5b | US-0071 sanitization grep on `docs/engineering/runbook.md` US-0126 section + template: assert no `DEC-xxxx` ids in operator-facing sentences (cross-references to DEC ids allowed only in a separate "Boundaries/evidence" subsection, not in operator prose). |
+| 7 | `test_us0126_program_dod_documented` | AC-6 | grep runbook for the DoD sentence key phrases (DQ5 lock): "fresh `its-magic --host opencode` install", "distinct sessions", "refuse writes on non-zero exit". |
+| 8 | `test_us0126_default_host_reminder` | AC-7 | grep runbook + README for the default-host reminder phrases (DQ6 lock): "Default install is cursor-only", "`--host opencode`", "`--host both`". |
+| 9 | `test_us0126_out_of_scope_listed` | AC-8 | grep runbook + README for each excluded item name (DQ7 lock): "standalone runtime", "OpenCode fork", "VS Code contrib rewrite", "Caveman", "Cursor browser as primary UAT". |
+| 10 | `test_us0126_template_doc_parity` | AC-9 | assert `docs/engineering/context/installer-owned-paths.manifest` active↔template byte-identical (DQ8 lock — no new entries) + `docs/engineering/runbook.md` active↔template byte-identical for installer-owned doc paths touched by this slice. |
+| 11 | `test_us0126_cursor_docs_not_deleted` | AC-10 | **Deterministic static check (DQ4 lock — NOT a frozen pre-US-0126 git snapshot, which is fragile)**: assert `.cursor/commands/` and `.cursor/agents/` directories still exist with expected file names vs current kit inventory (a manifest-style baseline checked into the repo, e.g. a sorted file-name list of `.cursor/commands/*.md` + `.cursor/agents/*.md` captured at execute time and asserted present). No git history dependency. |
+| 12 | `test_us0126_prior_story_markers_present` | AC-4 aggregate | grep `tests/` for `test_us0121_*`..`test_us0125_*` markers (aggregate prior-story marker presence — kept separate from marker 4 for explicit defense in depth; may be merged with marker 4 at execute if redundancy is justified, but architecture locks 12 for clarity). |
+
+Surjective AC coverage: AC-1 (marker 1), AC-2 (marker 2), AC-3 (marker 3 + marker 10), AC-4 (markers 4, 12), AC-5 (markers 5, 6), AC-6 (marker 7), AC-7 (marker 8), AC-8 (marker 9), AC-9 (marker 10), AC-10 (marker 11). Every AC has ≥1 marker.
+
+**AC-10 baseline lock (critic NB `ik_us0126_research_scope_yagni_markers` closed)**: `test_us0126_cursor_docs_not_deleted` asserts via a **deterministic static check** — `.cursor/commands/` and `.cursor/agents/` still exist with expected file names vs a current-kit-inventory baseline (a sorted file-name list checked into the repo at execute time). NOT a frozen pre-US-0126 git snapshot (fragile — requires immutable historical git state). NOT a hash manifest of the entire `.cursor/` directory (over-broad). The static check is grep/file-presence only; no live OpenCode probe.
+
+### Template parity manifest (DQ8 LOCKED — AC-9)
+
+`docs/engineering/context/installer-owned-paths.manifest` (active + template byte-identical) is **unchanged** — no new entries. The runbook is already installer-owned via `docs` in `[install_include_paths]`; the new "OpenCode host operator runbook (US-0126)" h2 section is part of the runbook — no new manifest entry needed for the section. `tests/us0126_contract_test.py` is NOT installer-shipped (matches US-0121..US-0125 pattern); it is parity-validated via the new `OPENCODE_ADAPTER_PAIRS` pair (DQ3 lock). The manifest itself stays byte-identical active↔template (no new entries); the runbook active↔template parity is validated via the new `OPENCODE_ADAPTER_PAIRS` runbook pair (DQ3 lock).
+
+<!-- US-0126 ARCHITECTURE BODY CONTINUES BELOW -->
+
+## Risks mitigated
+
+All 6 risks from R-0109 US-0126 ACCEPTED, plus 3 research critic NBs closed:
+
+| Risk | Severity | Mitigation |
+|------|----------|------------|
+| R1: Reason-code namespace collision with US-0125 stub references | MEDIUM → LOW | DQ2 consolidated table (US-0126 owns canonical cross-host table; US-0124/US-0125 stub h2 sections cross-link; NO `OPENCODE_VALIDATOR_FAILED` wrapper per DEC-0125 DQ7); T-005 + marker 2 `test_us0126_reason_code_catalog_present` asserts. |
+| R2: Parity-scope drift — `--scope=opencode-adapter` coverage gaps | MEDIUM → LOW | DQ3 additive `OPENCODE_ADAPTER_PAIRS` extension (2 new pairs; no sibling script); T-003 + marker 3 `test_us0126_parity_scope_opencode_adapter` asserts exit 0. |
+| R3: Operator-sentence DEC leakage | MEDIUM → LOW | DQ6/DQ7 US-0071 sanitization (no DEC ids in operator prose; cross-references to runbook h2 / Boundaries subsection only); markers 5 + 6 `test_us0126_readme_no_dec_leak` + `test_us0126_runbook_no_dec_leak` assert. |
+| R4: Template-parity gap — new runbook section not mirrored under `template/` | LOW–MEDIUM → LOW | DQ8 runbook pair in `OPENCODE_ADAPTER_PAIRS` (active↔template byte-identical); T-003 + marker 10 `test_us0126_template_doc_parity` asserts. |
+| R5: Program-DoD ambiguity ("without Cursor" + "different sessions/providers" + "validators still block") | LOW–MEDIUM → LOW | DQ5 operationally precise locked wording (static documentation test, not live probe); marker 7 `test_us0126_program_dod_documented` asserts key phrases. |
+| R6: Cursor-kit deletion temptation | LOW → LOW | DQ4 marker 11 `test_us0126_cursor_docs_not_deleted` asserts `.cursor/commands/` + `.cursor/agents/` present via deterministic static check (current-kit-inventory baseline, not frozen git snapshot); AC-10 compose guard. |
+| C1 (critic NB): `ik_us0126_dq3_parity_grep_false_pass` | → closed | DQ3 explicit layer split: `--scope=opencode-adapter` = byte-identical pair check only; reason-code table presence + `test_us0126_*` markers = contract-test grep, NOT parity-CLI predicates. Execute must not overload `check_intake_template_parity.py`. |
+| C2 (critic NB): `ik_us0126_layering_runbook_dec_tests` | → closed | DQ1 + DQ8: runbook pair is whole-file byte-identical (installer-owned `docs`); coupling risk documented; execute must keep active↔template runbook byte-identical after adding the new h2. |
+| C3 (critic NB): `ik_us0126_research_scope_yagni_markers` | → closed | DQ4: 12 markers locked (AC-5 split is real; marker 4 + marker 12 kept separate for defense in depth); AC-10 baseline = deterministic static check vs current-kit-inventory, not frozen git snapshot. |
+
+## Non-goals (this slice)
+
+- **Implement the runbook h2 body** — architecture locks the wording; execute ships the actual h2 body into `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md`. Architecture does NOT write the runbook section body in this phase.
+- **Implement the contract tests** — architecture locks the 12 marker names + grep patterns; execute authors `tests/us0126_contract_test.py` + `template/tests/us0126_contract_test.py`.
+- **Extend `check_intake_template_parity.py` with grep predicates** — parity CLI stays byte-only (DQ3 layer split); reason-code table presence + test markers are contract-test grep, not parity-CLI predicates.
+- **Edit `## OpenCode host mode (US-0121)` h2** — US-0121 owns the installer-flag reference; US-0126 cross-links to it (compose, do not amend).
+- **Edit `## OpenCode orchestrator plugin reason codes (US-0124)` h2** — US-0124 owns the stub; US-0126 owns the consolidated table and cross-links.
+- **Edit `## OpenCode thin commands + validator bridge (US-0125)` h2** — US-0125 owns the stub; US-0126 owns the consolidated table and cross-links.
+- **Add `tests/us0126_contract_test.py` to `[install_include_paths]`** — test files are NOT installer-shipped per US-0121..US-0125 pattern (DQ8).
+- **Resurrect `OPENCODE_VALIDATOR_FAILED` wrapper** — DEC-0125 DQ7 REJECTED it (DQ2).
+- **Live OpenCode probe in CI** — forbidden by vision D10 (DQ4, DQ5).
+- **Frozen pre-US-0126 git snapshot for AC-10** — fragile; deterministic static check used instead (DQ4).
+- **New GUI / standalone runtime / OpenCode fork / VS Code contrib rewrite / Caveman / Cursor-browser-as-primary-UAT** — all out of scope (DQ7).
+
+## Compose guards (UNCHANGED — additive only)
+
+| Compose target | Verification | Result |
+|---|---|---|
+| US-0071 (operator-sentence sanitization) | no DEC ids in operator prose; cross-references to runbook h2 / Boundaries subsection only (DQ6/DQ7) | ✅ compose |
+| US-0113..US-0117 (operator docs) | add OpenCode host section; do not rewrite Cursor command catalogs | ✅ compose |
+| US-0121 / DEC-0120 (installer `--host` flag docs hook — runbook L3870 h2) | untouched — US-0126 cross-links to it; does not rewrite the US-0121 h2 | ✅ untouched |
+| US-0122 / DEC-0122 (seven role agents) | runbook references seven role agents; does not redefine permissions | ✅ compose |
+| US-0123 (per-role slug routing) | runbook references `/connect` keys + per-role slug routing; does not re-list vendor slugs | ✅ compose |
+| US-0124 / DEC-0124 (orchestrator plugin + stub reason-code h2 L3995) | untouched — US-0126 owns consolidated table; cross-links to US-0124 stub h2; does not reimplement plugin logic | ✅ untouched |
+| US-0125 / DEC-0125 (thin commands + validator-bridge stub h2 L4009) | untouched — US-0126 owns consolidated table; cross-links to US-0125 stub h2; **DEC-0125 DQ7 raw Python reason codes upheld — `OPENCODE_VALIDATOR_FAILED` wrapper NOT resurrected** | ✅ untouched |
+| US-0102 / DEC-0087 (no vendor slugs in `template/`) | no vendor slugs in runbook/README operator prose | ✅ untouched |
+
+Contract tests `test_us0126_readme_no_dec_leak` (marker 5) + `test_us0126_runbook_no_dec_leak` (marker 6) + `test_us0126_cursor_docs_not_deleted` (marker 11) + `test_us0126_template_doc_parity` (marker 10) enforce at execute boundary.
+
+<!-- US-0126 ARCHITECTURE BODY CONTINUES BELOW -->
+
+## Sprint seeds preview (within SPRINT_MAX_TASKS=12)
+
+| Seed | Description | AC |
+|------|-------------|-----|
+| **T-anch** | Verify `# US-0126` H1 anchor placed AFTER `# US-0125` and BEFORE `US-0089` per DEC-0073; DEC-0126 Accepted; compose guards 8/8; 12-marker list locked; runbook h2 + reason-code table + parity extension + DoD/reminder/out-of-scope + manifest lock locked in DEC-0126. | AC-9, AC-10 |
+| **T-001** | Runbook section `## OpenCode host operator runbook (US-0126)` in `docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` byte-identical — program DoD sentence + default-host reminder + out-of-scope list + Boundaries subsection + consolidated reason-code table + parity scope cross-link; DQ1/DQ5/DQ6/DQ7/DQ2 locks. | AC-1, AC-2, AC-6, AC-7, AC-8 |
+| **T-002** | README user-visible OpenCode host blurb in `README.md` + `template/its_magic/README.md` — default-host reminder + out-of-scope list (operator prose, no DEC ids); DQ6/DQ7 locks. | AC-5, AC-7, AC-8 |
+| **T-003** | `scripts/check_intake_template_parity.py` `OPENCODE_ADAPTER_PAIRS` additive extension — 2 new pairs: `tests/us0126_contract_test.py` ↔ template + `docs/engineering/runbook.md` ↔ template; DQ3 lock; parity CLI stays byte-only (no grep predicates). | AC-3, AC-9 |
+| **T-004** | `tests/us0126_contract_test.py` + `template/tests/us0126_contract_test.py` byte-identical — 12 markers per DQ4 lock; static/grep, no live OpenCode probe. | AC-4 |
+| **T-005** | Consolidated reason-code table authoring — 4 `OPENCODE_*` US-0124 + 5 installer `OPENCODE_*`/`CURSOR_*` US-0121 + 3 reused cross-host + raw Python validator codes; each with one-line semantics + fail-closed action + cross-link to owning slice; NO `OPENCODE_VALIDATOR_FAILED` wrapper; DQ2 lock. | AC-2 |
+| **T-006** | US-0071 sanitization grep tests — `test_us0126_readme_no_dec_leak` + `test_us0126_runbook_no_dec_leak`; assert no DEC ids in operator-facing sentences; cross-references to DEC ids allowed only in Boundaries/evidence subsection. | AC-5 |
+| **T-007** | Program DoD static documentation test — `test_us0126_program_dod_documented`; grep for locked DoD sentence key phrases; DQ5 lock. | AC-6 |
+| **T-008** | Default-host reminder + out-of-scope tests — `test_us0126_default_host_reminder` + `test_us0126_out_of_scope_listed`; DQ6/DQ7 locks. | AC-7, AC-8 |
+| **T-009** | Parity + Cursor-docs-not-deleted tests — `test_us0126_parity_scope_opencode_adapter` + `test_us0126_template_doc_parity` + `test_us0126_cursor_docs_not_deleted`; DQ3/DQ8 locks; AC-10 deterministic static check (current-kit-inventory baseline, not frozen git snapshot). | AC-3, AC-9, AC-10 |
+| **T-010** | Prior-story marker checklist — `test_us0126_test_marker_checklist` / `test_us0126_prior_story_markers_present`; grep `tests/` for `test_us0121_*`..`test_us0125_*` markers; AC-4 aggregate. | AC-4 |
+
+**Total: 11 tasks (T-anch + T-001..T-010) — within `SPRINT_MAX_TASKS=12`.** `/sprint-plan` may merge or split within the 12-task budget.
+
+**AC mapping (10 ACs → 11 tasks surjective)**: AC-1 → T-001+T-004; AC-2 → T-005+T-004; AC-3 → T-003+T-009+T-004; AC-4 → T-004+T-010; AC-5 → T-002+T-006; AC-6 → T-007; AC-7 → T-002+T-008; AC-8 → T-002+T-008; AC-9 → T-003+T-009; AC-10 → T-009.
+
+## DC check
+
+`dc_check=clean`. No `# US-0126` or `## US-0126` existed in `architecture.md` prior to THIS write (verified by R-0109 US-0126 DC check). H1 anchor added per DEC-0076 / BUG-0010 heading policy — placed AFTER `# US-0125` (L1836) and BEFORE `US-0089` (L2103) per DEC-0073. Deferral register clean.
+
+## Stop conditions
+
+- `decision_gate=false`
+- `missing_acceptance_criteria=none` (10/10 ACs covered by 12 contract-test markers + compose guards 8/8)
+- `compose_guards=8/8 UNCHANGED (additive only)`
+- `dc_check=clean`
+- DQ1..DQ8 LOCKED for US-0126; 6/6 R ACCEPTED; A1 locked; 3 research critic NBs closed
+- Triad baseline `baseline_h2_count=38` preserved (H1 used, not H2)
+- Triad `--rollover` + `--check` + `--check-arch-heading-policy --baseline-h2-count 38` (run from repo root after this write)
+
+## Sovereign memory note
+
+`assemble_sovereign_memory_digest(...)` NOT called. No write to `mistakes.jsonl`.
+
+## Consequences
+
+- **Positive**: Operators on the OpenCode host get a single consolidated cross-host reason-code table + a locked operator runbook section (program DoD + default-host reminder + out-of-scope list) mirrored active↔template byte-identical; `--scope=opencode-adapter` validates the whole epic surface (10 pairs) in one invocation; 12 static/grep contract markers prove AC-1..AC-10 without any live OpenCode runtime probe (vision D10 upheld); US-0121/US-0122/US-0123/US-0124/US-0125 stub h2 sections stay untouched (compose, do not amend); US-0071 sanitization enforced (no DEC ids in operator prose); AC-10 cursor-kit-not-deleted enforced via deterministic static check (no fragile git snapshot).
+- **Negative**: One new runbook h2 section (mirrored); one README blurb (mirrored); one `OPENCODE_ADAPTER_PAIRS` additive extension (2 pairs); one new contract test file (12 markers, mirrored).
+- **Neutral**: `installer-owned-paths.manifest` unchanged (runbook already covered by `docs`); `tests/us0126_contract_test.py` not installer-shipped (matches US-0121..US-0125 pattern); Cursor `.cursor/commands/*.md` + `.cursor/agents/*.md` unchanged; US-0102 volatile-ID rule respected.
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0126`, `sprint_id=(pending — created at sprint-plan)`
+- `orchestrator_run_id=auto-20260825-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required; this spawn's producer model)
+- `fresh_context_marker=tl-US0126-architecture-20260825T160542Z-fresh`, `timestamp=2026-08-25T16:05:42Z` (UTC)
+- `evidence_ref=docs/engineering/architecture.md # US-0126 (this section), decisions/DEC-0126.md (companion DEC), docs/engineering/research.md ## R-0109 ### Deepened findings — US-0126 (DQ1..DQ8 LOCKED), docs/product/backlog.md ## US-0126 (D1..D10 + 10 ACs + DQ1..DQ8, status OPEN untouched, AC checkboxes untouched), docs/product/acceptance.md US-0126 row (L154 unchecked), docs/product/vision.md ## Intake Notes — US-0126 + ## Discovery Notes — US-0126, handoffs/po_to_tl.md US-0126 section, handoffs/sovereign_critic_findings.jsonl US-0126 research rows (3 non-blocking carry-forwards closed here), handoffs/resume_brief.md (US-0126 sovereign-critic PASS prepend consumed), decisions/DEC-0125.md (read-only compose — DQ7 raw Python reason codes + OPENCODE_VALIDATOR_FAILED wrapper REJECTED), decisions/DEC-0124.md (read-only compose — DQ4 reason-code namespace + DQ6 OPENCODE_DRIVER_INVOKE_FAILED), decisions/DEC-0122.md (read-only compose), decisions/DEC-0120.md (read-only compose), decisions/DEC-0060.md (read-only compose), decisions/DEC-0051.md (read-only compose), docs/engineering/runbook.md L3870–L4017 (OpenCode host h2 inventory — US-0121/US-0122/US-0123/US-0124/US-0125 h2 sections read-only compose), scripts/check_intake_template_parity.py L484–L517 (OPENCODE_ADAPTER_PAIRS read-only compose), docs/engineering/context/installer-owned-paths.manifest (read-only compose), docs/engineering/architecture.md # US-0125 (format template), docs/engineering/decisions.md ## DEC-0125 (stub format template), docs/product/acceptance.md L154 (US-0126 row — read-only, NOT mutated)`
+- Fresh tech-lead subagent per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to narrow-read files (US-0053). No `.env` reads, no credentials access, no intake-evidence mutation, no backlog status/AC mutation, no acceptance.md mutation, no vision.md D1–D10 rewrite, no US-0121..US-0125 DONE reopening.
+- Prior proof consumed: `rp-auto-20260825-01-research-tech-lead-20260825T155615Z-US-0126` (`proof_hash=22035314D2CD5763ECDBED6A3426B696A57331035F84E3BDEC97FC7DFAC3B188`, ttl 2026-08-25T16:56:15Z — consumed before RUNTIME_PROOF_STALE).
+- Triad baseline `baseline_h2_count=38` preserved via H1 anchor (no new H2 `## US-` headings added).
+
+## Strict runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260825-01-architecture-tech-lead-20260825T160542Z-US-0126`
+- Canonical payload (sorted-key JSON per DEC-0038): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260825-01","phase_id":"architecture","proof_issued_at":"2026-08-25T16:05:42Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260825-01-architecture-tech-lead-20260825T160542Z-US-0126","sprint_id":"(pending)","story_id":"US-0126"}`
+- `proof_hash=EEE667DAEE41839D9695C25D4BBFF2D8FA383CAEF6FDA69BFFEAF1D28B5263A2` (SHA-256 of sorted-key compact JSON payload, UTF-8 bytes via `C:\Users\flow\AppData\Local\Programs\Python\Python312\python.exe` hashlib; independently recomputed and confirmed match BEFORE returning)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-25T17:05:42Z` (UTC = issued_at + 3600s)
+- `hash_recompute_confirmation=true` (independent Python hashlib recompute on the exact canonical payload above yields `EEE667DAEE41839D9695C25D4BBFF2D8FA383CAEF6FDA69BFFEAF1D28B5263A2` — byte-identical match)
+
+## Decision gate
+
+- `decision_gate=false` (companion DEC-0126 authored Accepted in THIS phase; approach A1 locked; DQ1..DQ8 LOCKED for US-0126; 6/6 R ACCEPTED; 3 research critic NBs closed; DC check clean; compose guards 8/8 UNCHANGED)
+- `stop_conditions_met=yes`
+
+## Next scheduled phase
+
+- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase→role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro — after sovereign-critic of architecture)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after architecture completes; hand off via artifacts only to sovereign-critic of architecture, then /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent. Do not mark US-0126 DONE. Do not tick acceptance L154. Do not mutate intake JSON. Do not reopen US-0121..US-0125 DONE. Do not rewrite vision D1–D10.`
+
+# US-0127 — Convergence critic conjunct: blocking-only semantics plus non-blocking auto-resolve at phase PASS
+
+## Overview
+
+**US-0127** is a sovereign-loop convergence drift fix. `_critic_jsonl_has_open` in `scripts/sovereign_convergence_lib.py` (lines 318–331) treats every `status=open` row as unmet and defaults `blocking=True` when the key is absent — so ~280 informational `status=open, blocking=false` PASS concurrence rows currently block `CONVERGENCE_CROSS_REVIEWER_OPEN` despite US-0110 L3 conjunct-3 requiring "no open **blocking** cross-reviewer findings". The fix aligns the helper with `sovereign_critic_lib.read_open_blocking(repo)` (DEC-0104 §11) and DEC-0110 §10, auto-resolves non-blocking findings at `/sovereign-critic` PASS, and ships an operator-only hygiene CLI plus contract tests and runbook/reason-code docs.
+
+This is an **additive code + docs + parity + contract-test** change: one convergence lib helper narrows from "any open" to "open+blocking" (AC-1), one auto-resolve hook fires at `/sovereign-critic` PASS with zero blocking findings (AC-2), one new `scripts/sovereign_critic_hygiene.py` (+ template mirror) with `--report` / `--resolve-nonblocking-for-run` / `--dry-run` / `--self-test` / `--all-phases` and 6 deterministic reason codes (AC-3), 13 `test_us0127_*` markers in `tests/us0127_contract_test.py` (+ template mirror) (AC-4), runbook `### Blocking-only conjunct-3 semantics (US-0127)` + `### Hygiene CLI (US-0127)` subsections + `reason_codes.md` `## US-0127` section (active + template byte-identical) (AC-5), and `SOVEREIGN_CRITIC_PAIRS` additive extension + `--scope=sovereign-critic` parity CLI extension (AC-6). No new DEC (see Companion DEC below).
+
+**Research anchor**: **R-0110** (DQ1–DQ8 LOCKED). **Companion DEC**: **none** (align with DEC-0110 §10 / DEC-0104 §11; new DEC would duplicate governance).
+
+**Fresh context marker**: `tl-US0127-architecture-20260825T184100Z-fresh`
+**Orchestrator run id**: `auto-20260825-01`
+**Timestamp**: 2026-08-25T18:41:00Z (UTC)
+**Verdict**: PASS
+**Next**: `/sprint-plan` (after critic)
+
+## Approach locked (A1 — from R-0110 DQ1–DQ8)
+
+**Approach A1** (locked): Narrow `_critic_jsonl_has_open` to delegate to `sovereign_critic_lib.read_open_blocking(repo)` (or inline its exact two-clause AND `obj.get("blocking") and obj.get("status") == "open"`). Change `_eval_critic_resolved` dispatch (DQ6): when `handoffs/sovereign_critic_findings.jsonl` exists and is non-empty, the JSONL blocking-only predicate is authoritative and `_qa_findings_has_open_critic` is NOT consulted; when JSONL absent, fall back to the unchanged QA-markdown grep heuristic; when neither deployed, informational skip per US-0110 L3 degrade matrix. Add an auto-resolve hook at the end of `/sovereign-critic` (after `reconcile_findings` + JSONL append + isolation evidence, before `## Stop conditions`): when `read_open_blocking(repo) == []`, call `auto_resolve_nonblocking_for_run(repo, orchestrator_run_id, phase_id)` which iterates same-run same-phase `status=open, blocking=false` rows and sets `status=resolved` via `sovereign_critic_lib.resolve_finding` (idempotent; audit trail preserved; `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` is non-blocking informational). Ship `scripts/sovereign_critic_hygiene.py` (+ template mirror) as operator-only surface with `--report` / `--resolve-nonblocking-for-run <id>` / `--dry-run` / `--confirm` / `--self-test` / `--all-phases` / `--phase-id <id>` and 6 reason codes. 13 `test_us0127_*` markers. Runbook subsections + reason_codes.md section (active + template byte-identical). `SOVEREIGN_CRITIC_PAIRS` additive row for the hygiene script; `--scope=sovereign-critic` parity CLI extended.
+
+|| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A1** | **Narrow helper + JSONL-authoritative dispatch + auto-resolve hook + hygiene CLI + 13 markers + runbook/reason-code docs + parity** | **Preferred** — additive; composes read-only with US-0104/US-0110/US-0107; AC-1..AC-6 provable via static + fixture contract tests; no new DEC. |
+| A2 (rejected) | Widen `read_open_blocking` to accept a non-blocking flag | **Rejected** — violates compose-do-not-amend on US-0104 `read_open_blocking` signature (DQ7). |
+| A3 (rejected) | Drop `_critic_jsonl_has_open` entirely and inline `read_open_blocking` at every call site | **Rejected** — diverges from the single-helper pattern; harder to regression-test. |
+| A4 (rejected) | Auto-resolve via a background scheduler instead of at `/sovereign-critic` PASS | **Rejected** — adds concurrency risk (R1) without operator benefit; PASS-bounded hook is deterministic. |
+| A5 (rejected) | Hygiene CLI as a `--scope` on an existing script | **Rejected** — breaks the one-script-per-concern pattern. |
+| A6 (rejected) | Companion DEC-0127 locking the `(orchestrator_run_id, phase_id)` scope key | **Rejected** — R-0110 recommends no DEC; scope key is already implied by the 15-field schema (R-0092) + US-0104 `reconcile_findings` per-run partitioning; new DEC would duplicate DEC-0104/DEC-0110 governance. |
+## Components
+
+### Convergence lib fix (DQ1+DQ6 LOCKED — AC-1)
+
+`scripts/sovereign_convergence_lib.py` (+ `template/scripts/sovereign_convergence_lib.py` byte-identical mirror): replace `_critic_jsonl_has_open` body with a delegate to `sovereign_critic_lib.read_open_blocking(repo)` (import; do not redefine). Change `_eval_critic_resolved` dispatch: JSONL authoritative when present; QA-markdown fallback when JSONL absent; informational skip when neither deployed. `_qa_findings_has_open_critic` and `_qa_has_cross_reviewer_section` predicates unchanged (compose read-only on US-0104 derived surfaces).
+
+### Auto-resolve hook (DQ1 LOCKED — AC-2)
+
+`.cursor/commands/sovereign-critic.md` (+ template mirror): add a single conditional call at the end of the command after `reconcile_findings` + JSONL append + isolation evidence, before `## Stop conditions`: `if read_open_blocking(repo) == []: auto_resolve_nonblocking_for_run(repo, orchestrator_run_id, phase_id)`. `auto_resolve_nonblocking_for_run` helper added to `sovereign_critic_lib.py` (additive; does not amend `read_open_blocking`/`resolve_finding` signatures). Scope key = `(orchestrator_run_id, phase_id)` pair on the finding row. Idempotent re-run via `resolve_finding` no-op. `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` is non-blocking informational (PASS verdict stands).
+
+### Hygiene CLI (DQ2+DQ5 LOCKED — AC-3)
+
+New `scripts/sovereign_critic_hygiene.py` (+ `template/scripts/sovereign_critic_hygiene.py` byte-identical mirror). Surface inventory: `--report`, `--resolve-nonblocking-for-run <orchestrator_run_id>`, `--dry-run`, `--confirm`, `--self-test`, `--all-phases`, `--phase-id <phase_id>`. 6 reason codes (`HYGIENE_RESOLVE_CONFIRM_REQUIRED` exit 2, `HYGIENE_RESOLVE_NO_CANDIDATES` exit 0 info, `HYGIENE_RESOLVE_PARTIAL` exit 3, `HYGIENE_RESOLVE_FAILED` exit 4, `HYGIENE_REPORT_EMPTY` exit 0 info, `HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED` exit 2). Operator-only posture — `/auto` orchestrator does NOT call it during a run.
+
+### Contract tests (DQ3 LOCKED — AC-4)
+
+`tests/us0127_contract_test.py` (+ `template/tests/us0127_contract_test.py` byte-identical mirror). 13 markers: 10 from DQ3 (open+nonblocking PASS, open+blocking FAIL, auto-resolve idempotent, audit-trail preserved, skip when blocking open, scope-key run/phase, hygiene --report, hygiene --dry-run, hygiene confirm-required, hygiene --self-test) + 2 compose regression guards (marker 11 `test_us0127_compose_us0104_read_open_blocking_unchanged`, marker 12 `test_us0127_compose_us0110_conjunct3_contract`) + marker 13 `test_us0127_validate_rejects_missing_blocking` (R2 validator regression guard, accepted per Q1).
+
+### Operator docs (DQ4 LOCKED — AC-5)
+
+`docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` (byte-identical): new `### Blocking-only conjunct-3 semantics (US-0127)` subsection after `### Evaluate convergence` (L2792) and before `### Interpret goal_progress block` (L2811); new `### Hygiene CLI (US-0127)` subsection after `#### Parity enforcement` (L2915) and before `#### Related artifacts` (L2923). `docs/engineering/reason_codes.md` + template mirror: new `## US-0127: Convergence critic conjunct hygiene (DEC-0110 §10 / DEC-0104 §11)` section after the US-0110 section (L77–L107) with the 6 hygiene reason codes + `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` (info) + clarifying note that `CONVERGENCE_CROSS_REVIEWER_OPEN` now requires `blocking=true` (description amendment only; no US-0110 reason-code renumbering).
+
+### Template parity (DQ5 LOCKED — AC-6)
+
+`docs/engineering/runbook.md` § `#### Parity enforcement` pair table (L2921): `SOVEREIGN_CRITIC_PAIRS` additive row `scripts/sovereign_critic_hygiene.py` ↔ `template/scripts/sovereign_critic_hygiene.py`. `SOVEREIGN_CONVERGENCE_PAIRS` existing rows confirmed (no new row — convergence lib mirror already present). `scripts/check_intake_template_parity.py` `--scope=sovereign-critic` extended to include the hygiene script pair; `--scope=sovereign-convergence` unchanged.
+
+## Companion DEC = none
+
+**No companion DEC required.** US-0127 is an implementation-drift fix aligning `_critic_jsonl_has_open` with the already-governed US-0110 L3 conjunct-3 contract (DEC-0110 §10) and `read_open_blocking` predicate (DEC-0104 §11). The five-conjunct structure, degrade matrix, findings JSONL schema, and reason-code inventory are unchanged. Auto-resolve + hygiene CLI are additive operator surfaces consistent with DEC-0110 §10 "evaluate_convergence reads composed surfaces" and DEC-0104 §11 "findings JSONL is the canonical register". A new DEC would duplicate governance already captured in DEC-0104 / DEC-0110. The `(orchestrator_run_id, phase_id)` scope key is already implied by the 15-field schema (R-0092) + US-0104 `reconcile_findings` per-run partitioning. (Per R-0110 §Companion DEC recommendation.)
+
+## Risks finalized (R1–R6)
+
+- **R1 (HIGH)**: Auto-resolve rewrites JSONL in place — concurrent `/sovereign-critic` + hygiene CLI writes could clobber rows. Mitigation: document operator-only-when-quiet contract in runbook `### Hygiene CLI (US-0127)` subsection (Q3 accepted: no advisory lock; `/auto` is single-threaded per repo; `resolve_finding` already uses read-all + rewrite-all).
+- **R2 (MEDIUM)**: `_critic_jsonl_has_open` removal could mask a future regression where `blocking` key is absent. Mitigation: marker 13 `test_us0127_validate_rejects_missing_blocking` (validator regression guard; Q1 accepted: 13 markers).
+- **R3 (MEDIUM)**: Hygiene CLI `--resolve-nonblocking-for-run` with `--confirm` could resolve rows from a different phase if `--phase-id` omitted. Mitigation: `--all-phases` flag + `HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED` reason code (Q2 accepted).
+- **R4 (LOW–MEDIUM)**: Runbook section anchor drift. Mitigation: tests grep h2/h3 titles, not line numbers.
+- **R5 (LOW)**: Template parity gap. Mitigation: `--scope=sovereign-critic` parity CLI extension + `SOVEREIGN_CRITIC_PAIRS` additive row.
+- **R6 (LOW)**: `CONVERGENCE_CROSS_REVIEWER_OPEN` description amendment misread as US-0110 schema change. Mitigation: clarifying note in `reason_codes.md` "compose amendment to description only; code semantics already require `blocking=true` per DEC-0110 §10".
+## Compose, do not amend (verified 8/8)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0104 | `sovereign_critic_lib.read_open_blocking` / `resolve_finding` / findings JSONL schema / `build_qa_cross_reviewer_block` / `sovereign_critic_validate.py` | compose read-only — US-0127 consumes read-only; no signature/schema/reconciliation/lens changes (DQ7) |
+| US-0110 | five-conjunct structure / degrade matrix / `CONVERGENCE_CROSS_REVIEWER_OPEN` reason code | compose read-only — only `_critic_jsonl_has_open` helper narrows; conjunct name/order/shape unchanged (DQ8) |
+| US-0107 | deferral register / drain-generate / sovereign loop stop matrix | compose read-only — untouched; `zero_deferrals` conjunct upstream of `critic_resolved` (DQ8) |
+| US-0045 | canonical closure (DONE/acceptance/release) | compose read-only — US-0127 does not mutate backlog Status/ACs |
+| US-0048 / BUG-0006 | fresh-context isolation | compose read-only — architecture subagent fresh; no prior chat carried |
+| US-0053 / DEC-0035 | narrow-read phase context | compose read-only — started at phase-context.md + US-0127 anchor; no full-file reads |
+| US-0103 / DEC-0103 | AI Decision Ledger | compose read-only — architecture phase does not write ledger entries |
+| US-0056 | runtime proof | compose read-only — architecture issues its own proof; producer proof consumed before TTL |
+
+## Sprint seeds (8 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)
+
+- **T-anch** (architecture.md `# US-0127` anchor — RESOLVED in THIS phase + compose-do-not-amend verification; NO-OP / verification)
+- **T-001** (AC-1 — `scripts/sovereign_convergence_lib.py` `_critic_jsonl_has_open` -> delegate to `read_open_blocking` + `_eval_critic_resolved` JSONL-authoritative dispatch per DQ6; + template mirror)
+- **T-002** (AC-2 — `.cursor/commands/sovereign-critic.md` auto-resolve hook at PASS + `sovereign_critic_lib.auto_resolve_nonblocking_for_run` helper; + template mirror)
+- **T-003** (AC-3 — new `scripts/sovereign_critic_hygiene.py` + `template/scripts/sovereign_critic_hygiene.py` with `--report` / `--resolve-nonblocking-for-run` / `--dry-run` / `--confirm` / `--self-test` / `--all-phases` / `--phase-id` + 6 reason codes)
+- **T-004** (AC-4 — `tests/us0127_contract_test.py` 13 markers + `template/tests/us0127_contract_test.py` mirror)
+- **T-005** (AC-5 — runbook `### Blocking-only conjunct-3 semantics (US-0127)` + `### Hygiene CLI (US-0127)` subsections + `reason_codes.md` `## US-0127` section; active + template byte-identical)
+- **T-006** (AC-6 — `SOVEREIGN_CRITIC_PAIRS` additive row + `check_intake_template_parity.py --scope=sovereign-critic` extension)
+- **T-007** (R2 — validator regression guard marker 13 `test_us0127_validate_rejects_missing_blocking` + confirm `sovereign_critic_validate.py --enforce` rejects missing `blocking`)
+
+Execution order: T-anch -> T-001 -> T-002 -> T-003 -> T-004 -> T-005 -> T-006 -> T-007 (acyclic; T-001 first since it is the root-cause fix; T-002 depends on T-001's predicate; T-003/T-004 build on T-002; T-005/T-006 are docs/parity; T-007 is the validator regression guard).
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0127`, `sprint_id=(pending — created at sprint-plan)`, `orchestrator_run_id=auto-20260825-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required; isolation MUST include model_id)
+- `fresh_context_marker=tl-US0127-architecture-20260825T184100Z-fresh`, `timestamp=2026-08-25T18:41:00Z` (UTC)
+- `evidence_ref=docs/product/backlog.md (## US-0127 L4402–L4436 narrow-read), docs/engineering/research.md (## R-0110 L10203–L10353 narrow-read), docs/engineering/phase-context.md, handoffs/po_to_tl.md, docs/engineering/architecture.md (grep ^# US- anchors + US-0126 section L1747–L2051 boundary read), docs/engineering/state.md (top narrow-read for drain-advance prose shape)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + python SHA-256 computation for the strict runtime proof + powershell line-count computations + the artifact writes listed in this phase. No `.env` reads, no credentials access, no intake-evidence mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0127 is a drift-fix story; existing digest context sufficient per R-0110).
+- No write to `mistakes.jsonl` in architecture phase.
+- Prior phase strict proof consumed: `rp-auto-20260825-01-research-tech-lead-20260825T183641Z-US-0127-reattest` (from `docs/engineering/research.md` R-0110 producer consumed tuple, unchanged).
+- Current architecture-phase strict proof recorded below.
+
+## Strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260825-01-architecture-tech-lead-20260825T184100Z-US-0127`
+- Canonical payload (sorted-key JSON per DEC-0038, lowercase keys): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260825-01","phase_id":"architecture","proof_issued_at":"2026-08-25T18:41:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260825-01-architecture-tech-lead-20260825T184100Z-US-0127","sprint_id":"(pending)","story_id":"US-0127"}`
+- `proof_hash=DF773DDFBA1021C5DBD44F0470469BD76A909C1373FC528BAEA65070CB9A179C` (SHA-256)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-25T19:41:00Z` (UTC)
+
+## Decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; companion DEC: none per R-0110 recommendation; approach A1 locked; sprint seeds T-anch + T-001..T-007 within SPRINT_MAX_TASKS=12; risks R1–R6 finalized; compose-do-not-amend verified 8/8; Q1/Q2/Q3 accepted per research recommendations: 13 markers / yes --all-phases / no advisory lock)
+- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase->role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro — after sovereign-critic of architecture)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after architecture completes; hand off via artifacts only to sovereign-critic of architecture, then /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent. Do not mark US-0127 DONE. Do not tick acceptance. Do not mutate intake JSON. Do not amend US-0104/US-0110/US-0107 surfaces.`
+
+# US-0128 — Convergence smoke surrogate for contract-test and waived-probe UAT slices
+
+## Overview
+
+**US-0128** is a sovereign-loop convergence drift fix for the `smoke_green` conjunct (DEC-0110 §10). `_eval_smoke_green` in `scripts/sovereign_convergence_lib.py` (lines 459–470) PASSes only when `_report_passes(repo / REPORT_PATH)` AND `_uat_smoke_passes(uat)` both hold. `_uat_smoke_passes` (lines 443–456) requires at least one step whose `id`/`probe_kind`/`probe_type`/`expected` contains the substring "smoke" (via `_step_is_smoke`, lines 435–440) with `result` in `pass|passed|ok`. For ultra_lean/docs/contract-test slices (e.g., S0126 US-0126), the active `uat.json` documents all 6 live-runtime probe classes as `UAT_PROBE_FORBIDDEN` in `waived_probes[]` and emits NO smoke-named step — the slice is green (`tests/report.md` Fail:0, `contract_test_failed=0`, all steps PASS) but `_uat_smoke_passes` returns `False`, so `smoke_green` FAILs with `CONVERGENCE_SMOKE_PROBE_FAIL`, blocking `SOVEREIGN_GOAL_MODE=goal_convergence` for docs/contract-test slices despite there being no live runtime to smoke.
+
+The fix: add a surrogate evaluation branch to `_eval_smoke_green` that PASSes when (a) `tests/report.md` Fail:0, (b) active `uat.json` exists, (c) all 6 canonical live-runtime probe classes (`browser_smoke`, `api_health`, `process_health`, `cli_smoke`, `build`, `manual_operator`) are waived with `reason_code=UAT_PROBE_FORBIDDEN`, (d) `contract_test_failed=0` (top-level authoritative; derived from `contract_test_passed == contract_test_total` fallback), and (e) a canonical surrogate step exists (`id=convergence_smoke` preferred, or tail step with `probe_kind=contract_tests_primary` and `result=pass`). Legacy path unchanged: a real smoke-named step PASS still satisfies the conjunct (precedence case 1). `CONVERGENCE_SMOKE_PROBE_FAIL` retained for real smoke step failures and US-0109 deploy smoke. New `CONVERGENCE_SMOKE_SURROGATE_MISSING` for surrogate prerequisites unmet (cases 4–8). US-0109 deploy smoke precedence is orthogonal and unchanged (case 9).
+
+This is an **additive code + docs + parity + contract-test** change: one surrogate branch inside `_eval_smoke_green` (AC-1), canonical `convergence_smoke` uat step emitted by `/qa` and `/verify-work` for ultra_lean/docs/contract-test slices (AC-2), fail-closed `CONVERGENCE_SMOKE_SURROGATE_MISSING` reason code (AC-3), additive `### Convergence smoke surrogate (US-0128)` subsections in `.cursor/commands/qa.md` and `.cursor/commands/verify-work.md` (+ template mirrors) (AC-4), 11 `test_us0128_*` markers in `tests/us0128_contract_test.py` (+ template mirror) (AC-5), runbook `### Smoke surrogate for waived-probe UAT slices (US-0128)` subsection + `reason_codes.md` `## US-0128` section (active + template byte-identical) (AC-6), and `SOVEREIGN_CONVERGENCE_PAIRS` additive rows for `qa.md` ↔ `template/.cursor/commands/qa.md` and `verify-work.md` ↔ `template/.cursor/commands/verify-work.md` plus `--scope=sovereign-convergence` extension (AC-6). No new DEC (see Companion DEC below).
+
+**Research anchor**: **R-0111** (DQ1–DQ8 LOCKED). **Companion DEC**: **none** (align with DEC-0110 §10 smoke-green definition and DEC-0078 UAT probe contract; new DEC would duplicate governance).
+
+**Fresh context marker**: `tl-US0128-architecture-2026-08-26T195500Z-fresh`
+**Orchestrator run id**: `auto-20260826-01`
+**Timestamp**: 2026-08-26T19:55:00Z (UTC)
+**Verdict**: PASS
+**Next**: `/sprint-plan` (after critic)
+
+## Approach locked (A1 — from R-0111 DQ1–DQ8)
+
+**Approach A1** (locked): Add a surrogate evaluation branch to `_eval_smoke_green` in `scripts/sovereign_convergence_lib.py` (+ `template/scripts/sovereign_convergence_lib.py` byte-identical mirror). Implementation: check legacy path first via `_uat_smoke_passes(uat)`; if PASS, return PASS (precedence case 1). If legacy FAIL, evaluate surrogate prerequisites: (a) `tests/report.md` Fail:0 via `_report_passes`, (b) active `uat.json` exists, (c) `waived_probes[]` contains all 6 canonical live-runtime probe classes (`browser_smoke`, `api_health`, `process_health`, `cli_smoke`, `build`, `manual_operator`) with `reason_code=UAT_PROBE_FORBIDDEN`, (d) `contract_test_failed == 0` (top-level authoritative; derived from `contract_test_passed == contract_test_total` when top-level absent; fail closed with `CONVERGENCE_SMOKE_SURROGATE_MISSING` when neither present), (e) surrogate step exists (`id=convergence_smoke` with `result=pass` preferred, OR tail step with `probe_kind=contract_tests_primary` and `result=pass`). If surrogate prerequisites met, return PASS. If surrogate prerequisites unmet, return FAIL with `CONVERGENCE_SMOKE_SURROGATE_MISSING` (no smoke step exists) OR `CONVERGENCE_SMOKE_PROBE_FAIL` (smoke step exists but failed — case 2). `ConjunctResult(name="smoke_green", …)` shape unchanged — the surrogate branch is an additional PASS path inside the same conjunct. Update `.cursor/commands/qa.md` and `.cursor/commands/verify-work.md` (+ template mirrors) with additive `### Convergence smoke surrogate (US-0128)` subsections under `## Self-verify UAT probes (US-0092 / DEC-0078)` after `### Browser UAT self-test (US-0093)` and before `## Steps`; emission rule: for ultra_lean/docs/contract-test slices where all 6 live-runtime probe classes are waived with `UAT_PROBE_FORBIDDEN`, `/qa` and `/verify-work` MUST emit a `convergence_smoke` step in `sprints/Sxxxx/uat.json` `steps[]` with `probe_kind=contract_tests_primary`, `result=pass` (when `contract_test_failed=0`), and document the surrogate basis in `waived_probes[]` (6 entries, `UAT_PROBE_FORBIDDEN`). 11 `test_us0128_*` markers in `tests/us0128_contract_test.py` (+ template mirror). Runbook `### Smoke surrogate for waived-probe UAT slices (US-0128)` subsection after `### Blocking-only conjunct-3 semantics (US-0127)` and before `### Interpret goal_progress block`; `reason_codes.md` `## US-0128: Convergence smoke surrogate (DEC-0110 §10 smoke-green)` section after the US-0127 section and before `## US-0104`. `SOVEREIGN_CONVERGENCE_PAIRS` additive rows for `qa.md` ↔ `template/.cursor/commands/qa.md` and `verify-work.md` ↔ `template/.cursor/commands/verify-work.md`; `--scope=sovereign-convergence` extended to include the two new command-mirror pairs. US-0109 deploy smoke precedence orthogonal and unchanged (case 9).
+
+|| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A1** | **Surrogate branch in `_eval_smoke_green` + `convergence_smoke` uat step + `CONVERGENCE_SMOKE_SURROGATE_MISSING` + qa.md/verify-work.md additive subsections + 11 markers + runbook/reason-code docs + `SOVEREIGN_CONVERGENCE_PAIRS` +2 command rows** | **Preferred** — additive; composes read-only with US-0109/US-0126/US-0110/US-0127; AC-1..AC-6 provable via static + fixture contract tests; no new DEC. |
+| A2 (rejected) | Use `id=convergence_surrogate` (does not contain "smoke") so surrogate branch is the sole PASS path | **Rejected** — loses defense-in-depth; R-0111 DQ2/Q3 recommends `id=convergence_smoke` so `_step_is_smoke` legacy path also converges on PASS, documenting the waived-probe contract via the surrogate branch (Q3 accepted: `convergence_smoke`). |
+| A3 (rejected) | Relax `_uat_smoke_passes` to accept any `probe_kind=contract_tests_primary` step as smoke | **Rejected** — conflates contract-test probes with smoke probes; weakens the smoke conjunct for webapp slices that emit contract-test steps without a real smoke step. |
+| A4 (rejected) | Auto-emit a synthetic smoke step from the convergence lib when waived_probes are complete | **Rejected** — convergence lib is read-only on `uat.json`; the step emission owner is `/qa`/`/verify-work` (DQ5). Lib-side synthesis violates separation of concerns. |
+| A5 (rejected) | Drop the surrogate step requirement and PASS on waived_probes + green harness alone | **Rejected** — removes the operator-traceability hook (marker/evidence_ref) and the explicit gate that documents the waived-probe contract; R-0111 DQ2 requires the surrogate step as the canonical emission. |
+| A6 (rejected) | Companion DEC-0128 locking the 6-class canonical waived-probe inventory as normative | **Rejected** — R-0111 §Companion DEC recommendation: no DEC; the 6-class inventory is already implied by the probe catalog in `.cursor/commands/verify-work.md` (line 113–114) minus `test`, and the S0126 fixture is the canonical reference. New DEC would duplicate DEC-0110 §10 / DEC-0078 governance. |
+
+## Components
+
+### Surrogate eval branch (DQ1+DQ3+DQ4 LOCKED — AC-1)
+
+`scripts/sovereign_convergence_lib.py` (+ `template/scripts/sovereign_convergence_lib.py` byte-identical mirror): add a surrogate branch inside `_eval_smoke_green` (lines 459–470). Legacy `_uat_smoke_passes` (lines 443–456) and `_step_is_smoke` (lines 435–440) unchanged. Surrogate predicate reads `waived_probes[]` (6 canonical classes with `UAT_PROBE_FORBIDDEN`), `contract_test_failed` (top-level authoritative; derived fallback from `contract_test_passed == contract_test_total`), and surrogate step (`id=convergence_smoke` OR tail `probe_kind=contract_tests_primary` with `result=pass`). `ConjunctResult(name="smoke_green", …)` shape unchanged — surrogate is an additional PASS path inside the same conjunct.
+
+### Canonical uat step (DQ2+DQ5 LOCKED — AC-2)
+
+`.cursor/commands/qa.md` + `.cursor/commands/verify-work.md` (+ `template/.cursor/commands/qa.md` + `template/.cursor/commands/verify-work.md` byte-identical mirrors): additive `### Convergence smoke surrogate (US-0128)` subsection inside `## Self-verify UAT probes (US-0092 / DEC-0078)`, after `### Browser UAT self-test (US-0093)`, before `## Steps`. Emission rule: for ultra_lean/docs/contract-test slices where all 6 live-runtime probe classes are waived with `UAT_PROBE_FORBIDDEN`, `/qa`/`/verify-work` MUST emit `{"id": "convergence_smoke", "description": "Convergence smoke surrogate — waived-probe slice with green contract-test harness", "result": "pass", "marker": "test_us0128_convergence_smoke_surrogate", "evidence_ref": "tests/report.md Fail:0 + uat.json waived_probes[] (6 classes, UAT_PROBE_FORBIDDEN)", "probe_kind": "contract_tests_primary"}` in `sprints/Sxxxx/uat.json` `steps[]` when `contract_test_failed=0`; emit `result=fail` when `contract_test_failed>0` (convergence lib surfaces `CONVERGENCE_SMOKE_SURROGATE_MISSING`). No change to existing `## Self-verify UAT probes` prose, `### Browser UAT self-test` block, or `## Steps` numbering.
+
+### Fail-closed reason code (DQ3+DQ4 LOCKED — AC-3)
+
+`docs/engineering/reason_codes.md` (+ `template/docs/engineering/reason_codes.md` byte-identical mirror): new `## US-0128: Convergence smoke surrogate (DEC-0110 §10 smoke-green)` section after the US-0127 section and before `## US-0104`. Add `CONVERGENCE_SMOKE_SURROGATE_MISSING` (blocked_by=yes) — "smoke green — surrogate prerequisites unmet for waived-probe slice (no smoke step + incomplete waivers or harness red)". Add clarifying note on the US-0110 `CONVERGENCE_SMOKE_PROBE_FAIL` row (description only, not a schema change): "reserved for real smoke step failures and US-0109 deploy smoke; surrogate path uses `CONVERGENCE_SMOKE_SURROGATE_MISSING`". `CONVERGENCE_SMOKE_PROBE_FAIL` description unchanged.
+
+### Contract tests (DQ6 LOCKED — AC-5)
+
+`tests/us0128_contract_test.py` (+ `template/tests/us0128_contract_test.py` byte-identical mirror). 11 markers (Q1 accepted: 11 markers per research recommendation — defense in depth on US-0109/US-0110/US-0127 compose):
+
+1. `test_us0128_surrogate_passes_when_all_six_waived_and_green` — 6 waived_probes (UAT_PROBE_FORBIDDEN) + `contract_test_failed=0` + `convergence_smoke` step `result=pass` + `tests/report.md` Fail:0 → `_eval_smoke_green` returns `status=pass`, no reason code.
+2. `test_us0128_surrogate_missing_when_no_step` — 6 waived + green but NO `convergence_smoke` step and no `probe_kind=contract_tests_primary` tail pass → `status=fail, reason_code=CONVERGENCE_SMOKE_SURROGATE_MISSING`.
+3. `test_us0128_surrogate_missing_when_harness_fail` — 6 waived + `contract_test_failed>0` + no smoke step → `status=fail, reason_code=CONVERGENCE_SMOKE_SURROGATE_MISSING` (NOT PROBE_FAIL — no smoke step exists).
+4. `test_us0128_surrogate_missing_when_partial_waivers` — only 3 of 6 waived + no smoke step → surrogate does NOT activate; `reason_code=CONVERGENCE_SMOKE_SURROGATE_MISSING`.
+5. `test_us0128_real_smoke_step_pass_wins_over_surrogate` — real smoke-named step `result=pass` → `_eval_smoke_green` PASS via legacy path (surrogate not consulted); waived_probes irrelevant.
+6. `test_us0128_real_smoke_step_fail_uses_probe_fail_not_surrogate_missing` — real smoke-named step `result=fail` → `reason_code=CONVERGENCE_SMOKE_PROBE_FAIL` (NOT SURROGATE_MISSING — smoke step exists and failed).
+7. `test_us0128_compose_us0109_deploy_smoke_unchanged` — US-0109 deploy smoke path semantics unchanged; surrogate branch does not activate when deploy smoke applies (regression guard vs `tests/us0109_contract_test.py`).
+8. `test_us0128_template_parity_convergence_lib_and_commands` — `scripts/sovereign_convergence_lib.py` ↔ `template/scripts/sovereign_convergence_lib.py` byte-identical after AC-1 fix; `.cursor/commands/qa.md` ↔ `template/.cursor/commands/qa.md` and `.cursor/commands/verify-work.md` ↔ `template/.cursor/commands/verify-work.md` byte-identical after DQ5 subsection add.
+9. `test_us0128_compose_us0110_five_conjunct_unchanged` — `_eval_smoke_green` still emits `ConjunctResult(name="smoke_green", …)` with the same shape; `tests/us0110_contract_test.py` 8/8 still pass (no conjunct renumbering, no schema change). The surrogate branch is an additional PASS path inside the same conjunct.
+10. `test_us0128_compose_us0127_critic_conjunct_unchanged` — `_eval_critic_resolved` (US-0127) unchanged; `tests/us0127_contract_test.py` 13/13 still pass. US-0128 touches `smoke_green` only, not `critic_resolved`.
+11. `test_us0128_compose_us0126_waived_probe_fixture_reference_only` — `sprints/S0126/uat.json` is read as a reference fixture for `waived_probes[]` shape; US-0126 DONE product scope and S0126 release artifacts are NOT mutated by US-0128 (regression guard).
+
+**Total**: 11 markers (8 + 3 compose regression). Accepted per Q1 (research recommendation: 11, defense in depth on US-0109/US-0110/US-0127 compose).
+
+### Operator docs (DQ7 LOCKED — AC-6)
+
+`docs/engineering/runbook.md` + `template/docs/engineering/runbook.md` (byte-identical): new `### Smoke surrogate for waived-probe UAT slices (US-0128)` subsection inside `## Goal-Based Convergence (US-0110 / DEC-0110)`, after `### Blocking-only conjunct-3 semantics (US-0127)`, before `### Interpret goal_progress block`. Document: (a) surrogate eligibility (all 6 live-runtime probe classes waived with `UAT_PROBE_FORBIDDEN`); (b) surrogate step contract (`convergence_smoke` id preferred, or `probe_kind=contract_tests_primary` tail with `result=pass`); (c) `contract_test_failed=0` requirement (top-level authoritative, derived fallback); (d) precedence (real smoke step wins; deploy smoke US-0109 unchanged; partial waivers fail closed); (e) remediation for `CONVERGENCE_SMOKE_SURROGATE_MISSING` (emit `convergence_smoke` step in `/qa`/`/verify-work`; ensure 6 waived_probes; fix failing contract tests). `docs/engineering/reason_codes.md` + template mirror: new `## US-0128` section per AC-3 above.
+
+### Template parity (DQ8 LOCKED — AC-6)
+
+`docs/engineering/runbook.md` § `### Parity enforcement` pair table and `scripts/check_intake_template_parity.py` `SOVEREIGN_CONVERGENCE_PAIRS` (lines 538–547): additive rows:
+- `scripts/sovereign_convergence_lib.py` ↔ `template/scripts/sovereign_convergence_lib.py` (existing — confirm byte-identity after AC-1 surrogate branch add; guarded by marker 8)
+- `scripts/sovereign_convergence_validate.py` ↔ `template/scripts/sovereign_convergence_validate.py` (existing — unchanged)
+- `.cursor/commands/qa.md` ↔ `template/.cursor/commands/qa.md` (**new** — US-0128 DQ5 surrogate subsection)
+- `.cursor/commands/verify-work.md` ↔ `template/.cursor/commands/verify-work.md` (**new** — US-0128 DQ5 surrogate subsection)
+
+`SOVEREIGN_CRITIC_PAIRS` unchanged (no critic surface touched by US-0128). `scripts/check_intake_template_parity.py` `--scope=sovereign-convergence` extended to include the two new command-mirror pairs (additive); `--scope=sovereign-critic` unchanged; `all` scope auto-includes the new pairs via existing `SCOPES["all"]` concatenation.
+
+## Companion DEC = none
+
+**No companion DEC required.** US-0128 is an additive surrogate branch inside the already-governed US-0110 `smoke_green` conjunct (DEC-0110 §10). The five-conjunct structure, conjunct name/order, `ConjunctResult` shape, and `CONVERGENCE_SMOKE_PROBE_FAIL` reason code are unchanged. The new `CONVERGENCE_SMOKE_SURROGATE_MISSING` reason code is additive and falls under the US-0110 §10 smoke-green definition (the conjunct now has two PASS paths: real smoke step, or surrogate for waived-probe slices). The command contract edits (qa.md, verify-work.md) are additive subsections under the existing `## Self-verify UAT probes (US-0092 / DEC-0078)` block, governed by DEC-0078. A new DEC would duplicate governance already captured in DEC-0110 §10 (smoke-green definition) and DEC-0078 (UAT probe contract). The 6-class canonical waived-probe inventory is already implied by the probe catalog in `.cursor/commands/verify-work.md` (line 113–114) minus `test`, and the S0126 fixture is the canonical reference. Locks suffice. (Per R-0111 §Companion DEC recommendation.)
+
+## Risks finalized (R1–R7)
+
+- **R1 (HIGH)**: Surrogate path could mask a real smoke regression if `waived_probes[]` is over-broad (e.g., a webapp slice incorrectly waives `browser_smoke`). Mitigation: surrogate path activates ONLY when ALL 6 live-runtime probe classes are waived AND no smoke-named step exists AND `contract_test_failed=0`. A webapp slice with a real smoke step uses the legacy path (DQ4 case 1/2 — real smoke step wins). Marker 5 guards "real smoke step pass wins over surrogate"; marker 7 guards "US-0109 deploy smoke unchanged".
+- **R2 (MEDIUM)**: `contract_test_failed` field absent in older uat.json fixtures (pre-S0126). Mitigation: derive from `contract_test_passed == contract_test_total` when top-level absent (DQ3); fail closed with `CONVERGENCE_SMOKE_SURROGATE_MISSING` when neither present (DQ4 case 8). Document in runbook DQ7 subsection.
+- **R3 (MEDIUM)**: Partial-waiver case (some of 6 waived, some not) is ambiguous — could mean a probe was forgotten. Mitigation: fail closed `CONVERGENCE_SMOKE_SURROGATE_MISSING` (DQ4 case 6). Document in runbook. Marker 4 guards.
+- **R4 (LOW–MEDIUM)**: Runbook section anchor drift — `### Blocking-only conjunct-3 semantics (US-0127)` could shift before US-0128 ships. Mitigation: marker greps h2 `## Goal-Based Convergence (US-0110 / DEC-0110)` + h3 `### Smoke surrogate for waived-probe UAT slices (US-0128)` by text, not line number.
+- **R5 (LOW)**: Template parity gap — command mirrors (`qa.md`, `verify-work.md`) not in `SOVEREIGN_CONVERGENCE_PAIRS`. Mitigation: DQ8 additive rows + `--scope=sovereign-convergence` extension + marker 8 byte-identity guard.
+- **R6 (LOW)**: Surrogate step `id=convergence_smoke` contains "smoke" → `_step_is_smoke` picks it up, so `_uat_smoke_passes` returns True independently of the surrogate branch. This is intentional (defense in depth) but could confuse a future reader. Mitigation: runbook DQ7 subsection explicitly documents that the surrogate step IS a smoke step and the surrogate branch is the documented gate that also checks waived_probes + contract_test_failed.
+- **R7 (LOW)**: S0126 fixture does NOT carry `probe_kind` on `steps[]` — the tail fallback (DQ2) cannot match S0126 as-is. Mitigation: S0126 is a reference fixture for `waived_probes[]` shape only; new slices emit the explicit `convergence_smoke` step (preferred path). Marker 11 guards S0126 not mutated. The tail fallback is for future slices that emit `probe_kind` on contract-test steps without an explicit `convergence_smoke` id.
+
+## Compose, do not amend (verified 8/8)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0109 | deploy smoke post-publish path / `DEPLOY_SMOKE_*` reason codes | ✓ compose — surrogate path applies to `/qa`/`/verify-work` UAT slice only; deploy smoke step emitted by `/release` unchanged; marker 7 regression guard |
+| US-0126 | `sprints/S0126/uat.json` waived-probe fixture / S0126 release artifacts | ✓ compose — reference fixture for `waived_probes[]` shape only; US-0126 DONE product scope NOT reopened; marker 11 regression guard |
+| US-0127 | `_eval_critic_resolved` / `read_open_blocking` / hygiene CLI / `SOVEREIGN_CRITIC_PAIRS` | ✓ compose — US-0128 touches `smoke_green` only, not `critic_resolved`; marker 10 regression guard; `SOVEREIGN_CRITIC_PAIRS` unchanged |
+| US-0110 | five-conjunct structure / degrade matrix / `CONVERGENCE_SMOKE_PROBE_FAIL` | ✓ compose — surrogate branch is an additional PASS path inside `smoke_green`; conjunct name/order/shape unchanged; marker 9 regression guard; `CONVERGENCE_SMOKE_SURROGATE_MISSING` is additive |
+| US-0104 | critic findings JSONL / `read_open_blocking` / `resolve_finding` | ✓ compose — US-0128 does not touch critic surfaces |
+| US-0045 | canonical closure (DONE/acceptance/release) | ✓ compose — US-0128 does not mutate backlog Status/ACs; architecture appends `# US-0128` section only |
+| US-0048 / BUG-0006 | fresh-context isolation | ✓ compose — architecture subagent fresh; no prior chat carried |
+| US-0056 | runtime proof | ✓ compose — architecture issues its own proof; producer proof consumed before TTL |
+
+## Sprint seeds (8 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)
+
+- **T-anch** (architecture.md `# US-0128` anchor — RESOLVED in THIS phase + compose-do-not-amend verification; NO-OP / verification)
+- **T-001** (AC-1 — `scripts/sovereign_convergence_lib.py` `_eval_smoke_green` surrogate branch per DQ1+DQ3+DQ4 (legacy path first; surrogate prerequisites: 6 waived_probes UAT_PROBE_FORBIDDEN + `contract_test_failed=0` + surrogate step); + `template/scripts/sovereign_convergence_lib.py` byte-identical mirror)
+- **T-002** (AC-2+AC-4 — `.cursor/commands/qa.md` + `.cursor/commands/verify-work.md` additive `### Convergence smoke surrogate (US-0128)` subsections under `## Self-verify UAT probes (US-0092 / DEC-0078)` after `### Browser UAT self-test (US-0093)` before `## Steps`; emission rule for `convergence_smoke` step; + `template/.cursor/commands/qa.md` + `template/.cursor/commands/verify-work.md` byte-identical mirrors)
+- **T-003** (AC-3 — `docs/engineering/reason_codes.md` new `## US-0128: Convergence smoke surrogate (DEC-0110 §10 smoke-green)` section with `CONVERGENCE_SMOKE_SURROGATE_MISSING` + clarifying note on US-0110 `CONVERGENCE_SMOKE_PROBE_FAIL` row; + `template/docs/engineering/reason_codes.md` byte-identical mirror)
+- **T-004** (AC-5 — `tests/us0128_contract_test.py` 11 markers + `template/tests/us0128_contract_test.py` byte-identical mirror)
+- **T-005** (AC-6 — runbook `### Smoke surrogate for waived-probe UAT slices (US-0128)` subsection after `### Blocking-only conjunct-3 semantics (US-0127)` before `### Interpret goal_progress block`; + `template/docs/engineering/runbook.md` byte-identical mirror)
+- **T-006** (AC-6 — `SOVEREIGN_CONVERGENCE_PAIRS` additive rows for `qa.md` ↔ `template/.cursor/commands/qa.md` and `verify-work.md` ↔ `template/.cursor/commands/verify-work.md` + `check_intake_template_parity.py --scope=sovereign-convergence` extension)
+- **T-007** (R1+R3 — regression guards: marker 5 `test_us0128_real_smoke_step_pass_wins_over_surrogate` + marker 7 `test_us0128_compose_us0109_deploy_smoke_unchanged` + marker 4 `test_us0128_surrogate_missing_when_partial_waivers` — verify surrogate path does not mask real smoke regressions or partial waivers)
+
+Execution order: T-anch -> T-001 -> T-002 -> T-003 -> T-004 -> T-005 -> T-006 -> T-007 (acyclic; T-001 first since it is the root-cause fix; T-002 depends on T-001's surrogate predicate; T-003/T-004 build on T-002's contract; T-005/T-006 are docs/parity; T-007 is the R1/R3 regression guard).
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0128`, `sprint_id=(pending — created at sprint-plan)`, `orchestrator_run_id=auto-20260826-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=glm-5.2-high` (CROSS_MODEL_REVIEW=1 — required; isolation MUST include model_id)
+- `fresh_context_marker=tl-US0128-architecture-2026-08-26T195500Z-fresh`, `timestamp=2026-08-26T19:55:00Z` (UTC)
+- `evidence_ref=docs/product/backlog.md (## US-0128 L4440–L4474 narrow-read), docs/engineering/research.md (## R-0111 L10365–L10514 narrow-read), docs/product/vision.md (## Discovery Notes — US-0128 L2072–L2099 narrow-read), docs/engineering/phase-context.md, handoffs/po_to_tl.md, docs/engineering/architecture.md (grep ^# US- anchors + US-0127 section L1852–L1970 boundary read for insertion point + US-0091 L1972 boundary), docs/engineering/state.md (research checkpoint L1112–L1192 narrow-read for producer proof tuple + isolation evidence shape)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Context limited to the narrow-read files listed above (US-0053 / US-0096 Tranche A). No MCP / browser / shell side-effects beyond narrow-read grep + read tool calls + python SHA-256 computation for the strict runtime proof + powershell line-count computations + the artifact writes listed in this phase. No `.env` reads, no credentials access, no intake-evidence mutation.
+- `assemble_sovereign_memory_digest(...)` NOT called (US-0128 is a drift-fix story; existing digest context sufficient per R-0111).
+- No write to `mistakes.jsonl` in architecture phase.
+- Prior phase strict proof consumed: `rp-auto-20260826-01-research-tech-lead-2026-08-26T194816Z-US-0128` (proof_hash `BFE452C73D2921AE65A67C989CD397415F0D821CE87801AB33F915DB41240308` — independently recomputed MATCH via Python 3.12 hashlib sorted-key compact lowercase-keys JSON; consumed at 2026-08-26T19:55:00Z before RUNTIME_PROOF_STALE ttl 2026-08-26T20:48:16Z).
+- Current architecture-phase strict proof recorded below.
+
+## Strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260826-01-architecture-tech-lead-2026-08-26T195500Z-US-0128`
+- Canonical payload (sorted-key compact JSON per DEC-0038, lowercase keys): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"glm-5.2-high","orchestrator_run_id":"auto-20260826-01","phase_id":"architecture","proof_issued_at":"2026-08-26T19:55:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260826-01-architecture-tech-lead-2026-08-26T195500Z-US-0128","sprint_id":"pending","story_id":"US-0128"}`
+- `proof_hash=FF499010B78C4FB7855E9D6F4482227AD7B258230671D67E4E2B42571A68A969` (SHA-256)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-26T20:55:00Z` (UTC)
+
+## Decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; no hard stop; companion DEC: none per R-0111 recommendation; approach A1 locked; sprint seeds T-anch + T-001..T-007 within SPRINT_MAX_TASKS=12; risks R1–R7 finalized; compose-do-not-amend verified 8/8; Q1 accepted per research recommendation: 11 markers / `id=convergence_smoke` / `CONVERGENCE_SMOKE_SURROGATE_MISSING` in new US-0128 reason-code section + clarifying note on US-0110 `CONVERGENCE_SMOKE_PROBE_FAIL` row)
+- `next_scheduled_phase=/sprint-plan` (role=tech-lead per US-0069 / DEC-0051 phase->role matrix default; third canonical phase of `plan` macro per ultra_lean; research + architecture + sprint-plan merged into `plan` macro — after sovereign-critic of architecture)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after architecture completes; hand off via artifacts only to sovereign-critic of architecture, then /sprint-plan in fresh tech-lead subagent (BUG-0006). Do not spawn /sprint-plan from this subagent. Do not mark US-0128 DONE. Do not tick acceptance L156. Do not mutate intake JSON. Do not reopen US-0127. Do not amend US-0104/US-0110/US-0109/US-0126 surfaces. Do not mutate US-0129/US-0130.`
+
+# US-0129 — Architecture hot-surface rollover linkage guard (active contract preservation)
+
+## Overview
+
+**US-0129** ships a fail-closed pre/post architecture-rollover linkage guard so contract-test H1 story/bug headings stay on the active `docs/engineering/architecture.md` hot surface. US-0126 loop-2 hit **B-1**: `rollover_architecture` archived US-0089 / US-0090 / US-0091 / US-0093 / BUG-0011 (and a body token) to `architecture-pack-20260825.md` while `tests/auto_command_contract_test.py` and `tests/readme_feature_coverage_fixtures_test.py` still `assertIn` those headings on the live file → harness Fail:7. Headings were restored in execute loop-2; **no guard shipped**. This story is that guard. Do **not** reopen US-0126 product scope.
+
+The gap: `scripts/enforce-triad-hot-surface.py` `rollover_architecture` splits via `split_arch_stories` (DEC-0073 / BUG-0010), pops oldest blocks while `ARCH_HOT_MAX_LINES` / `ARCH_HOT_MAX_STORY_SECTIONS` are exceeded, writes an archive pack, then overwrites the hot file. `/refresh-context` step 4 runs `--rollover` then `--check` (`STATE_ARCHIVE_REQUIRED` / `ARTIFACT_HOT_SURFACE_OVERSIZE` only). Linkage is not a triad cap check. D10: cap numbers do **not** change — B-1 is linkage, not “caps too low”.
+
+This is an **additive guard + reason-code + optional stub repair + command wiring + docs + parity + contract-test** change. Companion **DEC-0129** (new fail-closed family `ARCH_LINKAGE_ROLLOVER_BLOCKED`, new `security_hard` matrix row, new default-off scratchpad flag, stub-shape/insertion contract). Compose DEC-0054 / DEC-0073 / US-0049 / US-0126 B-1 fixture only.
+
+**Research anchor**: **R-0113** (DQ1–DQ8 LOCKED). **Companion DEC**: **DEC-0129** (Accepted; authored THIS phase). **EARLY_RESEARCH**: consumed from R-0113 (fail-closed vs fail-open; Pact consumer-driven contracts; L0 opt-in `autoCorrect` — supports locks, no new R-id).
+
+**Fresh context marker**: `tl-US0129-architecture-20260827T073000Z-fresh`
+**Orchestrator run id**: `auto-20260827-01`
+**Timestamp**: 2026-08-27T07:30:00Z (UTC)
+**Verdict**: PASS
+**Next**: `/sprint-plan` (orchestrator-owned; CROSS_MODEL_REVIEW=1 critic of architecture is orchestrator-owned)
+
+## Approach locked (A1 — from R-0113 DQ1–DQ8)
+
+**Approach A1** (locked): New `scripts/arch_linkage_guard.py` (+ `template/scripts/` mirror) **wraps** `python scripts/enforce-triad-hot-surface.py --rollover`. Do **not** change `rollover_architecture` heading-split semantics, pack naming, or `ARCH_HOT_MAX_*` numbers (D4 / D10 / DEC-0054 compose).
+
+1. **Discover** required active headings at runtime via `discover_required_arch_headings(repo) -> frozenset[str]` (stdlib only). Scan `tests/**/*_test.py`, exclude `tests/.tmp*`. Include a token only when the test reads live `docs/engineering/architecture.md` and asserts membership / `find` / `startswith` of a literal H1 story/bug heading. **No hand-maintained YAML/manifest** (DQ2 — manifest drift is the B-1 class). Live set at R-0113 (evidence, not a frozen manifest): US-0089, US-0090, US-0091, US-0093, BUG-0009, BUG-0010, BUG-0011, BUG-0012, US-0109. Helper re-discovers at runtime.
+2. **Pre-hook**: reuse `split_arch_stories` + the same while-pop predicate as `rollover_architecture` (import/call; do **not** copy-fork). If any required heading is in the predicted moved set and `ARCH_LINKAGE_AUTO_REPAIR=0` → emit `ARCH_LINKAGE_ROLLOVER_BLOCKED` (story/bug id, missing heading, predicted pack path, remediation) and **do not write** archive pack or hot file.
+3. **`--rollover`**: existing archiver unchanged.
+4. **Repair-on** (`ARCH_LINKAGE_AUTO_REPAIR=1`): allow `--rollover` to archive **full** bodies; then inject **minimal H1 stubs** into the retained hot file (DQ8). Idempotent. One `state.md` audit row per repair event.
+5. **Post-hook**: re-run discovery against active `architecture.md`; if any required heading still missing → `ARCH_LINKAGE_ROLLOVER_BLOCKED` (packs are append-only; no pack rollback).
+6. **Wire** `/refresh-context` step 4: after cap read, **pre-guard → `--rollover` → post-guard → existing `--check`**.
+7. Classify `ARCH_LINKAGE_ROLLOVER_BLOCKED` as **`security_hard`** (`auto_repair_kind=n/a`, `cap=0`). Never skip — including under `AUTONOMY_STOP_POLICY=auto_repair_then_skip`. Repair is a **guard-flag** path, **not** a 10th `auto_repair_kind` (DEC-0119 compose). Flag is **not** in `AUTONOMY_PRESET` expansion.
+
+Q1 accepted: **8** `test_us0129_*` markers (fold “archiver unchanged” into marker 2). Q2 accepted: **DEC-0129** story-aligned (not sequential DEC-0127). Q3 accepted: **heading-only** stubs; body-token residual R3 documented, not in v1.
+
+| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A1** | **Wrap `--rollover` with `arch_linkage_guard.py` pre+post + default-off stub repair + security_hard block + 8 markers + DEC-0129** | **Preferred** — additive; archiver UNCHANGED; AC-1..AC-6 provable. |
+| A2 (rejected) | Mutate `rollover_architecture` internals to skip required headings | **Rejected** — D4 / DEC-0054 compose; changes heading-split / pack bytes. |
+| A3 (rejected) | Hand-maintained YAML/manifest of required headings | **Rejected** — DQ2; manifest drift is the B-1 failure class. |
+| A4 (rejected) | Default-on auto-repair | **Rejected** — DQ1; `AUTONOMY_PRESET=full` would silently rewrite architecture.md. |
+| A5 (rejected) | `auto_repair_then_skip` / 10th `auto_repair_kind` | **Rejected** — DQ4; security_hard never skip; DEC-0119 9-kind taxonomy UNCHANGED. |
+| A6 (rejected) | Sequential companion DEC-0127 | **Rejected** — US-0127/US-0128/US-0130 documented “none”; story-aligned DEC-0129. |
+| A7 (rejected) | Full-section restore or named body-token restore | **Rejected** — D10 / Q3 heading-only; residual R3 (US-0100 `{semver}-release-notes.md`) stays documented. |
+| A8 (rejected) | Raise `ARCH_HOT_MAX_*` instead of a guard | **Rejected** — D10; B-1 is linkage, not cap height. |
+
+## Components
+
+### Linkage guard script (DQ2+DQ3 LOCKED — AC-1)
+
+`scripts/arch_linkage_guard.py` (+ `template/scripts/arch_linkage_guard.py` byte-identical). CLI invoked pre and post `--rollover`. Helper `discover_required_arch_headings(repo)`. Pre-simulates pop via imported `split_arch_stories` + the same while-pop predicate (`dry_run` today lacks heading lists — guard simulates pop itself, or may extend `dry_run` in-story without changing success-path pack bytes). Stdlib only; no network; no `.env`.
+
+### Fail-closed block (DQ4+DQ5 LOCKED — AC-2)
+
+Emit `ARCH_LINKAGE_ROLLOVER_BLOCKED` with: story/bug id, missing heading token, archive pack path (predicted or written), remediation (`set ARCH_LINKAGE_AUTO_REPAIR=1` for stub restore, or restore H1s manually, then rerun `--rollover`). Register new `## US-0129 — Architecture hot-surface rollover linkage guard` in `docs/engineering/reason_codes.md` after the last story family, before `## Other stories`. One-code table `### ARCH_LINKAGE_*`. Do **not** extend US-0110 / US-0127 / US-0128 / US-0111 tables. `ARCH_LINKAGE_REPAIR_FAILED` is message text under the same code unless execute proves a split. Matrix: `scripts/data/autonomy_stop_matrix.yaml` + `docs/engineering/autonomy-stop-matrix.md` row `security_hard`.
+
+### Optional auto-repair (DQ1+DQ8 LOCKED — AC-3)
+
+Scratchpad flag `ARCH_LINKAGE_AUTO_REPAIR=0|1` (default **0**). Comment next to `AUTONOMY_STOP_POLICY` in `.cursor/scratchpad.md` + template mirrors. **No live `=1` assignment** in committed scratchpad. Not in `AUTONOMY_PRESET` expansion (twelve flags unchanged).
+
+**Stub shape (DQ8)**: H1 heading `US-xxxx — <title from archived block’s first heading line>` (or `BUG-xxxx — …`) matching `STORY_HEADING_H1` (`[:\u2014\-]` required). Body: exactly one pointer line, e.g. `Archived body in pack_ref: docs/engineering/architecture-archive/architecture-pack-<stamp>.md`. **Insertion**: into the retained hot surface **before** the US-0089 / US-0090 tail (DEC-0076 / `test_caveman_architecture_section_bottom_appended_and_linked` — only US-0090 may follow US-0089). Idempotent: if stub heading already exists, do not duplicate. Title source: first line of the archived block — do not invent titles.
+
+### Rollover wiring (DQ3 LOCKED — AC-4)
+
+`.cursor/commands/refresh-context.md` (+ template): after cap read, **pre-guard → `--rollover` → post-guard → existing `--check`**. Do not change `rollover_architecture` heading-split semantics or pack naming.
+
+### Contract tests + harness (DQ6+DQ7 LOCKED — AC-5; Q1 accepted: 8 markers)
+
+`tests/us0129_contract_test.py` (+ `template/tests/` mirror). Synthetic mini-architecture fixtures in temp dirs — **do not** replay `architecture-pack-20260825.md`. Harness section **26AB** after 26AA US-0102 in `tests/run-tests.ps1` **and** `tests/run-tests.sh`. Do not rename 26M rows. Do not call the section “B-1”. Existing linkage tests remain consumers; do not weaken them.
+
+1. `test_us0129_guard_discovers_contract_heading_set` — AC-1 / DQ2
+2. `test_us0129_pre_rollover_blocks_before_archive_write` — AC-1 / AC-2 / DQ3 (also folds “archiver unchanged”: no `split_arch_stories` / pack-header format change)
+3. `test_us0129_block_emits_arch_linkage_rollover_blocked_metadata` — AC-2
+4. `test_us0129_auto_repair_default_off` — AC-3 / DQ1
+5. `test_us0129_auto_repair_restores_h1_stub_idempotent` — AC-3 / DQ8 (fixture includes US-0089 tail)
+6. `test_us0129_post_rollover_verifies_active_linkage` — AC-1 / AC-4 / DQ3
+7. `test_us0129_refresh_context_wires_pre_post_guard` — AC-4
+8. `test_us0129_b1_regression_unprotected_rollover_fails` — AC-5
+
+### Operator docs + parity (DQ5+DQ8 LOCKED — AC-4 / D8)
+
+Runbook: new **h3** under `### Triad hot-surface enforcement (DEC-0054)` (~L871), not a new sibling h2. Operator troubleshooting + cross-link to reason_codes.md. New `ARCH_LINKAGE_PAIRS` + `--scope=arch-linkage` in `scripts/check_intake_template_parity.py` `SCOPES` (and `all`): `scripts/arch_linkage_guard.py`, `.cursor/commands/refresh-context.md`, `tests/us0129_contract_test.py` (plus scratchpad comment / runbook / reason_codes if not already covered). Add `scripts/arch_linkage_guard.py` to `docs/engineering/context/installer-owned-paths.manifest` (active + template), matching `enforce-triad-hot-surface.py`.
+
+## Companion DEC = DEC-0129 (Required → Accepted)
+
+**DEC-0129** authored Accepted in THIS phase at `decisions/DEC-0129.md`. This slice introduces a **new fail-closed family**, a **new security_hard matrix row**, a **new scratchpad flag**, and a **stub-shape/insertion contract**. DEC-0054 owns archiver split/caps/packs, not linkage. DEC-0073 owns H1 vs H2 anchors, not rollover guards. DEC-0119 owns the 9-kind taxonomy — compose it (security_hard, no 10th kind). Q2 accepted: story-aligned **DEC-0129** (highest existing DEC **file** is DEC-0126; US-0127/US-0128/US-0130 documented “none” — do not collide).
+
+## Risks finalized (R1–R5 from R-0113)
+
+- **R1 (HIGH)**: Helper false-positive on fixture strings (`# US-0067`) or command-file greps → over-blocking rollover. Mitigation: marker 1; exclude `.tmp*` and non-`docs/engineering/architecture.md` reads.
+- **R2 (HIGH)**: Stub placed after the US-0089 heading breaks caveman bottom-append test. Mitigation: DQ8 insertion lock; marker 5 uses a fixture that includes an US-0089 tail.
+- **R3 (MEDIUM)**: Body-token residual (US-0100 `{semver}-release-notes.md`) can still Fail the harness after heading-only repair. Mitigation: v1 heading-only (Q3); document residual; do not reopen US-0100.
+- **R4 (MEDIUM)**: `AUTONOMY_STOP_POLICY=auto_repair_then_skip` operator expects skip — must still block. Mitigation: security_hard row + matrix validator coverage in execute if added.
+- **R5 (LOW)**: Dual pre/post adds latency on every `/refresh-context`. Mitigation: stdlib scan of tests/ is local; no network.
+- **R6 (LOW, architecture note)**: Helper may discover a required heading already absent from the hot file at first post-ship `--rollover` (live set is evidence, not a frozen manifest). Remediation is AC-2 (repair flag or manual stub). Do **not** pre-seed unrelated stubs in `/architecture`.
+
+## Compose, do not amend (verified 8/8)
+
+| Story / DEC | Surface | Verification |
+|-------------|---------|--------------|
+| DEC-0054 | `rollover_architecture` split / pack format / `ARCH_HOT_MAX_*` numbers | ✓ guard wraps; caps unchanged (D10); marker 2 |
+| DEC-0073 | H1 anchor policy / H2 skip when H1 exists | ✓ stub is H1 with title separator |
+| DEC-0076 / US-0089 | bottom-append: only US-0090 after US-0089 | ✓ stub insertion before that tail; marker 5 |
+| US-0049 | state archive contract | ✓ state.md audit row append-bottom; no archive rewrite |
+| US-0126 | B-1 fixture only | ✓ not reopened; acceptance L154 stays checked |
+| US-0127 / US-0128 / US-0130 | DONE rows | ✓ not reopened; L155–L156 / L158 stay checked; L157 stays unchecked |
+| DEC-0119 | 9 `auto_repair_kind` values + 12 preset flags | ✓ no 10th kind; no 13th preset flag |
+| R-0112 | US-0130 overlay | ✓ not extended |
+
+## Sprint seeds (8 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)
+
+- **T-anch** (`# US-0129` H1 + DEC-0129 — RESOLVED in THIS phase + compose-do-not-amend; NO-OP / verification) — AC-6
+- **T-001** (AC-1 + AC-2 — `scripts/arch_linkage_guard.py` helper + pre-guard no-partial-write; + template mirror)
+- **T-002** (AC-2 — `reason_codes.md` `## US-0129` + `ARCH_LINKAGE_ROLLOVER_BLOCKED` + autonomy-stop-matrix `security_hard` row; + template mirrors)
+- **T-003** (AC-3 — `ARCH_LINKAGE_AUTO_REPAIR=0` scratchpad comment (no live `=1`) + DQ8 stub restore path; + template mirrors)
+- **T-004** (AC-4 — `.cursor/commands/refresh-context.md` pre-guard → `--rollover` → post-guard → `--check`; + template mirror)
+- **T-005** (AC-5 — `tests/us0129_contract_test.py` 8 markers + harness **26AB** in `run-tests.ps1` / `run-tests.sh`; + template test mirror)
+- **T-006** (AC-4 / D8 — runbook h3 under triad + `ARCH_LINKAGE_PAIRS` / `--scope=arch-linkage`; + template runbook)
+- **T-007** (D8 — `installer-owned-paths.manifest` active + template for `scripts/arch_linkage_guard.py`)
+
+Execution order: T-anch → T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 (acyclic; guard first, then reason-code/matrix, then flag+stub, then wiring, then tests, then docs/parity/installer).
+
+**AC surjection (preview for `/sprint-plan`)**: AC-1→T-001; AC-2→T-001,T-002; AC-3→T-003; AC-4→T-004,T-006; AC-5→T-005; AC-6→T-anch. 6/6.
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0129`, `sprint_id=(pending — created at sprint-plan)`, `orchestrator_run_id=auto-20260827-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=cursor-grok-4.6-high` (CROSS_MODEL_REVIEW=1 — required)
+- `fresh_context_marker=tl-US0129-architecture-20260827T073000Z-fresh`, `timestamp=2026-08-27T07:30:00Z` (UTC)
+- `evidence_ref=docs/product/backlog.md (## US-0129 L4477–L4512 narrow-read), docs/engineering/research.md (## R-0113 L10695–L10833 narrow-read), docs/product/vision.md (## Discovery Notes — US-0129 L2155–L2181), docs/engineering/phase-context.md, docs/engineering/architecture.md (grep ^# US- anchors + US-0128 L1671–L1814 insertion + US-0130 L1815 boundary + US-0091 tail), docs/engineering/state.md (research + sovereign-critic research checkpoints), .cursor/commands/refresh-context.md (step 4), scripts/enforce-triad-hot-surface.py (STORY_HEADING_H1 / rollover_architecture)`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Narrow-read (US-0053). No `.env` reads, no credentials, no intake-evidence mutation, no backlog Status/AC mutation (architecture_notes only), no DONE-row mutation (US-0108 / US-0121..US-0128 / US-0130), no `/sprint-plan` spawn, no acceptance L157 tick.
+- `assemble_sovereign_memory_digest(...)` NOT called.
+- No write to `mistakes.jsonl`.
+- Prior phase strict proof consumed: `rp-auto-20260827-01-research-tech-lead-20260827T071534Z-US-0129` (proof_hash `137A157B8275E4BB6D1FE92DB823819726AEFE81DF38C5458806A6B1FF2607E8` — independently recomputed MATCH via Python 3.12 hashlib sorted-key compact lowercase-keys JSON; consumed at 2026-08-27T07:24:40Z before RUNTIME_PROOF_STALE ttl 2026-08-27T08:15:34Z). Critic of research PASS marker `tl-US0129-sovereign-critic-research-20260827T072146Z-fresh` (anti_slop=8, 0 blocking).
+- Current architecture-phase strict proof recorded below.
+
+## Strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260827-01-architecture-tech-lead-20260827T073000Z-US-0129`
+- Canonical payload (sorted-key compact JSON per DEC-0038, lowercase keys): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260827-01","phase_id":"architecture","proof_issued_at":"2026-08-27T07:30:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260827-01-architecture-tech-lead-20260827T073000Z-US-0129","sprint_id":"pending","story_id":"US-0129"}`
+- `proof_hash=DDDA46794ED39186D77F268EE47364E3070997916777582095FF9198FEEF6196` (SHA-256)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-27T08:30:00Z` (UTC)
+
+## Decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; companion DEC-0129 Accepted; approach A1 locked; Q1=8 markers; Q2=DEC-0129; Q3=heading-only; sprint seeds T-anch + T-001..T-007 within SPRINT_MAX_TASKS=12; AC-1..AC-6 surjective; risks R1–R6; compose 8/8)
+- `next_scheduled_phase=/sprint-plan` (role=tech-lead; orchestrator-owned; CROSS_MODEL_REVIEW=1 may insert sovereign-critic of architecture first — this subagent does not spawn either)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after architecture completes; hand off via artifacts only. Do not spawn /sprint-plan from this subagent. Do not mark US-0129 DONE. Do not tick acceptance L157. Do not mutate intake JSON. Do not reopen US-0126/US-0127/US-0128/US-0130. Do not change archiver heading semantics. Do not add ARCH_LINKAGE_AUTO_REPAIR to AUTONOMY_PRESET.`
+
+# US-0130 — Operator-pinned sovereign-critic model (catalog role + scratchpad override)
+
+## Overview
+
+**US-0130** overlays an operator pin on `/sovereign-critic` model selection so operators can choose the critic the same way they pin PO/SA/DEV in a v2 role catalog. Today's gap: `select_critic_model` (`scripts/sovereign_critic_lib.py` L236–267) maps producer → opposition tier via `CRITIC_TIER_OPPOSITION` then calls `_resolve_slug_for_tier("sovereign-critic", critic_tier, pad)` and never reads scratchpad `MODEL_SOVEREIGN-CRITIC` or catalog `roles.critic`. `CATALOG_ROLE_KEYS` (L85–87) has no `critic`. `sovereign-critic` is a synthetic phase, not a canonical phase.
+
+The fix is a **dedicated overlay inside `select_critic_model`** (R-0112 DQ2): pin → optional `roles.critic` when `MODEL_RESOLVE=role_catalog` → existing opposition/`dev` fallback **UNCHANGED**. Same-slug collision keeps `CROSS_MODEL_DEGRADED_MODE` (not a hard stop). One global critic for all producer phases. Optional `critic` is an allowlist overlay (`CATALOG_OPTIONAL_ROLE_KEYS`), **not** added to required `CATALOG_ROLE_KEYS`. Hyphen exact: `MODEL_SOVEREIGN-CRITIC` via `phase_to_model_key` — no underscore alias. Examples + installer compose US-0112: add `critic` to v2 role examples; ship `role-based-balanced_cursor_only.json` as 9th example; **never** write `model-catalog.local.json`.
+
+This is an **additive overlay + validator allowlist + examples/installer + docs + parity + contract-test** change. No new fail-closed code family. No companion DEC (compose DEC-0104 §5 / DEC-0087 / DEC-0086).
+
+**Research anchor**: **R-0112** (DQ1–DQ8 LOCKED). **Companion DEC**: **none**. **EARLY_RESEARCH**: consumed from R-0112 (JSON Schema optional overlay vs required-set; no new R-id).
+
+**Fresh context marker**: `tl-US0130-architecture-20260826T214500Z-fresh`
+**Orchestrator run id**: `auto-20260826-01`
+**Timestamp**: 2026-08-26T21:45:00Z (UTC)
+**Verdict**: PASS
+**Next**: `/sprint-plan` (orchestrator-owned; CROSS_MODEL_REVIEW=1 critic of architecture is orchestrator-owned)
+
+## Approach locked (A1 — from R-0112 DQ1–DQ8)
+
+**Approach A1** (locked): Dedicated overlay **inside** `select_critic_model` before existing opposition. Overlay order:
+
+1. Exact pin `pad.get(phase_to_model_key("sovereign-critic"))` → `MODEL_SOVEREIGN-CRITIC` nonempty → use that slug (highest precedence). Validate via `validate_direct_slug` when `MODEL_RESOLVE` is `local_catalog`/`role_catalog` and a catalog is loaded (DEC-0087 §4). When `alias_only`, pin is an opaque slug.
+2. Else if `MODEL_RESOLVE=role_catalog`: load catalog from `MODEL_CATALOG` (default `.cursor/model-catalog.local.json`); if `roles.critic` present and nonempty → use it. Catalog miss on optional `critic` is **not** `MODEL_ROLE_SLUG_UNKNOWN` — fall through.
+3. Else existing opposition: `_resolve_slug_for_tier("sovereign-critic", …)` **UNCHANGED** (DQ7). Do not pass a newly loaded catalog into that helper.
+4. Existing same-slug comparison → `degraded=True` / `CROSS_MODEL_DEGRADED_MODE` **UNCHANGED**.
+
+Do **not** add `critic` to `CATALOG_ROLE_KEYS`. Introduce `CATALOG_OPTIONAL_ROLE_KEYS = frozenset({"critic"})`; subtract optional keys from the extra-key set. Do **not** register `sovereign-critic` in `PHASE_LOGICAL_ROLE`, `CANONICAL_PHASE_IDS`, or `DEFAULT_PHASE_TIER_MATRIX`. Do **not** consume `MODEL_SOVEREIGN_CRITIC` (underscore). Do **not** "fix" `_resolve_slug_for_tier`'s underscore injection in this slice.
+
+Cursor-only example `critic` slug locked: **`composer-2.5-fast`** (Q2 — distinct from `roles.dev=grok-4-6-high`; cheap opposition analogue). Generic v2 examples use `<your-critic-model-slug>`.
+
+|| Option | Summary | Verdict |
+|--------|---------|---------|
+| **A1** | **Dedicated overlay in `select_critic_model` + optional `CATALOG_OPTIONAL_ROLE_KEYS` + hyphen pin + examples/installer 9th file + 10 markers + scratchpad/runbook comments** | **Preferred** — additive; composes DEC-0104/DEC-0087/DEC-0086; no new fail-closed family; AC-1..AC-9 provable. |
+| A2 (rejected) | Add `critic` to required `CATALOG_ROLE_KEYS` | **Rejected** — fail-closes every existing v2 catalog missing `critic` (AC-2 / DQ1). |
+| A3 (rejected) | Register `sovereign-critic` in `PHASE_LOGICAL_ROLE` and reuse `resolve_model_for_phase("sovereign-critic")` | **Rejected** — unknown-phase maps to `"dev"`; would amend US-0101 matrix and US-0102 5-step chain (DQ2). |
+| A4 (rejected) | Underscore alias `MODEL_SOVEREIGN_CRITIC` | **Rejected** — DQ3 hyphen exact; alias would hide the current gap. |
+| A5 (rejected) | Hard-stop same-slug collision | **Rejected** — operator chose `degraded_keep`; DEC-0104 §5 UNCHANGED. |
+| A6 (rejected) | Companion DEC-0130 | **Rejected** — R-0112: no new fail-closed family; would duplicate DEC-0104/DEC-0087/DEC-0086. |
+| A7 (rejected) | Open `additionalProperties` on `roles` | **Rejected** — would silently accept typos and undo DEC-0087 unknown-key fail-closed. |
+| A8 (rejected) | Per-lens / per-producer-phase critic models | **Rejected** — AC-5 / D5 out of scope for v1. |
+
+## Components
+
+### Overlay in `select_critic_model` (DQ2+DQ3+DQ7 LOCKED — AC-1/AC-3/AC-4/AC-5)
+
+`scripts/sovereign_critic_lib.py` (+ `template/scripts/sovereign_critic_lib.py` byte-identical): prepend the overlay before L250–252 opposition. Pin lookup uses `phase_to_model_key("sovereign-critic")` → `MODEL_SOVEREIGN-CRITIC` only. `SelectCriticResult` shape UNCHANGED. One global critic (no per-lens / per-phase critic overrides). Same-slug path UNCHANGED.
+
+### Optional catalog role (DQ1+DQ6 LOCKED — AC-2)
+
+`scripts/model_tier_lib.py` (+ template): `CATALOG_OPTIONAL_ROLE_KEYS = frozenset({"critic"})`. `_validate_roles_object`: extra = `actual_keys - CATALOG_ROLE_KEYS - CATALOG_OPTIONAL_ROLE_KEYS`. Do not add `critic` to `CATALOG_ROLE_KEYS`, `LOGICAL_ROLE_TO_CATALOG_KEY`, or `PHASE_LOGICAL_ROLE`. `scripts/model_tier_validate.py` required-role loop stays `for role_name in CATALOG_ROLE_KEYS`. After that loop, if `"critic" in roles`: require nonempty string; empty/whitespace reuses `MODEL_CATALOG_SCHEMA_V2_INVALID` (message names the `critic` key; **no new reason-code family**). Missing `critic` is not an error. Unknown extras still fail-closed.
+
+### Examples + installer (DQ4+DQ5 LOCKED — AC-8)
+
+| Catalog | Action |
+|---------|--------|
+| v2 role-based-balanced + highend (active + `template/`) | add `"critic": "<your-critic-model-slug>"` |
+| `.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json` | add `"critic": "composer-2.5-fast"`; **ship as 9th example** — add `template/` copy + manifest `[install_include_paths]` + `installer.ps1` / `installer.py` explicit lists (`installer.sh` glob already matches) |
+| v1 examples (`example.json`, `cursor-only.json`, `level-1-easy` … `level-4-super`) | **unchanged** (do not add `roles.critic`) |
+| `role-based-budget.json` | out of installer compose this slice |
+| OpenCode example | out of scope (US-0123) |
+| `.cursor/model-catalog.local.json` | **never write** |
+
+### Scratchpad comments (DQ8 LOCKED — AC-1/AC-9)
+
+Two comment sites, mirrored to `template/.cursor/scratchpad.md`, `template/.cursor/scratchpad.local.example.md`, and active `scratchpad.local.example.md`:
+
+1. Next to `MODEL_<PHASE>` examples after `MODEL_REFRESH-CONTEXT` hyphen precedent: synthetic-phase pin `MODEL_SOVEREIGN-CRITIC=<your-critic-model-slug>` — not a canonical phase; hyphen exact; no underscore alias; vendor slugs in `.cursor/scratchpad.local.md` only. **No live assignment** in committed scratchpad.
+2. Next to `CROSS_MODEL_*` keys after `CROSS_MODEL_REWORK_MAX` comments, before enabled assignments: precedence pin > `roles.critic` (when `role_catalog`) > opposition/`dev`; same-slug keeps `CROSS_MODEL_DEGRADED_MODE`; one global critic.
+
+### Contract tests (R-0112 inventory — AC-6; Q1 accepted: 10 markers)
+
+`tests/us0130_contract_test.py` (+ `template/tests/us0130_contract_test.py` byte-identical):
+
+1. `test_us0130_pin_wins_over_catalog_and_opposition`
+2. `test_us0130_catalog_critic_hit_when_pin_absent`
+3. `test_us0130_omitted_critic_falls_back_to_opposition`
+4. `test_us0130_same_slug_keeps_degraded_mode`
+5. `test_us0130_compose_us0104_findings_schema_unchanged`
+6. `test_us0130_underscore_alias_not_consumed` (DQ3)
+7. `test_us0130_extra_critic_allowed_missing_not_error` (DQ6)
+8. `test_us0130_critic_not_in_catalog_role_keys` (DQ1)
+9. `test_us0130_cursor_only_example_ships_critic` (DQ4/DQ5)
+10. `test_us0130_installer_never_writes_local_catalog` (DQ5)
+
+### Operator docs + parity (DQ8 + AC-9)
+
+`docs/engineering/runbook.md` `#### Degraded fallback troubleshooting` (~L2948) — document pin precedence and optional `roles.critic` (do not change same-slug = not hard stop). `SOVEREIGN_CRITIC_PAIRS`: add `scripts/sovereign_critic_lib.py` ↔ `template/scripts/sovereign_critic_lib.py`. `MODEL_TIER_OVERRIDES_PAIRS`: add cursor_only json pair. `MODEL_TIER_PAIRS` already covers lib/validator/scratchpad.
+
+## Companion DEC = none
+
+**No companion DEC required.** Overlay implements AC-2/AC-3 on already-governed surfaces: DEC-0104 §5 (`select_critic_model` opposition + `degraded_keep`), DEC-0087 (optional v2 `roles` + 5-step chain for **canonical** phases + `validate_direct_slug`), DEC-0086 (phase-tier matrix untouched). Optional `critic` is a validator allowlist, not a new reason-code family. Empty-present-critic and unknown-extra reuse `MODEL_CATALOG_SCHEMA_V2_INVALID`. Pin slug unknown reuses `MODEL_OVERRIDE_SLUG_UNKNOWN`. Q3 accepted: none. Architecture discovered **no** new fail-closed code family.
+
+## Risks finalized (R1–R5 from R-0112)
+
+- **R1 (MEDIUM)**: Operators may assume `MODEL_SOVEREIGN-CRITIC` participates in canonical-phase resolution. Mitigation: DQ8 comments + runbook; tests pin exact key; do not register synthetic phase.
+- **R2 (MEDIUM)**: Shipping cursor_only as 9th installer file expands US-0112 payload. Mitigation: AC-8 names the file; `installer.sh` glob already matches; never write `model-catalog.local.json`; marker 9+10.
+- **R3 (LOW)**: `_resolve_slug_for_tier` hyphen/underscore mismatch remains. Mitigation: DQ7 forbids fixing it here; overlay bypasses that helper for pin/catalog.
+- **R4 (LOW)**: Empty-present `critic` reuses `MODEL_CATALOG_SCHEMA_V2_INVALID`. Mitigation: error message names the `critic` key (text, not a new code).
+- **R5 (LOW)**: Pin slug not in catalog under `role_catalog` → `MODEL_OVERRIDE_SLUG_UNKNOWN`. Mitigation: compose DEC-0087 §4; DQ8 documents pin slug must appear in catalog when `MODEL_RESOLVE` requires catalog.
+
+## Compose, do not amend (verified 9/9)
+
+| Story | Surface | Verification |
+|-------|---------|--------------|
+| US-0104 / DEC-0104 | findings JSONL / three lenses / `CROSS_MODEL_*` enable keys / anti-slop / opposition table / degraded_keep | ✓ overlay prepend; opposition + collision UNCHANGED; marker 5 |
+| US-0102 / DEC-0087 | 5-step chain / `CATALOG_ROLE_KEYS` required-set / `PHASE_LOGICAL_ROLE` | ✓ chain canonical-phase-only; `critic` not in required-set; synthetic phase not registered |
+| US-0101 / DEC-0086 | `DEFAULT_PHASE_TIER_MATRIX` / v1 catalogs | ✓ v1 examples unchanged; matrix not extended |
+| US-0112 | 8 example catalogs + installer never writes `model-catalog.local.json` | ✓ compose; add `critic` to v2 role examples; ship cursor_only as 9th; never write local.json |
+| US-0127 / US-0128 | hygiene / smoke surrogate | ✓ not reopened |
+| US-0129 | architecture linkage guard | ✓ untouched |
+| US-0123 | OpenCode `provider/slug` | ✓ distinct host; OpenCode example out of scope |
+| R-0088 | Cursor Task allowlist / BYOK | ✓ document-only |
+| US-0045 / US-0048 / US-0056 | status / isolation / runtime proof | ✓ Status stays OPEN; fresh isolation; this phase mints its own proof |
+
+## Sprint seeds (8 tasks within SPRINT_MAX_TASKS=12 — for `/sprint-plan` refinement)
+
+- **T-anch** (`# US-0130` H1 — RESOLVED in THIS phase + compose-do-not-amend; NO-OP / verification)
+- **T-001** (AC-1 consume + AC-3 + AC-4 + AC-5 — `select_critic_model` overlay per DQ2/DQ3/DQ7; + template mirror)
+- **T-002** (AC-2 — `CATALOG_OPTIONAL_ROLE_KEYS` + `_validate_roles_object` extra-key subtract + validator empty-present-critic; + template mirrors)
+- **T-003** (AC-8 — v2 example `critic` keys + ship cursor_only as 9th with `critic=composer-2.5-fast` + manifest/installer lists; never write `model-catalog.local.json`)
+- **T-004** (AC-1 docs + AC-9 — scratchpad DQ8 comment sites; no live `MODEL_SOVEREIGN-CRITIC=` assignment)
+- **T-005** (AC-6 + AC-7 — `tests/us0130_contract_test.py` 10 markers + template mirror)
+- **T-006** (AC-9 — runbook `#### Degraded fallback troubleshooting` pin-precedence note; + template mirror)
+- **T-007** (AC-9 — `SOVEREIGN_CRITIC_PAIRS` add `sovereign_critic_lib.py`; `MODEL_TIER_OVERRIDES_PAIRS` add cursor_only json pair)
+
+Execution order: T-anch → T-001 → T-002 → T-003 → T-004 → T-005 → T-006 → T-007 (acyclic; overlay first, then schema, then examples, then docs/tests/parity).
+
+## Isolation evidence (US-0048 / DEC-0029)
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0130`, `sprint_id=(pending — created at sprint-plan)`, `orchestrator_run_id=auto-20260826-01`
+- `delivery_mode=ultra_lean`, `macro_phase=plan` (architecture — second canonical phase of `plan` macro per US-0096 / DEC-0082)
+- `model_id=cursor-grok-4.6-high` (CROSS_MODEL_REVIEW=1 — required; glm-5.2-high usage-limited)
+- `fresh_context_marker=tl-US0130-architecture-20260826T214500Z-fresh`, `timestamp=2026-08-26T21:45:00Z` (UTC)
+- `evidence_ref=docs/product/backlog.md (## US-0130 L4511–L4551 narrow-read), docs/engineering/research.md (## R-0112 L10519–L10688 narrow-read), docs/product/vision.md (## Discovery Notes — US-0130 L2117–L2145), docs/engineering/phase-context.md, docs/engineering/architecture.md (grep ^# US- anchors + US-0128 L1671–L1814 insertion + US-0091 L1818 boundary), docs/engineering/state.md (research + sovereign-critic research checkpoints), scripts/sovereign_critic_lib.py (select_critic_model L236–267), scripts/model_tier_lib.py (CATALOG_ROLE_KEYS L85–87, phase_to_model_key L131–133), .cursor/model-catalog.local.example.role-based-balanced_cursor_only.json`
+- Tech-lead subagent spawned fresh per BUG-0006 / US-0048 isolation; no prior chat history carried forward. Narrow-read (US-0053). No `.env` reads, no credentials, no intake-evidence mutation, no backlog Status/AC mutation (architecture_notes only), no DONE-row mutation (US-0108 / US-0121..US-0128), no US-0129 mutation, no `/sprint-plan` spawn, no `model-catalog.local.json` write, no DEC-0130 file.
+- `assemble_sovereign_memory_digest(...)` NOT called.
+- No write to `mistakes.jsonl`.
+- Prior phase strict proof consumed: `rp-auto-20260826-01-research-tech-lead-20260826T213327Z-US-0130` (proof_hash `445A566247CDC79A70F161BFD71C56471C4785B27E2816C38AE8B35BC1C49F62` — independently recomputed MATCH via Python 3.12 hashlib sorted-key compact lowercase-keys JSON; consumed at 2026-08-26T21:43:10Z before RUNTIME_PROOF_STALE ttl 2026-08-26T22:33:27Z). Critic of research PASS marker `tl-US0130-sovereign-critic-research-20260826T213900Z-fresh` (anti_slop=8, 0 blocking).
+- Current architecture-phase strict proof recorded below.
+
+## Strict runtime proof (mirror)
+
+- `runtime_proof_id=rp-auto-20260826-01-architecture-tech-lead-20260826T214500Z-US-0130`
+- Canonical payload (sorted-key compact JSON per DEC-0038, lowercase keys): `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"cursor-grok-4.6-high","orchestrator_run_id":"auto-20260826-01","phase_id":"architecture","proof_issued_at":"2026-08-26T21:45:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260826-01-architecture-tech-lead-20260826T214500Z-US-0130","sprint_id":"pending","story_id":"US-0130"}`
+- `proof_hash=B071AE0659D99E2513304490BD3D191550631E7564398EEEC4485BD556FD8B4D` (SHA-256)
+- `proof_ttl_seconds=3600`, `proof_ttl=2026-08-26T22:45:00Z` (UTC)
+
+## Decision gate + next scheduled phase
+
+- `decision_gate=false` (no DECISION_GATE; companion DEC none; approach A1 locked; Q1=10 markers; Q2=`composer-2.5-fast`; Q3=no DEC; sprint seeds T-anch + T-001..T-007 within SPRINT_MAX_TASKS=12; risks R1–R5; compose 9/9)
+- `next_scheduled_phase=/sprint-plan` (role=tech-lead; orchestrator-owned; CROSS_MODEL_REVIEW=1 may insert sovereign-critic of architecture first — this subagent does not spawn either)
+- `next_scheduled_role=tech-lead`
+- `stop_condition=STOP after architecture completes; hand off via artifacts only. Do not spawn /sprint-plan from this subagent. Do not mark US-0130 DONE. Do not tick acceptance L158. Do not mutate intake JSON. Do not reopen US-0127/US-0128. Do not mutate US-0129. Do not amend US-0104 findings schema/lenses/CROSS_MODEL keys. Do not write model-catalog.local.json. Do not author DEC-0130.`
+
 <!-- Restored from architecture-archive for contract-test linkage (execute loop-3) -->
+# US-0091: README ↔ backlog feature coverage backfill + blocking drift gate
+
+## Overview
+
+**Composes on `# US-0077`** (dual-README audience — **`DEC-0059`**) and **extends the
+release doc-gate family** alongside **US-0030** (delta-driven command/flag documentation
+gate). Binding decision: **`DEC-0074`**. Composes on **`US-0017`** template drift guard and
+**`US-0071`** installer parity surfaces. Release changelog artifacts include
+`{semver}-release-notes.md` and **`CHANGELOG.md`** per **`DEC-0085`**.
+
+## Decision linkage
+
+- Decision: **`DEC-0074`**
+- Composed: **`US-0030`**, **`DEC-0059`**, **`US-0017`**, **`US-0071`**
+
+# US-0093: Cursor browser-integrated UAT self-test
+
+## Overview
+
+**`US-0093`** closes the execution gap left by **`US-0092`** / **`DEC-0078`**: stdlib
+**`scripts/uat_probe_lib.py`** classifies browser steps but Tier 2 agent execution owns
+Cursor built-in browser MCP. Binding decision: **`DEC-0079`**. Research anchor:
+**`R-0041`**. Composes on **`# US-0092`** / **`DEC-0078`**, **`US-0065`**, **`US-0066`**
+— spawn-only (**`BUG-0006`**) unchanged; stdlib never invokes browser MCP directly.
+
+## Agent-browser evidence contract
+
+Normative verify-work / qa / execute subsections require agents to write
+**`browser_evidence_refs`** after MCP probes. Scratchpad key **`UAT_BROWSER_PROBE_MODE`**
+selects primary path (`cursor` | `http_fallback` | `playwright_fallback`); fail closed on
+**`UAT_BROWSER_UNAVAILABLE`** when MCP is missing.
+
+## Decision linkage
+
+- Decision: **`DEC-0079`**
+- Composed: **`DEC-0078`**, **`US-0092`**, **`US-0065`**
+- Research: **`R-0041`**
+
+# US-0109 — Self-Healing Deploy Loop (post-deploy smoke probe + bounded retry + DEPLOY_DEFERRED)
+Archived body in pack_ref: docs/engineering/architecture-archive/architecture-pack-20260824.md
+
 # US-0089: Cursor Caveman mode (scratchpad-configurable terse responses)
 
 ## Overview
@@ -2997,4 +2766,15 @@ Runbook § **BUG-0012 regression verify**:
 - Research: **`R-0083`**
 - Composed: **`DEC-0078`**, **`BUG-0006`**, **`DEC-0069`**, **`DEC-0038`**, **`US-0095`**
 - Related: **`US-0088`**, **`US-0092`**, **`US-0044`**, **`R-0081`**
+
+# US-0090: Caveman input compression
+
+**`US-0090`** adds an optional **input-side** Caveman file-scope compression layer,
+orthogonal to the response-side voice owned by `# US-0089` (DEC-0072 §1 three-axis
+non-substitution). Binding: **`DEC-0073`**; research **`R-0073`**. Composes on `# US-0089`,
+**`US-0053`**, **`US-0085`** (See `# US-0085` for context fresh-context markers), and
+**`US-0078`** / **`DEC-0060`** (compressed input must not bypass the intake evidence gate).
+2 net-new keys: `CAVEMAN_COMPRESS_INPUT` / `CAVEMAN_FILE_SCOPE` + `CAVEMAN_COMPRESS_SCOPE_EMPTY`.
+
+- Decision: **`DEC-0073`** — Amends: **`DEC-0072`** — Research: **`R-0073`** — Composed: `# US-0089`, **`US-0053`**, **`US-0085`**, **`US-0078`**, **`DEC-0060`**
 

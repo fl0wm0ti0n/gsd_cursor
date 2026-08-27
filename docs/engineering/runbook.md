@@ -906,6 +906,33 @@ headings, the archiver now recognizes them for rollover after **BUG-0010**. For 
 existing repo, optionally normalize `## US-xxxx` → `# US-xxxx` manually (count decrease is
 allowed; adding new `## US-` story headings is blocked).
 
+#### Architecture rollover linkage guard (US-0129)
+
+`scripts/arch_linkage_guard.py` wraps `--rollover` so contract-test `# US-xxxx` /
+`# BUG-xxxx` headings stay on the active `docs/engineering/architecture.md` hot
+surface. `/refresh-context` step 4 order: **pre-guard → `--rollover` → post-guard →
+`--check`**.
+
+```bash
+python scripts/arch_linkage_guard.py --pre
+python scripts/enforce-triad-hot-surface.py --rollover
+python scripts/arch_linkage_guard.py --post
+python scripts/enforce-triad-hot-surface.py --check
+```
+
+- `--pre` simulates the same `split_arch_stories` while-pop as the archiver. If a
+  required heading would leave the hot file and `ARCH_LINKAGE_AUTO_REPAIR=0`
+  (default), it emits `ARCH_LINKAGE_ROLLOVER_BLOCKED` and **does not write** the
+  archive pack or hot file.
+- `--post` re-checks active headings after rollover. Packs are append-only (no
+  pack rollback).
+- Optional repair: set `ARCH_LINKAGE_AUTO_REPAIR=1` (scratchpad explicit key;
+  **not** in `AUTONOMY_PRESET`) then rerun. The guard injects a minimal H1 stub
+  plus one `pack_ref` pointer **before** the US-0089 / US-0090 tail.
+- The code is `security_hard` (`auto_repair_kind=n/a`, `cap=0`) — never skip,
+  including under `AUTONOMY_STOP_POLICY=auto_repair_then_skip`.
+- Reason-code table: `docs/engineering/reason_codes.md` `## US-0129`.
+
 ### Minimal-read defaults by phase (bounded escalation)
 
 Read `docs/engineering/phase-context.md` first, then the **required** paths for
@@ -2808,6 +2835,48 @@ python scripts/sovereign_convergence_validate.py --self-test
 python scripts/sovereign_convergence_validate.py --repo . --enforce
 ```
 
+### Blocking-only conjunct-3 semantics (US-0127)
+
+`CONVERGENCE_CROSS_REVIEWER_OPEN` requires an **open blocking** critic finding
+(`blocking=true` AND `status=open`) per US-0110 L3 conjunct-3 / DEC-0110 §10.
+Informational `status=open, blocking=false` PASS concurrence rows do **not**
+fail convergence.
+
+Dispatch (DQ6): when `handoffs/sovereign_critic_findings.jsonl` exists and is
+non-empty, the JSONL blocking-only predicate (`read_open_blocking`) is
+authoritative and the QA-markdown grep is not consulted. When the JSONL is
+absent, fall back to the QA-markdown heuristic. When neither is deployed,
+informational skip (US-0110 L3 degrade matrix).
+
+At `/sovereign-critic` PASS with `read_open_blocking(repo) == []`,
+`auto_resolve_nonblocking_for_run(repo, orchestrator_run_id, phase_id)` sets
+`status=resolved` on same-run same-phase non-blocking open rows (idempotent;
+audit trail preserved). `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` is informational.
+
+### Smoke surrogate for waived-probe UAT slices (US-0128)
+
+For ultra_lean/docs/contract-test slices, `_eval_smoke_green` has an additional PASS
+path inside the same `smoke_green` conjunct. Eligibility and fail-closed rules:
+
+- **Eligibility**: all 6 live-runtime probe classes (`browser_smoke`, `api_health`,
+  `process_health`, `cli_smoke`, `build`, `manual_operator`) are listed in
+  `uat.json` `waived_probes[]` with `reason_code=UAT_PROBE_FORBIDDEN`.
+- **Surrogate step**: prefer `id=convergence_smoke` with `result=pass` (emitted by
+  `/qa` and `/verify-work`). Tail fallback: last `steps[]` row with
+  `probe_kind=contract_tests_primary` and `result=pass`. S0126 `steps[]` lack
+  `probe_kind` — that file is a `waived_probes[]` shape reference only (do not mutate).
+- **Harness**: `contract_test_failed=0` is authoritative when present; otherwise derive
+  from `contract_test_passed == contract_test_total`. Fail closed
+  `CONVERGENCE_SMOKE_SURROGATE_MISSING` when neither is present.
+- **Precedence**: a real smoke-named step wins (legacy `_uat_smoke_passes` first).
+  US-0109 deploy smoke is orthogonal and unchanged. Partial waivers (fewer than 6)
+  fail closed — surrogate does not activate. `id=convergence_smoke` contains "smoke"
+  so `_step_is_smoke` also matches; the surrogate branch is the documented
+  waived_probes + `contract_test_failed` gate (R6).
+- **Remediation** for `CONVERGENCE_SMOKE_SURROGATE_MISSING`: emit `convergence_smoke`
+  in `/qa`/`/verify-work`; ensure 6 waived probes; fix failing contract tests.
+  Real smoke-step failures still surface `CONVERGENCE_SMOKE_PROBE_FAIL`.
+
 ### Interpret `goal_progress` block
 
 Curator **`/refresh-context`** emits a fenced JSON block under **`### goal_progress`** in
@@ -2844,6 +2913,8 @@ python scripts/check_intake_template_parity.py --scope=sovereign-convergence
 Pair table (`SOVEREIGN_CONVERGENCE_PAIRS`):
 - `scripts/sovereign_convergence_lib.py` ↔ `template/scripts/sovereign_convergence_lib.py`
 - `scripts/sovereign_convergence_validate.py` ↔ `template/scripts/sovereign_convergence_validate.py`
+- `.cursor/commands/qa.md` ↔ `template/.cursor/commands/qa.md` (US-0128 command surrogate subsection)
+- `.cursor/commands/verify-work.md` ↔ `template/.cursor/commands/verify-work.md` (US-0128 command surrogate subsection)
 
 ### Related artifacts
 
@@ -2907,6 +2978,10 @@ When `select_critic_model` resolves the same slug as producer (or catalog miss),
 `degraded_mode=true` and runs three sequential lens spawns on the same model. Informational reason
 **`CROSS_MODEL_DEGRADED_MODE`** — not a hard stop. Documented limitation per **R-0088**.
 
+US-0130 pin precedence (one global critic): `MODEL_SOVEREIGN-CRITIC` (hyphen exact) >
+optional catalog `roles.critic` when `MODEL_RESOLVE=role_catalog` > existing opposition/`dev`
+fallback. Missing `roles.critic` is not an error. Same-slug collision remains **not** a hard stop.
+
 #### Isolation `model_id` v2
 
 When `CROSS_MODEL_REVIEW=1`, producer **and** critic isolation evidence rows require additive
@@ -2919,6 +2994,29 @@ python scripts/check_intake_template_parity.py --scope=sovereign-critic
 ```
 
 Pair table (`SOVEREIGN_CRITIC_PAIRS`): lib, validator, command, scratchpad, `DEC-0104.md`.
+Additive US-0127 row: `scripts/sovereign_critic_hygiene.py` ↔ `template/scripts/sovereign_critic_hygiene.py`.
+
+### Hygiene CLI (US-0127)
+
+Operator-only surface `scripts/sovereign_critic_hygiene.py`. `/auto` does **not**
+call it during a run. No advisory lock (Q3 accepted): `/auto` is single-threaded
+per repo; `resolve_finding` already uses read-all + rewrite-all. Run only when
+the repo is quiet.
+
+```bash
+python scripts/sovereign_critic_hygiene.py --report --repo .
+python scripts/sovereign_critic_hygiene.py --resolve-nonblocking-for-run <orchestrator_run_id> --dry-run --all-phases --repo .
+python scripts/sovereign_critic_hygiene.py --resolve-nonblocking-for-run <orchestrator_run_id> --phase-id execute --confirm --repo .
+python scripts/sovereign_critic_hygiene.py --self-test
+```
+
+Flags: `--report`, `--resolve-nonblocking-for-run`, `--dry-run`, `--confirm`,
+`--self-test`, `--all-phases`, `--phase-id`.
+
+Reason codes: `HYGIENE_RESOLVE_CONFIRM_REQUIRED` (exit 2),
+`HYGIENE_RESOLVE_NO_CANDIDATES` (exit 0 info), `HYGIENE_RESOLVE_PARTIAL` (exit 3),
+`HYGIENE_RESOLVE_FAILED` (exit 4), `HYGIENE_REPORT_EMPTY` (exit 0 info),
+`HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED` (exit 2).
 
 #### Related artifacts
 
@@ -4015,4 +4113,85 @@ Stub reason-code reference — US-0126 owns the full cross-host consolidated tab
 - `OPENCODE_DRIVER_INVOKE_FAILED` — subprocess invocation failure (missing Python, missing script, timeout) per DEC-0124 DQ6; distinct from validator non-zero exit.
 
 Cross-link: US-0126 owns the full reason-code table text and remediation guidance.
+
+## OpenCode host operator runbook (US-0126)
+
+This is the operator-facing runbook for the OpenCode host adapter (the sixth and
+final slice of the OpenCode adapter epic). The kit UX on the OpenCode host is
+**stock OpenCode TUI / desktop / IDE** — the kit does not ship a new GUI. The
+operator opts in via the installer flag `--host opencode` (or `--host both`),
+connects provider keys via `/connect`, and drives the lifecycle through the
+kit's slash commands (`/intake`, `/discovery`, `/research`, `/architecture`,
+`/sprint-plan`, `/plan-verify`, `/execute`, `/qa`, `/verify-work`, `/release`,
+`/closure`, `/refresh-context`, `/auto`, `/quick`, `/ask`) with the
+persistence-blocking reason codes surfaced verbatim from the Python validators
+and the orchestrator plugin. No new its-magic GUI is introduced.
+
+Program done: with a fresh `its-magic --host opencode` install and `/connect`ed keys, an operator can run `intake → … → release` on stock OpenCode with PO/Dev/QA as distinct sessions (optionally distinct providers per US-0123 role-slug routing), and the Python persistence-blocking validators (`intake_evidence_validate.py`, `bug_issue_validate.py`, and the US-0125 bridge contract set) refuse writes on non-zero exit exactly as on the Cursor host.
+
+Default install is cursor-only. Pass `--host opencode` or `--host both` to install the OpenCode host adapter; without it, `.opencode/` is not installed. See `## OpenCode host mode (US-0121)` for the installer flag reference.
+
+Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT.
+
+### Boundaries
+
+- standalone runtime — see `docs/product/standalone-runtime-masterplan.md`.
+- OpenCode fork — out of scope; the adapter uses stock OpenCode plugins/agents/commands only.
+- VS Code contrib rewrite — out of scope; the adapter does not modify VS Code or its contrib extensions.
+- Caveman mode — see `DEC-0055`.
+- Cursor browser as primary UAT — out of scope; browser UAT remains a secondary surface (US-0093).
+
+### Consolidated cross-host reason-code table
+
+The table below consolidates the persistence-blocking and orchestration reason
+codes across the OpenCode host adapter epic (US-0121..US-0126). Each code has a
+one-line semantics, a fail-closed action, and a cross-link to its owning slice.
+Stub per-slice references live in `## OpenCode orchestrator plugin reason codes
+(US-0124)` and `## OpenCode thin commands + validator bridge (US-0125)`; this
+section owns the consolidated cross-host view. Raw Python validator reason
+codes surface as-is (no OpenCode-namespaced wrapper) per DEC-0125 DQ7.
+
+`OPENCODE_*` family (OpenCode-host-specific — from US-0124):
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` | v2 `ctx.session.create` unavailable at runtime; fail closed; do not degrade to same-session roleplay. | US-0124 |
+| `OPENCODE_SUBTASK_IGNORED` | `ctx.session.create` returned null/threw/identical-id; fail closed; stop `/auto`. | US-0124 |
+| `OPENCODE_HEADLESS_UNSUPPORTED` | `opencode run` CLI missing on PATH; fail closed; stop `/auto`. | US-0124 |
+| `OPENCODE_DRIVER_INVOKE_FAILED` | `scripts/auto_outer_driver.py` subprocess failed (non-zero exit, malformed JSON, timeout); fail closed; stop `/auto`. | US-0124 |
+
+Installer `OPENCODE_*` / `CURSOR_*` family (from US-0121):
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `INSTALL_HOST_INVALID` | Unknown or duplicate `--host` argv; fail closed; abort install. | US-0121 |
+| `OPENCODE_ORPHANED_BY_CLEAN_CURSOR` | `clean --host cursor` left `.opencode/` in place; fail closed; surface to operator. | US-0121 |
+| `OPENCODE_STALE_BY_UPGRADE_CURSOR` | `upgrade --host cursor` did not refresh `.opencode/`; fail closed; surface to operator. | US-0121 |
+| `CURSOR_ORPHANED_BY_CLEAN_OPENCODE` | `clean --host opencode` left `.cursor/` in place; fail closed; surface to operator. | US-0121 |
+| `CURSOR_STALE_BY_UPGRADE_OPENCODE` | `upgrade --host opencode` did not refresh `.cursor/`; fail closed; surface to operator. | US-0121 |
+
+Reused cross-host codes (no `OPENCODE_` prefix — same semantics on Cursor + OpenCode):
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `AUTO_ORCHESTRATOR_PHASE_EXECUTION` | Orchestrator (or any role) performing another role's artifact writes; fail closed; stop `/auto`. | US-0092 / DEC-0078 |
+| `PHASE_ROLE_MISMATCH` | Wrong-role spawn per US-0069 / DEC-0051 matrix; fail closed; stop `/auto`. | US-0069 / DEC-0051 |
+| `NATIVE_CHAIN_UNAVAILABLE` | Headless fallback when native in-session chain unavailable (compose with `OPENCODE_HEADLESS_UNSUPPORTED`); fail closed; surface to operator. | US-0092 / DEC-0078 |
+
+Raw Python validator reason codes (Python SOT — no `OPENCODE_*` wrapper per DEC-0125 DQ7):
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `INTAKE_PERSISTENCE_BLOCKED` | `intake_evidence_validate.py` refused a persistence write; fail closed; surface to operator. | US-0078 / DEC-0060 (Python SOT) |
+| `INTAKE_REQUIRED_TOPIC_MISSING` | `intake_evidence_validate.py` found a missing required topic; fail closed; surface to operator. | US-0078 / DEC-0060 (Python SOT) |
+| `BUG_ISSUE_VALIDATION_FAILED` | `bug_issue_validate.py` refused a bug-row write; fail closed; surface to operator. | US-0079 / DEC-0061 (Python SOT) |
+
+### Parity scope
+
+The whole OpenCode adapter epic surface (US-0121..US-0126) is validated by
+`python scripts/check_intake_template_parity.py --scope=opencode-adapter` —
+byte-identical active↔template pair checks for the manifest, parity script,
+contract tests, runbook, and model-tier validator. Reason-code table presence
+and `test_us0126_*` marker coverage are asserted by `tests/us0126_contract_test.py`
+(contract-test grep), not by the parity CLI (the parity CLI stays byte-only).
 

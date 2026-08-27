@@ -89,6 +89,23 @@ browser MCP** sequence — **lib never calls MCP directly** (**BUG-0006**):
 without agent **`browser_evidence_refs`**. Security: no auto-read **`.env`**, no credential
 auto-fill, no intake evidence mutation — **`UAT_PROBE_FORBIDDEN`** unchanged.
 
+### Convergence smoke surrogate (US-0128)
+
+For ultra_lean/docs/contract-test slices where all 6 live-runtime probe classes
+(`browser_smoke`, `api_health`, `process_health`, `cli_smoke`, `build`,
+`manual_operator`) are waived with **`UAT_PROBE_FORBIDDEN`**, `/qa` MUST emit a
+canonical surrogate step in `sprints/Sxxxx/uat.json` `steps[]` (do **not** mutate
+`sprints/S0126/uat.json` — reference fixture only). Prefer explicit
+`id=convergence_smoke` (R7). When `contract_test_failed=0` emit:
+
+```json
+{"id": "convergence_smoke", "description": "Convergence smoke surrogate — waived-probe slice with green contract-test harness", "result": "pass", "marker": "test_us0128_convergence_smoke_surrogate", "evidence_ref": "tests/report.md Fail:0 + uat.json waived_probes[] (6 classes, UAT_PROBE_FORBIDDEN)", "probe_kind": "contract_tests_primary"}
+```
+
+When `contract_test_failed>0`, emit the same step with `"result": "fail"` (convergence
+lib surfaces `CONVERGENCE_SMOKE_SURROGATE_MISSING` when no passing smoke/surrogate
+step exists). Do not synthesize `uat.json` from `scripts/sovereign_convergence_lib.py`.
+
 ## Steps
 0. If `SECURITY_REVIEW=1`, verify `docs/engineering/security-review.md` exists
    and has no unresolved `critical` findings before proceeding. If unresolved

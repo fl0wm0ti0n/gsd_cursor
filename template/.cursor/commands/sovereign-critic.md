@@ -87,6 +87,19 @@ At the end of `/sovereign-critic`, append isolation evidence to `docs/engineerin
 
 Missing `model_id` when critic enabled → fail-closed **`ISOLATION_EVIDENCE_MODEL_ID_MISSING`**.
 
+## Auto-resolve non-blocking (US-0127)
+
+After `reconcile_findings` + JSONL append + isolation evidence, when zero open
+blocking findings remain, auto-resolve same-run same-phase informational rows.
+Scope key is the `(orchestrator_run_id, phase_id)` pair. Idempotent via
+`resolve_finding`. `SOVEREIGN_CRITIC_AUTORESOLVE_FAILED` is non-blocking
+informational — PASS verdict stands.
+
+```python
+if read_open_blocking(repo) == []:
+    auto_resolve_nonblocking_for_run(repo, orchestrator_run_id, phase_id)
+```
+
 ## Stop conditions
 
 - `CROSS_MODEL_REVIEW=0` → skip entirely (zero overhead)

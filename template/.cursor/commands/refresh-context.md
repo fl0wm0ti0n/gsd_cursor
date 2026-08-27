@@ -44,11 +44,17 @@ description: "its-magic refresh context: compact state and decisions."
      including `STATE_HOT_MAX_LINES`, `STATE_HOT_MAX_CHECKPOINTS`,
      `PO_TO_TL_HOT_MAX_LINES`, `PO_TO_TL_HOT_MAX_SECTIONS`, `ARCH_HOT_MAX_LINES`,
      and `ARCH_HOT_MAX_STORY_SECTIONS` (see runbook defaults),
+   - run `python scripts/arch_linkage_guard.py --pre` from repo root
+     (or `--repo <root>`). On `ARCH_LINKAGE_ROLLOVER_BLOCKED` stop; do not run
+     `--rollover` (no partial archive write),
    - run `python scripts/enforce-triad-hot-surface.py --rollover` from repo root
      (or `--repo <root>`) so `state.md`, `handoffs/po_to_tl.md`, and
      `docs/engineering/architecture.md` archive oldest contiguous units into
      deterministic packs under `docs/engineering/state-archive/`,
      `handoffs/archive/`, and `docs/engineering/architecture-archive/`,
+   - run `python scripts/arch_linkage_guard.py --post` from repo root
+     (or `--repo <root>`). On `ARCH_LINKAGE_ROLLOVER_BLOCKED` stop (packs are
+     append-only; no pack rollback),
    - immediately rerun `python scripts/enforce-triad-hot-surface.py --check`;
      on failure stop with `STATE_ARCHIVE_REQUIRED` or
      `ARTIFACT_HOT_SURFACE_OVERSIZE` (no successful phase completion on oversize

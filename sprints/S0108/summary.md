@@ -1,3 +1,39 @@
+# Sprint S0108 — Terminal context (refresh-context complete)
+
+- **story_id**: US-0108
+- **sprint_id**: S0108
+- **orchestrator_run_id**: auto-20260825-01
+- **phase_id**: refresh-context (terminal)
+- **role**: curator
+- **verdict**: PASS — segment closed; story DONE via closure backfill
+- **timestamp**: 2026-08-25T18:02:05Z (UTC — RE-ATTEST; prior 19:58Z proof RUNTIME_PROOF_INVALID)
+- **fresh_context_marker**: curator-US0108-refresh-context-20260825T180205Z-reattest-fresh
+- **model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1)
+- **runtime_proof_id**: rp-auto-20260825-01-refresh-context-curator-20260825T180205Z-US-0108-reattest
+- **proof_hash**: E09E2A77434AE6B9CF1690199FDF97E9DEF4A1985A3D952658537D6AA0CE3DD3
+- **backlog**: US-0108 DONE (`docs/product/backlog.md` L3568)
+- **acceptance**: US-0108 ticked (`docs/product/acceptance.md` L135)
+- **release_queue**: S0108 `released` @ 2026-06-29T23:00:00Z (1st attempt PASS)
+- **closure**: `sprints/S0108/closure-verification.md` CLOSURE_PASS (status-drift backfill 2026-08-25; pre-US-0120 in-flight)
+- **next_drain_candidate**: none
+- **drain_terminated_reason**: no_open_stories
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **stop_phase**: refresh-context
+- **stop_reason**: completed (segment complete — drain terminated; NOT segment exhausted)
+
+## Lifecycle compact (US-0108)
+
+Parallel instance arbitrage (DEC-0108): spec → research (R-0096 Q1–Q10) → architecture → sprint-plan → execute (11/11 tasks; 9 contract tests) → qa → verify-work → release (`auto-20260628-04` / S0108 released 2026-06-29) → **closure backfill** (2026-08-25 `/closure` heals OPEN→DONE drift per US-0120) → sovereign-critic (closure) → refresh-context (this terminal).
+
+**Delivered**: `scripts/parallel_dev_arbiter.py` + worktree isolation + selection predicate + merge policy + resource guard + execute steps 25–28; default-off `SOVEREIGN_PARALLEL_DEV=0`; 9 `test_us0108_*` markers + `--scope=sovereign-parallel-dev` parity; `docs/sovereign-runbook-md/US-0108.md`.
+
+**Verification**: harness Pass:845/Fail:0 @ 2026-08-25T17:13:14Z; 9/9 contract tests; parity `sovereign-parallel-dev` OK; triad post-append rollover as recorded in `docs/engineering/state.md` refresh-context checkpoint.
+
+**Authoritative lifecycle**: this file + `sprints/S0108/qa-findings.md` + `sprints/S0108/closure-verification.md` + `handoffs/releases/S0108-release-notes.md` + `docs/engineering/state.md` (hot surface retains closure + sovereign-critic + refresh-context checkpoints).
+
+---
+
 # Sprint S0108 Summary
 
 ## Story: US-0108 - Parallel Instance Arbitrage

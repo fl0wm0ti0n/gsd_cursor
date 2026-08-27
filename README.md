@@ -366,6 +366,12 @@ Generated test scaffolding + auto-run behavior (US-0066):
 - `/auto`: orchestration mode that spawns a fresh subagent per phase.
 - **US-0124**: OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session).
 
+### OpenCode host operator runbook (US-0126)
+
+Default install is cursor-only. Pass `--host opencode` or `--host both` to install the OpenCode host adapter; without it, `.opencode/` is not installed. See `## OpenCode host mode (US-0121)` for the installer flag reference.
+
+Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT.
+
 ### Guided intake behavior (US-0033)
 
 `/intake` supports two PO interaction modes via `.cursor/scratchpad.md`:

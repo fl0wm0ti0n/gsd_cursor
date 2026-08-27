@@ -2040,4 +2040,143 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Compose**: additive on US-0071/US-0113..US-0117/US-0121/US-0122/US-0123/US-0124/US-0125; do **not** delete Cursor kit docs; do **not** reimplement plugin or validators; do **not** invent a GUI; do **not** make Cursor-browser primary UAT. US-0126 owns the full runbook + reason-code table + `--scope=opencode-adapter` parity. No vendor slugs in `template/` (US-0102 family).
 - **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0126 (DQ1..DQ8 remain open; do not treat as architecture locks), then `/architecture` to lock the runbook section anchor + reason-code catalog + parity scope surface + `test_us0126_*` list + program DoD wording + default-host reminder + out-of-scope phrasing + template-parity manifest updates. Do NOT add `# US-0126` to architecture.md from PO discovery — `/architecture` (tech-lead) owns that H1 after `# US-0125`.
 
+## Discovery Notes — US-0127
+
+- **Story**: Convergence critic conjunct — blocking-only open findings plus non-blocking auto-resolve at sovereign-critic PASS (sovereign-loop convergence slice; unblocks `CONVERGENCE_CROSS_REVIEWER_OPEN` from ~280 informational PASS concurrence rows).
+- **Discovery date**: 2026-08-25T18:27:31Z (UTC)
+- **Role / model**: po / `composer-2.5` (CROSS_MODEL_REVIEW=1)
+- **References**: intake evidence `handoffs/intake_evidence/US-0127-intake-20260825.json`; `scripts/sovereign_convergence_lib.py` (`_critic_jsonl_has_open` drift vs US-0110 L3); `scripts/sovereign_critic_lib.py` (`read_open_blocking`, `resolve_finding` — read-only compose); `handoffs/sovereign_critic_findings.jsonl`; `docs/product/backlog.md ## US-0127` (AC-1..AC-6); compose read-only **US-0104** / **US-0110** / **US-0107**; research anchor TBD by tech-lead (research owns R-id; expect sovereign-loop subsection — not R-0109 OpenCode epic).
+- **Discovery locks D1–D10**:
+  - **D1 (Blocking-only convergence conjunct)**: Replace `_critic_jsonl_has_open` in `scripts/sovereign_convergence_lib.py` (+ template mirror) with blocking-only semantics matching US-0110 L3 conjunct-3 and `read_open_blocking(repo)`. Only `blocking=true` AND `status=open` rows fail convergence; informational open rows must not block.
+  - **D2 (Auto-resolve at sovereign-critic PASS)**: When `/sovereign-critic` PASS and `read_open_blocking` is empty, auto-set `status=resolved` on same-run non-blocking open rows in `handoffs/sovereign_critic_findings.jsonl`. Preserve audit trail; idempotent on re-run. Scope key (orchestrator_run_id vs phase_id) is `/research`-locked per DQ1.
+  - **D3 (Hygiene CLI)**: New `scripts/sovereign_critic_hygiene.py` (+ template mirror): `--report`, `--resolve-nonblocking-for-run <orchestrator_run_id>`, `--dry-run`. Deterministic reason codes; exact inventory `/research`-locked per DQ2.
+  - **D4 (Contract tests)**: `test_us0127_*` cover: non-blocking open does not fail convergence; blocking open fails with `CONVERGENCE_CROSS_REVIEWER_OPEN`; auto-resolve idempotent; hygiene CLI modes; compose regressions vs US-0110 conjunct-3 and US-0104 `read_open_blocking`. Exact list `/research`-locked per DQ3.
+  - **D5 (Operator docs)**: Runbook convergence / cross-reviewer section (active + template) documents blocking-only conjunct + hygiene workflow + new reason codes. Section anchor `/research`-locked per DQ4.
+  - **D6 (SOVEREIGN_CRITIC_PAIRS parity)**: Extend `--scope=sovereign-critic` pair table for hygiene script + convergence lib changes. Exact rows `/research`-locked per DQ5.
+  - **D7 (QA markdown fallback)**: JSONL present → blocking-only JSONL authoritative; JSONL absent → retain QA grep heuristic; neither → skip per US-0110 degrade matrix.
+  - **D8 (Compose US-0104)**: Read-only — no schema, reconciliation, lens, or predicate changes to critic lib.
+  - **D9 (Compose US-0110)**: Read-only — five-conjunct structure unchanged except conjunct-3 blocking-only fix.
+  - **D10 (Compose US-0107)**: Read-only — deferral/drain/stop matrix unchanged.
+- **Open questions for `/research` (DQ1..DQ8)** — research owns R-id allocation; route to fresh tech-lead (do not extend R-0109 OpenCode epic):
+  - **DQ1 (Auto-resolve scope key, AC-2)**: same `orchestrator_run_id` only vs same `phase_id` vs all non-blocking open rows? Batch helper vs repeated `resolve_finding`?
+  - **DQ2 (Hygiene CLI reason codes, AC-3)**: exhaustive code list, exit codes, stdout markers, and `--dry-run` vs apply semantics?
+  - **DQ3 (`test_us0127_*` inventory, AC-4)**: exact test names, fixture JSONL shapes, and compose regression pair list?
+  - **DQ4 (Runbook section anchor, AC-5)**: heading text/anchor for blocking-only + hygiene workflow in active + template runbook?
+  - **DQ5 (`SOVEREIGN_CRITIC_PAIRS` extension, AC-6)**: exact pair rows beyond existing five US-0104 pairs?
+  - **DQ6 (Hook placement)**: auto-resolve in convergence lib eval path vs `/sovereign-critic` command post-PASS vs hygiene CLI-only operator path?
+  - **DQ7 (QA fallback alignment)**: should `_qa_findings_has_open_critic` grep adopt blocking-only keywords when JSONL partial?
+  - **DQ8 (Performance/idempotency)**: bounded batch resolve, fsync policy, and re-run noop detection for large JSONL tails?
+- **Compose**: read-only with **US-0104** / **US-0110** / **US-0107**; do not mutate **US-0108** or **US-0121..US-0126** DONE rows; siblings **US-0128** / **US-0129** out of scope (boundary pointer only).
+- **Next**: `/research` (tech-lead) to close DQ1..DQ8 and allocate/extend research entry, then `/architecture`. Do NOT add `# US-0127` to architecture.md from PO discovery.
+
+## Discovery Notes — US-0128
+
+- **Story**: Convergence smoke surrogate for contract-test and waived-probe UAT slices (sovereign-loop convergence; unblocks `CONVERGENCE_SMOKE_PROBE_FAIL` when harness is green but active `uat.json` waives all smoke probe classes with no smoke-named step).
+- **Discovery date**: 2026-08-26T19:43:00Z (UTC)
+- **Role / model**: po / `composer-2.5` (CROSS_MODEL_REVIEW=1)
+- **References**: intake evidence `handoffs/intake_evidence/US-0128-intake-20260825.json` (RE-ATTEST PASS — JSON not mutated); `scripts/sovereign_convergence_lib.py` (`_eval_smoke_green`, `_uat_smoke_passes`, `_step_is_smoke`); `sprints/S0126/uat.json` (reference waived-probe fixture); `.cursor/commands/qa.md` + `verify-work.md`; `docs/product/backlog.md ## US-0128` (AC-1..AC-6); compose read-only **US-0109** deploy smoke / **US-0126** waived uat / **US-0110** five-conjunct; research anchor TBD by tech-lead (expect **R-0111** sovereign-loop smoke subsection — do not extend R-0110 US-0127 or R-0109 OpenCode epic).
+- **Discovery locks D1–D10**:
+  - **D1 (Surrogate eval — AC-1)**: Extend `_eval_smoke_green` in `scripts/sovereign_convergence_lib.py` (+ template mirror) so `smoke_green` passes via surrogate when active sprint `uat.json` exists, `tests/report.md` Fail:0, all canonical smoke probe classes documented in `waived_probes[]` with `reason_code=UAT_PROBE_FORBIDDEN`, `contract_test_failed=0`, and surrogate step predicate satisfied (D2). Legacy path unchanged: real smoke-named step PASS still satisfies conjunct when surrogate path does not apply.
+  - **D2 (Canonical uat step — AC-2)**: Require a uat step with `id=convergence_smoke` (preferred) **or** tail step with `probe_kind=contract_tests_primary` and `result=pass`, written by `/qa` or `/verify-work` for ultra_lean/docs slices. Exact JSON shape `/research`-locked per DQ2.
+  - **D3 (Fail closed — AC-3)**: Add `CONVERGENCE_SMOKE_SURROGATE_MISSING` to convergence reason codes when uat exists but surrogate prerequisites fail (missing/incomplete waived_probes, harness Fail>0, missing surrogate step, or `contract_test_failed>0`). Retain `CONVERGENCE_SMOKE_PROBE_FAIL` for deploy/real-smoke failures. No fake browser PASS.
+  - **D4 (Command contracts — AC-4)**: Update `.cursor/commands/qa.md` and `.cursor/commands/verify-work.md` (+ template mirrors) to emit the canonical convergence smoke step for slices that waive live smoke probes. Exact contract text `/research`-locked per DQ5.
+  - **D5 (Contract tests — AC-5)**: `test_us0128_*` cover: S0126-style waived uat + surrogate step → convergence PASS; missing surrogate → `CONVERGENCE_SMOKE_SURROGATE_MISSING`; harness Fail>0 → fail-closed; compose regression that US-0109 deploy smoke path semantics unchanged. Exact marker list `/research`-locked per DQ6.
+  - **D6 (Operator docs — AC-6)**: Runbook Goal-Based Convergence / smoke-green section (active + template) documents surrogate eligibility, waived-probe predicate, surrogate step contract, and remediation for `CONVERGENCE_SMOKE_SURROGATE_MISSING`. Section anchor `/research`-locked per DQ7.
+  - **D7 (Template parity — AC-6)**: `SOVEREIGN_CONVERGENCE_PAIRS` (+ `--scope=sovereign-convergence`) covers convergence lib mirror; command mirror parity for qa/verify-work touched surfaces. Exact pair rows `/research`-locked per DQ8.
+  - **D8 (Compose US-0109)**: Deploy smoke post-publish path unchanged — when deploy smoke applies, real smoke step PASS remains required; surrogate path must not weaken US-0109 semantics.
+  - **D9 (Compose US-0126)**: `sprints/S0126/uat.json` waived-probe fixture is reference input only; do not reopen US-0126 DONE product scope or mutate S0126 release artifacts.
+  - **D10 (Compose US-0110 / DEC-0110)**: Five-conjunct structure preserved; only smoke conjunct gains surrogate branch aligned with DEC-0110 §10 smoke-green definition. Do not amend US-0127 critic conjunct or hygiene surfaces.
+- **Open questions for `/research` (DQ1..DQ8)** — research owns R-id allocation (expect **R-0111**); route to fresh tech-lead (do not extend R-0110 US-0127):
+  - **DQ1 (Waived-probe inventory, AC-1)**: what is the exhaustive `probe_class` list that must appear in `waived_probes[]` with `UAT_PROBE_FORBIDDEN` before surrogate path activates (S0126 lists six — is that canonical or slice-dependent)?
+  - **DQ2 (Surrogate step schema, AC-2)**: exact JSON fields for `convergence_smoke` step vs `probe_kind=contract_tests_primary` tail fallback; required `evidence_ref` / `marker` keys?
+  - **DQ3 (`contract_test_failed` source, AC-1)**: top-level `uat.json` field vs derived from `steps[]` / `probe_results[]` — which is authoritative for surrogate predicate?
+  - **DQ4 (Precedence matrix, AC-1)**: when both a smoke-named step and surrogate path could apply, which wins; degrade behavior when partial waivers exist?
+  - **DQ5 (Command contract placement, AC-4)**: exact qa.md / verify-work.md subsection anchors and emission rules for ultra_lean/docs slices only?
+  - **DQ6 (`test_us0128_*` inventory, AC-5)**: exact test names, fixture uat paths, and US-0109 compose-regression guard shape?
+  - **DQ7 (Runbook anchor, AC-6)**: heading text/anchor for surrogate rules in active + template runbook?
+  - **DQ8 (`SOVEREIGN_CONVERGENCE_PAIRS`, AC-6)**: additive rows for command mirrors vs convergence lib only; does `--scope=sovereign-convergence` need extension?
+- **Compose**: read-only with **US-0109** / **US-0126** / **US-0110** / **US-0127**; do not mutate **US-0108** or **US-0121..US-0127** DONE rows; sibling **US-0129** / **US-0130** out of scope (boundary pointer only).
+- **Next**: `/research` (tech-lead) to close DQ1..DQ8 and allocate **R-0111**, then `/architecture`. Do NOT add `# US-0128` to architecture.md from PO discovery.
+
+## Intake Notes — US-0130
+
+- **Story**: Operator-pinned sovereign-critic model (catalog `roles.critic` + scratchpad `MODEL_SOVEREIGN-CRITIC`).
+- **Intake date**: 2026-08-26T18:00:00Z (UTC)
+- **Role**: po. **Pack**: small-intake-pack. **Evidence**: `handoffs/intake_evidence/US-0130-intake-20260826.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`).
+- **Operator intent**: Set the critic AI model the same way role catalogs pin PO/SA/DEV (example: `.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json`).
+- **Locks from guided Q&A**:
+  - Precedence: `MODEL_SOVEREIGN-CRITIC` > catalog `roles.critic` > today’s opposition/`dev` fallback.
+  - Collision: keep `CROSS_MODEL_DEGRADED_MODE` (not fail-closed, not auto-next-slug).
+  - Granularity: one global critic for all producer phases (no per-lens v1).
+  - Done includes installer/template example delivery of the new key (US-0112 compose).
+- **Compose**: overlay on **US-0104** / **US-0102** / **US-0112**; do not amend critic findings schema or canonical-phase resolver.
+- **Next**: `/discovery` (fresh po).
+- **Handoff**: full PO→TL intake section archived at `handoffs/archive/po-to-tl-pack-20260826.md` (`triad-rollover|po_to_tl` moved=1, retained_lines=650).
+- **Discovery**: see `## Discovery Notes — US-0130` below.
+
+## Discovery Notes — US-0130
+
+- **Story**: Operator-pinned sovereign-critic model (catalog `roles.critic` + scratchpad `MODEL_SOVEREIGN-CRITIC`).
+- **Discovery date**: 2026-08-26T21:23:00Z (UTC)
+- **Role / model**: po / `composer-2.5` (CROSS_MODEL_REVIEW=1)
+- **References**: intake evidence `handoffs/intake_evidence/US-0130-intake-20260826.json` (RE-ATTEST PASS — JSON not mutated); `scripts/sovereign_critic_lib.py` (`select_critic_model`, `_resolve_slug_for_tier`, `CRITIC_TIER_OPPOSITION`); `scripts/model_tier_lib.py` (`CATALOG_ROLE_KEYS`, `override_key`, `resolve_model_for_phase` 5-step chain); `.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json` (no `roles.critic` today); `.cursor/scratchpad.md` CROSS_MODEL / MODEL comments; `docs/product/backlog.md ## US-0130` (AC-1..AC-9); compose read-only **US-0104** / **US-0102** / **US-0112** / **US-0127** / **US-0128** DONE; research anchor TBD by tech-lead (expect **R-0112** — do not extend R-0111 US-0128).
+- **Current gap (locked)**: `select_critic_model` resolves via tier opposition on synthetic phase `sovereign-critic` and does **not** read `MODEL_SOVEREIGN-CRITIC` or catalog `roles.critic`. `CATALOG_ROLE_KEYS` = `po, sa, dev, dev_difficult, qa, security, release` — no `critic`. `override_key("sovereign-critic")` → `MODEL_SOVEREIGN-CRITIC` (hyphen preserved in scratchpad key).
+- **Operator locks (from intake)**: `both_precedence`, `degraded_keep`, `one_global`, `plus_installer`.
+- **Discovery locks D1–D10**:
+  - **D1 (Scratchpad pin — AC-1)**: Document and consume `MODEL_SOVEREIGN-CRITIC=<slug>` as highest-precedence critic pin for synthetic phase `sovereign-critic` (hyphenated scratchpad key; template comments = placeholders only; vendor slugs live in `.cursor/scratchpad.local.md`).
+  - **D2 (Catalog `roles.critic` — AC-2)**: Additive optional v2 role key. When present and `MODEL_RESOLVE=role_catalog`, resolver uses it after scratchpad pin. When absent, existing v2 catalogs remain valid (no forced migration / no fail-closed missing-key). Whether `critic` joins `CATALOG_ROLE_KEYS` required-set vs optional overlay is `/research`-locked (DQ1).
+  - **D3 (`select_critic_model` precedence — AC-3)**: `MODEL_SOVEREIGN-CRITIC` > `roles.critic` (when `MODEL_RESOLVE=role_catalog`) > current `CRITIC_TIER_OPPOSITION` / `_resolve_slug_for_tier("sovereign-critic", …)` / `dev` fallback. Pin lookup must consume hyphenated key (no `MODEL_SOVEREIGN_CRITIC` underscore alias miss). Implementation path: dedicated overlay in `select_critic_model` vs reusing `resolve_model_for_phase("sovereign-critic")` is `/research`-locked (DQ2).
+  - **D4 (Collision policy — AC-4)**: If resolved critic slug equals producer slug, keep `degraded_mode=true` / `CROSS_MODEL_DEGRADED_MODE` single-model-multi-lens — not a hard stop, not auto-next-slug.
+  - **D5 (One global critic — AC-5)**: v1 is one critic model for all producer phases. Out of scope: per-lens slugs; per-producer-phase critic overrides.
+  - **D6 (Contract tests — AC-6)**: `test_us0130_*` cover pin-wins, catalog `roles.critic` hit, omitted-key fallback to opposition path, same-slug degraded path, and US-0104 findings-schema compose guard (no JSONL / lens / anti-slop regression).
+  - **D7 (Compose do not amend — AC-7)**: US-0104 findings JSONL schema, three lenses, `CROSS_MODEL_REVIEW` + threshold + rework keys, anti-slop formula unchanged. US-0101 default phase-tier matrix unchanged. US-0102 canonical-phase 5-step chain unchanged (overlay only on critic selection).
+  - **D8 (Examples + installer — AC-8)**: US-0112 compose — role-based example catalogs (including `.cursor/model-catalog.local.example.role-based-balanced_cursor_only.json` and template mirrors) gain `critic` key (placeholder or Cursor-only real slugs in cursor-only example). Installer/manifest ships updated examples; **never** writes `model-catalog.local.json`. Exact installer surfaces `/research`-locked (DQ5).
+  - **D9 (Docs + parity — AC-9)**: Scratchpad CROSS_MODEL / MODEL comments document critic pin; runbook critic-model troubleshooting section (active + template). Architecture `# US-0130` anchor is **out of PO scope** — tech-lead authors in `/architecture` after `/research` (PO did not add to `architecture.md`).
+  - **D10 (Compose guards)**: US-0127 / US-0128 DONE — do not reopen. US-0129 out of scope. Cursor Task allowlist / BYOK inheritance is document-only per **R-0088** (no runtime routing change in this slice).
+- **Open questions for `/research` (DQ1..DQ8)** — research owns R-id allocation (expect **R-0112**); route to fresh tech-lead (do not extend R-0111 US-0128):
+  - **DQ1 (`CATALOG_ROLE_KEYS` — AC-2)**: Should `critic` be added to the v2 schema required-set (`CATALOG_ROLE_KEYS`) or remain an optional overlay key validated only when present?
+  - **DQ2 (Resolver integration — AC-3)**: Reuse `resolve_model_for_phase("sovereign-critic")` with synthetic phase registration vs dedicated pin/catalog branch inside `select_critic_model` only?
+  - **DQ3 (Hyphenated scratchpad key — AC-1/AC-3)**: Exact parse rules for `MODEL_SOVEREIGN-CRITIC` vs `override_key` / scratchpad merge — confirm hyphen is preserved end-to-end (no underscore normalization).
+  - **DQ4 (Example slug policy — AC-8)**: Placeholder tokens in generic examples vs real Cursor Task slugs in `role-based-balanced_cursor_only` example — which catalogs get which treatment?
+  - **DQ5 (Installer compose surfaces — AC-8)**: Which installer/manifest paths must ship updated example catalogs (active vs `template/` mirrors; parity script rows)?
+  - **DQ6 (`validate_catalog_v2` — AC-2)**: Schema validator changes for optional `roles.critic` — error codes and backward-compat matrix for catalogs missing the key?
+  - **DQ7 (Opposition fallback interaction — AC-3)**: When pin and catalog both absent, confirm `CRITIC_TIER_OPPOSITION` + `_resolve_slug_for_tier("sovereign-critic", …)` behavior is unchanged from US-0104 baseline?
+  - **DQ8 (Scratchpad doc anchors — AC-9)**: Exact comment-block placement in `.cursor/scratchpad.md` / template for `MODEL_SOVEREIGN-CRITIC` and critic pin precedence relative to existing MODEL_* / CROSS_MODEL_* sections?
+
+## Intake Notes — US-0129
+
+- **Story**: Architecture hot-surface rollover linkage guard (active contract preservation).
+- **Intake date**: 2026-08-25T18:20:30Z (UTC). **RE-ATTEST**: 2026-08-27T07:01:00Z (`auto-20260827-01`).
+- **Role**: po. **Pack**: small-intake-pack. **Evidence**: `handoffs/intake_evidence/US-0129-intake-20260825.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`; JSON not mutated on RE-ATTEST).
+- **Operator intent**: Block or bounded auto-repair architecture triad rollover when active-only US/BUG heading refs required by contract tests would break; prevent US-0126 B-1 style Fail:7 after rollover archives active tokens.
+- **Compose**: read-only **DEC-0054** / **DEC-0073** / **US-0049** / **US-0126** B-1 fixture; do not reopen US-0126 product scope; **US-0127** / **US-0128** / **US-0130** DONE — boundary pointer only.
+- **Discovery**: see `## Discovery Notes — US-0129` below.
+
+## Discovery Notes — US-0129
+
+- **Story**: Architecture hot-surface rollover linkage guard (active contract preservation).
+- **Discovery date**: 2026-08-27T07:02:00Z (UTC)
+- **Role / model**: po / `composer-2.5` (CROSS_MODEL_REVIEW=1)
+- **References**: intake evidence `handoffs/intake_evidence/US-0129-intake-20260825.json` (RE-ATTEST PASS — JSON not mutated); `scripts/enforce-triad-hot-surface.py` (`rollover_architecture`, `split_arch_stories`, `ARCH_HOT_MAX_LINES`, `ARCH_HOT_MAX_STORY_SECTIONS`); `.cursor/commands/refresh-context.md` triad rollover step; `sprints/S0126/uat.md` B-1 harness Fail:7 root cause (rollover archived `# US-0090` / `# US-0091` / `# US-0093` while contract tests grep active surface); `tests/auto_command_contract_test.py` (`test_caveman_compress_input_architecture_linkage`, `test_bug0011_architecture_linkage`, `test_us0093_architecture_linkage`); `tests/readme_feature_coverage_fixtures_test.py::test_readme_feature_coverage_architecture_linkage`; `docs/product/backlog.md ## US-0129` (AC-1..AC-6); compose read-only **DEC-0054** / **DEC-0073** / **US-0049** / **US-0126**; **US-0127** / **US-0128** / **US-0130** DONE not reopened.
+- **Current gap (locked)**: `rollover_architecture` pops oldest story blocks from `docs/engineering/architecture.md` hot surface without checking whether contract tests still require those `# US-xxxx` / BUG linkage headings in the active file. US-0126 ship hit B-1: architecture rollover moved US-0090/US-0091/US-0093 tokens to `docs/engineering/architecture-archive/architecture-pack-20260825.md` while `tests/auto_command_contract_test.py` and readme-feature-coverage linkage tests still `assertIn("# US-0090")` etc. on active `architecture.md` → harness Fail:7.
+- **Discovery locks D1–D10**:
+  - **D1 (Linkage guard script — AC-1)**: Add `scripts/arch_linkage_guard.py` (+ `template/scripts/` mirror) invoked **pre** and **post** `python scripts/enforce-triad-hot-surface.py --rollover`; detect active-only US/BUG heading refs required by contract tests before rollover commits.
+  - **D2 (Fail-closed block — AC-2)**: On violation emit `ARCH_LINKAGE_ROLLOVER_BLOCKED` with story/bug id, missing heading token, archive pack path, remediation prose. New reason-code family — registration surface in `docs/engineering/reason_codes.md` is `/research`-locked (DQ5).
+  - **D3 (Optional auto-repair — AC-3)**: Bounded restore of **minimal H1 stubs** from latest `docs/engineering/architecture-archive/architecture-pack-*.md`; idempotent; audit row in `state.md` on repair. Default-off vs default-on under `AUTONOMY_STOP_POLICY` is `/research`-locked (DQ1, DQ4).
+  - **D4 (Rollover wiring — AC-4)**: Wire guard into `/refresh-context` triad rollover path (between cap read and `--rollover` / after `--rollover` per DQ3); **do not** change `rollover_architecture` heading-split semantics or archiver pack format (DEC-0054 compose).
+  - **D5 (Regression + harness marker — AC-5)**: US-0126 B-1 fixture — rollover without guard must FAIL linkage contract tests; with guard must PASS or emit explicit `ARCH_LINKAGE_ROLLOVER_BLOCKED` block. Harness marker name `/research`-locked (DQ6).
+  - **D6 (Contract tests — AC-1..AC-5)**: `test_us0129_*` inventory covering guard pre/post hook, block metadata, optional auto-repair idempotency, refresh-context wiring grep, B-1 regression slice. Exact count/names `/research`-locked (DQ7).
+  - **D7 (Compose — AC-6)**: Read-only with **DEC-0054** (triad hot-surface), **DEC-0073** (H1 anchor policy), **US-0049** (state archive contract), **US-0126** B-1 fixture only — do **not** reopen US-0126 product scope or mutate DONE rows **US-0127** / **US-0128** / **US-0130**.
+  - **D8 (Template parity — AC-4)**: Script mirror, runbook h2 operator troubleshooting, `.cursor/commands/refresh-context.md` command surface parity, `check_intake_template_parity.py` pair row if applicable.
+  - **D9 (Architecture anchor)**: `# US-0129` in `docs/engineering/architecture.md` is **out of PO scope** — tech-lead authors in `/architecture` after `/research` (PO did not add architecture anchor).
+  - **D10 (Scope guard)**: Guard-only slice — no change to `ARCH_HOT_MAX_LINES` / `ARCH_HOT_MAX_STORY_SECTIONS` policy numbers or scratchpad defaults unless `/research` proves required (DQ8).
+- **Open questions for `/research` (DQ1..DQ8)** — research owns R-id allocation (expect **R-0113**; do not extend **R-0112** US-0130); route to fresh tech-lead:
+  - **DQ1 (Auto-repair default — AC-3)**: Default-off (block-only) vs default-on (auto-repair then rollover) vs operator scratchpad flag?
+  - **DQ2 (Linkage discovery — AC-1)**: How to discover the authoritative set of "active-only headings required by contract tests" — static grep inventory of `tests/` for `# US-` / BUG tokens vs manifest file vs coupling to `validate_readme_feature_coverage` story list?
+  - **DQ3 (Hook ordering — AC-1/AC-4)**: Pre-rollover only, post-rollover only, or both — and whether pre-hook blocks before any archive write vs post-hook rollback?
+  - **DQ4 (`AUTONOMY_STOP_POLICY` — AC-2/AC-3)**: Under `full_autonomy`, fail-closed block vs attempt bounded auto-repair first — precedence and stop-matrix row?
+  - **DQ5 (Reason-code registration — AC-2)**: Where to register `ARCH_LINKAGE_ROLLOVER_BLOCKED` in `docs/engineering/reason_codes.md` (new h3 vs extend triad/archive family); template mirror + runbook cross-link?
+  - **DQ6 (Harness marker — AC-5)**: Exact pytest marker / harness row name for US-0126 B-1 regression slice?
+  - **DQ7 (`test_us0129_*` inventory — AC-5/AC-6)**: Exact test count, names, and fixture paths (synthetic mini-architecture vs replay `architecture-pack-20260825.md`)?
+  - **DQ8 (Minimal stub shape — AC-3)**: What constitutes a "minimal H1 stub" restored from archive — heading line only vs heading + one linkage sentence vs full archived section cap?
 

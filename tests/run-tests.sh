@@ -1510,6 +1510,16 @@ set -e
 assert_true "check_intake_template_parity --scope=model-tier-overrides passes (US-0102)" "[ \"$US0102_PARITY_PY\" -eq 0 ]"
 assert_true "US-0102 contract subtests pass" "[ \"$US0102_CONTRACT_PY\" -eq 0 ]"
 
+# 26AB) US-0129 / DEC-0129 — architecture rollover linkage guard
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=arch-linkage >/dev/null 2>&1
+US0129_PARITY_PY=$?
+"$PY" -m pytest tests/us0129_contract_test.py -q >/dev/null 2>&1
+US0129_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=arch-linkage passes (US-0129)" "[ \"$US0129_PARITY_PY\" -eq 0 ]"
+assert_true "US-0129 contract tests pass" "[ \"$US0129_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

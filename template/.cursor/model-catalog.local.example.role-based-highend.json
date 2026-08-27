@@ -12,7 +12,8 @@
     "dev_difficult": "<your-dev-difficult-highend-slug>",
     "qa": "<your-qa-highend-slug>",
     "security": "<your-security-highend-slug>",
-    "release": "<your-release-highend-slug>"
+    "release": "<your-release-highend-slug>",
+    "critic": "<your-critic-model-slug>"
   },
   "notes": "Role-based high-end preset (US-0102 / DEC-0087). See ai_modell_auslegung_cursor_highend.md for non-normative role recommendations. Enable with MODEL_RESOLVE=role_catalog."
 }

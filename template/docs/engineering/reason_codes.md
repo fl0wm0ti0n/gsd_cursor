@@ -106,6 +106,41 @@ overhead. When `goal_convergence`, `evaluate_convergence` reads composed surface
 | `SOVEREIGN_GOAL_DERIVE_FAILED` | Set explicit `SOVEREIGN_GOAL` or populate `docs/product/vision.md` |
 | `CONVERGENCE_EVAL_FAILED` | Check evaluator logs; re-run with `--self-test` |
 
+Note on `CONVERGENCE_SMOKE_PROBE_FAIL`: reserved for real smoke step failures and US-0109 deploy smoke; surrogate path uses `CONVERGENCE_SMOKE_SURROGATE_MISSING`. Description of `CONVERGENCE_SMOKE_PROBE_FAIL` unchanged.
+
+## US-0127: Convergence critic conjunct hygiene (DEC-0110 §10 / DEC-0104 §11)
+
+Blocking-only conjunct-3 plus operator hygiene for informational critic rows.
+`CONVERGENCE_CROSS_REVIEWER_OPEN` now requires `blocking=true` (description
+amendment only; compose amendment to description only; code semantics already
+require `blocking=true` per DEC-0110 §10). No US-0110 reason-code renumbering.
+
+| Code | Exit | Meaning |
+|------|------|---------|
+| **`HYGIENE_RESOLVE_CONFIRM_REQUIRED`** | 2 | `--resolve-nonblocking-for-run` without `--confirm` (and not `--dry-run`) |
+| **`HYGIENE_RESOLVE_NO_CANDIDATES`** | 0 (info) | No matching open non-blocking rows for the scoped run/phase |
+| **`HYGIENE_RESOLVE_PARTIAL`** | 3 | Some candidates resolved, some failed |
+| **`HYGIENE_RESOLVE_FAILED`** | 4 | Resolve attempted and none succeeded |
+| **`HYGIENE_REPORT_EMPTY`** | 0 (info) | `--report` found no open critic findings |
+| **`HYGIENE_RESOLVE_PHASE_SCOPE_REQUIRED`** | 2 | Resolve without `--all-phases` and without `--phase-id` |
+| **`SOVEREIGN_CRITIC_AUTORESOLVE_FAILED`** | info | Auto-resolve hook failed; PASS verdict stands |
+
+## US-0128: Convergence smoke surrogate (DEC-0110 §10 smoke-green)
+
+Additive PASS path inside the existing `smoke_green` conjunct for ultra_lean/docs/contract-test
+slices. Five-conjunct name/order/`ConjunctResult` shape unchanged. `CONVERGENCE_SMOKE_PROBE_FAIL`
+remains the US-0110 code for real smoke step failures and US-0109 deploy smoke.
+
+| Code | blocked_by? | Meaning |
+|------|-------------|---------|
+| **`CONVERGENCE_SMOKE_SURROGATE_MISSING`** | yes | smoke green — surrogate prerequisites unmet for waived-probe slice (no smoke step + incomplete waivers or harness red) |
+
+### Operational remediation
+
+| Reason code | Operator action |
+|-------------|-----------------|
+| `CONVERGENCE_SMOKE_SURROGATE_MISSING` | Emit `convergence_smoke` in `/qa`/`/verify-work`; ensure 6 `waived_probes` with `UAT_PROBE_FORBIDDEN`; fix failing contract tests |
+
 ## US-0104: Cross-Model Adversarial Critic (DEC-0104 §11)
 
 Default-off cross-model review (`CROSS_MODEL_REVIEW=0`) → zero overhead. When enabled,
@@ -391,6 +426,29 @@ All 9 codes map to exit code `1` (fail-closed) — execution halts and requires 
 - **Decision record**: `decisions/DEC-0111.md` (release trigger dispatch design)
 - **Library**: `scripts/release_trigger_adapters.py` — adapter registry + `TriggerContext` dataclass
 - **Contract tests**: `tests/us0111_contract_test.py` — adapter dispatch, previous-version resolution, atomic promotion, reason-code inventory
+
+## US-0129 — Architecture hot-surface rollover linkage guard
+
+Fail-closed pre/post wrap of `python scripts/enforce-triad-hot-surface.py --rollover` so contract-test `# US-xxxx` / `# BUG-xxxx` headings stay on the active `docs/engineering/architecture.md` hot surface (DEC-0129). Do not extend US-0110 / US-0127 / US-0128 / US-0111 tables.
+
+### ARCH_LINKAGE_*
+
+| Code | Meaning | Blocking |
+|------|---------|----------|
+| **`ARCH_LINKAGE_ROLLOVER_BLOCKED`** | Pre-hook predicted a required heading would leave the hot file, or post-hook found a required heading missing after rollover. Metadata: story/bug id, missing heading token, archive pack path (predicted or written). `ARCH_LINKAGE_REPAIR_FAILED` is message text under this same code (v1 — no sibling family). | **Yes** (`security_hard`; never skip, including `AUTONOMY_STOP_POLICY=auto_repair_then_skip`) |
+
+### Operator remediation
+
+| Reason code | Operator action |
+|-------------|------------------|
+| `ARCH_LINKAGE_ROLLOVER_BLOCKED` | `set ARCH_LINKAGE_AUTO_REPAIR=1` for stub restore, or restore H1s manually, then rerun `--rollover`. Pre-hook does not write archive pack or hot file. Post-hook packs are append-only (no pack rollback). |
+
+### Related artifacts
+
+- **Architecture**: `docs/engineering/architecture.md` `# US-0129`
+- **Decision record**: `decisions/DEC-0129.md`
+- **Library**: `scripts/arch_linkage_guard.py`
+- **Contract tests**: `tests/us0129_contract_test.py` — 8 markers
 
 ---
 

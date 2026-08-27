@@ -326,6 +326,10 @@ def validate_catalog(catalog_path: Path) -> Tuple[bool, List[str], ReasonCode]:
                 errors.append(f"Missing role key: {role_name}")
             elif not catalog["roles"][role_name].strip():
                 errors.append(f"Role '{role_name}' has empty slug")
+        if "critic" in catalog["roles"]:
+            critic_slug = catalog["roles"].get("critic")
+            if not isinstance(critic_slug, str) or not critic_slug.strip():
+                errors.append("Role 'critic' must have a non-empty string slug")
 
     code = (
         ReasonCode.MODEL_CATALOG_SCHEMA_V2_INVALID

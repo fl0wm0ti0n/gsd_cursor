@@ -33,7 +33,7 @@ Classifies all fail-closed reason codes into two stop classes to support `AUTONO
 | `regenerate_isolation_evidence` | Re-run context-refresh |
 | `skip_confirmation_gate` | Allowlist-gated skip |
 
-## Security-hard gates (18 codes)
+## Security-hard gates (19 codes)
 
 Reason codes that are NEVER auto-repaired. Violation of any triggers terminal `AUTONOMY_REPAIR_CAP_EXHAUSTED` escalation.
 
@@ -57,6 +57,7 @@ Reason codes that are NEVER auto-repaired. Violation of any triggers terminal `A
 | `AUTO_SCHEDULER_CONFLICT` | Scheduler conflict = unreliable sequencing |
 | `RESUME_BRIEF_STALE` (when `RESUME_BRIEF_AUTO_REFRESH != 1`) | Stale brief = unreliable context (when auto-refresh not enabled) |
 | `SECURITY_REVIEW_CRITICAL_FINDING` | Security review critical = security boundary |
+| `ARCH_LINKAGE_ROLLOVER_BLOCKED` | Architecture rollover would drop headings still required by contract tests (US-0129); never skip, including under `AUTONOMY_STOP_POLICY=auto_repair_then_skip` |
 
 ## Autonomy-resolvable gates (9 codes)
 

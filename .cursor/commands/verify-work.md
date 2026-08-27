@@ -140,6 +140,23 @@ browser MCP** sequence — **lib never calls MCP directly** (**BUG-0006**):
 without agent **`browser_evidence_refs`**. Security: no auto-read **`.env`**, no credential
 auto-fill, no intake evidence mutation — **`UAT_PROBE_FORBIDDEN`** unchanged.
 
+### Convergence smoke surrogate (US-0128)
+
+For ultra_lean/docs/contract-test slices where all 6 live-runtime probe classes
+(`browser_smoke`, `api_health`, `process_health`, `cli_smoke`, `build`,
+`manual_operator`) are waived with **`UAT_PROBE_FORBIDDEN`**, `/verify-work` MUST emit a
+canonical surrogate step in `sprints/Sxxxx/uat.json` `steps[]` (do **not** mutate
+`sprints/S0126/uat.json` — reference fixture only). Prefer explicit
+`id=convergence_smoke` (R7). When `contract_test_failed=0` emit:
+
+```json
+{"id": "convergence_smoke", "description": "Convergence smoke surrogate — waived-probe slice with green contract-test harness", "result": "pass", "marker": "test_us0128_convergence_smoke_surrogate", "evidence_ref": "tests/report.md Fail:0 + uat.json waived_probes[] (6 classes, UAT_PROBE_FORBIDDEN)", "probe_kind": "contract_tests_primary"}
+```
+
+When `contract_test_failed>0`, emit the same step with `"result": "fail"` (convergence
+lib surfaces `CONVERGENCE_SMOKE_SURROGATE_MISSING` when no passing smoke/surrogate
+step exists). Do not synthesize `uat.json` from `scripts/sovereign_convergence_lib.py`.
+
 ## Steps
 1. Convert acceptance criteria into testable UAT steps. Derive steps directly from the story's acceptance criteria in `docs/product/acceptance.md`. Each AC should map to at least one UAT step. Run **`scripts/uat_probe_lib.py`** for each step where automation applies; record `probe_results[]` in **`uat.json`**.
 2. Populate UAT artifacts: write derived steps into `uat.json` (with description and result per step, accurate pass/fail counts) and `uat.md` (step list with results, summary section). Ensure UAT artifacts are in **populated** state per DEC-0009 — not placeholder.

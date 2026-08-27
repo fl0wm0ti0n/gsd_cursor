@@ -129,6 +129,12 @@ reason_codes:
     cap: 0
     rationale: Security review critical = security boundary
 
+  - code: ARCH_LINKAGE_ROLLOVER_BLOCKED
+    stop_class: security_hard
+    auto_repair_kind: n/a
+    cap: 0
+    rationale: Architecture rollover would drop headings still required by contract tests (US-0129); never skip
+
   # ─────────────────────────────────────────────────────────────────────────
   # autonomy_resolvable codes — bounded auto-repair (cap default 3)
   # ─────────────────────────────────────────────────────────────────────────

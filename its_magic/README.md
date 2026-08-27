@@ -406,6 +406,22 @@ Generated test scaffolding + auto-run behavior (US-0066):
   for persistence-blocking gates; the plugin `ctx.tool.hook("execute.before")`
   enforces persistence (defense in depth). See `decisions/DEC-0125.md`.
 
+### OpenCode host operator runbook (US-0126)
+
+Default install is cursor-only. Pass `--host opencode` or `--host both` to install the OpenCode host adapter; without it, `.opencode/` is not installed. See `## OpenCode host mode (US-0121)` for the installer flag reference.
+
+Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT.
+
+### Operator-pinned sovereign-critic model (US-0130)
+
+Operators can pin which model `/sovereign-critic` uses via scratchpad
+`MODEL_SOVEREIGN-CRITIC=<slug>` (hyphen exact; highest precedence) or optional
+catalog `roles.critic` in the v2 model catalog. `select_critic_model` applies
+precedence pin > `roles.critic` (when `role_catalog`) > opposition/`dev`;
+same-slug collision keeps `CROSS_MODEL_DEGRADED_MODE`. Validate with
+`python scripts/sovereign_critic_validate.py --repo . --enforce`. See runbook
+**Degraded fallback troubleshooting** and `--scope=sovereign-critic` parity.
+
 ### Guided intake behavior (US-0033)
 
 `/intake` supports two PO interaction modes via `.cursor/scratchpad.md`:
