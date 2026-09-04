@@ -2,9 +2,9 @@
 
 [GitHub Repository](https://github.com/fl0wm0ti0n/its-magic)
 
-You bring the idea; its-magic is your structured **AI dev team** in Cursor — PO, Tech
-Lead, Dev, QA, Release, and Curator — that turns ideas into shipped software through
-explicit phases and handoff artifacts.
+You bring the idea; its-magic is your structured **AI dev team** in **Cursor or
+OpenCode** — PO, Tech Lead, Dev, QA, Release, and Curator — that turns ideas into
+shipped software through explicit phases and handoff artifacts.
 
 State lives in repo files (`docs/product`, `handoffs`, `sprints`, `decisions`) — not
 chat-only memory. Run `/intake` with your idea, then follow intake → discovery →
@@ -12,12 +12,18 @@ architecture → sprint plan → execute → QA → release; pause/resume and de
 keep you in control when you want to steer. Implementers: see `docs/developer/README.md`
 for the DEV shard.
 
+**Hosts:** default install is **Cursor-only**. Opt in to OpenCode with
+`its-magic --target . --mode missing --host opencode` (or `--host both` to keep Cursor
+and OpenCode on the same repo). Connect provider keys in OpenCode via `/connect`, then
+use the same slash-command lifecycle. Details:
+`docs/engineering/runbook.md` → **OpenCode host operator runbook**.
+
 When you want hands-off delivery, enable **`AUTO_FLOW_MODE=full_autonomy`**
-(default-off), run **`/auto` once in Cursor**, and let the native in-chat auto-chain
-drain your backlog — self-verify UAT, bounded block retry, and advance to the next OPEN
-story or bug without re-invoking each phase manually. The outer driver is **optional**
-(**fallback** for headless/CI or when native chain is unavailable). Guided and
-decision-gated modes remain the default.
+(default-off), run **`/auto` once** in your host (Cursor native chain, or OpenCode
+orchestrator plugin), and drain your backlog — self-verify UAT, bounded block retry,
+and advance to the next OPEN story or bug without re-invoking each phase manually.
+The outer driver is **optional** (**fallback** for headless/CI or when native chain is
+unavailable). Guided and decision-gated modes remain the default.
 
 ## Features (what its-magic can do)
 
@@ -26,8 +32,9 @@ decision-gated modes remain the default.
 - Run `/intake` through `/release` with explicit phase handoffs and fresh subagent contexts.
 - Use `/pause` and `/resume` with checkpoints when you want to steer; escalate blocking
   choices to `decisions/DEC-xxxx.md`.
-- Enable **`AUTO_FLOW_MODE=full_autonomy`** (default-off), run **`/auto` once in Cursor**,
-  and drain backlog in-chat; outer driver is **optional** / **fallback** for headless/CI.
+- Enable **`AUTO_FLOW_MODE=full_autonomy`** (default-off), run **`/auto` once** in your
+  host (Cursor or OpenCode), and drain backlog in-chat; outer driver is **optional** /
+  **fallback** for headless/CI.
 - Team mode routes work across PO, Tech Lead, Dev, QA, Release, and Curator roles.
 - Backlog and bug drain advance OPEN items without re-invoking each phase manually.
 - See the catalog in **Commands and workflow** for phase commands and orchestration details.
@@ -45,6 +52,8 @@ decision-gated modes remain the default.
 
 - Global install via npm, npx, Chocolatey, or Homebrew; apply to any repo with
   `its-magic --target`.
+- Host packs: `--host cursor` (default), `--host opencode`, or `--host both` — ships
+  `.cursor/` and/or `.opencode/` while shared docs/scripts stay the same.
 - Modes: `missing` (safe merge), `overwrite` (+ `--backup`), `upgrade` (framework only),
   and `--clean-repo`.
 - Lifecycle QA matrix validates fresh install, upgrade, backup, and clean-repo paths.
@@ -126,6 +135,13 @@ Existing repo (safe merge):
 its-magic --target . --mode missing
 ```
 
+OpenCode host (or both hosts on one repo):
+
+```bash
+its-magic --target . --mode missing --host opencode
+its-magic --target . --mode missing --host both
+```
+
 Existing repo (overwrite + backup):
 
 ```bash
@@ -164,11 +180,12 @@ Upgrade with backup (backs up framework files before updating):
 its-magic --target . --mode upgrade --backup
 ```
 
-### 3) Open in Cursor
+### 3) Open in Cursor or OpenCode
 
-1. Open the project folder
-2. Run `/intake` with your idea
-3. Follow the workflow
+1. Open the project folder in **Cursor** and/or **OpenCode** (stock TUI / desktop / IDE)
+2. If you installed with `--host opencode` or `--host both`, connect keys in OpenCode via `/connect`
+3. Run `/intake` with your idea
+4. Follow the workflow (same phases on either host)
 
 ### CLI quick commands
 
@@ -368,7 +385,11 @@ Generated test scaffolding + auto-run behavior (US-0066):
 
 ### OpenCode host operator runbook (US-0126)
 
-Default install is cursor-only. Pass `--host opencode` or `--host both` to install the OpenCode host adapter; without it, `.opencode/` is not installed. See `## OpenCode host mode (US-0121)` for the installer flag reference.
+its-magic supports **OpenCode** as a first-class host alongside Cursor (see the intro
+**Hosts** blurb). Default install is still cursor-only. Pass `--host opencode` or
+`--host both` to install the OpenCode host adapter; without it, `.opencode/` is not
+installed. Full operator path: `docs/engineering/runbook.md` → **OpenCode host operator
+runbook** (and **OpenCode host mode** for the installer flag reference).
 
 Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT.
 

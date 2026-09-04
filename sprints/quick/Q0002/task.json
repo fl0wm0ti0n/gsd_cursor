@@ -1,0 +1,13 @@
+{
+  "task": "Make OpenCode host support clearly visible in README intro and quick-start (not only buried under US-0126).",
+  "acceptance": [
+    "Root README hero/intro states Cursor or OpenCode as hosts.",
+    "Early Hosts blurb documents --host opencode|both, default cursor-only, /connect, runbook pointer.",
+    "Quick start and Distribution sections mention OpenCode / --host.",
+    "template/README.md byte-identical to root README.md.",
+    "its_magic/README.md + template/its_magic/README.md get matching early-visibility updates.",
+    "No new DEC ids in added operator prose (US-0071)."
+  ],
+  "status": "done",
+  "acceptance_met": true
+}

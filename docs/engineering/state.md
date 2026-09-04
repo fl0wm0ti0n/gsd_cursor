@@ -1195,3 +1195,16 @@
 - ARCH_LINKAGE_AUTO_REPAIR=default-off
 - pack_ref=docs/engineering/state-archive/state-pack-20260827-m.md
 
+## Quick checkpoint — Q0002 README OpenCode visibility
+
+- phase_id=quick
+- role=dev
+- quick_id=Q0002
+- timestamp=2026-09-04T19:40:00Z (UTC)
+- verdict=PASS
+- acceptance_met=true
+- summary=Root + template README hero now states Cursor or OpenCode; Hosts blurb with --host opencode|both; quick-start + distribution updated; its_magic README mirrors early visibility; US-0126 subsection cross-links intro.
+- evidence_ref=sprints/quick/Q0002/task.json + sprints/quick/Q0002/summary.md + README.md + template/README.md + its_magic/README.md + template/its_magic/README.md
+- checks=validate_readme_feature_coverage status=PASS; check_intake_template_parity --scope=opencode-adapter OK; root/template README byte-identical; its_magic/template its_magic byte-identical
+- stop_condition=STOP after /quick. No backlog/acceptance mutation. No git commit unless operator requests.
+
