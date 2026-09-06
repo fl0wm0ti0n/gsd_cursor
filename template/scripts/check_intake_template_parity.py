@@ -21,6 +21,8 @@ Scoped modes (DEC-0073 §10 / US-0090):
   --scope=opencode-adapter       US-0121 OpenCode host pack + --host cursor/opencode/both surfaces.
   --scope=sovereign-critic       US-0127 sovereign critic hygiene script pair.
   --scope=sovereign-convergence  US-0110 convergence lib + validator pair table.
+  --scope=bug-0015               BUG-0015 OpenCode /auto dispatch attach surfaces.
+  --scope=bug-0016               BUG-0016 OpenCode Layer-1 agent permission surfaces.
   --scope=all              union of all tables.
 """
 
@@ -528,6 +530,39 @@ OPENCODE_ADAPTER_PAIRS: tuple[tuple[str, str], ...] = (
         "docs/engineering/runbook.md",
         "template/docs/engineering/runbook.md",
     ),
+    # BUG-0016 / DEC-0122 §7 — active↔template agent inventory byte-identical
+    (".opencode/agents/po.md", "template/.opencode/agents/po.md"),
+    (".opencode/agents/tech-lead.md", "template/.opencode/agents/tech-lead.md"),
+    (".opencode/agents/dev.md", "template/.opencode/agents/dev.md"),
+    (".opencode/agents/qa.md", "template/.opencode/agents/qa.md"),
+    (".opencode/agents/release.md", "template/.opencode/agents/release.md"),
+    (".opencode/agents/curator.md", "template/.opencode/agents/curator.md"),
+    (".opencode/agents/security.md", "template/.opencode/agents/security.md"),
+    (".opencode/agents/auto.md", "template/.opencode/agents/auto.md"),
+    (
+        "tests/bug0016_contract_test.py",
+        "template/tests/bug0016_contract_test.py",
+    ),
+)
+
+# BUG-0016 additive: Layer-1 permission agent surfaces + contract test.
+BUG0016_PAIRS: tuple[tuple[str, str], ...] = (
+    (".opencode/agents/po.md", "template/.opencode/agents/po.md"),
+    (".opencode/agents/tech-lead.md", "template/.opencode/agents/tech-lead.md"),
+    (".opencode/agents/dev.md", "template/.opencode/agents/dev.md"),
+    (".opencode/agents/qa.md", "template/.opencode/agents/qa.md"),
+    (".opencode/agents/release.md", "template/.opencode/agents/release.md"),
+    (".opencode/agents/curator.md", "template/.opencode/agents/curator.md"),
+    (".opencode/agents/security.md", "template/.opencode/agents/security.md"),
+    (".opencode/agents/auto.md", "template/.opencode/agents/auto.md"),
+    (
+        "tests/bug0016_contract_test.py",
+        "template/tests/bug0016_contract_test.py",
+    ),
+    (
+        "tests/us0122_contract_test.py",
+        "template/tests/us0122_contract_test.py",
+    ),
 )
 
 # US-0127 additive: hygiene CLI pair. Existing scopes unchanged.
@@ -559,6 +594,30 @@ SOVEREIGN_CONVERGENCE_PAIRS: tuple[tuple[str, str], ...] = (
     (
         ".cursor/commands/verify-work.md",
         "template/.cursor/commands/verify-work.md",
+    ),
+)
+
+# BUG-0015 additive: OpenCode /auto dispatch attach surfaces (plugin/command/bridge/test).
+BUG0015_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        ".opencode/plugins/orchestrator.ts",
+        "template/.opencode/plugins/orchestrator.ts",
+    ),
+    (
+        ".opencode/commands/auto.md",
+        "template/.opencode/commands/auto.md",
+    ),
+    (
+        "scripts/opencode_auto_bridge.py",
+        "template/scripts/opencode_auto_bridge.py",
+    ),
+    (
+        "tests/bug0015_contract_test.py",
+        "template/tests/bug0015_contract_test.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
     ),
 )
 
@@ -616,6 +675,8 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "sovereign-critic": SOVEREIGN_CRITIC_PAIRS,
     "sovereign-convergence": SOVEREIGN_CONVERGENCE_PAIRS,
     "arch-linkage": ARCH_LINKAGE_PAIRS,
+    "bug-0015": BUG0015_PAIRS,
+    "bug-0016": BUG0016_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -641,6 +702,8 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + SOVEREIGN_CRITIC_PAIRS
         + SOVEREIGN_CONVERGENCE_PAIRS
         + ARCH_LINKAGE_PAIRS
+        + BUG0015_PAIRS
+        + BUG0016_PAIRS
     ),
 }
 

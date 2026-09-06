@@ -30,6 +30,8 @@ setup stays in the root `README.md` (user channel).
   runbook `## OpenCode model slug routing (US-0123)`, architecture `# US-0123`, `decisions/DEC-0123.md`.
 - **US-0124** — OpenCode orchestrator plugin spawn-only `/auto` (Task-spawns US-0069 roles, never executes phase work in-session); traceability:
   runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
+- **BUG-0015** — OpenCode `/auto` dispatch attach (plugin owns interactive spawn); traceability:
+  runbook `### OpenCode `/auto` dispatch attach reason codes (BUG-0015)`, architecture `# BUG-0015`.
 - **US-0126** — OpenCode host operator runbook, cross-host reason-code catalog, and `--scope=opencode-adapter` parity; traceability:
   runbook `## OpenCode host operator runbook (US-0126)`, architecture `# US-0126`.
 - **US-0130** — Operator-pinned sovereign-critic model (`MODEL_SOVEREIGN-CRITIC` + catalog `roles.critic`); traceability:

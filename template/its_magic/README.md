@@ -415,6 +415,16 @@ Generated test scaffolding + auto-run behavior (US-0066):
   `OPENCODE_SUBTASK_IGNORED`, `OPENCODE_HEADLESS_UNSUPPORTED`,
   `OPENCODE_DRIVER_INVOKE_FAILED`. See `decisions/DEC-0124.md`.
 
+### OpenCode `/auto` dispatch attach (BUG-0015)
+
+- Interactive `/auto` on OpenCode attaches via plugin `command.transform` /
+  `editor.add({ name: "auto", execute })` so the orchestrator owns spawn
+  (`runAutoLifecycle` → `spawnPhase` / stop-matrix). Missing attach →
+  `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED`; concurrent `/auto` →
+  `OPENCODE_AUTO_ALREADY_RUNNING`. Thin `auto.md` stays dispatch-only. See
+  runbook **OpenCode `/auto` dispatch attach reason codes (BUG-0015)** and
+  architecture `# BUG-0015`.
+
 ### OpenCode thin commands + validator bridge (US-0125)
 
 - 15 dispatch-only markdown commands at `template/.opencode/commands/<name>.md`

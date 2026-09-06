@@ -138,12 +138,16 @@ def _read_agent(name: str) -> tuple[str, str, str]:
 
 
 def test_us0122_agent_inventory():
-    """Eight markdown agents under template/.opencode/agents/; no kit-root mirror."""
+    """Eight markdown agents under template/.opencode/agents/; active↔template byte-identical (BUG-0016)."""
     md_files = sorted(p.stem for p in AGENTS_DIR.glob("*.md"))
     assert md_files == sorted(EXPECTED_AGENT_NAMES), f"agent inventory mismatch: {md_files}"
-    if KIT_OPENCODE_AGENTS.is_dir():
-        kit_role_md = list(KIT_OPENCODE_AGENTS.glob("*.md"))
-        assert not kit_role_md, "kit-root .opencode/agents/ must not mirror role md files (DQ8)"
+    assert KIT_OPENCODE_AGENTS.is_dir(), "kit-root .opencode/agents/ required for active↔template parity"
+    kit_stems = sorted(p.stem for p in KIT_OPENCODE_AGENTS.glob("*.md"))
+    assert kit_stems == sorted(EXPECTED_AGENT_NAMES), f"active agent inventory mismatch: {kit_stems}"
+    for name in sorted(EXPECTED_AGENT_NAMES):
+        active = KIT_OPENCODE_AGENTS / f"{name}.md"
+        template = AGENTS_DIR / f"{name}.md"
+        assert active.read_bytes() == template.read_bytes(), f"{name}.md active↔template parity mismatch"
 
 
 # -- marker 2 --
@@ -161,7 +165,7 @@ def test_us0122_po_permission_object_form():
 
 
 def test_us0122_po_production_code_denial():
-    """PO edit deny-last; no production path allow keys."""
+    """PO edit deny-last; amended duty allows; no production path allow keys (BUG-0016 / DEC-0122 §2)."""
     _, fm, _ = _read_agent("po")
     edit_pairs = _permission_subkey_value(fm, "edit")
     assert isinstance(edit_pairs, list)
@@ -171,10 +175,26 @@ def test_us0122_po_production_code_denial():
     assert values["**"] == "deny"
     assert values.get("docs/product/**") == "allow"
     assert values.get("handoffs/po_to_tl.md") == "allow"
+    assert values.get("handoffs/intake_evidence/**") == "allow"
+    assert values.get("handoffs/resume_brief.md") == "allow"
+    assert values.get("docs/engineering/state.md") == "allow"
+    bash = _permission_subkey_value(fm, "bash")
+    assert bash == "ask", f"po bash must be ask after BUG-0016, got {bash!r}"
     allow_keys = {k for k, v in edit_pairs if v == "allow"}
     assert not allow_keys & PRODUCTION_DENY_GLOBS
     for glob in PRODUCTION_DENY_GLOBS:
         assert glob not in values or values[glob] != "allow"
+    # Amended §2 sprint globs use S* (not literal Sxxxx) on owning roles
+    for role in ("tech-lead", "dev", "qa", "release"):
+        _, role_fm, _ = _read_agent(role)
+        role_edit = _permission_subkey_value(role_fm, "edit")
+        assert isinstance(role_edit, list)
+        role_keys = [k for k, _ in role_edit]
+        assert not any("Sxxxx" in k for k in role_keys), f"{role} still has Sxxxx permission key"
+        if role != "release":
+            assert any(k.startswith("sprints/S*/") for k in role_keys), f"{role} missing sprints/S*/ keys"
+        else:
+            assert "sprints/S*/release-findings.md" in role_keys
 
 
 # -- marker 4 --

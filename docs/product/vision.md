@@ -1044,6 +1044,40 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Evidence**: `handoffs/intake_evidence/BUG-0011-intake-20260606.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`); operator `/ask` comparing local `caveman.mdc` vs JuliusBrussee/caveman `SKILL.md`.
 - **Intake closure (2026-06-06, PO)**: Backlog **`BUG-0011`** **OPEN**; next **`/discovery`**.
 
+## Discovery Notes — BUG-0016
+
+- **Operator value proposition**: On an OpenCode host with the `.opencode/` pack installed, each role agent (`@po`, `@tech-lead`, …) can run the **kit-mandated Python validators** and **write owned phase artifacts** under Layer-1 host permissions — without granting non-dev roles production/code write (success test (c)).
+- **Defect framing (discovery-locked)**:
+  - **Matrix-vs-duties gap, not missing matrix**: US-0122 / DEC-0122 §2 shipped as designed; kit contracts (US-0078/US-0079 intake validators, DEC-0069 resume brief, triad/`/refresh-context` scripts, real `sprints/S####/` paths) require bash + path globs the literal matrix denies or misspells.
+  - **Distinct from BUG-0015** (DONE — `/auto` dispatch; compose note only: spawn-only Task path may now work).
+  - **Distinct from US-0131 / US-0132** (config/model parity — do not expand).
+  - **Distinct from US-0122 DONE** — do not reopen as a feature story; bug-fix amends the Layer-1 matrix.
+- **Product-facing constraints**:
+  - Preserve success test (c): non-dev `edit` keep `**` deny last; no production/code allow keys (`scripts/**`, `its_magic/**`, `**/*.py`, installer surfaces) for `po`/`tech-lead`/`qa`/`release`/`curator`/`security`/`auto`.
+  - `security` stays `edit: deny` + `bash: ask` unless research finds a duty contradiction.
+  - `auto` stays spawn-only (`edit`/`bash` deny; 7-role `task` allow-list).
+  - Active `.opencode/agents/*.md` and `template/.opencode/agents/*.md` remain byte-parity after fix.
+- **Discovery locks D1–D8**: see `docs/product/backlog.md` **`### BUG-0016`** `discovery_notes` and `handoffs/po_to_tl.md` discovery handoff.
+- **Done signal (operator)**: role agents can complete validator + owned-write duties on OpenCode; static harness proves production deny for non-dev; no live OpenCode CI probe required.
+- **Research asks**: DQ1–DQ8 for **`/research`** → new **`R-0115`** (compose **`R-0109`**; do not wipe). Next phase **`research`** (tech-lead).
+
+## Discovery Notes — BUG-0015
+
+- **Operator value proposition**: On an OpenCode host with the `.opencode/` pack installed, operators run **`/auto`** once and expect the orchestrator plugin to **start the spawn loop** (`spawnPhase` → phase→role chain → stop-matrix) so lifecycle advances — or fail closed with a documented **`OPENCODE_*`** reason code. Today the thin command reaches STOP and nothing invokes spawn.
+- **Defect framing (discovery-locked)**:
+  - **Compose gap, not missing surfaces**: **US-0124** / **DEC-0124** ships `spawnPhase` + stop-matrix subprocess; **US-0125** / **DEC-0125** ships dispatch-only `/auto` (`agent: auto` + STOP). Runtime linkage between slash-entry and plugin spawn is missing.
+  - **Distinct from BUG-0016** (Layer-1 permissions vs kit duties — out of scope this segment).
+  - **Distinct from US-0131 / US-0132** (config/model parity — do not expand).
+  - **Distinct from BUG-0006 / BUG-0012** (Cursor spawn-only / native-chain regressions).
+- **Product-facing messaging constraints**:
+  - Thin **`auto.md`** stays dispatch-only (≤20 lines; no `ctx.session.create` / spawn logic) per **DEC-0125** DQ5.
+  - Plugin remains single spawn owner; agent prompt alone is not sufficient (success test (a) / **BUG-0006**).
+  - Missing `session.create` → fail-closed **`OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`** (no in-band roleplay fallback).
+  - Python **`scripts/auto_outer_driver.py`** remains stop-matrix SOT (no TypeScript reimplementation).
+- **Discovery locks D1–D7**: see `docs/product/backlog.md` **`### BUG-0015`** `discovery_notes` and `handoffs/po_to_tl.md` discovery handoff.
+- **Done signal (operator)**: `/auto` on OpenCode starts plugin-owned spawn (or emits **`OPENCODE_*`** fail-closed); contract tests cover dispatch wiring without live OpenCode CI probe.
+- **Research asks**: DQ1–DQ7 for **`/research`** → new **`R-0114`** (compose **`R-0109`**; do not wipe). Next phase **`research`** (tech-lead).
+
 ## Discovery Notes — BUG-0012
 
 - **Operator value proposition**: When **`AUTO_FLOW_MODE=full_autonomy`** and **`AUTO_BACKLOG_DRAIN=1`** are set in Cursor IDE, operators run **`/auto` once** and expect **hands-off** advance across **multiple story segment boundaries** without manual re-**`/auto`** or mandatory **`auto_outer_driver.py`** prose — the product promise **US-0095** / **DEC-0080** shipped **2026-06-07** (**S0084**). **BUG-0012** tracks **post-delivery runtime regression**: operator reports orchestration **stops after every user-story completion** while paradoxically citing active drain/full_autonomy and instructing re-**`/auto`** — behavior resembling pre-**US-0095** manual re-invocation.
@@ -2097,6 +2131,17 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
   - **DQ8 (`SOVEREIGN_CONVERGENCE_PAIRS`, AC-6)**: additive rows for command mirrors vs convergence lib only; does `--scope=sovereign-convergence` need extension?
 - **Compose**: read-only with **US-0109** / **US-0126** / **US-0110** / **US-0127**; do not mutate **US-0108** or **US-0121..US-0127** DONE rows; sibling **US-0129** / **US-0130** out of scope (boundary pointer only).
 - **Next**: `/research` (tech-lead) to close DQ1..DQ8 and allocate **R-0111**, then `/architecture`. Do NOT add `# US-0128` to architecture.md from PO discovery.
+
+## Intake Notes — US-0131 and US-0132
+
+- **Stories**: US-0131 Cross-host Its-Magic runtime configuration and parity; US-0132 Explicit Cursor/OpenCode model configuration contract.
+- **Intake date**: 2026-09-06T00:00:00Z (UTC)
+- **Role / run**: po / `opencode-20260906-cross-host-config-intake`. **Evidence**: `handoffs/intake_evidence/US-0131-0132-intake-20260906.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`).
+- **Operator intent**: Close the missing OpenCode workflow/configuration gaps so shared Its-Magic behavior is handled correctly in Cursor-only, OpenCode-only, and both-host installations, including scratchpad and model configuration ownership.
+- **Current gaps carried into discovery**: OpenCode does not load Cursor `.mdc` rules; thin OpenCode commands do not carry the complete Cursor read/gate contract; shared scripts still contain `.cursor` assumptions; the OpenCode validator hook is not visibly wired to the declared mapping; and plugin/command closure role resolution differs.
+- **Split rationale**: US-0131 defines the host-neutral runtime/configuration adapter for shared behavior. US-0132 defines model-file ownership and keeps Cursor phase/tier catalogs separate from OpenCode per-role provider catalogs. Combining them would obscure two different schemas and precedence domains.
+- **Operator locks**: no silent host fallback; no duplication of Cursor command/rule bodies; no credentials or real provider slugs in templates; local operator files remain protected; unsupported host-specific features fail or skip deterministically.
+- **Next**: `/discovery` (fresh **po**) for **US-0131**, then **US-0132**.
 
 ## Intake Notes — US-0130
 

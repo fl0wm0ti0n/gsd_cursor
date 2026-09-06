@@ -1,0 +1,76 @@
+{
+  "selected_pack": "small-intake-pack",
+  "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+  "writer_id": "po-cursor-20260906-opencode-bugs",
+  "INTAKE_GUIDED_MODE": 1,
+  "INTAKE_WORK_ITEM_KIND": "bug",
+  "requested_mode": "bug",
+  "intake_boundary_utc": "2026-09-06T13:35:00Z",
+  "ID_NAMESPACE_BOOTSTRAP": 0,
+  "bug_id": "BUG-0016",
+  "asked_topics": [
+    "outcome_success_criteria",
+    "impacted_components",
+    "constraints_compatibility_risks",
+    "required_tests_acceptance_checks",
+    "done_definition"
+  ],
+  "missing_topics": [],
+  "assumptions_confirmed": "(none)",
+  "topic_coverage": [
+    {
+      "topic_key": "outcome_success_criteria",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "OpenCode role permission matrix blocks legitimate lifecycle duties — audit all roles (not only PO).",
+      "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+      "turn_index": 0,
+      "ref": "ie:cursor-20260906-BUG0015-0016-intake:0:72a7c8ba3724f6ce"
+    },
+    {
+      "topic_key": "impacted_components",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "evidence_refs: .opencode/agents/{po,tech-lead,dev,qa,release,curator,security,auto}.md; decisions/DEC-0122.md §2 matrix; OpenCode PO intake failure (proposed BUG-0015 not persisted due to bash/edit gaps).",
+      "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+      "turn_index": 1,
+      "ref": "ie:cursor-20260906-BUG0015-0016-intake:1:a17f4d192410132b"
+    },
+    {
+      "topic_key": "constraints_compatibility_risks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "expected: Each role can perform its phase duties (required Python validators + owned artifact writes) while still denying production/code paths for non-dev roles (success test (c) preserved).",
+      "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+      "turn_index": 2,
+      "ref": "ie:cursor-20260906-BUG0015-0016-intake:2:ab9a1b18b55c68ae"
+    },
+    {
+      "topic_key": "required_tests_acceptance_checks",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "po bash: deny blocks mandatory intake_evidence_validate.py / bug_issue_validate.py / resume-brief refresh. Edit allows docs/product/** + handoffs/po_to_tl.md only — missing handoffs/intake_evidence/** and bug-intake handoffs/resume_brief.md (DEC-0069).",
+      "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+      "turn_index": 3,
+      "ref": "ie:cursor-20260906-BUG0015-0016-intake:3:8871197431c9569e"
+    },
+    {
+      "topic_key": "done_definition",
+      "satisfied_by": "answer_ref",
+      "quoted_user_text": "actual: Matrix as shipped in .opencode/agents/*.md (+ template peers) matches DEC-0122 literally but is incompatible with kit phase contracts that require bash validators and real sprint path globs / additional handoff paths.",
+      "intake_run_id": "cursor-20260906-BUG0015-0016-intake",
+      "turn_index": 4,
+      "ref": "ie:cursor-20260906-BUG0015-0016-intake:4:ff394837d98f9e00"
+    }
+  ],
+  "duplicate_check_pass": true,
+  "duplicate_check_notes": "Distinct from US-0122 DONE (shipped matrix as designed), US-0131/US-0132 (config/model), BUG-0015 (dispatch). Matrix-vs-duty incompatibility.",
+  "decomposition_verdict": "two_bugs",
+  "decomposition_rationale": "Permissions defect is independent of /auto dispatch wiring; fix may amend DEC-0122 + agent frontmatter without touching orchestrator hook.",
+  "permission_audit_roles": [
+    "po",
+    "tech-lead",
+    "dev",
+    "qa",
+    "release",
+    "curator",
+    "security",
+    "auto"
+  ]
+}

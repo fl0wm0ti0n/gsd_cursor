@@ -4114,6 +4114,19 @@ Stub reason-code reference — US-0126 owns the full cross-host consolidated tab
 
 Cross-link: US-0126 owns the full reason-code table text and remediation guidance.
 
+### OpenCode `/auto` dispatch attach reason codes (BUG-0015)
+
+Stub reason-code table — US-0126 owns the full cross-host consolidated table; this section ships the one-liner stub only for the interactive `/auto` → plugin attach gap fix (compose US-0124/US-0125).
+
+- `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED` — no usable `/auto` attach surface (`ctx.command.transform` / `editor.add({ name: "auto" })` and no event subscribe); fail closed; stop `/auto`.
+- `OPENCODE_AUTO_ALREADY_RUNNING` — concurrent or re-entrant `/auto` while `runAutoLifecycle` is in-flight (mutex TTL 7200s / clear-on-exit); fail closed; distinct from `AUTO_SCHEDULER_CONFLICT`.
+
+**Release status (S0132 / BUG-0016)**: **`released`** (`2026-09-06T19:35:00Z`); backlog remains **OPEN** until `/closure`. Operator verify: **`handoffs/releases/S0132-release-notes.md`** **## Verify**; publish skipped while **`RELEASE_PUBLISH_MODE=confirm`**. Gate-1 evidence: `tests/report.md` @ `2026-09-06T20:46:57Z` Pass:851 / Fail:0.
+
+**Release status (S0131 / BUG-0015)**: **`released`** (`2026-09-06T15:30:00Z`, attempt 2 / Fail:0); backlog remains **OPEN** until `/closure`. Operator verify: **`handoffs/releases/S0131-release-notes.md`** **## Verify**; publish skipped while **`RELEASE_PUBLISH_MODE=confirm`**.
+
+Cross-link: US-0126 owns the full reason-code table text and remediation guidance.
+
 ## OpenCode host operator runbook (US-0126)
 
 This is the operator-facing runbook for the OpenCode host adapter (the sixth and

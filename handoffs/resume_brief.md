@@ -1,3 +1,1082 @@
+﻿# Resume Brief — BUG-0016 closure PASS → refresh-context (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status DONE — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship
+- **last_completed_phase**: closure (role=qe)
+- **intended_resume_phase**: refresh-context
+- **next_scheduled_phase**: refresh-context
+- **next_scheduled_role**: curator
+- **wall_clock**: 2026-09-06T19:50:00Z
+- **fresh_context_marker**: qe-BUG0016-closure-20260906T195000Z-fresh
+- **verdict**: CLOSURE_PASS
+- **pre_closure_status**: OPEN
+- **post_closure_status**: DONE
+- **acceptance_L181**: ticked ([x] BUG-0016)
+- **queue_status**: released (unchanged)
+- **release_notes_ref**: handoffs/releases/S0132-release-notes.md
+- **closure_verification_ref**: sprints/S0132/closure-verification.md
+- **harness**: Pass:851 / Fail:0 @ 2026-09-06T20:46:57Z (not re-run)
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **uat_total**: 9
+- **ac_satisfied**: 8/8
+- **contract_markers**: 7/7 test_bug0016_* PASS
+- **blocking_findings**: 0
+- **isolation_compliance**: PASS (execute + qa + verify-work + release + sovereign-critic + closure)
+- **runtime_proof_id**: rp-auto-20260906-bug0016-closure-qe-20260906T195000Z-BUG-0016
+- **proof_hash**: 97101FF190491152FB149082D9F536A4786283337BF204C7A58798F24CC4D902
+- **proof_ttl**: 2026-09-06T20:50:00Z
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-release-release-20260906T193500Z-BUG-0016
+- **producer_proof_hash**: FB658AA87D763F7282EEE5279116C551AF40C5F03A4D8DEF491E09EF2538135F
+- **producer_proof_ttl**: 2026-09-06T20:35:00Z
+- **producer_proof_consumed_at**: 2026-09-06T19:50:00Z
+- **sibling_boundary**: BUG-0015 DONE preserved (not reopened)
+- **evidence_ref**: sprints/S0132/closure-verification.md; docs/product/backlog.md; docs/product/acceptance.md; docs/engineering/state.md; handoffs/releases/S0132-release-notes.md; handoffs/release_queue.md
+- **stop_condition**: STOP after /closure PASS. Orchestrator spawns /refresh-context in fresh curator subagent (BUG-0006). Do NOT spawn refresh-context from this closure subagent. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **DONE** (closure PASS; awaiting refresh-context)
+- **Sprint**: **S0132** — CLOSURE_PASS (queue=released)
+- **Last phase**: closure PASS
+
+## Intended resume phase
+
+refresh-context
+
+---
+# Resume Brief — BUG-0016 release PASS → closure (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md; do NOT flip DONE in release)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship (release PASS → closure)
+- **last_completed_phase**: release
+- **intended_resume_phase**: closure
+- **next_scheduled_phase**: closure
+- **next_scheduled_role**: qe
+- **wall_clock**: 2026-09-06T19:35:00Z
+- **fresh_context_marker**: release-BUG0016-release-20260906T193500Z-fresh
+- **verdict**: RELEASE_PASS (decision_gate=false; gates 1–4b green; Fail:0 harness; queue S0132=released; blocking_count=0)
+- **approach**: A* LOCKED upheld — DEC-0122 §2 sole SOT + agent frontmatter parity; bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved; T-007 no double-deny
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; all DONE; release finalized)
+- **uat**: sprints/S0132/uat.json + uat.md — populated 9/9 PASS
+- **release_notes**: handoffs/releases/S0132-release-notes.md
+- **release_findings**: sprints/S0132/release-findings.md
+- **queue**: handoffs/release_queue.md S0132=released
+- **runtime_proof_id**: rp-auto-20260906-bug0016-release-release-20260906T193500Z-BUG-0016
+- **proof_hash**: FB658AA87D763F7282EEE5279116C551AF40C5F03A4D8DEF491E09EF2538135F
+- **proof_ttl**: 2026-09-06T20:35:00Z
+- **consumed_verify_work_proof**: rp-auto-20260906-bug0016-verify-work-qa-20260906T192500Z-BUG-0016 (C9DE18A187C251AEC3081E43EA65645CBA3B7C8341D0F10639567CF3224B5B41 — MATCH)
+- **harness**: tests/report.md @ 2026-09-06T20:46:57Z Pass:851 / Fail:0 (gate-1; incl. BUG-0016 rows)
+- **closure_nbs**: flip BUG-0016 OPEN→DONE; tick acceptance L181; write sprints/S0132/closure-verification.md; do not reopen BUG-0015; do not invent DEC-0130
+- **sibling_boundary**: BUG-0015 DONE (compose note only); US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: handoffs/releases/S0132-release-notes.md; sprints/S0132/release-findings.md; handoffs/release_queue.md; tests/report.md; docs/engineering/state.md release checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after /release PASS. Orchestrator spawns /closure in fresh qe subagent (BUG-0006 / DEC-0082). Do NOT spawn closure from this chat. Do NOT mark BUG-0016 DONE in release. Do NOT tick acceptance. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN** (queue released; closure owns DONE flip)
+- **Last phase**: release PASS (S0132 Fail:0)
+- **Sibling**: BUG-0015 DONE (not reopened)
+
+## Intended resume phase
+
+closure
+
+# Resume Brief — BUG-0016 verify-work PASS → release (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify (verify-work PASS → release)
+- **last_completed_phase**: verify-work
+- **intended_resume_phase**: release
+- **next_scheduled_phase**: release
+- **next_scheduled_role**: release
+- **wall_clock**: 2026-09-06T19:25:00Z
+- **fresh_context_marker**: qa-BUG0016-verify-work-20260906T192500Z-fresh
+- **verdict**: VERIFY_WORK_PASS (decision_gate=false; UAT 9/9; blocking_count=0; isolation execute+qa+verify-work PASS)
+- **approach**: A* LOCKED upheld — DEC-0122 §2 sole SOT + agent frontmatter parity; bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved; T-007 no double-deny
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; all DONE; verify-work UAT populated)
+- **uat**: sprints/S0132/uat.json + uat.md — populated 9/9 PASS (UAT-1..UAT-8 + convergence_smoke)
+- **runtime_proof_id**: rp-auto-20260906-bug0016-verify-work-qa-20260906T192500Z-BUG-0016
+- **proof_hash**: C9DE18A187C251AEC3081E43EA65645CBA3B7C8341D0F10639567CF3224B5B41
+- **proof_ttl**: 2026-09-06T20:25:00Z
+- **consumed_qa_proof**: rp-auto-20260906-bug0016-qa-qa-20260906T191500Z-BUG-0016 (2258AE43B09997167501DD437B38DBA1A01356D1D09991707C1098EBC8D5523D — MATCH)
+- **execute_proof**: rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016 (519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF — MATCH)
+- **convergence_smoke**: pass (contract_test_failed=0)
+- **release_nbs**: keep S*; DEC-0122 sole SOT; CF2 runbook ≠ US-0126; no DONE/tick/DEC-0130/bash:allow/live probe until /closure
+- **sibling_boundary**: BUG-0015 DONE compose-note only (not reopened); US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: sprints/S0132/uat.json; sprints/S0132/uat.md; sprints/S0132/verify-work-findings.md; sprints/S0132/verify-work-verdict.json; handoffs/verify-work-to-release.md; tests/bug0016_contract_test.py; docs/engineering/state.md verify-work checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after verify-work PASS. Orchestrator runs sovereign-critic of verify-work then spawns /release in fresh release subagent (BUG-0006). Do NOT spawn release from this chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: verify-work PASS (S0132 UAT 9/9)
+- **Sibling**: BUG-0015 DONE (not reopened)
+
+## Intended resume phase
+
+release
+
+# Resume Brief — BUG-0016 qa PASS → verify-work (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify (qa PASS → verify-work)
+- **last_completed_phase**: qa
+- **intended_resume_phase**: verify-work
+- **next_scheduled_phase**: verify-work
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T19:15:00Z
+- **fresh_context_marker**: qa-BUG0016-qa-20260906T191500Z-fresh
+- **verdict**: QA_PASS (decision_gate=false; plan-verify PASS surjective 8/8; blocking_count=0)
+- **approach**: A* LOCKED upheld — DEC-0122 §2 sole SOT + agent frontmatter parity; bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved; T-007 no double-deny
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; all DONE in execute; QA verified)
+- **plan_verify**: sprints/S0132/plan-verify.json PASS (ultra_lean merged)
+- **runtime_proof_id**: rp-auto-20260906-bug0016-qa-qa-20260906T191500Z-BUG-0016
+- **proof_hash**: 2258AE43B09997167501DD437B38DBA1A01356D1D09991707C1098EBC8D5523D
+- **proof_ttl**: 2026-09-06T20:15:00Z
+- **plan_verify_runtime_proof_id**: rp-auto-20260906-bug0016-plan-verify-qa-20260906T191500Z-BUG-0016
+- **plan_verify_proof_hash**: B7272F32D7B432CEEDDF2A7C70CFCB633CA6A9AF2B8C5FAADF33DFAF07BF01AB
+- **consumed_execute_proof**: rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016 (519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF — MATCH)
+- **convergence_smoke**: pass (contract_test_failed=0)
+- **qa_nbs_for_verify**: keep S*; DEC-0122 sole SOT; CF2 runbook ≠ US-0126; no DONE/tick/DEC-0130/bash:allow/live probe
+- **sibling_boundary**: BUG-0015 DONE compose-note only (not reopened); US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: sprints/S0132/qa-findings.md; sprints/S0132/plan-verify.json; sprints/S0132/uat.json; handoffs/qa_to_verify.md; tests/bug0016_contract_test.py; docs/engineering/state.md qa checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after /qa PASS. Orchestrator runs sovereign-critic of qa then spawns /verify-work in fresh qa subagent (BUG-0006). Do NOT spawn verify-work from this chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: qa PASS (S0132 plan-verify + contract gates)
+- **Sibling**: BUG-0015 DONE (not reopened)
+
+## Intended resume phase
+
+verify-work
+
+# Resume Brief — BUG-0016 sovereign-critic execute PASS → qa (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify (execute critic PASS → qa)
+- **last_completed_phase**: sovereign-critic (producer_phase=execute; role=tech-lead critic)
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T19:10:00Z
+- **fresh_context_marker**: critic-BUG0016-execute-20260906T191000Z-fresh
+- **verdict**: SOVEREIGN_CRITIC_PASS (0 blocking; anti_slop_aggregate=10; concurs EXECUTE_PASS)
+- **approach**: A* LOCKED upheld — agent frontmatter parity to amended DEC-0122 §2; bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved; T-007 no double-deny
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; all DONE in execute)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016
+- **proof_hash**: 519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF (critic MATCH)
+- **proof_ttl**: 2026-09-06T20:05:00Z
+- **finding_ids**: b0016ex-challenger-001, b0016ex-architect-002, b0016ex-subtractor-003
+- **qa_nbs**: keep S*; deny-last + non-dev no production allow; DEC-0122 sole SOT; CF2 runbook allow ≠ US-0126; no DONE/tick/DEC-0130/bash:allow/live probe; plan-verify.json within ultra_lean QA
+- **sibling_boundary**: BUG-0015 DONE compose-note only (not reopened); US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl b0016ex-*; sprints/S0132/summary.md; handoffs/dev_to_qa.md; tests/bug0016_contract_test.py; docs/engineering/state.md sovereign-critic execute checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after sovereign-critic PASS. Orchestrator spawns /qa in fresh qa subagent (BUG-0006). Do NOT spawn qa from critic chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: sovereign-critic execute PASS (0 blocking; anti_slop=10)
+- **Sibling**: BUG-0015 DONE (not reopened)
+
+## Intended resume phase
+
+qa
+
+# Resume Brief — BUG-0016 execute PASS → qa (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **last_completed_phase**: execute
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T19:05:00Z
+- **fresh_context_marker**: dev-BUG0016-execute-20260906T190500Z-fresh
+- **verdict**: EXECUTE_PASS (decision_gate=false; T-anch..T-007 done; 7/7 bug0016 + 8/8 us0122 PASS)
+- **approach**: A* LOCKED — agent frontmatter parity to amended DEC-0122 §2; bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; all DONE)
+- **t007_write_guard**: no double-deny; DEC-0124/0125 untouched
+- **runtime_proof_id**: rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016
+- **proof_hash**: 519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF
+- **proof_ttl**: 2026-09-06T20:05:00Z
+- **consumed_sprint_plan_proof**: rp-auto-20260906-bug0016-sprint-plan-techlead-20260906T185500Z-BUG-0016 (F6892B96789FF471D7A97B40F80BBE59E725FB5A5DD573515D0ABC663B0A997F)
+- **critic_nbs_closed_in_execute**: b0016ar-challenger-001, b0016ar-architect-002, b0016ar-subtractor-003
+- **sibling_boundary**: BUG-0015 DONE compose-note only (not reopened); US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: sprints/S0132/summary.md; sprints/S0132/tasks.md; sprints/S0132/progress.md; sprints/S0132/t-anch-verification.md; handoffs/dev_to_qa.md; tests/bug0016_contract_test.py; docs/engineering/state.md execute checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after execute. Orchestrator runs sovereign-critic of execute then spawns /qa in fresh qa subagent (BUG-0006). Do NOT spawn qa from this chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT reopen BUG-0015.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: execute PASS (S0132 T-anch..T-007)
+- **Sibling**: BUG-0015 DONE (not reopened)
+
+## Intended resume phase
+
+qa
+
+# Resume Brief — BUG-0016 sprint-plan PASS → execute (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (sprint-plan terminal → build+verify)
+- **last_completed_phase**: sprint-plan
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **wall_clock**: 2026-09-06T18:55:00Z
+- **fresh_context_marker**: tl-BUG0016-sprint-plan-20260906T185500Z-fresh
+- **verdict**: SPRINT_PLAN_PASS (decision_gate=false; 8 tasks within SPRINT_MAX_TASKS=12; plan-verify deferred to QA)
+- **approach**: A* LOCKED — DEC-0122 §2 sole SOT + agent frontmatter (execute); bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **tasks**: T-anch + T-001..T-007 (8; 1:1 architecture seeds)
+- **runtime_proof_id**: rp-auto-20260906-bug0016-sprint-plan-techlead-20260906T185500Z-BUG-0016
+- **proof_hash**: F6892B96789FF471D7A97B40F80BBE59E725FB5A5DD573515D0ABC663B0A997F
+- **proof_ttl**: 2026-09-06T19:55:00Z
+- **consumed_architecture_proof**: rp-auto-20260906-bug0016-architecture-techlead-20260906T184500Z-BUG-0016 (7AC851CDF1953594365AFF11B015BFD850E737F75A327FA2A02B1CCB544D5A31)
+- **critic_nbs_routed**: b0016ar-challenger-001, b0016ar-architect-002, b0016ar-subtractor-003 → execute awareness
+- **sibling_boundary**: BUG-0015 DONE compose-note only; US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: sprints/S0132/sprint.md; sprints/S0132/tasks.md; handoffs/tl_to_dev.md; docs/engineering/state.md sprint-plan checkpoint; docs/product/backlog.md ### BUG-0016 sprint_plan_notes; handoffs/resume_brief.md
+- **stop_condition**: STOP after sprint-plan. Orchestrator runs sovereign-critic of sprint-plan then spawns /execute in fresh dev subagent (BUG-0006). Do NOT spawn execute or plan-verify from this chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT mutate agent frontmatter from sprint-plan (execute owns).
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: sprint-plan PASS (S0132 materialized; 8 tasks)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+execute
+
+# Resume Brief — BUG-0016 sovereign-critic architecture PASS → sprint-plan (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: none (pending — create at sprint-plan)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (architecture critic PASS → sprint-plan)
+- **last_completed_phase**: sovereign-critic (producer_phase=architecture; role=tech-lead critic)
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T18:50:00Z
+- **fresh_context_marker**: critic-BUG0016-architecture-20260906T185000Z-fresh
+- **verdict**: SOVEREIGN_CRITIC_PASS (0 blocking; anti_slop_aggregate=10)
+- **approach**: A* LOCKED upheld — amend DEC-0122 §2 sole SOT + agent frontmatter (execute); bash ask; PO paths; S* globs; release duty paths; 7 test_bug0016_*; success test (c) preserved
+- **companion_dec**: none (DEC-0130 rejected)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **task_seeds**: T-anch + T-001..T-007 (8; under SPRINT_MAX_TASKS=12)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-architecture-techlead-20260906T184500Z-BUG-0016
+- **proof_hash**: 7AC851CDF1953594365AFF11B015BFD850E737F75A327FA2A02B1CCB544D5A31 (critic MATCH)
+- **proof_ttl**: 2026-09-06T19:45:00Z
+- **finding_ids**: b0016ar-challenger-001, b0016ar-architect-002, b0016ar-subtractor-003
+- **sprint_plan_nbs**: T-007 Layer-1∩write-guard verify; active↔template parity; keep seeds 1:1; no DEC-0130 / bash:allow / live probe
+- **sibling_boundary**: BUG-0015 DONE compose-note only; US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl b0016ar-*; docs/engineering/architecture.md # BUG-0016; decisions/DEC-0122.md §2; docs/engineering/state.md sovereign-critic architecture checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after sovereign-critic. Orchestrator spawns /sprint-plan in fresh tech-lead subagent (BUG-0006). Do NOT spawn sprint-plan from critic chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT mutate agent frontmatter from critic. Do NOT execute implementation.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: sovereign-critic architecture PASS (A* + DEC-0122 §2 upheld; 0 blocking)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+sprint-plan
+
+# Resume Brief — BUG-0016 architecture PASS → sprint-plan (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: none (pending — create at sprint-plan)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (architecture PASS → sprint-plan)
+- **last_completed_phase**: architecture
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T18:45:00Z
+- **fresh_context_marker**: tl-BUG0016-architecture-20260906T184500Z-fresh
+- **verdict**: ARCHITECTURE_PASS (decision_gate=false)
+- **approach**: A* LOCKED — amend DEC-0122 §2 sole SOT + agent frontmatter (active+template); bash ask po/tl/curator; PO +intake_evidence/** +resume_brief +state.md; sprints/S*/ globs; release duty paths; 7 test_bug0016_*; success test (c) preserved
+- **companion_dec**: none (DEC-0130 rejected; DEC-0122 §2 amended in architecture)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0016
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED; CF1–CF5 closed)
+- **task_seeds**: T-anch + T-001..T-007 (8; under SPRINT_MAX_TASKS=12)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-architecture-techlead-20260906T184500Z-BUG-0016
+- **proof_hash**: 7AC851CDF1953594365AFF11B015BFD850E737F75A327FA2A02B1CCB544D5A31
+- **proof_ttl**: 2026-09-06T19:45:00Z
+- **consumed_research_proof**: rp-auto-20260906-bug0016-research-techlead-20260906T183500Z-BUG-0016
+- **sibling_boundary**: BUG-0015 DONE compose-note only; US-0131/US-0132 out; security/auto unchanged
+- **evidence_ref**: docs/engineering/architecture.md # BUG-0016; decisions/DEC-0122.md §2; docs/engineering/research.md ## R-0115; docs/product/backlog.md ### BUG-0016 architecture_notes; docs/engineering/state.md architecture checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after architecture. Orchestrator spawns /sprint-plan in fresh tech-lead subagent (BUG-0006). Do NOT spawn sprint-plan from architecture chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT mutate agent frontmatter from architecture (execute owns). Do NOT execute implementation.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: architecture PASS (approach A*; DEC-0122 §2 amended; 8 seeds)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+sprint-plan
+
+# Resume Brief — BUG-0016 sovereign-critic research PASS → architecture (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: none (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (research critic PASS → architecture)
+- **last_completed_phase**: sovereign-critic (producer_phase=research; role=tech-lead critic)
+- **intended_resume_phase**: architecture
+- **next_scheduled_phase**: architecture
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T18:40:00Z
+- **fresh_context_marker**: critic-BUG0016-research-20260906T184000Z-fresh
+- **verdict**: SOVEREIGN_CRITIC_PASS (0 blocking; anti_slop_aggregate=10)
+- **research_id**: R-0115 (DQ1..DQ8 LOCKED upheld)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-research-techlead-20260906T183500Z-BUG-0016
+- **proof_hash**: 04839252A587E2877F310A008943C6EF91732A1B227F439D49B704BD1F405BFF (critic MATCH)
+- **proof_ttl**: 2026-09-06T19:35:00Z
+- **finding_ids**: b0016rs-challenger-001, b0016rs-architect-002, b0016rs-subtractor-003
+- **architecture_nbs**: R1 deny-last vs OpenCode docs order; DQ5 release runbook.md allow vs US-0126; DQ8 Layer-1∩write-guard double-deny verify; optional thin DEC-0130; active↔template parity
+- **sibling_boundary**: BUG-0015 DONE compose-note only; this bug = permissions matrix vs kit duties
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl b0016rs-*; docs/engineering/research.md ## R-0115; docs/engineering/state.md sovereign-critic research checkpoint; handoffs/resume_brief.md
+- **stop_condition**: STOP after sovereign-critic. Orchestrator spawns /architecture in fresh tech-lead subagent (BUG-0006). Do NOT spawn architecture from critic chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance. Do NOT amend DEC-0122 from critic. Do NOT mutate agent frontmatter from critic.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: sovereign-critic research PASS (R-0115 upheld)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+architecture
+
+---
+# Resume Brief — BUG-0016 research PASS → architecture (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: none (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (research PASS → architecture)
+- **last_completed_phase**: research (role=tech-lead)
+- **intended_resume_phase**: architecture
+- **next_scheduled_phase**: architecture
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T18:35:00Z
+- **fresh_context_marker**: tl-BUG0016-research-20260906T183000Z-fresh
+- **verdict**: RESEARCH_PASS
+- **research_id**: R-0115
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-research-techlead-20260906T183500Z-BUG-0016
+- **proof_hash**: 04839252A587E2877F310A008943C6EF91732A1B227F439D49B704BD1F405BFF
+- **proof_ttl**: 2026-09-06T19:35:00Z
+- **consumed_discovery_proof**: rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016 (hash 1381C92191BD8EF182ADF0942BD68777D2A45613C5808497311B2BCC06C18935)
+- **dq_locks**: DQ1 bash ask shorthand; DQ2 PO +state.md; DQ3 sprints/S*/; DQ4 ask covers validators; DQ5 release duty paths complete; DQ6 amend DEC-0122 §2 (+ optional thin DEC-0130); DQ7 7 static markers; DQ8 Layer-1 ∩ plugin write-guard
+- **critic_nbs_closed**: b0016dsc-challenger-001, b0016dsc-architect-002, b0016dsc-subtractor-003
+- **sibling_boundary**: BUG-0015 DONE compose-note only; this bug = permissions matrix vs kit duties
+- **evidence_ref**: docs/engineering/research.md ## R-0115; docs/product/backlog.md ### BUG-0016 research_notes; docs/engineering/state.md research checkpoint; handoffs/po_to_tl.md Discovery handoff BUG-0016
+- **stop_condition**: STOP after research. Orchestrator spawns /architecture in fresh tech-lead subagent (BUG-0006). Do NOT spawn architecture from research chat. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance BUG-0016. Do NOT amend DEC-0122 body from research. Do NOT mutate agent frontmatter from research.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: research PASS (R-0115; DQ1..DQ8 LOCKED)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+architecture
+
+---
+# Resume Brief — BUG-0016 discovery PASS → research (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: none (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: spec (intake DONE; discovery PASS)
+- **last_completed_phase**: discovery (role=po)
+- **intended_resume_phase**: research
+- **next_scheduled_phase**: research
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T18:20:00Z
+- **fresh_context_marker**: po-BUG0016-discovery-20260906T181957Z-fresh
+- **verdict**: DISCOVERY_PASS
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016
+- **proof_hash**: 1381C92191BD8EF182ADF0942BD68777D2A45613C5808497311B2BCC06C18935
+- **proof_ttl**: 2026-09-06T19:20:00Z
+- **research_target**: R-0115 (compose R-0109; do not wipe)
+- **discovery_locks**: D1 bash deny→ask for po/tl/curator; D2 PO intake_evidence+resume_brief; D3 Sxxxx→S* sprint globs; D4 tl/curator bash ask; D5 release release-findings+verify-work-to-release; D6 amend DEC-0122 (± optional DEC-0130); D7 static harness no live probe; D8 boundaries vs BUG-0015 DONE / US-0131/0132
+- **sibling_boundary**: BUG-0015 DONE out-of-scope except compose note (auto spawn may work); this bug = permissions matrix vs kit duties
+- **evidence_ref**: docs/product/backlog.md ### BUG-0016 discovery_notes; docs/product/vision.md ## Discovery Notes — BUG-0016; handoffs/po_to_tl.md Discovery handoff BUG-0016; docs/engineering/state.md discovery checkpoint
+- **stop_condition**: STOP after discovery. Orchestrator spawns /research in fresh tech-lead subagent (BUG-0006). Do NOT spawn research from discovery PO. Do NOT mark BUG-0016 DONE. Do NOT tick acceptance BUG-0016. Do NOT amend DEC-0122 in discovery.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **OPEN**
+- **Last phase**: discovery PASS (D1..D8 locked)
+- **Sibling**: BUG-0015 DONE
+
+## Intended resume phase
+
+research
+
+---
+# Resume Brief — BUG-0015 closure PASS → refresh-context (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status DONE — authority docs/product/backlog.md)
+- **story_id**: BUG-0015
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship
+- **last_completed_phase**: closure (role=qe)
+- **intended_resume_phase**: refresh-context
+- **next_scheduled_phase**: refresh-context
+- **next_scheduled_role**: curator
+- **wall_clock**: 2026-09-06T15:40:00Z
+- **fresh_context_marker**: qe-BUG0015-closure-20260906T154000Z-fresh
+- **verdict**: CLOSURE_PASS
+- **pre_closure_status**: OPEN
+- **post_closure_status**: DONE
+- **acceptance_L180**: ticked ([x] BUG-0015)
+- **queue_status**: released (unchanged)
+- **release_notes_ref**: handoffs/releases/S0131-release-notes.md
+- **closure_verification_ref**: sprints/S0131/closure-verification.md
+- **harness**: Pass:849 / Fail:0 @ 2026-09-06T15:28:42Z (not re-run)
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **uat_total**: 9
+- **ac_satisfied**: 8/8
+- **contract_markers**: 7/7 test_bug0015_* PASS
+- **blocking_findings**: 0
+- **isolation_compliance**: PASS (execute + remediation + qa + verify-work + release attempt 2 + closure)
+- **runtime_proof_id**: rp-auto-20260906-bug0015-closure-qe-20260906T154000Z-BUG-0015
+- **proof_hash**: CD85075B4C46214DB663E9EA95AEEA2F4AAAC7B559B85333EE80C9E41AFAF732
+- **proof_ttl**: 2026-09-06T16:40:00Z
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-release-release-20260906T153000Z-BUG-0015
+- **producer_proof_hash**: 1467A9436D9012A5974AC13C269E28EDFA1D1E9821BA3C94422E1DAB4D8FAD00
+- **producer_proof_ttl**: 2026-09-06T16:30:00Z
+- **producer_proof_consumed_at**: 2026-09-06T15:40:00Z
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/closure-verification.md; docs/product/backlog.md; docs/product/acceptance.md; docs/engineering/state.md; handoffs/releases/S0131-release-notes.md; handoffs/release_queue.md
+- **stop_condition**: STOP after /closure PASS. Orchestrator spawns /refresh-context in fresh curator subagent (BUG-0006). Do NOT spawn refresh-context from this closure subagent. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **DONE** (closure PASS; awaiting refresh-context)
+- **Sprint**: **S0131** — CLOSURE_PASS (queue=released)
+- **Last phase**: closure PASS
+
+## Intended resume phase
+
+refresh-context
+
+---
+# Resume Brief — BUG-0015 release PASS (attempt 2 / Fail:0) → closure (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md; closure owns OPEN→DONE)
+- **story_id**: BUG-0015
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship
+- **last_completed_phase**: release (role=release; attempt 2)
+- **intended_resume_phase**: closure
+- **next_scheduled_phase**: closure
+- **next_scheduled_role**: qe
+- **wall_clock**: 2026-09-06T15:30:00Z
+- **fresh_context_marker**: release-BUG0015-release-rerun-20260906T153000Z-fresh
+- **verdict**: RELEASE_PASS
+- **release_attempt**: 2
+- **harness**: Pass:849 / Fail:0 @ 2026-09-06T15:28:42Z
+- **queue_status**: released
+- **critic_issue_key**: ik_bug0015_release_gate1_fail_nonzero → resolved
+- **release_notes_ref**: handoffs/releases/S0131-release-notes.md
+- **release_findings_ref**: sprints/S0131/release-findings.md
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **uat_total**: 9
+- **ac_satisfied**: 8/8
+- **contract_markers**: 7/7 test_bug0015_* PASS
+- **blocking_findings**: 0
+- **isolation_compliance**: PASS (execute + remediation + qa + verify-work + release attempt 2)
+- **runtime_proof_id**: rp-auto-20260906-bug0015-release-release-20260906T153000Z-BUG-0015
+- **proof_hash**: 1467A9436D9012A5974AC13C269E28EDFA1D1E9821BA3C94422E1DAB4D8FAD00
+- **proof_ttl**: 2026-09-06T16:30:00Z
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-verify-work-qa-20260906T150500Z-BUG-0015
+- **producer_proof_hash**: 165F812E5357B9DC0BF07AC07628F96D62BB10DFA2056F7EA2C97ADE8C5A4117
+- **producer_proof_ttl**: 2026-09-06T16:05:00Z
+- **producer_proof_consumed_at**: 2026-09-06T15:30:00Z
+- **backlog_status**: OPEN (do not mark DONE from release)
+- **acceptance_L180**: unchecked
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/release-findings.md; handoffs/releases/S0131-release-notes.md; handoffs/release_queue.md; tests/report.md; docs/engineering/state.md
+- **stop_condition**: STOP after /release PASS. Orchestrator spawns /closure in fresh qe subagent (BUG-0006). Do NOT spawn closure from this release subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN** (released attempt 2 / Fail:0; awaiting closure)
+- **Sprint**: **S0131** — RELEASE_PASS (queue=released)
+- **Last phase**: release PASS (attempt 2)
+
+## Intended resume phase
+
+closure
+
+---
+# Resume Brief — BUG-0015 verify-work PASS → release (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0015
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **last_completed_phase**: verify-work (role=qa)
+- **intended_resume_phase**: release
+- **next_scheduled_phase**: release
+- **next_scheduled_role**: release
+- **wall_clock**: 2026-09-06T15:05:00Z
+- **fresh_context_marker**: qa-BUG0015-verify-work-20260906T150500Z-fresh
+- **verdict**: VERIFY_WORK_PASS
+- **uat_lifecycle**: populated (DEC-0009)
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **uat_total**: 9
+- **ac_satisfied**: 8/8
+- **convergence_smoke**: pass
+- **contract_markers**: 7/7 test_bug0015_* PASS (0.71s)
+- **compose_us0124**: 12/12 PASS
+- **uat_probe_class**: contract_tests_primary
+- **browser_probe_used**: false
+- **blocking_findings**: 0
+- **non_blocking_findings**: 3 (NB-1..NB-3 informational)
+- **isolation_compliance**: PASS (execute + qa + verify-work)
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only UNCHANGED)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **research_anchor**: R-0114
+- **runtime_proof_id**: rp-auto-20260906-bug0015-verify-work-qa-20260906T150500Z-BUG-0015
+- **proof_hash**: 165F812E5357B9DC0BF07AC07628F96D62BB10DFA2056F7EA2C97ADE8C5A4117
+- **proof_ttl**: 2026-09-06T16:05:00Z
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-qa-qa-20260906T145500Z-BUG-0015
+- **producer_proof_hash**: B2924E1E4F3B1E750491884C7F1226E6DA15F24C9421333914394386AA4E35FB
+- **producer_proof_ttl**: 2026-09-06T15:55:00Z
+- **producer_proof_consumed_at**: 2026-09-06T15:05:00Z
+- **traceability_status**: PASS
+- **backlog_status**: OPEN (do not mark DONE)
+- **acceptance_L180**: unchecked
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/uat.json; sprints/S0131/uat.md; sprints/S0131/verify-work-findings.md; sprints/S0131/verify-work-verdict.json; handoffs/verify-work-to-release.md; docs/engineering/state.md
+- **stop_condition**: STOP after verify-work PASS. Orchestrator runs sovereign-critic of verify-work if CROSS_MODEL_REVIEW=1, then spawns /release in fresh release subagent (BUG-0006). Do NOT spawn release from this qa subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Sprint**: **S0131** — VERIFY_WORK_PASS (awaiting release)
+- **Last phase**: verify-work PASS
+
+## Intended resume phase
+
+release
+
+---
+
+# Resume Brief — BUG-0015 sovereign-critic qa PASS → verify-work (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0015
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (reviewing qa; role=tech-lead critic)
+- **intended_resume_phase**: verify-work
+- **next_scheduled_phase**: verify-work
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T15:00:00Z
+- **fresh_context_marker**: critic-BUG0015-qa-20260906T150000Z-fresh
+- **verdict**: PASS (critic concurs QA_PASS; 0 blocking; anti_slop_aggregate=8)
+- **critic_model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **degraded_mode**: false
+- **finding_ids**: b0015qa-challenger-001, b0015qa-architect-002, b0015qa-subtractor-003
+- **plan_verify**: PASS (sprints/S0131/plan-verify.json; AC surjective 8/8)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-qa-qa-20260906T145500Z-BUG-0015
+- **producer_proof_hash**: B2924E1E4F3B1E750491884C7F1226E6DA15F24C9421333914394386AA4E35FB
+- **plan_verify_runtime_proof_id**: rp-auto-20260906-bug0015-plan-verify-qa-20260906T145500Z-BUG-0015
+- **plan_verify_proof_hash**: B9462F769BD5CBB61D3FD41769BA1B669ACF44296A5724861F87D9F208226BC5
+- **producer_proof_ttl**: 2026-09-06T15:55:00Z
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (b0015qa-*); sprints/S0131/qa-findings.md; sprints/S0131/plan-verify.json; docs/engineering/state.md
+- **stop_condition**: STOP after sovereign-critic PASS. Orchestrator spawns /verify-work in fresh qa subagent (BUG-0006). Do NOT spawn verify-work from this critic subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Sprint**: **S0131** — QA_PASS (sovereign-critic qa PASS; awaiting verify-work)
+- **Last phase**: sovereign-critic of qa PASS
+
+## Intended resume phase
+
+verify-work
+
+---
+
+# Resume Brief — BUG-0015 qa PASS → verify-work (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: BUG-0015
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **last_completed_phase**: qa (role=qa; plan-verify merged PASS)
+- **intended_resume_phase**: verify-work
+- **next_scheduled_phase**: verify-work
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T14:55:00Z
+- **fresh_context_marker**: qa-BUG0015-qa-20260906T145500Z-fresh
+- **verdict**: QA_PASS
+- **plan_verify**: PASS (sprints/S0131/plan-verify.json; AC surjective 8/8)
+- **contract_markers**: 7/7 test_bug0015_* PASS
+- **compose_us0124**: 12/12 PASS
+- **uat_probe_class**: contract_tests_primary
+- **convergence_smoke**: pass
+- **browser_probe_used**: false
+- **blocking_findings**: 0
+- **non_blocking_findings**: 3 (NB-1..NB-3 execute-critic carry-forwards)
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only UNCHANGED)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **research_anchor**: R-0114
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-qa-qa-20260906T145500Z-BUG-0015
+- **producer_proof_hash**: B2924E1E4F3B1E750491884C7F1226E6DA15F24C9421333914394386AA4E35FB
+- **producer_proof_ttl**: 2026-09-06T15:55:00Z
+- **plan_verify_runtime_proof_id**: rp-auto-20260906-bug0015-plan-verify-qa-20260906T145500Z-BUG-0015
+- **plan_verify_proof_hash**: B9462F769BD5CBB61D3FD41769BA1B669ACF44296A5724861F87D9F208226BC5
+- **prior_proof_consumed**: rp-auto-20260906-bug0015-execute-dev-20260906T144500Z-BUG-0015 (1E8BF77730FB73CD94657EA5A0287E8F769F31C0CCD2EF81370181AD641D9CB0)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/qa-findings.md; sprints/S0131/plan-verify.json; sprints/S0131/uat.json; handoffs/qa_to_verify.md; docs/engineering/state.md
+- **stop_condition**: STOP after qa PASS. Orchestrator runs sovereign-critic of qa then spawns /verify-work in fresh qa subagent. Do NOT spawn verify-work from this qa subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Sprint**: **S0131** — QA_PASS (awaiting verify-work)
+- **Last phase**: qa PASS (plan-verify merged; 7/7 markers; convergence_smoke pass)
+
+## Intended resume phase
+
+verify-work
+
+---
+
+# Resume Brief — BUG-0015 execute PASS → qa (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: build+verify
+- **last_completed_phase**: execute (role=dev)
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **wall_clock**: 2026-09-06T14:45:00Z
+- **fresh_context_marker**: dev-BUG0015-execute-20260906T144000Z-fresh
+- **verdict**: EXECUTE_PASS
+- **task_count**: 7 (T-anch + T-001..T-006 complete)
+- **contract_markers**: 7/7 test_bug0015_* PASS
+- **compose_us0124**: 12/12 PASS
+- **plan-verify**: ultra_lean — QA creates plan-verify.json within build+verify
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only UNCHANGED)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **research_anchor**: R-0114
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-execute-dev-20260906T144500Z-BUG-0015
+- **producer_proof_hash**: 1E8BF77730FB73CD94657EA5A0287E8F769F31C0CCD2EF81370181AD641D9CB0
+- **producer_proof_ttl**: 2026-09-06T15:45:00Z
+- **prior_proof_consumed**: rp-auto-20260906-bug0015-sprint-plan-techlead-20260906T143000Z-BUG-0015 (628D489A395FD783DE7E84A5D8AAC82823AA35843A4FE498638DEB0A5175E43E)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/summary.md; handoffs/dev_to_qa.md; tests/bug0015_contract_test.py; .opencode/plugins/orchestrator.ts; docs/engineering/state.md
+- **stop_condition**: STOP after execute PASS. Orchestrator runs sovereign-critic of execute then spawns /qa in fresh qa subagent. Do NOT spawn qa from this dev subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Sprint**: **S0131** — EXECUTED (awaiting QA)
+- **Last phase**: execute PASS (7/7 markers; attach + lifecycle + bridges + runbook stub)
+
+## Intended resume phase
+
+qa
+
+---
+
+# Resume Brief — BUG-0015 sprint-plan PASS → execute (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: S0131
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (sprint-plan terminal; next macro build+verify starts with execute)
+- **last_completed_phase**: sprint-plan (role=tech-lead)
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **wall_clock**: 2026-09-06T14:30:00Z
+- **fresh_context_marker**: tl-BUG0015-sprint-plan-20260906T143000Z-fresh
+- **verdict**: SPRINT_PLAN_PASS
+- **task_count**: 7 (T-anch + T-001..T-006; within SPRINT_MAX_TASKS=12)
+- **ac_coverage**: 8/8 surjective
+- **plan-verify**: ultra_lean — deferred/merged into QA within build+verify; plan-verify.json NOT written
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only)
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **research_anchor**: R-0114
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-sprint-plan-techlead-20260906T143000Z-BUG-0015
+- **producer_proof_hash**: 628D489A395FD783DE7E84A5D8AAC82823AA35843A4FE498638DEB0A5175E43E
+- **producer_proof_ttl**: 2026-09-06T15:30:00Z
+- **prior_proof_consumed**: rp-auto-20260906-bug0015-architecture-techlead-20260906T142000Z-BUG-0015 (DBEB0F5D44E6801D5E1DEEA686A95CB32090B75A1FA1DCCF5621C1E1FD017440)
+- **nb_carry_ins**: ik_bug0015_arch_edge_and_proof; ik_bug0015_arch_layer_coupling; ik_bug0015_arch_scope_minimal (resolved non-blocking → execute awareness)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: sprints/S0131/sprint.md; sprints/S0131/tasks.md; handoffs/tl_to_dev.md; docs/engineering/state.md; docs/product/backlog.md ### BUG-0015 sprint_plan_notes
+- **stop_condition**: STOP after sprint-plan PASS. Orchestrator runs sovereign-critic of sprint-plan then spawns /execute in fresh dev subagent. Do NOT spawn execute from this tech-lead subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016. Do NOT execute implementation from this phase.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Sprint**: **S0131** — PLANNED
+- **Last phase**: sprint-plan PASS (7 tasks; 8/8 ACs; plan-verify deferred to QA)
+
+## Intended resume phase
+
+execute
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=S0131
+- boundary=post-sprint-plan (**DEC-0069**) — ultra_lean next macro build+verify starts with execute
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=execute
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=sprint_plan_complete
+- stop_phase=sprint-plan
+- next_scheduled_phase=execute
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=S0131
+- orchestrator_run_id=auto-20260906-bug0015
+- sprint_plan_boundary_utc=2026-09-06T14:30:00Z
+
+---
+
+# Resume Brief — BUG-0015 sovereign-critic concurs ARCHITECTURE_PASS → sprint-plan (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (sovereign-critic concurs — sprint-plan next)
+- **last_completed_phase**: sovereign-critic (role=tech-lead critic, model_id=composer-2.5-fast; PASS on architecture artifacts)
+- **producer_phase_for_critic**: architecture (role=tech-lead, model_id=composer-2.5; ARCHITECTURE_PASS)
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T14:25:00Z
+- **fresh_context_marker**: critic-BUG0015-architecture-20260906T142500Z-fresh
+- **verdict**: SOVEREIGN_CRITIC_PASS (0 blocking; anti_slop_aggregate=8)
+- **blocking_findings**: 0
+- **degraded_mode**: false (producer composer-2.5 vs critic composer-2.5-fast)
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-architecture-techlead-20260906T142000Z-BUG-0015
+- **producer_proof_hash**: DBEB0F5D44E6801D5E1DEEA686A95CB32090B75A1FA1DCCF5621C1E1FD017440 (critic recomputed MATCH)
+- **producer_proof_ttl**: 2026-09-06T15:20:00Z
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only)
+- **task_seeds**: T-anch + T-001..T-006 (7)
+- **finding_ids**: b0015ar-challenger-001, b0015ar-architect-002, b0015ar-subtractor-003
+- **nb_carry_ins**: ik_bug0015_arch_edge_and_proof; ik_bug0015_arch_layer_coupling; ik_bug0015_arch_scope_minimal (resolved non-blocking → sprint-plan/execute awareness)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (b0015ar-*); docs/engineering/architecture.md # BUG-0015; docs/product/backlog.md ### BUG-0015 architecture_notes; docs/engineering/research.md ## R-0114; docs/engineering/state.md (architecture + critic checkpoints)
+- **stop_condition**: STOP after sovereign-critic PASS. Orchestrator spawns /sprint-plan in fresh tech-lead subagent. Do NOT spawn sprint-plan from this critic subagent. Do NOT mark BUG-0015 DONE. Do NOT tick acceptance BUG-0015. Do NOT solve BUG-0016. Do NOT execute implementation.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Last phase**: sovereign-critic of architecture PASS (anti_slop=8; CF1–CF7 closed; approach A*)
+
+## Intended resume phase
+
+sprint-plan
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-architecture-critic (**DEC-0069**)
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=sprint-plan
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=sovereign_critic_architecture_complete
+- stop_phase=sovereign-critic
+- next_scheduled_phase=sprint-plan
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=auto-20260906-bug0015
+- critic_boundary_utc=2026-09-06T14:25:00Z
+
+---
+
+# Resume Brief — BUG-0015 architecture PASS → sprint-plan (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (architecture PASS; sprint-plan next)
+- **last_completed_phase**: architecture (role=tech-lead)
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T14:20:00Z
+- **fresh_context_marker**: tl-BUG0015-architecture-20260906T142000Z-fresh
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-architecture-techlead-20260906T142000Z-BUG-0015
+- **producer_proof_hash**: DBEB0F5D44E6801D5E1DEEA686A95CB32090B75A1FA1DCCF5621C1E1FD017440
+- **producer_proof_ttl**: 2026-09-06T15:20:00Z
+- **decision_gate**: false
+- **architecture_anchor**: docs/engineering/architecture.md # BUG-0015
+- **approach**: A* (command.transform / editor.add auto execute → runAutoLifecycle)
+- **companion_dec**: none (cite R-0114; DEC-0124/0125 compose-only)
+- **task_seeds**: T-anch + T-001..T-006 (7)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: docs/engineering/architecture.md # BUG-0015; docs/product/backlog.md ### BUG-0015 architecture_notes; docs/engineering/research.md ## R-0114; docs/engineering/state.md architecture checkpoint
+- **stop_condition**: STOP after architecture PASS. Orchestrator spawns /sprint-plan in fresh tech-lead subagent. Do NOT spawn sprint-plan from architecture chat. Do NOT mark BUG-0015 DONE. Do NOT solve BUG-0016. Do NOT execute implementation.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Last phase**: architecture PASS (approach A*; no companion DEC; CF1–CF7 closed)
+
+## Intended resume phase
+
+sprint-plan
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-architecture (**DEC-0069**)
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=sprint-plan
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=architecture_complete
+- stop_phase=architecture
+- next_scheduled_phase=sprint-plan
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=auto-20260906-bug0015
+- architecture_boundary_utc=2026-09-06T14:20:00Z
+
+---
+
+# Resume Brief — BUG-0015 research PASS → architecture (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: plan (research PASS; architecture next)
+- **last_completed_phase**: research (role=tech-lead)
+- **intended_resume_phase**: architecture
+- **next_scheduled_phase**: architecture
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T14:10:00Z
+- **fresh_context_marker**: tl-BUG0015-research-20260906T141000Z-fresh
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-research-techlead-20260906T141000Z-BUG-0015
+- **producer_proof_hash**: 3D9E02EBBECA8C02D3051638B0782F575ABD03FEDCD369A255144D36CC01F3A1
+- **producer_proof_ttl**: 2026-09-06T15:10:00Z
+- **decision_gate**: false
+- **research_anchor**: docs/engineering/research.md ## R-0114
+- **dq_status**: DQ1–DQ7 LOCKED (attach=command.transform; single-owner plugin; first-phase compose; shared lifecycle; isolation min; additive test_bug0015_*; additive DEC/architecture)
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **evidence_ref**: docs/engineering/research.md ## R-0114; docs/product/backlog.md ### BUG-0015 research_notes; docs/engineering/state.md research checkpoint; handoffs/po_to_tl.md Discovery handoff BUG-0015
+- **stop_condition**: STOP after research PASS. Orchestrator spawns /architecture in fresh tech-lead subagent. Do NOT spawn architecture from research chat. Do NOT mark BUG-0015 DONE. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Last phase**: research PASS (R-0114; DQ1–DQ7 LOCKED)
+
+## Intended resume phase
+
+architecture
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-research (**DEC-0069**)
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=architecture
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=research_complete
+- stop_phase=research
+- next_scheduled_phase=architecture
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=auto-20260906-bug0015
+- research_boundary_utc=2026-09-06T14:10:00Z
+
+---
+
+# Resume Brief — BUG-0015 discovery PASS → research (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0015
+- **bug_id**: BUG-0015 (Status OPEN — authority docs/product/backlog.md)
+- **story_id**: (none — bug segment)
+- **sprint_id**: (pending)
+- **delivery_mode**: ultra_lean
+- **macro_phase**: spec (intake DONE; discovery PASS)
+- **last_completed_phase**: discovery (role=po)
+- **intended_resume_phase**: research
+- **next_scheduled_phase**: research
+- **next_scheduled_role**: tech-lead
+- **wall_clock**: 2026-09-06T14:05:00Z
+- **fresh_context_marker**: po-BUG0015-discovery-20260906T140049Z-fresh
+- **producer_runtime_proof_id**: rp-auto-20260906-bug0015-discovery-po-20260906T140500Z-BUG-0015
+- **producer_proof_hash**: 700734379DE4CFE3B0509DB39E8F3208DFAEC8ADB2BA475EA8CDB9C0AF37C83F
+- **producer_proof_ttl**: 2026-09-06T15:05:00Z
+- **decision_gate**: false
+- **sibling_boundary**: BUG-0016 OPEN out-of-scope this segment
+- **research_target**: R-0114 (compose R-0109; do not wipe) — lock DQ1..DQ7 from discovery handoff
+- **evidence_ref**: docs/product/backlog.md ### BUG-0015 discovery_notes; docs/product/vision.md ## Discovery Notes — BUG-0015; handoffs/po_to_tl.md Discovery handoff BUG-0015; docs/engineering/state.md discovery checkpoint
+- **stop_condition**: STOP after discovery. Orchestrator spawns /research in fresh tech-lead subagent. Do NOT spawn research from discovery PO. Do NOT mark BUG-0015 DONE. Do NOT solve BUG-0016.
+
+## Current status
+
+- **Active bug**: **BUG-0015** — **OPEN**
+- **Last phase**: discovery PASS (D1..D7 locked)
+
+## Intended resume phase
+
+
+esearch
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-discovery (**DEC-0069**)
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=research
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=discovery_complete
+- stop_phase=discovery
+- next_scheduled_phase=research
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=auto-20260906-bug0015
+- discovery_boundary_utc=2026-09-06T14:05:00Z
+
+---
+
 ﻿# Resume Brief — auto-20260827-01 sovereign terminal CONVERGED (post US-0129 / S0129)
 
 - **orchestrator_run_id**: auto-20260827-01
@@ -32,103 +1111,80 @@
 
 **Stop condition**: sovereign loop `terminal_converged`. Portfolio has 0 OPEN stories. Native in-chat chain stopped at a deterministic hard stop (`converged`). Drain-generate was not scheduled.
 
-## Latest orchestration pointer
+## Latest orchestration pointer — post-bug-intake (DEC-0069)
 
-- **segment_closed**: true
-- **stop_phase**: refresh-context
-- **stop_reason**: converged
-- **next**: none
-- **drain_advance_action**: not_applicable
-- **native_chain_continuing**: false
+- **Boundary**: successful **`/intake bug`** persistence (**`US-0045`**) — **`intake_boundary_utc=2026-09-06T13:35:00Z`**
+- **`bug_id`**: **`BUG-0015`** — must remain **`OPEN`** in **`docs/product/backlog.md`** (authority); this refresh is rejected if backlog shows **DONE**
+- **Intake evidence ref**: `handoffs/intake_evidence/BUG-0015-intake-20260906.json`
+- **`orchestrator_run_id`**: `cursor-20260906-BUG0015-0016-intake` (boundary metadata when known; optional at intake)
+- **Contract**: default **`/auto`** continuation targets **`discovery`** for this OPEN bug (not a stale pre-intake **`intake`** resume target)
 
-# Resume Brief — auto-20260827-01 US-0129 sovereign-critic concurs REFRESH_CONTEXT_PASS → orchestrator advance
+## Current status
 
-- **orchestrator_run_id**: auto-20260827-01
-- **story_id**: US-0129
-- **sprint_id**: S0129
-- **delivery_mode**: ultra_lean
-- **macro_phase**: ship (sovereign-critic of refresh-context — segment terminal review per DEC-0082)
-- **last_completed_phase**: sovereign-critic (role=tech-lead, model_id=composer-2.5-fast; PASS)
-- **producer_phase_consumed**: refresh-context (role=curator, model_id=cursor-grok-4.6-high; PASS)
-- **critic_of_refresh-context**: PASS (anti_slop=8, 0 blocking; marker `tl-US0129-sovereign-critic-refresh-context-20260827T091003Z-fresh`)
-- **intended_resume_phase**: orchestrator `advance_sovereign_loop(orchestrator_run_id='auto-20260827-01')`
-- **wall_clock**: 2026-08-27T09:10:03Z
-- **status**: DONE (canonical `docs/product/backlog.md` US-0129 L4482; acceptance L157 `[x]`)
-- **fresh_context_marker**: tl-US0129-sovereign-critic-refresh-context-20260827T091003Z-fresh
-- **producer_runtime_proof_id**: rp-auto-20260827-01-refresh-context-curator-20260827T090403Z-US-0129
-- **producer_proof_hash**: 8F1838ECC5F21B2163E419A22957E342BF372405D92312F32147E806C53DCBFF MATCH (critic recomputed byte-identical)
-- **producer_proof_ttl**: 2026-08-27T10:04:03Z (consumed_at=2026-08-27T09:10:03Z — valid)
-- **degraded_mode**: false (distinct slugs cursor-grok-4.6-high vs composer-2.5-fast)
-- **verdict**: PASS — segment closed; US-0129 DONE; S0129 released; curator compacted state/decisions; retrospective S0129.md present; curator did not drain-advance
-- **segment_closed**: true
-- **stop_phase**: refresh-context
-- **stop_reason**: completed (NOT segment exhausted)
-- **native_chain_active**: true
-- **native_chain_continuing**: true
-- **drain_advance_action**: not_applicable (curator did **not** drain-advance)
-- **next_scheduled_phase**: `advance_sovereign_loop` (orchestrator-owned)
-- **finding_ids**: a0129rc-challenger-001, a0129rc-architect-002, a0129rc-subtractor-003
-- **do_not**: call `advance_sovereign_loop` from this sovereign-critic subagent; drain-advance; mutate backlog/acceptance; reopen US-0129; mutate intake JSON; spawn critics
+- **Active bug**: **`BUG-0015`** — **OPEN** per **`docs/product/backlog.md`** at refresh time
 
-**Stop condition**: sovereign-critic PASS. Segment closed (`stop_reason=completed`). Orchestrator owns `advance_sovereign_loop(orchestrator_run_id='auto-20260827-01')`. This critic subagent did not drain-advance or call advance.
+## Intended resume phase
 
-## Latest orchestration pointer
+`discovery`
 
-- **segment_closed**: true
-- **stop_phase**: refresh-context
-- **stop_reason**: completed
-- **next**: orchestrator `advance_sovereign_loop(orchestrator_run_id='auto-20260827-01')`
-- **drain_advance_action**: not_applicable
+## Resume target
 
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-bug-intake (**DEC-0069**)
 
-### goal_progress
+## Latest auto breadcrumb seed
 
-```json
-{
-  "goal_progress": {
-    "blocked_by": [],
-    "conjuncts": {
-      "backlog_clear": {
-        "reason_code": null,
-        "skipped": false,
-        "status": "pass"
-      },
-      "critic_resolved": {
-        "reason_code": null,
-        "skipped": false,
-        "status": "pass"
-      },
-      "ledger_clean": {
-        "reason_code": null,
-        "skipped": true,
-        "status": "skip"
-      },
-      "smoke_green": {
-        "reason_code": null,
-        "skipped": false,
-        "status": "pass"
-      },
-      "zero_deferrals": {
-        "reason_code": null,
-        "skipped": true,
-        "status": "skip"
-      }
-    },
-    "converged": true,
-    "evaluated_at": "2026-08-27T09:08:20.000Z",
-    "goal_source": "vision_derived",
-    "goal_text": "AI coding assistants in Cursor lose context across sessions, produce fragmented work without structure, and lack a repeatable process for turning ideas into shipped software. Teams and solo developers face: \u2014 cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source). \u2014 **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) \u2014 hash for baseline stability.",
-    "mode": "goal_convergence",
-    "orchestrator_run_id": "auto-20260827-01",
-    "schema_version": 1,
-    "unmet_conditions": [
-      "deferral_register_not_yet_deployed",
-      "ledger_disabled_skip"
-    ]
-  }
-}
-```
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=intake_complete
+- stop_phase=intake
+- next_scheduled_phase=discovery
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=cursor-20260906-BUG0015-0016-intake
+- intake_boundary_utc=2026-09-06T13:35:00Z
+## Latest orchestration pointer — post-bug-intake (DEC-0069)
 
+- **Boundary**: successful **`/intake bug`** persistence (**`US-0045`**) — **`intake_boundary_utc=2026-09-06T13:35:00Z`**
+- **`bug_id`**: **`BUG-0015`** — must remain **`OPEN`** in **`docs/product/backlog.md`** (authority); this refresh is rejected if backlog shows **DONE**
+- **Intake evidence ref**: `handoffs/intake_evidence/BUG-0015-intake-20260906.json`
+- **`orchestrator_run_id`**: `cursor-20260906-BUG0015-0016-intake` (boundary metadata when known; optional at intake)
+- **Contract**: default **`/auto`** continuation targets **`discovery`** for this OPEN bug (not a stale pre-intake **`intake`** resume target)
+
+## Current status
+
+- **Active bug**: **`BUG-0015`** — **OPEN** per **`docs/product/backlog.md`** at refresh time
+
+## Intended resume phase
+
+`discovery`
+
+## Resume target
+
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- boundary=post-bug-intake (**DEC-0069**)
+
+## Latest auto breadcrumb seed
+
+- requested_start_from=(none)
+- resolved_start_phase=discovery
+- resolution_source=resume_brief
+- resolution_status=resolved
+- stop_reason=intake_complete
+- stop_phase=intake
+- next_scheduled_phase=discovery
+- bug_id=BUG-0015
+- story_id=(none)
+- sprint_id=(none)
+- orchestrator_run_id=cursor-20260906-BUG0015-0016-intake
+- intake_boundary_utc=2026-09-06T13:35:00Z
 ## Prior orchestration pointer
 
 ---

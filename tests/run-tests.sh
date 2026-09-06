@@ -1520,6 +1520,26 @@ set -e
 assert_true "check_intake_template_parity --scope=arch-linkage passes (US-0129)" "[ \"$US0129_PARITY_PY\" -eq 0 ]"
 assert_true "US-0129 contract tests pass" "[ \"$US0129_CONTRACT_PY\" -eq 0 ]"
 
+# 26AC) BUG-0015 — OpenCode /auto dispatch attach
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=bug-0015 >/dev/null 2>&1
+BUG0015_PARITY_PY=$?
+"$PY" -m pytest tests/bug0015_contract_test.py -q >/dev/null 2>&1
+BUG0015_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=bug-0015 passes (BUG-0015)" "[ \"$BUG0015_PARITY_PY\" -eq 0 ]"
+assert_true "BUG-0015 contract tests pass" "[ \"$BUG0015_CONTRACT_PY\" -eq 0 ]"
+
+# 26AD) BUG-0016 — OpenCode Layer-1 agent permission matrix vs kit duties
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=bug-0016 >/dev/null 2>&1
+BUG0016_PARITY_PY=$?
+"$PY" -m pytest tests/bug0016_contract_test.py -q >/dev/null 2>&1
+BUG0016_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=bug-0016 passes (BUG-0016)" "[ \"$BUG0016_PARITY_PY\" -eq 0 ]"
+assert_true "BUG-0016 contract tests pass" "[ \"$BUG0016_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

@@ -1,196 +1,68 @@
-## US-0123 spec PASS — pointer
-
-- US-0123 spec (intake+discovery) PASS; Status OPEN; AC-1..AC-10 unchecked; full narrative `handoffs/archive/po-to-tl-pack-20260824.md ## Spec handoff — US-0123`; research PASS (deepened R-0109 DQ1..DQ10 LOCKED — see `handoffs/archive/po-to-tl-pack-20260824-a.md ## US-0123 research PASS — pointer` + `docs/engineering/research.md ## R-0109 ### Deepened findings — US-0123`); next `/architecture` (tech-lead) authors companion DEC-0123 + locks SOT/materializer/validator; proofs intake `6c9aabdc...0468f578` discovery `66d9fa99...d048e5f2` research `FAE07A6C...E24BF351` (model_id=glm-5.2-high).
-## Spec handoff — US-0122 OpenCode role agents and Layer-1 permission table
-
-- **Phase completed**: spec (`intake + discovery`). **Role**: po. **Story**: US-0122. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
-- **Timestamp**: intake 2026-08-24T11:33:00Z; discovery 2026-08-24T11:34:00Z. **Fresh markers**: `po-US0122-intake-20260824T113300Z-fresh`, `po-US0122-discovery-20260824T113400Z-fresh`.
-- **Runtime proofs**: intake `rp-auto-20260824-01-intake-po-20260824T113300Z-US-0122` (`proof_hash=3FD8A7B437448E01750F5C3FFC64E57D76B293A015F663CA05533E5CCB943140`, ttl 2026-08-24T12:33:00Z); discovery `rp-auto-20260824-01-discovery-po-20260824T113400Z-US-0122` (`proof_hash=C8B6E58EEC9929156E8F8D71497B998E9FDD4E0AD86C9CD1C2C252362CB8BC3D`, ttl 2026-08-24T12:34:00Z).
-- **Intake verdict**: PASS by existing program evidence; no new story ID allocated, no ACs wiped. `handoffs/intake_evidence/US-0121-intake-20260822.json` maps `role-agents-permissions` → [US-0122], `coverage_complete=true`, `missing_topics=[]`, `selected_pack=first-intake-pack`. US-0121 remains DONE; US-0122 remains OPEN.
-- **Discovery locks D1–D10**: eight agents (`po`, `tech-lead`, `dev`, `qa`, `release`, `curator`, `security`, `auto`); Layer-1 host permissions are enforcement; short Layer-2 prompts only; PO product-doc allow + production/code deny; orchestrator no phase-artifact writes and Task allow-list only to role agents; security findings-oriented; no `.cursor/agents`/rules/skills/command-body clones; no vendor slugs in template agents; consumes US-0121 `.opencode` path and cursor-only default; `test_us0122_*` inventory/deny/clone/parity surface; architecture must lock final permission matrix.
-- **Discovery question count**: 8. **Questions for `/research` / R-0109**: DQ1 exact project file form (`.opencode/agents/*.md` vs `opencode.json` `agent` table); DQ2 exact `edit` permission object syntax and precedence; DQ3 whether deny globs win over broad allow globs; DQ4 `task` allow-list syntax for seven role agents; DQ5 hidden/manual invocation settings for primary `auto` vs role agents; DQ6 whether security findings-only paths need a committed directory; DQ7 minimum contract harness for prompt-ignoring PO denial; DQ8 whether active kit repo mirrors stay template-only until US-0126.
-- **Compose guards**: US-0003 / US-0023 / BUG-0006 compose only; do not clone `.cursor/agents` as enforcement. US-0123 owns provider/slug routing; no vendor slugs in template. US-0121 host default remains cursor-only until explicit `--host opencode|both`.
-- **Isolation**: `phase_id=intake`, `role=po`, `model_id=gpt-5.5-medium`, `fresh_context_marker=po-US0122-intake-20260824T113300Z-fresh`; `phase_id=discovery`, `role=po`, `model_id=gpt-5.5-medium`, `fresh_context_marker=po-US0122-discovery-20260824T113400Z-fresh`; evidence refs: `docs/product/backlog.md ## US-0122`, `docs/product/vision.md ## Discovery Notes — US-0122`, this handoff.
-- **Status**: OPEN. **Next**: `/research` (tech-lead) to deepen **R-0109** for US-0122. `stop_condition=STOP after spec completes; hand off via artifacts only`.
-
-## Discovery handoff — US-0121 OpenCode template pack and installer host mode
-
-- **Phase completed**: discovery. **Role**: po. **Story**: US-0121. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
-- **Timestamp**: 2026-08-23T07:40:00Z. **Fresh context marker**: `po-US0121-discovery-20260823T074000Z-fresh`.
-- **Runtime proof**: `rp-auto-20260823-01-discovery-po-20260823T074000Z-US-0121` (`proof_hash=9c346006191ee7b9b94d4386708ec8756d7e38cb13d342d09b520f4ef3b6f3dc`, ttl 2026-08-23T08:40:00Z).
-- **Locks D1–D11**: `--host cursor|opencode|both` (default cursor-only; unknown=`INSTALL_HOST_INVALID`); empty-but-valid `template/.opencode/{agents,commands,plugins}` + gitignore; coexistence (cursor-only byte-identical on `.cursor/`); manifest + triple-installer; `--scope=opencode-adapter`; no secrets/slugs; compose US-0008 additive only; epic US-0122..US-0126 out of scope; no new GUI.
-- **R-0109 Q1–Q5 remain open** (not architecture locks). Discovery Q6–Q12 (pack layout, manifest encoding, kernel vs host packs, active vs template, gitignore names, companion DEC, CLI `--host` passthrough) go to `/research`.
-- **Isolation**: `phase_id=discovery`, `role=po`, `fresh_context_marker=po-US0121-discovery-20260823T074000Z-fresh`, `timestamp=2026-08-23T07:40:00Z`, `evidence_ref=docs/product/backlog.md ## US-0121 + docs/product/vision.md ## Discovery Notes — US-0121 + this compact hot copy`.
-- **Full narrative**: `handoffs/archive/po-to-tl-pack-20260823.md` (triad prefix-archive of this newest-first file; compact copy restored under `PO_TO_TL_HOT_MAX_LINES=650`).
-- **Triad rollover**: `triad-rollover|po_to_tl` moved=1 pack=`handoffs/archive/po-to-tl-pack-20260823.md` retained_sections=8 retained_lines=623; `triad-rollover|state` moved=1 pack=`docs/engineering/state-archive/state-pack-20260823.md` then post-append moved=1 pack=`docs/engineering/state-archive/state-pack-20260823-a.md` retained_lines=998.
-- **Status**: OPEN. **Next**: `/research` (tech-lead). `stop_condition=STOP after discovery completes; hand off via artifacts only`.
-
-## US-0121 — OpenCode adapter epic intake (US-0121..US-0126)
-
-- **Stories**: US-0121 (first slice) plus OPEN siblings US-0122..US-0126; acceptance rows unchecked.
-- **Evidence**: `handoffs/intake_evidence/US-0121-intake-20260822.json` (`[INTAKE_EVIDENCE_VALIDATION_OK]`, first-intake-pack, coverage_complete=true)
-- **Research**: **R-0109** stub. Brief: `docs/product/opencode-adapter-masterplan.md`
-- **Phase**: intake. **Role**: po. **Verdict**: INTAKE PASS; no DECISION_GATE
-- `intake_run_id=cursor-20260822-opencode-adapter-intake`, `writer_id=po-cursor-20260822`
-- **Status**: OPEN per US-0045. **Next**: `/discovery` (fresh PO) for **US-0121**; US-0122–US-0126 remain OPEN.
-
-### Isolation evidence (US-0048 / BUG-0006)
-
-- `phase_id=intake`; `role=po`; `fresh_context_marker=po-US0121-intake-20260822T211500Z-fresh`; `timestamp=2026-08-22T21:15:00Z`
-
-### Summary
-
-Host-adapter on stock OpenCode: kernel + Python validators + `.opencode/` pack + one orchestrator plugin. Cursor pack stays. Default install remains **cursor-only** until `--host opencode|both`. Plugin v1 vs v2 deferred to `/research`. Standalone runtime is a separate program.
-
-### Split rationale (US-0051)
-
-Workflow-step slices (operator accepted via masterplan): **US-0121** pack+installer+coexistence; **US-0122** roles+permissions (success test c); **US-0123** `provider/slug`; **US-0124** spawn-only plugin (success tests a,d) + US-0092 `--invoke-cmd`; **US-0125** thin commands + validator bridge (success test b); **US-0126** runbook + `--scope=opencode-adapter`. Do not clone US-0001–US-0119.
-
-### Assumptions locked
-
-Default install host remains cursor-only until explicit `--host opencode|both` opt-in; OpenCode plugin v1 vs v2 deferred to `/research`.
-
-### Compose, do not amend
-
-US-0008 (additive `--host` only); US-0003 roles; US-0069 matrix; US-0092 outer driver; US-0101/US-0102 without Cursor aliases as runtime; BUG-0006 spawn-only; US-0023 isolation. Do not port US-0095 — the plugin is the OpenCode chain.
-
-### Risks
-
-R1 spawn isolation / V2 `subtask` ignored (fail closed; **R-0109** Q1–Q2). R2 dual-host parity. R3 plugin API unknown. R4 template slug leakage. R5 sovereign/standalone scope creep (deferred plan areas).
-
-### Next scheduled phase
-
-`/discovery` fresh PO for **US-0121**. Then `/research` (tech-lead) to deepen **R-0109**, then `/architecture`.
-
-### Triad rollover
-
-- `triad-rollover|state` moved=1 pack=`docs/engineering/state-archive/state-pack-20260822.md` retained_checkpoints=12 retained_lines=978
-- `triad-rollover|po_to_tl` moved=1 pack=`handoffs/archive/po-to-tl-pack-20260822.md` retained_lines=580 retained_sections=7
-- Full intake section also stored in that po_to_tl pack (prefix archive on newest-first file). This compact copy restored to the hot surface under `PO_TO_TL_HOT_MAX_LINES=650`.
-
-## Discovery handoff Ã¢Â€Â” US-0119 Autonomous-autonomy presets (spec macro)
-
-**Phase completed**: discovery
-**Phase role**: po
-**Story**: US-0119 Autonomous-autonomy presets and configurable hard-stop relaxation
-**Verdict**: PASS (no DECISION_GATE)
-**Timestamp**: 2026-07-05T21:50:00Z
-**Fresh context marker**: po-US0119-discovery-20260705T215000Z-fresh
-**Runtime proof**: rp-auto-20260705-us0119-discovery-po-20260705T215000Z-US-0119 (proof_hash=71f1f55775f4d33bdd469f860eddfb7b4361ac462077386d27863f8c22c1cf86, proof_ttl=2026-07-05T22:50:00Z)
-**Delivery mode**: ultra_lean (spec+plan merged)
-**Macro phase**: spec (intake+discovery merged)
-
-### Summary
-
-AUTONOMY_PRESET={none|balanced|full} scratchpad flag that deterministically expands into twelve per-feature autonomy flags. AUTONOMY_STOP_POLICY={block|auto_repair_then_block|auto_repair_then_skip} flag that classifies every fail-closed reason code as security_hard (never auto-resolved) or autonomy_resolvable (bounded auto-repair with ledger cap). Compose (read-only) with US-0092/US-0095/US-0056/US-0068/US-0096/BUG-0007 Ã¢Â€Â” preset layer is additive only, never rewrites existing semantics.
-
-### Discovery locks (L1..L12)
-
-**L1**: AUTONOMY_PRESET=none|balanced|full (default none) in .cursor/scratchpad.md + template/.cursor/scratchpad.local.example.md. When none, byte-identical pre-US-0119 behavior.
-
-**L2**: scripts/autonomy_preset_lib.py:expand_autonomy_preset(preset, overrides) returns dict. Expansion is deterministic. Explicit per-flag values win over preset expansion.
-
-**L3**: AUTONOMY_STOP_POLICY=block|auto_repair_then_block|auto_repair_then_skip (default block).
-
-**L4**: docs/engineering/autonomy-stop-matrix.md + template/docs/engineering/autonomy-stop-matrix.md (parity). YAML companion scripts/data/autonomy_stop_matrix.yaml + scripts/validate_autonomy_stop_matrix.py.
-
-**L5**: Twelve per-feature flags documented and consumed: INTAKE_AUTONOMY_MODE, INTAKE_MINIMAL_PACK, INTAKE_ASSUME_STACK_CONTEXT, WORK_KIND_AUTO_ACCEPT, CROSS_MODEL_REWORK_EXHAUSTED_POLICY, CROSS_MODEL_SKIP_PHASES, RESUME_BRIEF_AUTO_REFRESH, RUNTIME_PROOF_KIND, GOAL_CONVERGENCE_INTERVAL, SOVEREIGN_DRAIN_AUTO_ACCEPT, RELEASE_PUBLISH_AUTO_CONFIRM, AUTONOMY_STOP_POLICY.
-
-**L6**: Twelve flags do NOT exist yet in scratchpad (grep yields zero matches). US-0119 ADDS these twelve keys net-new.
-
-**L7**: AUTONOMY_PRESET=none produces byte-identical pre-US-0119 orchestrator behavior. Contract test test_us0119_preset_none_is_noop enforces.
-
-**L8**: security_hard gates NEVER softened. Contract test test_us0119_security_hard_gates_never_auto_repaired enforces matrix divergence.
-
-**L9**: Append-only handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl. Cap per (run, reason_code). AUTONOMY_REPAIR_CAP_EXHAUSTED terminal stop reason.
-
-**L10**: autonomy_relaxed breadcrumbs in docs/engineering/state.md.
-
-**L11**: Compose do-not-amend Ã¢Â€Â” US-0092/US-0095/US-0056/US-0068/US-0096/BUG-0007 untouched. Contract test test_us0119_preset_expansion_uses_known_keys_only enforces.
-
-**L12**: Ten contract test markers (test_us0119_*).
-
-### Open questions Q1..Q10 for /research
-
-**Q1** enumerate every autonomy_resolvable reason-code from /auto /intake /execute /qa /release.
-
-**Q2** per-reason-code auto_repair_kind taxonomy.
-
-**Q3** matrix cap defaults Ã¢Â€Â” uniform 3 or per-code tuning?
-
-**Q4** RUNTIME_PROOF_KIND=lightweight TTL same as strict_hash?
-
-**Q5** SOVEREIGN_DRAIN_RISK_THRESHOLD low|medium|high criteria per tier.
-
-**Q6** RELEASE_PUBLISH_AUTO_CONFIRM allowlist only or includes previously-confirmed?
-
-**Q7** INTAKE_MINIMAL_PACK threshold for "established project".
-
-**Q8** matrix validator grep commands vs explicit manifest.
-
-**Q9** AUTONOMY_REPAIR_CAP_EXHAUSTED new code vs extension of BLOCK_RETRY_CAP_EXHAUSTED.
-
-**Q10** breadcrumb format in state.md Ã¢Â€Â” one-line per soft-stop or aggregated per phase?
-
-### Risks R1..R6 carried to /architecture
-
-**R1** (MEDIUM) backward-compat regression Ã¢Â€Â” test_us0119_preset_none_is_noop.
-
-**R2** (MEDIUM) security gate bypass matrix Ã¢Â€Â” test_us0119_security_hard_gates_never_auto_repaired.
-
-**R3** (LOW) repair ledger growth Ã¢Â€Â” per-run cap + gitignore.
-
-**R4** (MEDIUM) operator confusion Ã¢Â€Â” breadcrumb + ledger audit surface.
-
-**R5** (LOW-MEDIUM) preset-expansion vs explicit-key precedence Ã¢Â€Â” LOCKED: explicit > preset > defaults.
-
-**R6** (LOW) compose-do-not-amend drift Ã¢Â€Â” test_us0119_preset_expansion_uses_known_keys_only.
-
-### Compose do-not-amend (verified)
-
-- US-0092: Ã¢ÂœÂ“ exists Ã¢Â€Â” delivery confirmation gate unchanged
-- US-0095: Ã¢ÂœÂ“ exists Ã¢Â€Â” native auto-chain unchanged
-- US-0056: Ã¢ÂœÂ“ exists as inline reference Ã¢Â€Â” strict runtime proof semantics UNCHANGED
-- US-0068: Ã¢ÂœÂ“ exists as intake evidence gate Ã¢Â€Â” NEVER bypassed
-- US-0096: Ã¢ÂœÂ“ exists Ã¢Â€Â” delivery modes unchanged
-- BUG-0007: Ã¢ÂœÂ“ exists as anti-echo truthfulness rule Ã¢Â€Â” assumption_confirmation_ref contract preserved
-
-### DC check
-
-grep "^## US-0119" docs/engineering/architecture.md Ã¢Â†Â’ no matches. Expected (anchor added in /architecture phase). Not appended to sovereign_deferrals.jsonl.
-
-### Validator gates
-
-- validate_readme_feature_coverage.py PASS
-- scratchpad_example_parity_test.py 4 passed
-
-### Isolation evidence
-
-- phase_id=discovery, role=po, story_id=US-0119, sprint_id=(pending)
-- orchestrator_run_id=auto-20260705-us0119-intake
-- fresh_context_marker=po-US0119-discovery-20260705T215000Z-fresh
-- timestamp=2026-07-05T21:50:00Z (UTC)
-- evidence_ref=docs/product/backlog.md (## US-0119 L4028-4070), handoffs/intake_evidence/US-0119-intake-20260705.json, handoffs/po_to_tl.md, handoffs/resume_brief.md, docs/engineering/research.md (R-0107 stub L8907-8928), docs/engineering/architecture.md (grep ^## US-0119 + compose targets), .cursor/scratchpad.md (grep autonomy keys Ã¢Â€Â” zero matches confirming L6), docs/product/acceptance.md (US-0119 row L146)
-- assemble_sovereign_memory_digest(...) NOT called
-- No write to mistakes.jsonl
-
-### Decision gate
-
-decision_gate=false (no DECISION_GATE)
-stop_conditions_met=yes
-
-### Next scheduled phase
-
-next_scheduled_phase=/research
-next_scheduled_role=tech-lead
-next_scheduled_sprint_macro=plan
-stop_condition=STOP after discovery completes; hand off to /research in fresh tech-lead subagent
+## Architecture handoff — BUG-0016 OpenCode Layer-1 permissions vs kit duties
+
+- **Phase completed**: architecture. **Role**: tech-lead. **Bug**: BUG-0016 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-06T18:45:00Z. **Fresh marker**: `tl-BUG0016-architecture-20260906T184500Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260906-bug0016`, `delivery_mode=ultra_lean`, macro=`plan`.
+- **Architecture anchor**: `docs/engineering/architecture.md` `# BUG-0016` (H1; `baseline_h2_count=0`).
+- **Approach A\*** LOCKED: amend **DEC-0122 §2** sole SOT + agent frontmatter (active+template) — bash ask for po/tl/curator; PO +intake_evidence/** +resume_brief +state.md; `sprints/S*/` globs; release duty paths; 7 `test_bug0016_*`; success test (c) preserved. Companion DEC: **none**.
+- **DEC**: `decisions/DEC-0122.md` §2 amended in THIS phase (R-0115 DQ6). DEC-0130 rejected.
+- **Seeds for `/sprint-plan`**: T-anch + T-001..T-007 (8; under SPRINT_MAX_TASKS=12).
+- **Runtime proof**: `rp-auto-20260906-bug0016-architecture-techlead-20260906T184500Z-BUG-0016` / `proof_hash=7AC851CDF1953594365AFF11B015BFD850E737F75A327FA2A02B1CCB544D5A31` / ttl `2026-09-06T19:45:00Z`.
+- **Status**: BUG-0016 remains **OPEN**. **Next**: `/sprint-plan` in fresh tech-lead subagent. Do not spawn sprint-plan from this architecture chat. STOP.
 
 ---
 
-# PO-to-TL handoffs
+## Discovery handoff — BUG-0016 OpenCode Layer-1 permissions vs kit duties
 
-<!-- Archive pointer: US-0117 lifecycle handoffs (sprint-plan, architecture, research, spec) rolled over to `handoffs/archive/po-to-tl-pack-20260704-c.md` on 2026-07-04 by curator (US-0117 refresh-context terminal - final story in 5-story drain). US-0113/US-0114/US-0115 lifecycles in po-to-tl-pack-20260704-a/b.md; US-0116 lifecycle handoffs lost in git checkout HEAD recovery event (authoritative record in sprints/S0116/). Drain queue EMPTY - no next-story handoff to retain. -->
+- **Phase completed**: discovery. **Role**: po. **Bug**: BUG-0016 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-06T18:20:00Z. **Fresh marker**: `po-BUG0016-discovery-20260906T181957Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260906-bug0016`, `delivery_mode=ultra_lean`, macro=`spec` (intake already DONE — not re-intaken).
+- **Sibling boundary**: BUG-0015 is **DONE** (dispatch fix shipped) — out of scope except compose note that auto spawn-only Task path may now work; this segment is **permissions matrix vs kit duties only**. US-0131/US-0132 out of scope.
+- **Gap confirmed (narrow-read)**: `.opencode/agents/*.md` + `template/.opencode/agents/*.md` peers are byte-identical and match `decisions/DEC-0122.md` §2 literally; incompatible with kit phase contracts (validators + real sprint/handoff paths).
+
+### Discovery locks D1–D8
+
+| ID | Lock |
+|----|------|
+| **D1** | Validator roles **`po` / `tech-lead` / `curator`**: change `bash: deny` → **`bash: ask`** (parity with `dev`/`qa`/`release`). Reject `bash: allow`. Optional bash **object** allowlist (`python *` → ask, `*` → deny last) is a research refinement only — not required to unblock duties. |
+| **D2** | **PO edit** add allows: `handoffs/intake_evidence/**`, `handoffs/resume_brief.md`; keep `docs/product/**` + `handoffs/po_to_tl.md`; `**` → deny **last**. Success test (c) preserved (no production/code allow). Whether PO also needs `docs/engineering/state.md` for phase checkpoints → DQ2. |
+| **D3** | Replace literal placeholder globs `sprints/Sxxxx/…` with real OpenCode minimatch **`sprints/S*/…`** for tech-lead (`sprint.md`, `tasks.md`), dev (`progress.md`, `qa-findings.md`), qa (qa-findings / plan-verify / verify-work / uat paths). Exact pattern (`S*` vs `S[0-9]*` vs `sprints/*/`) → DQ3. |
+| **D4** | **tech-lead** + **curator** get `bash: ask` so triad/`enforce-triad-hot-surface.py` and research/architecture validators can run under operator prompt (same posture as D1). |
+| **D5** | **release** edit add: `sprints/S*/release-findings.md` + `handoffs/verify-work-to-release.md` (kit uses both `verify_to_release.md` and `verify-work-to-release.md`); keep existing release handoff/CHANGELOG allows; `bash: ask` unchanged. |
+| **D6** | **Amend DEC-0122 §2** as the primary matrix SOT (bug-fix of US-0122 contract). Optional thin companion **DEC-0130** at `/architecture` for audit trail only — must not become a second competing matrix. Do not reopen US-0122 as a feature story. |
+| **D7** | Tests: extend **static permission-object harness** — additive `test_bug0016_*` and/or amend `us0122_*` markers; assert bash postures, new allow globs, `S*` not `Sxxxx`, deny-last ordering, no production allow for non-dev; active↔template parity. **No live OpenCode probe in CI**. |
+| **D8** | Boundaries: BUG-0015 DONE = compose note only; US-0131/US-0132 do not expand; `security` (`edit: deny`, `bash: ask`) and `auto` (spawn-only Task allow-list) stay in-contract unless research finds a duty contradiction. |
+
+### Research questions DQ1–DQ8 (for `/research` → **R-0115**)
+
+1. **DQ1**: Confirm OpenCode bash object-form command patterns (`python *`, `python scripts/*`) vs shorthand `ask` — least-privilege recommendation for po/tl/curator without blocking validators.
+2. **DQ2**: Does PO Layer-1 edit need `docs/engineering/state.md` (and/or triad-related paths) for phase-checkpoint duties, or do orchestrator/curator own those writes on OpenCode?
+3. **DQ3**: Exact sprint glob string that matches real ids (`S0131`, `S-BUG0014`) under OpenCode minimatch — lock `sprints/S*/file` vs alternatives; prove `Sxxxx` never matches.
+4. **DQ4**: Curator/tech-lead required script inventory (validators + `enforce-triad-hot-surface.py` + materialize) — any bash object patterns beyond shorthand `ask`?
+5. **DQ5**: Release path completeness — any other missing owned writes (`resume_brief.md`, `state.md`, `runbook.md`) beyond release-findings + verify-work-to-release?
+6. **DQ6**: Amend-in-place DEC-0122 revision shape vs thin companion DEC-0130 — single SOT rule; impact on `test_us0122_*` vs new `test_bug0016_*`.
+7. **DQ7**: Minimal static harness marker list (expected ≥6) covering D1–D5 + success test (c); fixture strategy without live host.
+8. **DQ8**: Compose guards with BUG-0015 DONE / US-0124 plugin write-guard — any Layer-1 vs plugin double-deny interaction to document?
+
+### Intake evidence (already DONE — do not re-intake)
+
+- `handoffs/intake_evidence/BUG-0016-intake-20260906.json` (`small-intake-pack`, `[INTAKE_EVIDENCE_VALIDATION_OK]`)
+- Research refs to deepen: `R-0109` (US-0122 permission locks); `decisions/DEC-0122.md` §2
+
+### Runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016`
+- `proof_hash=1381C92191BD8EF182ADF0942BD68777D2A45613C5808497311B2BCC06C18935`
+- `proof_ttl=2026-09-06T19:20:00Z`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"composer-2.5","orchestrator_run_id":"auto-20260906-bug0016","phase_id":"discovery","proof_issued_at":"2026-09-06T18:20:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016","sprint_id":"none","story_id":"BUG-0016"}`
+
+### Isolation + stop
+
+- `phase_id=discovery`, `role=po`, `bug_id=BUG-0016`, `fresh_context_marker=po-BUG0016-discovery-20260906T181957Z-fresh`
+- `evidence_ref=docs/product/vision.md ## Discovery Notes — BUG-0016; docs/product/backlog.md ### BUG-0016 discovery_notes; handoffs/intake_evidence/BUG-0016-intake-20260906.json; decisions/DEC-0122.md §2; .opencode/agents/*.md; template/.opencode/agents/*.md; docs/engineering/state.md discovery checkpoint; handoffs/resume_brief.md`
+- **Status**: BUG-0016 remains **OPEN**. **Next**: `/research` in fresh **tech-lead** subagent. Do not spawn research from this discovery chat. STOP.
+
+---
 
 ## US-0119 Â— Autonomous-autonomy presets (INTAKE ? DISCOVERY handoff)
 
@@ -647,4 +519,84 @@ Per-story **work-kind classifier** `scripts/work_kind_classify_lib.py` returns `
 ### Handoff
 - TL: take this handoff into `/discovery` (fresh PO) then `/architecture`. Lock the classifier contract, precedence chain, and the `dev_environment_lib` reuse boundary before `/sprint-plan`.
 - Research stub: `R-0106` in `docs/engineering/research.md`.
+
+## Intake handoff — BUG-0015 and BUG-0016 OpenCode /auto dispatch + Layer-1 permission matrix
+
+- **Phase completed**: intake (`/intake bug`). **Role**: po. **Bugs**: BUG-0015 (primary), BUG-0016 (also OPEN). **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp**: 2026-09-06T13:35:00Z. **Fresh marker**: `po-BUG0015-BUG0016-intake-20260906T133500Z-fresh`.
+- **Writer**: `writer_id=po-cursor-20260906-opencode-bugs`, `intake_run_id=cursor-20260906-BUG0015-0016-intake`.
+- **Routing**: argv `/intake bug` wins over scratchpad `INTAKE_WORK_ITEM_KIND=story`. `selected_pack=small-intake-pack`. `INTAKE_GUIDED_MODE=1`.
+- **Evidence**:
+  - `handoffs/intake_evidence/BUG-0015-intake-20260906.json` — `[INTAKE_EVIDENCE_VALIDATION_OK]`
+  - `handoffs/intake_evidence/BUG-0016-intake-20260906.json` — `[INTAKE_EVIDENCE_VALIDATION_OK]`
+  - `python scripts/bug_issue_validate.py --backlog docs/product/backlog.md --check-acceptance` — `[BUG_VALIDATION_OK]`
+  - `python scripts/intake_bug_resume_brief_refresh.py ... --bug-id BUG-0015` — `[INTAKE_BUG_RESUME_BRIEF_REFRESH_OK]` (primary continuation; BUG-0016 also OPEN)
+- **Operator ask**: Persist two OPEN defects — (1) OpenCode `/auto` never starts orchestrator plugin dispatch (STOP); (2) OpenCode Layer-1 role permissions block legitimate lifecycle duties (audit all roles).
+- **Decomposition (recommended)**: two independently valuable bugs — dispatch wiring vs permission matrix/duty mismatch. Do not fold into US-0131/US-0132.
+- **Alternatives considered**:
+  1. **Two OPEN bugs** (recommended) — separate dispatch vs permissions; independently testable.
+  2. **Fold into US-0131** — rejected (wrong scope: config/model parity, not runtime dispatch/permissions).
+  3. **Amend DEC-0122 only without bugs** — rejected (no OPEN work item / no acceptance row).
+- **BUG-0015 (primary fix target)**: `.opencode/commands/auto.md` is STOP-only; `.opencode/plugins/orchestrator.ts` exports `spawnPhase` from `setup()` return API and hooks `execute.before` write-guard only — no command/event hook invokes spawn loop on `/auto`. Compose US-0124/US-0125 ships surfaces but runtime linkage gap remains.
+- **BUG-0016 (permission audit — all roles)**:
+
+| Role | Issue |
+|------|--------|
+| `po` | `bash: deny` blocks mandatory validators / resume-brief refresh; edit misses `handoffs/intake_evidence/**` and bug-intake `handoffs/resume_brief.md` (DEC-0069). |
+| `tech-lead` | `bash: deny` blocks research/architecture validators; literal `sprints/Sxxxx/` likely fails real ids. |
+| `dev` | `bash: ask` OK-ish; same `Sxxxx` glob risk; confirm owned paths vs execute ownership. |
+| `qa` | `bash: ask` OK-ish; literal `Sxxxx` glob risk. |
+| `release` | `bash: ask` OK-ish; may miss `sprints/*/release-findings.md` (scope carefully). |
+| `curator` | `bash: deny` blocks `enforce-triad-hot-surface.py` / materialize scripts for `/refresh-context`. |
+| `security` | `edit: deny` + `bash: ask` matches DEC-0122 v1 — in-contract unless contradiction found. |
+| `auto` | spawn-only OK for Task path; OpenCode still broken by BUG-0015. |
+
+- **Duplicate check**: Distinct from BUG-0006, BUG-0012, US-0122 DONE, US-0131/US-0132 OPEN (do not expand those stories).
+- **Risks**: R1 — OpenCode host plugin API may lack a clean `/auto` hook (fail closed with `OPENCODE_*`); R2 — widening bash/edit for non-dev roles must preserve success test (c) production/code deny; R3 — DEC-0122 amendment + `test_us0122_*` / template parity churn; R4 — fixing permissions without BUG-0015 still leaves `/auto` dead.
+- **Isolation**: `phase_id=intake`; `role=po`; `fresh_context_marker=po-BUG0015-BUG0016-intake-20260906T133500Z-fresh`; `timestamp=2026-09-06T13:35:00Z`; `evidence_ref=docs/product/backlog.md ## Bug issues BUG-0015 + BUG-0016, docs/product/acceptance.md bug rows, handoffs/resume_brief.md, this handoff`.
+- **Hot-surface note**: Full narrative also in `handoffs/archive/po-to-tl-pack-20260906.md`. Appended (not prepended) so triad oldest-prefix rollover retains the newest section under `PO_TO_TL_HOT_MAX_LINES`.
+- **Status**: both OPEN per US-0045. **Next**: `/discovery` (fresh **po**) for **BUG-0015**, or `/auto bug-target=BUG-0015`. Do not run architecture/execute from this intake chat. STOP after intake.
+
+## Discovery handoff — BUG-0015 OpenCode `/auto` dispatch wiring gap
+
+- **Phase completed**: discovery. **Role**: po. **Bug**: BUG-0015 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-06T14:05:00Z. **Fresh marker**: `po-BUG0015-discovery-20260906T140049Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260906-bug0015`, `delivery_mode=ultra_lean`, macro=`spec` (intake already DONE — not re-intaken).
+- **Sibling boundary**: BUG-0016 remains OPEN and out of scope this segment (permissions only).
+- **Gap confirmed (narrow-read)**: `.opencode/commands/auto.md` body is STOP-only; `.opencode/plugins/orchestrator.ts` exports `spawnPhase` from `setup()` return API and registers only `tool.hook("execute.before")` write-guard — no command/event hook starts the spawn loop on `/auto`.
+
+### Discovery locks D1–D7
+
+| ID | Lock |
+|----|------|
+| **D1** | Dispatch attaches primarily via **plugin command/event hook** that invokes the spawn loop when `/auto` starts. Thin `auto.md` stays dispatch-only (DEC-0125 DQ5). Agent prompt may restate "plugin owns spawn" but is **not** sole dispatch (success test (a) / BUG-0006). Returning `spawnPhase` from `setup()` alone is insufficient. Exact OpenCode v2 hook name → DQ1. |
+| **D2** | Missing / non-function `session.create` → fail-closed **`OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`**. No in-band roleplay; no Cursor Task port; operator-visible stop with reason code. |
+| **D3** | Python `scripts/auto_outer_driver.py` remains stop-matrix SOT; plugin keeps `dispatchStopMatrix` subprocess; no TS reimplementation (DEC-0124 §6). Headless `opencode run --agent auto` compose unchanged — this bug is interactive `/auto` → spawn linkage. |
+| **D4** | Each spawn MUST emit `IsolationEvidence` (`parentID`, `sessionID`, `role`, `phase_id`, `timestamp`, `fresh_context_marker`) with `sessionID !== parentID`; null/throw/identical-id → **`OPENCODE_SUBTASK_IGNORED`**; persist per US-0023/US-0048/BUG-0006. |
+| **D5** | Additive `test_bug0015_*` (and/or amend us0124 markers) via mock-ctx harness — assert dispatch hook registration + `/auto` entry invokes `spawnPhase`; static `auto.md` ≤20 lines / no spawn literals; **no live OpenCode probe in CI**. |
+| **D6** | BUG-0016 permissions OUT OF SCOPE; US-0131/US-0132 config/model OUT OF SCOPE; do not amend DEC-0122 Layer-1 matrix here; compose US-0124/US-0125 without reopening DONE ACs. |
+| **D7** | Research questions DQ1–DQ7 below → `/research` authors **R-0114** (compose R-0109; do not wipe). |
+
+### Research questions DQ1–DQ7 (for `/research`)
+
+1. **DQ1**: Exact OpenCode v2 plugin API surface to detect `/auto` command invocation (event/hook name, args, lifecycle) — cite current docs.
+2. **DQ2**: Should the spawn loop live entirely inside plugin `setup` callbacks vs host-invoked exported `spawnPhase` after command dispatch — single-owner rule?
+3. **DQ3**: First-phase selection after `/auto` on OpenCode — `resume_brief` / argv / scratchpad / US-0087 bug-queue compose?
+4. **DQ4**: How do interactive plugin path and headless `opencode run --auto` share one entry without duplicate spawn (DEC-0125 R3)?
+5. **DQ5**: Isolation-evidence persistence target for OpenCode-spawned phases (`state.md` only vs additional plugin-local) — minimum contract?
+6. **DQ6**: Minimal contract-test inventory for dispatch wiring without live host (markers, harness extensions)?
+7. **DQ7**: Does the fix require amending DEC-0124/DEC-0125 vs additive companion DEC-0015-bug / `# BUG-0015` architecture section only?
+
+### Runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260906-bug0015-discovery-po-20260906T140500Z-BUG-0015`
+- `proof_hash=700734379DE4CFE3B0509DB39E8F3208DFAEC8ADB2BA475EA8CDB9C0AF37C83F`
+- `proof_ttl=2026-09-06T15:05:00Z`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"composer-2.5","orchestrator_run_id":"auto-20260906-bug0015","phase_id":"discovery","proof_issued_at":"2026-09-06T14:05:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260906-bug0015-discovery-po-20260906T140500Z-BUG-0015","sprint_id":"pending","story_id":"BUG-0015"}`
+
+### Isolation + stop
+
+- `phase_id=discovery`, `role=po`, `bug_id=BUG-0015`, `fresh_context_marker=po-BUG0015-discovery-20260906T140049Z-fresh`
+- `evidence_ref=docs/product/vision.md ## Discovery Notes — BUG-0015; docs/product/backlog.md ### BUG-0015 discovery_notes; handoffs/intake_evidence/BUG-0015-intake-20260906.json; .opencode/commands/auto.md; .opencode/plugins/orchestrator.ts; docs/engineering/state.md discovery checkpoint; handoffs/resume_brief.md`
+- **Status**: BUG-0015 remains **OPEN**. **Next**: `/research` in fresh **tech-lead** subagent. Do not spawn research from this discovery chat. STOP.
 

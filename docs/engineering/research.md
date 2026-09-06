@@ -10837,4 +10837,276 @@ New `ARCH_LINKAGE_PAIRS` + `--scope=arch-linkage` in `scripts/check_intake_templ
 - **Status**: **delivered** — US-0129 **DONE** / **S0129** **released**; `scripts/arch_linkage_guard.py` pre+post `--rollover` + fail-closed `ARCH_LINKAGE_ROLLOVER_BLOCKED` (`security_hard`) + default-off `ARCH_LINKAGE_AUTO_REPAIR=0` + stdlib heading discovery + DQ8 H1 stub + 8 contract-test markers + harness **26AB** shipped per R-0113 DQ1–DQ8 locks; companion **DEC-0129** Accepted; evidence: **`handoffs/releases/S0129-release-notes.md`**, **`sprints/S0129/closure-verification.md`**, **`docs/engineering/architecture.md`** `# US-0129`, harness Pass:847/Fail:0 @ 2026-08-27T08:41:43Z; curator **`/refresh-context`** reconciles research posture with delivery.
 - **Freshness review**: R-0112 / R-0111 / R-0110 remain **delivered** (compose bases; not outdated). No duplicate R-ids to merge. Unlinked prune deferred (no operator request; 0 OPEN stories remain). EARLY_RESEARCH fail-closed / Pact sources remain supporting-only; locks stay codebase-grounded.
 
+## R-0114 - BUG-0015 OpenCode `/auto` plugin dispatch attach research
 
+- **Date**: 2026-09-06
+- **Topic**: Wire interactive OpenCode `/auto` to plugin-owned `spawnPhase` loop (compose US-0124/US-0125; close discovery DQ1–DQ7)
+- **Linked**: BUG-0015, US-0124, US-0125, US-0069, US-0092, DEC-0124, DEC-0125, DEC-0069, BUG-0006, R-0109, R-0001
+- **Confidence**: high (docs + in-repo gap verified; no live OpenCode probe)
+- **Status**: current
+- **Query**: Exact v2 attach surface for `/auto`; single-owner spawn rule; first-phase selection; interactive vs headless shared entry; isolation-evidence minimum; additive contract tests; DEC amend vs additive
+- **Producer consumed**: discovery `rp-auto-20260906-bug0015-discovery-po-20260906T140500Z-BUG-0015` (proof_hash `700734379DE4CFE3B0509DB39E8F3208DFAEC8ADB2BA475EA8CDB9C0AF37C83F`, ttl `2026-09-06T15:05:00Z`); sovereign-critic `b0015dsc-*` PASS (0 blocking; anti_slop_aggregate=8)
+- **EARLY_RESEARCH posture**: scratchpad `EARLY_RESEARCH=1` — web + Context7 consulted; locks are docs + codebase grounded (`.opencode/plugins/orchestrator.ts`, `.opencode/commands/auto.md`, R-0109 US-0124/US-0125 DQs, DEC-0124 §1–§2 / §8)
+- **ID policy**: highest existing research id was **R-0113**. This entry is **R-0114**. Do **not** wipe or renumber R-0109 / R-0113.
+- **Compose base**: R-0109 US-0124 DQ1–DQ8 + US-0125 DQ5 (dispatch-only `auto.md`; plugin = single spawn owner). Gap: `setup()` returns `spawnPhase` API and registers only `ctx.tool.hook("execute.before")` write-guard — no host-invoked entry starts the spawn loop on `/auto`.
+
+### Web / docs sources (2026-09-06)
+
+- https://opencode.ai/v2/docs/build/plugins — v2 `Plugin.define`, `ctx.command.transform` / `editor.add({ name, execute })`, `ctx.session.create` / `wait`, `ctx.event.subscribe`, `ctx.tool.hook("execute.before")`
+- https://opencode.ai/docs/plugins/ — v1 hooks object; event bus includes `command.executed` (payload name/sessionID/arguments/messageID) and `tui.command.execute`
+- https://github.com/joshuadavidthomas/opencode-plugins-manual/blob/main/docs/07-events.md — `command.executed` lifecycle notes
+- Context7 `/websites/opencode_ai` plugin events list (command/session/tool/TUI) — corroborates v1 event names; v2 subscribe is the forward path per R-0109 Q1
+
+### Critic NB closures (discovery `b0015dsc-*`, non-blocking → research locks)
+
+| Critic theme | Resolution in R-0114 |
+|---|---|
+| Missing attach reason code (challenger) | **LOCKED** distinct `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED` when neither `ctx.command.transform` nor usable `command.executed`/subscribe attach surface exists. Distinct from `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` (missing `session.create`). |
+| Concurrent second `/auto` (challenger) | **LOCKED** in-flight mutex; second entry → `OPENCODE_AUTO_ALREADY_RUNNING` fail-closed (plugin-local flag via `ctx.storage` or module state). Not `AUTO_SCHEDULER_CONFLICT` (that code is story-drain vs bug-queue mutex). |
+| DEC amend vs additive (architect) | **LOCKED** additive: `# BUG-0015` architecture section; do **not** amend DEC-0124/DEC-0125 bodies. Companion DEC optional at architecture (cite R-0114 if no new cross-cutting contract). |
+| `test_bug0015_*` additive (subtractor) | **LOCKED** additive-only markers; do **not** amend `test_us0124_*` / `test_us0125_*` DONE surfaces. Extend mock-ctx harness additively (command.transform + event recorders). |
+
+### Gap confirmation (code)
+
+- `.opencode/commands/auto.md`: dispatch-only + `STOP` (≤20 lines; `agent: auto`; no spawn literals) — DEC-0125 DQ5 intact.
+- `.opencode/plugins/orchestrator.ts`: exports `spawnPhase`; `Plugin.define` `setup` returns API; only `tool.hook("execute.before")`; **no** `command.transform` / `event.subscribe` attach for `/auto`.
+
+### DQ1 — Attach API for `/auto` (LOCKED)
+
+- **Primary (v2)**: in `setup(ctx)`, call `await ctx.command.transform((editor) => { editor.add({ name: "auto", description: "...", execute: async ({ sessionID, prompt, delivery }) => { /* start spawn loop */ } }) })` (docs: Commands section, `CommandDefinition.execute`).
+- **Defense / observe**: `ctx.event.subscribe` (v2) or v1 `event` hook filtering `event.type === "command.executed"` and `name === "auto"` — may fire after markdown command body; acceptable only as secondary if primary transform cannot own execution. Do **not** rely on agent prompt alone (BUG-0006 / success test (a)).
+- **Insufficient**: returning `spawnPhase` from `setup()` without a host-invoked entry (current defect).
+- **Missing attach**: fail-closed `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED` (operator-visible; stop `/auto`).
+- **deferred_to_architecture**: exact host precedence when both markdown `.opencode/commands/auto.md` and plugin `editor.add({ name: "auto" })` exist (override vs dual-fire); whether thin `auto.md` body stays STOP-only or becomes a no-op pointer once transform owns execute.
+
+### DQ2 — Single-owner spawn rule (LOCKED)
+
+- **Single owner = plugin.** Spawn loop runs inside plugin `setup` callbacks (command `execute` and/or event handler) that call internal `spawnPhase(ctx, args)`.
+- Exported `spawnPhase` remains the unit-testable + headless-callable API; it is **not** a host-auto-invoked entry by itself.
+- Agent prompt / thin `auto.md` must **not** call `session.create` or roleplay phases (DEC-0124 §8 / DEC-0125 DQ5 / BUG-0006).
+- Write-guard `tool.hook("execute.before")` stays composed (DEC-0124 DQ8); attach is additive, not a replacement for the write-guard.
+
+### DQ3 — First-phase selection after `/auto` (LOCKED)
+
+- Compose existing kit selectors — **do not invent an OpenCode-only resolver**:
+  1. Explicit argv / command arguments (`start-from`, `bug-target=`) when present
+  2. `handoffs/resume_brief.md` `intended_resume_phase` / `next_scheduled_phase` (DEC-0069)
+  3. Scratchpad `AUTO_*` / delivery-mode flags (US-0092 / US-0096)
+  4. US-0087 bug-queue when bug scheduler wins (mutex `AUTO_SCHEDULER_CONFLICT` unchanged)
+- OpenCode plugin reads the same artifacts (or asks Python driver via `dispatchStopMatrix`) rather than reimplementing selection in TypeScript.
+- **deferred_to_architecture**: exact helper (TS read vs Python subprocess) for resume_brief parse.
+
+### DQ4 — Interactive vs headless shared entry (LOCKED)
+
+- **One internal lifecycle entry** (name deferred to architecture, e.g. `runAutoLifecycle`) shared by:
+  - Interactive: command.transform `execute` / event attach (DQ1)
+  - Headless: existing `invokeHeadless` / `opencode run --agent auto --format json --auto` (DEC-0124 DQ7) — unchanged compose
+- Both paths call the same `spawnPhase` + `dispatchStopMatrix` loop.
+- In-flight mutex (critic concurrent NB) prevents duplicate spawn if interactive and headless overlap, or double `/auto`.
+- Thin `auto.md` remains slash discoverability; headless does not depend on markdown STOP prose.
+
+### DQ5 — Isolation-evidence persistence (LOCKED — minimum contract)
+
+- Minimum fields (D4 / DEC-0124 AC-3): `parentID`, `sessionID`, `role`, `phase_id`, `timestamp`, `fresh_context_marker` with `sessionID !== parentID`.
+- **SOT for audit**: phase checkpoints in `docs/engineering/state.md` (same US-0048 / DEC-0029 pattern as Cursor). Plugin return `IsolationEvidence` is the producer of that tuple.
+- Plugin-local `ctx.storage` may hold in-flight mutex / ephemeral handles only — **not** the durable SOT.
+- Null/throw/identical-id → `OPENCODE_SUBTASK_IGNORED` (unchanged DEC-0124 DQ5).
+- **deferred_to_architecture**: exact write helper (direct file append vs Python validator bridge).
+
+### DQ6 — Contract-test inventory (LOCKED — additive)
+
+Extend mock-ctx harness additively (no live OpenCode CI probe). New file preferred: `tests/bug0015_contract_test.py` (+ optional `tests/bug0015/mock_ctx_dispatch.ts`). Markers:
+
+1. `test_bug0015_command_transform_registers_auto` — `setup` registers `command.transform` / `editor.add({ name: "auto" })`
+2. `test_bug0015_auto_execute_invokes_spawn_phase` — mock execute → `session.create` with expected parentID/agent
+3. `test_bug0015_missing_attach_fail_closed` — no transform + no event attach → `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED`
+4. `test_bug0015_missing_session_create_fail_closed` — attach ok, `session.create` missing → `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED`
+5. `test_bug0015_concurrent_reentry_fail_closed` — second `/auto` while in-flight → `OPENCODE_AUTO_ALREADY_RUNNING`
+6. `test_bug0015_auto_md_dispatch_only_static` — `auto.md` ≤20 lines; no `session.create` / spawn literals
+7. `test_bug0015_compose_us0124_spawn_api_unchanged` — existing `spawnPhase` / reason-code exports still present (read-only compose assert; does not mutate us0124 tests)
+
+Do **not** amend `test_us0124_*` / `test_us0125_*` bodies.
+
+### DQ7 — DEC amend vs additive (LOCKED)
+
+- **Additive only.** Do not rewrite Accepted DEC-0124 / DEC-0125.
+- Architecture authors `# BUG-0015` (H1 per DEC-0054 preference) section citing R-0114 + compose pointers.
+- Companion DEC: **RECOMMENDATION only** if architecture needs a cross-cutting attach/mutex/reason-code lock beyond R-0114; otherwise cite R-0114 from architecture. Research does **not** author a DEC (architecture owns).
+- Out of scope unchanged (D6): BUG-0016 permissions; US-0131/US-0132; DEC-0122 matrix; Cursor Task port; TS stop-matrix rewrite.
+
+### Reason-code additions (LOCKED vocabulary for architecture)
+
+| Code | When |
+|---|---|
+| `OPENCODE_PLUGIN_DISPATCH_ATTACH_UNSUPPORTED` | No usable `/auto` attach surface on host |
+| `OPENCODE_AUTO_ALREADY_RUNNING` | Concurrent/re-entrant `/auto` while spawn loop in-flight |
+| Existing `OPENCODE_PLUGIN_SPAWN_UNSUPPORTED` | `session.create` missing (unchanged) |
+| Existing `OPENCODE_SUBTASK_IGNORED` | null/throw/identical session id (unchanged) |
+
+Stub table text: architecture may add a BUG-0015 runbook h3; US-0126 full-table ownership unchanged (compose stub only).
+
+### Risks
+
+- **R1 (MEDIUM)**: markdown `auto.md` vs `command.transform` precedence unknown without live host → architecture picks override strategy; tests cover both attach-present and attach-missing.
+- **R2 (MEDIUM)**: `command.executed` after STOP may race → prefer transform `execute` as primary.
+- **R3 (LOW)**: mutex false-positive if crash leaves in-flight flag → architecture TTL/clear-on-idle.
+- **R4 (LOW)**: reason-code stub drift vs US-0126 → stub + cross-link only.
+- **R5 (LOW)**: BUG-0016 still blocks validators after dispatch fixed → expected; do not expand scope.
+
+### Verdict for /architecture
+
+- `decision_gate=false` — DQ1–DQ7 closed (LOCKED; two narrow deferred_to_architecture implementation details only: command precedence; isolation write helper).
+- Next: `/architecture` fresh tech-lead — author `# BUG-0015` approach + optional companion DEC; do not execute code in architecture.
+- Status: BUG-0015 remains **OPEN**.
+
+## R-0115 - BUG-0016 OpenCode Layer-1 permissions vs kit duties research
+
+- **Date**: 2026-09-06
+- **Topic**: Amend DEC-0122 §2 / agent frontmatter so OpenCode role agents can run kit validators + owned writes without weakening success test (c)
+- **Linked**: BUG-0016, US-0122, DEC-0122, US-0078, US-0079, DEC-0069, US-0124, BUG-0015, R-0109, R-0114
+- **Confidence**: high (OpenCode permissions docs + in-repo agent frontmatter + DEC-0122 §2 + discovery D1–D8 verified; no live OpenCode probe)
+- **Status**: current
+- **Query**: bash ask vs object form; PO state.md duty; exact sprint glob; tl/curator script inventory; release path completeness; DEC amend shape; static harness markers; Layer-1 vs plugin compose
+- **Producer consumed**: discovery `rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016` (proof_hash `1381C92191BD8EF182ADF0942BD68777D2A45613C5808497311B2BCC06C18935`, ttl `2026-09-06T19:20:00Z`); sovereign-critic `b0016dsc-*` PASS (0 blocking; anti_slop_aggregate=10)
+- **EARLY_RESEARCH posture**: scratchpad `EARLY_RESEARCH=1` — OpenCode permissions docs + Context7 `/websites/opencode_ai` consulted; locks are docs + codebase grounded (`.opencode/agents/*.md`, `template/.opencode/agents/*.md`, `decisions/DEC-0122.md` §2, discovery D1–D8)
+- **ID policy**: highest existing research id was **R-0114**. This entry is **R-0115**. Do **not** wipe or renumber R-0109 / R-0114.
+- **Compose base**: R-0109 US-0122 DQ1–DQ8 + DEC-0122 §2 locked matrix. Gap: matrix matches DEC literally but blocks kit phase duties (bash validators; missing handoff/sprint globs; literal `Sxxxx`).
+
+### Web / docs sources (2026-09-06)
+
+- https://opencode.ai/docs/permissions/ — `permission.bash` / `permission.edit` shorthand **or** object form; last matching rule wins; wildcards `*` (any seq) and `?` (one char); literals otherwise (no regex character classes)
+- https://opencode.ai/docs/agents/ — markdown agent frontmatter `permission:` with bash object examples (`"*": ask`, `"git log*": allow`)
+- Context7 `/websites/opencode_ai` — corroborates bash/edit object syntax + last-match-wins
+- https://github.com/anomalyco/opencode/issues/7029 — wildcard/ordering operator reports (supporting risk only; not a lock source)
+
+### Critic NB closures (discovery `b0016dsc-*`, non-blocking → research locks)
+
+| Critic theme | Resolution in R-0115 |
+|---|---|
+| Bash object allowlist vs shorthand ask (challenger) | **LOCKED DQ1**: ship shorthand `bash: ask` for po/tech-lead/curator (parity with dev/qa/release). Object form is **supported** by OpenCode but **YAGNI** for this bug — optional future tighten (`python *` / `python scripts/*` ask + `*` deny last) deferred; do not block duties. Reject `bash: allow`. |
+| PO `docs/engineering/state.md` for IsolationEvidence (challenger/subtractor) | **LOCKED DQ2**: **YES** — grant PO edit allow on `docs/engineering/state.md` (checkpoint append only). Kit `/intake`/`/discovery` require phase checkpoints (US-0048); Cursor PO writes state today; OpenCode PO is blocked. Do **not** grant `state-archive/**` (curator-owned). Triad scripts remain bash-ask, not edit-of-scripts. |
+| `S*` breadth vs `S[0-9]*` (challenger) | **LOCKED DQ3**: OpenCode simple wildcards — **no** `[0-9]` classes (brackets literal). Lock path templates `sprints/S*/<file>` for owned files. Prove: `Sxxxx` is four literal `x` chars → **never** matches `S0131`. `S*` matches `S0131` and `S-BUG0014`. |
+| Companion DEC not second SOT (architect/subtractor) | **LOCKED DQ6**: **Amend DEC-0122 §2 in place** as sole matrix SOT. Thin companion **DEC-0130** optional at `/architecture` for audit trail only — must cite amended DEC-0122; must **not** duplicate the matrix table. |
+| Scope / YAGNI (subtractor) | Held: no US-0122 feature reopen; no US-0131/0132; no live probe; no intake JSON mutation; no DONE flip; security/auto unchanged. |
+
+### Gap confirmation (code)
+
+- `.opencode/agents/{po,tech-lead,curator}.md`: `bash: deny` (blocks `python scripts/*_validate.py`, `enforce-triad-hot-surface.py`)
+- `.opencode/agents/po.md`: edit lacks `handoffs/intake_evidence/**`, `handoffs/resume_brief.md`, `docs/engineering/state.md`
+- `.opencode/agents/{tech-lead,dev,qa}.md`: literal `sprints/Sxxxx/…` (does not match `sprints/S0131/…`)
+- `.opencode/agents/release.md`: has `verify_to_release.md`; lacks `verify-work-to-release.md` + `sprints/S*/release-findings.md` + duty `state.md` / `resume_brief.md`
+- Active ↔ template agents: byte-identical (parity must be preserved after fix)
+- `security` / `auto`: in-contract (D8)
+
+### DQ1 — Bash posture for po / tech-lead / curator (LOCKED)
+
+- **Ship**: `bash: "ask"` shorthand for `po`, `tech-lead`, `curator` (D1/D4).
+- **Reject**: `bash: "allow"` (operator prompt required; auto-approve via `opencode --auto` is host UX, not Layer-1 allow).
+- **Object form**: OpenCode supports `bash: { "*": "ask", "python *": "allow", … }` with last-match-wins. **Not required** for BUG-0016 — shorthand ask unblocks validators under operator prompt (parity with `dev`/`qa`/`release`).
+- **deferred_to_architecture**: whether any role needs a documented example of object-form bash in runbook stub (US-0126 compose only).
+
+### DQ2 — PO `state.md` edit allow (LOCKED)
+
+- **Grant** PO `docs/engineering/state.md` → `allow` (in addition to D2: `handoffs/intake_evidence/**`, `handoffs/resume_brief.md`, existing `docs/product/**`, `handoffs/po_to_tl.md`).
+- **Rationale**: US-0048 IsolationEvidence / phase checkpoints are written by the phase role; `/intake` command explicitly allows optional state checkpoint; discovery critic observed Cursor PO writes state while OpenCode PO cannot.
+- **Do not grant**: `docs/engineering/state-archive/**` (curator), `scripts/**` / production paths (success test (c)).
+- Orchestrator/plugin does **not** own PO checkpoint writes on OpenCode — Layer-1 must allow the role.
+
+### DQ3 — Sprint glob string (LOCKED)
+
+- **Replace** every frontmatter / DEC-0122 §2 occurrence of `sprints/Sxxxx/<file>` with `sprints/S*/<file>` for:
+  - tech-lead: `sprint.md`, `tasks.md`
+  - dev: `progress.md`, `qa-findings.md`
+  - qa: `qa-findings.md`, `plan-verify.json`, `verify-work-findings.md`, `uat.md`, `uat.json`
+  - release: `release-findings.md` (new)
+- **Proof**: under OpenCode simple wildcards, literal `Sxxxx` ≠ `S0131`; `S*` matches `S0131` and `S-BUG0014`.
+- **Reject**: `S[0-9]*` (character classes not supported — brackets are literal).
+- **Reject**: leaving `Sxxxx` as documentation placeholder in **permission keys** (prose may still say Sxxxx meaning “sprint id”).
+- Breadth risk (`sprints/Something/…`): **ACCEPTED LOW** — kit only creates `S*` sprint dirs; static tests assert pattern prefix `sprints/S*/`.
+
+### DQ4 — Tech-lead / curator script inventory (LOCKED)
+
+Required bash under ask (illustrative, not an allowlist to encode):
+
+| Role | Scripts / commands |
+|---|---|
+| po | `python scripts/intake_evidence_validate.py …`; `python scripts/intake_bug_resume_brief_refresh.py …` |
+| tech-lead | triad/`enforce-triad-hot-surface.py`; research/architecture validators as invoked by commands |
+| curator | `enforce-triad-hot-surface.py`; archive/materialize helpers invoked by `/refresh-context` |
+
+- **No bash object patterns required** beyond shorthand `ask` for this bug.
+- Edit surfaces for scripts remain **deny** for these roles (success test (c)).
+
+### DQ5 — Release path completeness (LOCKED)
+
+Beyond discovery D5 (`sprints/S*/release-findings.md`, `handoffs/verify-work-to-release.md`):
+
+| Path | Lock |
+|---|---|
+| `sprints/S*/release-findings.md` | **ALLOW** (D5) |
+| `handoffs/verify-work-to-release.md` | **ALLOW** (D5; keep existing `verify_to_release.md`) |
+| `docs/engineering/state.md` | **ALLOW** — `/release` mandates state checkpoints |
+| `handoffs/resume_brief.md` | **ALLOW** — DEC-0069 continuation after release |
+| `docs/engineering/runbook.md` | **ALLOW** — release.md lists runbook as writable derived/ops surface when gates update stubs |
+| Existing release handoffs + CHANGELOG | **KEEP** |
+
+`bash: ask` unchanged. No production/code edit allows.
+
+### DQ6 — DEC amend shape + tests (LOCKED)
+
+- **Primary SOT**: amend **`decisions/DEC-0122.md` §2** matrix in place (bug-fix of US-0122 contract). Do **not** reopen US-0122 as a feature story.
+- **Companion**: optional thin **DEC-0130** at `/architecture` — audit trail + “amended by BUG-0016” pointer only; **forbidden** to carry a second full matrix.
+- **Tests**:
+  1. **Amend** `tests/us0122_contract_test.py` expectations to the new matrix (SOT alignment — `S*`, bash ask, new allows).
+  2. **Add** additive `tests/bug0016_contract_test.py` markers for the delta narrative (see DQ7).
+- Success test (c) markers remain: deny-last `**` on non-dev edit objects; no production/code allow keys for non-dev.
+
+### DQ7 — Minimal static harness (≥6 markers) (LOCKED)
+
+New file `tests/bug0016_contract_test.py` (+ active/template parity). **No live OpenCode probe**.
+
+1. `test_bug0016_po_tl_curator_bash_ask` — po/tech-lead/curator `bash == ask` (not deny/allow)
+2. `test_bug0016_po_intake_resume_state_allows` — PO edit allows `handoffs/intake_evidence/**`, `handoffs/resume_brief.md`, `docs/engineering/state.md`; `**` deny last; no `scripts/**` allow
+3. `test_bug0016_sprint_globs_are_s_star_not_sxxxx` — tech-lead/dev/qa/release sprint keys use `sprints/S*/`; assert substring `Sxxxx` absent from permission keys
+4. `test_bug0016_release_duty_paths` — release allows `sprints/S*/release-findings.md`, `handoffs/verify-work-to-release.md`, `docs/engineering/state.md`, `handoffs/resume_brief.md`, `docs/engineering/runbook.md`
+5. `test_bug0016_success_test_c_non_dev_no_production_allow` — for po/tl/qa/release/curator/security/auto: no allow on `scripts/**`, `its_magic/**`, `**/*.py`, installer surfaces; object-form edit keeps `**` deny last where object form used
+6. `test_bug0016_security_auto_unchanged` — security `edit: deny` + `bash: ask`; auto `edit/bash: deny` + 7-role task allow + `*` deny last
+7. `test_bug0016_active_template_agent_parity` — eight agents byte-identical active↔template (or via `check_intake_template_parity.py --scope=opencode-adapter` / bug-0016 scope)
+
+(7 markers ≥6; marker 7 may fold into parity scope if clean.)
+
+### DQ8 — Compose with BUG-0015 / US-0124 plugin write-guard (LOCKED)
+
+- **Layer-1** (host frontmatter) and **Layer-2** (plugin `tool.hook("execute.before")` write-guard per DEC-0124) are **conjunctive**: both must allow for a write to proceed.
+- After Layer-1 grants duty paths, architecture/execute must **verify** the plugin write-guard does **not** re-deny those same globs for the owning role.
+- **Do not amend DEC-0124/DEC-0125** bodies in BUG-0016 unless a concrete double-deny contradiction is proven in execute.
+- BUG-0015 DONE = compose note only (spawn path may work); this bug remains permissions-only.
+- US-0131/US-0132 out of scope.
+
+### Amended matrix delta (for /architecture — normative table lives in DEC-0122 §2)
+
+| Agent | bash | edit adds / changes |
+|---|---|---|
+| po | deny→**ask** | +`handoffs/intake_evidence/**`, +`handoffs/resume_brief.md`, +`docs/engineering/state.md` |
+| tech-lead | deny→**ask** | `sprints/Sxxxx/…`→`sprints/S*/…` |
+| curator | deny→**ask** | (edit set unchanged) |
+| dev | ask (unchanged) | `Sxxxx`→`S*` |
+| qa | ask (unchanged) | `Sxxxx`→`S*` |
+| release | ask (unchanged) | +`sprints/S*/release-findings.md`, +`verify-work-to-release.md`, +`state.md`, +`resume_brief.md`, +`runbook.md` |
+| security | ask + edit deny | unchanged |
+| auto | deny + task allowlist | unchanged |
+
+### Risks
+
+- **R1 (MEDIUM)**: OpenCode docs illustrate catch-all `*` **first** then specific allows (last-match-wins); DEC-0122 ships allow-first + `**` deny-last. BUG-0016 **preserves** deny-last key order (discovery D2/D7; static success test (c)). Runtime match semantics remain unproven without live host (D7) — architecture documents divergence; do not flip global ordering in this bug.
+- **R2 (LOW)**: `sprints/S*` breadth — accepted; kit naming convention.
+- **R3 (LOW)**: Plugin write-guard double-deny after Layer-1 fix — DQ8 verify in execute; no DEC-0124 amend unless proven.
+- **R4 (LOW)**: Companion DEC-0130 accidentally becomes second matrix — DQ6 forbids; architecture review gate.
+- **R5 (LOW)**: Amending `us0122_*` expectations churns DONE-story tests — intentional SOT realignment; additive `bug0016_*` carries bug narrative.
+
+### Verdict for /architecture
+
+- `decision_gate=false` — DQ1–DQ8 closed LOCKED.
+- Next: `/architecture` fresh tech-lead — author `# BUG-0016` approach; amend DEC-0122 §2 (execute may ship file body); optional thin DEC-0130; do not execute agent frontmatter from architecture unless ultra_lean merges — prefer architecture locks + sprint seeds.
+- Status: BUG-0016 remains **OPEN**.
+- Research runtime proof: `runtime_proof_id=rp-auto-20260906-bug0016-research-techlead-20260906T183500Z-BUG-0016` / `proof_hash=04839252A587E2877F310A008943C6EF91732A1B227F439D49B704BD1F405BFF` / ttl `2026-09-06T19:35:00Z`.

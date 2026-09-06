@@ -13,6 +13,44 @@ Canonical queue state now lives under:
 
 ---
 
+## Release finalized note (S0132)
+
+- Sprint: `S0132`
+- Story: `BUG-0016` (OpenCode Layer-1 agent permission matrix vs kit duties — bash ask; PO paths; S* globs; release duty paths; 7 contract markers)
+- Release: **finalized** (`2026-09-06T19:35:00Z`, `orchestrator_run_id=auto-20260906-bug0016`, `fresh_context_marker=release-BUG0016-release-20260906T193500Z-fresh`, `runtime_proof_id=rp-auto-20260906-bug0016-release-release-20260906T193500Z-BUG-0016`, `model_id=composer-2.5`)
+- Queue: **`handoffs/release_queue.md`** row **`S0132`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS** — all mandatory release gates (1, 2, 3, 4, 4b) green with **Fail:0**.
+- **Run / verify:** `python -m pytest tests/bug0016_contract_test.py -v` → 7 passed; `python -m pytest tests/us0122_contract_test.py -q` → 8 passed; `python scripts/check_intake_template_parity.py --scope=bug-0016` → `[INTAKE_TEMPLATE_PARITY_OK]`; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → PASS (`coverage_missing=[]`); `python scripts/check-user-visible-metadata.py --repo .` → exit 0; harness `tests/report.md` @ `2026-09-06T20:46:57Z` **Pass:851 / Fail:0**. See **`handoffs/releases/S0132-release-notes.md`** **## Run** / **## Verify**.
+- **Operator summary**: start=`python -m pytest tests/bug0016_contract_test.py -v`; endpoint=`n/a` (permission matrix kit); verify pointer=`handoffs/releases/S0132-release-notes.md` ## Verify.
+- **Gate snapshot**: check_in_tests=PASS (harness Fail:0 + bug0016 7/7); qa=PASS (0 blockers); verify_work=PASS (8/8 ACs; 9/9 UAT; 7/7 live); uat=PASS (9/9); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed @19:35:00Z before TTL 20:25:00Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **8/8** (7/7 contract markers live; 0 open blocking findings)
+- Compose guards: DEC-0122 §2 sole SOT; DEC-0124/0125 UNCHANGED; BUG-0016 OPEN L4914; acceptance unchecked L181
+- **Backlog status**: BUG-0016 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: BUG-0016 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** + **`RELEASE_PUBLISH_AUTO_CONFIRM=0`** — `publish_snapshot=skipped_pending_operator_confirm`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=FB658AA87D763F7282EEE5279116C551AF40C5F03A4D8DEF491E09EF2538135F`, `proof_ttl=2026-09-06T20:35:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
+## Release finalized note (S0131)
+
+- Sprint: `S0131`
+- Story: `BUG-0015` (OpenCode `/auto` plugin dispatch attach — `command.transform` / `editor.add` → `runAutoLifecycle` + 7 contract-test markers)
+- Release: **finalized** (`2026-09-06T15:30:00Z` attempt 2, `orchestrator_run_id=auto-20260906-bug0015`, `fresh_context_marker=release-BUG0015-release-rerun-20260906T153000Z-fresh`, `runtime_proof_id=rp-auto-20260906-bug0015-release-release-20260906T153000Z-BUG-0015`, `model_id=composer-2.5`)
+- Queue: **`handoffs/release_queue.md`** row **`S0131`** = **`released`** (idempotent; workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS (2nd attempt)** — all mandatory release gates (1, 2, 3, 4, 4b) green with **Fail:0**.
+- **Run / verify:** `python -m pytest tests/bug0015_contract_test.py -v` → 7 passed in 0.69s; `python -m pytest tests/us0124_contract_test.py -q` → 12 passed; `python scripts/check_intake_template_parity.py --scope=bug-0015` → `[INTAKE_TEMPLATE_PARITY_OK]`; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → PASS (`coverage_missing=[]`); `python scripts/check-user-visible-metadata.py --repo .` → exit 0; harness `tests/report.md` @ `2026-09-06T15:28:42Z` **Pass:849 / Fail:0**. See **`handoffs/releases/S0131-release-notes.md`** **## Run** / **## Verify**.
+- **Operator summary**: start=`python -m pytest tests/bug0015_contract_test.py -v`; endpoint=`n/a` (plugin kit); verify pointer=`handoffs/releases/S0131-release-notes.md` ## Verify.
+- **Gate snapshot**: check_in_tests=PASS (harness Fail:0 + bug0015 7/7); qa=PASS (0 blockers); verify_work=PASS (8/8 ACs; 9/9 UAT; 7/7 live); uat=PASS (9/9); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed @15:30:00Z before TTL 16:05:00Z); critic `ik_bug0015_release_gate1_fail_nonzero`=resolved; finalization=PASS (queue → `released`).
+- ACs satisfied: **8/8** (7/7 contract markers live; 0 open blocking findings)
+- Compose guards: DEC-0124/0125 UNCHANGED (backlog OPEN L4899; acceptance unchecked L180)
+- **Backlog status**: BUG-0015 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: BUG-0015 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** + **`RELEASE_PUBLISH_AUTO_CONFIRM=0`** — `publish_snapshot=skipped_pending_operator_confirm`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=1467A9436D9012A5974AC13C269E28EDFA1D1E9821BA3C94422E1DAB4D8FAD00`, `proof_ttl=2026-09-06T16:30:00Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
 ## Release finalized note (S0129)
 
 - Sprint: `S0129`

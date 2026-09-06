@@ -29,6 +29,20 @@ export interface MockHookCall {
   event: string;
 }
 
+export interface MockEditorAddCall {
+  name: string;
+  description?: string;
+  execute?: (args: {
+    sessionID: string;
+    prompt?: string;
+    delivery?: string;
+  }) => Promise<unknown>;
+}
+
+export interface MockEventSubscribeCall {
+  registered: boolean;
+}
+
 export interface MockCtx {
   session: {
     create: (args: {
@@ -42,32 +56,77 @@ export interface MockCtx {
   tool: {
     hook: (event: string, cb: (event: unknown) => unknown) => unknown;
   };
+  // BUG-0015 additive attach surfaces (extend, do not replace US-0124 fields)
+  command?: {
+    transform: (
+      cb: (editor: {
+        add: (def: MockEditorAddCall) => void;
+      }) => void,
+    ) => void | Promise<void>;
+  };
+  event?: {
+    subscribe: (cb: (event: unknown) => unknown) => void;
+  };
   options: Record<string, unknown>;
   // test inspection
   _calls: {
     create: MockCreateCall[];
     wait: MockWaitCall[];
     hook: MockHookCall[];
+    editorAdd: MockEditorAddCall[];
+    eventSubscribe: MockEventSubscribeCall[];
   };
   _config: MockCreateConfig;
   _setCreate: (cfg: MockCreateConfig) => void;
   _result: string;
   _setResult: (r: string) => void;
+  _waitGate: Promise<void> | null;
+  _setWaitGate: (gate: Promise<void> | null) => void;
+  _eventHandler: ((event: unknown) => unknown) | null;
+  _autoExecute:
+    | ((args: {
+        sessionID: string;
+        prompt?: string;
+        delivery?: string;
+      }) => Promise<unknown>)
+    | null;
 }
 
 function freshSessionID(parentID: string): string {
   return `child-${parentID}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+export interface CreateMockCtxOptions {
+  /** When false, omit command.transform (missing primary attach). Default true. */
+  withCommandTransform?: boolean;
+  /** When true, register event.subscribe (secondary attach). Default false. */
+  withEventSubscribe?: boolean;
+}
+
 export function createMockCtx(
   config: MockCreateConfig = {},
   result = "phase-complete",
+  options: CreateMockCtxOptions = {},
 ): MockCtx {
+  const withCommandTransform = options.withCommandTransform !== false;
+  const withEventSubscribe = options.withEventSubscribe === true;
   const calls: MockCtx["_calls"] = {
     create: [],
     wait: [],
     hook: [],
+    editorAdd: [],
+    eventSubscribe: [],
   };
+  let waitGate: Promise<void> | null = null;
+  let eventHandler: ((event: unknown) => unknown) | null = null;
+  let autoExecute:
+    | ((args: {
+        sessionID: string;
+        prompt?: string;
+        delivery?: string;
+      }) => Promise<unknown>)
+    | null = null;
+
   const ctx: MockCtx = {
     session: {
       async create(args) {
@@ -90,6 +149,9 @@ export function createMockCtx(
       },
       async wait(sessionID) {
         calls.wait.push({ sessionID });
+        if (waitGate) {
+          await waitGate;
+        }
         return result;
       },
       async prompt(_sessionID, _message) {
@@ -112,7 +174,42 @@ export function createMockCtx(
     _setResult(r) {
       result = r;
     },
+    _waitGate: null,
+    _setWaitGate(gate) {
+      waitGate = gate;
+      ctx._waitGate = gate;
+    },
+    _eventHandler: null,
+    _autoExecute: null,
   };
+
+  if (withCommandTransform) {
+    ctx.command = {
+      transform(cb) {
+        const editor = {
+          add(def: MockEditorAddCall) {
+            calls.editorAdd.push(def);
+            if (typeof def.execute === "function") {
+              autoExecute = def.execute;
+              ctx._autoExecute = def.execute;
+            }
+          },
+        };
+        cb(editor);
+      },
+    };
+  }
+
+  if (withEventSubscribe) {
+    ctx.event = {
+      subscribe(cb) {
+        calls.eventSubscribe.push({ registered: true });
+        eventHandler = cb;
+        ctx._eventHandler = cb;
+      },
+    };
+  }
+
   return ctx;
 }
 

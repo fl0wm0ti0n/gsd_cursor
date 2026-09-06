@@ -663,10 +663,10 @@
 
 ## DEC-0122
 
-- Story: US-0122 (OpenCode role agents and Layer-1 permission table)
-- Status: Accepted (authored in `/architecture` phase 2026-08-24T11:45:00Z UTC — full entry in `decisions/DEC-0122.md`)
-- Topic: Eight markdown agents at `template/.opencode/agents/<role>.md` + locked Layer-1 permission matrix (object-form `edit` with deny-last ordering, `task` 7-role allow-list + `*` deny last on `auto`, `task: "deny"` shorthand on role agents, `auto` primary / roles subagent, security `edit: "deny"` YAGNI) + static success-test-(c) harness (DQ1..DQ8 of R-0109)
-- Composes on: US-0003 (role set unchanged), US-0023 / BUG-0006 (spawn-only isolation), US-0121 (pack path consumed), US-0102 / DEC-0087 (no vendor slugs in template), US-0002 / US-0004 (no Cursor rules/skills port)
+- Story: US-0122 (OpenCode role agents and Layer-1 permission table); **amended by BUG-0016** (2026-09-06) — §2 matrix in place (sole SOT; no DEC-0130)
+- Status: Accepted (authored in `/architecture` phase 2026-08-24T11:45:00Z UTC — full entry in `decisions/DEC-0122.md`; BUG-0016 amend 2026-09-06T18:45:00Z)
+- Topic: Eight markdown agents at `template/.opencode/agents/<role>.md` + locked Layer-1 permission matrix (object-form `edit` with deny-last ordering, `task` 7-role allow-list + `*` deny last on `auto`, `task: "deny"` shorthand on role agents, `auto` primary / roles subagent, security `edit: "deny"` YAGNI) + static success-test-(c) harness (DQ1..DQ8 of R-0109). **BUG-0016 / R-0115**: po/tl/curator `bash: ask`; PO +intake_evidence/** +resume_brief +state.md; sprint globs `sprints/S*/`; release +release-findings +verify-work-to-release +state +resume_brief +runbook; success test (c) preserved.
+- Composes on: US-0003 (role set unchanged), US-0023 / BUG-0006 (spawn-only isolation), US-0121 (pack path consumed), US-0102 / DEC-0087 (no vendor slugs in template), US-0002 / US-0004 (no Cursor rules/skills port), US-0078 / US-0079 / DEC-0069 (kit duties unlocked by BUG-0016), US-0124 (Layer-1 ∩ write-guard conjunctive)
 
 ## DEC-0123
 

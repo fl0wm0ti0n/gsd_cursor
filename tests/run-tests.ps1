@@ -1659,6 +1659,18 @@ Assert-True "check_intake_template_parity --scope=arch-linkage passes (US-0129)"
 $us0129Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\us0129_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "US-0129 contract tests pass" ($us0129Contract.ExitCode -eq 0)
 
+# 26AC) BUG-0015 — OpenCode /auto dispatch attach
+$bug0015Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=bug-0015") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=bug-0015 passes (BUG-0015)" ($bug0015Parity.ExitCode -eq 0)
+$bug0015Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\bug0015_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "BUG-0015 contract tests pass" ($bug0015Contract.ExitCode -eq 0)
+
+# 26AD) BUG-0016 — OpenCode Layer-1 agent permission matrix vs kit duties
+$bug0016Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=bug-0016") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=bug-0016 passes (BUG-0016)" ($bug0016Parity.ExitCode -eq 0)
+$bug0016Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\bug0016_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "BUG-0016 contract tests pass" ($bug0016Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue
