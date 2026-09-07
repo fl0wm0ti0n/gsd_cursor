@@ -1,3 +1,19 @@
+## Next — **`S0133` / `US-0131`** (**`/execute`**)
+
+- **Verdict**: **PASS** — `sprints/S0133/plan-verify.json` status=`PASS` (`plan_verified_at=2026-09-07T19:52:00Z`, **qa**, `fresh_context_marker=qa-US0131-plan-verify-20260907T195200Z-fresh`, `orchestrator_run_id=auto-20260907-us0131`, `model_id=composer-2.5`, CROSS_MODEL_REVIEW=1).
+- **Coverage**: AC-1..AC-8 surjective vs T-anch+T-001..T-008; `task_count=9<=12`; no `PLAN_AC_COVERAGE_GAP`; `decision_gate=false`.
+- **Critic NB closures**: AC-6 notes vs marker 5 nuance (m5=AC-3/DQ4 primary; AC-6 via T-005+m4); `host_mode=None` auto-detect pin T-001/T-003; do **not** re-split T-009 (marker 9 retained in T-007).
+- **Governance**: DEC-0131 Accepted; `# US-0131`; R-0116; approach A1; US-0132 OUT OF SCOPE; Status OPEN (US-0045).
+- **Producer proof consumed**: `rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131` / `96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66` — RUNTIME_PROOF_VALID (consumed 2026-09-07T19:52:00Z before ttl 2026-09-07T20:45:00Z).
+- **Plan-verify proof**: `rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131` / `5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1` / ttl `2026-09-07T20:52:00Z`.
+- **Next queue target**: `/execute` (**dev**, fresh). Do NOT spawn execute from this qa. Do NOT mark US-0131 DONE. Do NOT work US-0132.
+
+## Prior — **`S0133` / `US-0131`** (**`/plan-verify`** PENDING — superseded)
+
+- **Verdict**: **PENDING** — superseded by plan-verify **PASS** above (`planned_at=2026-09-07T19:45:00Z`, **tech-lead**, `fresh_context_marker=tl-US0131-sprint-plan-20260907T194500Z-fresh`).
+
+---
+
 # QA — `/plan-verify` handoff (hot inbox)
 
 ## Next — **`S0107` / `US-0107`** (**`/execute`**)

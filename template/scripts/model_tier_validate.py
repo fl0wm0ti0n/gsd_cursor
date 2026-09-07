@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 sys.path.insert(0, str(Path(__file__).parent))
+import host_runtime_config_lib as hrc  # noqa: E402
 from model_tier_lib import (
     CANONICAL_PHASE_IDS,
     CATALOG_ROLE_KEYS,
@@ -526,6 +527,8 @@ Examples:
                     all_errors.extend(f"[{code.value}] {e}" for e in errors)
 
         scratchpad = repo_root / ".cursor" / "scratchpad.md"
+        # US-0131 path inject only — do not reinterpret/validate MODEL_* here (US-0132).
+        _ = hrc.resolve_runtime_config(repo_root, raise_on_fatal=False)
         if scratchpad.exists():
             print(f"[SCRATCHPAD] Validating {scratchpad}...")
             is_valid, errors = validate_scratchpad_tiers(scratchpad)

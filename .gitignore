@@ -12,6 +12,7 @@ backups/
 .cursor/dev-environment.json
 .cursor/scratchpad.local.md
 .cursor/model-catalog.local.json
+.its-magic/config.local.json
 
 # Template hook state (not shipped)
 template/.cursor/hooks/*.jsonl

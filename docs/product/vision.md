@@ -2142,6 +2142,47 @@ AI coding assistants in Cursor lose context across sessions, produce fragmented 
 - **Split rationale**: US-0131 defines the host-neutral runtime/configuration adapter for shared behavior. US-0132 defines model-file ownership and keeps Cursor phase/tier catalogs separate from OpenCode per-role provider catalogs. Combining them would obscure two different schemas and precedence domains.
 - **Operator locks**: no silent host fallback; no duplication of Cursor command/rule bodies; no credentials or real provider slugs in templates; local operator files remain protected; unsupported host-specific features fail or skip deterministically.
 - **Next**: `/discovery` (fresh **po**) for **US-0131**, then **US-0132**.
+- **Discovery**: see `## Discovery Notes — US-0131` below (US-0132 discovery deferred until US-0131 segment advances).
+
+## Discovery Notes — US-0131
+
+- **Story**: Cross-host Its-Magic runtime configuration and parity.
+- **Discovery date**: 2026-09-07T19:15:00Z (UTC)
+- **Role / model**: po / `composer-2.5` (CROSS_MODEL_REVIEW=1)
+- **Orchestrator**: `orchestrator_run_id=auto-20260907-us0131`, `delivery_mode=ultra_lean`, macro=`spec` (intake PASS — not re-intaken)
+- **References**: `docs/product/backlog.md` `## US-0131` (AC-1..AC-8 + Boundaries); intake `handoffs/intake_evidence/US-0131-0132-intake-20260906.json` (RE-ATTEST read-only — JSON not mutated); vision intake notes above; DEC-0055 / US-0073 scratchpad Model B; DEC-0039 example refresh + local preservation; US-0121..US-0126 OpenCode adapter compose; OpenCode config surfaces https://opencode.ai/v2/docs/config/ (`opencode.json{,c}`, `.opencode/`); script hardcode inventory (`auto_outer_driver.py`, `opencode_auto_bridge.py`, `enforce-triad-hot-surface.py`, `dev_environment_lib.py`, `caveman_compress_input.py`).
+- **Current gap (locked)**: Shared governance/runtime keys are still consumed via Cursor-path readers. OpenCode-only installs cannot satisfy the shared kernel without inventing a `.cursor/` dependency. Host-specific UX (Cursor `.mdc` rules, OpenCode Layer-1 agents/plugin) must stay classified — not silently assumed everywhere.
+- **UX / operator config surface (discovery)**:
+  - **Cursor**: team baseline `.cursor/scratchpad.md` + personal `.cursor/scratchpad.local.md` (gitignored) remain the familiar compatibility UX; installer must not overwrite active local files (DEC-0039 compose).
+  - **OpenCode**: operators already use `opencode.json{,c}` + `.opencode/` for host pack/agents/commands/plugins — kit shared settings must resolve without requiring `.cursor/`; do **not** dump kit governance keys into OpenCode model/`permission` schema without an explicit architecture lock (DQ1).
+  - **Both**: one deterministic precedence; no conflicting duplicate writes; independent host-local overrides where schemas differ.
+- **Capability classification seed (for `/research` to finalize)**:
+  - **Shared / host-neutral**: `DELIVERY_MODE`, `TOKEN_PROFILE`, `AUTO_*` orchestration keys, intake/work-kind/id-bootstrap keys, triad hot-surface thresholds, phase plan/exclude/include, state/handoff governance toggles used by Python validators and outer driver.
+  - **Cursor-only (fail/skip when absent)**: `.cursor/rules/*.mdc` advisory surface, Cursor browser MCP UAT path, `REMOTE_CONFIG=.cursor/remote.json` default path, Cursor Task spawn wiring, `MODEL_PROVIDER_MODE=cursor` (compose note — model resolution owned by US-0132).
+  - **OpenCode-only (fail/skip when absent)**: `.opencode/agents` Layer-1 matrix, orchestrator plugin spawn, thin `.opencode/commands`, `OPENCODE_*` reason codes, OpenCode `/connect` auth store.
+  - **US-0132-owned (do not specify here)**: `.cursor/model-catalog.local.json`, `.opencode/model-catalog.local.json`, scratchpad `MODEL_*` / `MODEL_TIER_*`, materializers, volatile slug policy.
+- **Discovery locks D1–D10**:
+  - **D1 (Host-neutral SOT — AC-1)**: Document a typed, host-neutral configuration contract for shared Its-Magic runtime/governance settings. No credentials, provider secrets, or real vendor model slugs in the contract or templates.
+  - **D2 (Cursor compatibility adapter — AC-2)**: Cursor scratchpad layers (DEC-0055 Model B merge + DEC-0039 local protection) remain a **compatibility reader/adapter** into the host-neutral contract — not silently redefined as the only SOT.
+  - **D3 (OpenCode-only operation — AC-3)**: OpenCode-only install must resolve all shared settings required by supported lifecycle phases **without** requiring `.cursor/scratchpad.md` or `.cursor/scratchpad.local.md`.
+  - **D4 (Shared-kernel migration — AC-4)**: Shared Python validators, outer-driver paths, triad/state/handoff governance, and common scripts accept resolved configuration explicitly; hardcoding `.cursor` for host-neutral behavior is forbidden after migration.
+  - **D5 (Host-specific boundaries — AC-5)**: Cursor-only and OpenCode-only capabilities are classified; unavailable capabilities fail or skip with documented reason codes — no silent unsupported-parity claims; no cloning of Cursor command/rule bodies into OpenCode.
+  - **D6 (Both-host determinism — AC-6)**: `--host both` has one deterministic precedence model, prevents conflicting duplicate writes, and preserves independent host-local overrides where schemas differ.
+  - **D7 (Installer safety — AC-7)**: Install / missing / upgrade / clean deliver config **examples** to the selected host, preserve local operator files, and do not overwrite active scratchpad/config data.
+  - **D8 (Verification + docs — AC-8)**: Cross-host contract tests for cursor-only, opencode-only, and both-host modes; document supported lifecycle phases, config precedence, migration, and reason-code behavior (active + template).
+  - **D9 (US-0132 boundary)**: Model catalog ownership, materialization, and `MODEL_*` schemas remain **US-0132**. US-0131 may pass through resolved non-model settings only; do not invent a third undocumented model SOT (`model.json` forbidden — US-0132).
+  - **D10 (Compose do-not-amend)**: Compose US-0073/DEC-0055, DEC-0039, US-0121..US-0126, US-0092 outer driver, US-0069 phase→role. Do **not** reopen BUG-0015/BUG-0016; do **not** amend Cursor or OpenCode model DECs (0086/0087/0123).
+- **Open questions for `/research` (DQ1..DQ10)** — research owns **`R-0116`** allocation (do not extend R-0115 BUG-0016):
+  - **DQ1 (Neutral config path — AC-1/AC-3)**: Canonical filesystem location for the host-neutral contract (repo-root kit file vs `.its-magic/` vs `.opencode/its-magic-*.json` vs other) — must not require `.cursor/` on OpenCode-only.
+  - **DQ2 (Schema shape — AC-1)**: Typed schema for shared keys vs host-adapter overlays; versioning; fail-closed codes for malformed/missing required shared keys.
+  - **DQ3 (Cursor adapter — AC-2)**: How scratchpad merge (baseline + local) maps into the neutral resolver without breaking DEC-0055 precedence or DEC-0039 preservation.
+  - **DQ4 (OpenCode adapter — AC-3)**: How OpenCode-only installs supply shared settings (dedicated kit config file vs reading a non-model subset of `opencode.json` — latter discouraged unless architecture proves isolation from US-0132 surfaces).
+  - **DQ5 (Hardcode inventory — AC-4)**: Complete inventory of `.cursor/scratchpad*` (and related) hardcodes in `scripts/` / `its_magic/` and the migration injection API shape.
+  - **DQ6 (Both-host precedence — AC-6)**: Exact precedence table when Cursor adapter + OpenCode adapter + neutral file coexist under `--host both`.
+  - **DQ7 (Capability matrix — AC-5)**: Finalize shared / Cursor-only / OpenCode-only / skip-vs-fail matrix with reason-code family names.
+  - **DQ8 (Installer surfaces — AC-7)**: Which installer/manifest paths deliver examples per `--host cursor|opencode|both`; confirm never-overwrite rules for local operator files.
+  - **DQ9 (Contract tests — AC-8)**: Minimal `test_us0131_*` marker inventory + fixture strategy (cursor-only / opencode-only / both) without live OpenCode CI probe.
+  - **DQ10 (Docs parity — AC-8)**: Runbook/README/auto-orchestration-reference anchors (active + template) for precedence, migration, and unsupported-capability behavior.
 
 ## Intake Notes — US-0130
 

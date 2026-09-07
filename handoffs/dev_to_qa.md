@@ -1,108 +1,109 @@
-# Dev → QA handoff — BUG-0016 / S0132 / execute PASS
+## Execute remediation PASS handoff — US-0131 / S0133 — /qa re-run (fresh qa)
 
-- sprint_id: S0132
-- bug_id: BUG-0016 (Status OPEN — authority docs/product/backlog.md; do NOT mark DONE)
-- story_id: (none — bug segment)
-- phase_id: execute
+- sprint_id: S0133
+- story_id: US-0131 (Status OPEN — authority docs/product/backlog.md)
+- companion_dec: DEC-0131 Accepted
+- research_anchor: R-0116
+- architecture_anchor: docs/engineering/architecture.md # US-0131
+- approach: A1 LOCKED (unchanged)
+- orchestrator_run_id: auto-20260907-us0131
+- phase_id: execute (remediation)
 - role: dev
-- orchestrator_run_id: auto-20260906-bug0016
-- delivery_mode: ultra_lean
-- macro_phase: build+verify
-- fresh_context_marker: dev-BUG0016-execute-20260906T190500Z-fresh
-- timestamp: 2026-09-06T19:05:00Z (UTC)
+- fresh_context_marker: dev-US0131-execute-remediation-20260907T202531Z-fresh
+- timestamp: 2026-09-07T20:25:31Z (UTC)
+- model_id: composer-2.5 (CROSS_MODEL_REVIEW=1 — required on isolation)
+- execute_verdict: EXECUTE_REMEDIATION_PASS
+- decision_gate: false
+- sprint_status: EXECUTE_REMEDIATION_PASS (backlog OPEN per US-0045 — not mutated; AC-1..AC-8 unchecked)
+- blocking_finding_fixed: B-1 USER_VISIBLE_INTERNAL_METADATA_DETECTED
+- fix: Removed US-0131 from installer.py docstrings (materialize_kit_config_example + run_kit_config_postinstall); # comments allowlisted
+- tests: pytest tests/us0131_contract_test.py -v → 10/10 PASS
+- parity: check_intake_template_parity.py --scope=us-0131 → OK
+- metadata: check-user-visible-metadata.py --repo . → exit 0
+- triad: enforce-triad-hot-surface.py --check → exit 0 (pre-append)
+- compose_guards: US-0132 OUT OF SCOPE held; BUG-0015/0016 not reopened; no DONE flip; no AC ticks
+- runtime_proof_id: rp-auto-20260907-us0131-execute-remediation-dev-20260907T202531Z-US-0131
+- proof_hash: 7BB3B2E38B12A434B1039A1FEC7BC90727CD15823C36328B1A32BF5E12FEB95C
+- proof_ttl: 2026-09-07T21:25:31Z
+- consumed_qa_proof: rp-auto-20260907-us0131-qa-qa-20260907T201647Z-US-0131 / 49001F39145837AF92BDC30671FF4D097F232A64DBA7C2E3E6782CC72503C66E — RUNTIME_PROOF_VALID
+- next_scheduled_phase: /qa (role=qa; re-run)
+- next_scheduled_role: qa
+- stop_condition: STOP after execute remediation. Orchestrator may critic then spawn /qa in fresh qa (BUG-0006). Do NOT spawn qa from this execute subagent. Do NOT mark US-0131 DONE. Do NOT work US-0132.
+
+---
+
+## Execute PASS handoff — US-0131 / S0133 — `/qa` next (fresh qa)
+
+- sprint_id: S0133
+- story_id: US-0131 (Status OPEN — authority docs/product/backlog.md)
+- companion_dec: DEC-0131 Accepted
+- research_anchor: R-0116 (DQ1–DQ10 LOCKED)
+- architecture_anchor: docs/engineering/architecture.md # US-0131
+- approach: A1 LOCKED — `.its-magic/config{,.local,.example}.json` SOT + LegacyScratchpadAdapter + `resolve_runtime_config` migration
+- orchestrator_run_id: auto-20260907-us0131
+- fresh_context_marker: dev-US0131-execute-20260907T200826Z-fresh
+- timestamp: 2026-09-07T20:08:26Z (UTC)
 - model_id: composer-2.5 (CROSS_MODEL_REVIEW=1 — required on isolation)
 - execute_verdict: PASS
-- approach: A* — DEC-0122 §2 sole SOT + agent frontmatter parity; bash ask po/tl/curator; PO duty paths; S* sprint globs; release duty paths; 7× test_bug0016_*; success test (c) preserved
-- companion_DEC: none (DEC-0130 rejected; DEC-0122 §2 already amended in architecture)
+- decision_gate: false
+- sprint_status: EXECUTE_PASS (backlog OPEN per US-0045 — not mutated; AC-1..AC-8 unchecked)
+- task_count: 9 (T-anch + T-001..T-008; all DONE)
+- tests: `pytest tests/us0131_contract_test.py -v` → 10/10 PASS
+- parity: `check_intake_template_parity.py --scope=us-0131` → OK
+- triad: `enforce-triad-hot-surface.py --check` → exit 0
+- compose_guards: US-0132 OUT OF SCOPE held; BUG-0015/0016 not reopened; no DONE flip; no AC ticks; no live OpenCode probe
+- key_deliverables:
+  - `.its-magic/config.example.json` (+ template)
+  - `scripts/host_runtime_config_lib.py` (+ template)
+  - 9 shared-kernel modules migrated
+  - installer `run_kit_config_postinstall` + manifest kernel path
+  - `tests/us0131_contract_test.py` 10 markers (+ template)
+  - runbook h2 + README + auto-orchestration-reference + US-0126 additive HOST_CONFIG_* rows
+- runtime_proof_id: rp-auto-20260907-us0131-execute-dev-20260907T200826Z-US-0131
+- proof_hash: 0A1A526927EC1F78F02ECDC7C085A3A978C53E7C3E57C6E48C1B845E1E02F9B4
+- proof_ttl: 2026-09-07T21:08:26Z
+- consumed_plan_verify_proof: rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131 / 5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1 — RUNTIME_PROOF_VALID
+- next_scheduled_phase: /qa (role=qa)
+- next_scheduled_role: qa
+- stop_condition: STOP after execute. Orchestrator may critic then spawn /qa in fresh qa (BUG-0006). Do NOT spawn qa from this execute subagent. Do NOT mark US-0131 DONE. Do NOT work US-0132.
 
-## What shipped
+---
 
-1. Active + template `.opencode/agents/{po,tech-lead,dev,qa,release,curator}.md` frontmatter aligned to amended DEC-0122 §2
-2. po/tech-lead/curator: `bash: ask` (not deny/allow)
-3. PO edit: +`handoffs/intake_evidence/**` +`handoffs/resume_brief.md` +`docs/engineering/state.md`; `**` deny last
-4. tech-lead/dev/qa/release: `sprints/Sxxxx/…` → `sprints/S*/…`
-5. release: +release-findings +verify-work-to-release +state.md +resume_brief.md +runbook.md (keep verify_to_release)
-6. security.md / auto.md UNCHANGED
-7. `tests/us0122_contract_test.py` intentional realign + `tests/bug0016_contract_test.py` (7 markers) + template mirrors
-8. Parity scope `bug-0016` (+ agent pairs on `opencode-adapter`)
-9. T-007: write-guard does not re-deny duty globs — DEC-0124/0125 untouched
+## Plan-verify PASS handoff — US-0131 / S0133 — `/execute` next (fresh dev)
 
-## Test evidence
-
-| Gate | Result |
-|---|---|
-| `pytest tests/bug0016_contract_test.py -v` | 7/7 PASS |
-| `pytest tests/us0122_contract_test.py -q` | 8/8 PASS (intentional realign) |
-| `check_intake_template_parity.py --scope=bug-0016` | OK |
-| `enforce-triad-hot-surface.py --check` | exit 0 |
-| `check-user-visible-metadata.py --repo . --json` | OK / 0 violations |
-
-## Files changed (execute)
-
-- `.opencode/agents/{po,tech-lead,curator,dev,qa,release}.md` + `template/.opencode/agents/` peers
-- `tests/us0122_contract_test.py` + `template/tests/us0122_contract_test.py`
-- `tests/bug0016_contract_test.py` + `template/tests/bug0016_contract_test.py` (NEW)
-- `scripts/check_intake_template_parity.py` + template (`bug-0016` scope + agent pairs)
-- `sprints/S0132/{t-anch-verification.md,summary.md,progress.md,tasks.md}`
-- `docs/engineering/state.md` (execute checkpoint)
-- `handoffs/resume_brief.md` (execute PASS → qa)
-- `handoffs/dev_to_qa.md` (this file)
-
-## Compose / scope guards for QA
-
-- Do NOT invent DEC-0130 / second matrix SOT
-- Do NOT use `bash: allow`
-- Do NOT amend DEC-0124 / DEC-0125 bodies (T-007: no double-deny proven)
-- Do NOT reopen US-0131 / US-0132
-- Do NOT reopen BUG-0015 (DONE compose-note only)
-- Do NOT mark BUG-0016 DONE; do NOT tick acceptance BUG-0016
-- Do NOT mutate intake JSON
-- Do NOT rewrite architecture.md
-- CF2: release runbook Layer-1 allow ≠ US-0126 prose ownership transfer
-- plan-verify.json: create within QA per ultra_lean (merged into build+verify)
-
-## Runtime proof (producer)
-
-- runtime_proof_id: `rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016`
-- proof_hash: `519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF`
-- proof_ttl: 2026-09-06T20:05:00Z
-- prior_consumed: `rp-auto-20260906-bug0016-sprint-plan-techlead-20260906T185500Z-BUG-0016` (F6892B96789FF471D7A97B40F80BBE59E725FB5A5DD573515D0ABC663B0A997F)
-
-## critic_evidence (CROSS_MODEL_REVIEW=1 — producer evidence; critic runs after)
-
-```yaml
-critic_evidence:
-  producer_phase_id: execute
-  producer_role: dev
-  producer_model_id: composer-2.5
-  orchestrator_run_id: auto-20260906-bug0016
-  sprint_id: S0132
-  story_id: BUG-0016
-  bug_id: BUG-0016
-  fresh_context_marker: dev-BUG0016-execute-20260906T190500Z-fresh
-  runtime_proof_id: rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016
-  proof_hash: 519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF
-  proof_issued_at: 2026-09-06T19:05:00Z
-  proof_ttl: 2026-09-06T20:05:00Z
-  canonical_payload: '{"delivery_mode":"ultra_lean","macro_phase":"build+verify","model_id":"composer-2.5","orchestrator_run_id":"auto-20260906-bug0016","phase_id":"execute","proof_issued_at":"2026-09-06T19:05:00Z","proof_ttl_seconds":3600,"role":"dev","runtime_proof_id":"rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016","sprint_id":"S0132","story_id":"BUG-0016"}'
-  evidence_refs:
-    - sprints/S0132/summary.md
-    - sprints/S0132/tasks.md
-    - sprints/S0132/progress.md
-    - sprints/S0132/t-anch-verification.md
-    - tests/bug0016_contract_test.py
-    - tests/us0122_contract_test.py
-    - .opencode/agents/po.md
-    - .opencode/agents/release.md
-    - decisions/DEC-0122.md
-    - docs/engineering/state.md
-  nb_awareness_closed_in_execute:
-    - b0016ar-challenger-001 / ik_bug0016_arch_edge_and_proof (T-007 write-guard verify; S* kept; parity + us0122 realign)
-    - b0016ar-architect-002 / ik_bug0016_arch_layer_coupling (T-anch..T-007 1:1; DEC-0122 sole SOT; CF2 runbook allow ≠ US-0126 ownership)
-    - b0016ar-subtractor-003 / ik_bug0016_arch_scope_minimal (no DONE / no DEC-0130 / no bash:allow / no live probe / 7 markers)
-  ready_for_sovereign_critic: true
-```
-
-## Stop condition
-
-STOP after execute. Orchestrator owns sovereign-critic of execute then `/qa` in fresh qa subagent (BUG-0006). Do not spawn QA from this subagent. Do not mark BUG-0016 DONE. Do not tick acceptance. Do not reopen BUG-0015.
+- sprint_id: S0133
+- story_id: US-0131 (Status OPEN — authority docs/product/backlog.md)
+- bug_id: (none)
+- companion_dec: DEC-0131 Accepted
+- research_anchor: R-0116 (DQ1–DQ10 LOCKED)
+- architecture_anchor: docs/engineering/architecture.md # US-0131
+- approach: A1 LOCKED — `.its-magic/config{,.local,.example}.json` SOT + LegacyScratchpadAdapter + `resolve_runtime_config` migration
+- orchestrator_run_id: auto-20260907-us0131
+- plan_verify_fresh_context_marker: qa-US0131-plan-verify-20260907T195200Z-fresh
+- plan_verify_timestamp: 2026-09-07T19:52:00Z (UTC)
+- model_id: composer-2.5 (CROSS_MODEL_REVIEW=1 — required on isolation)
+- plan_verify_verdict: PASS
+- decision_gate: false
+- sprint_status: PLANNED → execute-ready (backlog OPEN per US-0045 — not mutated; AC-1..AC-8 unchecked)
+- task_count: 9 (T-anch + T-001..T-008; T-009 folded into T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-007(m1,m6); AC-2->T-002,T-007(m2); AC-3->T-003,T-007(m3; m5 DQ4 primary); AC-4->T-004,T-007(m8); AC-5->T-005,T-007(m10); AC-6->T-005,T-007(m4 primary; m5 nuance=AC-3/DQ4); AC-7->T-006,T-007(m7); AC-8->T-007(all10 incl m9),T-008; DC->T-anch
+- task_order: T-anch -> T-001 -> T-002 -> T-003 -> T-004 -> T-005 -> T-006 -> T-007 -> T-008
+- plan-verify.json: PASS at sprints/S0133/plan-verify.json
+- compose_guards (non-negotiable): DO NOT expand US-0132; DO NOT dump kit keys into opencode.json; DO NOT reopen BUG-0015/0016; DO NOT amend DEC-0086/0087/0123; DO NOT mark US-0131 DONE; DO NOT tick ACs; DO NOT mutate intake JSON; DO NOT rewrite architecture.md / DEC-0131
+- critic_nb_execute_awareness:
+  - host_mode=None = auto-detect (T-001/T-003); HOST_CONFIG_PATH_FORBIDDEN only OpenCode-only + forbidden cursor-sole request
+  - T-004 exhaustive 9-module inventory; do not expand to Cursor-only parity scripts
+  - Do not re-split T-009; marker 9 mandatory in T-007 10-marker set
+- first_execute_task: T-anch
+- key_locked_artifacts:
+  - paths: `.its-magic/config.example.json` / `config.json` / `config.local.json` (token=`config`)
+  - API: `resolve_runtime_config(repo_root, *, host_mode=None, required_keys=None)`
+  - 10 `test_us0131_*` markers (static/fixture; no live OpenCode probe)
+  - US-0132 boundary: ignore MODEL_* (marker 9)
+- runtime_proof_id: rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131
+- proof_hash: 5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1
+- proof_ttl: 2026-09-07T20:52:00Z
+- consumed_sprint_plan_proof: rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131 / 96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66 — RUNTIME_PROOF_VALID
+- next_scheduled_phase: /execute (role=dev)
+- next_scheduled_role: dev
+- stop_condition: STOP after plan-verify. Orchestrator may critic plan-verify then spawn /execute in fresh dev (BUG-0006). Do NOT spawn execute from plan-verify qa. Do NOT work US-0132.

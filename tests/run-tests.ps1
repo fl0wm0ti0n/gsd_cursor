@@ -1671,6 +1671,12 @@ Assert-True "check_intake_template_parity --scope=bug-0016 passes (BUG-0016)" ($
 $bug0016Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\bug0016_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
 Assert-True "BUG-0016 contract tests pass" ($bug0016Contract.ExitCode -eq 0)
 
+# 26AE) US-0131 — Cross-host Its-Magic runtime configuration and parity
+$us0131Parity = Start-Process python -ArgumentList @((Join-Path $root "scripts\check_intake_template_parity.py"), "--scope=us-0131") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "check_intake_template_parity --scope=us-0131 passes (US-0131)" ($us0131Parity.ExitCode -eq 0)
+$us0131Contract = Start-Process python -ArgumentList @("-m", "pytest", "tests\us0131_contract_test.py", "-q") -PassThru -NoNewWindow -Wait -WorkingDirectory $root
+Assert-True "US-0131 contract tests pass" ($us0131Contract.ExitCode -eq 0)
+
 # Cleanup
 if (Test-Path (Join-Path $root "tests\.tmp-install")) {
   Remove-Item -Recurse -Force (Join-Path $root "tests\.tmp-install") -ErrorAction SilentlyContinue

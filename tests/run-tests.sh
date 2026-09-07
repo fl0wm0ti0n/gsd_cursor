@@ -1540,6 +1540,16 @@ set -e
 assert_true "check_intake_template_parity --scope=bug-0016 passes (BUG-0016)" "[ \"$BUG0016_PARITY_PY\" -eq 0 ]"
 assert_true "BUG-0016 contract tests pass" "[ \"$BUG0016_CONTRACT_PY\" -eq 0 ]"
 
+# 26AE) US-0131 — Cross-host Its-Magic runtime configuration and parity
+set +e
+"$PY" "$ROOT/scripts/check_intake_template_parity.py" --scope=us-0131 >/dev/null 2>&1
+US0131_PARITY_PY=$?
+"$PY" -m pytest tests/us0131_contract_test.py -q >/dev/null 2>&1
+US0131_CONTRACT_PY=$?
+set -e
+assert_true "check_intake_template_parity --scope=us-0131 passes (US-0131)" "[ \"$US0131_PARITY_PY\" -eq 0 ]"
+assert_true "US-0131 contract tests pass" "[ \"$US0131_CONTRACT_PY\" -eq 0 ]"
+
 timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 {
   echo "# its-magic Test Report"

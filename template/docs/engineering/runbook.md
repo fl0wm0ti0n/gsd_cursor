@@ -4199,6 +4199,19 @@ Raw Python validator reason codes (Python SOT — no `OPENCODE_*` wrapper per DE
 | `INTAKE_REQUIRED_TOPIC_MISSING` | `intake_evidence_validate.py` found a missing required topic; fail closed; surface to operator. | US-0078 / DEC-0060 (Python SOT) |
 | `BUG_ISSUE_VALIDATION_FAILED` | `bug_issue_validate.py` refused a bug-row write; fail closed; surface to operator. | US-0079 / DEC-0061 (Python SOT) |
 
+`HOST_CONFIG_*` family (host-neutral kit config — additive from US-0131 / DEC-0131; compose only):
+
+| Code | Semantics + fail-closed action | Owning slice |
+|------|--------------------------------|--------------|
+| `HOST_CONFIG_SCHEMA_UNSUPPORTED` | Unsupported `schema_version` in `.its-magic/config*.json`; fail closed. | US-0131 |
+| `HOST_CONFIG_INVALID` | Malformed JSON / wrong types / unknown top-level keys; fail closed. | US-0131 |
+| `HOST_CONFIG_MISSING_REQUIRED` | Call-site `required_keys` empty after full resolve; fail closed. | US-0131 |
+| `HOST_CONFIG_PATH_FORBIDDEN` | OpenCode-only asked to treat `.cursor/` as sole SOT, or kit keys dumped into `opencode.json`; fail closed. | US-0131 |
+| `HOST_CONFIG_SECRET_REJECTED` | Credential-shaped values in shared layers; fail closed. | US-0131 |
+| `HOST_CONFIG_KEY_SHADOWED` | Kit local and Cursor local disagree (kit wins); diagnostic; fatal only when `HOST_CONFIG_STRICT=1`. | US-0131 |
+
+Cross-link: full operator guidance for precedence, migration, and unsupported-capability behavior lives in `## Cross-host runtime configuration (US-0131)`.
+
 ### Parity scope
 
 The whole OpenCode adapter epic surface (US-0121..US-0126) is validated by
@@ -4207,4 +4220,64 @@ byte-identical active↔template pair checks for the manifest, parity script,
 contract tests, runbook, and model-tier validator. Reason-code table presence
 and `test_us0126_*` marker coverage are asserted by `tests/us0126_contract_test.py`
 (contract-test grep), not by the parity CLI (the parity CLI stays byte-only).
+
+## Cross-host runtime configuration (US-0131)
+
+**Release status (S0133 / US-0131)**: **`released`** (`2026-09-07T21:15:18Z`); backlog remains **OPEN** until `/closure`. Operator verify: **`handoffs/releases/S0133-release-notes.md`** **## Verify**; publish skipped while **`RELEASE_PUBLISH_MODE=confirm`**. Gate-1 evidence: `tests/report.md` @ `2026-09-07T21:15:18Z` Pass:853 / Fail:0.
+
+Shared Its-Magic lifecycle/governance settings resolve through host-neutral
+`.its-magic/config{,.local,.example}.json` (`DEC-0131` approach A1). Cursor
+`.cursor/scratchpad*` remains a **compatibility adapter** (DEC-0055 Model B +
+DEC-0039 never-overwrite of locals). OpenCode-only installs resolve shared
+settings from `.its-magic/` + code defaults **without requiring `.cursor/`**.
+
+API: `scripts/host_runtime_config_lib.py:resolve_runtime_config(repo_root, *, host_mode=None, required_keys=None)`.
+
+### Precedence (shared keys — highest wins)
+
+1. Explicit one-run test override path (`ITS_MAGIC_CONFIG_ROOT` / `--config-root`) — not a second SOT
+2. `.its-magic/config.local.json` (`shared.*`)
+3. Cursor local (`.cursor/scratchpad.local.md` via adapter)
+4. `.its-magic/config.json` (`shared.*`)
+5. Cursor baseline (`.cursor/scratchpad.md`)
+6. `.its-magic/config.example.json`
+7. Built-in code defaults
+
+When kit local and Cursor local disagree → **kit local wins** and emit
+`HOST_CONFIG_KEY_SHADOWED` (non-fatal unless `HOST_CONFIG_STRICT=1`; default off).
+
+`host_mode=None` means **auto-detect** from install surfaces. Do not equate
+`None` with OpenCode-only. `HOST_CONFIG_PATH_FORBIDDEN` applies only when the
+resolved host is OpenCode-only **and** the caller requests `.cursor/` as sole SOT
+(or when kit governance keys are dumped into `opencode.json{,c}`).
+
+### Migration
+
+Shared-kernel scripts (outer-driver, OpenCode bridge, triad enforce,
+`dev_environment_lib`, caveman compress, parallel arbiter, UAT probe, autonomy
+stop matrix, and `model_tier_validate` **path inject only**) call
+`resolve_runtime_config` instead of silently hardcoding `.cursor/scratchpad*`.
+`MODEL_*` / `MODEL_TIER_*` keys are **ignored** by this resolver (US-0132 owns
+model catalogs/materializers).
+
+### Unsupported capability behavior
+
+| Class | Unavailable behavior |
+|-------|----------------------|
+| Shared / host-neutral | `HOST_CONFIG_*` fail-closed or defaults |
+| Cursor-only | `CURSOR_CAPABILITY_UNAVAILABLE` — no silent parity |
+| OpenCode-only | existing `OPENCODE_*` (US-0124/0126) unchanged |
+| US-0132-owned | out of scope; ignore |
+
+### Installer safety
+
+- `.its-magic/config.example.json` is a **kernel** install path for all `--host` modes.
+- Missing `.its-magic/config.json` materializes from example (Model B semantics).
+- **Never overwrite** `.its-magic/config.local.json` or `.cursor/scratchpad.local.md`.
+
+### Reason codes
+
+See additive `HOST_CONFIG_*` rows under `## OpenCode host operator runbook (US-0126)` →
+`### Consolidated cross-host reason-code table`. Contract tests:
+`python -m pytest tests/us0131_contract_test.py -v` (10 markers; no live OpenCode probe).
 

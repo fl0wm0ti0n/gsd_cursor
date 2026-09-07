@@ -1,131 +1,3 @@
-## Architecture handoff — BUG-0016 OpenCode Layer-1 permissions vs kit duties
-
-- **Phase completed**: architecture. **Role**: tech-lead. **Bug**: BUG-0016 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
-- **Timestamp (UTC)**: 2026-09-06T18:45:00Z. **Fresh marker**: `tl-BUG0016-architecture-20260906T184500Z-fresh`.
-- **Orchestrator**: `orchestrator_run_id=auto-20260906-bug0016`, `delivery_mode=ultra_lean`, macro=`plan`.
-- **Architecture anchor**: `docs/engineering/architecture.md` `# BUG-0016` (H1; `baseline_h2_count=0`).
-- **Approach A\*** LOCKED: amend **DEC-0122 §2** sole SOT + agent frontmatter (active+template) — bash ask for po/tl/curator; PO +intake_evidence/** +resume_brief +state.md; `sprints/S*/` globs; release duty paths; 7 `test_bug0016_*`; success test (c) preserved. Companion DEC: **none**.
-- **DEC**: `decisions/DEC-0122.md` §2 amended in THIS phase (R-0115 DQ6). DEC-0130 rejected.
-- **Seeds for `/sprint-plan`**: T-anch + T-001..T-007 (8; under SPRINT_MAX_TASKS=12).
-- **Runtime proof**: `rp-auto-20260906-bug0016-architecture-techlead-20260906T184500Z-BUG-0016` / `proof_hash=7AC851CDF1953594365AFF11B015BFD850E737F75A327FA2A02B1CCB544D5A31` / ttl `2026-09-06T19:45:00Z`.
-- **Status**: BUG-0016 remains **OPEN**. **Next**: `/sprint-plan` in fresh tech-lead subagent. Do not spawn sprint-plan from this architecture chat. STOP.
-
----
-
-## Discovery handoff — BUG-0016 OpenCode Layer-1 permissions vs kit duties
-
-- **Phase completed**: discovery. **Role**: po. **Bug**: BUG-0016 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
-- **Timestamp (UTC)**: 2026-09-06T18:20:00Z. **Fresh marker**: `po-BUG0016-discovery-20260906T181957Z-fresh`.
-- **Orchestrator**: `orchestrator_run_id=auto-20260906-bug0016`, `delivery_mode=ultra_lean`, macro=`spec` (intake already DONE — not re-intaken).
-- **Sibling boundary**: BUG-0015 is **DONE** (dispatch fix shipped) — out of scope except compose note that auto spawn-only Task path may now work; this segment is **permissions matrix vs kit duties only**. US-0131/US-0132 out of scope.
-- **Gap confirmed (narrow-read)**: `.opencode/agents/*.md` + `template/.opencode/agents/*.md` peers are byte-identical and match `decisions/DEC-0122.md` §2 literally; incompatible with kit phase contracts (validators + real sprint/handoff paths).
-
-### Discovery locks D1–D8
-
-| ID | Lock |
-|----|------|
-| **D1** | Validator roles **`po` / `tech-lead` / `curator`**: change `bash: deny` → **`bash: ask`** (parity with `dev`/`qa`/`release`). Reject `bash: allow`. Optional bash **object** allowlist (`python *` → ask, `*` → deny last) is a research refinement only — not required to unblock duties. |
-| **D2** | **PO edit** add allows: `handoffs/intake_evidence/**`, `handoffs/resume_brief.md`; keep `docs/product/**` + `handoffs/po_to_tl.md`; `**` → deny **last**. Success test (c) preserved (no production/code allow). Whether PO also needs `docs/engineering/state.md` for phase checkpoints → DQ2. |
-| **D3** | Replace literal placeholder globs `sprints/Sxxxx/…` with real OpenCode minimatch **`sprints/S*/…`** for tech-lead (`sprint.md`, `tasks.md`), dev (`progress.md`, `qa-findings.md`), qa (qa-findings / plan-verify / verify-work / uat paths). Exact pattern (`S*` vs `S[0-9]*` vs `sprints/*/`) → DQ3. |
-| **D4** | **tech-lead** + **curator** get `bash: ask` so triad/`enforce-triad-hot-surface.py` and research/architecture validators can run under operator prompt (same posture as D1). |
-| **D5** | **release** edit add: `sprints/S*/release-findings.md` + `handoffs/verify-work-to-release.md` (kit uses both `verify_to_release.md` and `verify-work-to-release.md`); keep existing release handoff/CHANGELOG allows; `bash: ask` unchanged. |
-| **D6** | **Amend DEC-0122 §2** as the primary matrix SOT (bug-fix of US-0122 contract). Optional thin companion **DEC-0130** at `/architecture` for audit trail only — must not become a second competing matrix. Do not reopen US-0122 as a feature story. |
-| **D7** | Tests: extend **static permission-object harness** — additive `test_bug0016_*` and/or amend `us0122_*` markers; assert bash postures, new allow globs, `S*` not `Sxxxx`, deny-last ordering, no production allow for non-dev; active↔template parity. **No live OpenCode probe in CI**. |
-| **D8** | Boundaries: BUG-0015 DONE = compose note only; US-0131/US-0132 do not expand; `security` (`edit: deny`, `bash: ask`) and `auto` (spawn-only Task allow-list) stay in-contract unless research finds a duty contradiction. |
-
-### Research questions DQ1–DQ8 (for `/research` → **R-0115**)
-
-1. **DQ1**: Confirm OpenCode bash object-form command patterns (`python *`, `python scripts/*`) vs shorthand `ask` — least-privilege recommendation for po/tl/curator without blocking validators.
-2. **DQ2**: Does PO Layer-1 edit need `docs/engineering/state.md` (and/or triad-related paths) for phase-checkpoint duties, or do orchestrator/curator own those writes on OpenCode?
-3. **DQ3**: Exact sprint glob string that matches real ids (`S0131`, `S-BUG0014`) under OpenCode minimatch — lock `sprints/S*/file` vs alternatives; prove `Sxxxx` never matches.
-4. **DQ4**: Curator/tech-lead required script inventory (validators + `enforce-triad-hot-surface.py` + materialize) — any bash object patterns beyond shorthand `ask`?
-5. **DQ5**: Release path completeness — any other missing owned writes (`resume_brief.md`, `state.md`, `runbook.md`) beyond release-findings + verify-work-to-release?
-6. **DQ6**: Amend-in-place DEC-0122 revision shape vs thin companion DEC-0130 — single SOT rule; impact on `test_us0122_*` vs new `test_bug0016_*`.
-7. **DQ7**: Minimal static harness marker list (expected ≥6) covering D1–D5 + success test (c); fixture strategy without live host.
-8. **DQ8**: Compose guards with BUG-0015 DONE / US-0124 plugin write-guard — any Layer-1 vs plugin double-deny interaction to document?
-
-### Intake evidence (already DONE — do not re-intake)
-
-- `handoffs/intake_evidence/BUG-0016-intake-20260906.json` (`small-intake-pack`, `[INTAKE_EVIDENCE_VALIDATION_OK]`)
-- Research refs to deepen: `R-0109` (US-0122 permission locks); `decisions/DEC-0122.md` §2
-
-### Runtime proof (DEC-0038)
-
-- `runtime_proof_id=rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016`
-- `proof_hash=1381C92191BD8EF182ADF0942BD68777D2A45613C5808497311B2BCC06C18935`
-- `proof_ttl=2026-09-06T19:20:00Z`
-- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"composer-2.5","orchestrator_run_id":"auto-20260906-bug0016","phase_id":"discovery","proof_issued_at":"2026-09-06T18:20:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260906-bug0016-discovery-po-20260906T182000Z-BUG-0016","sprint_id":"none","story_id":"BUG-0016"}`
-
-### Isolation + stop
-
-- `phase_id=discovery`, `role=po`, `bug_id=BUG-0016`, `fresh_context_marker=po-BUG0016-discovery-20260906T181957Z-fresh`
-- `evidence_ref=docs/product/vision.md ## Discovery Notes — BUG-0016; docs/product/backlog.md ### BUG-0016 discovery_notes; handoffs/intake_evidence/BUG-0016-intake-20260906.json; decisions/DEC-0122.md §2; .opencode/agents/*.md; template/.opencode/agents/*.md; docs/engineering/state.md discovery checkpoint; handoffs/resume_brief.md`
-- **Status**: BUG-0016 remains **OPEN**. **Next**: `/research` in fresh **tech-lead** subagent. Do not spawn research from this discovery chat. STOP.
-
----
-
-## US-0119 Â— Autonomous-autonomy presets (INTAKE ? DISCOVERY handoff)
-
-- **Story**: `docs/product/backlog.md` `## US-0119 ? Autonomous-autonomy presets and configurable hard-stop relaxation`
-- **Acceptance**: `docs/product/acceptance.md` US-0119 row (13 ACs, OPEN)
-- **Intake evidence**: `handoffs/intake_evidence/US-0119-intake-20260705.json` (first-intake-pack, all 8 topics covered, coverage_complete=true, plan_area_id=`autonomy-presets`)
-- **Phase**: discovery (intake complete; next is discovery)
-- **Verdict**: INTAKE PASS; no DECISION_GATE
-- `orchestrator_run_id=auto-20260705-us0119-intake`, `intake_run_id=auto-20260705-us0119-intake`
-- **Status**: OPEN per US-0045. **Next**: `/discovery` (fresh PO for US-0119).
-
-### Summary
-
-`AUTONOMY_PRESET={none|balanced|full}` scratchpad flag that deterministically expands into twelve per-feature autonomy flags (additive consumers on existing surfaces; no existing consumer semantics change). `AUTONOMY_STOP_POLICY={block|auto_repair_then_block|auto_repair_then_skip}` flag that classifies every fail-closed reason code as `security_hard` (never auto-resolved) or `autonomy_resolvable` (bounded auto-repair with ledger cap). Authority manifest `docs/engineering/autonomy-stop-matrix.md` + YAML companion `scripts/data/autonomy_stop_matrix.yaml` + validator `scripts/validate_autonomy_stop_matrix.py`. Bounded auto-repair ledger at `handoffs/autonomy_repair_ledger/<orchestrator_run_id>.jsonl`. `autonomy_relaxed` breadcrumb in `docs/engineering/state.md` at every phase boundary where a stop code was softened. Security-hard gates NEVER softened (PHASE_CONTEXT_ISOLATION_*, RUNTIME_PROOF_*, PHASE_ROLE_*, PHASE_OWNERSHIP_VIOLATION, INTAKE_REQUIRED_TOPIC_MISSING, INTAKE_PERSISTENCE_BLOCKED, AUTO_SCHEDULER_CONFLICT, RESUME_BRIEF_STALE (when RESUME_BRIEF_AUTO_REFRESH != 1), SECURITY_REVIEW critical findings). Backward-compatible default (`AUTONOMY_PRESET=none` = byte-identical pre-US-0119). Compose (read-only) with US-0092/US-0095/US-0056/US-0068/US-0096/BUG-0007: preset layer is additive only, never rewrites semantics.
-
-### Companion DEC = DEC-0119 (to be authored in `/architecture`)
-
-Required ? Accepted; authored in `/architecture` phase. Mirrors DEC-0078 / DEC-0052 precedent.
-
-### Risks (locked at architecture)
-
-- R1 backward-compat regression (MEDIUM Â— test_us0119_preset_none_is_noop)
-- R2 security gate bypass matrix (MEDIUM Â— test_us0119_security_hard_gates_never_auto_repaired)
-- R3 repair ledger growth (LOW Â— per-run cap + gitignore)
-- R4 operator confusion (MEDIUM Â— breadcrumb + ledger)
-- R5 preset-expansion vs explicit precedence (LOW-MEDIUM Â— LOCKED: explicit per-flag > preset > defaults)
-
-### Compose, do not amend
-
-- US-0092/US-0095 (full-autonomy + native chain) Â— unchanged
-- US-0056 (strict runtime proof) Â— unchanged; `RUNTIME_PROOF_KIND=lightweight` is opt-in lighter attestation inside autonomy mode
-- US-0068 (mandatory intake packs) Â— unchanged; US-0078 / DEC-0060 evidence gate NEVER bypassed
-- US-0096 (delivery modes) Â— unchanged
-- BUG-0007 (truthfulness) Â— unchanged; `INTAKE_ASSUME_STACK_CONTEXT=1` auto-derives with assumption_confirmation_ref contract preserved
-
-### Test markers (10 locked)
-
-- `test_us0119_preset_none_is_noop`
-- `test_us0119_preset_balanced_expansion`
-- `test_us0119_preset_full_expansion`
-- `test_us0119_explicit_flag_overrides_preset`
-- `test_us0119_preset_expansion_uses_known_keys_only`
-- `test_us0119_matrix_validator_passes`
-- `test_us0119_security_hard_gates_never_auto_repaired`
-- `test_us0119_stop_policy_affects_repair_dispatch`
-- `test_us0119_repair_ledger_cap_escalates`
-- `test_us0119_matrix_no_orphan_codes`
-
-### Open questions for /discovery
-
-- Q1: exact list of `autonomy_resolvable` reason codes from /auto /intake /execute /qa /release
-- Q2: per-reason-code `auto_repair_kind` taxonomy
-- Q3: matrix cap defaults Â— 3 or per-`(reason)` tuning?
-- Q4: `RUNTIME_PROOF_KIND=lightweight` Â— proof_ttl reduced? or same TTL as strict_hash?
-- Q5: `SOVEREIGN_DRAIN_RISK_THRESHOLD` Â— `low|medium|high` enum with what criteria per tier?
-- Q6: `RELEASE_PUBLISH_AUTO_CONFIRM` Â— is "known targets" = allowlist only, or includes previously-confirmed?
-- Q7: `INTAKE_MINIMAL_PACK` Â— what is the threshold for "established project" (max US-xxxx id + stack known)?
-- Q8: matrix validator Â— should it grep `.cursor/commands/*.md` or maintain an explicit reason-code manifest?
-- Q9: `AUTONOMY_REPAIR_CAP_EXHAUSTED` Â— new stop code, or extension of existing `BLOCK_RETRY_CAP_EXHAUSTED`?
-- Q10: breadcrumb format in state.md Â— one-line per soft-stop, or aggregated per phase?
-
----
-
 ## US-0118 Â— Work-kind classification (TL sprint-plan handoff)
 
 - **Story**: `docs/product/backlog.md` `## US-0118 ? Work-kind classification + tiered delivery routing per story` (L3983)
@@ -600,3 +472,132 @@ Per-story **work-kind classifier** `scripts/work_kind_classify_lib.py` returns `
 - `evidence_ref=docs/product/vision.md ## Discovery Notes — BUG-0015; docs/product/backlog.md ### BUG-0015 discovery_notes; handoffs/intake_evidence/BUG-0015-intake-20260906.json; .opencode/commands/auto.md; .opencode/plugins/orchestrator.ts; docs/engineering/state.md discovery checkpoint; handoffs/resume_brief.md`
 - **Status**: BUG-0015 remains **OPEN**. **Next**: `/research` in fresh **tech-lead** subagent. Do not spawn research from this discovery chat. STOP.
 
+## Discovery handoff — US-0131 Cross-host Its-Magic runtime configuration and parity
+
+- **Phase completed**: discovery. **Role**: po. **Story**: US-0131 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-07T19:15:00Z. **Fresh marker**: `po-US0131-discovery-20260907T191500Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260907-us0131`, `delivery_mode=ultra_lean`, macro=`spec` (intake already PASS — not re-intaken).
+- **Sibling boundary**: **US-0132** OPEN (model configuration contract) — OUT OF SCOPE; do not expand into US-0132 ACs. **BUG-0015/BUG-0016** DONE — do not reopen.
+- **Gap confirmed**: shared lifecycle/governance settings still resolve through Cursor-path scratchpad readers; OpenCode-only installs must not require `.cursor/`; host-specific capabilities must fail/skip deterministically.
+
+### Discovery locks D1–D10
+
+| ID | Lock |
+|----|------|
+| **D1** | Host-neutral typed config contract for shared runtime/governance (no credentials / provider secrets / vendor slugs in templates). |
+| **D2** | Cursor scratchpad (DEC-0055 Model B + DEC-0039 local protection) = **compatibility adapter** into the neutral contract — not the sole SOT after migration. |
+| **D3** | OpenCode-only install resolves all shared settings without `.cursor/scratchpad.md` or `.cursor/scratchpad.local.md`. |
+| **D4** | Shared Python validators/outer-driver/triad/state/handoff scripts accept resolved config explicitly — no silent `.cursor` hardcode for host-neutral behavior. |
+| **D5** | Cursor-only vs OpenCode-only capabilities classified; unavailable → fail/skip with reason codes; no silent unsupported parity; no Cursor command/rule body clones. |
+| **D6** | `--host both` has one deterministic precedence; no conflicting duplicate writes; independent host-local overrides where schemas differ. |
+| **D7** | Installer delivers examples to selected host; preserves local operator files; never overwrites active scratchpad/config. |
+| **D8** | Contract tests for cursor-only / opencode-only / both + docs for precedence, migration, reason codes (active + template). |
+| **D9** | **US-0132 boundary** — model catalogs / `MODEL_*` / materializers out of scope; no third `model.json` SOT. |
+| **D10** | Compose US-0073/DEC-0055, DEC-0039, US-0121..US-0126, US-0092, US-0069; do not amend DEC-0086/0087/0123; do not reopen BUG-0015/0016. |
+
+### Research questions DQ1–DQ10 (for `/research` → expect **R-0116**)
+
+1. **DQ1**: Canonical host-neutral config path (must not require `.cursor/` on OpenCode-only).
+2. **DQ2**: Typed schema + versioning + fail-closed codes for malformed/missing shared keys.
+3. **DQ3**: Cursor scratchpad merge → neutral resolver mapping (preserve DEC-0055/0039).
+4. **DQ4**: OpenCode-only shared-settings adapter (prefer dedicated kit config over dumping into `opencode.json` model/permission schema).
+5. **DQ5**: Complete `.cursor/scratchpad*` hardcode inventory + injection API shape.
+6. **DQ6**: Exact `--host both` precedence table.
+7. **DQ7**: Finalize shared / Cursor-only / OpenCode-only / skip-vs-fail matrix + reason-code family.
+8. **DQ8**: Installer/manifest example delivery surfaces per `--host cursor|opencode|both`.
+9. **DQ9**: Minimal `test_us0131_*` inventory + fixtures (no live OpenCode CI probe).
+10. **DQ10**: Docs anchors (runbook/README/auto-orchestration-reference) for precedence/migration/unsupported capability.
+
+### Config-surface / design refs
+
+- OpenCode: https://opencode.ai/v2/docs/config/ — `opencode.json{,c}`, `.opencode/`
+- Cursor: DEC-0055 Model B scratchpad pair; DEC-0039 local preservation
+- Script hardcodes: `scripts/auto_outer_driver.py`, `scripts/opencode_auto_bridge.py`, `scripts/enforce-triad-hot-surface.py`, `scripts/dev_environment_lib.py`, `scripts/caveman_compress_input.py`
+- Vision: `docs/product/vision.md` `## Discovery Notes — US-0131`
+- Intake (read-only): `handoffs/intake_evidence/US-0131-0132-intake-20260906.json`
+
+### Runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131`
+- `proof_hash=7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE`
+- `proof_ttl=2026-09-07T20:15:00Z`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"spec","model_id":"composer-2.5","orchestrator_run_id":"auto-20260907-us0131","phase_id":"discovery","proof_issued_at":"2026-09-07T19:15:00Z","proof_ttl_seconds":3600,"role":"po","runtime_proof_id":"rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131","sprint_id":"none","story_id":"US-0131"}`
+
+### Isolation + stop
+
+- `phase_id=discovery`, `role=po`, `story_id=US-0131`, `model_id=composer-2.5`, `fresh_context_marker=po-US0131-discovery-20260907T191500Z-fresh`
+- `evidence_ref=docs/product/vision.md ## Discovery Notes — US-0131; docs/product/backlog.md ## US-0131 discovery_notes; handoffs/intake_evidence/US-0131-0132-intake-20260906.json; docs/engineering/state.md discovery checkpoint; handoffs/resume_brief.md`
+- **Status**: US-0131 remains **OPEN**. **Next**: `/research` in fresh **tech-lead** subagent. Do not spawn research from this discovery chat. STOP.
+
+---
+
+## Research handoff — US-0131 Cross-host Its-Magic runtime configuration and parity
+
+- **Phase completed**: research. **Role**: tech-lead. **Story**: US-0131 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-07T19:25:00Z. **Fresh marker**: `tl-US0131-research-20260907T192500Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260907-us0131`, `delivery_mode=ultra_lean`, macro=`plan` (research = first of research+architecture+sprint-plan).
+- **Sibling boundary**: **US-0132** OPEN — OUT OF SCOPE (model catalogs / `MODEL_*` / materializers). **BUG-0015/BUG-0016** DONE — do not reopen.
+- **Research anchor**: `docs/engineering/research.md` **`## R-0116`** (DQ1–DQ10 LOCKED; do not renumber R-0115).
+
+### DQ locks (summary for architecture)
+
+| DQ | Lock |
+|----|------|
+| **DQ1** | Host-neutral path **`.its-magic/config{,.local,.example}.json`** — no `.cursor/` required on OpenCode-only |
+| **DQ2** | JSON `schema_version` + `shared` KEY map; fail-closed `HOST_CONFIG_*` |
+| **DQ3** | Cursor scratchpad DEC-0055/0039 = compatibility adapter into same `shared` namespace |
+| **DQ4** | OpenCode-only reads `.its-magic/` only; **forbid** dumping kit keys into `opencode.json` |
+| **DQ5** | `scripts/host_runtime_config_lib.py:resolve_runtime_config` migrates shared-kernel hardcodes |
+| **DQ6** | Both-host precedence: kit-local > cursor-local > kit-baseline > cursor-baseline > example > defaults |
+| **DQ7** | Shared / Cursor-only / OpenCode-only / US-0132 matrix + reason-code family |
+| **DQ8** | Kernel deliver `.its-magic/config.example.json`; never overwrite locals |
+| **DQ9** | 10 `test_us0131_*` static/fixture markers (no live OpenCode probe) |
+| **DQ10** | Runbook h2 `## Cross-host runtime configuration (US-0131)` + README + auto-orch cross-link |
+
+### Architecture seeds
+
+- Approach **A1** recommended (`.its-magic/` + LegacyScratchpadAdapter + resolver migration). Reject A2 (scratchpad-only), A3 (`opencode.json` store).
+- Companion **DEC-0131** Required → Accepted in `/architecture`.
+- Author `# US-0131` architecture H1; do not expand US-0132 ACs.
+
+### Runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131`
+- `proof_hash=7DB90B2B345D7C4E84F0A7C78E99A662C7FF308271415ECC5F7DFEAB774BE2BE`
+- `proof_ttl=2026-09-07T20:25:00Z`
+- Canonical payload: `{"delivery_mode":"ultra_lean","macro_phase":"plan","model_id":"composer-2.5","orchestrator_run_id":"auto-20260907-us0131","phase_id":"research","proof_issued_at":"2026-09-07T19:25:00Z","proof_ttl_seconds":3600,"role":"tech-lead","runtime_proof_id":"rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131","sprint_id":"none","story_id":"US-0131"}`
+- Consumed discovery proof: `rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131` / `7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE` — RUNTIME_PROOF_VALID (MATCH before TTL)
+
+### Isolation + stop
+
+- `phase_id=research`, `role=tech-lead`, `story_id=US-0131`, `model_id=composer-2.5`, `fresh_context_marker=tl-US0131-research-20260907T192500Z-fresh`
+- `evidence_ref=docs/engineering/research.md ## R-0116; docs/product/backlog.md ## US-0131 research_notes; handoffs/po_to_tl.md Discovery handoff US-0131; docs/engineering/state.md discovery+critic checkpoints; docs/product/vision.md ## Discovery Notes — US-0131`
+- **Status**: US-0131 remains **OPEN**. **Next**: `/architecture` in fresh **tech-lead** subagent. Do not spawn architecture from this research chat. STOP.
+
+---
+
+## Architecture handoff — US-0131 Cross-host Its-Magic runtime configuration and parity
+
+- **Phase completed**: architecture. **Role**: tech-lead. **Story**: US-0131 only. **Sprint**: (pending). **Verdict**: PASS (`decision_gate=false`).
+- **Timestamp (UTC)**: 2026-09-07T19:35:00Z. **Fresh marker**: `tl-US0131-architecture-20260907T193500Z-fresh`.
+- **Orchestrator**: `orchestrator_run_id=auto-20260907-us0131`, `delivery_mode=ultra_lean`, macro=`plan` (architecture = second of research+architecture+sprint-plan).
+- **Sibling boundary**: **US-0132** OPEN — OUT OF SCOPE. **BUG-0015/BUG-0016** DONE — do not reopen.
+- **Architecture anchor**: `docs/engineering/architecture.md` **`# US-0131`**
+- **Companion DEC**: `decisions/DEC-0131.md` (**Accepted**)
+- **Research anchor**: `docs/engineering/research.md` **`## R-0116`** (DQ1–DQ10 LOCKED)
+
+### Approach A1 LOCKED
+
+Host-neutral `.its-magic/config{,.local,.example}.json` SOT + Cursor DEC-0055/0039 LegacyScratchpadAdapter (Model B pre-merge then DQ6 interleave) + `host_runtime_config_lib.resolve_runtime_config` shared-kernel injection. OpenCode-only without `.cursor/`. Forbid kit keys in `opencode.json`. Schema v1 + `HOST_CONFIG_*` family. 10 `test_us0131_*` markers. Sprint seeds T-anch + T-001..T-009 within SPRINT_MAX_TASKS=12.
+
+### Runtime proof (DEC-0038)
+
+- `runtime_proof_id=rp-auto-20260907-us0131-architecture-techlead-20260907T193500Z-US-0131`
+- `proof_hash=F31B058CC5CDEAF68EDD2F53F4EF790D1845CE842E2B16057247CF5FE4170C4C`
+- `proof_ttl=2026-09-07T20:35:00Z`
+- Consumed research proof: `rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131` / `7DB90B2B345D7C4E84F0A7C78E99A662C7FF308271415ECC5F7DFEAB774BE2BE` — RUNTIME_PROOF_VALID
+
+### Isolation + stop
+
+- `phase_id=architecture`, `role=tech-lead`, `story_id=US-0131`, `model_id=composer-2.5`, `fresh_context_marker=tl-US0131-architecture-20260907T193500Z-fresh`
+- **Status**: US-0131 remains **OPEN**. **Next**: `/sprint-plan` in fresh **tech-lead** subagent (orchestrator may insert sovereign-critic of architecture first). Do not spawn sprint-plan from this architecture chat. STOP.

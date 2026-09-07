@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "shared": {
+    "MAGIC_CONTEXT_STRICT": "1",
+    "LOOP_UNTIL_GREEN": "1",
+    "RUN_TESTS_ON_EDIT": "1",
+    "AUTO_IMPLEMENTATION_LOOP": "1",
+    "AUTO_LOOP_MAX_CYCLES": "50",
+    "AUTO_PAUSE_REQUEST": "0",
+    "AUTO_PAUSE_POLICY": "after_phase",
+    "DONE": "0",
+    "AUTO_FLOW_MODE": "manual",
+    "PHASE_MODE": "interactive",
+    "PERMISSION_MODE": "interactive",
+    "AUTO_INSTALL_DEPS": "0",
+    "AUTO_RELEASE_NOTES": "0",
+    "AUTO_BACKLOG_DRAIN": "0",
+    "AUTO_BACKLOG_MAX_STORIES": "10",
+    "AUTO_BACKLOG_ON_BLOCK": "stop",
+    "AUTO_BUG_QUEUE": "0",
+    "AUTO_QUIET": "0",
+    "CAVEMAN_COMPRESS_INPUT": "0",
+    "SOVEREIGN_PARALLEL_DEV": "0",
+    "UAT_BROWSER_PROBE_MODE": "cursor",
+    "UAT_BROWSER_FALLBACK_CHAIN": "1",
+    "UAT_PROCESS_HEALTH_POLL_SECONDS": "60",
+    "UAT_PROCESS_HEALTH_POLL_INTERVAL_SECONDS": "2",
+    "STATE_HOT_MAX_LINES": "1200",
+    "STATE_HOT_MAX_CHECKPOINTS": "80",
+    "PO_TO_TL_HOT_MAX_LINES": "800",
+    "PO_TO_TL_HOT_MAX_SECTIONS": "60",
+    "ARCH_HOT_MAX_LINES": "3500",
+    "ARCH_HOT_MAX_STORY_SECTIONS": "120",
+    "DELIVERY_MODE": "ultra_lean",
+    "TOKEN_PROFILE": "standard"
+  },
+  "host_overlays": {
+    "cursor": {},
+    "opencode": {}
+  }
+}

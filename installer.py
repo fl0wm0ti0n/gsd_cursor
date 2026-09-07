@@ -242,6 +242,7 @@ FRAMEWORK_PREFIXES = (
 )
 FRAMEWORK_EXACT = {
     ".cursor/hooks.json", ".cursor/scratchpad.local.example.md",
+    ".its-magic/config.example.json",
     ".cursor/model-catalog.local.example.json",
     ".cursor/model-catalog.local.example.cursor-only.json",
     ".cursor/model-catalog.local.example.level-1-easy.json",
@@ -263,6 +264,12 @@ MIXED_FILES = {"README.md"}
 SCRATCHPAD_BASELINE_REL = os.path.join(".cursor", "scratchpad.md")
 SCRATCHPAD_EXAMPLE_REL = os.path.join(".cursor", "scratchpad.local.example.md")
 SCRATCHPAD_LOCAL_REL = os.path.join(".cursor", "scratchpad.local.md")
+
+# US-0131 / DEC-0131: host-neutral kit config (kernel for all --host modes).
+KIT_CONFIG_DIR = ".its-magic"
+KIT_CONFIG_EXAMPLE_REL = os.path.join(KIT_CONFIG_DIR, "config.example.json")
+KIT_CONFIG_BASELINE_REL = os.path.join(KIT_CONFIG_DIR, "config.json")
+KIT_CONFIG_LOCAL_REL = os.path.join(KIT_CONFIG_DIR, "config.local.json")
 
 # After merge (local > baseline > example), these must be non-empty (fail closed).
 REQUIRED_SCRATCHPAD_KEYS = (
@@ -542,6 +549,79 @@ def run_scratchpad_postinstall(target_root, source_root, mode, print_ok=True):
             "merged scratchpad validation passed."
         )
     return ok
+
+
+# Host-neutral kit config example refresh (kernel post-install).
+def materialize_kit_config_example(target_root, source_root, print_ok=True):
+    """Refresh framework-owned `.its-magic/config.example.json`.
+
+    Never touches `.its-magic/config.local.json` or `.cursor/scratchpad.local.md`.
+    """
+    src = os.path.join(source_root, "template", KIT_CONFIG_EXAMPLE_REL)
+    if not os.path.isfile(src):
+        alt = os.path.join(source_root, KIT_CONFIG_EXAMPLE_REL)
+        src = alt if os.path.isfile(alt) else src
+    if not os.path.isfile(src):
+        print(
+            f"[HOST_CONFIG_INVALID] expected template file at {src}. "
+            "Reinstall its-magic package."
+        )
+        return False
+    dst = os.path.join(target_root, KIT_CONFIG_EXAMPLE_REL)
+    ensure_parent(dst)
+    shutil.copy2(src, dst)
+    if print_ok:
+        print(f"[HOST_CONFIG_LAYER] example_refresh: wrote {KIT_CONFIG_EXAMPLE_REL}")
+    return True
+
+
+def materialize_kit_config_baseline(target_root, source_root, mode, print_ok=True):
+    """Materialize `.its-magic/config.json` from example when missing (Model B).
+
+    Never overwrites existing baseline unless mode == overwrite.
+    Never touches `.its-magic/config.local.json`.
+    """
+    local_path = os.path.join(target_root, KIT_CONFIG_LOCAL_REL)
+    if os.path.isfile(local_path) and print_ok:
+        print(
+            f"[HOST_CONFIG_LAYER] local_preserve: left untouched {KIT_CONFIG_LOCAL_REL}"
+        )
+
+    example = os.path.join(target_root, KIT_CONFIG_EXAMPLE_REL)
+    if not os.path.isfile(example):
+        if not materialize_kit_config_example(target_root, source_root, print_ok=False):
+            return False
+    baseline = os.path.join(target_root, KIT_CONFIG_BASELINE_REL)
+    if os.path.isfile(baseline) and mode != "overwrite":
+        if print_ok:
+            print(
+                "[HOST_CONFIG_LAYER] baseline_skip: config.json already present "
+                f"under {target_root}"
+            )
+        return True
+    ensure_parent(baseline)
+    shutil.copy2(example, baseline)
+    if print_ok:
+        print(
+            "[HOST_CONFIG_LAYER] baseline_materialize: wrote materialized "
+            f"{KIT_CONFIG_BASELINE_REL}"
+        )
+    return True
+
+
+# Host-neutral kit config post-install for all --host modes.
+def run_kit_config_postinstall(target_root, source_root, mode, print_ok=True):
+    """Kernel host-neutral config post-install for all --host modes."""
+    if not materialize_kit_config_example(target_root, source_root, print_ok=print_ok):
+        return False
+    if not materialize_kit_config_baseline(target_root, source_root, mode, print_ok=print_ok):
+        return False
+    if print_ok:
+        print(
+            "[HOST_CONFIG_POSTINSTALL_OK] kit config example refreshed; "
+            "baseline materialized when missing; locals preserved."
+        )
+    return True
 
 
 def run_cursor_surface_postinstall_hooks(target_root, source_root, mode, host, print_ok=True):
@@ -1173,6 +1253,8 @@ def main():
                     review.append(rel)
                 continue
 
+        if not run_kit_config_postinstall(target_root, source_root, "upgrade", print_ok=True):
+            return 1
         if not run_cursor_surface_postinstall_hooks(
             target_root, source_root, "upgrade", host, print_ok=True
         ):
@@ -1270,6 +1352,8 @@ def main():
                 ensure_parent(dst)
                 shutil.copy2(src, dst)
 
+    if not run_kit_config_postinstall(target_root, source_root, mode, print_ok=True):
+        return 1
     if not run_cursor_surface_postinstall_hooks(
         target_root, source_root, mode, host, print_ok=True
     ):

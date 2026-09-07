@@ -18,6 +18,10 @@ import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 YAML_PATH = REPO_ROOT / "scripts" / "data" / "autonomy_stop_matrix.yaml"
@@ -417,8 +421,13 @@ def check_yaml_code_references_in_scripts(matrix: Dict) -> List[str]:
         REPO_ROOT / "scripts" / "validate_autonomy_stop_matrix.py",
         REPO_ROOT / "scripts" / "autonomy_repair_ledger_lib.py",
         REPO_ROOT / "docs" / "engineering" / "autonomy-stop-matrix.md",
-        REPO_ROOT / ".cursor" / "scratchpad.md",
+        REPO_ROOT / ".its-magic" / "config.example.json",
     ]
+    # Path inject via resolver (US-0131); Cursor scratchpad remains optional adapter surface.
+    _ = hrc.resolve_runtime_config(REPO_ROOT, raise_on_fatal=False)
+    cursor_sp = REPO_ROOT / ".cursor" / "scratchpad.md"
+    if cursor_sp.is_file():
+        us0119_surface_files.append(cursor_sp)
 
     all_text_parts: list[str] = []
     for f in us0119_surface_files:

@@ -13,6 +13,25 @@ Canonical queue state now lives under:
 
 ---
 
+## Release finalized note (S0133)
+
+- Sprint: `S0133`
+- Story: `US-0131` (Cross-host Its-Magic runtime configuration and parity — host-neutral `.its-magic/config*`; Cursor adapter; OpenCode-only without `.cursor/`; 10 contract markers)
+- Release: **finalized** (`2026-09-07T21:15:18Z`, `orchestrator_run_id=auto-20260907-us0131`, `fresh_context_marker=release-US0131-release-20260907T211518Z-fresh`, `runtime_proof_id=rp-auto-20260907-us0131-release-release-20260907T211518Z-US-0131`, `model_id=composer-2.5`)
+- Queue: **`handoffs/release_queue.md`** row **`S0133`** = **`released`** (workflow-only; no version bump; backlog reconciliation deferred to `/closure`)
+- **Verdict**: **PASS** — all mandatory release gates (1, 2, 3, 4, 4b) green with **Fail:0**.
+- **Run / verify:** `python -m pytest tests/us0131_contract_test.py -v` → 10 passed; `python scripts/check_intake_template_parity.py --scope=us-0131` → `[INTAKE_TEMPLATE_PARITY_OK]`; `python scripts/validate_readme_feature_coverage.py --repo . --enforce` → PASS (`coverage_missing=[]`); `python scripts/check-user-visible-metadata.py --repo .` → exit 0; harness `tests/report.md` @ `2026-09-07T21:15:18Z` **Pass:853 / Fail:0**. See **`handoffs/releases/S0133-release-notes.md`** **## Run** / **## Verify**.
+- **Operator summary**: start=`python -m pytest tests/us0131_contract_test.py -v`; endpoint=`n/a` (cross-host config kit); verify pointer=`handoffs/releases/S0133-release-notes.md` ## Verify.
+- **Gate snapshot**: check_in_tests=PASS (harness Fail:0 + us0131 10/10); qa=PASS (0 blockers; B-1 CLOSED); verify_work=PASS (8/8 ACs; 9/9 UAT; 10/10 live); uat=PASS (9/9); isolation=PASS; strict_runtime_proof=PASS (verify-work proof consumed @21:15:18Z before TTL 21:46:21Z); finalization=PASS (queue → `released`).
+- ACs satisfied: **8/8** (10/10 contract markers live; 0 open blocking findings)
+- Compose guards: DEC-0131 Accepted; US-0132 OOS; US-0131 OPEN; acceptance unchecked L159
+- **Backlog status**: US-0131 remains **OPEN** — closure deferred to `/closure`
+- **Acceptance**: US-0131 row remains **unchecked** — tick at `/closure`
+- Publish: **`RELEASE_PUBLISH_MODE=confirm`** + **`RELEASE_PUBLISH_AUTO_CONFIRM=0`** — `publish_snapshot=skipped_pending_operator_confirm`
+- Sync: **`SYNC_POLICY_MODE=disabled`** → `push_decision=not_eligible`, `reason_code=SYNC_DISABLED`
+- **Strict runtime proof (release)**: `proof_hash=10026570510E2C006AE4A86CFC2F0A70BE0CF170E30E43C13BEC342EC3E72D7A`, `proof_ttl=2026-09-07T22:15:18Z`
+- **Next**: **`/closure`** (fresh **qe** subagent, ship macro phase 2 per DEC-0082)
+
 ## Release finalized note (S0132)
 
 - Sprint: `S0132`

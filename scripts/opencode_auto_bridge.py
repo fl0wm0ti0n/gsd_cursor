@@ -16,6 +16,11 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
+
 EXIT_OK = 0
 EXIT_FAIL = 1
 
@@ -53,16 +58,9 @@ def _parse_resume_brief(repo: Path) -> dict[str, str]:
 
 
 def _merge_scratchpad(repo: Path) -> dict[str, str]:
-    merged: dict[str, str] = {}
-    for name in (".cursor/scratchpad.md", ".cursor/scratchpad.local.md"):
-        path = repo / name
-        if not path.is_file():
-            continue
-        for line in path.read_text(encoding="utf-8").splitlines():
-            m = re.match(r"^([A-Z][A-Z0-9_]*)=(.*)$", line.strip())
-            if m:
-                merged[m.group(1)] = m.group(2).strip()
-    return merged
+    """Resolve shared governance keys via host-neutral config (US-0131 / DEC-0131)."""
+    resolved = hrc.resolve_runtime_config(repo, raise_on_fatal=False)
+    return dict(resolved.values)
 
 
 def _parse_state_next_phase(repo: Path) -> str | None:

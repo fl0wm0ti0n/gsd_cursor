@@ -33,6 +33,11 @@ import re
 import sys
 from pathlib import Path, PurePosixPath
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
+
 # ---------------------------------------------------------------------------
 # Deny-list baseline (DEC-0073 §4.1). Any edit here requires a subsequent DEC.
 # `deny_list_version` in --report is the SHA-256 of sorted(DENY_BASELINE) as
@@ -670,9 +675,9 @@ def run(argv: list[str]) -> int:
 
     repo_root: Path = args.repo
 
-    # Read scratchpad (for gating + CAVEMAN_COMPRESS_INGEST_CURSORIGNORE overlay flag).
-    scratchpad_path = repo_root / ".cursor" / "scratchpad.md"
-    scratchpad = read_scratchpad(scratchpad_path)
+    # Read host-neutral runtime config (US-0131) for gating + overlay flags.
+    resolved = hrc.resolve_runtime_config(repo_root, raise_on_fatal=False)
+    scratchpad = dict(resolved.values)
     mode = scratchpad.get("CAVEMAN_COMPRESS_INPUT", "0").strip()
     scope_raw = scratchpad.get("CAVEMAN_FILE_SCOPE", "").strip()
     ingest_overlay = scratchpad.get("CAVEMAN_COMPRESS_INGEST_CURSORIGNORE", "0").strip()

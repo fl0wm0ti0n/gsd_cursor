@@ -32,6 +32,8 @@ setup stays in the root `README.md` (user channel).
   runbook `## OpenCode orchestrator plugin reason codes (US-0124)`, architecture `# US-0124`, `decisions/DEC-0124.md`.
 - **BUG-0015** — OpenCode `/auto` dispatch attach (plugin owns interactive spawn); traceability:
   runbook `### OpenCode `/auto` dispatch attach reason codes (BUG-0015)`, architecture `# BUG-0015`.
+- **BUG-0016** — OpenCode Layer-1 role permissions vs kit duties (bash ask; S* globs; release duty paths); traceability:
+  architecture `# BUG-0016`, `decisions/DEC-0122.md` §2.
 - **US-0126** — OpenCode host operator runbook, cross-host reason-code catalog, and `--scope=opencode-adapter` parity; traceability:
   runbook `## OpenCode host operator runbook (US-0126)`, architecture `# US-0126`.
 - **US-0130** — Operator-pinned sovereign-critic model (`MODEL_SOVEREIGN-CRITIC` + catalog `roles.critic`); traceability:

@@ -7,7 +7,8 @@ Surfaces:
   handoffs/po_to_tl.md
   docs/engineering/architecture.md
 
-Thresholds resolve from merged .cursor/scratchpad.md + scratchpad.local.md.
+Thresholds resolve via host-neutral resolve_runtime_config (US-0131 / DEC-0131),
+with Cursor scratchpad remaining a DEC-0055 compatibility adapter.
 
 Modes:
   --check     fail closed if any surface exceeds policy (exit 1)
@@ -27,6 +28,11 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
+
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
 
 DEFAULTS = {
     "STATE_HOT_MAX_LINES": "1200",
@@ -63,33 +69,11 @@ def _repo_root(cli: Optional[str]) -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-def _parse_scratchpad_text(text: str, into: Dict[str, str]) -> None:
-    for raw in text.splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#"):
-            continue
-        if line.startswith("- "):
-            continue
-        if "=" not in line:
-            continue
-        key, _, val = line.partition("=")
-        key, val = key.strip(), val.strip()
-        if key and val:
-            into[key] = val
-
-
 def load_merged_policy(repo: Path) -> Dict[str, str]:
-    """Merge scratchpad layers: DEFAULTS < example < baseline < local (DEC-0055)."""
+    """Resolve triad thresholds via host-neutral config (US-0131 / DEC-0131)."""
+    resolved = hrc.resolve_runtime_config(repo, raise_on_fatal=False)
     out = dict(DEFAULTS)
-    example = repo / ".cursor" / "scratchpad.local.example.md"
-    base = repo / ".cursor" / "scratchpad.md"
-    local = repo / ".cursor" / "scratchpad.local.md"
-    if example.is_file():
-        _parse_scratchpad_text(example.read_text(encoding="utf-8"), out)
-    if base.is_file():
-        _parse_scratchpad_text(base.read_text(encoding="utf-8"), out)
-    if local.is_file():
-        _parse_scratchpad_text(local.read_text(encoding="utf-8"), out)
+    out.update(resolved.values)
     return out
 
 

@@ -1,7 +1,47 @@
-# Sprint S0132 — Execute Summary (BUG-0016)
+# Sprint S0132 — Context Pack / Refresh Summary (BUG-0016)
 
 **sprint_id**: S0132  
-**bug_id**: BUG-0016 (Status **OPEN** — not flipped DONE)  
+**bug_id**: BUG-0016 (Status **DONE**)  
+**phase_id**: refresh-context  
+**role**: curator  
+**orchestrator_run_id**: auto-20260906-bug0016  
+**delivery_mode**: ultra_lean  
+**macro_phase**: ship (terminal)  
+**fresh_context_marker**: `cur-BUG0016-refresh-context-20260907T184000Z-fresh`  
+**timestamp**: 2026-09-07T18:40:00Z (UTC)  
+**model_id**: composer-2.5 (CROSS_MODEL_REVIEW=1)  
+**verdict**: REFRESH_CONTEXT_PASS  
+**segment_closed**: true  
+
+## Segment outcome
+
+| Gate | Result |
+|---|---|
+| Release | PASS — queue S0132=released; notes `handoffs/releases/S0132-release-notes.md` |
+| Closure | PASS — Status OPEN→DONE; acceptance L181 [x] |
+| Sovereign-critic (closure) | PASS — archived to `docs/engineering/state-archive/state-pack-20260907.md` |
+| Refresh-context | PASS — this pack; triad rollover units=1; retrospective `S0132.md` |
+
+## Runtime proof (refresh-context)
+
+- **runtime_proof_id**: `rp-auto-20260906-bug0016-refresh-context-curator-20260907T184000Z-BUG-0016`
+- **proof_hash**: `37D590EC1106E43F228040ED35446D1F051945EF22E6260A865795FE9E36C3F5`
+- **proof_ttl**: 2026-09-07T19:40:00Z
+
+## Invocation note
+
+Operator `/refresh-context` after `/auto` hit **`NATIVE_CHAIN_UNAVAILABLE`** (IDE Task usage gate). Product outcome for BUG-0016 was already DONE; this phase completed ship-segment hygiene only.
+
+## Prior execute summary (historical)
+
+See earlier execute summary body below for T-anch..T-007 detail (unchanged historical record).
+
+---
+
+# Sprint S0132 — Execute Summary (BUG-0016) [historical]
+
+**sprint_id**: S0132  
+**bug_id**: BUG-0016 (Status was **OPEN** at execute — now **DONE**)  
 **phase_id**: execute  
 **role**: dev  
 **orchestrator_run_id**: auto-20260906-bug0016  
@@ -44,30 +84,6 @@ python scripts/check-user-visible-metadata.py --repo . --json
 → {"reason_code":"OK","violations":[]}
 ```
 
-## T-007 write-guard findings (DQ8 / CF3)
+## Next (historical at execute)
 
-- `.opencode/plugins/orchestrator.ts` `ctx.tool.hook("execute.before")` returns `AUTO_ORCHESTRATOR_PHASE_EXECUTION` only.
-- Comments + `test_us0124_agent_plugin_compose` posture: detection is path-based / not a duplicated edit allow-list.
-- No plugin literals for duty globs (`intake_evidence`, `S*/release-findings`, `verify-work-to-release`, `Sxxxx`).
-- **No double-deny proven** → DEC-0124 / DEC-0125 bodies unchanged (compose-only).
-- Kept `S*` (not `S[0-9]*`).
-
-## Runtime proof
-
-- **runtime_proof_id**: `rp-auto-20260906-bug0016-execute-dev-20260906T190500Z-BUG-0016`
-- **proof_hash**: `519A7617F1ADBEAFD95A940AF28B130F8EB309350F3F787C0AC02152FBEC76BF`
-- **proof_ttl**: 2026-09-06T20:05:00Z
-- **prior_consumed**: `rp-auto-20260906-bug0016-sprint-plan-techlead-20260906T185500Z-BUG-0016` (F6892B96789FF471D7A97B40F80BBE59E725FB5A5DD573515D0ABC663B0A997F)
-
-## Compose guards (unchanged)
-
-- DEC-0122 §2 sole SOT (already amended in architecture — execute shipped frontmatter only; no DEC-0130)
-- DEC-0124 / DEC-0125 bodies UNCHANGED
-- security.md / auto.md UNCHANGED
-- BUG-0015 remains DONE (compose note only — not reopened)
-- BUG-0016 remains OPEN; acceptance unchecked; intake JSON not mutated
-- No `bash: allow`; no live OpenCode CI probe; no US-0131/US-0132 reopen
-
-## Next
-
-`/qa` (fresh qa subagent; plan-verify merged into build+verify under ultra_lean). STOP after execute — do not spawn QA from this subagent.
+Was `/qa` — superseded; segment now closed at refresh-context.

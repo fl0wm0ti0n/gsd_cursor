@@ -11110,3 +11110,184 @@ New file `tests/bug0016_contract_test.py` (+ active/template parity). **No live 
 - Next: `/architecture` fresh tech-lead — author `# BUG-0016` approach; amend DEC-0122 §2 (execute may ship file body); optional thin DEC-0130; do not execute agent frontmatter from architecture unless ultra_lean merges — prefer architecture locks + sprint seeds.
 - Status: BUG-0016 remains **OPEN**.
 - Research runtime proof: `runtime_proof_id=rp-auto-20260906-bug0016-research-techlead-20260906T183500Z-BUG-0016` / `proof_hash=04839252A587E2877F310A008943C6EF91732A1B227F439D49B704BD1F405BFF` / ttl `2026-09-06T19:35:00Z`.
+
+### Delivery closure (curator / refresh-context 2026-09-07T18:40:00Z)
+
+- **Status**: BUG-0016 **DONE**; S0132 **released**; acceptance L181 **[x]**; segment_closed at `/refresh-context`.
+- **Research anchor R-0115**: **delivered** (DQ1–DQ8 LOCKED upheld through execute/release; no DEC-0130).
+- **Curator proof**: `runtime_proof_id=rp-auto-20260906-bug0016-refresh-context-curator-20260907T184000Z-BUG-0016` / `proof_hash=37D590EC1106E43F228040ED35446D1F051945EF22E6260A865795FE9E36C3F5` / ttl `2026-09-07T19:40:00Z`.
+- **Retrospective**: `docs/engineering/sovereign-memory/retrospectives/S0132.md`.
+- Historical “Status OPEN / Next architecture” lines above remain as research-time snapshot only.
+
+## R-0116 - US-0131 Cross-host Its-Magic runtime configuration and parity research
+
+- **Date**: 2026-09-07
+- **Topic**: Host-neutral runtime/governance config contract with Cursor scratchpad compatibility and OpenCode-only operation without .cursor/
+- **Linked**: US-0131, US-0073, DEC-0055, DEC-0039, US-0121, US-0122, US-0124, US-0125, US-0126, US-0092, US-0069, US-0132 (boundary only), R-0109, masterplan §13
+- **Confidence**: high (OpenCode v2 config docs + Context7 /websites/opencode_ai_v2 + in-repo hardcode inventory + discovery D1–D10 + critic NB1–NB3 closures; no live OpenCode probe)
+- **Status**: current
+- **Query**: DQ1–DQ10 — neutral path, schema/versioning, Cursor adapter, OpenCode adapter, hardcode inventory + injection API, both-host precedence, capability matrix, installer surfaces, contract tests, docs anchors
+- **Producer consumed**: discovery 
+p-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131 (proof_hash 7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE, ttl 2026-09-07T20:15:00Z); sovereign-critic us0131dsc-* PASS (0 blocking; anti_slop_aggregate=10); marker po-US0131-discovery-20260907T191500Z-fresh
+- **EARLY_RESEARCH posture**: scratchpad EARLY_RESEARCH=1 — OpenCode v2 config docs (https://opencode.ai/v2/docs/config/) + Context7 /websites/opencode_ai_v2 consulted; masterplan §13.2–13.3 compatibility-adapter precedence aligned
+- **ID policy**: highest existing research id was **R-0115**. This entry is **R-0116**. Do **not** wipe or renumber R-0115 / R-0114 / R-0109.
+- **Compose base**: DEC-0055 Model B + DEC-0039 local preservation + US-0121 --host kernel-always-install + US-0126 cross-host reason-code table. Gap: shared governance keys still resolve only via .cursor/scratchpad* readers.
+- **US-0132 boundary (LOCKED)**: model catalogs, MODEL_* / MODEL_TIER_*, materializers, opencode.json model/providers fields, and any third model.json SOT are **out of scope**. US-0131 resolver may ignore or pass-through without interpreting model keys.
+
+### Web / docs sources (2026-09-07)
+
+- https://opencode.ai/v2/docs/config/ — locations ~/.config/opencode/opencode.json{,c}, project opencode.json{,c}, .opencode/opencode.json{,c}; .opencode form overrides direct form; schema is host model/permissions/agents/plugins — **not** a kit governance store
+- Context7 /websites/opencode_ai_v2 — corroborates same path inventory + merge precedence
+- In-repo: docs/engineering/runbook.md ## Scratchpad delivery Model B (US-0073 / DEC-0055), ## OpenCode host mode (US-0121), ## OpenCode host operator runbook (US-0126); docs/product/standalone-its-magic-pi-masterplan.md §13.2–13.3
+- Discovery: docs/product/vision.md ## Discovery Notes — US-0131; handoffs/po_to_tl.md D1–D10 / DQ1–DQ10
+
+### Critic NB closures (discovery us0131dsc-*, non-blocking → research locks)
+
+| Critic theme | Resolution in R-0116 |
+|---|---|
+| Residual .cursor hardcodes + both-host precedence + opencode.json dump risk (challenger) | **LOCKED DQ1/DQ4/DQ5/DQ6**: dedicated .its-magic/ kit config; forbid dumping shared keys into opencode.json; complete hardcode inventory + 
+esolve_runtime_config injection; both-host precedence table below |
+| Path/schema/injection API + R-0116 ownership (architect) | **LOCKED DQ1/DQ2/DQ5**: path + schema_version + fail-closed codes + lib API owned by this research; architecture authors # US-0131 + companion **DEC-0131** |
+| Scope / YAGNI (subtractor) | Held: no US-0132 expansion; no model DEC amend; no BUG-0015/0016 reopen; no DONE flip; no architecture spawn from research |
+
+### Gap confirmation (code)
+
+Primary .cursor/scratchpad* hardcode / merge consumers (shared-kernel migration targets):
+
+| Module | Role |
+|---|---|
+| scripts/auto_outer_driver.py | _merge_scratchpad — outer-driver autonomy gates |
+| scripts/opencode_auto_bridge.py | _merge_scratchpad — OpenCode first-phase selection |
+| scripts/enforce-triad-hot-surface.py | example/base/local merge for triad thresholds |
+| scripts/dev_environment_lib.py | SCRATCHPAD_*_REL constants + merge |
+| scripts/caveman_compress_input.py | baseline scratchpad path |
+| scripts/parallel_dev_arbiter.py | default .cursor/scratchpad.md |
+| scripts/uat_probe_lib.py | scratchpad pair merge |
+| scripts/validate_autonomy_stop_matrix.py | scratchpad path default |
+| scripts/model_tier_validate.py | default scratchpad path (**US-0132 compose** — do not reinterpret model keys here) |
+
+Cursor-host-only parity tooling (remain Cursor-scoped; not OpenCode-required): check-scratchpad-pair-parity.py, check_intake_template_parity.py, alidate_doc_profile.py, sync_push_gates.py.
+
+### DQ1 — Canonical host-neutral config path (LOCKED)
+
+- **Ship**: repo-local kit directory **.its-magic/** (host-neutral; not under .cursor/ or .opencode/):
+  - .its-magic/config.example.json — framework catalog (installer-delivered; refreshable)
+  - .its-magic/config.json — team/shared baseline (materialize-from-example when absent; never overwrite if present except explicit overwrite mode)
+  - .its-magic/config.local.json — operator overrides (**gitignored**; never overwritten by install/upgrade/clean)
+- **Rationale**: OpenCode-only installs get shared settings without inventing .cursor/; kernel paths already install regardless of --host (US-0121); avoids polluting OpenCode host schema.
+- **Reject**: requiring .cursor/scratchpad* on OpenCode-only.
+- **Reject**: storing kit governance keys inside opencode.json{,c} / .opencode/opencode.json{,c} (host model/permissions/agents surface per OpenCode v2 docs).
+- **Reject**: undocumented third model SOT (model.json) — US-0132.
+- **Reject (YAGNI)**: repo-root its-magic.json (clutters root; weaker local-file protection symmetry).
+- **deferred_to_architecture**: exact filename tokens (config vs 
+untime) if DEC-0131 prefers alias — default **config**.
+
+### DQ2 — Typed schema + versioning + fail-closed codes (LOCKED)
+
+- **Shape**: JSON object with required schema_version (int, start at 1) and shared object mapping **scratchpad-compatible KEY names** → string values (1:1 with existing KEY=VAL automation keys for adapter simplicity).
+- **Optional**: host_overlays.cursor / host_overlays.opencode for non-shared host-local non-model knobs only (empty in v1 unless architecture finds a required overlay).
+- **Forbidden in all layers**: credentials, provider API keys, real vendor model slugs in examples/templates.
+- **Fail-closed reason codes** (new family; document in US-0126 consolidated table via compose):
+  - HOST_CONFIG_SCHEMA_UNSUPPORTED — unknown/unsupported schema_version
+  - HOST_CONFIG_INVALID — malformed JSON / wrong types / unknown top-level keys (strict)
+  - HOST_CONFIG_MISSING_REQUIRED — required shared key empty after full resolve (call-site required set)
+  - HOST_CONFIG_PATH_FORBIDDEN — resolver asked to treat .cursor/ as sole SOT on OpenCode-only host mode
+  - HOST_CONFIG_SECRET_REJECTED — credential-shaped values detected in shared layers
+- Absent optional config file on OpenCode-only → resolve from defaults + any present layers; **not** the same as invalid present file.
+- **deferred_to_architecture**: exact required-key allowlist per phase vs global defaults table.
+
+### DQ3 — Cursor scratchpad → neutral resolver mapping (LOCKED)
+
+- Preserve **DEC-0055 Model B** merge for Cursor compatibility: **local > baseline > example** within the Cursor adapter.
+- Adapter maps merged KEY=VAL into the same shared dict namespace as .its-magic JSON.
+- **DEC-0039**: installer never overwrites .cursor/scratchpad.local.md; example refresh remains example-only.
+- Cursor scratchpad remains **compatibility UX**, not sole SOT after migration (D2).
+- MODEL_* / MODEL_TIER_* keys encountered by US-0131 resolver: **ignore** (do not validate as shared governance; US-0132 owns).
+
+### DQ4 — OpenCode-only shared-settings adapter (LOCKED)
+
+- OpenCode-only resolves shared settings from **.its-magic/** (+ code defaults) only.
+- **Forbidden**: dumping kit governance keys into opencode.json model/providers/permissions schema.
+- OpenCode host pack (.opencode/agents|commands|plugins) remains host UX; shared kernel reads kit config via Python lib, not by parsing OpenCode JSON.
+- Compose US-0123/0124/0125/0126 unchanged for host-specific surfaces.
+
+### DQ5 — Hardcode inventory + injection API (LOCKED)
+
+- **API**: new scripts/host_runtime_config_lib.py with 
+esolve_runtime_config(repo_root, *, host_mode: str | None = None) -> ResolvedRuntimeConfig returning {values: dict[str,str], provenance: dict[str,str], diagnostics: list[str]}.
+- Callers replace private _merge_scratchpad / hardcoded .cursor/scratchpad* defaults with this resolver (migration list in Gap confirmation).
+- Optional CLI --config-root / env ITS_MAGIC_CONFIG_ROOT override for tests only (not a second SOT).
+- Cursor-only parity scripts may keep reading .cursor/scratchpad* **when validating Cursor pair surfaces**, but outer-driver / triad / OpenCode bridge **must** use the resolver.
+
+### DQ6 — --host both precedence table (LOCKED)
+
+Aligned to masterplan §13.3; highest wins for **shared** keys:
+
+1. Explicit one-run CLI/env overrides (if architecture introduces; else N/A)
+2. .its-magic/config.local.json (shared.*)
+3. .cursor/scratchpad.local.md (compatibility adapter; shared keys only)
+4. .its-magic/config.json (shared.*)
+5. .cursor/scratchpad.md (compatibility baseline)
+6. .its-magic/config.example.json (framework catalog fallback when baseline absent)
+7. Built-in code defaults
+
+Rules:
+- **No conflicting duplicate writes**: installer writes examples / materializes missing baselines only; never writes both Cursor local and .its-magic local in one step.
+- When key present in both kit local and Cursor local with different values → **kit local wins**; emit diagnostic HOST_CONFIG_KEY_SHADOWED (non-fatal unless HOST_CONFIG_STRICT=1 — architecture default-off).
+- Host-local schema differences (Cursor .mdc, OpenCode Layer-1) stay outside shared resolver.
+
+### DQ7 — Capability matrix + reason-code family (LOCKED)
+
+| Class | Examples | Unavailable behavior |
+|---|---|---|
+| **Shared / host-neutral** | DELIVERY_MODE, TOKEN_PROFILE, AUTO_*, intake/work-kind/id-bootstrap, triad thresholds, phase plan include/exclude, autonomy presets | Malformed → HOST_CONFIG_* fail-closed; missing optional → defaults |
+| **Cursor-only** | .cursor/rules/*.mdc, Cursor browser MCP UAT, .cursor/remote.json, Cursor Task spawn, Cursor pair-parity validators | Skip or fail with existing/CURSOR_CAPABILITY_UNAVAILABLE (architecture picks per call site); **no silent parity claim** |
+| **OpenCode-only** | .opencode/agents Layer-1, orchestrator plugin spawn, thin commands, OPENCODE_* codes, /connect auth | Existing OPENCODE_* fail/skip (US-0124/0126); unchanged |
+| **US-0132-owned** | model catalogs, MODEL_*, materializers | Out of scope; do not classify as shared |
+
+### DQ8 — Installer / manifest surfaces (LOCKED)
+
+- Deliver .its-magic/config.example.json as **kernel** install path (always, all --host modes) — add to [install_include_paths] (or new [its_magic_config_install_include_paths] if architecture prefers section split; default: include_paths).
+- --host cursor|both: keep DEC-0055 scratchpad Model B + DEC-0039 local protection **unchanged**.
+- --host opencode|both: do **not** require .cursor/ rows; materialize .its-magic/config.json from example when absent (mirror Model B materialize semantics).
+- **Never overwrite**: .its-magic/config.local.json, .cursor/scratchpad.local.md, active catalogs (compose US-0132).
+- Clean/upgrade host-scoping remains US-0121; shrinking host must not delete the other host's locals.
+
+### DQ9 — Minimal 	est_us0131_* inventory (LOCKED)
+
+Static/fixture only — **no live OpenCode CI probe**:
+
+1. 	est_us0131_neutral_path_no_cursor_required
+2. 	est_us0131_cursor_adapter_preserves_dec0055_precedence
+3. 	est_us0131_opencode_only_resolves_shared_from_its_magic
+4. 	est_us0131_both_host_precedence_table
+5. 	est_us0131_rejects_opencode_json_governance_dump
+6. 	est_us0131_schema_fail_closed_codes
+7. 	est_us0131_installer_preserves_local_config
+8. 	est_us0131_shared_kernel_uses_resolver_not_hardcode (grep/import contract on migrated modules)
+9. 	est_us0131_model_keys_ignored_us0132_boundary
+10. 	est_us0131_capability_matrix_reason_codes_documented
+
+Fixtures: temp repos for cursor / opencode / oth with/without .cursor/ and with .its-magic/ layers.
+
+### DQ10 — Docs anchors (LOCKED)
+
+- New runbook h2: ## Cross-host runtime configuration (US-0131) (active + template byte-identical) — precedence table, migration, unsupported-capability behavior, reason codes.
+- README operator subsection under Commands/workflow (or Delivery & lifecycle) pointing at runbook h2.
+- docs/engineering/auto-orchestration-reference.md cross-link for outer-driver/OpenCode bridge config source.
+- US-0126 OpenCode host operator runbook gains a **compose cross-link** only (do not rewrite consolidated table semantics beyond additive HOST_CONFIG_* rows).
+- Architecture owns # US-0131 H1 + companion **DEC-0131**.
+
+### Architecture seeds (for /architecture — not authored here)
+
+- Approach **A1 (recommended)**: .its-magic/ JSON SOT + Cursor scratchpad LegacyScratchpadAdapter + host_runtime_config_lib.resolve_runtime_config migration of shared-kernel readers.
+- Reject **A2**: scratchpad-only forever (fails AC-3).
+- Reject **A3**: opencode.json as shared store (DQ4 / OpenCode schema collision / US-0132 risk).
+- Companion DEC: **DEC-0131** (Required → Accepted in architecture).
+- Risks: R1 migration miss leaves hardcode (MEDIUM — DQ9 marker 8); R2 both-host shadow confusion (LOW–MEDIUM — diagnostic); R3 schema churn (LOW — version gate); R4 installer overwrite regression (MEDIUM — DEC-0039 compose tests); R5 US-0132 boundary leak (MEDIUM — ignore MODEL_* + contract test).
+
+### Decision gate
+
+- **decision_gate=false** — DQ1–DQ10 LOCKED; no critical unknowns remain for architecture.
+- **Status**: US-0131 remains **OPEN**. **Next**: /architecture in fresh **tech-lead** subagent. Do not spawn architecture from this research chat. STOP.
+

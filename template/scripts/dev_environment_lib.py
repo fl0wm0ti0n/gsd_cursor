@@ -15,6 +15,11 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
+
 SCHEMA_VERSION = 1
 DEFAULT_PROFILE_PATH = ".cursor/dev-environment.json"
 MAX_RETRY_COUNT = 2
@@ -129,38 +134,10 @@ def _normalize_path(path: str) -> str:
     return path.replace("\\", "/")
 
 
-def _parse_scratchpad_file(path: Path) -> Dict[str, str]:
-    if not path.is_file():
-        return {}
-    out: Dict[str, str] = {}
-    with open(path, "r", encoding="utf-8") as f:
-        for raw in f:
-            line = raw.strip()
-            if not line or line.startswith("#") or line.startswith("- "):
-                continue
-            if "=" not in line:
-                continue
-            key, _, val = line.partition("=")
-            key = key.strip()
-            if key:
-                out[key] = val.strip()
-    return out
-
-
 def read_merged_scratchpad(target_root: Path) -> Dict[str, str]:
-    """Model B merge precedence: local > materialized baseline > example."""
-    example = _parse_scratchpad_file(target_root / SCRATCHPAD_EXAMPLE_REL)
-    baseline = _parse_scratchpad_file(target_root / SCRATCHPAD_BASELINE_REL)
-    local = _parse_scratchpad_file(target_root / SCRATCHPAD_LOCAL_REL)
-    merged: Dict[str, str] = {}
-    for key in set(example) | set(baseline) | set(local):
-        if key in local:
-            merged[key] = local[key]
-        elif key in baseline:
-            merged[key] = baseline[key]
-        elif key in example:
-            merged[key] = example[key]
-    return merged
+    """Resolve shared governance keys via host-neutral config (US-0131 / DEC-0131)."""
+    resolved = hrc.resolve_runtime_config(target_root, raise_on_fatal=False)
+    return dict(resolved.values)
 
 
 def resolve_profile_path(

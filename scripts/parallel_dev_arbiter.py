@@ -38,6 +38,7 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
 
 
 # --- Scratchpad key contracts (DEC-0108 §1) ------------------------------------
@@ -124,17 +125,24 @@ def read_scratchpad(path: Path) -> dict[str, str]:
 
 
 def read_scratchpad_with_defaults(scratchpad_path: Path) -> dict[str, str]:
-    """Read scratchpad applying US-0108 defaults for missing keys."""
-    raw = read_scratchpad(scratchpad_path)
+    """Read governance keys via host-neutral resolver (US-0131); path kept for API compat."""
+    repo = scratchpad_path.parent.parent if scratchpad_path.name.endswith(".md") else _REPO_ROOT
+    # Prefer repo inferred from conventional .cursor/scratchpad*.md paths.
+    if scratchpad_path.parts[-2:] == (".cursor", "scratchpad.md") or scratchpad_path.parts[-2:] == (
+        ".cursor",
+        "scratchpad.local.md",
+    ):
+        repo = scratchpad_path.parent.parent
+    resolved = hrc.resolve_runtime_config(repo, raise_on_fatal=False)
     merged = dict(SCRATCHPAD_KEY_DEFAULTS)
-    merged.update(raw)
+    merged.update(resolved.values)
     return merged
 
 
 def is_parallel_enabled(scratchpad_path: Path) -> bool:
     """Return True only when SOVEREIGN_PARALLEL_DEV=1 explicitly."""
-    raw = read_scratchpad(scratchpad_path)
-    return raw.get(SOVEREIGN_PARALLEL_DEV_KEY, "0").strip() == "1"
+    values = read_scratchpad_with_defaults(scratchpad_path)
+    return values.get(SOVEREIGN_PARALLEL_DEV_KEY, "0").strip() == "1"
 
 
 # --- Reason codes ---------------------------------------------------------------
@@ -700,6 +708,8 @@ def execute_parallel_dev(
     if repo_root is None:
         repo_root = _REPO_ROOT
     if scratchpad_path is None:
+        # Host-neutral default: resolve via US-0131; Cursor path is adapter-only.
+        _ = hrc.resolve_runtime_config(repo_root, raise_on_fatal=False)
         scratchpad_path = repo_root / ".cursor" / "scratchpad.md"
     if pick_output_path is None:
         pick_output_path = repo_root / "handoffs" / "parallel_dev_pick.json"

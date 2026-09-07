@@ -393,6 +393,22 @@ runbook** (and **OpenCode host mode** for the installer flag reference).
 
 Out of scope for the OpenCode host adapter: standalone runtime, OpenCode fork, VS Code contrib rewrite, Caveman mode, Cursor browser as primary UAT.
 
+### Cross-host runtime configuration (US-0131)
+
+Shared lifecycle/governance settings resolve from host-neutral
+`.its-magic/config{,.local,.example}.json`. Cursor scratchpad remains a DEC-0055
+compatibility adapter. OpenCode-only installs do not require `.cursor/`. Operator
+details: `docs/engineering/runbook.md` → **Cross-host runtime configuration (US-0131)**.
+Model catalogs / `MODEL_*` remain US-0132.
+
+### OpenCode Layer-1 role permissions vs kit duties (BUG-0016)
+
+OpenCode Layer-1 agent frontmatter (`bash: ask` for po/tech-lead/curator; real
+`sprints/S*/` globs; PO intake_evidence + resume_brief + state edit paths; release
+duty paths) is aligned with kit phase contracts while preserving success test (c)
+(non-dev no production/code allow). See runbook / architecture `# BUG-0016` and
+`decisions/DEC-0122.md` §2.
+
 ### Guided intake behavior (US-0033)
 
 `/intake` supports two PO interaction modes via `.cursor/scratchpad.md`:

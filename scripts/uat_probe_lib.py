@@ -18,6 +18,11 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 
+_SCRIPT_DIR = Path(__file__).resolve().parent
+if str(_SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPT_DIR))
+import host_runtime_config_lib as hrc  # noqa: E402
+
 UAT_PROBE_UNRESOLVED = "UAT_PROBE_UNRESOLVED"
 UAT_STACK_PROFILE_UNKNOWN = "UAT_STACK_PROFILE_UNKNOWN"
 UAT_PROBE_TIMEOUT = "UAT_PROBE_TIMEOUT"
@@ -79,19 +84,9 @@ MAX_SCREENSHOTS = 5
 
 
 def _merge_scratchpad(repo: Path) -> dict[str, str]:
-    values: dict[str, str] = {}
-    for name in (".cursor/scratchpad.md", ".cursor/scratchpad.local.md"):
-        path = repo / name
-        if not path.is_file():
-            continue
-        for line in path.read_text(encoding="utf-8").splitlines():
-            stripped = line.strip()
-            if not stripped or stripped.startswith("#"):
-                continue
-            if "=" in stripped:
-                key, _, val = stripped.partition("=")
-                values[key.strip()] = val.strip()
-    return values
+    """Resolve shared UAT probe settings via host-neutral config (US-0131)."""
+    resolved = hrc.resolve_runtime_config(repo, raise_on_fatal=False)
+    return dict(resolved.values)
 
 
 def _read_int(merged: dict[str, str], key: str, default: int) -> int:

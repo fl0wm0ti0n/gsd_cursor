@@ -309,6 +309,11 @@ bug-scoped; see **`architecture.md`** **`# US-0087`**):
 true for the same materialized run (scheduler mutex).
 
 ## Inputs
+- Host-neutral runtime config (`US-0131` / `DEC-0131`): shared governance keys
+  resolve via `scripts/host_runtime_config_lib.resolve_runtime_config` from
+  `.its-magic/config{,.local,.example}.json`, with Cursor `.cursor/scratchpad*`
+  as a DEC-0055 compatibility adapter. OpenCode-only does not require `.cursor/`.
+  See `docs/engineering/runbook.md` → **Cross-host runtime configuration (US-0131)**.
 - Merged scratchpad policy (`US-0073` / `DEC-0055`): resolve flags from **local >
   materialized `.cursor/scratchpad.md` > `.cursor/scratchpad.local.example.md`**
   (installers materialize baseline when missing; missing required keys after merge

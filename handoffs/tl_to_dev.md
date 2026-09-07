@@ -1,3 +1,56 @@
+## Plan-verify PASS handoff — US-0131 / S0133 — `/execute` next (fresh dev)
+
+- sprint_id: S0133
+- story_id: US-0131 (Status OPEN — authority docs/product/backlog.md)
+- bug_id: (none)
+- companion_dec: DEC-0131 Accepted
+- research_anchor: R-0116 (DQ1–DQ10 LOCKED)
+- architecture_anchor: docs/engineering/architecture.md # US-0131
+- approach: A1 LOCKED — `.its-magic/config{,.local,.example}.json` SOT + LegacyScratchpadAdapter + `resolve_runtime_config` migration
+- orchestrator_run_id: auto-20260907-us0131
+- plan_verify_fresh_context_marker: qa-US0131-plan-verify-20260907T195200Z-fresh
+- plan_verify_timestamp: 2026-09-07T19:52:00Z (UTC)
+- model_id: composer-2.5 (CROSS_MODEL_REVIEW=1 — required on isolation)
+- plan_verify_verdict: PASS
+- decision_gate: false
+- sprint_status: PLANNED → execute-ready (backlog OPEN per US-0045 — not mutated; AC-1..AC-8 unchecked)
+- task_count: 9 (T-anch + T-001..T-008; T-009 folded into T-007; within SPRINT_MAX_TASKS=12)
+- ac_surjective_map: AC-1->T-001,T-007(m1,m6); AC-2->T-002,T-007(m2); AC-3->T-003,T-007(m3; m5 DQ4 primary); AC-4->T-004,T-007(m8); AC-5->T-005,T-007(m10); AC-6->T-005,T-007(m4 primary; m5 nuance=AC-3/DQ4); AC-7->T-006,T-007(m7); AC-8->T-007(all10 incl m9),T-008; DC->T-anch
+- task_order: T-anch -> T-001 -> T-002 -> T-003 -> T-004 -> T-005 -> T-006 -> T-007 -> T-008
+- plan-verify.json: PASS at sprints/S0133/plan-verify.json
+- compose_guards (non-negotiable): DO NOT expand US-0132; DO NOT dump kit keys into opencode.json; DO NOT reopen BUG-0015/0016; DO NOT amend DEC-0086/0087/0123; DO NOT mark US-0131 DONE; DO NOT tick ACs; DO NOT mutate intake JSON; DO NOT rewrite architecture.md / DEC-0131
+- critic_nb_execute_awareness:
+  - host_mode=None = auto-detect (T-001/T-003); HOST_CONFIG_PATH_FORBIDDEN only OpenCode-only + forbidden cursor-sole request
+  - T-004 exhaustive 9-module inventory; do not expand to Cursor-only parity scripts
+  - Do not re-split T-009; marker 9 mandatory in T-007 10-marker set
+- first_execute_task: T-anch
+- key_locked_artifacts:
+  - paths: `.its-magic/config.example.json` / `config.json` / `config.local.json` (token=`config`)
+  - API: `resolve_runtime_config(repo_root, *, host_mode=None, required_keys=None)`
+  - 10 `test_us0131_*` markers (static/fixture; no live OpenCode probe)
+  - US-0132 boundary: ignore MODEL_* (marker 9)
+- runtime_proof_id: rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131
+- proof_hash: 5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1
+- proof_ttl: 2026-09-07T20:52:00Z
+- consumed_sprint_plan_proof: rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131 / 96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66 — RUNTIME_PROOF_VALID
+- next_scheduled_phase: /execute (role=dev)
+- next_scheduled_role: dev
+- stop_condition: STOP after plan-verify. Orchestrator may critic plan-verify then spawn /execute in fresh dev (BUG-0006). Do NOT spawn execute from plan-verify qa. Do NOT work US-0132.
+
+---
+
+## Prior — Sprint-plan handoff — US-0131 / S0133 — `/plan-verify` (superseded by PASS)
+
+- sprint_id: S0133
+- story_id: US-0131
+- plan-verify.json: was PENDING — now PASS (see above)
+- fresh_context_marker: tl-US0131-sprint-plan-20260907T194500Z-fresh
+- timestamp: 2026-09-07T19:45:00Z (UTC)
+- runtime_proof_id: rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131
+- proof_hash: 96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66
+
+---
+
 ## Sprint-plan handoff — BUG-0016 / S0132 — `/execute` next (fresh dev; ultra_lean skips standalone /plan-verify)
 
 - sprint_id: S0132

@@ -1,3 +1,1558 @@
+# Resume Brief — US-0131 sovereign-critic PASS on closure → refresh-context (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: ship
+- **last_completed_phase**: sovereign-critic (of closure)
+- **intended_resume_phase**: refresh-context
+- **next_scheduled_phase**: refresh-context
+- **next_scheduled_role**: curator
+- **resolution_source**: SOVEREIGN_CRITIC_PASS (tech-lead / composer-2.5-fast) — concurs CLOSURE_PASS; Status DONE; L159 [x]; US-0132 OPEN; queue S0133=released; 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T21:38:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131clo-challenger-001, us0131clo-architect-002, us0131clo-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-closure-20260907T213800Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-closure-qe-20260907T212848Z-US-0131
+- **producer_proof_hash**: 69B2C58BC1026E266C1533DB3E28D9202FD428362F4D34BEE4A15EFAB1CCD335
+- **producer_proof_ttl**: 2026-09-07T22:28:48Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T21:38:00Z)
+- **producer_fresh_context_marker**: qe-US0131-closure-20260907T212848Z-fresh
+- **queue_status**: S0133=released
+- **harness**: tests/report.md @ 2026-09-07T21:15:18Z Pass:853 / Fail:0 (not re-run by critic)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132 (remains OPEN — do not close)
+- **status**: DONE (US-0045 / US-0120 — flipped by /closure; critic concurs)
+- **acceptance**: L159 [x]
+- **b1_status**: CLOSED (metadata exit 0)
+- **nb_carry**: active runbook L4226 Release-status stamp still says OPEN until /closure — refresh should rewrite to DONE; parity already green
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131clo-*); sprints/S0133/closure-verification.md; docs/product/backlog.md; docs/product/acceptance.md; handoffs/release_queue.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh curator for /refresh-context (BUG-0006). Do NOT spawn refresh-context from this critic. Do NOT close US-0132. Do NOT reopen BUG-0015/BUG-0016.
+
+## Current status
+
+- **Active story**: **US-0131** — **DONE** (sovereign-critic PASS on closure; awaiting refresh-context)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this ship segment
+
+## Latest orchestration pointer
+
+- Next: /refresh-context (fresh **curator** subagent)
+- STOP — do not spawn refresh-context from this sovereign-critic subagent
+
+---
+
+# Resume Brief — US-0131 closure PASS → refresh-context (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: ship
+- **last_completed_phase**: closure
+- **intended_resume_phase**: refresh-context
+- **next_scheduled_phase**: refresh-context
+- **next_scheduled_role**: curator
+- **resolution_source**: CLOSURE_PASS (qe / composer-2.5) — Status OPEN→DONE; acceptance L159 [x]; queue S0133=released unchanged
+- **wall_clock**: 2026-09-07T21:28:48Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **decision_gate**: false
+- **fresh_context_marker**: qe-US0131-closure-20260907T212848Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-closure-qe-20260907T212848Z-US-0131
+- **proof_hash**: 69B2C58BC1026E266C1533DB3E28D9202FD428362F4D34BEE4A15EFAB1CCD335
+- **proof_ttl**: 2026-09-07T22:28:48Z
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-release-release-20260907T211518Z-US-0131
+- **producer_proof_hash**: 10026570510E2C006AE4A86CFC2F0A70BE0CF170E30E43C13BEC342EC3E72D7A
+- **producer_proof_ttl**: 2026-09-07T22:15:18Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T21:28:48Z)
+- **queue_status**: S0133=released
+- **harness**: tests/report.md @ 2026-09-07T21:15:18Z Pass:853 / Fail:0
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132 (remains OPEN — do not close)
+- **status**: DONE (US-0045 / US-0120 — flipped by /closure)
+- **acceptance**: L159 [x]
+- **b1_status**: CLOSED (metadata exit 0)
+- **nb_carry**: template runbook Release-status stamp synced for --scope=us-0131; active stamp wording still says OPEN until /closure — refresh should rewrite to DONE
+- **evidence_ref**: sprints/S0133/closure-verification.md; docs/product/backlog.md; docs/product/acceptance.md; docs/engineering/state.md; handoffs/release_queue.md; handoffs/releases/S0133-release-notes.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh curator for /refresh-context (BUG-0006). Do NOT spawn refresh-context from this closure subagent. Do NOT close US-0132. Do NOT reopen BUG-0015/BUG-0016.
+
+## Current status
+
+- **Active story**: **US-0131** — **DONE** (closure PASS; awaiting refresh-context)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this ship segment
+
+## Latest orchestration pointer
+
+- Next: /refresh-context (fresh **curator** subagent)
+- STOP — do not spawn refresh-context from this closure subagent
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS on release → closure (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: ship
+- **last_completed_phase**: sovereign-critic (of release)
+- **intended_resume_phase**: closure
+- **next_scheduled_phase**: closure
+- **next_scheduled_role**: qe
+- **resolution_source**: SOVEREIGN_CRITIC_PASS (tech-lead / composer-2.5-fast) — concurs RELEASE_PASS; Fail:0; Status OPEN; queue S0133=released; 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T21:23:10Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131rel-challenger-001, us0131rel-architect-002, us0131rel-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-release-20260907T212310Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-release-release-20260907T211518Z-US-0131
+- **producer_proof_hash**: 10026570510E2C006AE4A86CFC2F0A70BE0CF170E30E43C13BEC342EC3E72D7A
+- **producer_proof_ttl**: 2026-09-07T22:15:18Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T21:23:10Z)
+- **producer_fresh_context_marker**: release-US0131-release-20260907T211518Z-fresh
+- **queue_status**: S0133=released
+- **harness**: tests/report.md @ 2026-09-07T21:15:18Z Pass:853 / Fail:0
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 / US-0120 — do NOT flip DONE; do NOT tick ACs — closure owns)
+- **b1_status**: CLOSED (metadata exit 0)
+- **nb_carry**: post-gate runbook us-0131 template parity lag (active Release-status stamp) — sync at closure/refresh
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131rel-*); handoffs/releases/S0133-release-notes.md; sprints/S0133/release-findings.md; handoffs/release_queue.md; tests/report.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qe for /closure (BUG-0006). Do NOT spawn closure from this critic. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (sovereign-critic PASS on release; awaiting closure)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /closure (fresh **qe** subagent)
+- STOP — do not spawn closure from this sovereign-critic subagent
+
+---
+
+# Resume Brief — US-0131 release PASS → closure (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: ship
+- **last_completed_phase**: release
+- **intended_resume_phase**: closure
+- **next_scheduled_phase**: closure
+- **next_scheduled_role**: qe
+- **resolution_source**: RELEASE_PASS (release / composer-2.5) — gates 1–4b green; Fail:0; queue S0133=released; Status OPEN; ACs unchecked
+- **wall_clock**: 2026-09-07T21:15:18Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: RELEASE_PASS
+- **blocking_count**: 0
+- **fresh_context_marker**: release-US0131-release-20260907T211518Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-release-release-20260907T211518Z-US-0131
+- **proof_hash**: 10026570510E2C006AE4A86CFC2F0A70BE0CF170E30E43C13BEC342EC3E72D7A
+- **proof_ttl**: 2026-09-07T22:15:18Z
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-verify-work-qa-20260907T204621Z-US-0131
+- **producer_proof_hash**: 7F59D8E38F3449966F5E07B861314CD4EC85DC5CC432828C8CB90A451175984F
+- **producer_proof_ttl**: 2026-09-07T21:46:21Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T21:15:18Z)
+- **queue_status**: S0133=released
+- **harness**: tests/report.md @ 2026-09-07T21:15:18Z Pass:853 / Fail:0
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 / US-0120 — do NOT flip DONE; do NOT tick ACs — closure owns)
+- **b1_status**: CLOSED (metadata exit 0)
+- **evidence_ref**: handoffs/releases/S0133-release-notes.md; sprints/S0133/release-findings.md; handoffs/release_queue.md; tests/report.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qe for /closure (BUG-0006). Do NOT spawn closure from this release subagent. Do NOT mark US-0131 DONE. Do NOT tick acceptance L159. Do NOT work US-0132.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (release PASS; queue released; awaiting closure)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /closure (fresh **qe** subagent)
+- STOP — do not spawn closure from this release subagent
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS on verify-work → release (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (of verify-work)
+- **intended_resume_phase**: release
+- **next_scheduled_phase**: release
+- **next_scheduled_role**: release
+- **resolution_source**: SOVEREIGN_CRITIC_PASS (tech-lead / composer-2.5-fast) — concurs verify-work PASS; UAT 9/9; Status OPEN; 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T20:58:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131vw-challenger-001, us0131vw-architect-002, us0131vw-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-verify-work-20260907T205800Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-verify-work-qa-20260907T204621Z-US-0131
+- **producer_proof_hash**: 7F59D8E38F3449966F5E07B861314CD4EC85DC5CC432828C8CB90A451175984F
+- **producer_proof_ttl**: 2026-09-07T21:46:21Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T20:58:00Z)
+- **producer_fresh_context_marker**: qa-US0131-verify-work-20260907T204621Z-fresh
+- **uat_total**: 9
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 / US-0120 — do NOT flip DONE; do NOT tick ACs — closure owns)
+- **b1_status**: CLOSED (metadata exit 0)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131vw-*); sprints/S0133/uat.json; sprints/S0133/uat.md; sprints/S0133/qa-findings.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh release for /release (BUG-0006). Do NOT spawn release from this critic. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (sovereign-critic PASS on verify-work; awaiting release)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /release (fresh **release** subagent)
+- STOP — do not spawn release from this sovereign-critic subagent
+
+---
+
+# Resume Brief — US-0131 verify-work PASS → release (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: verify-work
+- **intended_resume_phase**: release
+- **next_scheduled_phase**: release
+- **next_scheduled_role**: release
+- **resolution_source**: VERIFY_WORK_PASS (qa / composer-2.5) — UAT populated 9/9; B-1 CLOSED; Status OPEN; acceptance unchecked
+- **wall_clock**: 2026-09-07T20:46:21Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete; no reopen)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **uat_total**: 9
+- **uat_passed**: 9
+- **uat_failed**: 0
+- **blocking_count**: 0
+- **decision_gate**: false
+- **fresh_context_marker**: qa-US0131-verify-work-20260907T204621Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-verify-work-qa-20260907T204621Z-US-0131
+- **proof_hash**: 7F59D8E38F3449966F5E07B861314CD4EC85DC5CC432828C8CB90A451175984F
+- **proof_ttl**: 2026-09-07T21:46:21Z
+- **consumed_producer_proof**: rp-auto-20260907-us0131-qa-qa-20260907T203347Z-US-0131 / 84692196079278DF25EDF8781DCCE750282DC8F7DFCBA4A9039D7F5FBDCB87CC — RUNTIME_PROOF_VALID
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 / US-0120 — do NOT flip DONE; do NOT tick ACs — closure owns)
+- **b1_status**: CLOSED (metadata exit 0)
+- **evidence_ref**: sprints/S0133/uat.json; sprints/S0133/uat.md; sprints/S0133/qa-findings.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh release for /release after optional sovereign-critic of verify-work (BUG-0006). Do NOT spawn release from this qa. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (verify-work PASS; UAT populated; awaiting release)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /release (fresh **release** subagent)
+- STOP — do not spawn release from this verify-work qa subagent
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS on qa re-run → verify-work (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (of qa re-run)
+- **intended_resume_phase**: verify-work
+- **next_scheduled_phase**: verify-work
+- **next_scheduled_role**: qa
+- **resolution_source**: SOVEREIGN_CRITIC_PASS (tech-lead / composer-2.5-fast) — concurs QA_PASS; B-1 CLOSED; Status OPEN; 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T20:40:15Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131qa2-challenger-001, us0131qa2-architect-002, us0131qa2-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-qa-rerun-20260907T204015Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-qa-qa-20260907T203347Z-US-0131
+- **producer_proof_hash**: 84692196079278DF25EDF8781DCCE750282DC8F7DFCBA4A9039D7F5FBDCB87CC
+- **producer_proof_ttl**: 2026-09-07T21:33:47Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T20:40:15Z)
+- **producer_fresh_context_marker**: qa-US0131-qa-20260907T203347Z-fresh
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **b1_status**: CLOSED (metadata exit 0)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131qa2-*); sprints/S0133/qa-findings.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /verify-work (BUG-0006). Do NOT spawn verify-work from this critic. Do NOT spawn execute. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (QA_PASS + sovereign-critic PASS; awaiting verify-work)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /verify-work (fresh **qa** subagent)
+- STOP — do not spawn verify-work from this critic subagent
+
+---
+# Resume Brief — US-0131 QA_PASS → verify-work (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: qa (re-run after remediation)
+- **intended_resume_phase**: verify-work
+- **next_scheduled_phase**: verify-work
+- **next_scheduled_role**: qa
+- **resolution_source**: QA_PASS (qa / composer-2.5) — B-1 CLOSED; metadata exit 0; 10/10 contract; parity OK; blocking_count=0
+- **wall_clock**: 2026-09-07T20:33:47Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1 (cycle complete)
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **decision_gate**: false
+- **fresh_context_marker**: qa-US0131-qa-20260907T203347Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-qa-qa-20260907T203347Z-US-0131
+- **proof_hash**: 84692196079278DF25EDF8781DCCE750282DC8F7DFCBA4A9039D7F5FBDCB87CC
+- **proof_ttl**: 2026-09-07T21:33:47Z
+- **consumed_producer_proof**: rp-auto-20260907-us0131-execute-remediation-dev-20260907T202531Z-US-0131 / 7BB3B2E38B12A434B1039A1FEC7BC90727CD15823C36328B1A32BF5E12FEB95C — RUNTIME_PROOF_VALID
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs in qa)
+- **b1_status**: CLOSED
+- **evidence_ref**: sprints/S0133/qa-findings.md; sprints/S0133/uat.json; handoffs/qa_to_dev.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /verify-work (BUG-0006). Do NOT spawn verify-work from this qa. Do NOT spawn execute. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (QA_PASS; awaiting verify-work)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: /verify-work (fresh **qa** subagent)
+- STOP — do not spawn verify-work from this qa subagent
+
+---
+﻿# Resume Brief — US-0131 sovereign-critic PASS → qa re-run (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (of execute remediation)
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **resolution_source**: SOVEREIGN_CRITIC_PASS (tech-lead / composer-2.5-fast) — concurs EXECUTE_REMEDIATION_PASS; B-1 docstring-only; metadata green; 0 blocking
+- **wall_clock**: 2026-09-07T20:30:25Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131exr-challenger-001, us0131exr-architect-002, us0131exr-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-execute-remediation-20260907T203025Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_runtime_proof_id**: rp-auto-20260907-us0131-execute-remediation-dev-20260907T202531Z-US-0131
+- **producer_proof_hash**: 7BB3B2E38B12A434B1039A1FEC7BC90727CD15823C36328B1A32BF5E12FEB95C
+- **producer_proof_ttl**: 2026-09-07T21:25:31Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed_at 2026-09-07T20:30:25Z)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **remediation_confirmed**: B-1 docstring US tokens removed; metadata exit 0; no scope creep
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131exr-*); installer.py; sprints/S0133/summary.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /qa re-run (BUG-0006). Do NOT spawn qa from critic. Do NOT spawn verify-work. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (execute remediation + sovereign-critic PASS; awaiting QA re-run)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- Next: `/qa` (fresh **qa** subagent) — re-run after B-1 remediation
+- STOP — do not spawn qa from this critic subagent
+
+---
+# Resume Brief — US-0131 execute remediation PASS → qa re-run (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: execute (remediation)
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **resolution_source**: EXECUTE_REMEDIATION_PASS (dev / composer-2.5) — B-1 docstring US tokens removed; metadata guard exit 0
+- **wall_clock**: 2026-09-07T20:25:31Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: EXECUTE_REMEDIATION_PASS
+- **blocking_count**: 0
+- **decision_gate**: false
+- **fresh_context_marker**: dev-US0131-execute-remediation-20260907T202531Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-execute-remediation-dev-20260907T202531Z-US-0131
+- **proof_hash**: 7BB3B2E38B12A434B1039A1FEC7BC90727CD15823C36328B1A32BF5E12FEB95C
+- **proof_ttl**: 2026-09-07T21:25:31Z
+- **consumed_qa_proof**: rp-auto-20260907-us0131-qa-qa-20260907T201647Z-US-0131 / 49001F39145837AF92BDC30671FF4D097F232A64DBA7C2E3E6782CC72503C66E — RUNTIME_PROOF_VALID
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **fix**: installer.py docstrings no longer contain US-0131 STRING tokens; # comment at L268 remain allowlisted
+- **evidence_ref**: sprints/S0133/summary.md; sprints/S0133/progress.md; handoffs/dev_to_qa.md; installer.py
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /qa re-run (BUG-0006). Do NOT spawn qa from execute. Do NOT spawn verify-work. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (execute remediation PASS; awaiting QA re-run)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- **stop_phase**: execute (remediation)
+- **stop_reason**: completed (B-1 fixed; metadata exit 0; 10/10 contract green)
+- **next_phase**: qa
+- **next_role**: qa
+
+## Intended resume phase
+
+- **/qa** in a **fresh** qa subagent (BUG-0006) — re-verify after remediation.
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS → execute remediation (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (of qa)
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after QA_FAIL (qa / composer-2.5) — critic confirms B-1 honest block; 0 critic blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T20:23:08Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131qa-challenger-001,us0131qa-architect-002,us0131qa-subtractor-003
+- **decision_gate**: false
+- **fresh_context_marker**: critic-US0131-qa-20260907T202308Z-fresh
+- **model_id**: composer-2.5-fast
+- **consumed_qa_proof**: rp-auto-20260907-us0131-qa-qa-20260907T201647Z-US-0131 / 49001F39145837AF92BDC30671FF4D097F232A64DBA7C2E3E6782CC72503C66E — RUNTIME_PROOF_VALID
+- **proof_ttl**: 2026-09-07T21:16:47Z
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **producer_qa_verdict**: QA_FAIL (B-1 USER_VISIBLE_INTERNAL_METADATA_DETECTED — critic-confirmed honest)
+- **blocking_finding**: B-1 installer.py docstrings contain US-0131 (lines 555, 612) — remove from STRING tokens; # comments OK
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131qa-*); sprints/S0133/qa-findings.md; handoffs/qa_to_dev.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh dev for /execute remediation (BUG-0006). Do NOT spawn execute from critic. Do NOT spawn verify-work. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (QA_FAIL upheld by critic; S0133 awaiting execute remediation)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic
+- **stop_reason**: completed (critic PASS on QA honesty; QA_FAIL stands; B-1 remains)
+- **next_phase**: execute
+- **next_role**: dev
+
+## Intended resume phase
+
+- **/execute** in a **fresh** dev subagent (BUG-0006) — minimal docstring remediation only.
+
+---
+
+# Resume Brief — US-0131 QA_FAIL → execute remediation (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: qa
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **resolution_source**: QA_FAIL (qa / composer-2.5) — blocking_count=1 (B-1 USER_VISIBLE_INTERNAL_METADATA_DETECTED)
+- **wall_clock**: 2026-09-07T20:16:47Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **AUTO_IMPLEMENTATION_LOOP**: 1
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: FAIL
+- **blocking_count**: 1
+- **decision_gate**: false
+- **fresh_context_marker**: qa-US0131-qa-20260907T201647Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-qa-qa-20260907T201647Z-US-0131
+- **proof_hash**: 49001F39145837AF92BDC30671FF4D097F232A64DBA7C2E3E6782CC72503C66E
+- **proof_ttl**: 2026-09-07T21:16:47Z
+- **consumed_execute_proof**: rp-auto-20260907-us0131-execute-dev-20260907T200826Z-US-0131 / 0A1A526927EC1F78F02ECDC7C085A3A978C53E7C3E57C6E48C1B845E1E02F9B4 — RUNTIME_PROOF_VALID
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **blocking_finding**: B-1 installer.py docstrings contain US-0131 (lines 555, 612) — remove from STRING tokens; # comments OK
+- **evidence_ref**: sprints/S0133/qa-findings.md; handoffs/qa_to_dev.md; sprints/S0133/uat.json
+- **stop_condition**: Orchestrator MUST Task-spawn fresh dev for /execute remediation (BUG-0006). Do NOT spawn verify-work. Do NOT run execute in-band from qa. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (QA_FAIL; S0133 awaiting execute remediation)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+
+## Latest orchestration pointer
+
+- **stop_phase**: qa
+- **stop_reason**: completed (QA_FAIL; blocking_count=1; B-1 metadata)
+- **next_phase**: execute
+- **next_role**: dev
+
+## Intended resume phase
+
+- **/execute** in a **fresh** dev subagent (BUG-0006) — minimal docstring remediation only.
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS → qa (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: sovereign-critic (of execute)
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after execute PASS (dev / composer-2.5) — 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T20:15:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131ex-challenger-001,us0131ex-architect-002,us0131ex-subtractor-003
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: critic-US0131-execute-20260907T201500Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **critic_model_id**: composer-2.5-fast
+- **runtime_proof_id**: rp-auto-20260907-us0131-execute-dev-20260907T200826Z-US-0131
+- **proof_hash**: 0A1A526927EC1F78F02ECDC7C085A3A978C53E7C3E57C6E48C1B845E1E02F9B4
+- **proof_ttl**: 2026-09-07T21:08:26Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed 2026-09-07T20:15:00Z)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **task_count**: 9 (T-anch + T-001..T-008; all DONE; marker 9 retained)
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131ex-*); sprints/S0133/summary.md; handoffs/dev_to_qa.md; docs/engineering/state.md sovereign-critic of execute checkpoint
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /qa (BUG-0006). Do NOT run qa in-band from this critic. Do NOT spawn qa from sovereign-critic. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (execute + sovereign-critic PASS; S0133 awaiting /qa)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic (of execute)
+- **stop_reason**: completed (SOVEREIGN_CRITIC_PASS; blocking_count=0; anti_slop_aggregate=10)
+- **next_phase**: qa
+- **next_role**: qa
+
+## Intended resume phase
+
+- **/qa** in a **fresh** qa subagent (BUG-0006). Critic NBs us0131ex-* are informational only.
+
+---
+
+# Resume Brief — US-0131 execute PASS → qa (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: build+verify
+- **last_completed_phase**: execute
+- **intended_resume_phase**: qa
+- **next_scheduled_phase**: qa
+- **next_scheduled_role**: qa
+- **resolution_source**: execute PASS (dev / composer-2.5) — 9/9 tasks DONE; 10/10 contract markers PASS
+- **wall_clock**: 2026-09-07T20:08:26Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: EXECUTE_PASS
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: dev-US0131-execute-20260907T200826Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-execute-dev-20260907T200826Z-US-0131
+- **proof_hash**: 0A1A526927EC1F78F02ECDC7C085A3A978C53E7C3E57C6E48C1B845E1E02F9B4
+- **proof_ttl**: 2026-09-07T21:08:26Z
+- **proof_consume**: plan-verify proof RUNTIME_PROOF_VALID (MATCH before TTL 2026-09-07T20:52:00Z; consumed at execute)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **task_count**: 9 (T-anch + T-001..T-008; all DONE; marker 9 retained in T-007)
+- **status**: OPEN (US-0045 — do NOT flip DONE; do NOT tick ACs)
+- **evidence_ref**: handoffs/dev_to_qa.md; sprints/S0133/summary.md; sprints/S0133/tasks.md; tests/us0131_contract_test.py; docs/engineering/state.md execute checkpoint
+- **stop_condition**: Orchestrator MUST Task-spawn fresh qa for /qa (BUG-0006). Do NOT run qa in-band from this execute. Do NOT spawn qa from execute. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (execute PASS; S0133 awaiting /qa)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: execute
+- **stop_reason**: completed (EXECUTE_PASS; 10/10 markers; triad OK)
+- **next_phase**: qa
+- **next_role**: qa
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS → execute (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan → build+verify
+- **last_completed_phase**: sovereign-critic (of plan-verify)
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after plan-verify PASS (qa / composer-2.5) — 0 blocking; anti_slop=10
+- **wall_clock**: 2026-09-07T19:55:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131pv-challenger-001,us0131pv-architect-002,us0131pv-subtractor-003
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: critic-US0131-plan-verify-20260907T195500Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **critic_model_id**: composer-2.5-fast
+- **runtime_proof_id**: rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131
+- **proof_hash**: 5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1
+- **proof_ttl**: 2026-09-07T20:52:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed 2026-09-07T19:55:00Z)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **task_count**: 9 (T-anch + T-001..T-008; T-009 folded into T-007; marker 9 retained)
+- **first_execute_task**: T-anch
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131pv-*); sprints/S0133/plan-verify.json; docs/engineering/state.md sovereign-critic of plan-verify checkpoint; handoffs/tl_to_dev.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh dev for /execute (BUG-0006). Do NOT execute in-band from this critic. Do NOT spawn execute from sovereign-critic. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (plan-verify + sovereign-critic PASS; S0133 execute-ready)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic (of plan-verify)
+- **stop_reason**: completed (SOVEREIGN_CRITIC_PASS; blocking_count=0; anti_slop_aggregate=10)
+- **next_phase**: execute
+- **next_role**: dev
+
+## Intended resume phase
+
+execute
+
+---
+# Resume Brief — US-0131 plan-verify PASS → execute (DEC-0069 / US-0095) — superseded by sovereign-critic
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: S0133
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan → build+verify
+- **last_completed_phase**: plan-verify
+- **intended_resume_phase**: execute
+- **next_scheduled_phase**: execute
+- **next_scheduled_role**: dev
+- **resolution_source**: plan-verify PASS (qa / composer-2.5) — 8/8 AC surjective; decision_gate=false; critic NBs closed (AC-6/m5 nuance; host_mode=None; no T-009 re-split)
+- **wall_clock**: 2026-09-07T19:52:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **decision_gate**: false
+- **fresh_context_marker**: qa-US0131-plan-verify-20260907T195200Z-fresh
+- **model_id**: composer-2.5
+- **degraded_mode**: false
+- **runtime_proof_id**: rp-auto-20260907-us0131-plan-verify-qa-20260907T195200Z-US-0131
+- **proof_hash**: 5F198A1862986704CC24AE0EA2D41C87D343C3AACF842997CB5C76D2995C29F1
+- **proof_ttl**: 2026-09-07T20:52:00Z
+- **proof_consume**: sprint-plan proof MATCH — RUNTIME_PROOF_VALID (consumed 2026-09-07T19:52:00Z before TTL 2026-09-07T20:45:00Z)
+- **producer_sprint_plan_proof_id**: rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131
+- **producer_sprint_plan_proof_hash**: 96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **task_count**: 9 (T-anch + T-001..T-008; T-009 folded into T-007; marker 9 retained)
+- **first_execute_task**: T-anch
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: sprints/S0133/plan-verify.json (PASS); sprints/S0133/sprint.md; sprints/S0133/tasks.md; handoffs/tl_to_dev.md; handoffs/qa_plan_verify.md; docs/engineering/state.md plan-verify checkpoint; docs/product/backlog.md ## US-0131 plan_verify_notes
+- **stop_condition**: Orchestrator MUST Task-spawn fresh dev for /execute (BUG-0006). Do NOT execute in-band from this qa. Do NOT spawn execute from plan-verify. Do NOT work US-0132. Do NOT mark US-0131 DONE.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (plan-verify PASS; S0133 execute-ready)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: plan-verify
+- **stop_reason**: completed (PLAN_VERIFY_PASS; decision_gate=false)
+- **next_phase**: execute
+- **next_role**: dev
+
+## Intended resume phase
+
+execute
+
+---
+# Resume Brief — US-0131 sovereign-critic PASS → plan-verify (DEC-0069 / US-0095) — superseded
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **story_id**: US-0131
+- **sprint_id**: S0133
+- **last_completed_phase**: sovereign-critic (of sprint-plan)
+- **intended_resume_phase**: plan-verify (COMPLETED — see top brief)
+- **verdict**: PASS
+- **fresh_context_marker**: critic-US0131-sprint-plan-20260907T195000Z-fresh
+- **runtime_proof_id**: rp-auto-20260907-us0131-sprint-plan-techlead-20260907T194500Z-US-0131
+- **proof_hash**: 96221EF4BC1FB83F9A0C288287672F1A18ACC023C80185029EA3A6DDABD84E66
+- **wall_clock**: 2026-09-07T19:50:00Z
+
+---
+# Resume Brief — US-0131 sovereign-critic PASS → sprint-plan (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan
+- **last_completed_phase**: architecture + sovereign-critic
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after architecture PASS (tech-lead / composer-2.5) — A1 LOCKED; DEC-0131 Accepted
+- **wall_clock**: 2026-09-07T19:40:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131arc-challenger-001,us0131arc-architect-002,us0131arc-subtractor-003
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: critic-US0131-architecture-20260907T194000Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **critic_model_id**: composer-2.5-fast
+- **runtime_proof_id**: rp-auto-20260907-us0131-architecture-techlead-20260907T193500Z-US-0131
+- **proof_hash**: F31B058CC5CDEAF68EDD2F53F4EF790D1845CE842E2B16057247CF5FE4170C4C
+- **proof_ttl**: 2026-09-07T20:35:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed 2026-09-07T19:40:00Z)
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131arc-*); docs/engineering/architecture.md # US-0131; decisions/DEC-0131.md; docs/engineering/state.md architecture + critic checkpoints; docs/product/backlog.md ## US-0131
+- **stop_condition**: Orchestrator MUST Task-spawn fresh tech-lead for /sprint-plan (BUG-0006). Do NOT execute sprint-plan in-band. Do NOT spawn sprint-plan from this critic. Do NOT work US-0132.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (architecture + sovereign-critic PASS; awaiting sprint-plan)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic (architecture)
+- **stop_reason**: completed (critic PASS; decision_gate=false; 0 blocking)
+- **next_phase**: sprint-plan
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+sprint-plan
+
+---
+﻿# Resume Brief — US-0131 architecture PASS → sprint-plan (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan
+- **last_completed_phase**: architecture
+- **intended_resume_phase**: sprint-plan
+- **next_scheduled_phase**: sprint-plan
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: architecture PASS (tech-lead / composer-2.5) — approach A1 LOCKED; DEC-0131 Accepted; # US-0131 authored
+- **wall_clock**: 2026-09-07T19:35:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: tl-US0131-architecture-20260907T193500Z-fresh
+- **model_id**: composer-2.5
+- **producer_model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-architecture-techlead-20260907T193500Z-US-0131
+- **proof_hash**: F31B058CC5CDEAF68EDD2F53F4EF790D1845CE842E2B16057247CF5FE4170C4C
+- **proof_ttl**: 2026-09-07T20:35:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (research MATCH before TTL; architecture issued)
+- **consumed_research_proof_id**: rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131
+- **consumed_research_proof_hash**: 7DB90B2B345D7C4E84F0A7C78E99A662C7FF308271415ECC5F7DFEAB774BE2BE
+- **research_id**: R-0116
+- **companion_dec**: DEC-0131
+- **approach_id**: A1
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: docs/engineering/architecture.md # US-0131; decisions/DEC-0131.md; docs/engineering/state.md architecture checkpoint; docs/product/backlog.md ## US-0131 architecture_notes; handoffs/po_to_tl.md Architecture handoff US-0131
+- **stop_condition**: Orchestrator may Task-spawn sovereign-critic of architecture (CROSS_MODEL_REVIEW=1) then MUST Task-spawn fresh tech-lead for /sprint-plan (BUG-0006). Do NOT execute sprint-plan in-band. Do NOT spawn sprint-plan from this architecture subagent. Do NOT work US-0132.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (architecture PASS; awaiting sprint-plan)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: architecture
+- **stop_reason**: completed (architecture PASS; decision_gate=false; DEC-0131 Accepted; approach A1)
+- **next_phase**: sprint-plan
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+sprint-plan
+
+---
+# Resume Brief — US-0131 sovereign-critic PASS → architecture (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan
+- **last_completed_phase**: research + sovereign-critic
+- **intended_resume_phase**: architecture
+- **next_scheduled_phase**: architecture
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after research PASS (tech-lead / composer-2.5) — R-0116 DQ1–DQ10 LOCKED
+- **wall_clock**: 2026-09-07T19:30:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **finding_ids**: us0131rsc-challenger-001,us0131rsc-architect-002,us0131rsc-subtractor-003
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: critic-US0131-research-20260907T193000Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **critic_model_id**: composer-2.5-fast
+- **runtime_proof_id**: rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131
+- **proof_hash**: 7DB90B2B345D7C4E84F0A7C78E99A662C7FF308271415ECC5F7DFEAB774BE2BE
+- **proof_ttl**: 2026-09-07T20:25:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL; consumed 2026-09-07T19:30:00Z)
+- **research_id**: R-0116
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131rsc-*); docs/engineering/research.md ## R-0116; docs/engineering/state.md research + critic checkpoints; docs/product/backlog.md ## US-0131
+- **stop_condition**: Orchestrator MUST Task-spawn fresh tech-lead for /architecture (BUG-0006). Do NOT execute architecture in-band. Do NOT spawn architecture from this critic. Do NOT work US-0132. Do NOT spawn sprint-plan.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (research + sovereign-critic PASS; awaiting architecture)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic (research)
+- **stop_reason**: completed (critic PASS; decision_gate=false; 0 blocking)
+- **next_phase**: architecture
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+architecture
+
+---
+
+# Resume Brief — US-0131 research PASS → architecture (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: plan
+- **last_completed_phase**: research
+- **intended_resume_phase**: architecture
+- **next_scheduled_phase**: architecture
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: research PASS (tech-lead) — R-0116 DQ1–DQ10 LOCKED; handoff for /architecture
+- **wall_clock**: 2026-09-07T19:25:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: tl-US0131-research-20260907T192500Z-fresh
+- **model_id**: composer-2.5
+- **producer_model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-research-techlead-20260907T192500Z-US-0131
+- **proof_hash**: 7DB90B2B345D7C4E84F0A7C78E99A662C7FF308271415ECC5F7DFEAB774BE2BE
+- **proof_ttl**: 2026-09-07T20:25:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (discovery MATCH before TTL; research issued)
+- **consumed_discovery_proof_id**: rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131
+- **consumed_discovery_proof_hash**: 7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE
+- **research_id**: R-0116
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: docs/engineering/research.md ## R-0116; docs/product/backlog.md ## US-0131 research_notes; handoffs/po_to_tl.md ## Research handoff — US-0131; docs/engineering/state.md research checkpoint; handoffs/resume_brief.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh tech-lead for /architecture (BUG-0006). Do NOT execute architecture in-band. Do NOT spawn sprint-plan. Do NOT work US-0132. Do NOT spawn architecture from research.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (research PASS; awaiting architecture)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: research
+- **stop_reason**: completed (research PASS; decision_gate=false)
+- **next_phase**: architecture
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+architecture
+
+---
+
+# Resume Brief — US-0131 sovereign-critic PASS → research (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: spec
+- **last_completed_phase**: discovery + sovereign-critic
+- **intended_resume_phase**: research
+- **next_scheduled_phase**: research
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: sovereign-critic PASS (tech-lead / composer-2.5-fast) after discovery PASS (po)
+- **wall_clock**: 2026-09-07T19:20:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **decision_gate**: false
+- **degraded_mode**: false
+- **fresh_context_marker**: critic-US0131-discovery-20260907T192000Z-fresh
+- **model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **producer_fresh_context_marker**: po-US0131-discovery-20260907T191500Z-fresh
+- **runtime_proof_id**: rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131
+- **proof_hash**: 7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE
+- **proof_ttl**: 2026-09-07T20:15:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID (MATCH before TTL)
+- **finding_ids**: us0131dsc-challenger-001,us0131dsc-architect-002,us0131dsc-subtractor-003
+- **research_stub**: expect R-0116 (tech-lead allocates; do not extend R-0115)
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl (us0131dsc-*); docs/engineering/state.md sovereign-critic + discovery checkpoints; docs/product/vision.md ## Discovery Notes — US-0131; docs/product/backlog.md ## US-0131; handoffs/po_to_tl.md ## Discovery handoff — US-0131
+- **stop_condition**: Orchestrator MUST Task-spawn fresh tech-lead for /research (BUG-0006). Do NOT execute research in-band. Do NOT spawn architecture. Do NOT work US-0132. Do NOT spawn research from critic.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (discovery + sovereign-critic PASS; awaiting research)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic (reviewed discovery)
+- **stop_reason**: completed (sovereign-critic PASS)
+- **next_phase**: research
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+research
+
+---
+# Resume Brief — US-0131 discovery PASS → research (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: spec
+- **last_completed_phase**: discovery
+- **intended_resume_phase**: research
+- **next_scheduled_phase**: research
+- **next_scheduled_role**: tech-lead
+- **resolution_source**: discovery PASS (po) — handoff for /research
+- **wall_clock**: 2026-09-07T19:15:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **verdict**: PASS
+- **decision_gate**: false
+- **fresh_context_marker**: po-US0131-discovery-20260907T191500Z-fresh
+- **model_id**: composer-2.5
+- **runtime_proof_id**: rp-auto-20260907-us0131-discovery-po-20260907T191500Z-US-0131
+- **proof_hash**: 7BC1124AE3DE20960D42D6FE750B9A9F4412B42D20798245BA452C1573BE83AE
+- **proof_ttl**: 2026-09-07T20:15:00Z
+- **research_stub**: expect R-0116 (tech-lead allocates; do not extend R-0115)
+- **sibling_out_of_scope**: US-0132
+- **status**: OPEN (US-0045 — do NOT flip DONE)
+- **evidence_ref**: docs/product/vision.md ## Discovery Notes — US-0131; docs/product/backlog.md ## US-0131; handoffs/po_to_tl.md ## Discovery handoff — US-0131; docs/engineering/state.md discovery checkpoint; handoffs/archive/po-to-tl-pack-20260907.md; handoffs/archive/po-to-tl-pack-20260907-a.md; docs/engineering/state-archive/state-pack-20260907-d.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh tech-lead for /research (BUG-0006). Do NOT execute research in-band. Do NOT spawn architecture. Do NOT work US-0132.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (discovery PASS; awaiting research)
+- **Sibling OPEN**: **US-0132** (P1) — deferred; out of scope for this segment
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: discovery
+- **stop_reason**: completed (discovery PASS)
+- **next_phase**: research
+- **next_role**: tech-lead
+
+## Intended resume phase
+
+research
+
+---
+# Resume Brief — drain-advance BUG-0016 segment → US-0131 discovery (DEC-0069 / US-0095)
+
+- **orchestrator_run_id**: auto-20260907-us0131
+- **prior_orchestrator_run_id**: auto-20260906-bug0016
+- **story_id**: US-0131
+- **bug_id**: (none)
+- **sprint_id**: (none yet)
+- **delivery_mode**: ultra_lean
+- **resolved_phase_plan**: [spec, plan, build+verify, ship]
+- **reinstatement_mode**: none
+- **memory_layer**: pack
+- **macro_phase**: spec
+- **last_completed_phase**: refresh-context + sovereign-critic (BUG-0016 segment closed)
+- **intended_resume_phase**: discovery
+- **next_scheduled_phase**: discovery
+- **next_scheduled_role**: po
+- **resolution_source**: drain_advance + backlog OPEN selection (priority_then_backlog_order)
+- **wall_clock**: 2026-09-07T19:10:00Z
+- **segment_work_item_kind**: story
+- **backlog_drain_active**: 1
+- **drain_advance_action**: spawned
+- **stories_selected_this_run**: US-0131 (1 of AUTO_BACKLOG_MAX_STORIES=10)
+- **next_eligible_after**: US-0132 (P1 OPEN)
+- **AUTO_FLOW_MODE**: full_autonomy
+- **native_chain_active**: true
+- **native_chain_continuing**: true
+- **CROSS_MODEL_REVIEW**: 1
+- **intake_status**: PASS (do not re-intake; discovery owns next)
+- **evidence_ref**: docs/product/backlog.md ## US-0131; handoffs/resume_brief.md; docs/engineering/state.md
+- **stop_condition**: Orchestrator MUST Task-spawn fresh po for /discovery (BUG-0006). Do NOT execute discovery in-band.
+
+## Current status
+
+- **Active story**: **US-0131** — **OPEN** (intake PASS; awaiting discovery)
+- **Sibling OPEN**: **US-0132** (P1) — deferred until US-0131 segment advances/completes
+- **Prior segment**: BUG-0016 DONE / S0132 closed
+
+## Latest orchestration pointer
+
+- **stop_phase**: refresh-context (prior) → drain-advance
+- **stop_reason**: completed (BUG-0016) + sovereign action=continue (OPEN stories remain)
+- **drain_advance_action**: spawned
+- **next_phase**: discovery
+- **next_role**: po
+
+## Intended resume phase
+
+discovery
+
+---
+# Resume Brief — BUG-0016 sovereign-critic PASS of refresh-context → advance_sovereign_loop (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status DONE — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship (terminal)
+- **last_completed_phase**: sovereign-critic (role=tech-lead; reviewed refresh-context / curator)
+- **intended_resume_phase**: (none — segment_closed; critic PASS)
+- **next_scheduled_phase**: advance_sovereign_loop (orchestrator; no OPEN drain target)
+- **next_scheduled_role**: (orchestrator)
+- **wall_clock**: 2026-09-07T19:05:30Z
+- **fresh_context_marker**: critic-BUG0016-refresh-context-20260907T190530Z-fresh
+- **producer_fresh_context_marker**: cur-BUG0016-refresh-context-20260907T184000Z-fresh
+- **verdict**: PASS
+- **blocking_count**: 0
+- **anti_slop_aggregate**: 10
+- **degraded_mode**: false
+- **critic_model_id**: composer-2.5-fast
+- **producer_model_id**: composer-2.5
+- **segment_closed**: true
+- **acceptance_L181**: [x] BUG-0016 (CONFIRMED)
+- **queue_status**: released
+- **finding_ids**: b0016rc-challenger-001, b0016rc-architect-002, b0016rc-subtractor-003
+- **runtime_proof_id**: rp-auto-20260906-bug0016-refresh-context-curator-20260907T184000Z-BUG-0016
+- **proof_hash**: 37D590EC1106E43F228040ED35446D1F051945EF22E6260A865795FE9E36C3F5
+- **proof_ttl**: 2026-09-07T19:40:00Z
+- **proof_consume**: RUNTIME_PROOF_VALID @ 2026-09-07T19:05:30Z
+- **drain_advance_action**: not_applicable
+- **next_eligible_open_story**: none
+- **sibling_boundary**: BUG-0015 DONE preserved
+- **evidence_ref**: handoffs/sovereign_critic_findings.jsonl; docs/engineering/state.md; sprints/S0132/summary.md
+- **stop_condition**: STOP after sovereign-critic PASS. Critic does NOT spawn drain/PO/refresh. Orchestrator owns advance_sovereign_loop.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **DONE** (segment closed; refresh-context critic PASS)
+- **Sprint**: **S0132** — RELEASED / REFRESH_CONTEXT_PASS / critic PASS
+- **Last phase**: sovereign-critic PASS (of refresh-context)
+- **Portfolio**: 0 OPEN stories / 0 OPEN bugs
+
+## Latest orchestration pointer
+
+- **stop_phase**: sovereign-critic
+- **stop_reason**: completed
+- **segment_closed**: true
+- **AUTO_BACKLOG_DRAIN**: 1
+- **drain_terminated**: true (no_open_stories)
+- **AUTO_SOVEREIGN**: 1 / SOVEREIGN_GOAL_MODE=goal_convergence
+- **next_operator_action**: orchestrator `advance_sovereign_loop(orchestrator_run_id='auto-20260906-bug0016')` (no OPEN drain)
+
+---
+# Resume Brief — BUG-0016 refresh-context PASS → segment complete (DEC-0069)
+
+- **orchestrator_run_id**: auto-20260906-bug0016
+- **bug_id**: BUG-0016 (Status DONE — authority docs/product/backlog.md)
+- **story_id**: BUG-0016
+- **sprint_id**: S0132
+- **delivery_mode**: ultra_lean
+- **macro_phase**: ship (terminal)
+- **last_completed_phase**: refresh-context (role=curator)
+- **intended_resume_phase**: (none — segment_closed)
+- **next_scheduled_phase**: (segment complete)
+- **next_scheduled_role**: (orchestrator — critic when Task available, then sovereign-loop advance)
+- **wall_clock**: 2026-09-07T18:40:00Z
+- **fresh_context_marker**: cur-BUG0016-refresh-context-20260907T184000Z-fresh
+- **verdict**: REFRESH_CONTEXT_PASS
+- **segment_closed**: true
+- **acceptance_L181**: [x] BUG-0016
+- **queue_status**: released
+- **release_notes_ref**: handoffs/releases/S0132-release-notes.md
+- **closure_verification_ref**: sprints/S0132/closure-verification.md
+- **retrospective_ref**: docs/engineering/sovereign-memory/retrospectives/S0132.md
+- **triad_pack_ref**: docs/engineering/state-archive/state-pack-20260907.md; docs/engineering/state-archive/state-pack-20260907-a.md
+- **harness**: Pass:851 / Fail:0 @ 2026-09-06T20:46:57Z (not re-run)
+- **blocking_findings**: 0
+- **runtime_proof_id**: rp-auto-20260906-bug0016-refresh-context-curator-20260907T184000Z-BUG-0016
+- **proof_hash**: 37D590EC1106E43F228040ED35446D1F051945EF22E6260A865795FE9E36C3F5
+- **proof_ttl**: 2026-09-07T19:40:00Z
+- **invocation**: operator /refresh-context after NATIVE_CHAIN_UNAVAILABLE
+- **sibling_boundary**: BUG-0015 DONE preserved
+- **next_eligible_open_story**: none
+- **drain_advance_action**: not_applicable
+- **evidence_ref**: docs/engineering/state.md; handoffs/resume_brief.md; sprints/S0132/summary.md; docs/engineering/decisions.md; docs/engineering/sovereign-memory/retrospectives/S0132.md; docs/engineering/state-archive/state-pack-20260907.md
+- **stop_condition**: STOP after /refresh-context PASS. Curator does NOT spawn critic or drain-advance. Portfolio 0 OPEN.
+
+## Current status
+
+- **Active bug**: **BUG-0016** — **DONE** (segment closed at refresh-context)
+- **Sprint**: **S0132** — RELEASED / REFRESH_CONTEXT_PASS
+- **Last phase**: refresh-context PASS
+- **Portfolio**: 0 OPEN stories / 0 OPEN bugs
+
+## Latest orchestration pointer
+
+- **stop_phase**: refresh-context
+- **stop_reason**: completed
+- **segment_closed**: true
+- **native_chain_active**: false (Task usage gate)
+- **AUTO_BACKLOG_DRAIN**: 1
+- **drain_terminated**: true (no_open_stories)
+- **AUTO_SOVEREIGN**: 1 / SOVEREIGN_GOAL_MODE=goal_convergence
+- **next_operator_action**: optional /auto when Task available (critic + sovereign advance); or leave portfolio empty
+
+
+### goal_progress
+
+`json
+{
+  "goal_progress": {
+    "blocked_by": [
+      "CONVERGENCE_OPEN_STORIES_REMAIN"
+    ],
+    "conjuncts": {
+      "backlog_clear": {
+        "reason_code": "CONVERGENCE_OPEN_STORIES_REMAIN",
+        "skipped": false,
+        "status": "fail"
+      },
+      "critic_resolved": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "ledger_clean": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      },
+      "smoke_green": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "zero_deferrals": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      }
+    },
+    "converged": false,
+    "evaluated_at": "2026-09-07T18:45:37.000Z",
+    "goal_source": "vision_derived",
+    "goal_text": "AI coding assistants in Cursor lose context across sessions, produce fragmented work without structure, and lack a repeatable process for turning ideas into shipped software. Teams and solo developers face: \u2014 cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source). \u2014 **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) \u2014 hash for baseline stability.",
+    "mode": "goal_convergence",
+    "orchestrator_run_id": "auto-20260906-bug0016",
+    "schema_version": 1,
+    "unmet_conditions": [
+      "backlog has open stories",
+      "ledger_disabled_skip"
+    ]
+  }
+}
+`
+
+## Intended resume phase
+
+(none — segment_closed; no OPEN backlog item)
+
+---
 ﻿# Resume Brief — BUG-0016 closure PASS → refresh-context (DEC-0069)
 
 - **orchestrator_run_id**: auto-20260906-bug0016
@@ -1185,6 +2740,162 @@ esearch
 - sprint_id=(none)
 - orchestrator_run_id=cursor-20260906-BUG0015-0016-intake
 - intake_boundary_utc=2026-09-06T13:35:00Z
+
+### goal_progress
+
+```json
+{
+  "goal_progress": {
+    "blocked_by": [
+      "CONVERGENCE_OPEN_STORIES_REMAIN"
+    ],
+    "conjuncts": {
+      "backlog_clear": {
+        "reason_code": "CONVERGENCE_OPEN_STORIES_REMAIN",
+        "skipped": false,
+        "status": "fail"
+      },
+      "critic_resolved": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "ledger_clean": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      },
+      "smoke_green": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "zero_deferrals": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      }
+    },
+    "converged": false,
+    "evaluated_at": "2026-09-07T18:40:32.000Z",
+    "goal_source": "vision_derived",
+    "goal_text": "AI coding assistants in Cursor lose context across sessions, produce fragmented work without structure, and lack a repeatable process for turning ideas into shipped software. Teams and solo developers face: \u2014 cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source). \u2014 **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) \u2014 hash for baseline stability.",
+    "mode": "goal_convergence",
+    "orchestrator_run_id": "auto-20260906-bug0016",
+    "schema_version": 1,
+    "unmet_conditions": [
+      "backlog has open stories",
+      "deferral_register_not_yet_deployed",
+      "ledger_disabled_skip"
+    ]
+  }
+}
+```
+
+
+### goal_progress
+
+```json
+{
+  "goal_progress": {
+    "blocked_by": [
+      "CONVERGENCE_OPEN_STORIES_REMAIN"
+    ],
+    "conjuncts": {
+      "backlog_clear": {
+        "reason_code": "CONVERGENCE_OPEN_STORIES_REMAIN",
+        "skipped": false,
+        "status": "fail"
+      },
+      "critic_resolved": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "ledger_clean": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      },
+      "smoke_green": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "zero_deferrals": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      }
+    },
+    "converged": false,
+    "evaluated_at": "2026-09-07T18:43:09.000Z",
+    "goal_source": "vision_derived",
+    "goal_text": "AI coding assistants in Cursor lose context across sessions, produce fragmented work without structure, and lack a repeatable process for turning ideas into shipped software. Teams and solo developers face: \u2014 cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source). \u2014 **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) \u2014 hash for baseline stability.",
+    "mode": "goal_convergence",
+    "orchestrator_run_id": "auto-20260906-bug0016",
+    "schema_version": 1,
+    "unmet_conditions": [
+      "backlog has open stories",
+      "deferral_register_not_yet_deployed",
+      "ledger_disabled_skip"
+    ]
+  }
+}
+```
+
+
+### goal_progress
+
+```json
+{
+  "goal_progress": {
+    "blocked_by": [
+      "CONVERGENCE_OPEN_STORIES_REMAIN"
+    ],
+    "conjuncts": {
+      "backlog_clear": {
+        "reason_code": "CONVERGENCE_OPEN_STORIES_REMAIN",
+        "skipped": false,
+        "status": "fail"
+      },
+      "critic_resolved": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "ledger_clean": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      },
+      "smoke_green": {
+        "reason_code": null,
+        "skipped": false,
+        "status": "pass"
+      },
+      "zero_deferrals": {
+        "reason_code": null,
+        "skipped": true,
+        "status": "skip"
+      }
+    },
+    "converged": false,
+    "evaluated_at": "2026-09-07T18:45:04.000Z",
+    "goal_source": "vision_derived",
+    "goal_text": "AI coding assistants in Cursor lose context across sessions, produce fragmented work without structure, and lack a repeatable process for turning ideas into shipped software. Teams and solo developers face: \u2014 cache read vs cache creation vs ordinary input tokens (see **`R-0057`** Anthropic source). \u2014 **`SECURITY_REVIEW`**, materialized phase plan, resume anchor) \u2014 hash for baseline stability.",
+    "mode": "goal_convergence",
+    "orchestrator_run_id": "auto-20260906-bug0016",
+    "schema_version": 1,
+    "unmet_conditions": [
+      "backlog has open stories",
+      "deferral_register_not_yet_deployed",
+      "ledger_disabled_skip"
+    ]
+  }
+}
+```
+
 ## Prior orchestration pointer
 
 ---

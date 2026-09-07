@@ -649,6 +649,30 @@ ARCH_LINKAGE_PAIRS: tuple[tuple[str, str], ...] = (
     ),
 )
 
+# US-0131 additive: host-neutral runtime config surfaces.
+US0131_PAIRS: tuple[tuple[str, str], ...] = (
+    (
+        "scripts/host_runtime_config_lib.py",
+        "template/scripts/host_runtime_config_lib.py",
+    ),
+    (
+        ".its-magic/config.example.json",
+        "template/.its-magic/config.example.json",
+    ),
+    (
+        "tests/us0131_contract_test.py",
+        "template/tests/us0131_contract_test.py",
+    ),
+    (
+        "docs/engineering/runbook.md",
+        "template/docs/engineering/runbook.md",
+    ),
+    (
+        "docs/engineering/context/installer-owned-paths.manifest",
+        "template/docs/engineering/context/installer-owned-paths.manifest",
+    ),
+)
+
 SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "intake": INTAKE_TEMPLATE_PAIRS,
     "caveman-compress": CAVEMAN_COMPRESS_PAIRS,
@@ -677,6 +701,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
     "arch-linkage": ARCH_LINKAGE_PAIRS,
     "bug-0015": BUG0015_PAIRS,
     "bug-0016": BUG0016_PAIRS,
+    "us-0131": US0131_PAIRS,
     "all": (
         INTAKE_TEMPLATE_PAIRS
         + CAVEMAN_COMPRESS_PAIRS
@@ -704,6 +729,7 @@ SCOPES: dict[str, tuple[tuple[str, str], ...]] = {
         + ARCH_LINKAGE_PAIRS
         + BUG0015_PAIRS
         + BUG0016_PAIRS
+        + US0131_PAIRS
     ),
 }
 
